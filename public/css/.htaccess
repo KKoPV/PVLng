@@ -1,0 +1,3 @@
+RewriteEngine On
+
+RewriteRule ^(.*\.css)$ css.php?$1 [L,QSA]

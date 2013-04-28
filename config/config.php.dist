@@ -1,0 +1,63 @@
+<?php
+/**
+ * Central configuration
+ *
+ * Copy this file to config/config.php
+ *
+ * 1. Change your database credentials
+ *
+ * 2. Generate administrator account on
+ *    http://your.domain.here/adminpass
+ *
+ * Paste the code snippet afterwards below
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2013 Knut Kohl
+ * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version     $Id$
+ */
+return array(
+
+	/**
+	 * 1. Change the database credentials for your needs
+	 */
+	'Database' => array(
+		'Host'     => 'localhost',
+		'Username' => 'root',
+		'Password' => '',
+		'Database' => ''
+	),
+
+	/**
+	 * 2. Protect your installation.
+	 *
+	 * Call
+	 *
+	 * 	  http://your.domain.here/adminpass
+	 *
+	 * to setup your administrator account
+	 */
+	'Admin' => array(
+		'User'     => '',
+		'Password' => ''
+	),
+
+	/**
+	 * Default language, "en" or "de"
+	 *
+	 * Will be overwritten by browsers accept language settings if exists
+	 */
+	'Language' => 'en',
+
+	/**
+	 * Defaults, no need to change
+	 *
+	 * Login cookie settings for private installation
+	 */
+	'Cookie' => array(
+		'Name'     => 'PVLng',
+		'Lifetime' => 0, // Session only, default
+#		'Lifetime' => 24*60*60 * 7, // 7 days (in seconds)
+	),
+
+);

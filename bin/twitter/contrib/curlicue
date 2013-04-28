@@ -1,0 +1,153 @@
+#!/bin/sh
+
+# Curlicue - an OAuth wrapper for curl
+#
+# Copyright © 2010 Decklin Foster <decklin@red-bean.com>
+# Please see README for usage information and LICENSE for license.
+
+# Because HTTP responses from the OAuth "dance" will be percent-encoded,
+# and we want to round-trip this data, we require that credentials files
+# are also percent-encoded. Therefore, no decoding is done here. $1 is
+# the name of another function that processes each pair (as two args).
+
+load_cred_file() {
+    foreach_query_pair parse_cred "$(cat "$1" 2>/dev/null)"
+}
+
+foreach_query_pair() {
+    local IFS='&'
+    for i in $2; do
+        $1 "${i%%=*}" "${i#*=}"
+    done
+}
+
+# This list is tiring, but we can't just let random files set any old
+# variable. The ones that don't start with oauth_ are extensions from
+# one provider or another.
+
+parse_cred() {
+    case "$1" in
+        oauth_consumer_key) oauth_consumer_key="$2";;
+        oauth_consumer_secret) oauth_consumer_secret="$2";;
+        oauth_token) oauth_token="$2";;
+        oauth_token_secret) oauth_token_secret="$2";;
+        user_id) user_id="$2";;
+        screen_name) screen_name="$2";;
+        application_name) application_name="$2";;
+    esac
+}
+
+# This is incredibly inefficient if printf is not a builtin. I'm not
+# sure if there's a good way to do it without passing the buck.
+
+url_encode() {
+    string="$1"
+    while [ "$string" ]; do
+        case "$string" in
+            [A-Za-z0-9._~-]*) printf '%c' "$string";;
+            *) printf '%%%X' "'$string";;
+        esac
+        string="${string#?}"
+    done
+    echo
+}
+
+quote_vals() {
+    sed 's/=\(.*\)/="\1"/'
+}
+
+echo_pair() {
+    echo "$1=$2"
+}
+
+join_params() {
+    paste -s -d '&' - | sed "s/&/$1/g"
+}
+
+# The first four values come from this script, so they need to be
+# percent-encoded. (Never mind that e.g. "1.0" is obviously fine... some
+# day it might be "3.0~beta2".) The others are read in from form-encoded
+# files or parameters, so they should *not* be encoded again.
+
+mk_params() {
+    for i in \
+        oauth_version="$(url_encode "1.0")" \
+        oauth_signature_method="$(url_encode "HMAC-SHA1")" \
+        oauth_timestamp="$(url_encode "$oauth_timestamp")" \
+        oauth_nonce="$(url_encode "$oauth_nonce")" \
+        oauth_consumer_key="$oauth_consumer_key" \
+        ${oauth_token:+oauth_token="$oauth_token"} \
+        $(foreach_query_pair echo_pair "$extra_params") \
+        $(foreach_query_pair echo_pair "$1")
+    do
+        echo "$i"
+    done | sort
+}
+
+# This is bad; it leaks the secret on the command line. The right thing
+# would be to use -passin, but it doesn't seem to affect -hmac.
+
+hmac_sha1() {
+    printf '%s' "$2" | openssl dgst -sha1 -hmac "$1" -binary | openssl base64
+}
+
+# Here's where we start.
+
+method=GET
+oauth_timestamp="$(date +%s)"
+oauth_nonce="$(openssl rand -base64 12)"
+
+while getopts 'e:f:p:vu:' OPTION; do
+    case $OPTION in
+        e) eval "echo \"$OPTARG\""; exit 0;;
+        f) load_cred_file "$OPTARG"; loaded=1;;
+        p) extra_params="$OPTARG";;
+        u) echo "$(url_encode "$OPTARG")"; exit 0;;
+        v) verbose=1;;
+        *) echo "Unknown option: $OPTION"; exit 2;;
+    esac
+done
+shift $(($OPTIND-1))
+
+# The remaining args in $@ go directly to curl. Fools that we are, we
+# attempt to parse them here. Only one URL is supported.
+
+for i; do
+    case "$prev" in
+        -d|--data) url_params="$i";;
+        -X) method="$i";;
+    esac
+    case "$i" in
+        -d|--data) method=POST;;
+        http*\?*) url="${i%%\?*}"; url_params="${i#*\?}";;
+        http*) url="$i";;
+    esac
+    prev="$i"
+done
+
+if [ -z "$loaded" ]; then
+    cropped_url="${url#*://}"
+    host="${cropped_url%%/*}"
+    load_cred_file "$HOME/.curlicue/$host"
+fi
+
+if [ -z "$oauth_consumer_key" ]; then
+    echo "Couldn't load a consumer key! Exiting." 1>&2
+    exit 1
+fi
+
+# This is where the magic happens.
+
+params="$(mk_params "$url_params" | join_params '&')"
+base_string="$method&$(url_encode "$url")&$(url_encode "$params")"
+signing_key="$oauth_consumer_secret&$oauth_token_secret"
+oauth_signature="$(hmac_sha1 "$signing_key" "$base_string")"
+sig_params="oauth_signature=$(url_encode "$oauth_signature")"
+auth_header="$(mk_params "$sig_params" | quote_vals | join_params ', ')"
+
+if [ "$verbose" ]; then
+    echo "Base string: $base_string" 1>&2
+    echo "Authorization: OAuth $auth_header" 1>&2
+fi
+
+curl -H "Authorization: OAuth $auth_header" "$@"

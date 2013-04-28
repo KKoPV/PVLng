@@ -1,0 +1,102 @@
+##############################################################################
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2013 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     $Id$
+##############################################################################
+
+##############################################################################
+### PVOutput System Id
+### Settings > Registered Systems : "System Id"
+### required
+##############################################################################
+SYSTEMID      ""
+
+##############################################################################
+### PVOutput System status interval in minutes
+### Settings > Registered Systems > [Edit] > Live Settings > Status Interval
+### (5|10|15), required
+##############################################################################
+#INTERVAL      "5"
+#INTERVAL      "10"
+#INTERVAL      "15"
+
+##############################################################################
+### Additional data to post to PVOutput, available are v1 ... v12
+### see http://pvoutput.org/help.html#api-addstatus
+###
+### - Define for each parameter the GUID to query from
+### - Define the parameter to query, defaults to "data:avg"
+### - Define the factor to multiply the gattered value with, defaults to 1
+###   (see FACTOR_1 for example)
+###
+### Please refer to the documenation "Scripts >> PVOutput" for details
+###
+### At least one of v1 .. v4 must be filled to update PVOutput!
+##############################################################################
+### v1  - Energy Generation
+### Inverter today
+GUID_1        ""
+CHANNEL_1     "today:max"
+### If your today is in kilo watt hours, multiply with 1000!
+### PVOutput expects watt hours!
+FACTOR_1      1000
+
+### v2  - Power Generation
+### Inverter power
+GUID_2        ""
+CHANNEL_2     "pac:avg"
+FACTOR_2      1
+
+### v3	- Energy Consumption
+GUID_3        ""
+CHANNEL_3     "data:avg"
+
+### v4	- Power Consumption
+### Consumption
+GUID_4        ""
+CHANNEL_4     "data:avg"
+
+### v5	- Temperature
+### Inverter temperature
+GUID_5        ""
+CHANNEL_5     "data:avg"
+
+### v6	- Voltage
+GUID_6        ""
+CHANNEL_6     "data:avg"
+
+##############################################################################
+### Values 7 .. 12 are available in donation mode
+### http://pvoutput.org/help.html#donations
+##############################################################################
+
+### v7	- Extended Value 1
+### Irradiation
+GUID_7        ""
+#CHANNEL_7     "irradiation:avg"
+CHANNEL_7     "data:avg"
+
+### v8	- Extended Value 2
+### Module temperature
+GUID_8        ""
+#CHANNEL_8     "tempm:avg"
+CHANNEL_8     "data:avg"
+
+### v9	- Extended Value 3
+### Outside temperature
+GUID_9        ""
+#CHANNEL_9     "tempo:avg"
+CHANNEL_9     "data:avg"
+
+### v10	- Extended Value 4
+GUID_10       ""
+CHANNEL_10    "data:avg"
+
+### v11	- Extended Value 5
+GUID_11       ""
+CHANNEL_11    "data:avg"
+
+### v12	- Extended Value 6
+GUID_12       ""
+CHANNEL_12    "data:avg"

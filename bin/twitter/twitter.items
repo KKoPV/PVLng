@@ -1,0 +1,101 @@
+##############################################################################
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2013 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     $Id$
+##############################################################################
+
+##############################################################################
+### Actual power
+##############################################################################
+function twitter_power {
+  url="$PVLngURL1/$1.tsv?period=last"
+  log 1 "$url"
+
+  ### skip attribtues line, get last line, get 2nd value
+  value=$($curl $url | tail -n+2 | tail -n1 | cut -f2)
+  log 1 "=> $value"
+
+  echo $value
+}
+
+##############################################################################
+### Average power over the last $1 minutes (e.g. 60 for last hour)
+##############################################################################
+function twitter_power_avg {
+  url="$PVLngURL1/$2.tsv?start=-${1}minutes&period=${1}minutes"
+  log 1 "$url"
+
+  ### skip attribtues line, get last line, get 2nd value
+  value=$($curl $url | tail -n+2 | tail -n1 | cut -f2)
+  log 1 "=> $value"
+
+  echo $value
+}
+
+##############################################################################
+### Max. power of today
+##############################################################################
+function twitter_power_max {
+  url="$PVLngURL1/$1.tsv"
+  log 1 "$url"
+
+  ### skip attribtues line
+  $($curl $url | tail -n+2 >$TMPFILE)
+
+  max=0
+  while read line; do
+    value=$(echo "$line" | cut -f2)
+    test $value -gt $max && max=$value
+  done < $TMPFILE
+
+  log 1 "=> $max"
+  echo $max
+}
+
+##############################################################################
+### Production today in kWh
+##############################################################################
+function twitter_today {
+  url="$PVLngURL1/$1.tsv"
+  log 1 "$url"
+
+  ### skip attribtues line, get last line, get 2nd value
+  value=$($curl $url | tail -n+2 | tail -n1 | cut -f2)
+  log 1 "=> $value"
+
+  echo $value
+}
+
+##############################################################################
+### Overall production in MWh
+##############################################################################
+function twitter_overall {
+  url="$PVLngURL1/$1.tsv?absolute=1"
+  log 1 "$url"
+
+  ### skip attribtues line, get last line, get 2nd value
+  value=$($curl $url | tail -n+2 | tail -n1 | cut -f2)
+  log 1 "=> $value"
+
+  echo $value
+}
+
+##############################################################################
+### Today working hours in hours :-)
+##############################################################################
+function twitter_today_working_hours {
+  url="$PVLngURL1/$1.tsv"
+  log 1 "$url"
+
+  $($curl $url >$TMPFILE)
+
+  ### skip attribtues line, get first line, get 1st value
+  min=$(cat $TMPFILE | tail -n+2 | head -n1 | cut -f1)
+  ### skip attribtues line, get last line, get 1st value
+  max=$(cat $TMPFILE | tail -n+2 | tail -n1 | cut -f1)
+  log 1 "=> $min - $max"
+
+  ### to hours
+  echo "scale=3; ($max - $min) / 3600" | bc -l
+}

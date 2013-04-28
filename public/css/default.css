@@ -1,0 +1,177 @@
+#header,
+#content,
+#footer {
+	font-family: Verdana, Arial, sans-serif;
+}
+
+#content {
+    font-size: 90%;
+}
+
+hr {
+	height: 0;
+	border-top: solid gray 1px;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:link, a:visited, a:focus, a:hover, a:active {
+	color: rgb(204, 102, 17);
+}
+
+a:hover, a:active {
+    text-decoration: underline;
+}
+
+.toolbar a {
+	color: black;
+}
+
+/* Tooltips
+--------------------------------------------------------------------------- */
+.tip {
+	cursor: help;
+}
+
+.tipid {
+	display: none;
+}
+
+img.tip {
+	border: 0;
+}
+
+#tiptip_content {
+	font-size: 90%;
+	text-shadow: none;
+	padding: 0.5em 1em;
+}
+
+/* Chart-Tooltips
+--------------------------------------------------------------------------- */
+.chart-tooltips {
+	width: auto !important;
+	padding: 0.3em !important;
+	font-family: Verdana, Arial, sans-serif !important;
+	font-size: 85% !important;
+	background-color: rgb(255,255,200) !important;
+}
+
+/* Header
+--------------------------------------------------------------------------- */
+#header {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	height: 5.5em;
+	border-bottom: dotted 1px gray;
+}
+
+#title1 {
+	font-size: 130%;
+	font-weight: bold;
+	font-style: italic;
+	text-shadow: #AAA 0.1em 0.1em 0.1em;
+	color: black;
+}
+
+/* Footer
+--------------------------------------------------------------------------- */
+#footer {
+	margin-top: 1em;
+	border-top: dotted 1px gray;
+	padding-top: 0.5em;
+}
+
+#powered {
+	margin-top: 1em;
+}
+
+#powered a {
+	margin-left: 0.3em;
+}
+
+/* Other
+--------------------------------------------------------------------------- */
+.ui-textfield {
+	font: inherit;
+	color: inherit;
+	text-align: inherit;
+	outline: none;
+}
+
+.ui-button-text {
+	color: black;
+}
+
+input[type=text],
+input[type=password],
+select {
+	padding: 0.3em 0.2em;
+	background-color: white;
+}
+
+.s {
+	font-size: small;
+}
+
+.b {
+	font-weight: bold;
+}
+
+.i {
+	font-style: italic;
+}
+
+.l {
+	text-align: left;
+}
+
+.c {
+	text-align: center;
+}
+
+.r {
+	text-align: right;
+}
+
+.fl {
+	float: left;
+}
+
+.fr {
+	float: right;
+}
+
+form {
+	display: inline;
+}
+
+.p10, .ten-cols {
+	width: 10%;
+}
+
+.p14, .seven-cols {
+	width: 14%;
+}
+
+.p12_5, .eight-cols {
+	width: 12.5%;
+}
+
+.p20, .five-cols {
+	width: 20%;
+}
+
+.p25, .four-cols {
+	width: 25%;
+}
+
+.p33, .three-cols {
+	width: 33%;
+}
+
+.p50, .two-cols {
+	width: 50%;
+}
