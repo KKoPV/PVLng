@@ -1,0 +1,46 @@
+SHELL = /bin/sh
+CC    = gcc
+
+FLAGS        = -std=gnu99 -Isrc
+CFLAGS       = -pedantic -Wall -Wextra -march=native -ggdb3
+DEBUGFLAGS   = -O0 -D _DEBUG
+RELEASEFLAGS = -O2 -D NDEBUG -combine -fwhole-program
+
+TARGET  = S0
+SOURCES = src/S0.c
+HEADERS = src/S0.h
+COMMON  =
+OBJECTS = $(SOURCES:.c=.o)
+
+PREFIX = $(DESTDIR)/usr/local
+BINDIR = $(PREFIX)/bin
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS) $(COMMON)
+	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -o $(TARGET) $(OBJECTS)
+
+again: distclean all
+
+release: $(SOURCES) $(HEADERS) $(COMMON)
+	$(CC) $(FLAGS) $(CFLAGS) $(RELEASEFLAGS) -o $(TARGET) $(SOURCES)
+
+install: release
+	install -D -s $(TARGET) $(BINDIR)/$(TARGET)
+
+uninstall:
+	-rm $(BINDIR)/$(TARGET)
+
+clean:
+	-rm -f $(OBJECTS)
+
+distclean: clean
+	-rm -f $(TARGET)
+
+.SECONDEXPANSION:
+
+$(foreach OBJ,$(OBJECTS),$(eval $(OBJ)_DEPS = $(shell gcc -MM $(OBJ:.o=.c) | sed s/.*://)))
+%.o: %.c $$($$@_DEPS)
+	$(CC) $(FLAGS) $(CFLAGS) $(DEBUGFLAGS) -c -o $@ $<
+
+.PHONY : CTAGS GTAGS all again release install uninstall clean distclean

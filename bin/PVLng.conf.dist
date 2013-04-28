@@ -1,0 +1,25 @@
+##############################################################################
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2013 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     $Id$
+##############################################################################
+
+##############################################################################
+### Host for HTTP API
+##############################################################################
+### If your PVLng installation runs not exclusive on this server, change it
+### to your settings, Port is optional if it is the default (80)
+##############################################################################
+PVLNGHOST     "http://localhost:80"
+
+##############################################################################
+### API key
+##############################################################################
+PVLNGAPIKEY   ""
+
+##############################################################################
+### Common cUrl options
+### More at http://curl.haxx.se/docs/manpage.html
+##############################################################################
+CURLCONNECT   "--connect-timeout 10 --retry 3 --retry-max-time 60"

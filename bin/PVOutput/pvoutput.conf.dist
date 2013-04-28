@@ -1,0 +1,22 @@
+##############################################################################
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2013 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     $Id$
+##############################################################################
+
+##############################################################################
+### Add status URL
+### See http://pvoutput.org/help.html#api-addstatus
+### required
+##############################################################################
+APIURL      "http://pvoutput.org/service/r2/addstatus.jsp"
+
+##############################################################################
+### You API key
+### See Settings > API Settings
+### Your API key is used to update your data automatically,
+### always keep your API key secret. API Access must be enabled
+### required
+##############################################################################
+APIKEY      ""

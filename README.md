@@ -1,4 +1,6 @@
 PVLng
-=====
+=========
 
-Photovoltaic logger next generation
+PhotoVoltaic Logger new generation
+
+Please see http://pvlng.com for details
