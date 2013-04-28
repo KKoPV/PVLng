@@ -131,7 +131,6 @@ define('PVLNG', 'PhotoVoltaic Logger new generation');
 $version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
 define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
-define('PVLNG_VERSION_DESC', $version[2]);
 
 // ---------------------------------------------------------------------------
 // FUNCTIONS
