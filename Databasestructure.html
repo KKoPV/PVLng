@@ -1,0 +1,432 @@
+﻿<html>
+	
+<head>
+	<title>Database structure</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Databasestructure");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Database structure</h1>
+				
+				</div>
+			<div id="topic_header_nav">
+				<a href="Backup.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Contributions.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps7"><span class="rvts7">pvlng_tree</span></p>
+<p class="rvps2"><span class="rvts6">The channel tree is organized in a nested set structure.</span></p>
+<p class="rvps21"><span class="rvts6">"The nested set model is a particular technique for representing nested sets (also known as trees or hierarchies) in relational databases." -- </span><a class="rvts12" href="https://en.wikipedia.org/wiki/Nested_set_model">Wikipedia</a></p>
+<p class="rvps2"><a class="rvts12" href="http://www.evanpetersen.com/item/nested-sets.html">More theory</a></p>
+<div class="rvps42"><table border="1" cellpadding="2" cellspacing="0" style="border-width: 0px;">
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; background-color: #000000; width: 125px; height: 24px;"><p><span class="rvts75">Column</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; background-color: #000000; width: 289px; height: 24px;"><p><span class="rvts75">Type</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; background-color: #000000; width: 265px; height: 24px;"><p><span class="rvts75">Comment</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">id</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned&nbsp;Auto-Increment</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">lft</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">rgt</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">moved</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">tinyint(1) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">entity</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">pvlng_channel -&gt; id</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; width: 125px; height: 24px;"><p><span class="rvts77">guid</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(39)&nbsp;</span><span class="rvts76">NULL</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps7"><span class="rvts7">pvlng_channel</span></p>
+<p class="rvps2"><span class="rvts6">The channels are organized in the tree and based on a channel type.</span></p>
+<div class="rvps42"><table border="1" cellpadding="2" cellspacing="0" style="border-width: 0px;">
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; background-color: #000000; width: 125px; height: 24px;"><p><span class="rvts75">Column</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; background-color: #000000; width: 289px; height: 24px;"><p><span class="rvts75">Type</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; background-color: #000000; width: 265px; height: 24px;"><p><span class="rvts75">Comment</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">id</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned&nbsp;Auto-Increment</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">Unique Id</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">guid</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(39)&nbsp;NULL</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">Unique GUID</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">name</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(255)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">Unique identifier</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">description</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(255)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">Longer description</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">serial</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(30)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">channel</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(30)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">type</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">pvlng_type -&gt; id</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">resolution</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">double [1]</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">unit</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(10)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">meter</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">tinyint(1) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">numeric</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">tinyint(1) unsigned [1]</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">0 for alphanumeric data</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">cost</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">double</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">per unit or unit * h</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">threshold</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">double unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">valid_from</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">double&nbsp;NULL</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">numeric min. acceptable value</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; width: 125px; height: 24px;"><p><span class="rvts77">valid_to</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">double&nbsp;NULL</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">numeric max. acceptable value</span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps7"><span class="rvts7">pvlng_type</span></p>
+<p class="rvps2"><span class="rvts6">Channel types describe common attributes and will be handled by a model.</span></p>
+<div class="rvps42"><table border="1" cellpadding="2" cellspacing="0" style="border-width: 0px;">
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; background-color: #000000; width: 125px; height: 24px;"><p><span class="rvts75">Column</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; background-color: #000000; width: 289px; height: 24px;"><p><span class="rvts75">Type</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; background-color: #000000; width: 265px; height: 24px;"><p><span class="rvts75">Comment</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">id</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">Unique Id</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">name</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(60)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">description</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(255)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">model</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(30)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">unit</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(10)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">childs</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">tinyint(1)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">read</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">tinyint(1) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">write</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">tinyint(1) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">graph</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">tinyint(1) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; width: 125px; height: 24px;"><p><span class="rvts77">icon</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(30)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps7"><span class="rvts7">pvlng_reading_num</span></p>
+<p class="rvps2"><span class="rvts6">The reading tables hold the data for each channel and timestamp.</span></p>
+<p class="rvps2"><span class="rvts6">The timestamp column is plain integer for better indexes.</span></p>
+<div class="rvps42"><table border="1" cellpadding="2" cellspacing="0" style="border-width: 0px;">
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; background-color: #000000; width: 125px; height: 24px;"><p><span class="rvts75">Column</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; background-color: #000000; width: 289px; height: 24px;"><p><span class="rvts75">Type</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; background-color: #000000; width: 265px; height: 24px;"><p><span class="rvts75">Comment</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">id</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">pvlng_channel -&gt; id</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">timestamp</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; width: 125px; height: 24px;"><p><span class="rvts77">data</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">decimal(13,4)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps7"><span class="rvts7">pvlng_reading_str</span></p>
+<div class="rvps42"><table border="1" cellpadding="2" cellspacing="0" style="border-width: 0px;">
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; background-color: #000000; width: 125px; height: 24px;"><p><span class="rvts75">Column</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; background-color: #000000; width: 289px; height: 24px;"><p><span class="rvts75">Type</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; background-color: #000000; width: 265px; height: 24px;"><p><span class="rvts75">Comment</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">id</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78">pvlng_channel -&gt; id</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; width: 125px; height: 24px;"><p><span class="rvts77">timestamp</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-bottom: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">int(10) unsigned</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-bottom: none; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+<tr valign="top">
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; width: 125px; height: 24px;"><p><span class="rvts77">data</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-right: none; border-left: none; width: 289px; height: 24px;"><p><span class="rvts78">varchar(50)</span></p>
+</td>
+<td valign="middle" style="border-width : 1px; border-color : #000000 #000000 #000000 #000000; border-style: solid; border-left: none; width: 265px; height: 24px;"><p><span class="rvts78"><br/></span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps42"><span class="rvts77"><br/></span></p>
+<p class="rvps42"><span class="rvts77"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/help-authoring-tool">Free help authoring environment</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

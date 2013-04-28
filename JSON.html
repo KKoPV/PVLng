@@ -1,0 +1,85 @@
+﻿<html>
+	
+<head>
+	<title>JSON</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("JSON");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>JSON</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="ApplicationProgrammingInterfaceA.html">Application Programming Interface (API)</a> &rsaquo;&rsaquo; <a href="Datareadout.html">Data readout</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="Datareadout.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="Datareadout.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="CSVTSV.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps23"><span class="rvts31">Default</span></p>
+<p class="rvps25"><span class="rvts34">Request</span><br/><span class="rvts34"><br/></span></p>
+<p class="rvps20"><span class="rvts63">http://your.domain.here/api/r1/{GUID}.json</span></p>
+<p class="rvps13"><span class="rvts30"><br/></span></p>
+<p class="rvps25"><span class="rvts34">Result</span><br/><span class="rvts34"><br/></span></p>
+<p class="rvps20"><span class="rvts63">[</span><br/><span class="rvts63"> &nbsp; &nbsp;{</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"counter": 0,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"start": 1365372000,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"end": 1365458400,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"id": 135,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"entity": 19,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"guid": "{GUID}",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"name": "Outside temperature",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"serial": "28CA2307040000E0",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"channel": "temperature",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"description": "",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"resolution": 1,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"cost": 0,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"meter": 0,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"numeric": 1,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"unit": "°C",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"threshold": 5,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"type": "Temperature sensor",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"model": "Sensor",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"childs": 0,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"read": 1,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"write": 1,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"icon": "application_monitor.png",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"consumption": 0,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"costs": 0</span><br/><span class="rvts63"> &nbsp; &nbsp;},</span><br/><span class="rvts63"> &nbsp; &nbsp;{</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"timestamp": 1365372000,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"data": 2</span><br/><span class="rvts63"> &nbsp; &nbsp;},</span><br/><span class="rvts63"> &nbsp; &nbsp;{</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"timestamp": 1365372120,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"data": 1.8125</span><br/><span class="rvts63"> &nbsp; &nbsp;},</span><br/><span class="rvts63"> &nbsp; &nbsp;...</span><br/><span class="rvts63">]</span></p>
+<p class="rvps13"><span class="rvts30"><br/></span></p>
+<p class="rvps23"><span class="rvts31">Full</span></p>
+<p class="rvps25"><span class="rvts34">Request</span><br/><span class="rvts34"><br/></span></p>
+<p class="rvps20"><span class="rvts63">http://your.domain.here/api/r1/{GUID}.json?full=1</span></p>
+<p class="rvps13"><span class="rvts30"><br/></span></p>
+<p class="rvps25"><span class="rvts34">Result</span><br/><span class="rvts34"><br/></span></p>
+<p class="rvps20"><span class="rvts63">[</span><br/><span class="rvts63"> &nbsp; &nbsp;{</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;...</span><br/><span class="rvts63"> &nbsp; &nbsp;}</span><br/><span class="rvts63"> &nbsp; &nbsp;{</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"datetime": "2013-04-08 00:00:00",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"timestamp": 1365372000,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"data": 2,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"min": 2,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"max": 2,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"count": 1,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"timediff": 0,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"consumption": 0</span><br/><span class="rvts63"> &nbsp; &nbsp;},</span><br/><span class="rvts63"> &nbsp; &nbsp;{</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"datetime": "2013-04-08 00:02:00",</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"timestamp": 1365372120,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"data": 1.8125,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"min": 1.8125,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"max": 1.8125,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"count": 1,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"timediff": 0,</span><br/><span class="rvts63"> &nbsp; &nbsp; &nbsp; &nbsp;"consumption": 0</span><br/><span class="rvts63"> &nbsp; &nbsp;},</span><br/><span class="rvts63"> &nbsp; &nbsp;...</span><br/><span class="rvts63">]</span></p>
+<p class="rvps13"><span class="rvts30"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/help-authoring-tool">Create HTML Help, DOC, PDF and print manuals from 1 single source</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

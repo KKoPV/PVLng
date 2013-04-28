@@ -1,0 +1,92 @@
+﻿<html>
+	
+<head>
+	<title>Fixed name for USB device</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("FixednameforUSBdevice");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Fixed name for USB device</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="HowTo.html">HowTo</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="HowTo.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="HowTo.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Backup.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps2"><span class="rvts6">If you have no more a real serial port on your system, you will have to use in most cases a USB-serial adapter.</span></p>
+<p class="rvps2"><span class="rvts6">If you have more than adapter, the device (</span><span class="rvts27">/dev/ttyUSB?</span><span class="rvts6">) assigned to the adapter during boot time is not in every cases the same.</span></p>
+<p class="rvps2"><span class="rvts6">But it is required to have for the PVLng scripts to have always the same device...</span></p>
+<p class="rvps2"><span class="rvts6">No problem with </span><span class="rvts27">udev</span><span class="rvts6">.</span></p>
+<p class="rvps21"><span class="rvts6">"udev is a device manager for the Linux kernel. Primarily, it manages device nodes in /dev. It is the successor of devfs and hotplug, which means that it handles the /dev directory and all user space actions when adding/removing devices, including firmware load." -- </span><a class="rvts12" href="http://en.wikipedia.org/wiki/Udev">Wikipedia</a></p>
+<p class="rvps2"><span class="rvts6">At 1</span><span class="rvts21">st</span><span class="rvts6"> find out information about your device:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ sudo udevadm info --query=all --name=/dev/ttyUSB0</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Look for these lines:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">P: /devices/pci0000:00/0000:00:13.1/usb3/3-2/3-2:1.0/ttyUSB0/tty/ttyUSB0</span><br/><span class="rvts25">...</span><br/><span class="rvts25">N: ttyUSB0</span><br/><span class="rvts25">...</span><br/><span class="rvts25">S: serial/by-id/usb-FTDI_USB_Serial_Converter_FTGCYLSS-if00-port0</span><br/><span class="rvts25">...</span><br/><span class="rvts25">E: </span><span class="rvts71">SUBSYSTEM=tty</span><br/><span class="rvts25">...</span><br/><span class="rvts25">E: </span><span class="rvts72">ID_SERIAL_SHORT=FTGCYLSS</span><br/><span class="rvts25">...</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Choose a (for you :-) meaningful device name.</span></p>
+<p class="rvps2"><span class="rvts6">I use </span><span class="rvts73">usb-ftdi-1</span><span class="rvts6"> because its my only serial adapter, all others are for 1-Wire.</span></p>
+<p class="rvps2"><span class="rvts6">I also played with the idea of </span><span class="rvts27">consumption-watt-meter-s0</span><span class="rvts6"> ...</span></p>
+<p class="rvps19"><span class="rvts7">Create a rules file</span><br/><span class="rvts7"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ echo '</span><span class="rvts71">SUBSYSTEM=="tty"</span><span class="rvts25">, ENV{</span><span class="rvts72">ID_SERIAL_SHORT</span><span class="rvts25">}=="</span><span class="rvts72">FTGCYLSS</span><span class="rvts25">", SYMLINK+="</span><span class="rvts74">usb-ftdi-1</span><span class="rvts25">"' &gt;/etc/udev/rules.d/99-usb-S0.rules</span></p>
+<p class="rvps19"><span class="rvts7">Restart udev</span><br/><span class="rvts7"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ udevadm trigger</span></p>
+<p class="rvps19"><span class="rvts7">Check</span><br/><span class="rvts7"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ ls -al /dev/u*</span><br/><span class="rvts25">lrwxrwxrwx 1 root root &nbsp; &nbsp;7 &nbsp;9. Feb 21:47 /dev/usb-ftdi-1 -&gt; ttyUSB0</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Here you can see, that the adapter is at he moment also </span><span class="rvts27">/dev/ttyUSB0</span></p>
+<p class="rvps2"><span class="rvts6">Put this device name into the channels attribute "</span><a class="rvts16" href="Channel.html#Channel">Channel</a><span class="rvts6">" of your Power</span><span class="rvts6"> sensor</span><span class="rvts6">.</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour/iphone-website-generation">iPhone web sites made easy</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

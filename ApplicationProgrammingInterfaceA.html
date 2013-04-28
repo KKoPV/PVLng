@@ -1,0 +1,90 @@
+﻿<html>
+	
+<head>
+	<title>Application Programming Interface (API)</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("ApplicationProgrammingInterfaceA");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Application Programming Interface (API)</h1>
+				
+				</div>
+			<div id="topic_header_nav">
+				<a href="Operatinginstructions.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Storedata.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps21"><span class="rvts6">"An application programming interface (API) is a protocol intended to be used as an interface by software components to communicate with each other." -- </span><a class="rvts12" href="http://wikipedia/wiki/API">Wikipedia</a></p>
+<p class="rvps13"><span class="rvts6">The API is implemented as a </span><a class="rvts12" href="http://wikipedia.org/wiki/REST">RESTful API</a><span class="rvts6">, so it uses HTTP requests to store and read data. Thus, REST uses HTTP for all four CRUD (Create/Read/Update/Delete) operations.</span></p>
+<p class="rvps13"><span class="rvts6">The following request methods are supported by PVLng:</span></p>
+<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">PUT</span><span class="rvts6"> = create</span></p>
+<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">GET</span><span class="rvts6"> = read</span></p>
+<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Update (</span><span class="rvts27">POST</span><span class="rvts6">) and deletion (</span><span class="rvts27">DELETE</span><span class="rvts6">) of data is </span><span class="rvts26">not</span><span class="rvts6"> supported by this API!</span></p>
+<p class="rvps31"><span class="rvts38">Data storage</span></p>
+<p class="rvps13"><span class="rvts6">For data storage we have two possibilities:</span></p>
+<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Web front end for the master data, like channels and their relationships</span></p>
+<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">HTTP REST API for the operational channel data with HTTP PUT requests</span></p>
+<p class="rvps13"><span class="rvts6">The </span><a class="rvts16" href="Storedata.html">storage API</a><span class="rvts6"> accepts only one parameter "data" and routes it to the requested channel.</span></p>
+<p class="rvps13"><span class="rvts6">By default (load live data) system date and time will be used. The time will be rounded down to the next full minute to align the readings.</span></p>
+<p class="rvps13"><span class="rvts6">The model behind the channel represents the interface to the database.</span></p>
+<p class="rvps31"><span class="rvts38">Data readout</span></p>
+<p class="rvps13"><span class="rvts6">The data readout from the system must be done with HTTP GET requests.</span></p>
+<p class="rvps13"><span class="rvts6">The </span><a class="rvts16" href="Datareadout.html">readout API</a><span class="rvts6"> analyzes the requests, identifies the channel and returns the extracted data.</span></p>
+<p class="rvps13"><span class="rvts6">The model behind the channel provides a defined interface to query data.</span></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour/iphone-website-generation">Free iPhone documentation generator</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

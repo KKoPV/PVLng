@@ -1,0 +1,149 @@
+﻿<html>
+	
+<head>
+	<title>Data readout</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Datareadout1");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Data readout</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="Examples.html">Examples</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="Examples.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="Datastorage.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Inverterefficiency.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps2"><span class="rvts6">If the queried time period (end – start) is less than the aggregation period, the result can be only one line by design.</span></p>
+<p class="rvps2"><span class="rvts6">(Remember the defaults</span><span class="rvts27"> start: 00:00, end: 24:00</span><span class="rvts6">)</span></p>
+<p class="rvps19"><span class="rvts7">Time declarations</span></p>
+<p class="rvps2"><span class="rvts6">Here are some useful examples for "start" and "end" declarations</span><br/><span class="rvts6"><br/></span></p>
+<div class="rvps2"><table width="100%" border="1" cellpadding="5" cellspacing="0" style="border-color: #000000; border-style: solid;">
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 50%;"><p class="rvps2"><span class="rvts67">What</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 97px;"><p class="rvps2"><span class="rvts67">Request as "start" or "end"</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts6">1-Jan this year</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts27">1/1</span><br/><span class="rvts27">first day of this year</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts6">1-Jan of last year</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts27">1/1-1year</span><br/><span class="rvts27">first day of last year</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts6">1</span><span class="rvts66">st</span><span class="rvts6"> day of this month</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts27">first day of this month</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts6">1</span><span class="rvts66">st</span><span class="rvts6"> day of last month</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 97px;"><p class="rvps2"><span class="rvts27">first day of last month</span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps19"><span class="rvts7">Return content type</span></p>
+<p class="rvps2"><span class="rvts26">Get all feed-in power values from today as CSV, so many lines as data records exists</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">As above, but as JSON array of objects</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.json</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">Get only one CSV line of the last stored data record today</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv?period=</span><span class="rvts68">last</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">Get CSV lines of data on daily basis.</span></p>
+<p class="rvps2"><span class="rvts6">Because of the queried time period (00:00 – now), the result will be one line...</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv?period=day</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">Get CSV lines on daily basis, start at begin of the year</span></p>
+<p class="rvps2"><span class="rvts6">This will return one line for each day in the time period.</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv?start=1/1&amp;period=day</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">Get data as above, but on a weekly basis</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv?start=1/1&amp;period=week</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">Get all data for last 7 days</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv?start=-7days</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">Get the monthly data since commissioning</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv?start=0&amp;period=month</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts26">Get CSV lines of data on yearly basis</span></p>
+<p class="rvps2"><span class="rvts6">Because of the queried time period ("1-Jan this year" ... "now" is lower than aggregation period), the result will be one line...</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/{GUID}.csv?start=1/1&amp;period=year</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour">Easily create CHM Help documents</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

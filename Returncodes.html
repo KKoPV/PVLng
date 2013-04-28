@@ -1,0 +1,100 @@
+﻿<html>
+	
+<head>
+	<title>Return codes</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Returncodes");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Return codes</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="ApplicationProgrammingInterfaceA.html">Application Programming Interface (API)</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="ApplicationProgrammingInterfaceA.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="XML.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Examples.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps13"><span class="rvts30">The status code will be doubled into the response header and the response body.</span></p>
+<p class="rvps13"><span class="rvts30">This offers the possibility to analyze either the header or the body to check for success or errors.</span></p>
+<p class="rvps13"><span class="rvts30">For every request the response body will contain further information, especially in case of an error.</span></p>
+<p class="rvps13"><span class="rvts30">The following HTTP status codes are used by the API.</span></p>
+<p class="rvps23"><span class="rvts31">200 - OK</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts30">Read of data was successful</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts30">Data was error free, but not saved.</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts30">Insert data within 1 minute interval will be ignored.</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts30">Not changed Switcher states will be ignored</span></p>
+<p class="rvps23"><span class="rvts31">201 - Created</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts30">Data was successful saved.</span></p>
+<p class="rvps13"><span class="rvts30">On batch loads the response body contains the count of inserted data sets.</span></p>
+<p class="rvps23"><span class="rvts31">400 - Bad Request</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts30">There was a problem reading the data</span></p>
+<p class="rvps13"><span class="rvts30">See response body for details.</span></p>
+<p class="rvps23"><span class="rvts31">401 - Unauthorized</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts30">Missing or wrong API key for PUT requests</span></p>
+<p class="rvps23"><span class="rvts31">405 - Method Not Allowed</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts30">Only PUT / GET are allowed</span></p>
+<p class="rvps23"><span class="rvts31">500 - Internal Server Error</span></p>
+<p class="rvps13"><span class="rvts30">See response body for details.</span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/create-epub-ebooks">Full-featured EPub generator</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

@@ -1,0 +1,126 @@
+﻿<html>
+	
+<head>
+	<title>Channel</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Channel");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Channel</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="DesignConcept.html">Design &amp; Concept</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="DesignConcept.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="Channeltype.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="1Wiresensor.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps2"><span class="rvts6">A channel is the interface of PVLng to the outer world.</span></p>
+<p class="rvps2"><span class="rvts6">Many channels can be based on the same channel type.</span></p>
+<p class="rvps2"><span class="rvts6">Channels are defined in database table </span><span class="rvts27">pvlng_channel</span><span class="rvts6">.</span></p>
+<p class="rvps2"><span class="rvts6">You can </span><span class="rvts26">really</span><span class="rvts6"> delete a channel only, if it is </span><span class="rvts26">not assigned</span><span class="rvts6"> in channel hierarchy!</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps34"><span class="rvts46"></span><br/><span class="rvts49">ATTENTION</span><br/><span class="rvts47"></span><br/><span class="rvts47">If you delete a channel, </span><span class="rvts48">ALL</span><span class="rvts47"> readings will be cleared from database forever (unless you have a backup :-)!</span><br/><span class="rvts47"><br/></span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps19"><span class="rvts7">Characteristics</span></p>
+<p class="rvps32"><a name="ChannelGUID"></a>
+<span class="rvts9">GUID</span></p>
+<p class="rvps2"><span class="rvts6">All channels are accessed by its unique GUID in form of</span><span class="rvts27"> e107-c8b1-d4b4-aaa6-5e56-e003-ea14-4705</span></p>
+<p class="rvps33"><span class="rvts10">Direct channels</span></p>
+<p class="rvps2"><span class="rvts6">The GUID is assigned during channel creation on channel level.</span></p>
+<p class="rvps2"><span class="rvts6">Such a channel can be assigned to more than one group in during </span><a class="rvts16" href="Channelgrouping.html">channel grouping</a><span class="rvts6"> and must be found uniquely independent from its position.</span></p>
+<p class="rvps2"><span class="rvts6">For example each inverter have a "Actual power" channel (based on the "Power sensor" channel type).</span></p>
+<p class="rvps33"><span class="rvts10">Grouping channels</span></p>
+<p class="rvps2"><span class="rvts6">The GUID is assign during channel grouping.</span></p>
+<p class="rvps2"><span class="rvts6">Such a channel can be used multiple in channel tree, but it must be able to find its sub channels according to its position in the channel tree.</span></p>
+<p class="rvps2"><span class="rvts6">For example a "Inverter" channel (based on the "Inverter" grouping channel type) can be used multiple in the channel tree, but with different sub channels.</span></p>
+<p class="rvps2"><span class="rvts6">Please refer to the </span><span class="rvts16">grouping examples</span><span class="rvts6"> for details.</span></p>
+<p class="rvps32"><span class="rvts9">Name, Description</span></p>
+<p class="rvps2"><span class="rvts6">Each channel is uniquely characterized by a name and a description.</span></p>
+<p class="rvps2"><span class="rvts6">The combination of name and description must be unique for each channel.</span></p>
+<p class="rvps32"><span class="rvts9">Serial</span></p>
+<p class="rvps2"><span class="rvts6">If the equipment have a serial number, store it here for reference.</span></p>
+<p class="rvps2"><span class="rvts6">For </span><a class="rvts16" href="SMAWebbox.html">SMA inverter and sensorbox</a><span class="rvts6"> and </span><a class="rvts16" href="1Wiresensor.html">1-Wire sensors</a><span class="rvts6"> is this field required!</span></p>
+<p class="rvps32"><a name="Channel"></a>
+<span class="rvts9">Channel</span></p>
+<p class="rvps2"><span class="rvts6">Define here the channel name for equipments with more than one channel.</span></p>
+<p class="rvps2"><span class="rvts6">See </span><a class="rvts16" href="SMAWebbox.html">SMA inverter and sensorbox</a><span class="rvts6"> and </span><span class="rvts16">1-Wire sensors</span><span class="rvts6">.</span></p>
+<p class="rvps2"><span class="rvts6">For </span><a class="rvts16" href="1Wiresensor.html">1-Wire sensors</a><span class="rvts6"> is this field required!</span></p>
+<p class="rvps32"><span class="rvts9">Numeric</span></p>
+<p class="rvps2"><span class="rvts6">The system can handle numeric and alphanumeric readings.</span></p>
+<p class="rvps2"><span class="rvts6">Alphanumeric readings are for example the inverter mode and inverter error channels.</span></p>
+<p class="rvps32"><a name="Resolution"></a>
+<span class="rvts9">Resolution</span></p>
+<p class="rvps2"><span class="rvts8">(For numeric channels only)</span></p>
+<p class="rvps2"><span class="rvts6">Multiply the reading during readout with this resolution, default 1.</span></p>
+<p class="rvps32"><span class="rvts9">Unit</span></p>
+<p class="rvps2"><span class="rvts8">(For numeric channels only)</span></p>
+<p class="rvps2"><span class="rvts6">Unit for display in internal graphing module.</span></p>
+<p class="rvps32"><span class="rvts9">Meter</span></p>
+<p class="rvps2"><span class="rvts6">All numeric channel types can be handled as meters.</span></p>
+<p class="rvps2"><span class="rvts6">A meter stores in every case raising values, this means a new reading to be stored can't be smaller than the last stored reading, for example watt meters.</span></p>
+<p class="rvps2"><span class="rvts6">Some grouping channels support only meter channels for correct working.</span></p>
+<p class="rvps32"><span class="rvts9">Cost</span></p>
+<p class="rvps2"><span class="rvts6">Cost per unit.</span></p>
+<p class="rvps2"><span class="rvts6">Please refer to </span><a class="rvts12" href="Energyimport.html">this example</a><span class="rvts6">.</span></p>
+<p class="rvps32"><span class="rvts9">Threshold</span></p>
+<p class="rvps2"><span class="rvts6">Defines a max. threshold between reading values.</span></p>
+<p class="rvps2"><span class="rvts6">If the difference between the actual and the last reading is grater than the threshold, the reading will be ignored to avoid wrong peaks.</span></p>
+<p class="rvps2"><span class="rvts6">(For example a temperature should change not more than ? °C per minute.)</span></p>
+<p class="rvps32"><span class="rvts9">Valid from, Valid to</span></p>
+<p class="rvps2"><span class="rvts6">Beside the threshold also a valid value range can be defined. All readings have to be inside the range incl. boundaries.</span></p>
+<p class="rvps2"><span class="rvts6">(For example my irradiation sensor reports at night sometimes 1 W/m² "moon power", so I set the range of 2 ... 5000)</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com">Free Web Help generator</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

@@ -1,0 +1,101 @@
+﻿<html>
+	
+<head>
+	<title>Inverter efficiency</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Inverterefficiency");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Inverter efficiency</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="Examples.html">Examples</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="Examples.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="Datareadout1.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Energyimport.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps21"><span class="rvts6">"By efficiency, we are really saying, what percentage of the power that goes into the inverter comes out as usable AC current (nothing is ever 100% efficient, there will always be some losses in the system).</span><br/><span class="rvts6">This efficiency figure will vary according to how much power is being used at the time, with the efficiency generally being greater when more power is used." -- </span><a class="rvts12" href="http://www.solar-facts.com/inverters/inverter-efficiency.php">Solar-facts.com</a></p>
+<p class="rvps2"><span class="rvts6">The Inverter efficiency is calculated by:</span></p>
+<p class="rvps2"><img align="absmiddle" alt="" src="lib/NewItem23.png"/><span class="rvts6"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts6"></span></p>
+<p class="rvps2"><span class="rvts6">For this we need the special channel group </span><a class="rvts16" href="Model.html#ModelRatio">Ratio</a><br/><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem77.png"/></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">The Ratio calculator would return in the required channel combination values between 0 ... 1</span><br/><span class="rvts6">To get readout values as percentage (0 ... 100), set </span><span class="rvts22">resolution</span><span class="rvts6"> to 100.</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">The </span><span class="rvts22">valid range</span><span class="rvts6"> 0 ... 100 avoid values values over 100%, which is possible by inaccurate readings.</span><br/><span class="rvts6">So the result will be aligned into the range.</span></p>
+<p class="rvps2"><span class="rvts23">Please note:</span><span class="rvts6"> The performance ratio model accepts </span><span class="rvts26">only exact 2 sub channels</span><span class="rvts6"> for correct operation!</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">If your inverter have more than one MPP tracker (as mine), we need another special group to sum all P</span><span class="rvts41">DC?</span><span class="rvts6"> up: </span><a class="rvts16" href="Model.html#ModelAccumulator">Accumulator</a><br/><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem86.png"/></p>
+<p class="rvps2"><span class="rvts6">HTML entities are fine here, e.g. for the name.</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">Define your required channels, put this all together and you should have the following definition:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem90.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts23">Please note:</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">The real </span><span class="rvts22">sensor channels</span><span class="rvts6"> for </span><span class="rvts27">P</span><span class="rvts69">AC</span><span class="rvts6">, </span><span class="rvts27">P</span><span class="rvts69">DC1</span><span class="rvts6">, </span><span class="rvts27">P</span><span class="rvts69">DC2</span><span class="rvts6"> etc. must be defined for </span><span class="rvts22">each inverter</span><span class="rvts6">!</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">The </span><span class="rvts22">grouping channels</span><span class="rvts6"> "Inverter efficiency [%]" and "Σ Pdc [W]" must be defined only </span><span class="rvts22">once</span><span class="rvts6">!</span><br/><span class="rvts6">They </span><span class="rvts22">find out</span><span class="rvts6"> on request their correct sub channels from their</span><span class="rvts22"> position in the channel tree</span><span class="rvts6">.</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">If you want to have a more detailed result for efficiency, set the "valid from" for example to </span><span class="rvts26">95</span><span class="rvts6">:</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem48.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">There is very good to see, that the efficiency (black dashed) is after noon about 97%!</span></p>
+<p class="rvps2"><span class="rvts6">All values below 95% are "raised" to 95%, so just ignore them until 8:00</span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/create-epub-ebooks">Produce electronic books easily</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

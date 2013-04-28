@@ -1,0 +1,130 @@
+﻿<html>
+	
+<head>
+	<title>Energy import</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Energyimport");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Energy import</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="Examples.html">Examples</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="Examples.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="Inverterefficiency.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Charts.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps2"><span class="rvts6">The so called "Energy import" is inspired by </span><a class="rvts16" href="http://pvoutput.org/">PVOutput</a><span class="rvts6"> energy import chart.</span></p>
+<p class="rvps2"><span class="rvts6">If the generated power (Net power) is greater than the consumption, the energy import is no more raising.</span></p>
+<p class="rvps19"><span class="rvts7">PVOutput chart</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem50.png"/></p>
+<p class="rvps19"><span class="rvts7">PVLng adoption</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem51.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">First there are 2 areas, the overall production (E-Total, blue) and overall consumption (Power consumption, red) over time.</span></p>
+<p class="rvps2"><span class="rvts6">Then the actual inverter yield (P</span><span class="rvts70">AC</span><span class="rvts6"> Blockhaus, blue) and actual consumption (S0 consumption, dashed red).</span></p>
+<p class="rvps2"><span class="rvts6">The interesting part is the black Energy import spline, which stays by 2998 Wh since 07:08 here. This means, since 07:08 there is no energy import, only export.</span></p>
+<p class="rvps2"><span class="rvts23">Please note:</span><span class="rvts6"> Arrange the channels according their </span><span class="rvts22">units</span><span class="rvts6"> to the </span><span class="rvts22">axes</span><span class="rvts6">!</span></p>
+<p class="rvps19"><span class="rvts7">Definition</span></p>
+<p class="rvps2"><span class="rvts6">Let's start with the meter channels for the areas.</span></p>
+<p class="rvps2"><span class="rvts6">I decided to put all "watt" channels on the left and all "watt hour" channels on the right axis.</span></p>
+<p class="rvps32"><span class="rvts9">E-Total</span></p>
+<p class="rvps33"><span class="rvts10">Definition</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem91.png"/></p>
+<p class="rvps2"><span class="rvts6">We define here a </span><span class="rvts26">positive</span><span class="rvts6"> cost per watt hour to see later the income amount generated.</span></p>
+<p class="rvps2"><span class="rvts6">(We get here 28.74 cent per kilo watt hour == 0.0002874 Euro per watt hour)</span></p>
+<p class="rvps33"><span class="rvts10">Chart settings</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem14.png"/></p>
+<p class="rvps32"><span class="rvts9">S0 consumption and Power consumption</span></p>
+<p class="rvps33"><span class="rvts10">Definition</span></p>
+<p class="rvps2"><span class="rvts6">Here we need a special channel type, the </span><a class="rvts12" href="Model.html#SensorToMeter">Sensor to Meter</a><span class="rvts6"> proxy.</span></p>
+<p class="rvps2"><span class="rvts6">We have to convert the actual power consumption (Power sensor in watt) into an meter channel (in watt hours) which also sums up the data.</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem56.png"/></p>
+<p class="rvps2"><span class="rvts6">The consumption is a normal power sensor.</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem92.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">Here comes the proxy which convert the sensor to a meter channel!</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem94.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps33"><span class="rvts10">Chart settings</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem108.png"/><span class="rvts6"> </span><img alt="" style="padding : 1px;" src="lib/NewItem109.png"/></p>
+<p class="rvps2"><span class="rvts6">For "Power consumtion" we are also intersted in peeak powers used.</span></p>
+<p class="rvps32"><span class="rvts9">PAC</span></p>
+<p class="rvps33"><span class="rvts10">Definition</span></p>
+<p class="rvps2"><span class="rvts6">Simply the actual generated inverter power:</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem96.png"/></p>
+<p class="rvps33"><span class="rvts10">Chart settings</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem111.png"/></p>
+<p class="rvps2"><span class="rvts6">We are also interested in the max. value.</span></p>
+<p class="rvps32"><span class="rvts9">Energy Import</span></p>
+<p class="rvps33"><span class="rvts10">Definition</span></p>
+<p class="rvps2"><span class="rvts6">There we need the channel type "Internal consumption" based on the </span><a class="rvts12" href="Model.html#InternalConsumption">named model</a><span class="rvts6">.</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem98.png"/></p>
+<p class="rvps2"><span class="rvts6">We define here a </span><span class="rvts26">negative</span><span class="rvts6"> cost per Wh to see later the amount consumed.</span></p>
+<p class="rvps2"><span class="rvts6">(We pay here 23.44 cent per kilo watt hour == 0.0002344 Euro per watt hour)</span></p>
+<p class="rvps33"><span class="rvts10">Chart settings</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem112.png"/></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Now we can put this all together:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem105.png"/></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">In the Charts view we will have this:</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem107.png"/></p>
+<p class="rvps2"><span class="rvts6">So we have </span><span class="rvts26">consumed</span><span class="rvts6"> 4.6 kWh, but </span><span class="rvts26">bought</span><span class="rvts6"> only 2.8 kWh and have a </span><span class="rvts26">win</span><span class="rvts6"> of € 4.79 at the moment!</span></p>
+<p class="rvps2"><span class="rvts6">The </span><span class="rvts26">Amount</span><span class="rvts6"> column will be filled only for channels with meter flag.</span></p>
+<p class="rvps2"><span class="rvts6">The </span><span class="rvts26">Cost</span><span class="rvts6"> column will be filled only for meter channels with cost defined.</span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour">Easily create HTML Help documents</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

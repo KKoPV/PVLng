@@ -1,0 +1,98 @@
+﻿<html>
+	
+<head>
+	<title>Channel type</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Channeltype");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Channel type</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="DesignConcept.html">Design &amp; Concept</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="DesignConcept.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="Kaco12.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Channel.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps13"><span class="rvts6">A channel type uses a model to handle the write / read requests.</span></p>
+<p class="rvps13"><span class="rvts6">Many channel types can be based on the same model.</span></p>
+<p class="rvps13"><span class="rvts6">Channel types are defined in database table </span><span class="rvts27">pvlng_type</span><span class="rvts6">.</span></p>
+<p class="rvps31"><span class="rvts38">General characteristics</span></p>
+<p class="rvps13"><span class="rvts6">The </span><span class="rvts22">read</span><span class="rvts6"> and </span><span class="rvts22">write</span><span class="rvts6"> characteristics are primarily defined by the model but they are doubled into database for performance.</span></p>
+<p class="rvps25"><span class="rvts39">Name, Description</span></p>
+<p class="rvps13"><span class="rvts6">Each channel type is uniquely characterized by a name and a description.</span></p>
+<p class="rvps25"><span class="rvts39">Model</span></p>
+<p class="rvps13"><span class="rvts6">The model which will handle the read / write requests.</span></p>
+<p class="rvps25"><span class="rvts39">Unit</span></p>
+<p class="rvps13"><span class="rvts6">This is the unit which will be proposed on channel definition for orientation</span></p>
+<p class="rvps25"><span class="rvts39">Childs</span></p>
+<p class="rvps13"><span class="rvts6">Defines how many childs this type will accept.</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Channel type based on single models will not accept childs at all: </span><span class="rvts27">childs = 0</span><span class="rvts6">.</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Channel type which accepts only a specific number of childs, will have a positive number, e.g. </span><span class="rvts27">childs = 1</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Channel types, which accept any number of childs must have </span><span class="rvts27">childs = -1</span></p>
+<p class="rvps25"><span class="rvts39">Graph</span></p>
+<p class="rvps13"><span class="rvts6">This flag define, if the channel is available for the internal graphing module.</span></p>
+<p class="rvps13"><span class="rvts6">By default, all readable channels can be used for graphs.</span></p>
+<p class="rvps13"><span class="rvts6">But there are also channel groups, which are readable, but can't be used for graphing: </span><a class="rvts16" href="PVLog.html">PV-Log</a></p>
+<p class="rvps25"><span class="rvts39">Icon</span></p>
+<p class="rvps13"><span class="rvts6">An icon file name to mark the channels of this type.</span></p>
+<p class="rvps13"><span class="rvts6">The icons are located in</span><span class="rvts45"> </span><span class="rvts27">images/ico</span></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com">Full-featured Documentation generator</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

@@ -1,0 +1,90 @@
+﻿<html>
+	
+<head>
+	<title>Kaco 1 &amp; 2</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Kaco12");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Kaco 1 &amp; 2</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="DesignConcept.html">Design &amp; Concept</a> &rsaquo;&rsaquo; <a href="Model.html">Model</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="Model.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="DocumentationofPVLogJsonfileform.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Channeltype.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps7"><span class="rvts7">Kaco 1</span></p>
+<p class="rvps2"><span class="rvts44"> ToDo - NOT YET implemented </span></p>
+<p class="rvps2"><span class="rvts6">The Kaco inverter with a RS‑232 interface provide a semicolon separated string with the operating data.</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">&lt;Date&gt;;&lt;Time&gt;;&lt;Operating mode&gt;;&lt;Generator voltage&gt;;&lt;Generator current&gt;;&lt;Generator power&gt;;&lt;Mains voltage&gt;;&lt;Mains current&gt;;&lt;Feed-in power&gt;;&lt;Temperature&gt;</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Define the inverter with sub channels as this:</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Date and time will be ignored</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Fill the "Channel" attribute for a sub channel with the Id (zero based) of the value Id.</span></p>
+<p class="rvps2"><span class="rvts6">For example, the "Generator power" is the 6th value and have therefor Id 5</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem7.png"/></p>
+<p class="rvps7"><span class="rvts7">Kaco 2</span></p>
+<p class="rvps2"><span class="rvts44"> ToDo - NOT YET implemented </span></p>
+<p class="rvps2"><span class="rvts6">The Kaco inverter with a RS‑485 interface provide a semicolon separated string with the operating data.</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">&lt;Inverter Id&gt;;&lt;Operating mode&gt;;&lt;Generator voltage&gt;;&lt;Generator current&gt;;&lt;Generator power&gt;;&lt;Mains voltage&gt;;&lt;Mains current&gt;;&lt;Feed-in power&gt;;&lt;Temperature&gt;;&lt;Diurnal energy&gt;;&lt;Inverter type&gt;;&lt;Check sum&gt;</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">The inverter Id here must be defined as the serial number in the master data of the inverter!</span></p>
+<p class="rvps2"><span class="rvts6">The channel definition is the same as for Kaco 1:</span></p>
+<p class="rvps2"><span class="rvts6">For example, the "Generator power" is the 5th value and have therefor Id 4</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem11.png"/></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com">Free EBook and documentation generator</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

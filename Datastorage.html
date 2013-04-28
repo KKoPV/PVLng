@@ -1,0 +1,126 @@
+﻿<html>
+	
+<head>
+	<title>Data storage</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Datastorage");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Data storage</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="Examples.html">Examples</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="Examples.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="Examples.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Datareadout1.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps2"><span class="rvts6">As example we will store a temperature.</span></p>
+<div class="rvps2"><table width="100%" border="1" cellpadding="5" cellspacing="0" style="border-color: #000000; border-style: solid;">
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 205px;"><p class="rvps2"><span class="rvts26">Parameter</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 734px;"><p class="rvps2"><span class="rvts26">Value</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 140px;"><p class="rvps39"><span class="rvts26">since</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 205px;"><p class="rvps2"><span class="rvts6">API key</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 734px;"><p class="rvps2"><span class="rvts6">a10d3cca-370c-121e-b79c-2f0a58030a01</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 140px;"><p class="rvps39"><span class="rvts6">r1</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 205px;"><p class="rvps2"><span class="rvts6">Channel GUID</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 734px;"><p class="rvps2"><span class="rvts6">87fd-cc15-cb33-71a8-6b78-3855-4c11-a79e</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 140px;"><p class="rvps39"><span class="rvts6">r1</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 205px;"><p class="rvps2"><span class="rvts6">Temperature</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 734px;"><p class="rvps2"><span class="rvts6">23.45 °C</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 140px;"><p class="rvps39"><span class="rvts6">r1</span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps32"><span class="rvts9">Insert data</span></p>
+<p class="rvps2"><span class="rvts6">To store data we send a PUT request from a console with </span><a class="rvts16" href="http://curl.haxx.se/">curl</a><span class="rvts6">.</span></p>
+<p class="rvps2"><span class="rvts6">Interesting is the </span><a class="rvts16" href="Returncodes.html">HTTP code</a><span class="rvts6"> returned and the response body for error analysis in case of HTTP code is not 200 or 201.</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ set $(curl --request PUT \</span><br/><span class="rvts25"> &nbsp; &nbsp; &nbsp; &nbsp; –-write-out %{http_code} \</span><br/><span class="rvts25"> &nbsp; &nbsp; &nbsp; &nbsp; --output /tmp/pvlng.curl \</span><br/><span class="rvts25"> &nbsp; &nbsp; &nbsp; &nbsp; --header "X-PVLng-key: a10d3cca-370c-121e-b79c-2f0a58030a01" \</span><br/><span class="rvts25"> &nbsp; &nbsp; &nbsp; &nbsp; --data data=23.45 \</span><br/><span class="rvts25"> &nbsp; &nbsp; &nbsp; &nbsp; http://your.domain.here/api/r1/87fd-cc15-cb33-71a8-6b78-3855-4c11-a79e)</span></p>
+<p class="rvps2"><span class="rvts27"><br/></span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">--request</span><span class="rvts6"> - PUT / insert data</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">--write-out</span><span class="rvts6"> - Fetch only HTTP code from response headers</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">--output</span><span class="rvts6"> - Put response body into file for error analysis</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">$1</span><span class="rvts6"> will contain afterwards the HTTP code</span></p>
+<p class="rvps32"><span class="rvts9">Simple check</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ test $1 -eq 200 -o $1 -eq 201 || echo "Error ($1): $(cat /tmp/pvlng.curl)" &amp;&amp; exit 1</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour">Easily create Web Help sites</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

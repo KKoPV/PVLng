@@ -1,0 +1,517 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+	<title>PVLng - PhotoVoltaic Logger new generation- Table of Contents</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/silver-theme/jquery-ui-1.8.12.custom.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/dynatree/folder/ui.dynatree.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+    <link type="text/css" rel="stylesheet" media="all" href="css/toc.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#tabs .ui-widget-header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui-1.8.17.custom.min.js"></script>
+    <script type="text/javascript" src="js/jquery.cookie.js"></script>
+    <script type="text/javascript" src="js/jquery.dynatree.min.js"></script>
+	<script type="text/javascript" src="js/hndjsse.js"></script>
+	<script type="text/javascript">
+	
+		var bSearchDataLoaded = false;
+		var sHelpIdToActivate = '';
+	
+		$(document).ready(function()
+		{
+			var sAnchorName = '';
+			try { sAnchorName = top.location.href.substring(top.location.href.lastIndexOf("#") + 1, top.location.href.length); }
+			catch(err) { sAnchorName = ''; }
+			var nSelectedTab = 0;
+			if (sAnchorName == '_index') nSelectedTab = 1
+			else if (sAnchorName == '_search') nSelectedTab = 2;			
+			$("#tabs").tabs({
+				selected: nSelectedTab,
+				select: function(event, ui) { HideKwPopup(); }
+			});
+			
+			// Toc
+			if ($("#tab-toc").length) {
+				$("#tab-toc").dynatree({
+					clickFolderMode: 1,
+					debugLevel: 0,
+					imagePath: 'css/dynatree/folder/',
+					onActivate: function(node){
+						if ($("#tab-keywords").length && $("#tab-keywords").dynatree && $("#tab-keywords").dynatree("getTree") && $("#tab-keywords").dynatree("getTree").activateKey)
+							$("#tab-keywords").dynatree("getTree").activateKey(null);
+						if(node.data.href && node.data.href != '#'){
+							window.open(node.data.href, node.data.target);
+						}
+					}
+				});
+				// Expand all nodes if required
+				$("#tab-toc").dynatree("getRoot").visit(function(node){
+						node.expand(true);
+					});
+				// Select the active help id
+				if (sHelpIdToActivate != '') $("#tab-toc").dynatree("getTree").activateKey(sHelpIdToActivate);
+			}
+			
+			// Keywords
+			
+			if ($("#tab-keywords").length) {
+				$("#tab-keywords").dynatree({
+					clickFolderMode: 1,
+					debugLevel: 0,
+					imagePath: 'css/dynatree/folder/',
+					onClick: function(node, event){
+						HideKwPopup();
+						if (node.data && node.data.click)
+						{
+							var aRefList = null;
+							eval('aRefList=' + node.data.click);
+							if (ShowKwPopup(node.li, aRefList))
+							{
+								if ($("#tab-toc") && $("#tab-toc").dynatree && $("#tab-toc").dynatree("getTree") && $("#tab-toc").dynatree("getTree").activateKey)
+									$("#tab-toc").dynatree("getTree").activateKey(null);
+								if(node.data.href && node.data.href != '#'){
+									window.open(node.data.href, node.data.target);
+								}
+							}
+						}
+					}
+				});
+				// Expand all nodes if required
+				$("#tab-keywords").dynatree("getRoot").visit(function(node){
+						node.expand(true);
+					});
+				}
+			
+			// Load search data
+			$.getScript("js/searchdata.js",	function() {
+				bSearchDataLoaded = true;
+			});
+		});
+		
+		$('body').click(function() {
+			HideKwPopup();
+		});
+		
+		function SelectTocItem(sHelpId)
+		{
+			if ($("#tab-toc").length && $("#tab-toc").dynatree && $("#tab-toc").dynatree("getTree") && $("#tab-toc").dynatree("getTree").getNodeByKey) {
+				$("#tab-toc").dynatree("getTree").getNodeByKey(sHelpId).activateSilently();
+			}
+			else {
+				sHelpIdToActivate = sHelpId;
+			}
+		}
+		
+		function HideKwPopup()
+		{
+			if($("#popupMenu")) $("#popupMenu").remove();
+		}
+		
+		function ShowKwPopup(oSender, aLinks)
+		{
+			HideKwPopup();
+			if (!aLinks || !aLinks.length || aLinks.length == 0) return false
+			else if (aLinks.length == 1) return true
+			else
+			{
+				var oParentDiv = document.createElement("DIV");
+				oParentDiv.id = "popupMenu";
+				var oLink = null;
+				// Close button
+				oLink = document.createElement("SPAN");
+				oLink.className = "close-button";
+				oLink.innerHTML = "X";
+				oLink.href = "#";
+				oLink.onclick = HideKwPopup;
+				oParentDiv.appendChild(oLink);
+				// Items
+				for (var nCnt=0; nCnt<aLinks.length; nCnt++)
+				{
+					oLink = document.createElement("A");
+					oLink.innerHTML = aLinks[nCnt][0];
+					oLink.href = aLinks[nCnt][1];
+					oLink.target = "FrameMain";
+					oLink.onclick = HideKwPopup;
+					oParentDiv.appendChild(oLink);
+				}
+				document.body.appendChild(oParentDiv);
+				var pos = $(oSender).offset(); 
+				var height = $(oSender).height();
+				$(oParentDiv).css({
+					"left": (pos.left+20) + "px",
+					"top": (pos.top + height + 5) + "px"
+				});
+				$(oParentDiv).show();
+				return false;
+			}
+		}
+		
+		function PerformSearch()
+		{
+			sValue = $("#search_value").val();
+			$("#search_results").html('Searching...');
+			var oSearchEngine = new HndJsSe;
+			oSearchEngine.ParseInput(sValue);			
+			oSearchEngine.PerformSearch();
+			if (!oSearchEngine.aResults || !oSearchEngine.aResults.length)
+			{
+				$("#search_results").html('No results found.');
+			}
+			else
+			{
+				$("#search_results").html('<div id="search_results_content"></div>');
+				var oUl = $("#search_results_content").append("<ul id='lr'></ul>").find("ul");
+				for (var nCnt = 0; nCnt < oSearchEngine.aResults.length; nCnt++)
+				{
+					if (oSearchEngine.aResults[nCnt] < aTl.length)
+					{
+						oUl.append("<li><a href='" + aTl[oSearchEngine.aResults[nCnt]][0] + "?search=" + escape(sValue) + "' target='FrameMain'>" + unescape(aTl[oSearchEngine.aResults[nCnt]][1]) + "</a></li>");
+					}
+				}
+				// Tree
+				$("#search_results_content").dynatree({
+					clickFolderMode: 1,
+					debugLevel: 0,
+					imagePath: 'css/dynatree/folder/',
+					onActivate: function(node){
+						if ($("#search_results_content") && $("#search_results_content").dynatree && $("#search_results_content").dynatree("getTree") && $("#search_results_content").dynatree("getTree").activateKey)
+							$("#search_results_content").dynatree("getTree").activateKey(null);
+						if(node.data.href && node.data.href != '#'){
+							window.open(node.data.href, node.data.target);
+						}
+					}
+				});
+			}
+		}
+	</script>
+</head>
+
+<body>
+
+	<div id="tabs">
+		<ul>
+			<li><a href="#tab-toc">Contents</a></li>
+			<li><a href="#tab-search">Search</a></li>
+			</ul>
+		<div id="tab-toc">
+			<ul id="toc" class="">
+
+				<li class="" id="Start" data="">
+							<a
+							href="Start.html"
+							target="FrameMain">
+								Start</a>
+
+				</li><li class="folder" id="Introduction" data="">
+							<a
+							href="Introduction.html"
+							target="FrameMain">
+								Introduction</a>
+
+				<ul><li class="" id="Quickstart" data="">
+							<a
+							href="Quickstart.html"
+							target="FrameMain">
+								Quick start</a>
+
+				</li></ul></li><li class="folder" id="Installation" data="">
+							<a
+							href="Installation.html"
+							target="FrameMain">
+								Installation</a>
+
+				<ul><li class="" id="Requirements" data="">
+							<a
+							href="Requirements.html"
+							target="FrameMain">
+								Requirements</a>
+
+				</li></ul></li><li class="folder" id="DesignConcept" data="">
+							<a
+							href="DesignConcept.html"
+							target="FrameMain">
+								Design &amp; Concept</a>
+
+				<ul><li class="folder" id="Model" data="">
+							<a
+							href="Model.html"
+							target="FrameMain">
+								Model</a>
+
+				<ul><li class="folder" id="SMAWebbox" data="">
+							<a
+							href="SMAWebbox.html"
+							target="FrameMain">
+								SMA/Webbox</a>
+
+				<ul><li class="" id="STPchannels" data="">
+							<a
+							href="STPchannels.html"
+							target="FrameMain">
+								STP channels</a>
+
+				</li></ul></li><li class="folder" id="PVLog" data="">
+							<a
+							href="PVLog.html"
+							target="FrameMain">
+								PV-Log</a>
+
+				<ul><li class="" id="PVLogJsonyielddatafileformat" data="">
+							<a
+							href="http://hilfe.pv-log.com/knowledgebase/articles/130499-en-pv-log-json-yield-data-file-format"
+							target="FrameMain">
+								PV-Log Json yield data file format</a>
+
+				</li><li class="" id="DocumentationofPVLogJsonfileform" data="">
+							<a
+							href="https://docs.google.com/document/pub?id=1QsDGMhr_Vbz2Pa5rkeDtkK_NgTjfJIqr6PNCub5sKs4"
+							target="FrameMain">
+								Documentation of PV-Log Json file format</a>
+
+				</li></ul></li><li class="" id="Kaco12" data="">
+							<a
+							href="Kaco12.html"
+							target="FrameMain">
+								Kaco 1 &amp; 2</a>
+
+				</li></ul></li><li class="" id="Channeltype" data="">
+							<a
+							href="Channeltype.html"
+							target="FrameMain">
+								Channel type</a>
+
+				</li><li class="folder" id="Channel" data="">
+							<a
+							href="Channel.html"
+							target="FrameMain">
+								Channel</a>
+
+				<ul><li class="" id="1Wiresensor" data="">
+							<a
+							href="1Wiresensor.html"
+							target="FrameMain">
+								1-Wire sensor</a>
+
+				</li></ul></li><li class="" id="Channelgrouping" data="">
+							<a
+							href="Channelgrouping.html"
+							target="FrameMain">
+								Channel grouping</a>
+
+				</li></ul></li><li class="" id="Operatinginstructions" data="">
+							<a
+							href="Operatinginstructions.html"
+							target="FrameMain">
+								Operating instructions</a>
+
+				</li><li class="folder" id="ApplicationProgrammingInterfaceA" data="">
+							<a
+							href="ApplicationProgrammingInterfaceA.html"
+							target="FrameMain">
+								Application Programming Interface (API)</a>
+
+				<ul><li class="folder" id="Storedata" data="">
+							<a
+							href="Storedata.html"
+							target="FrameMain">
+								Store data</a>
+
+				<ul><li class="folder" id="Scripts" data="">
+							<a
+							href="Scripts.html"
+							target="FrameMain">
+								Scripts</a>
+
+				<ul><li class="folder" id="OWFS1" data="">
+							<a
+							href="OWFS1.html"
+							target="FrameMain">
+								OWFS</a>
+
+				<ul><li class="" id="Debian" data="">
+							<a
+							href="Debian.html"
+							target="FrameMain">
+								Debian</a>
+
+				</li></ul></li><li class="folder" id="S0reader" data="">
+							<a
+							href="S0reader.html"
+							target="FrameMain">
+								S0 reader</a>
+
+				<ul><li class="" id="Hardwarerequirements" data="">
+							<a
+							href="Hardwarerequirements.html"
+							target="FrameMain">
+								Hardware requirements</a>
+
+				</li></ul></li><li class="" id="SMAWebbox1" data="">
+							<a
+							href="SMAWebbox1.html"
+							target="FrameMain">
+								SMA Webbox</a>
+
+				</li></ul></li></ul></li><li class="folder" id="Datareadout" data="">
+							<a
+							href="Datareadout.html"
+							target="FrameMain">
+								Data readout</a>
+
+				<ul><li class="" id="JSON" data="">
+							<a
+							href="JSON.html"
+							target="FrameMain">
+								JSON</a>
+
+				</li><li class="" id="CSVTSV" data="">
+							<a
+							href="CSVTSV.html"
+							target="FrameMain">
+								CSV / TSV</a>
+
+				</li><li class="" id="XML" data="">
+							<a
+							href="XML.html"
+							target="FrameMain">
+								XML</a>
+
+				</li></ul></li><li class="" id="Returncodes" data="">
+							<a
+							href="Returncodes.html"
+							target="FrameMain">
+								Return codes</a>
+
+				</li></ul></li><li class="folder" id="Examples" data="">
+							<a
+							href="Examples.html"
+							target="FrameMain">
+								Examples</a>
+
+				<ul><li class="" id="Datastorage" data="">
+							<a
+							href="Datastorage.html"
+							target="FrameMain">
+								Data storage</a>
+
+				</li><li class="" id="Datareadout1" data="">
+							<a
+							href="Datareadout1.html"
+							target="FrameMain">
+								Data readout</a>
+
+				</li><li class="" id="Inverterefficiency" data="">
+							<a
+							href="Inverterefficiency.html"
+							target="FrameMain">
+								Inverter efficiency</a>
+
+				</li><li class="" id="Energyimport" data="">
+							<a
+							href="Energyimport.html"
+							target="FrameMain">
+								Energy import</a>
+
+				</li><li class="folder" id="Charts" data="">
+							<a
+							href="Charts.html"
+							target="FrameMain">
+								Charts</a>
+
+				<ul><li class="" id="Alphanumericchannels" data="">
+							<a
+							href="Alphanumericchannels.html"
+							target="FrameMain">
+								Alphanumeric channels</a>
+
+				</li><li class="" id="Axishandling" data="">
+							<a
+							href="Axishandling.html"
+							target="FrameMain">
+								Axis handling</a>
+
+				</li><li class="" id="Limits" data="">
+							<a
+							href="Limits.html"
+							target="FrameMain">
+								Limits</a>
+
+				</li></ul></li><li class="" id="Mobile" data="">
+							<a
+							href="Mobile.html"
+							target="FrameMain">
+								Mobile</a>
+
+				</li></ul></li><li class="folder" id="HowTo" data="">
+							<a
+							href="HowTo.html"
+							target="FrameMain">
+								HowTo</a>
+
+				<ul><li class="" id="FixednameforUSBdevice" data="">
+							<a
+							href="FixednameforUSBdevice.html"
+							target="FrameMain">
+								Fixed name for USB device</a>
+
+				</li><li class="" id="Backup" data="">
+							<a
+							href="Backup.html"
+							target="FrameMain">
+								Backup</a>
+
+				</li></ul></li><li class="" id="Databasestructure" data="">
+							<a
+							href="Databasestructure.html"
+							target="FrameMain">
+								Database structure</a>
+
+				</li><li class="" id="Contributions" data="">
+							<a
+							href="Contributions.html"
+							target="FrameMain">
+								Contributions</a>
+
+				</li><li class="" id="Author" data="">
+							<a
+							href="Author.html"
+							target="FrameMain">
+								Author</a>
+
+				</li><li class="" id="Licence" data="">
+							<a
+							href="http://www.gnu.org/licenses/gpl.txt"
+							target="FrameMain">
+								Licence</a>
+
+				</li></ul>
+		</div>
+		
+		<div id="tab-search">
+			<form onsubmit="PerformSearch(); return false;">
+				<label for="search_value">Search:</label>
+				<input id="search_value" name="search_value"></input>
+				<input type="submit" value="Search"/>
+			</form>
+			<div id="search_results"></div>
+		</div>
+		
+		</div>
+    
+</body>
+
+</html>
+

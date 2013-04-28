@@ -1,0 +1,112 @@
+﻿<html>
+	
+<head>
+	<title>Installation</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Installation");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Installation</h1>
+				
+				</div>
+			<div id="topic_header_nav">
+				<a href="Quickstart.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Requirements.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps2"><span class="rvts6">Please check the software and hardware </span><a class="rvts29" href="Requirements.html">requirements</a><span class="rvts6"> first.</span></p>
+<p class="rvps2"><span class="rvts6">At 1</span><span class="rvts24">st</span><span class="rvts6"> find the document root of your web server, usually </span><span class="rvts27">/var/www/htdocs, /var/htdocs, /srv/www/htdocs</span><span class="rvts6"> ...</span></p>
+<p class="rvps2"><span class="rvts6">If you want to run only PVLng on your server, just install PVLng direct into the document root.</span></p>
+<p class="rvps2"><span class="rvts6">If you have more running on your server, setup a own document root for PVLng.</span></p>
+<p class="rvps7"><span class="rvts7">Install with Git</span></p>
+<p class="rvps2"><span class="rvts6">If your system have </span><a class="rvts12" href="http://git-scm.com/">Git</a><span class="rvts6"> installed, it will be simplest way to clone the </span><a class="rvts12" href="https://github.com/K-Ko/PVLng">Github</a><span class="rvts6"> repository.</span></p>
+<p class="rvps2"><span class="rvts6">Clone the repository directly </span><span class="rvts26">into the selected</span><span class="rvts6"> directory:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ git clone git@github.com:K-Ko/PVLng.git .</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">If you find than there a file </span><span class="rvts27">README.md</span><span class="rvts6">, your done.</span></p>
+<p class="rvps2"><span class="rvts6">Move forward to </span><a class="rvts12" href="Installation.html#Setup">setup</a><span class="rvts6">.</span></p>
+<p class="rvps7"><span class="rvts7">Install from ZIP file or TAR ball</span></p>
+<p class="rvps4"><span class="rvts9">FTP</span></p>
+<p class="rvps2"><span class="rvts6">Download an archive on your desk, extract it and upload the contents of directory </span><span class="rvts27">PVLng-master</span><span class="rvts6"> into your document root.</span></p>
+<p class="rvps4"><span class="rvts9">Console</span></p>
+<p class="rvps2"><span class="rvts6">Just download your preferred archive and extract it direct on your server.</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ wget https://github.com/K-Ko/PVLng/zipball/master -O master.zip</span><br/><span class="rvts25">$ unzip master.zip</span><br/><span class="rvts25">$ mv PVLng-master/* .</span><br/><span class="rvts25">$ rm -r master.zip PVLng-master</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">If you find than there a file README.md, your done.</span></p>
+<p class="rvps7"><a name="Setup"></a>
+<span class="rvts7">Setup database</span></p>
+<p class="rvps2"><span class="rvts6">Create a database for PVLng if you want. I recommend this, but it is not required.</span></p>
+<p class="rvps2"><span class="rvts6">All PVLng specific tables have a </span><span class="rvts27">pvlng_</span><span class="rvts6"> as prefix.</span></p>
+<p class="rvps2"><span class="rvts6">Import the SQL file </span><span class="rvts27">sql/install.sql</span><span class="rvts6"> into your database.</span></p>
+<p class="rvps4"><span class="rvts9">From command line</span><br/><span class="rvts9"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ mysql -u[username] -p[password] [database] &lt;sql/pvlng.sql</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">This will install all the required tables, a predefined set of channel types, a view and some functions.</span></p>
+<p class="rvps4"><span class="rvts9">Web frontend</span></p>
+<p class="rvps2"><span class="rvts6">PVLng have </span><a class="rvts12" href="http://www.adminer.org/en/">Adminer</a><span class="rvts6"> installed by default.</span></p>
+<p class="rvps21"><span class="rvts6">"Adminer (formerly phpMinAdmin) is a full-featured database management tool written in PHP. Conversely to phpMyAdmin, it consist of a single file ready to deploy to the target server."</span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/adminer/</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">Choose </span><span class="rvts27">SQL-Query &gt; File upload &gt; Execute</span></p>
+<p class="rvps7"><span class="rvts7">Configuration</span></p>
+<p class="rvps4"><span class="rvts9">Database</span></p>
+<p class="rvps2"><span class="rvts6">Prepare the configuration file:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ cp config/config.php.dist config/config.php</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Fill in your database credentials.</span></p>
+<p class="rvps4"><span class="rvts9">Privacy</span></p>
+<p class="rvps2"><span class="rvts6">You have to protect your installation with an administration account.</span></p>
+<p class="rvps2"><span class="rvts6">Open</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/adminpass</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">and update your </span><span class="rvts27">config/config.php</span><span class="rvts6"> afterwards.</span></p>
+<p class="rvps4"><span class="rvts9">Scripts</span></p>
+<p class="rvps2"><span class="rvts6">Prepare the configuration file:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">$ cp bin/PVLng.conf.dist bin/PVLng.conf</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Fill in at least your API key, you can find it on the </span><span class="rvts26">Information</span><span class="rvts6"> page.</span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour/iphone-website-generation">Free iPhone documentation generator</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

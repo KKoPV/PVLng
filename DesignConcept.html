@@ -1,0 +1,105 @@
+﻿<html>
+	
+<head>
+	<title>Design &amp; Concept</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("DesignConcept");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Design &amp; Concept</h1>
+				
+				</div>
+			<div id="topic_header_nav">
+				<a href="Requirements.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Model.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps7"><span class="rvts7">Software layers</span></p>
+<p class="rvps2"><span class="rvts6">The whole system consists of 3 essential layers:</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem12.png"/></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">External systems, which handles</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">the data acquisition or</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">the data analysis</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">PVLng as core component</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">A MySQL database for data storage</span></p>
+<p class="rvps4"><span class="rvts9">External systems</span></p>
+<p class="rvps2"><span class="rvts6">The most data storage work must be done by external </span><a class="rvts16" href="Scripts.html">scripts</a><span class="rvts6">. They obtain the measuring data from e.g. sensors and push them via API into the system.</span></p>
+<p class="rvps2"><span class="rvts6">In these scripts are simple to use functions defined, which pushes the data and handles errors.</span></p>
+<p class="rvps2"><span class="rvts6">Scripts to push your data to other sides are also available, for photovoltaic plants I recommend </span><a class="rvts16" href="http://pv.log.com">PV-Log</a><span class="rvts6"> or </span><a class="rvts16" href="http://pvoutput.org">PVOutput</a><span class="rvts6">.</span></p>
+<p class="rvps2"><span class="rvts6">The web front end handles all channel definitions, their attributes and the organization of channels in the channel tree and a charting module for simple visualizations.</span></p>
+<p class="rvps4"><span class="rvts9">PVLng layers</span></p>
+<p class="rvps2"><span class="rvts6">The system is build (bottom-up) by</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts12" href="Model.html">Models</a><span class="rvts6"> handles a very special kind of data/sensor</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts12" href="Channeltype.html">Channel types</a><span class="rvts6"> implements a set set of predefined sensor types</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts12" href="Channel.html">Channels</a><span class="rvts6"> represent concrete sensors</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts12" href="Channelgrouping.html">Channel groups</a><span class="rvts6"> handles special needs about grouping or calculation/transformation</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">The following documentation will mainly describe the characteristics of PVLng and the other layers only if required.</span></p>
+<p class="rvps4"><span class="rvts9">Database</span></p>
+<p class="rvps2"><span class="rvts6">The </span><a class="rvts16" href="Databasestructure.html">database</a><span class="rvts6"> have 3 tables for channel organization and 2 tables for readings.</span></p>
+<p class="rvps4"><span class="rvts9">Data flow</span></p>
+<p class="rvps2"><span class="rvts6">The general information and data flow is like this:</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem13.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/help-authoring-tool">Free help authoring tool</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

@@ -1,0 +1,253 @@
+﻿<html>
+	
+<head>
+	<title>Data readout</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Datareadout");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Data readout</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="ApplicationProgrammingInterfaceA.html">Application Programming Interface (API)</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="ApplicationProgrammingInterfaceA.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="SMAWebbox1.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="JSON.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Support for request method </span><span class="rvts62">GET</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Each request must contain the </span><span class="rvts22">channel GUID</span><span class="rvts6"> in the URL.</span></p>
+<p class="rvps31"><span class="rvts38">URL</span><br/><span class="rvts38"><br/></span></p>
+<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/&lt;GUID&gt;.&lt;format&gt;</span></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p class="rvps31"><span class="rvts38">Format</span></p>
+<p class="rvps13"><span class="rvts6">Supported formats are:</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts60" href="JSON.html">json</a></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts60" href="CSVTSV.html">csv</a><span class="rvts6"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts6">(Semicolon separated values)</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts60" href="CSVTSV.html">tsv</a><span class="rvts6"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts6">(TAB separated values)</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<a class="rvts60" href="XML.html">xml</a></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p class="rvps13"><span class="rvts6">If one of the following "Accept" HTTP header is provided </span><span class="rvts6">with the call</span><span class="rvts6">, the format in the URL is optional and will be overwritten by this!</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">application/json</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">text/json</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">application/csv</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">text/csv</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">text/comma-separated-values</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">application/tsv</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">text/tsv</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">text/tab-separated-values</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">application/xml</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">text/xml</span></p>
+<p class="rvps31"><span class="rvts38">Parameters</span></p>
+<p class="rvps13"><span class="rvts6">The following parameters describes the requested data.</span></p>
+<div class="rvps13"><table width="100%" border="1" cellpadding="5" cellspacing="0" style="border-color: #000000; border-style: solid;">
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 188px;"><p class="rvps13"><span class="rvts26">Parameter</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 280px;"><p class="rvps13"><span class="rvts26">Name</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 213px;"><p class="rvps13"><span class="rvts26">default</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 454px;"><p class="rvps13"><span class="rvts26">Format</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; background-color: #c0c0c0; width: 73px;"><p class="rvps13"><span class="rvts26">since</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 188px;"><p class="rvps13"><span class="rvts56">start</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 280px;"><p class="rvps13"><span class="rvts6">Starting time stamp</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 213px;"><p class="rvps13"><span class="rvts6">00:00</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 454px;"><p class="rvps13"><span class="rvts6">string|integer</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 73px;"><p class="rvps13"><span class="rvts6">r1</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 188px;"><p class="rvps13"><span class="rvts56">end</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 280px;"><p class="rvps13"><span class="rvts6">End time stamp</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 213px;"><p class="rvps13"><span class="rvts6">24:00</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 454px;"><p class="rvps13"><span class="rvts6">string|integer</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 73px;"><p class="rvps13"><span class="rvts6">r1</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 188px;"><p class="rvps13"><span class="rvts56">period</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 280px;"><p class="rvps13"><span class="rvts6">Aggregation period</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 213px;"><br/>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 454px;"><p class="rvps13"><span class="rvts6">(last|minute|hour|day|week|month|quarter|year)</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 73px;"><p class="rvps13"><span class="rvts6">r1</span></p>
+</td>
+</tr>
+<tr valign="top">
+<td style="border-color: #000000; border-style: solid; width: 188px;"><p class="rvps13"><span class="rvts56">full</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 280px;"><p class="rvps13"><span class="rvts6">Return full data, see below</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 213px;"><br/>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 454px;"><p class="rvps13"><span class="rvts6">(0|1)</span></p>
+</td>
+<td style="border-color: #000000; border-style: solid; width: 73px;"><p class="rvps13"><span class="rvts6">r1</span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps13"><span class="rvts6">The selection range for the data is build by: </span><span class="rvts27">start ≤ timestamp &lt; end</span></p>
+<p class="rvps25"><span class="rvts39">start, end</span></p>
+<p class="rvps13"><span class="rvts6">The "start" and the "end" can be provided as</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">A string "YYYY-MM-DD hh:mm:ss"</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Relative from now (see below)</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">In seconds since 1.1.1970 00:00:00 UTC</span></p>
+<p class="rvps13"><span class="rvts6">The definition can also be done with </span><a class="rvts12" href="http://php.net/manual/datetime.formats.relative.php">PHPs Relative Formats syntax</a><span class="rvts6">. Using this, the time is set always to midnight!</span></p>
+<p class="rvps13"><span class="rvts26">Example:</span><span class="rvts6"> Query the data from last month</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps20"><span class="rvts25">start=first day of last month&amp;end=first day of this month</span></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p class="rvps25"><span class="rvts39">period</span></p>
+<p class="rvps13"><span class="rvts6">Special periods are</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">[blank] = raw data, all lines between </span><span class="rvts55">start</span><span class="rvts6"> and </span><span class="rvts55">end</span><span class="rvts6"> (default)</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">last</span><span class="rvts6"> = one (last) line of the whole result</span></p>
+<p class="rvps13"><span class="rvts6">To multiply the period, add a number:</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">12hour</span><span class="rvts6"> = half day</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">30minute</span><span class="rvts6"> = half hour</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts27">10year</span><span class="rvts6"> = decade</span></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p class="rvps13"><span class="rvts23">Please note</span><span class="rvts6"> the difference between aggregation of "hour" and "minute":</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Hour always covers the beginning of an hour (??:00)</span></p>
+<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Minute always work exact from "end" parameter time stamp backwards</span></p>
+<p class="rvps38"><span class="rvts61">What does it mean?</span></p>
+<p class="rvps13"><span class="rvts6">Let me show an example. The following results looks like the same: ("end" == now == 12:19)</span></p>
+<p class="rvps13"><span class="rvts6">But the left one (hour) is aligned to</span><span class="rvts57"> ??:00 &amp; ??:30</span><span class="rvts6"> and the right one (minute) exactly to</span><span class="rvts57"> ??:50 &amp; ??:20</span></p>
+<p class="rvps13"><span class="rvts6">(To get the readable date time, we request the </span><span class="rvts27">full</span><span class="rvts6"> result.)</span></p>
+<div class="rvps13"><table width="100%" border="1" cellpadding="1" cellspacing="2" style="border-width: 0px;">
+<tr valign="top">
+<td style="border-width : 1px; border-color: #000000; border-style: solid; border-top: none; border-right: none; border-bottom: none; border-left: none; width: 49%;"><p class="rvps20"><span class="rvts25">http://.../&lt;GUID&gt;.csv?period=</span><span class="rvts58">0.5hour</span><span class="rvts25">&amp;full=1</span></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">10:00:00</span><span class="rvts54">;1364461200;398.06666667;384;412;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">10:30:00</span><span class="rvts54">;1364463000;480.2;411;568;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">11:00:00</span><span class="rvts54">;1364464800;634.73333333;520;745;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">11:30:00</span><span class="rvts54">;1364466600;789.8;482;912;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">12:00:00</span><span class="rvts54">;1364468400;834;749;886;10;1080</span></p>
+</td>
+<td style="border-width : 1px; border-color: #000000; border-style: solid; border-top: none; border-right: none; border-bottom: none; border-left: none; width: 2%;"><br/>
+</td>
+<td style="border-width : 1px; border-color: #000000; border-style: solid; border-top: none; border-right: none; border-bottom: none; border-left: none;"><p class="rvps20"><span class="rvts25">http://.../&lt;GUID&gt;.csv?period=</span><span class="rvts58">30minute</span><span class="rvts25">&amp;full=1</span></p>
+<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">09:50:00</span><span class="rvts54">;1364460600;378.73333333;324;401;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">10:20:00</span><span class="rvts54">;1364462400;435.33333333;407;502;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">10:50:00</span><span class="rvts54">;1364464200;578.2;518;745;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">11:20:00</span><span class="rvts54">;1364466000;776.66666667;649;846;15;1680</span></p>
+<p class="rvps13"><span class="rvts54">2013-03-28 </span><span class="rvts57">11:50:00</span><span class="rvts54">;1364467800;807.06666667;482;912;15;1680</span></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="rvps25"><span class="rvts39">full</span></p>
+<p class="rvps13"><span class="rvts6">See below at the result description.</span></p>
+<p class="rvps31"><span class="rvts38">Result</span></p>
+<p class="rvps13"><span class="rvts6">By default, the 1</span><span class="rvts24">st</span><span class="rvts6"> line / array element will contain the channel attributes and further rows the following fields.</span></p>
+<p class="rvps13"><span class="rvts6">Data are not rounded at all, they are delivered as stored or calculated.</span></p>
+<p class="rvps13"><span class="rvts6">By default, only the </span><span class="rvts26">Timestamp</span><span class="rvts6"> and the </span><span class="rvts26">Data</span><span class="rvts6"> column are returned. If you set the request parameter </span><span class="rvts59">full=1</span><span class="rvts6">, </span><span class="rvts22">all</span><span class="rvts6"> the following data are returned.</span></p>
+<p class="rvps25"><span class="rvts39">Date time</span></p>
+<p class="rvps13"><span class="rvts6">A readable timestamp. Mostly used for debugging.</span></p>
+<p class="rvps25"><span class="rvts39">Timestamp</span></p>
+<p class="rvps13"><span class="rvts6">UTC Timestamp, good for direct use in graphing.</span></p>
+<p class="rvps25"><span class="rvts39">Data</span></p>
+<p class="rvps13"><span class="rvts6">Reading value for this timestamp.</span></p>
+<p class="rvps25"><span class="rvts39">Min, Max</span></p>
+<p class="rvps13"><span class="rvts6">Minimal / maximal value during aggregation period.</span></p>
+<p class="rvps25"><span class="rvts39">Count</span></p>
+<p class="rvps13"><span class="rvts6">Count of aggregated values between returned rows.</span></p>
+<p class="rvps25"><span class="rvts39">Time range</span></p>
+<p class="rvps13"><span class="rvts6">Time range of the aggregation in seconds.</span></p>
+<p class="rvps13"><span class="rvts8"><br/></span></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour/iphone-website-generation">iPhone web sites made easy</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

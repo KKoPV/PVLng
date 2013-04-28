@@ -1,0 +1,99 @@
+﻿<html>
+	
+<head>
+	<title>Introduction</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Introduction");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Introduction</h1>
+				
+				</div>
+			<div id="topic_header_nav">
+				<a href="Start.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Quickstart.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps18"><span class="rvts8"><br/></span></p>
+<p class="rvps7"><span class="rvts7">A logging and data warehouse system for measuring data of sensors and photovoltaic plants.</span></p>
+<p class="rvps2"><span class="rvts6">The system acts as a data warehouse.</span></p>
+<p class="rvps2"><span class="rvts6">All data will be stored in an very simple and efficient internal structure (readings), optimized for data readout of any kind with a well defined interface.</span></p>
+<p class="rvps2"><span class="rvts6">This system addresses all the user interested in data analysis, which will have a deeper look into their logged data.</span></p>
+<p class="rvps2"><span class="rvts6">The system will accept data from any external sources and can deliver them for any purpose. A web front end for graphing is also integrated.</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem8.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">To use this system best, a deeper knowledge in server administration, shell scripting and probably PHP is recommended but not required.</span></p>
+<p class="rvps2"><span class="rvts6">The system is build using a channel logic which will described later in detail.</span></p>
+<p class="rvps2"><span class="rvts6">Each channel will handled by a specific model.</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">Depending of the installed base of our plant, the following components are still implemented:</span></p>
+<p class="rvps4"><span class="rvts9">1. Data storage</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">Inverter data (feed-in power, DC power voltage, Current etc.) from a </span><span class="rvts12">SMA Webbox</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">Irradiation and module temperature from a </span><span class="rvts12">SMA Sensorbox</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">Outside and inverter temperatures via USB -&gt; 1‑Wire -&gt; </span><span class="rvts12">Temperature sensor</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">Power consumption from watt meter via </span><a class="rvts12" href="S0reader.html">S0</a><span class="rvts6"> impulses</span></p>
+<p class="rvps4"><span class="rvts9">2. Data readout</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">Model for the </span><a class="rvts12" href="PVLog.html">PV-Log</a><span class="rvts6"> URL interface in JSON</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">Script to push data to </span><a class="rvts12" href="http://pvoutput.org">PVOutput</a></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">Script to update a Twitter account</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts6">[</span><a class="rvts12" href="ToDo.html">planned</a><span class="rvts6">] Extractor witch creates Solar-Log compatible JS files, for example for </span><a class="rvts12" href="http://www.solar-log.com">Solar-Log</a><span class="rvts6">&nbsp;homemade or </span><a class="rvts12" href="http://sunics.de/solaranalyzer_beschreibung.htm">SolarAnalyzer</a></p>
+<p></p>
+<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/feature-tour/create-ebooks-for-amazon-kindle">Free Kindle producer</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+
