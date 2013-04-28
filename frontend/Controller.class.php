@@ -89,7 +89,6 @@ class Controller extends yMVC\Controller {
 		$this->view->PVLng = PVLNG;
 		$this->view->Version = PVLNG_VERSION;
 		$this->view->VersionDate = PVLNG_VERSION_DATE;
-		$this->view->VersionDescription = PVLNG_VERSION_DESC;
 
 		$this->view->PHPVersion = PHP_VERSION;
 		$this->view->MySQLVersion = $this->model->getDatabaseVersion();
