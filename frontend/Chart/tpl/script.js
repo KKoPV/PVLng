@@ -625,14 +625,14 @@ $(function() {
 		},
 		text: false,
 		disabled: ('{VIEW}' == '')
-	});
+	}).prop('href', $('#btn-bookmark').data('url') + encodeURIComponent('{VIEW}'));
 
 	$('#loadview').change(function() {
 		var el = $('#btn-bookmark');
 		el.button({
 			label: 'PVLng | ' + this.value,
 			disabled: (this.value == '')
-		}).prop('href', el.data('url') + this.value);
+		}).prop('href', el.data('url') + encodeURIComponent(this.value));
 	});
 
 });

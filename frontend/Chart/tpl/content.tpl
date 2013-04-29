@@ -138,8 +138,7 @@
 	</select>
 	<input type="submit" name="load" value="{{Load}}" />
 	<input type="submit" name="delete" value="{{Delete}}" />
-	<a id="btn-bookmark" class="fr tip" href="/chart?view={VIEW}"
-	   data-url="/chart?view=" title="{{DragBookmark}}">PVLng | {VIEW}</a>
+	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">PVLng | {VIEW}</a>
 </p>
 
 </form>

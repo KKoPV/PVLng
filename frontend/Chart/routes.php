@@ -13,6 +13,7 @@
  */
 return array(
 
-	'chart' => array( 'Chart', 'Index' ),
+	'chart'       => array( 'Chart', 'Index' ),
+	'chart/:view' => array( 'Chart', 'Index' ),
 
 );
