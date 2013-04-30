@@ -201,8 +201,12 @@ class Channel {
 						if ($offset == 0) $offset = $data['data'];
 						$data['data'] -= $offset;
 					}
-					$data['consumption'] = $data['data'] - $last;
-					$last = $data['data'];
+					if ($this->period[1] > 0) {
+						$data['consumption'] = $data['max'] - $data['min'];
+					} else {
+						$data['consumption'] = $data['data'] - $last;
+						$last = $data['data'];
+					}
 				}
 
 				$id = $data['g'];
@@ -372,7 +376,7 @@ class Channel {
 
 		$tmpfile2 = tmpfile();
 
-		$last = 0;
+		$last = $consumption = 0;
 		$lastrow = '';
 
 		while ($row = fgets($tmpfile)) {
@@ -384,6 +388,7 @@ class Channel {
 				    $this->resolution < 0 AND $row['data'] > $last) {
 					$row['data'] = $last;
 				}
+				$consumption += $row['consumption'];
 				$last = $row['data'];
 			}
 
@@ -398,12 +403,8 @@ class Channel {
 
 		if ($attributes) {
 			$attr = $this->getAttributes();
-			if ($this->meter AND $lastrow != '') {
-				$attr['consumption'] = $lastrow['data'];
-			} else {
-				$attr['consumption'] = 0;
-			}
-			$attr['costs'] = $attr['consumption'] * $this->cost;
+			$attr['consumption'] = $consumption;
+			$attr['costs'] = $consumption * $this->cost;
 		}
 
 		if ($this->period[1] == -1) {
