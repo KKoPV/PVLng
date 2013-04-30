@@ -31,6 +31,7 @@ class Chart_Controller extends ControllerAuth {
 				LANGUAGE,
 				array(
 					'var_name' => 'v[p]',
+					'blank_prompt' => I18N::_('None'),
 					'value'    => isset($this->Channels->p) ? $this->Channels->p : '',
 					'options'  => 'id="period"'
 				)
