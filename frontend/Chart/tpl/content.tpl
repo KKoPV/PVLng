@@ -9,6 +9,8 @@
  */
 -->
 
+<form method="post">
+
 <div id="nav" style="margin-top:1em;padding-top:1em;border-top:dotted gray 1px">
 	<input type="hidden" id="fromdate" name="fromdate" />
 	<input type="hidden" id="todate" name="todate" />
@@ -40,7 +42,7 @@
 			<label for="periodcnt" style="margin-left:1em" >{{Aggregation}}:</label>
 			<input class="numbersOnly r" type="text" id="periodcnt" name="periodcnt"
 						 value="1" size="2" />
-			{PERIODSELECT} &nbsp; <button id="btn-refresh" onclick="updateChart()">{{Refresh}}</button>
+			{PERIODSELECT} &nbsp; <button id="btn-refresh" onclick="updateChart(); return false">{{Refresh}}</button>
 		</td>
 	</tr>
 	</table>
@@ -55,8 +57,6 @@
 </div>
 
 <div class="clear"></div>
-
-<form method="post">
 
 <table id="tree" class="dataTable treeTable">
 	<thead>
@@ -177,6 +177,19 @@
 					<option value="bar">Bar</option>
 					<option value="scatter">Scatter</option>
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="d-cons">{{Presentation}}</label>
+			</td>
+			<td>
+				<div class="fl">
+					<input type="checkbox" id="d-cons" class="iCheckLine tip" />
+					<label for="d-cons">{{ShowConsumption}}</label>
+				</div>
+				<img src="/images/ico/information_frame.png" class="tip"
+				     style="margin-left:.5em" title="{{ShowConsumptionHint}}" />
 			</td>
 		</tr>
 		<tr>

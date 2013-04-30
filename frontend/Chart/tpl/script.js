@@ -80,16 +80,13 @@ var
 				fillOpacity: 0.2
 			},
 			bar: {
+			    minPointLength: 3,
 				groupPadding: 0.1
 			}
 		},
 		xAxis : {
 			type: 'datetime',
-			maxZoom: 3600 * 1000, /* 1 hour */
-			dateTimeLabelFormats: {
-				second: '%H:%M:%S', minute: '%H:%M', hour: '%H:%M',
-				day: '%e. %b', week: '%e. %b', month: '%b \'%y', year: '%Y'
-			}
+			maxZoom: 3600 * 1000 /* 1 hour */
 		},
 		tooltip: {
 			useHTML: true,
@@ -190,6 +187,7 @@ function ChartDialog( id, name ) {
 	/* find the radio button with the axis value and check it */
 	$('input[name="d-axis"][value="' + p.axis + '"]').prop('checked', true);
 	$('#d-type').val(p.type);
+	$('#d-cons').prop('checked', p.consumption);
 	$('#d-bold').prop('checked', p.bold);
 	$('#d-min').prop('checked', p.min);
 	$('#d-max').prop('checked', p.max);
@@ -207,6 +205,18 @@ function ChartDialog( id, name ) {
  *
  */
 var channels = [];
+
+/**
+ * Scale timestamps down to full hour, day, week, month, quarter or year
+ */
+var xAxisResolution = {
+	h: 3600,
+	d: 3600 * 24,
+	w: 3600 * 24 * 7,
+	m: 3600 * 24 * 30,
+	q: 3600 * 24 * 90,
+	y: 3600 * 24 * 360,
+};
 
 /**
  *
@@ -299,19 +309,21 @@ function updateChart() {
 		}
 	}
 
+	var res = xAxisResolution[$('#period').val()];
+
 	if (changed) {
+		/* use UTC for timestamps with a period >= day to avoid wrong hours in hint */
+		Highcharts.setOptions({	global: { useUTC: (res >= xAxisResolution.d) } });
+
 		/* happens also on 1st call! */
 		options.yAxis = yAxis;
 		/* (re)create chart */
 		chart = new Highcharts.Chart(options);
 	}
 
-	if (chart) chart.showLoading('{{LOADING}}');
+	chart.showLoading('{{LOADING}}');
 
-	/* if (chart) chart.setTitle({ text: $('#datepicker').val() }, { title: '' }); */
-
-	var series = [],
-	    costs = 0;
+	var series = [], costs = 0;
 
 	/* get data */
 	$(channels).each(function(id, channel) {
@@ -374,11 +386,16 @@ function updateChart() {
 				}
 
 				$(data).each(function(id, row) {
+					var ts = res
+					       ? Math.round(row.timestamp / res) * res * 1000
+					       : row.timestamp * 1000;
 					if ($.isNumeric(row.data)) {
 						if (channel.type == 'areasplinerange') {
-							serie.data.push([row.timestamp*1000, row.min, row.max]);
+							serie.data.push([ts, row.min, row.max]);
+						} else if (channel.consumption) {
+							serie.data.push([ts, row.consumption]);
 						} else {
-							serie.data.push([row.timestamp*1000, row.data]);
+							serie.data.push([ts, row.data]);
 						}
 					} else {
 						serie.data.push({
@@ -496,13 +513,14 @@ $(function() {
 		buttons: {
 			'{{Ok}}': function() {
 				p = new presentation();
-				p.axis	= +$('input[name="d-axis"]:checked').val();
-				p.type	= $('#d-type').val();
+				p.axis = +$('input[name="d-axis"]:checked').val();
+				p.type = $('#d-type').val();
+				p.consumption = $('#d-cons').is(':checked');
 				p.style = $('#d-style').val();
+				p.bold = $('#d-bold').is(':checked');
+				p.min = $('#d-min').is(':checked');
+				p.max = $('#d-max').is(':checked');
 				p.color = $('#spectrum').spectrum("get").toHexString();
-				p.bold	= $('#d-bold').is(':checked');
-				p.min   = $('#d-min').is(':checked');
-				p.max   = $('#d-max').is(':checked');
 				$('#c'+$(this).data('id')).val(p.toString());
 				$(this).dialog('close');
 			},
@@ -577,7 +595,6 @@ $(function() {
 
 	Highcharts.setOptions({
 		global: {
-			useUTC: false,
 			alignTicks: false
 		},
 		lang: {
