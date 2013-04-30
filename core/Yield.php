@@ -158,6 +158,13 @@ class Yield extends AbstractYield {
 	/**
 	 *
 	 */
+	public function getPlant () {
+		return $this->data['plant'];
+	}
+
+	/**
+	 *
+	 */
 	public function asArray() {
 		$return = $this->data;
 		$return['plant'] = $return['plant']->asArray();

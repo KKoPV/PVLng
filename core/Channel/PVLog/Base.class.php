@@ -104,10 +104,14 @@ class Base extends \Channel {
 	protected function finish ( &$yield, $request ) {
 		$yield->setCreator('PVLng ' . PVLNG_VERSION);
 
-		$yield->setUtcOffset(3600);
-
 		$date = array_key_exists(0, $request) ? $request[0] : date('Y-m-d');
 		$yield->setDeleteDayBeforeImport(($date != date('Y-m-d')));
+
+		// Force timestamp calculation...
+        $yield->asArray();
+
+		// Emulate a UTC summer time
+		$yield->setUtcOffset(date('I', $yield->getPlant()->getTimestampStart()) ? 3600 : 0);
 
 		return $yield->asArray();
 	}
