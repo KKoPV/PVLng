@@ -17,12 +17,11 @@ abstract class ORMTable {
 	/**
 	 *
 	 * @param mixed $id Key describing one row, on primary keys
-	 *									with more than field, provide an array
+	 *                  with more than field, provide an array
 	 */
 	public function __construct ( $id=NULL ) {
 		$this->db = MySQLi::getInstance();
 
-		$dir = self::$CACHEDIR ?: sys_get_temp_dir();
 		$schemafile = sprintf('%s%s%s~%s.tbl',
 		                      self::$CACHEDIR ?: sys_get_temp_dir(), DS,
 		                      substr(md5(__FILE__), -7), $this->table);
@@ -31,7 +30,7 @@ abstract class ORMTable {
 			$res = $this->db->query('SHOW COLUMNS FROM `'.$this->table.'`');
 			while ($row = $res->fetch_object()) {
 				$this->fields[$row->Field] = NULL;
-				if ($row->Key	 == 'PRI') $this->primary[] = $row->Field;
+				if ($row->Key   == 'PRI') $this->primary[] = $row->Field;
 				if ($row->Extra == 'auto_increment') $this->autoinc = $row->Field;
 			}
 			file_put_contents($schemafile,
