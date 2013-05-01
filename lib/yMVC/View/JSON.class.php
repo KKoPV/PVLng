@@ -5,7 +5,7 @@
  * @author		 Knut Kohl <knutkohl@users.sourceforge.net>
  * @copyright	2012 Knut Kohl
  * @license		GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version		$Id$
+ * @version		$Id: v1.0.0.2-1-ga6cbe48 2013-05-01 14:59:41 +0200 Knut Kohl $
  */
 namespace yMVC\View;
 
@@ -14,7 +14,7 @@ namespace yMVC\View;
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.2-1-ga6cbe48 2013-05-01 14:59:41 +0200 Knut Kohl $
  */
 use yMVC\View;
 
@@ -26,7 +26,7 @@ use yMVC\View;
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.2-1-ga6cbe48 2013-05-01 14:59:41 +0200 Knut Kohl $
  */
 class JSON extends View {
 
