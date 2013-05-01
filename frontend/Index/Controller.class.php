@@ -189,7 +189,7 @@ class Index_Controller extends ControllerAuth {
 		$this->view->User = $this->User;
 		Messages::fSuccess(I18N::_('LogoutSuccessful', $this->User));
 		$this->User = '';
-		setcookie(Session::token(), '', time()-60*60*24, '/');
+		Session::destroy();
 	}
 
 	/**
