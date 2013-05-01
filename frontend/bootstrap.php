@@ -94,14 +94,6 @@ if (!API) {
 	define('LANGUAGE', 'en');
 }
 
-/*
-$locales = array('de_DE', 'de', 'en_EN', 'en');
-
-foreach ($locales as $locale) {
-	if (setlocale(LC_ALL, $locale . '.utf-8') OR setlocale(LC_ALL, $locale)) break;
-}
-*/
-
 yMVC\ORMTable::cache(TEMP_DIR);
 
 // iconv encoding
@@ -135,6 +127,9 @@ define('PVLNG_VERSION_DATE', $version[1]);
 // ---------------------------------------------------------------------------
 // FUNCTIONS
 // ---------------------------------------------------------------------------
+/**
+ * Garbage collect temp. dir
+ */
 register_shutdown_function(function() {
 	// probability 0.1%
 	if (rand(1, 1000) > 1) return;
@@ -150,7 +145,7 @@ register_shutdown_function(function() {
 });
 
 /**
- *
+ * For development only
  */
 function dbg() {
 	$params = func_get_args();

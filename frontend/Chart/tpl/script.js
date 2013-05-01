@@ -85,8 +85,7 @@ var
 			}
 		},
 		xAxis : {
-			type: 'datetime',
-			maxZoom: 3600 * 1000 /* 1 hour */
+			type: 'datetime'
 		},
 		tooltip: {
 			useHTML: true,

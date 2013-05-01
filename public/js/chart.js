@@ -72,15 +72,12 @@ function setExtremes() {
  *
  */
 function trimDecimal( value ) {
-	var factor;
-
 	switch (true) {
-		case (Math.abs(value) <	 10):	factor = 1000;	break;
-		case (Math.abs(value) <	100):	factor =  100;	break;
-		case (Math.abs(value) < 1000):	factor =   10;	break;
-		default:                        factor =    1;	break;
+		case (Math.abs(value) <   10):  var factor = 1000;  break;
+		case (Math.abs(value) <  100):  var factor =  100;  break;
+		case (Math.abs(value) < 1000):  var factor =   10;  break;
+		default:                        var factor =    1;  break;
 	}
-
 	return Math.round(value * factor) / factor;
 }
 
@@ -90,7 +87,7 @@ function trimDecimal( value ) {
 function setMinMax( serie, setMin, setMax ) {
 
 	var
-		min = { id: null, x: null, y:	Number.MAX_VALUE },
+		min = { id: null, x: null, y:  Number.MAX_VALUE },
 		max = { id: null, x: null, y: -Number.MAX_VALUE };
 
 	/* search min. and max. values */
@@ -107,15 +104,16 @@ function setMinMax( serie, setMin, setMax ) {
 		serie.data[min.id] = {
 			marker: {
 				enabled: true,
-				symbol: 'circle',
+				symbol: 'triangle',
 				fillColor: serie.color
 			},
 			dataLabels: {
 				enabled: true,
+				formatter: function() { return Highcharts.numberFormat(this.y, -1) },
 				color: serie.color,
 				style: { fontWeight: 'bold' },
 				align: 'center',
-				y: 7,
+				y: 26,
 				borderRadius: 3,
 				backgroundColor: 'rgba(252, 255, 197, 0.7)',
 				borderWidth: 1,
@@ -131,11 +129,12 @@ function setMinMax( serie, setMin, setMax ) {
 		serie.data[max.id] = {
 			marker: {
 				enabled: true,
-				symbol: 'circle',
+				symbol: 'triangle-down',
 				fillColor: serie.color
 			},
 			dataLabels: {
 				enabled: true,
+				formatter: function() { return Highcharts.numberFormat(this.y, -1) },
 				color: serie.color,
 				style: { fontWeight: 'bold' },
 				align: 'center',
