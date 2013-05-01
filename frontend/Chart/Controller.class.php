@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.1-9-g08f2434 2013-04-30 21:45:01 +0200 Knut Kohl $
  */
 class Chart_Controller extends ControllerAuth {
 
@@ -31,6 +31,7 @@ class Chart_Controller extends ControllerAuth {
 				LANGUAGE,
 				array(
 					'var_name' => 'v[p]',
+					'blank_prompt' => I18N::_('None'),
 					'value'    => isset($this->Channels->p) ? $this->Channels->p : '',
 					'options'  => 'id="period"'
 				)

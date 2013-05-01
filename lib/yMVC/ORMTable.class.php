@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.1-8-g74c0519 2013-04-30 21:43:54 +0200 Knut Kohl $
  */
 namespace yMVC;
 
@@ -17,12 +17,11 @@ abstract class ORMTable {
 	/**
 	 *
 	 * @param mixed $id Key describing one row, on primary keys
-	 *									with more than field, provide an array
+	 *                  with more than field, provide an array
 	 */
 	public function __construct ( $id=NULL ) {
 		$this->db = MySQLi::getInstance();
 
-		$dir = self::$CACHEDIR ?: sys_get_temp_dir();
 		$schemafile = sprintf('%s%s%s~%s.tbl',
 		                      self::$CACHEDIR ?: sys_get_temp_dir(), DS,
 		                      substr(md5(__FILE__), -7), $this->table);
@@ -31,7 +30,7 @@ abstract class ORMTable {
 			$res = $this->db->query('SHOW COLUMNS FROM `'.$this->table.'`');
 			while ($row = $res->fetch_object()) {
 				$this->fields[$row->Field] = NULL;
-				if ($row->Key	 == 'PRI') $this->primary[] = $row->Field;
+				if ($row->Key   == 'PRI') $this->primary[] = $row->Field;
 				if ($row->Extra == 'auto_increment') $this->autoinc = $row->Field;
 			}
 			file_put_contents($schemafile,

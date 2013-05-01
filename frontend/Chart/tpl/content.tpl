@@ -5,9 +5,11 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.1-10-gd62a54c 2013-04-30 22:28:01 +0200 Knut Kohl $
  */
 -->
+
+<form method="post">
 
 <div id="nav" style="margin-top:1em;padding-top:1em;border-top:dotted gray 1px">
 	<input type="hidden" id="fromdate" name="fromdate" />
@@ -40,7 +42,7 @@
 			<label for="periodcnt" style="margin-left:1em" >{{Aggregation}}:</label>
 			<input class="numbersOnly r" type="text" id="periodcnt" name="periodcnt"
 						 value="1" size="2" />
-			{PERIODSELECT} &nbsp; <button id="btn-refresh" onclick="updateChart()">{{Refresh}}</button>
+			{PERIODSELECT} &nbsp; <button id="btn-refresh" onclick="updateChart(); return false">{{Refresh}}</button>
 		</td>
 	</tr>
 	</table>
@@ -55,8 +57,6 @@
 </div>
 
 <div class="clear"></div>
-
-<form method="post">
 
 <table id="tree" class="dataTable treeTable">
 	<thead>
@@ -138,8 +138,7 @@
 	</select>
 	<input type="submit" name="load" value="{{Load}}" />
 	<input type="submit" name="delete" value="{{Delete}}" />
-	<a id="btn-bookmark" class="fr tip" href="/chart?view={VIEW}"
-	   data-url="/chart?view=" title="{{DragBookmark}}">PVLng | {VIEW}</a>
+	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">PVLng | {VIEW}</a>
 </p>
 
 </form>
@@ -178,6 +177,19 @@
 					<option value="bar">Bar</option>
 					<option value="scatter">Scatter</option>
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="d-cons">{{Presentation}}</label>
+			</td>
+			<td>
+				<div class="fl">
+					<input type="checkbox" id="d-cons" class="iCheckLine tip" />
+					<label for="d-cons">{{ShowConsumption}}</label>
+				</div>
+				<img src="/images/ico/information_frame.png" class="tip"
+				     style="margin-left:.5em" title="{{ShowConsumptionHint}}" />
 			</td>
 		</tr>
 		<tr>

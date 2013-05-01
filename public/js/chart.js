@@ -22,8 +22,9 @@ var defaults = {
  */
 function presentation( data ) {
 	/* set defaults */
-	this.axis  = 1;
-	this.type  = defaults.line.type;
+	this.axis = 1;
+	this.type = defaults.line.type;
+	this.consumption = false;
 	this.style = 'Solid';
 	this.color = defaults.line.color;
 	this.bold  = false;

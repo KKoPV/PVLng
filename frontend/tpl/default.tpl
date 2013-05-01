@@ -70,7 +70,7 @@
 				{VERSION}
 				<!-- IF {VERSIONNEW} -->
 				<br /><br />
-				<a href="https://github.com/K-Ko/PVLng"
+				<a href="https://github.com/K-Ko/PVLng/wiki"
 				   style="font-weight:bold;color:red">
 					{VERSIONNEW}
 				</a>

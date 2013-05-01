@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.1-6-gc61bfdd 2013-04-30 20:31:28 +0200 Knut Kohl $
  */
 namespace Channel\PVLog;
 
@@ -104,10 +104,14 @@ class Base extends \Channel {
 	protected function finish ( &$yield, $request ) {
 		$yield->setCreator('PVLng ' . PVLNG_VERSION);
 
-		$yield->setUtcOffset(3600);
-
 		$date = array_key_exists(0, $request) ? $request[0] : date('Y-m-d');
 		$yield->setDeleteDayBeforeImport(($date != date('Y-m-d')));
+
+		// Force timestamp calculation...
+        $yield->asArray();
+
+		// Emulate a UTC summer time
+		$yield->setUtcOffset(date('I', $yield->getPlant()->getTimestampStart()) ? 3600 : 0);
 
 		return $yield->asArray();
 	}

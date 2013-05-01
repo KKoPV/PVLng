@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.2-13-gc0cc73c 2013-05-01 20:24:30 +0200 Knut Kohl $
  */
 namespace Channel;
 
@@ -46,7 +46,7 @@ class Accumulator extends \Channel {
 
 		// no childs, return empty file
 		if (count($childs) == 0) {
-			return $this->after_read(tmpfile(), $attributes);
+			return $this->after_read($this->tmpfile(), $attributes);
 		}
 
 		$tmpfile_1 = $childs[0]->read($request);
@@ -69,7 +69,7 @@ class Accumulator extends \Channel {
 			$row2 = fgets($tmpfile_2);
 			$this->decode($row2, $id2);
 
-			$result = tmpfile();
+			$result = $this->tmpfile();
 
 			$done = ($row1 == '' AND $row2 == '');
 
