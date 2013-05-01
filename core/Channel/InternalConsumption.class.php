@@ -53,7 +53,7 @@ class InternalConsumption extends \Channel {
 
 		$last = 0;
 		$done = ($row1 == '' AND $row2 == '');
-
+$c = 0;
 		while (!$done) {
 
 			if ($id1 == $id2) {
@@ -62,9 +62,11 @@ class InternalConsumption extends \Channel {
 				if ($last) $row1['data'] = $last;
 
 				if ($row1['consumption'] > $row2['consumption']) {
-					$row1['data'] += $row1['consumption'] - $row2['consumption'];
+					$row1['consumption'] -= $row2['consumption'];
+					$row1['data'] += $row1['consumption'];
+				} else {
+					$row1['consumption'] = 0;
 				}
-
 				$last = $row1['data'];
 
 				fwrite($result, $this->encode($row1, $id1));
@@ -78,9 +80,12 @@ class InternalConsumption extends \Channel {
 
 			} elseif ($id2 == '' OR $id1 < $id2) {
 
-				if ($last) $row1['data'] = $last;
-
-				$row1['data'] += $row1['consumption'];
+				if ($last) {
+					$row1['data'] = $last;
+					$row1['data'] += $row1['consumption'];
+				} else {
+					$row1['data'] = $row1['consumption'];
+				}
 				$last = $row1['data'];
 
 				// missing row 2, save row 1 as is

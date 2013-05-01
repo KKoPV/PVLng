@@ -56,6 +56,10 @@ class JSON extends View {
 				} else {
 					echo ',';
 				}
+				// make numeric
+				array_walk($row, function(&$d) {
+					if ((string) $d == (string) +$d) $d = +$d;
+				});
 				echo json_encode($row);
 			}
 			echo ']';

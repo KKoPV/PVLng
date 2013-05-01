@@ -3,7 +3,7 @@
  */
 var defaults = {
 	/* Chart hint decimals */
-	hintDecimals: 2,
+	HintDecimals: 2,
 
 	line: {
 		/* normal line width */

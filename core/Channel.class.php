@@ -189,20 +189,18 @@ class Channel {
 				$data = $row;
 				$data['consumption'] = 0;
 
-				if ($this->numeric) {
-					$data['data'] *= $this->resolution;
-					$data['min']  *= $this->resolution;
-					$data['max']  *= $this->resolution;
-				}
-
 				if ($this->meter) {
 					if (!$meterabsolute) {
 						// calc meter offset for uncompressed data
 						if ($offset == 0) $offset = $data['data'];
 						$data['data'] -= $offset;
 					}
-					$data['consumption'] = $data['data'] - $last;
-					$last = $data['data'];
+					if ($this->period[1] > 0) {
+						$data['consumption'] = $data['max'] - $data['min'];
+					} else {
+						$data['consumption'] = $data['data'] - $last;
+						$last = $data['data'];
+					}
 				}
 
 				$id = $data['g'];
@@ -368,13 +366,12 @@ class Channel {
 	 */
 	protected function after_read( $tmpfile, $attributes ) {
 
-		rewind($tmpfile);
-
 		$tmpfile2 = tmpfile();
 
-		$last = 0;
+		$last = $consumption = 0;
 		$lastrow = '';
 
+		rewind($tmpfile);
 		while ($row = fgets($tmpfile)) {
 			$this->decode($row, $id);
 
@@ -384,7 +381,15 @@ class Channel {
 				    $this->resolution < 0 AND $row['data'] > $last) {
 					$row['data'] = $last;
 				}
+				$consumption += $row['consumption'];
 				$last = $row['data'];
+			}
+
+			if ($this->numeric AND $this->resolution != 1) {
+				$row['data'] *= $this->resolution;
+				$row['min']  *= $this->resolution;
+				$row['max']  *= $this->resolution;
+				$row['consumption'] *= $this->resolution;
 			}
 
 			$row['data'] = $this->valid($row['data']);
@@ -398,11 +403,7 @@ class Channel {
 
 		if ($attributes) {
 			$attr = $this->getAttributes();
-			if ($this->meter AND $lastrow != '') {
-				$attr['consumption'] = $lastrow['data'];
-			} else {
-				$attr['consumption'] = 0;
-			}
+			$attr['consumption'] = $consumption * $this->resolution;
 			$attr['costs'] = $attr['consumption'] * $this->cost;
 		}
 
@@ -421,21 +422,13 @@ class Channel {
 			rewind($tmpfile2);
 			while ($row = fgets($tmpfile2)) {
 				$this->decode($row, $id);
-
-				if ($this->full) {
-					// return all data
-					array_walk($row, function(&$d) {
-						// make numeric
-						if ((string) $d === (string) +$d) $d = +$d;
-					});
-				} else {
-				// default result: only timestamp and data
+				if (!$this->full) {
+					// default result: only timestamp and data
 					$row = array(
-						'timestamp' => +$row['timestamp'],
-						'data'      => $this->numeric ? +$row['data'] : $row['data'],
+						'timestamp' => $row['timestamp'],
+						'data'      => $row['data'],
 					);
 				}
-
 				fwrite($tmpfile3, serialize($row) . PHP_EOL);
 			}
 			fclose($tmpfile2);
