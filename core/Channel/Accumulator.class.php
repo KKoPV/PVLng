@@ -45,12 +45,16 @@ class Accumulator extends \Channel {
 		$childs = $this->getChilds();
 
 		// no childs, return empty file
-		if (count($childs) == 0) return tmpfile();
+		if (count($childs) == 0) {
+			return $this->after_read(tmpfile(), $attributes);
+		}
 
 		$tmpfile_1 = $childs[0]->read($request);
 
 		// only one child, return as is
-		if (count($childs) == 1) return $tmpfile_1;
+		if (count($childs) == 1) {
+			return $this->after_read($tmpfile_1, $attributes);
+		}
 
 		// combine all data for same timestamp
 		for ($i=1; $i<count($childs); $i++) {

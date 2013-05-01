@@ -40,8 +40,9 @@ class Counter extends \Channel {
 					$row['timediff'] = $row['timestamp'] - $last;
 				}
 
-				// remove resolution
-				$factor = 3600 / $row['timediff'] / $this->resolution / $this->resolution;
+				// remove resolution, will be applied in after_read
+				$factor = 3600 / $row['timediff'] / $this->resolution /
+				          $this->resolution / $this->resolution;
 
 				$row['data']        *= $factor;
 				$row['min']         *= $factor;

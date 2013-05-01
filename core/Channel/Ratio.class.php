@@ -43,15 +43,15 @@ class Ratio extends \Channel {
 			if ($id1 == $id2) {
 
 				$row1['data'] = $row2['data'] != 0
-				              ? $row1['data'] / $row2['data'] * $this->resolution
+				              ? $row1['data'] / $row2['data']
 				              : 0;
 
 				$row1['min']  = $row2['min'] != 0
-				              ? $row1['min'] / $row2['min'] * $this->resolution
+				              ? $row1['min'] / $row2['min']
 				              : 0;
 
 				$row1['max']  = $row2['max'] != 0
-				              ? $row1['max'] / $row2['max'] * $this->resolution
+				              ? $row1['max'] / $row2['max']
 				              : 0;
 
 				fwrite($result, $this->encode($row1, $id1));
