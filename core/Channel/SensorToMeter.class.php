@@ -34,13 +34,12 @@ class SensorToMeter extends \Channel {
 			$this->decode($row, $id);
 
 			if ($last) {
-				$consumption = ($row['timestamp'] - $last) / 3600 *
-				               $row['data'] / $this->resolution;
+				$consumption = ($row['timestamp'] - $last) / 3600 * $row['data'];
 				$sum += $consumption;
 			}
 
 			$row['data']        = $sum;
-			$row['consumption'] = $consumption;
+			$row['consumption'] = $consumption * $this->resolution;
 			fwrite($result, $this->encode($row, $id));
 
 			$last = $row['timestamp'];
@@ -61,6 +60,7 @@ class SensorToMeter extends \Channel {
 	protected function __construct( $guid ) {
 		parent::__construct($guid);
 		$this->meter = TRUE;
+		$this->resolution = 1 / $this->resolution;
 	}
 
 }
