@@ -53,7 +53,7 @@ class InternalConsumption extends \Channel {
 
 		$last = 0;
 		$done = ($row1 == '' AND $row2 == '');
-$c = 0;
+
 		while (!$done) {
 
 			if ($id1 == $id2) {
