@@ -49,7 +49,7 @@ class InternalConsumption extends \Channel {
 		$row2 = fgets($tmpfile_2);
 		$this->decode($row2, $id2);
 
-		$result = tmpfile();
+		$result = $this->tmpfile();
 
 		$last = 0;
 		$done = ($row1 == '' AND $row2 == '');

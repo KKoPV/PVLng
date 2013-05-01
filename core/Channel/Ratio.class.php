@@ -34,7 +34,7 @@ class Ratio extends \Channel {
 		$row2 = fgets($tmpfile_2);
 		$this->decode($row2, $id2);
 
-		$result = tmpfile();
+		$result = $this->tmpfile();
 
 		$done = ($row1 == '' AND $row2 == '');
 

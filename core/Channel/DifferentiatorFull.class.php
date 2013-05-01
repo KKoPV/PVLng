@@ -24,12 +24,16 @@ class DifferentiatorFull extends Differentiator {
 		$childs = $this->getChilds();
 
 		// no childs, return empty file
-		if (count($childs) == 0) return tmpfile();
+		if (count($childs) == 0) {
+			return $this->after_read($this->tmpfile(), $attributes);
+		}
 
 		$tmpfile_1 = $childs[0]->read($request);
 
 		// only one child, return as is
-		if (count($childs) == 1) return $tmpfile_1;
+		if (count($childs) == 1) {
+			return $this->after_read($tmpfile_1, $attributes);
+		}
 
 		// combine all data for same timestamp
 		for ($i=1; $i<count($childs); $i++) {
@@ -44,7 +48,7 @@ class DifferentiatorFull extends Differentiator {
 			$row2 = fgets($tmpfile_2);
 			$this->decode($row2, $id2);
 
-			$result = tmpfile();
+			$result = $this->tmpfile();
 
 			$done = ($row1 == '' AND $row2 == '');
 

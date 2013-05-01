@@ -25,7 +25,7 @@ class SensorToMeter extends \Channel {
 
 		$tmpfile = $childs[0]->read($request);
 
-		$result = tmpfile();
+		$result = $this->tmpfile();
 
 		$last = $consumption = $sum = 0;
 

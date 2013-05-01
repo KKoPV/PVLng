@@ -23,7 +23,7 @@ class Counter extends \Channel {
 
 		$tmpfile = parent::read($request);
 
-		$result = tmpfile();
+		$result = $this->tmpfile();
 
 		$last = 0;
 

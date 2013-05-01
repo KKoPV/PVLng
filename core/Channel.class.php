@@ -178,7 +178,7 @@ class Channel {
 
 #echo $q;
 
-		$tmpfile = tmpfile();
+		$tmpfile = $this->tmpfile();
 		$meterabsolute = (isset($request['absolute']) AND $request['absolute']);
 
 		if ($res = $this->db->query($q)) {
@@ -311,12 +311,21 @@ class Channel {
 	}
 
 	/**
+	 * Use PHPs internal temp stream, use file for data greater 5 MB
+	 */
+	protected function tmpfile() {
+	    // 5 MB
+		$size = 5 * 1024 * 1024;
+	    return fopen('php://temp/maxmemory:'.$size, 'w+');
+	}
+
+	/**
 	 *
 	 */
 	protected function before_read( $request ) {
 		if (!$this->read)
 			throw new \Exception('Can\'t read data from "'.$this->name.'", '
-												 .'instance of "'.get_class($this).'"!', 400);
+			                    .'instance of "'.get_class($this).'"!', 400);
 
 		if ($this->childs >= 0 AND
 				count($this->getChilds()) != $this->childs)
@@ -366,7 +375,7 @@ class Channel {
 	 */
 	protected function after_read( $tmpfile, $attributes ) {
 
-		$tmpfile2 = tmpfile();
+		$tmpfile2 = $this->tmpfile();
 
 		$last = $consumption = 0;
 		$lastrow = '';
@@ -410,12 +419,12 @@ class Channel {
 		if ($this->period[1] == -1) {
 			// recreate temp. file with last row only
 			fclose($tmpfile2);
-			$tmpfile2 = tmpfile();
+			$tmpfile2 = $this->tmpfile();
 			fwrite($tmpfile2, $this->encode($lastrow, $id));
 		}
 
 		if ($attributes) {
-			$tmpfile3 = tmpfile();
+			$tmpfile3 = $this->tmpfile();
 
 			fwrite($tmpfile3, serialize($attr) . PHP_EOL);
 
