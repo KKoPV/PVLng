@@ -56,36 +56,36 @@
 	<div id="topic_content">
 		
 <p></p>
-<p class="rvps2"><span class="rvts6">Scripts located in </span><span class="rvts27">bin/S0/</span></p>
+<p class="rvps2"><span class="rvts6">Scripts located in </span><span class="rvts26">bin/S0/</span></p>
 <p class="rvps2"><span class="rvts6">To read S0 impulses from e.g. energy meters, a program and a script to store this into PVLng is included.</span></p>
-<p class="rvps2"><span class="rvts6">Please refer 1st to the </span><a class="rvts16" href="Hardwarerequirements.html">hardware</a><span class="rvts6"> requirements sections.</span></p>
+<p class="rvps2"><span class="rvts6">Please refer 1st to the </span><a class="rvts14" href="Hardwarerequirements.html">hardware</a><span class="rvts6"> requirements sections.</span></p>
 <p class="rvps2"><span class="rvts6">Please put the device where your energy meter is connected to into the "channel" attribute like this:</span></p>
-<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem16.png"/><br/><span class="rvts16"><br/></span></p>
-<p class="rvps2"><span class="rvts6">HowTo: </span><a class="rvts16" href="FixednameforUSBdevice.html">Define a "named" device</a></p>
-<p class="rvps7"><span class="rvts7">Mode of operation</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem16.png"/><br/><span class="rvts14"><br/></span></p>
+<p class="rvps2"><span class="rvts6">HowTo: </span><a class="rvts14" href="FixednameforUSBdevice.html">Define a "named" device</a></p>
+<p class="rvps6"><span class="rvts19">Mode of operation</span></p>
 <p class="rvps2"><span class="rvts6">An energy meter with S0 interface sends depending of the actual power usage an amount of impulses per kilo watt hour.</span></p>
 <p class="rvps2"><span class="rvts6">A common frequency is 1000 or 2000 per kilo watt hour, or 800 as for our energy meter.</span></p>
 <p class="rvps2"><span class="rvts6">The S0 binary listen the device and detects the time between these impulses. It converts them to power usage in watt.</span></p>
-<p class="rvps7"><span class="rvts7">Installation</span></p>
-<p class="rvps2"><span class="rvts6">Go to </span><span class="rvts54">bin/S0</span><span class="rvts6"> and run</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">$ ./configure</span></p>
-<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Make and install the S0 binary into </span><span class="rvts27">/usr/local/bin</span><span class="rvts6"> with</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">$ make &amp;&amp; sudo make install</span></p>
-<p class="rvps7"><span class="rvts7"></span><br/><span class="rvts7">Configuration</span></p>
-<p class="rvps2"><span class="rvts6">Please refer to </span><span class="rvts27">S0.conf.dist</span><span class="rvts6"> to configure your environment regarding interfaces and channels.</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">$ cp bin/S0/S0.conf.dist cp bin/S0/S0.conf</span></p>
-<p class="rvps7"><span class="rvts7">Test</span></p>
+<p class="rvps6"><span class="rvts19">Installation</span></p>
+<p class="rvps2"><span class="rvts6">Go to </span><span class="rvts53">bin/S0</span><span class="rvts6"> and run</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps18"><span class="rvts24">$ ./configure</span></p>
+<p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Make and install the S0 binary into </span><span class="rvts26">/usr/local/bin</span><span class="rvts6"> with</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps18"><span class="rvts24">$ make &amp;&amp; sudo make install</span></p>
+<p class="rvps6"><span class="rvts19"></span><br/><span class="rvts19">Configuration</span></p>
+<p class="rvps2"><span class="rvts6">Please refer to </span><span class="rvts26">S0.conf.dist</span><span class="rvts6"> to configure your environment regarding interfaces and channels.</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps18"><span class="rvts24">$ cp bin/S0/S0.conf.dist cp bin/S0/S0.conf</span></p>
+<p class="rvps6"><span class="rvts19">Test</span></p>
 <p class="rvps2"><span class="rvts6">To test your configuration, run</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">$ ./S0.sh -t</span></p>
-<p class="rvps7"><span class="rvts7"></span><br/><span class="rvts7">Run with cron</span></p>
+<p class="rvps18"><span class="rvts24">$ ./S0.sh -t</span></p>
+<p class="rvps6"><span class="rvts19"></span><br/><span class="rvts19">Run with cron</span></p>
 <p class="rvps2"><span class="rvts6">Edit your crontab with</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">$ crontab -e</span></p>
+<p class="rvps18"><span class="rvts24">$ crontab -e</span></p>
 <p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">and add the following</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25"># run each 2 minutes</span><br/><span class="rvts25">*/2 * * * * /path/to/bin/S0.sh</span></p>
+<p class="rvps18"><span class="rvts24"># run each 2 minutes</span><br/><span class="rvts24">*/2 * * * * /path/to/bin/S0.sh</span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
 <p></p>
-<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com/create-epub-ebooks">Free EPub producer</a></p>
+<p class="rvps15"><span class="rvts17">Created with the Personal Edition of HelpNDoc: </span><a class="rvts18" href="http://www.helpndoc.com/create-epub-ebooks">Free EPub producer</a></p>
 </div>
 	
 	<div id="topic_footer">

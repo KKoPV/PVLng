@@ -56,22 +56,22 @@
 	<div id="topic_content">
 		
 <p></p>
-<p class="rvps2"><span class="rvts6">These models provide data for import into </span><a class="rvts16" href="http://pv-log.com">PV-Log</a><span class="rvts6"> in JSON via URL.</span></p>
+<p class="rvps2"><span class="rvts6">These models provide data for import into </span><a class="rvts14" href="http://pv-log.com">PV-Log</a><span class="rvts6"> in JSON via URL.</span></p>
 <p class="rvps2"><span class="rvts6">PV-Log supports "installations" with multiple inverters.</span></p>
-<p class="rvps2"><span class="rvts23">Please note: </span><span class="rvts6">If you have more than one inverter in your plant with different modules, strings, direction or roof pitches, you should split them into multiple "installations".</span></p>
+<p class="rvps2"><span class="rvts22">Please note: </span><span class="rvts6">If you have more than one inverter in your plant with different modules, strings, direction or roof pitches, you should split them into multiple "installations".</span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
 <p class="rvps2"><span class="rvts6">The system supports both scenarios and can deliver either whole plant data or single inverter data.</span></p>
 <p class="rvps2"><span class="rvts6">It is handled by 2 models:</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts27">PVLog\Plant</span></p>
+<span class="rvts26">PVLog\Plant</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts27">PVLog\Inverter</span></p>
+<span class="rvts26">PVLog\Inverter</span></p>
 <p class="rvps2"><span class="rvts6">The plant model acts as a super group combining all its inverter data.</span></p>
 <p class="rvps2"><span class="rvts6">URL for the HTTP GET requests:</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/[GUID]/YYYY-MM-DD.json</span><br/><span class="rvts25">http://your.domain.here/api/r1/[GUID].json</span></p>
+<p class="rvps18"><span class="rvts24">http://your.domain.here/api/r1/[GUID]/YYYY-MM-DD.json</span><br/><span class="rvts24">http://your.domain.here/api/r1/[GUID].json</span></p>
 <p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">Use either your "plant" or the "inverter" GUID. If no date is provided, today is used by default.</span></p>
-<p class="rvps2"><span class="rvts23">Please note:</span><span class="rvts6"> Don't forget the required </span><span class="rvts27">.json</span><span class="rvts6">!</span></p>
-<p class="rvps7"><span class="rvts7">Setup channel tree</span></p>
+<p class="rvps2"><span class="rvts22">Please note:</span><span class="rvts6"> Don't forget the required </span><span class="rvts26">.json</span><span class="rvts6">!</span></p>
+<p class="rvps6"><span class="rvts19">Setup channel tree</span></p>
 <p class="rvps2"><span class="rvts6">Start the definition with the plant, which will combine all your inverters.</span></p>
 <p class="rvps4"><span class="rvts9">Plant</span></p>
 <p class="rvps2"><span class="rvts6">Create a new "PV-Log plant" channel by selecting channel type "PV-Log plant"</span><br/><span class="rvts6"><br/></span></p>
@@ -81,42 +81,42 @@
 <p class="rvps4"><span class="rvts9">Inverter</span></p>
 <p class="rvps2"><span class="rvts6">Create next an inverter channel the same way using channel type "PV-Log Inverter" and assign it afterwards as sub channel to the plant.</span></p>
 <p class="rvps4"><span class="rvts9">Data channels</span></p>
-<p class="rvps2"><span class="rvts6">Now the inverter channel must have </span><span class="rvts26">at least</span><span class="rvts6"> 2 sub channels with following conventions:</span></p>
+<p class="rvps2"><span class="rvts6">Now the inverter channel must have </span><span class="rvts25">at least</span><span class="rvts6"> 2 sub channels with following conventions:</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts22">1</span><span class="rvts42">st</span><span class="rvts22"> sub channel</span><span class="rvts6">: Total or today production of the inverter (must have "consumption" parameter set)</span></p>
+<span class="rvts21">1</span><span class="rvts41">st</span><span class="rvts21"> sub channel</span><span class="rvts6">: Total or today production of the inverter (must have "consumption" parameter set)</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts22">2</span><span class="rvts42">nd</span><span class="rvts22"> sub channel</span><span class="rvts6">: PAC power of the inverter</span></p>
+<span class="rvts21">2</span><span class="rvts41">nd</span><span class="rvts21"> sub channel</span><span class="rvts6">: PAC power of the inverter</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts22">3</span><span class="rvts42">rd</span><span class="rvts22"> and following</span><span class="rvts6">: PDC string powers (optional)</span></p>
-<p class="rvps2"><span class="rvts23">Please note:</span><span class="rvts6"> These requirements can't really checked by the model during data readout, a wrong definition it will result in wrong results!</span></p>
+<span class="rvts21">3</span><span class="rvts41">rd</span><span class="rvts21"> and following</span><span class="rvts6">: PDC string powers (optional)</span></p>
+<p class="rvps2"><span class="rvts22">Please note:</span><span class="rvts6"> These requirements can't really checked by the model during data readout, a wrong definition it will result in wrong results!</span></p>
 <p class="rvps2"><span class="rvts6">The whole definition for our installation (2 inverters with 2 strings each) look like this:</span><br/><span class="rvts6"><br/></span></p>
 <p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem1.png"/></p>
 <p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">The corresponding "plants" on PV-Log:</span></p>
-<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <a class="rvts12" href="http://www.pv-log.com/photovoltaikanlage-kkopv">http://www.pv-log.com/photovoltaikanlage-kkopv</a></p>
-<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <a class="rvts12" href="http://www.pv-log.com/photovoltaikanlage-kkopv1">http://www.pv-log.com/photovoltaikanlage-kkopv1</a></p>
-<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <a class="rvts12" href="http://www.pv-log.com/photovoltaikanlage-kkopv2">http://www.pv-log.com/photovoltaikanlage-kkopv2</a></p>
-<p class="rvps7"><span class="rvts7">Setup PV-Log</span></p>
-<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<p class="rvps6"><span class="rvts19">Setup PV-Log</span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <span class="rvts6">Open your profile page</span></p>
-<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <span class="rvts6">Create a plant with "Add new PV installation"</span></p>
-<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <span class="rvts6">In the plant section open "Yield data: Automatic data import / Data logger"</span></p>
-<p class="rvps29" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts6">Make the following settings (with </span><span class="rvts22">your domain</span><span class="rvts6"> and </span><span class="rvts22">GUID</span><span class="rvts6">):</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps28" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Make the following settings (with </span><span class="rvts21">your domain</span><span class="rvts6"> and </span><span class="rvts21">GUID</span><span class="rvts6">):</span><br/><span class="rvts6"><br/></span></p>
 <p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem44.png"/><br/><span class="rvts6"><br/></span></p>
-<p class="rvps7"><span class="rvts7">Examples for fields and formats on PV-Log</span></p>
+<p class="rvps6"><span class="rvts19">Examples for fields and formats on PV-Log</span></p>
 <p class="rvps2"><a class="rvts12" href="http://www.pv-log.com/Resources/Public/Upload/1-2012-04-20-pvlog.json">http://www.pv-log.com/Resources/Public/Upload/1-2012-04-20-pvlog.json</a><br/><a class="rvts12" href="http://www.pv-log.com/Resources/Public/Upload/1-2012-04-20-pvlog.json"><br/></a></p>
-<p class="rvps7"><span class="rvts7">Check your definitions</span></p>
-<p class="rvps2"><span class="rvts6">Please check your PV-Log definition (Data-URL + File Name) by using a service like </span><a class="rvts16" href="http://jsoneditoronline.org/">http://jsoneditoronline.org/</a><span class="rvts6">, just use</span><span class="rvts27"> Open &gt; Open URL</span></p>
+<p class="rvps6"><span class="rvts19">Check your definitions</span></p>
+<p class="rvps2"><span class="rvts6">Please check your PV-Log definition (Data-URL + File Name) by using a service like </span><a class="rvts14" href="http://jsoneditoronline.org/">http://jsoneditoronline.org/</a><span class="rvts6">, just use</span><span class="rvts26"> Open &gt; Open URL</span></p>
 <p class="rvps2"><span class="rvts6">Fetch your URL and check for completeness and correctness!</span></p>
-<p class="rvps2"><span class="rvts6">If you use Chrome, I recommend </span><a class="rvts16" href="https://github.com/a85/POSTMan-Chrome-Extension/wiki">POSTman - REST client</a><span class="rvts6"> or </span><a class="rvts16" href="http://restforchrome.blogspot.de/?utm_source=ARC&amp;utm_medium=InsideApplication&amp;utm_campaign=About">Advanced Rest Client</a></p>
+<p class="rvps2"><span class="rvts6">If you use Chrome, I recommend </span><a class="rvts14" href="https://github.com/a85/POSTMan-Chrome-Extension/wiki">POSTman - REST client</a><span class="rvts6"> or </span><a class="rvts14" href="http://restforchrome.blogspot.de/?utm_source=ARC&amp;utm_medium=InsideApplication&amp;utm_campaign=About">Advanced Rest Client</a></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
 <p></p>
-<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com">Free HTML Help documentation generator</a></p>
+<p class="rvps15"><span class="rvts17">Created with the Personal Edition of HelpNDoc: </span><a class="rvts18" href="http://www.helpndoc.com">Free HTML Help documentation generator</a></p>
 </div>
 	
 	<div id="topic_footer">

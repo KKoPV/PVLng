@@ -57,42 +57,42 @@
 		
 <p></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts6">Supports only </span><span class="rvts27">PUT</span><span class="rvts6"> request method for data storage</span></p>
+<span class="rvts6">Supports only </span><span class="rvts26">PUT</span><span class="rvts6"> request method for data storage</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts6">The</span><span class="rvts22"> API key</span><span class="rvts6"> of your installation is </span><span class="rvts22">required</span><span class="rvts6"> for security reasons for every storage request.</span><br/><span class="rvts6">The key have to be send by HTTP PUT requests as so called</span><span class="rvts22"> X-Header</span><span class="rvts6"> with the name </span><span class="rvts27">X-PVLng-key</span><span class="rvts6"> (see your information site in the web front end)</span></p>
+<span class="rvts6">The</span><span class="rvts21"> API key</span><span class="rvts6"> of your installation is </span><span class="rvts21">required</span><span class="rvts6"> for security reasons for every storage request.</span><br/><span class="rvts6">The key have to be send by HTTP PUT requests as so called</span><span class="rvts21"> X-Header</span><span class="rvts6"> with the name </span><span class="rvts26">X-PVLng-key</span><span class="rvts6"> (see your information site in the web front end)</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <span class="rvts6">Floating point numbers must not contain a thousand separator and a dot as decimal separator.</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <span class="rvts6">Each request must contain the channel GUID in the URL.</span></p>
-<p class="rvps7"><span class="rvts7">URL</span></p>
+<p class="rvps6"><span class="rvts19">URL</span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">http://your.domain.here/api/r1/[GUID]</span></p>
+<p class="rvps18"><span class="rvts24">http://your.domain.here/api/r1/[GUID]</span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
-<p class="rvps7"><span class="rvts7">Data</span></p>
-<p class="rvps2"><span class="rvts6">The data to store have to be provided as parameter </span><span class="rvts27">data</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">data="123.45"</span></p>
+<p class="rvps6"><span class="rvts19">Data</span></p>
+<p class="rvps2"><span class="rvts6">The data to store have to be provided as parameter </span><span class="rvts26">data</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps18"><span class="rvts24">data="123.45"</span></p>
 <p class="rvps2"><span class="rvts6"></span><br/><span class="rvts6">For concrete build of the requests see the </span><a class="rvts12" href="Datastorage.html">examples</a><span class="rvts6">.</span></p>
-<p class="rvps7"><span class="rvts7">Batch</span></p>
-<p class="rvps2"><span class="rvts6">The data to store have to be provided as parameter </span><span class="rvts27">batch</span></p>
+<p class="rvps6"><span class="rvts19">Batch</span></p>
+<p class="rvps2"><span class="rvts6">The data to store have to be provided as parameter </span><span class="rvts26">batch</span></p>
 <p class="rvps2"><span class="rvts6">This parameter consists of up to 100 data sets (this should be enough in most cases :-)</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts6">A data set contains </span><span class="rvts26">comma </span><span class="rvts6">separated values for</span></p>
-<p class="rvps36" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
-<span class="rvts26">date</span><span class="rvts6"> (YYYY-MM-DD / YYYYMMDD)</span></p>
-<p class="rvps36" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
-<span class="rvts26">time</span><span class="rvts6"> (HH:mm / HHmm)</span></p>
-<p class="rvps36" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
-<span class="rvts26">value</span><span class="rvts6"> (with decimal </span><span class="rvts26">dot</span><span class="rvts6">) </span></p>
+<span class="rvts6">A data set contains </span><span class="rvts25">comma </span><span class="rvts6">separated values for</span></p>
+<p class="rvps35" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts25">date</span><span class="rvts6"> (YYYY-MM-DD / YYYYMMDD)</span></p>
+<p class="rvps35" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts25">time</span><span class="rvts6"> (HH:mm / HHmm)</span></p>
+<p class="rvps35" style="text-indent: -24px; padding-left: 24px; margin-left: 48px;"><span style="font-size: 12pt; font-family: 'Courier New'; color: #000000;">o</span>
+<span class="rvts25">value</span><span class="rvts6"> (with decimal </span><span class="rvts25">dot</span><span class="rvts6">) </span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts6">Data tuples must be separated by </span><span class="rvts26">semicolon</span><span class="rvts6">.</span></p>
+<span class="rvts6">Data tuples must be separated by </span><span class="rvts25">semicolon</span><span class="rvts6">.</span></p>
 <p class="rvps2"><span class="rvts6">To store 2 reading values:</span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
-<p class="rvps20"><span class="rvts25">batch="1012-01-01</span><span class="rvts51">,</span><span class="rvts25">00:00</span><span class="rvts52">,</span><span class="rvts25">123.45</span><span class="rvts53">;</span><span class="rvts25">2012-01-01</span><span class="rvts52">,</span><span class="rvts25">00:05</span><span class="rvts52">,</span><span class="rvts25">123.67"</span></p>
+<p class="rvps18"><span class="rvts24">batch="1012-01-01</span><span class="rvts50">,</span><span class="rvts24">00:00</span><span class="rvts51">,</span><span class="rvts24">123.45</span><span class="rvts52">;</span><span class="rvts24">2012-01-01</span><span class="rvts51">,</span><span class="rvts24">00:05</span><span class="rvts51">,</span><span class="rvts24">123.67"</span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
 <p class="rvps2"><span class="rvts6">The count of inserted readings is returned in the response body on success.</span></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
 <p></p>
-<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com">Free EBook and documentation generator</a></p>
+<p class="rvps15"><span class="rvts17">Created with the Personal Edition of HelpNDoc: </span><a class="rvts18" href="http://www.helpndoc.com">Free EBook and documentation generator</a></p>
 </div>
 	
 	<div id="topic_footer">

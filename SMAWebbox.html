@@ -56,43 +56,43 @@
 	<div id="topic_content">
 		
 <p></p>
-<p class="rvps13"><span class="rvts6">A special model to split Webbox RPC content into single channel values.</span></p>
-<p class="rvps13"><span class="rvts6">This model is in contrast to other grouping models writable but not readable!</span></p>
-<p class="rvps23"><span class="rvts38">Operation mode</span></p>
-<p class="rvps13"><span class="rvts6">The SMA Webbox model handles JSON outputs from Webbox RPC requests.</span></p>
-<p class="rvps13"><span class="rvts6">It scans the data and search its </span><span class="rvts22">direct</span><span class="rvts6"> sub channels for matching channel definitions!</span></p>
-<p class="rvps23"><span class="rvts38">Setup</span></p>
-<p class="rvps25"><span class="rvts39">Create a channel for the Inverter</span></p>
-<p class="rvps13"><img alt="" style="padding : 1px;" src="lib/NewItem10.png"/><span class="rvts6"> &nbsp;</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps13"><img alt="" style="padding : 1px;" src="lib/NewItem20.png"/><br/><span class="rvts6"><br/></span></p>
-<p class="rvps13"><img alt="" style="padding : 1px;" src="lib/NewItem25.png"/></p>
-<p class="rvps13"><span class="rvts23">Please note:</span></p>
-<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts6">The </span><span class="rvts22">serial number</span><span class="rvts6"> is used from external upload script to ask the SMA Webbox for the correct equipment.</span></p>
-<p class="rvps13" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts6">When the serial number </span><span class="rvts22">changes</span><span class="rvts6"> after</span><span class="rvts22"> firmware updates, don't</span><span class="rvts6"> forget to update the serial number here!</span></p>
-<p class="rvps13"><span class="rvts6"><br/></span></p>
-<p class="rvps13"><span class="rvts6">Special use for this channel type is the resolution. By default, the resolution is only used for reading data.</span></p>
-<p class="rvps13"><span class="rvts6">But as you know, the SMA inverter is a not readable group... That is correct, BUT the attributes are always readable!</span></p>
-<p class="rvps13"><span class="rvts6">In this case, the resolution should held the</span><span class="rvts22"> installed power in watt peak</span><span class="rvts6"> on this inverter.</span></p>
-<p class="rvps13"><span class="rvts6">So it is possible to calculate the relative yield of the inverter (watt or watt hours per watt peak) by using a sub channel and this resolution.</span></p>
-<p class="rvps13"><span class="rvts6">(This is done for example by the Twitter update script)</span></p>
-<p class="rvps25"><span class="rvts39">Insert the inverter into the channel tree</span></p>
-<p class="rvps13"><span class="rvts6">If you have more than 1 inverter, it could make sense for a better overview to group them, e.g. by building or location.</span></p>
-<p class="rvps13"><img alt="" style="padding : 1px;" src="lib/NewItem30.png"/></p>
-<p class="rvps13"><span class="rvts6">Result:</span></p>
-<p class="rvps13"><img alt="" style="padding : 1px;" src="lib/NewItem32.png"/></p>
-<p class="rvps25"><span class="rvts39">Define the inverter channels according to your inverter</span></p>
-<p class="rvps13"><span class="rvts6">Create all further needed channels, e.g. P</span><span class="rvts41">AC</span><span class="rvts6"> for a </span><a class="rvts12" href="STPchannels.html">STP series inverter</a><span class="rvts6">:</span><br/><span class="rvts6"><br/></span></p>
-<p class="rvps13"><img alt="" style="padding : 1px;" src="lib/NewItem37.png"/></p>
-<p class="rvps13"><span class="rvts23">Please note:</span><span class="rvts6"> Use the exact channel name as your inverter delivers. This is needed to find the correct channel to store readings for!</span></p>
-<p class="rvps25"><span class="rvts39">Insert all the channels as sub channels of the inverter in the channel tree</span></p>
-<p class="rvps13"><img alt="" style="padding : 1px;" src="lib/NewItem41.png"/></p>
-<p class="rvps13"><span class="rvts6"></span><br/><span class="rvts6">A special case here is the</span><span class="rvts6"> </span><a class="rvts16" href="Inverterefficiency.html">Inverter efficiency</a><span class="rvts6">.</span></p>
-<p class="rvps13"><span class="rvts6"><br/></span></p>
-<p class="rvps13"><span class="rvts6"><br/></span></p>
+<p class="rvps12"><span class="rvts6">A special model to split Webbox RPC content into single channel values.</span></p>
+<p class="rvps12"><span class="rvts6">This model is in contrast to other grouping models writable but not readable!</span></p>
+<p class="rvps21"><span class="rvts7">Operation mode</span></p>
+<p class="rvps12"><span class="rvts6">The SMA Webbox model handles JSON outputs from Webbox RPC requests.</span></p>
+<p class="rvps12"><span class="rvts6">It scans the data and search its </span><span class="rvts21">direct</span><span class="rvts6"> sub channels for matching channel definitions!</span></p>
+<p class="rvps21"><span class="rvts7">Setup</span></p>
+<p class="rvps23"><span class="rvts37">Create a channel for the Inverter</span></p>
+<p class="rvps12"><img alt="" style="padding : 1px;" src="lib/NewItem10.png"/><span class="rvts6"> &nbsp;</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps12"><img alt="" style="padding : 1px;" src="lib/NewItem20.png"/><br/><span class="rvts6"><br/></span></p>
+<p class="rvps12"><img alt="" style="padding : 1px;" src="lib/NewItem25.png"/></p>
+<p class="rvps12"><span class="rvts22">Please note:</span></p>
+<p class="rvps12" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">The </span><span class="rvts21">serial number</span><span class="rvts6"> is used from external upload script to ask the SMA Webbox for the correct equipment.</span></p>
+<p class="rvps12" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">When the serial number </span><span class="rvts21">changes</span><span class="rvts6"> after</span><span class="rvts21"> firmware updates, don't</span><span class="rvts6"> forget to update the serial number here!</span></p>
+<p class="rvps12"><span class="rvts6"><br/></span></p>
+<p class="rvps12"><span class="rvts6">Special use for this channel type is the resolution. By default, the resolution is only used for reading data.</span></p>
+<p class="rvps12"><span class="rvts6">But as you know, the SMA inverter is a not readable group... That is correct, BUT the attributes are always readable!</span></p>
+<p class="rvps12"><span class="rvts6">In this case, the resolution should held the</span><span class="rvts21"> installed power in watt peak</span><span class="rvts6"> on this inverter.</span></p>
+<p class="rvps12"><span class="rvts6">So it is possible to calculate the relative yield of the inverter (watt or watt hours per watt peak) by using a sub channel and this resolution.</span></p>
+<p class="rvps12"><span class="rvts6">(This is done for example by the Twitter update script)</span></p>
+<p class="rvps23"><span class="rvts37">Insert the inverter into the channel tree</span></p>
+<p class="rvps12"><span class="rvts6">If you have more than 1 inverter, it could make sense for a better overview to group them, e.g. by building or location.</span></p>
+<p class="rvps12"><img alt="" style="padding : 1px;" src="lib/NewItem30.png"/></p>
+<p class="rvps12"><span class="rvts6">Result:</span></p>
+<p class="rvps12"><img alt="" style="padding : 1px;" src="lib/NewItem32.png"/></p>
+<p class="rvps23"><span class="rvts37">Define the inverter channels according to your inverter</span></p>
+<p class="rvps12"><span class="rvts6">Create all further needed channels, e.g. P</span><span class="rvts40">AC</span><span class="rvts6"> for a </span><a class="rvts12" href="STPchannels.html">STP series inverter</a><span class="rvts6">:</span><br/><span class="rvts6"><br/></span></p>
+<p class="rvps12"><img alt="" style="padding : 1px;" src="lib/NewItem37.png"/></p>
+<p class="rvps12"><span class="rvts22">Please note:</span><span class="rvts6"> Use the exact channel name as your inverter delivers. This is needed to find the correct channel to store readings for!</span></p>
+<p class="rvps23"><span class="rvts37">Insert all the channels as sub channels of the inverter in the channel tree</span></p>
+<p class="rvps12"><img alt="" style="padding : 1px;" src="lib/NewItem41.png"/></p>
+<p class="rvps12"><span class="rvts6"></span><br/><span class="rvts6">A special case here is the</span><span class="rvts6"> </span><a class="rvts14" href="Inverterefficiency.html">Inverter efficiency</a><span class="rvts6">.</span></p>
+<p class="rvps12"><span class="rvts6"><br/></span></p>
+<p class="rvps12"><span class="rvts6"><br/></span></p>
 <p></p>
-<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com">Easy EBook and documentation generator</a></p>
+<p class="rvps15"><span class="rvts17">Created with the Personal Edition of HelpNDoc: </span><a class="rvts18" href="http://www.helpndoc.com">Easy EBook and documentation generator</a></p>
 </div>
 	
 	<div id="topic_footer">

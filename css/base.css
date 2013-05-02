@@ -66,6 +66,7 @@ body {
 #topic_header  h1 {
 	color: #333;
 	font-size: 18px;
+	font-weight: bold;
 }
 
 #topic_footer {
@@ -73,7 +74,7 @@ body {
 }
 
 #topic_breadcrumb {
-	font-size: 11px;
+	font-size: 12px;
 }
 
 /* Popup */

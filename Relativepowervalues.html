@@ -1,0 +1,102 @@
+﻿<html>
+	
+<head>
+	<title>Relative power values</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc Personal Edition 3.9.0.595">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #808080;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			if (top.frames.length == 0)
+			{
+				var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+				top.location.href = "index.html?" + sTopicUrl;
+			}
+			else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+			{
+				top.FrameTOC.SelectTocItem("Relativepowervalues");
+			}
+		});
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Relative power values</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="Examples.html">Examples</a> &rsaquo;&rsaquo; <a href="Charts.html">Charts</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="Charts.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="MeterchannelsPeriodvalues.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				<a href="Mobile.html"><img src="img/arrow_right.png" alt="Next"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p></p>
+<p class="rvps2"><span class="rvts6">If you have for example more than one solar plant/inverter with different size/orientation, the absolute power values in watt are not so helpful for comparison.</span></p>
+<p class="rvps2"><span class="rvts6">A common unit for comparison is kilo watt per kilo watt peak.</span></p>
+<p class="rvps2"><span class="rvts6">So therefor you have to transform the watt data from a power sensor into kilo watt per kilo watt peak.</span></p>
+<p class="rvps4"><span class="rvts9">Setup</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">A power sensor (with unit watt in this example)</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">A "proxy" channel for calculation</span></p>
+<p class="rvps2"><span class="rvts6">I use for this a </span><a class="rvts14" href="Model.html#Accumulator">accumulator</a><span class="rvts6"> channel type, which works also with only one sub channel assigned!</span></p>
+<p class="rvps2"><span class="rvts6">To force the proxy to make the calculation, a proper </span><a class="rvts14" href="Channel.html#Resolution">resolution</a><span class="rvts6"> must be set.</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Inverter 1 installed power: </span><span class="rvts26">11.28 kWp</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Inverter 2 installed power: </span><span class="rvts26">9.18 kWp</span></p>
+<p class="rvps2"><span class="rvts6">Transform watt into kilo watt per kilo watt peak: </span><img align="absmiddle" alt="" style="padding : 1px;" src="lib/NewItem53.png"/></p>
+<p class="rvps2"><span class="rvts6">Values for the resolution:</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Inverter 1: </span><span class="rvts26">0.0000887</span></p>
+<p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts6">Inverter 2: </span><span class="rvts26">0.000109</span></p>
+<p class="rvps4"><span class="rvts9">Channel definition</span></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem40.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p class="rvps2"><span class="rvts6">Build a proper channel hierarchy:</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem42.png"/></p>
+<p class="rvps2"><span class="rvts6">Now you can compare very different things on a common basis.</span></p>
+<p class="rvps4"><span class="rvts9">Chart</span></p>
+<p class="rvps2"><span class="rvts6">(Blockhaus (blue): East and South, Carport (green): East and West)</span></p>
+<p class="rvps2"><img alt="" style="padding : 1px;" src="lib/NewItem46.png"/></p>
+<p class="rvps2"><span class="rvts6"><br/></span></p>
+<p></p>
+<p class="rvps15"><span class="rvts17">Created with the Personal Edition of HelpNDoc: </span><a class="rvts18" href="http://www.helpndoc.com/help-authoring-tool">Single source CHM, PDF, DOC and HTML Help creation</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 2012-2013 by Knut Kohl. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

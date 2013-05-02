@@ -57,16 +57,16 @@
 		
 <p></p>
 <p class="rvps2"><span class="rvts6">A model implements the direct interface to the database.</span></p>
-<p class="rvps2"><span class="rvts6">They are PHP classes below </span><span class="rvts27">core/Channel</span><span class="rvts6"> directory.</span></p>
+<p class="rvps2"><span class="rvts6">They are PHP classes below </span><span class="rvts26">core/Channel</span><span class="rvts6"> directory.</span></p>
 <p class="rvps2"><span class="rvts6">There are in general 3 different model types:</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts26">Direct</span><span class="rvts6"> channels which stores their data directly and can't have sub channels (e.g. </span><a class="rvts12" href="Model.html#Sensor">Sensor</a><span class="rvts6">, </span><a class="rvts12" href="Model.html#Counter">Counter</a><span class="rvts6">, </span><a class="rvts12" href="Model.html#Switcher">Switcher</a><span class="rvts6">)</span></p>
+<span class="rvts25">Direct</span><span class="rvts6"> channels which stores their data directly and can't have sub channels (e.g. </span><a class="rvts12" href="Model.html#Sensor">Sensor</a><span class="rvts6">, </span><a class="rvts12" href="Model.html#Counter">Counter</a><span class="rvts6">, </span><a class="rvts12" href="Model.html#Switcher">Switcher</a><span class="rvts6">)</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts26">Proxy</span><span class="rvts6"> channels with exact 1 sub channel for readout (e.g. </span><a class="rvts12" href="Model.html#SensorToMeter">SensorToMeter</a><span class="rvts6">)</span></p>
+<span class="rvts25">Proxy</span><span class="rvts6"> channels with exact 1 sub channel for readout (e.g. </span><a class="rvts12" href="Model.html#SensorToMeter">SensorToMeter</a><span class="rvts6">)</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts26">Grouping</span><span class="rvts6"> channels which merges always sub channel data (e.g. </span><a class="rvts12" href="Model.html#Accumulator">Accumulator</a><span class="rvts6">)</span><br/><span class="rvts6">(Sub channels can be all kind of type again)</span></p>
+<span class="rvts25">Grouping</span><span class="rvts6"> channels which merges always sub channel data (e.g. </span><a class="rvts12" href="Model.html#Accumulator">Accumulator</a><span class="rvts6">)</span><br/><span class="rvts6">(Sub channels can be all kind of type again)</span></p>
 <p class="rvps2"><span class="rvts6">A model implements in their sources the following characteristics and interface methods.</span></p>
-<p class="rvps7"><span class="rvts7">General characteristics</span></p>
+<p class="rvps6"><span class="rvts19">General characteristics</span></p>
 <p class="rvps4"><span class="rvts9">Read</span></p>
 <p class="rvps2"><span class="rvts6">All direct and proxy channels are readable to query their readings.</span></p>
 <p class="rvps2"><span class="rvts6">All grouping models are readable (except </span><a class="rvts12" href="SMAWebbox.html">SMA/Webbox</a><span class="rvts6"> model)</span></p>
@@ -75,8 +75,8 @@
 <p class="rvps2"><span class="rvts6">All direct channels are writable to store readings.</span></p>
 <p class="rvps2"><span class="rvts6">No grouping model is writable (except </span><a class="rvts12" href="SMAWebbox.html">SMA/Webbox</a><span class="rvts6"> model)</span></p>
 <p class="rvps2"><span class="rvts6">(This attribute is held redundant in database for better performance on feature requests.)</span></p>
-<p class="rvps7"><span class="rvts7">Direct models</span></p>
-<p class="rvps2"><span class="rvts6">Direct models implement the </span><span class="rvts26">direct</span><span class="rvts6"> data access. They don't care about child channels on data storing or readout.</span></p>
+<p class="rvps6"><span class="rvts19">Direct models</span></p>
+<p class="rvps2"><span class="rvts6">Direct models implement the </span><span class="rvts25">direct</span><span class="rvts6"> data access. They don't care about child channels on data storing or readout.</span></p>
 <p class="rvps4"><a name="Sensor"></a>
 <span class="rvts9">Sensor</span></p>
 <p class="rvps2"><span class="rvts6">A sensor is the generic model for universal use, it stores any value as is.</span></p>
@@ -88,36 +88,36 @@
 <span class="rvts9">Switcher</span></p>
 <p class="rvps2"><span class="rvts6">A switcher model will store only readings, if the actual value is different from the last stored reading.</span></p>
 <p class="rvps2"><span class="rvts6">Switching sensors are for example an inverter states or valve states.</span></p>
-<p class="rvps7"><span class="rvts7">Proxy models</span></p>
+<p class="rvps6"><span class="rvts19">Proxy models</span></p>
 <p class="rvps4"><a name="SensorToMeter"></a>
 <span class="rvts9">SensorToMeter</span></p>
 <p class="rvps2"><span class="rvts6">This model type acts as a proxy and requires exact one sub channel.</span></p>
 <p class="rvps2"><span class="rvts6">It accept only channels, which are based on models "Sensor" or "Counter"!</span></p>
-<p class="rvps7"><span class="rvts7">Grouping models</span></p>
-<p class="rvps2"><span class="rvts6">Grouping models delegate </span><span class="rvts26">all </span><span class="rvts6">data access during storing or readout to their sub channels.</span></p>
+<p class="rvps6"><span class="rvts19">Grouping models</span></p>
+<p class="rvps2"><span class="rvts6">Grouping models delegate </span><span class="rvts25">all </span><span class="rvts6">data access during storing or readout to their sub channels.</span></p>
 <p class="rvps4"><a name="Accumulator"></a>
 <span class="rvts9">Accumulator</span></p>
-<p class="rvps2"><span class="rvts6">An accumulator model accepts only childs of the </span><span class="rvts26">same channel type</span></p>
+<p class="rvps2"><span class="rvts6">An accumulator model accepts only childs of the </span><span class="rvts25">same channel type</span></p>
 <p class="rvps2"><span class="rvts6">It sums up all data from the sub channels for the same timestamp.</span></p>
-<p class="rvps2"><span class="rvts6">It is used for example to combine all single string powers (P</span><span class="rvts35">DC?</span><span class="rvts6">) into one P</span><span class="rvts35">DC</span></p>
+<p class="rvps2"><span class="rvts6">It is used for example to combine all single string powers (P</span><span class="rvts34">DC?</span><span class="rvts6">) into one P</span><span class="rvts34">DC</span></p>
 <p class="rvps4"><a name="Differentiator"></a>
 <span class="rvts9">Differentiator</span></p>
-<p class="rvps2"><span class="rvts6">An differentiator model accepts only childs of the </span><span class="rvts26">same channel type</span></p>
-<p class="rvps2"><span class="rvts6">It subtract from the 1</span><span class="rvts24">st</span><span class="rvts6"> sub channel all data from the other sub channels for the same timestamp.</span></p>
+<p class="rvps2"><span class="rvts6">An differentiator model accepts only childs of the </span><span class="rvts25">same channel type</span></p>
+<p class="rvps2"><span class="rvts6">It subtract from the 1</span><span class="rvts23">st</span><span class="rvts6"> sub channel all data from the other sub channels for the same timestamp.</span></p>
 <p class="rvps2"><span class="rvts6">It skips all timestamps, where at least one reading is missing.</span></p>
 <p class="rvps2"><span class="rvts6">It is used for example to calculate the difference between outside temperature and modules temperature.</span></p>
 <p class="rvps4"><a name="DifferentiatorFull"></a>
 <span class="rvts9">DifferentiatorFull</span></p>
-<p class="rvps2"><span class="rvts6">This model is similar to the Differentiator</span><span class="rvts26">, </span><span class="rvts6">but it </span><span class="rvts26">ignores</span><span class="rvts6"> missing readings and handle them as 0 (zero), for example a power balance.</span></p>
+<p class="rvps2"><span class="rvts6">This model is similar to the Differentiator</span><span class="rvts25">, </span><span class="rvts6">but it </span><span class="rvts25">ignores</span><span class="rvts6"> missing readings and handle them as 0 (zero), for example a power balance.</span></p>
 <p class="rvps2"><span class="rvts6">Refer to </span><span class="rvts12">this example</span><span class="rvts6"> for more details.</span></p>
 <p class="rvps4"><a name="InternalConsumption"></a>
 <span class="rvts9">InternalConsumption</span></p>
-<p class="rvps21"><span class="rvts6">"Internal consumption refers to the amount of PV energy consumed where it is generated. Therefore the internal consumption rate equals the portion of the total PV energy generated that is used for internal consumption." -- </span><a class="rvts12" href="http://www.sma.de/en/solutions/medium-power-solutions/knowledgebase/intelligent-concept-with-dual-benefits.html">SMA</a></p>
-<p class="rvps2"><span class="rvts6">This channel type requires exact</span><span class="rvts26"> 2 sub channels</span><span class="rvts6"> with:</span></p>
+<p class="rvps19"><span class="rvts6">"Internal consumption refers to the amount of PV energy consumed where it is generated. Therefore the internal consumption rate equals the portion of the total PV energy generated that is used for internal consumption." -- </span><a class="rvts12" href="http://www.sma.de/en/solutions/medium-power-solutions/knowledgebase/intelligent-concept-with-dual-benefits.html">SMA</a></p>
+<p class="rvps2"><span class="rvts6">This channel type requires exact</span><span class="rvts25"> 2 sub channels</span><span class="rvts6"> with:</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts26">1</span><span class="rvts36">st</span><span class="rvts6"> sub channel: Power </span><span class="rvts26">consumption meter</span></p>
+<span class="rvts25">1</span><span class="rvts35">st</span><span class="rvts6"> sub channel: Power </span><span class="rvts25">consumption meter</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
-<span class="rvts26">2</span><span class="rvts36">nd</span><span class="rvts6"> sub channel: Power </span><span class="rvts26">production meter</span></p>
+<span class="rvts25">2</span><span class="rvts35">nd</span><span class="rvts6"> sub channel: Power </span><span class="rvts25">production meter</span></p>
 <p class="rvps2"><span class="rvts6">The model checks the difference between consumption and production and works as this:</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <span class="rvts6">If the Consumption is higher than production =&gt; full or partly energy import</span></p>
@@ -126,10 +126,10 @@
 <p class="rvps2"><span class="rvts6">See this </span><a class="rvts12" href="Energyimport.html">example</a><span class="rvts6"> for channels and charts definition.</span></p>
 <p class="rvps4"><a name="ModelRatio"></a>
 <span class="rvts9">Ratio</span></p>
-<p class="rvps2"><span class="rvts6">A ratio calculator calculates a ratio between </span><span class="rvts26">exact 2</span><span class="rvts6"> sub channels.</span></p>
+<p class="rvps2"><span class="rvts6">A ratio calculator calculates a ratio between </span><span class="rvts25">exact 2</span><span class="rvts6"> sub channels.</span></p>
 <p class="rvps2"><span class="rvts6">It skips all timestamps, where one reading is missing.</span></p>
-<p class="rvps2"><span class="rvts6">It is used </span><a class="rvts12" href="Inverterefficiency.html">for example</a><span class="rvts6"> to calculate a inverter efficiency by using the P</span><span class="rvts35">AC</span><span class="rvts6"> and the (summarized) P</span><span class="rvts35">DC</span><span class="rvts6">.</span></p>
-<p class="rvps7"><span class="rvts7">Specials</span></p>
+<p class="rvps2"><span class="rvts6">It is used </span><a class="rvts12" href="Inverterefficiency.html">for example</a><span class="rvts6"> to calculate a inverter efficiency by using the P</span><span class="rvts34">AC</span><span class="rvts6"> and the (summarized) P</span><span class="rvts34">DC</span><span class="rvts6">.</span></p>
+<p class="rvps6"><span class="rvts19">Specials</span></p>
 <p class="rvps2"><span class="rvts6">For special usage are the following models are implemented:</span></p>
 <p class="rvps2" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
 <a class="rvts12" href="SMAWebbox.html">SMA/Webbox</a></p>
@@ -141,7 +141,7 @@
 <a class="rvts12" href="Kaco12.html">Kaco2</a></p>
 <p class="rvps2"><span class="rvts6"><br/></span></p>
 <p></p>
-<p class="rvps17"><span class="rvts19">Created with the Personal Edition of HelpNDoc: </span><a class="rvts20" href="http://www.helpndoc.com">Easy EBook and documentation generator</a></p>
+<p class="rvps15"><span class="rvts17">Created with the Personal Edition of HelpNDoc: </span><a class="rvts18" href="http://www.helpndoc.com">Easy EBook and documentation generator</a></p>
 </div>
 	
 	<div id="topic_footer">
