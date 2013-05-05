@@ -140,5 +140,7 @@
 </div>
 
 <div id="dialog-guid" style="display:none" title="GUID">
-	<p id="show-guid" class="b c"></p>
+	<p>
+		<input id="show-guid" class="b c" style="border:0;width:100%" readonly="readonly" />
+	</p>
 </div>
