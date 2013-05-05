@@ -46,7 +46,7 @@ class Channel {
 
 		if (count($this->getChilds()) == $this->childs) {
 			throw new \Exception('"'.$this->name.'" accepts only '
-													.$this->childs . ' child(s) at all!', 400);
+			                    .$this->childs . ' child(s) at all!', 400);
 		}
 
 		$new = self::byGUID($guid);
@@ -64,11 +64,11 @@ class Channel {
 		}
 
 		return ($attribute == '' OR $attribute == '*')
-				 ? $attr
-				 : ( isset($attr[$attribute])
-					 ? array($attribute => $attr[$attribute])
-					 : ''
-					 );
+		     ? $attr
+		     : ( isset($attr[$attribute])
+		       ? array($attribute => $attr[$attribute])
+		       : ''
+		     );
 	}
 
 	/**
@@ -152,7 +152,7 @@ class Channel {
 			$grouping = sprintf($this->GroupBy[$this->period[1]], $this->period[0]);
 
 			$q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
-				->get($q->MIN('timestamp'), 'timestamp');
+			  ->get($q->MIN('timestamp'), 'timestamp');
 
 			if ($this->meter) {
 				$q->get($q->MAX('data'), 'data');
@@ -163,23 +163,22 @@ class Channel {
 			}
 
 			$q->get($q->MIN('data'), 'min')
-			   ->get($q->MAX('data'), 'max')
-			   ->get($q->COUNT('id'), 'count')
-			   ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff', TRUE)
-			   ->get($grouping, 'g')
-			   ->group($grouping);
+			  ->get($q->MAX('data'), 'max')
+			  ->get($q->COUNT('id'), 'count')
+			  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff', TRUE)
+			  ->get($grouping, 'g')
+			  ->group($grouping);
 		}
 
 		$q->whereEQ('id', $this->entity)
-		   // BETWEEN is  start <= ? <= end  incl. end
-		   // subtract 1 second for excluding end
-		   ->whereBT('timestamp', $this->start, $this->end-1)
-		   ->order('timestamp');
+		  // BETWEEN is  start <= ? <= end  incl. end
+		  // subtract 1 second for excluding end
+		  ->whereBT('timestamp', $this->start, $this->end-1)
+		  ->order('timestamp');
 
-#echo $q;
+		if (array_key_exists('sql', $request) AND $request['sql']) echo $q, PHP_EOL;
 
 		$tmpfile = $this->tmpfile();
-		$meterabsolute = (isset($request['absolute']) AND $request['absolute']);
 
 		if ($res = $this->db->query($q)) {
 
@@ -190,19 +189,21 @@ class Channel {
 				$data['consumption'] = 0;
 
 				if ($this->meter) {
-					if (!$meterabsolute) {
-						// calc meter offset for uncompressed data
-						if ($offset == 0) $offset = $data['data'];
-						$data['data'] -= $offset;
+					// calc meter offset for uncompressed data
+					if ($offset == 0) {
+						$offset = $data['data'];
 					}
-					if ($this->period[1] > 0) {
+					$data['data'] -= $offset;
+
+					// calc consumption from previous max value
+				    if ($last == 0) {
 						$data['consumption'] = $data['max'] - $data['min'];
 					} else {
-						$data['consumption'] = $data['data'] - $last;
-						$last = $data['data'];
+						$data['consumption'] = $data['max'] - $last;
 					}
+					$last = $data['max'];
 				}
-
+				// remove grouping value
 				$id = $data['g'];
 				unset($data['g']);
 				fwrite($tmpfile, $this->encode($data, $id));
@@ -267,6 +268,7 @@ class Channel {
 		/* month */	        5 => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
 		/* quarter */       6 => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
 		/* year */          7 => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
+		/* all */           8 => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV 10000',
 	);
 
 	/**
@@ -349,18 +351,22 @@ class Channel {
 
 		if (isset($request['period'])) {
 			// normalize aggr. periods
-			if (preg_match('~^([.\d]*)(|l|last|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years?)$~',
+			if (preg_match('~^([.\d]*)(|l|last|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
 			               $request['period'], $args)) {
 				$this->period = array($args[1]?:1, '');
 				switch (substr($args[2], 0, 2)) {
-					case 'l': case 'la':	$this->period[1] = -1;	break;
-					case 'i': case 'mi':	$this->period[1] =	1;	break;
-					case 'h': case 'ho':	$this->period[1] =	2;	break;
-					case 'd': case 'da':	$this->period[1] =	3;	break;
-					case 'w': case 'we':	$this->period[1] =	4;	break;
-					case 'm': case 'mo':	$this->period[1] =	5;	break;
-					case 'q': case 'qa':	$this->period[1] =	6;	break;
-					case 'y': case 'ye':	$this->period[1] =	7;	break;
+					case 'l': case 'la':  $this->period[1] = -1;  break;
+					case 'i': case 'mi':  $this->period[1] =  1;  break;
+					case 'h': case 'ho':  $this->period[1] =  2;  break;
+					case 'd': case 'da':  $this->period[1] =  3;  break;
+					case 'w': case 'we':  $this->period[1] =  4;  break;
+					case 'm': case 'mo':  $this->period[1] =  5;  break;
+					case 'q': case 'qa':  $this->period[1] =  6;  break;
+					case 'y': case 'ye':  $this->period[1] =  7;  break;
+					case 'a': case 'al':
+						$this->period[1] = 8;
+						$this->start = 0;
+						break;
 				}
 			} else {
 				throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
