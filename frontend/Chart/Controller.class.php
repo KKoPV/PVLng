@@ -17,6 +17,7 @@ class Chart_Controller extends ControllerAuth {
 
 		$this->Tree = NestedSet::getInstance();
 		$this->channels = array();
+		$this->views = $this->model->getViews();
 	}
 
 	/**

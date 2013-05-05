@@ -11,19 +11,21 @@
 
 <form method="post">
 
-<div id="nav" style="margin-top:1em;padding-top:1em;border-top:dotted gray 1px">
+<div id="nav" style="margin-top:1em">
 	<input type="hidden" id="fromdate" name="fromdate" />
 	<input type="hidden" id="todate" name="todate" />
 
-	<table>
+	<table style="width:100%">
 	<tr>
+<!--
 		<td>
 			<a id="btn-clear" href="/chart">{{Clear}}</a>
 			&nbsp; {{Period}}:
 		</td>
+-->
 		<td>
 			<span class="ui-icon ui-icon-triangle-1-w tip"
-						title="{{PrevDay}}" onclick="changeDates(-1)"></span>
+			      title="{{PrevDay}}" onclick="changeDates(-1)"></span>
 		</td>
 		<td>
 			<input class="c" type="text" id="from" name="from" size="10" />
@@ -36,9 +38,9 @@
 		</td>
 		<td>
 			<span class="ui-icon ui-icon-triangle-1-e tip"
-						title="{{NextDay}}" onclick="changeDates(1)"></span>
+			      title="{{NextDay}}" onclick="changeDates(1)"></span>
 		</td>
-		<td>
+		<td style="width:99%;text-align:right">
 			<label for="periodcnt" style="margin-left:1em" >{{Aggregation}}:</label>
 			<input class="numbersOnly r" type="text" id="periodcnt" name="periodcnt"
 						 value="1" size="2" />
@@ -49,7 +51,10 @@
 </div>
 
 <div id="chart" style="margin-top: 1em">
-	<div id="chart-placeholder">{{NoChannelsSelectedYet}}</div>
+	<div id="chart-placeholder">
+		{{NoChannelsSelectedYet}} &nbsp;
+		<a id="btn-go" href="#view">{{GoToVariants}}</a>
+	</div>
 </div>
 
 <div class="push_4 grid_6" style="margin-top:1em;margin-bottom:1em">
@@ -113,14 +118,16 @@
 
 	<tfoot>
 		<tr>
-			<th colspan="4">&nbsp;</th>
-			<th id="costs" class="r b"></th>
+			<th colspan="2">&nbsp;</th>
+			<th colspan="2" class="l">{{Total}}</th>
+			<th id="costs" style="padding-right:10px" class="r"></th>
 			<th></th>
 		</tr>
 	<tfoot>
 </table>
 
 <h3>
+	<a name="view"></a>
 	{{Variant}}
 	<img src="/images/ico/information_frame.png" class="tip"
 	     title="{{MobileVariantHint}}" />

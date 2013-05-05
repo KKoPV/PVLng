@@ -80,7 +80,6 @@ var
 				fillOpacity: 0.2
 			},
 			bar: {
-			    minPointLength: 3,
 				groupPadding: 0.1
 			}
 		},
@@ -226,7 +225,7 @@ function updateChart() {
 
 	var channels_new = [], yAxisMap = [], yAxis = [],
 		channel, channel_clone, buffer = [],
-		period = $('#periodcnt').val() + $('#period').val();
+		period = $('#period').val();
 
 	/* reset consumption and costs data */
 	$('.consumption, .costs, #costs').each(function(id, el) {
@@ -308,7 +307,7 @@ function updateChart() {
 		}
 	}
 
-	var res = xAxisResolution[$('#period').val()];
+	var res = xAxisResolution[period];
 
 	if (changed) {
 		/* use UTC for timestamps with a period >= day to avoid wrong hours in hint */
@@ -337,7 +336,7 @@ function updateChart() {
 			{
 				start:	$('#fromdate').attr('value'),
 				end:	$('#todate').attr('value') + '+1day',
-				period: (channel.type != 'scatter') ? period : '',
+				period: (channel.type != 'scatter') ? $('#periodcnt').val() + period : '',
 				full:   period,
 				_ts:	(new Date).getTime()
 			},
@@ -624,6 +623,13 @@ $(function() {
 	$('#btn-clear').button({
 		icons: {
 			primary: 'ui-icon-trash'
+		},
+		text: false
+	});
+
+	$('#btn-go').button({
+		icons: {
+			primary: 'ui-icon-folder-open'
 		},
 		text: false
 	});
