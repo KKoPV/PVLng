@@ -17,6 +17,11 @@ class Plant extends Base {
 	/**
 	 *
 	 */
+	public $UTC_Offset = 3600;
+
+	/**
+	 *
+	 */
 	public function read( $request, $attributes=TRUE ) {
 
 		$plant = new \YieldPlant;

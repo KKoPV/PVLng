@@ -28,6 +28,11 @@ class Base extends \Channel {
 	public $useStrings = TRUE;
 
 	/**
+	 *
+	 */
+	public $UTC_Offset = 0;
+
+	/**
 	 * Fetch data for one inverter
 	 *
 	 * @param $request array Holds the date to extract
@@ -84,6 +89,19 @@ class Base extends \Channel {
 	/**
 	 *
 	 */
+	protected $ts;
+
+	/**
+	 *
+	 */
+	protected function __construct( $guid ) {
+		parent::__construct($guid);
+		$this->ts = microtime(TRUE);
+	}
+
+	/**
+	 *
+	 */
 	protected function calcTimesAndPowers ( $fh, $obj ) {
 		rewind($fh);
 		$start = PHP_INT_MAX;
@@ -108,12 +126,16 @@ class Base extends \Channel {
 		$yield->setDeleteDayBeforeImport(($date != date('Y-m-d')));
 
 		// Force timestamp calculation...
-        $yield->asArray();
+		$yield->asArray();
+		$yield->getPlant()->setPowerValues(array());
 
 		// Emulate a UTC summer time
-		$yield->setUtcOffset(date('I', $yield->getPlant()->getTimestampStart()) ? 3600 : 0);
+		$yield->setUtcOffset(date('I', $yield->getPlant()->getTimestampStart())
+		                   ? $this->UTC_Offset + 3600 : $this->UTC_Offset);
 
-		return $yield->asArray();
+		$result = $yield->asArray();
+#		$result['dbg']['QueryTime'] = sprintf('%.0f ms', (microtime(TRUE) - $this->ts) * 1000);
+		return $result;
 	}
 
 }

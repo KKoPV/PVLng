@@ -3,7 +3,7 @@
  * Used as base for Yield, Plant, Inverter and String
  */
 abstract class AbstractYield {
-	
+
 	/**
 	 *
 	 */
@@ -29,7 +29,7 @@ abstract class AbstractYield {
 	public function isValid () {
 		return TRUE;
 	}
-	
+
 	/**
 	 * Put 0 in front
 	 *
@@ -62,7 +62,7 @@ abstract class AbstractYield {
  *
  */
 class Yield extends AbstractYield {
-	
+
 	/**
 	 *
 	 */
@@ -74,7 +74,7 @@ class Yield extends AbstractYield {
 		'utc_offset'			=> 0,
 		'plant'					=> NULL,
 	);
-	
+
 	/**
 	 *
 	 */
@@ -146,7 +146,7 @@ class Yield extends AbstractYield {
 	public function getCreator () {
 		return $this->data['creator'];
 	}
-	
+
 	/**
 	 *
 	 */
@@ -167,6 +167,13 @@ class Yield extends AbstractYield {
 	 */
 	public function asArray() {
 		$return = $this->data;
+/*
+		// some debugging
+		$return['dbg'] = array(
+			'Start' => date('r', $return['plant']->getTimestampStart()),
+			'End'   => date('r', $return['plant']->getTimestampEnd())
+		);
+*/
 		$return['plant'] = $return['plant']->asArray();
 		return $return;
 	}
@@ -253,7 +260,7 @@ class YieldPlant extends AbstractYield {
 		$this->data['powerAcW'][] = (int)$value;
 		return $this;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -306,7 +313,7 @@ class YieldPlant extends AbstractYield {
 		$this->data['inverter'][count($this->data['inverter']) + 1] = $inverter;
 		return $this;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -359,7 +366,7 @@ class YieldPlant extends AbstractYield {
 			$inverter->setPowerValues($powers);
 
 			// sum up current and daily watt hours for corresponding parent plant values
-			$currentTotalWattHours += $inverter->getCurrentTotalWattHours(); 
+			$currentTotalWattHours += $inverter->getCurrentTotalWattHours();
 			$dailyWattHours += $inverter->getDailyWattHours();
 
 			// calc plant 'powerAcW'
@@ -382,9 +389,9 @@ class YieldPlant extends AbstractYield {
 			foreach ($inverter->getStrings() as $string) {
 
 				// sum up current and daily watt hours for corresponding parent inverter values
-				$currentTotalWattHoursInverter += $string->getCurrentTotalWattHours(); 
+				$currentTotalWattHoursInverter += $string->getCurrentTotalWattHours();
 				$dailyWattHoursInverter += $string->getDailyWattHours();
-				
+			
 				// inverter
 				$start = $string->getTimestampStart();
 				$end = $string->getTimestampEnd();
@@ -398,15 +405,15 @@ class YieldPlant extends AbstractYield {
 				// set new values
 				$string->setPowerValues($powers);
 			}
-			
+
 			// set the summed up strings instead of inverter value as plant sum if the inverter has not a given value already
 			if ($currentTotalWattHoursInverter > 0 && $this->data['inverter'][$idInverter]->getCurrentTotalWattHours() == 0) {
 				$currentTotalWattHours = $currentTotalWattHoursInverter;
 			}
-			if ($dailyWattHoursInverter > 0 && $this->data['inverter'][$idInverter]->getDailyWattHours() == 0) { 
+			if ($dailyWattHoursInverter > 0 && $this->data['inverter'][$idInverter]->getDailyWattHours() == 0) {
 				$dailyWattHours = $dailyWattHoursInverter;
 			}
-			
+		
 			// set the calculated string value into the inverter if it has not a given value
 			if ($this->data['inverter'][$idInverter]->getCurrentTotalWattHours() == 0) {
 				$this->data['inverter'][$idInverter]->setCurrentTotalWattHours($currentTotalWattHoursInverter);
@@ -414,7 +421,7 @@ class YieldPlant extends AbstractYield {
 			if ($this->data['inverter'][$idInverter]->getDailyWattHours() == 0) {
 				$this->data['inverter'][$idInverter]->setDailyWattHours($dailyWattHoursInverter);
 			}
-			
+
 		}
 
 		// set the calculated inverter value into the plant if it has not a given value
@@ -424,7 +431,7 @@ class YieldPlant extends AbstractYield {
 		if ($this->data['totalWh'] == 0) {
 			$this->data['totalWh'] = $dailyWattHours;
 		}
-		
+
 		$this->setTimestampStart($plantStart);
 		$this->setTimestampEnd($plantEnd);
 		if ($plantStart != $plantEnd || $this->getIntervallInSeconds() == 0) {
@@ -432,11 +439,11 @@ class YieldPlant extends AbstractYield {
 				ceil(($plantEnd - $plantStart) / count($this->data['powerAcW']))
 			);
 		}
-		
+
 		$return = $this->data;
 		foreach ($return['inverter'] as $id => $inverter) {
 			if (is_object($inverter) && $inverter instanceof YieldInverter) {
-				$return['inverter'][$id] = $inverter->asArray(); 
+				$return['inverter'][$id] = $inverter->asArray();
 			}
 		}
 		return $return;
@@ -448,7 +455,7 @@ class YieldPlant extends AbstractYield {
  *
  */
 class YieldInverter extends AbstractYield {
-	
+
 	/**
 	 *
 	 */
@@ -491,11 +498,11 @@ class YieldInverter extends AbstractYield {
 	 *
 	 */
 	public function getCurrentTotalWattHours () {
-		// if we only got a single yield value in the inverter and no currentTotalWh set, 
+		// if we only got a single yield value in the inverter and no currentTotalWh set,
 		// this single yield value is the currentTotalWh and we return it as that
 		if (count($this->data['powerAcW']) == 1 && $this->data['currentTotalWh'] == 0) {
 			return current($this->data['powerAcW']);
-		} 
+		}
 		return $this->data['currentTotalWh'];
 	}
 
@@ -505,7 +512,7 @@ class YieldInverter extends AbstractYield {
 	public function getDailyWattHours () {
 		return $this->data['totalWh'];
 	}
-	
+
 	/**
 	 *
 	 */
@@ -528,7 +535,7 @@ class YieldInverter extends AbstractYield {
 		$this->data['powerAcW'] = $values;
 		return $this;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -600,7 +607,7 @@ class YieldInverter extends AbstractYield {
 		foreach ($return['strings'] as $id => $string) {
 			if (is_object($string) && $string instanceof YieldString) {
 				$return['strings'][$id] = $string->asArray();
-				$currentTotalWattHours += $string->getCurrentTotalWattHours(); 
+				$currentTotalWattHours += $string->getCurrentTotalWattHours();
 				$dailyWattHours += $string->getDailyWattHours();
 			}
         }
@@ -619,7 +626,7 @@ class YieldInverter extends AbstractYield {
  *
  */
 class YieldString extends AbstractYield {
-	
+
 	/**
 	 *
 	 */
@@ -629,7 +636,7 @@ class YieldString extends AbstractYield {
 	 *
 	 */
 	protected $recordTimestampEnd;
-	
+
 	/**
 	 *
 	 */
@@ -638,7 +645,7 @@ class YieldString extends AbstractYield {
 		'totalWh'			=> 0,
 		'powerAcW'			=> array(),
 	);
-	
+
 	/**
 	 *
 	 */
@@ -662,7 +669,7 @@ class YieldString extends AbstractYield {
 	public function getCurrentTotalWattHours () {
 		return $this->data['currentTotalWh'];
 	}
-	
+
 	/**
 	 *
 	 */
@@ -692,7 +699,7 @@ class YieldString extends AbstractYield {
 	public function getPowerValues () {
 		return $this->data['powerAcW'];
 	}
-	
+
 	/**
 	 *
 	 */
@@ -700,7 +707,7 @@ class YieldString extends AbstractYield {
 		$this->data['powerAcW'][] = (int)$value;
 		return $this;
 	}
-	
+
 	/**
 	 *
 	 */
