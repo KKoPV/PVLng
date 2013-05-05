@@ -29,7 +29,7 @@ class ControllerAuth extends Controller {
 				$this->User = $this->config->Admin_User;
 			} else {
 				// Login!
-				Session::set('returnto', $this->router->Route);
+				Session::set('returnto', $this->router->Route == 'logout' ? 'index' : $this->router->Route);
 				$this->redirect('login');
 			}
 		}
@@ -41,20 +41,7 @@ class ControllerAuth extends Controller {
 	 *
 	 */
 	public function after() {
-
-		if ($this->User == '') {
-			unset($_COOKIE[Session::token()]);
-			Session::regenerate();
-			Session::set('user');
-		} else {
-			if (isset($_SESSION['returnto'])) {
-				$r = $_SESSION['returnto'];
-				unset($_SESSION['returnto']);
-				$this->redirect($r);
-			}
-		}
 		$this->view->User = $this->User;
-
 		parent::after();
 	}
 

@@ -51,74 +51,6 @@ class Router {
 	/**
 	 *
 	 */
-	private function __construct() {
-
-		$this->Routes = array();
-
-		$this->config = Config::getInstance();
-
-		$routes = array();
-
-		foreach (glob(APP_DIR . DS . '*' . DS . 'routes.php') as $file) {
-			$routes = array_merge($routes, include $file);
-		}
-
-		foreach ($routes as $route=>$data) {
-
-			$parameters = $matchUrl = array();
-
-			foreach (explode('/', $route) as $expl) {
-				if (preg_match('~:(\w+)(\?)?~', $expl, $args)) {
-					// Named (string) parameter
-					if (!isset($args[2])) $args[2] = '';
-					$expl = $args[2].'([^/]+)'.$args[2];
-					$parameters[] = $args[1];
-				} elseif (preg_match('~#(\w+)(\?)?~', $expl, $args)) {
-					// Named (numeric) parameter
-					if (!isset($args[2])) $args[2] = '';
-					$expl = $args[2].'(\d+)'.$args[2];
-					$parameters[] = $args[1];
-				} elseif (preg_match('~\*~', $expl)) {
-					// Catch all parts
-					$expl = '?(.*)';
-					$parameters[] = '*';
-				}
-				$matchUrl[] = $expl;
-			}
-			$matchUrl = '~^'.implode('/', $matchUrl).'$~';
-			$this->Routes[$matchUrl] = array($data, $parameters);
-		}
-
-		$this->Route = isset($_SERVER['PATH_INFO'])
-								 ? trim($_SERVER['PATH_INFO'], '/')
-								 : '';
-
-		if (preg_match('~^(.+)\.([^.]+)$~', $this->Route, $args)) {
-			$this->Route = $args[1];
-			$this->Format = strtoupper($args[2]);
-		} else {
-			$this->Format = 'HTML';
-		}
-		//	$this->Route = preg_replace('~\.[^.]*$~', '', $this->Route);
-
-		if ($data = $this->getMatch($this->Route)) {
-			$this->Controller = $data['Controller'];
-			$this->Action		 = $data['Action'];
-			foreach ($data as $key=>$value) {
-				$this->request[$key] = $value;
-			}
-		} elseif ($e = $this->config->get('Router.ErrorRoute') AND
-		          $data = $this->getMatch($e)) {
-			$this->Controller = $data['Controller'];
-			$this->Action		 = $data['Action'];
-		}
-
-		$this->request = array_merge($this->request, $_GET, $_POST);
-	}
-
-	/**
-	 *
-	 */
 	public final function request( $key=NULL, $default=NULL ) {
 		return isset($key)
 		     ? ( (isset($this->request[$key]) AND $this->request[$key] != '')
@@ -133,7 +65,15 @@ class Router {
 	 */
 	public function URL( $controller='', $action='', $params=array() ) {
 		$url = '/' . ($controller?:'index') . '/' . $action;
-		if (!empty($params)) $url .= '?'.http_build_query($params);
+        if (!empty($params)) {
+			if (array_key_exists('#', $params)) {
+				$anchor = '#' . $params['#'];
+				unset($params['#']);
+			} else {
+				$anchor = '';
+			}
+			$url .= '?'.http_build_query($params).$anchor;
+		}
 		return $url;
 	}
 
@@ -187,6 +127,74 @@ class Router {
 	 *
 	 */
 	private $config;
+
+	/**
+	 *
+	 */
+	private function __construct() {
+
+		$this->Routes = array();
+
+		$this->config = Config::getInstance();
+
+		$routes = array();
+
+		foreach (glob(APP_DIR . DS . '*' . DS . 'routes.php') as $file) {
+			$routes = array_merge($routes, include $file);
+		}
+
+		foreach ($routes as $route=>$data) {
+
+			$parameters = $matchUrl = array();
+
+			foreach (explode('/', $route) as $expl) {
+				if (preg_match('~:(\w+)(\?)?~', $expl, $args)) {
+					// Named (string) parameter
+					if (!isset($args[2])) $args[2] = '';
+					$expl = $args[2].'([^/]+)'.$args[2];
+					$parameters[] = $args[1];
+				} elseif (preg_match('~#(\w+)(\?)?~', $expl, $args)) {
+					// Named (numeric) parameter
+					if (!isset($args[2])) $args[2] = '';
+					$expl = $args[2].'(\d+)'.$args[2];
+					$parameters[] = $args[1];
+				} elseif (preg_match('~\*~', $expl)) {
+					// Catch all parts
+					$expl = '?(.*)';
+					$parameters[] = '*';
+				}
+				$matchUrl[] = $expl;
+			}
+			$matchUrl = '~^'.implode('/', $matchUrl).'$~';
+			$this->Routes[$matchUrl] = array($data, $parameters);
+		}
+
+		$this->Route = isset($_SERVER['PATH_INFO'])
+		             ? trim($_SERVER['PATH_INFO'], '/')
+		             : '';
+
+		if (preg_match('~^(.+)\.([^.]+)$~', $this->Route, $args)) {
+			$this->Route = $args[1];
+			$this->Format = strtoupper($args[2]);
+		} else {
+			$this->Format = 'HTML';
+		}
+		//	$this->Route = preg_replace('~\.[^.]*$~', '', $this->Route);
+
+		if ($data = $this->getMatch($this->Route)) {
+			$this->Controller = $data['Controller'];
+			$this->Action		 = $data['Action'];
+			foreach ($data as $key=>$value) {
+				$this->request[$key] = $value;
+			}
+		} elseif ($e = $this->config->get('Router.ErrorRoute') AND
+		          $data = $this->getMatch($e)) {
+			$this->Controller = $data['Controller'];
+			$this->Action		 = $data['Action'];
+		}
+
+		$this->request = array_merge($this->request, $_GET, $_POST);
+	}
 
 	/**
 	 *
