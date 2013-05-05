@@ -41,7 +41,7 @@ function log {
 ##############################################################################
 function usage {
 	s=$(cat "$0" | \
-			awk '{if($0~/^#+ +USAGE +>+/){while(getline>0){if($0~/^#+ *<+ *USAGE/)exit;print $0}}}')
+        awk '{if($0~/^#+ +USAGE +>+/){while(getline>0){if($0~/^#+ *<+ *USAGE/)exit;print $0}}}')
 	eval s="$(echo \""$s"\")"
 	echo "$s" >&2
 }
@@ -50,7 +50,7 @@ function usage {
 ### read config file
 ##############################################################################
 function read_config {
-	test "$1"		|| error_exit 'Missing config file!'
+	test "$1"    || error_exit 'Missing config file!'
 	test -r "$1" || error_exit 'Configuration file is not readable!'
 
 	while read var value; do
@@ -67,7 +67,7 @@ function read_config {
 function bool {
 	case $(echo "$1" | tr '[A-Z]' '[a-z]') in
 		1|on|yes|true) echo 1 ;;
-		*)						 echo 0 ;;
+		*)             echo 0 ;;
 	esac
 }
 
@@ -100,14 +100,17 @@ function curl_cmd {
 ### $2 = message
 ##############################################################################
 function save_log {
-	log 1 "Scope	: $1"
-	log 1 "Message: $2"
+	log 1 "Scope   : $1"
+	log 1 "Message : $2"
 
-	test "${2:0:1}" != '@' && message="message=\"$2\"" || message="message$2"
+	### detect @filename or "normal string" to post
+	test "${2:0:1}" == '@' && msg="$2" || msg="=\"$2\""
 
-	$(curl_cmd) --header "X-PVLng-key: $PVLngAPIkey" --request PUT \
-							--data-urlencode scope="$1" --data-urlencode $message \
-							$PVLngHost/api/log
+	$(curl_cmd) --request PUT \
+                --header "X-PVLng-key: $PVLngAPIkey" \
+                --data-urlencode scope="$1" \
+                --data-urlencode "message$msg" \
+                $PVLngHost/api/log
 }
 
 ##############################################################################
