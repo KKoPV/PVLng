@@ -53,10 +53,9 @@ class Channel_Controller extends ControllerAuth {
 			}
 
 			/* preset channel unit */
-			$q = new DBQuery('entity_type', 'unit');
+			$q = new DBQuery('pvlng_type', 'unit');
 			$q->whereEQ('id', $this->type);
 			$this->fields['unit']['VALUE'] = $this->db->queryOne($q);
-
 			$this->view->Fields = $this->fields;
 			$this->foreward('Edit');
 		}
