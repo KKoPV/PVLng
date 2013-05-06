@@ -170,11 +170,15 @@ class Channel {
 			  ->group($grouping);
 		}
 
-		$q->whereEQ('id', $this->entity)
-		  // BETWEEN is  start <= ? <= end  incl. end
-		  // subtract 1 second for excluding end
-		  ->whereBT('timestamp', $this->start, $this->end-1)
-		  ->order('timestamp');
+		$q->whereEQ('id', $this->entity);
+
+		if ($this->period[1] != 8) {
+			  // Time is only relevant for select <> period=all
+			  // BETWEEN is  start <= ? <= end  incl. end
+			  // subtract 1 second for excluding end
+			$q->whereBT('timestamp', $this->start, $this->end-1)
+              ->order('timestamp');
+		}
 
 		if (array_key_exists('sql', $request) AND $request['sql']) echo $q, PHP_EOL;
 
@@ -268,7 +272,7 @@ class Channel {
 		/* month */	        5 => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
 		/* quarter */       6 => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
 		/* year */          7 => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
-		/* all */           8 => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV 10000',
+		/* all */           8 => '""',
 	);
 
 	/**
@@ -363,10 +367,7 @@ class Channel {
 					case 'm': case 'mo':  $this->period[1] =  5;  break;
 					case 'q': case 'qa':  $this->period[1] =  6;  break;
 					case 'y': case 'ye':  $this->period[1] =  7;  break;
-					case 'a': case 'al':
-						$this->period[1] = 8;
-						$this->start = 0;
-						break;
+					case 'a': case 'al':  $this->period[1] =  8;  break;
 				}
 			} else {
 				throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
