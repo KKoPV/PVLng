@@ -43,7 +43,7 @@ class JSON extends \Channel {
 	public function read( $request, $attributes=FALSE ) {
 
 		$year = date('Y');
-		$month = array_key_exists('m', $request) ? $request['m'] : date('n');
+		$month = (array_key_exists('m', $request) AND $request['m']) ? $request['m'] : date('n');
 		if ($month > date('n')) $year--;
 
 		$request['start']  = $year . '-' . $month . '-01';

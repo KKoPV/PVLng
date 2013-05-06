@@ -83,12 +83,15 @@ while test $i -lt $GUID_N; do
 	url="$PVLngURL1/$GUID.tsv?period=${INTERVAL}minutes"
 	log 2 "Get-URL  : $url"
 
-	### skip attributes row, get last row, set timestamp and data to $1 and $2
-	set $($curl $url | tail -n+2 | tail -n1)
-	timestamp=$1
+	### skip attributes row, get last row
+	row=$($curl $url | tail -n+2 | tail -n1)
 
 	### Just after 0:00 no data for today yet
-	test "$timestamp" || continue
+	test "$row" || continue
+
+	### set timestamp and data to $1 and $2
+	set $row
+	timestamp=$1
 
 	if test "$FORMAT"; then
 	    value=$(printf "$FORMAT" "$2")
