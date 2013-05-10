@@ -128,11 +128,11 @@ class JSON extends \Channel {
 		$data = array();
 		while ($row = fgets($result)) {
 			$this->decode($row, $id);
-			$data[] = round($row['consumption']);
+			$data[] = round($row['consumption']/1000, 3);
 		}
 
+		// Don't return to JSON view, output directly
 		Header('Content-Type: application/x-json; charset=UTF-8');
-
 		die('[' . implode(',', $data) . ']');
 	}
 

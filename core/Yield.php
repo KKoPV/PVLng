@@ -356,11 +356,13 @@ class YieldPlant extends AbstractYield {
 			$start = $inverter->getTimestampStart();
 			$end = $inverter->getTimestampEnd();
 			$powers = $inverter->getPowerValues();
-			$intervall = ($end - $start) / count($powers);
 
-			// fill up missing values
-			$powers = $this->leftPadPowers($powers, round(($start - $plantStart) / $intervall));
-			$powers = $this->rightPadPowers($powers, round(($plantEnd - $end) / $intervall));
+			if ($cnt = count($powers)) {
+				$intervall = ($end - $start) / $cnt;
+				// fill up missing values
+				$powers = $this->leftPadPowers($powers, round(($start - $plantStart) / $intervall));
+				$powers = $this->rightPadPowers($powers, round(($plantEnd - $end) / $intervall));
+			}
 
 			// set new values
 			$inverter->setPowerValues($powers);
@@ -379,7 +381,7 @@ class YieldPlant extends AbstractYield {
 				// add further inverter
 				foreach ($this->data['powerAcW'] as $id => $power) {
 					$this->data['powerAcW'][$id] += $powers[$id];
-                }
+				}
 			}
 
 			$currentTotalWattHoursInverter = 0;
@@ -396,11 +398,13 @@ class YieldPlant extends AbstractYield {
 				$start = $string->getTimestampStart();
 				$end = $string->getTimestampEnd();
 				$powers = $string->getPowerValues();
-				$intervall = ($end - $start) / count($powers);
 
-				// fill up missing values
-				$powers = $this->leftPadPowers($powers, round(($start - $plantStart) / $intervall));
-				$powers = $this->rightPadPowers($powers, $powersCnt - count($powers));
+				if ($cnt = count($powers)) {
+					$intervall = ($end - $start) / $cnt;
+					// fill up missing values
+					$powers = $this->leftPadPowers($powers, round(($start - $plantStart) / $intervall));
+					$powers = $this->rightPadPowers($powers, $powersCnt - count($powers));
+				}
 
 				// set new values
 				$string->setPowerValues($powers);
@@ -435,9 +439,9 @@ class YieldPlant extends AbstractYield {
 		$this->setTimestampStart($plantStart);
 		$this->setTimestampEnd($plantEnd);
 		if ($plantStart != $plantEnd || $this->getIntervallInSeconds() == 0) {
-			$this->setIntervallInSeconds(
-				ceil(($plantEnd - $plantStart) / count($this->data['powerAcW']))
-			);
+			if ($cnt = count($this->data['powerAcW'])) {
+				$this->setIntervallInSeconds(ceil(($plantEnd - $plantStart) / $cnt));
+			}
 		}
 
 		$return = $this->data;

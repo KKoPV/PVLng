@@ -47,34 +47,37 @@ class Base extends \Channel {
 		}
 
 		// transform request date into start - end
-		$date = array_key_exists('date', $request) ? $request['date'] : date('Y-m-d');
 		$date = array_key_exists(0, $request) ? $request[0] : date('Y-m-d');
 		$request['start'] = $date;
 		$request['end']   = $date . '+1day';
-
+/*
+		$d = explode('-', $date);
+		$request['start'] = mktime(0, 0, 0, $d[1], $d[2], $d[0]);
+		$request['end']   = $date != date('Y-m-d')
+		                  ? $request['start'] + 86400
+						  : ceil(time() / 360) * 360;
+		$request['period'] = '6min';
+*/
 		// 1st child: total production
 		$child = array_shift($childs);
 		$fh = $child->read($request, TRUE);
 		// get only attributes line
 		rewind($fh);
 		$row = fgets($fh);
+		fclose($fh);
+
 		$row = unserialize($row);
 		$inverter->setCurrentTotalWattHours($row['consumption']);
-		fclose($fh);
 
 		// 2nd child: Pac power
 		$child = array_shift($childs);
-		$fh = $child->read($request);
-		$this->calcTimesAndPowers($fh, $inverter);
-		fclose($fh);
+		$this->calcTimesAndPowers($child->read($request), $inverter);
 
-		// other childs: strings Pdc
+		// other childs: must be the Strings Pdc
 		if ($this->useStrings) {
 			foreach ($childs as $id=>$child) {
 			    $string = new \YieldString;
-				$fh = $child->read($request);
-				$this->calcTimesAndPowers($fh, $string);
-				fclose($fh);
+				$this->calcTimesAndPowers($child->read($request), $string);
 				$inverter->addString($string);
 			}
 		}
@@ -97,35 +100,38 @@ class Base extends \Channel {
 	protected function __construct( $guid ) {
 		parent::__construct($guid);
 		$this->ts = microtime(TRUE);
+		$this->UTC_Offset = file_get_contents(__DIR__ . DS . 'utc_offset');
 	}
 
 	/**
 	 *
 	 */
-	protected function calcTimesAndPowers ( $fh, $obj ) {
+	protected function calcTimesAndPowers( $fh, $obj ) {
 		rewind($fh);
 		$start = PHP_INT_MAX;
-		$end = 0;
+		$end   = 0;
 		while ($row = fgets($fh)) {
-			$this->decode($row, $ts);
-			if ($row['timestamp'] < $start) $start = $row['timestamp'];
-			if ($row['timestamp'] > $end)   $end   = $row['timestamp'];
+			$this->decode($row, $id);
+			$start = min($start, $row['timestamp']);
+			$end   = max($end,   $row['timestamp']);
 			$obj->addPowerValue($row['data']);
 		}
 		$obj->setTimestampStart($start);
 		$obj->setTimestampEnd($end);
+		fclose($fh);
 	}
 
 	/**
 	 *
 	 */
-	protected function finish ( &$yield, $request ) {
+	protected function finish( &$yield, $request ) {
 		$yield->setCreator('PVLng ' . PVLNG_VERSION);
 
 		$date = array_key_exists(0, $request) ? $request[0] : date('Y-m-d');
 		$yield->setDeleteDayBeforeImport(($date != date('Y-m-d')));
+#		$yield->setDeleteDayBeforeImport(1);
 
-		// Force timestamp calculation...
+		// Force timestamp calculation
 		$yield->asArray();
 		$yield->getPlant()->setPowerValues(array());
 

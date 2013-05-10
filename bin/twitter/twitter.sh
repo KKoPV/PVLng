@@ -61,7 +61,7 @@ ITEMS=0
 while test $ITEMS -lt $ITEM_N; do
 
   ITEMS=$(expr $ITEMS + 1)
-  log 1 "--- Section $ITEMS ---"
+  log 1 "--- $ITEMS ---"
 
   eval ITEM=\$ITEM_$ITEMS
   log 1 "Item  : $ITEM"
@@ -70,7 +70,11 @@ while test $ITEMS -lt $ITEM_N; do
   log 1 "GUID  : $GUID"
 
   value=$(twitter_$ITEM $GUID)
+  value=$(int $value)
   log 1 "Value : $value"
+
+  ### Exit if no value is found, e.g. no actual power outside daylight times
+  test "$value" != "0" || test "$FORCE" || exit
 
   eval FACTOR=\$FACTOR_$ITEMS
   log 1 "Factor: $FACTOR"
@@ -79,9 +83,6 @@ while test $ITEMS -lt $ITEM_N; do
     value=$(echo "scale=3; $value * $FACTOR" | bc -l)
     log 1 "Value : $value"
   fi
-
-  ### Exit if no value is found, e.g. no actual power outside daylight times
-  test "$value" != "0" || test "$FORCE" || exit
 
   PARAMS="$PARAMS $value"
 

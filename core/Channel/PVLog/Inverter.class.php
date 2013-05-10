@@ -17,11 +17,6 @@ class Inverter extends Base {
 	/**
 	 *
 	 */
-	public $UTC_Offset = 3600;
-
-	/**
-	 *
-	 */
 	public function read( $request, $attributes=TRUE ) {
 
 		$inverter = new \YieldInverter;
