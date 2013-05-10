@@ -1,18 +1,20 @@
 <?php
 /**
- * An Accumulator sums channels with the same unit to retrieve them as one channel
+ * http://wiki.sonnenertrag.eu/datenimport:json
+ *
+ * Delivers the daily production in Wh
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-14-g2a8e482 2013-05-01 20:44:21 +0200 Knut Kohl $
+ * @version     $Id: v1.0.0.2-28-g4d7f5c3 2013-05-10 14:29:24 +0200 Knut Kohl $
  */
-namespace Channel;
+namespace Channel\Sonnenertrag;
 
 /**
  *
  */
-class Accumulator extends \Channel {
+class JSON extends \Channel {
 
 	/**
 	 * Accept only childs of the same entity type
@@ -26,7 +28,7 @@ class Accumulator extends \Channel {
 
 		// Check if the new child have the same type as the 1st (and any other) child
 		$first = self::byID($childs[0]['entity']);
-		$new	 = self::byGUID($guid);
+		$new   = self::byGUID($guid);
 		if ($first->type == $new->type) {
 			// ok, add new child
 			return parent::addChild($guid);
@@ -39,6 +41,15 @@ class Accumulator extends \Channel {
 	 *
 	 */
 	public function read( $request, $attributes=FALSE ) {
+
+		$year = date('Y');
+		$month = (array_key_exists('m', $request) AND $request['m']) ? $request['m'] : date('n');
+		if ($month > date('n')) $year--;
+
+		$request['start']  = $year . '-' . $month . '-01';
+		$request['end']    = $year . '-' . $month . '-01+1month';
+		$request['period'] = '1day';
+		$request['full']   = TRUE;
 
 		$this->before_read($request);
 
@@ -74,13 +85,9 @@ class Accumulator extends \Channel {
 			$done = ($row1 == '' AND $row2 == '');
 
 			while (!$done) {
-
 				if ($id1 == $id2) {
 
 					// same timestamp, combine
-					$row1['data']        += $row2['data'];
-					$row1['min']         += $row2['min'];
-					$row1['max']         += $row2['max'];
 					$row1['consumption'] += $row2['consumption'];
 					fwrite($result, $this->encode($row1, $id1));
 
@@ -117,7 +124,16 @@ class Accumulator extends \Channel {
 			$tmpfile_1 = $result;
 		}
 
-		return $this->after_read($result, $attributes);
+		rewind($result);
+		$data = array();
+		while ($row = fgets($result)) {
+			$this->decode($row, $id);
+			$data[] = round($row['consumption']/1000, 3);
+		}
+
+		// Don't return to JSON view, output directly
+		Header('Content-Type: application/x-json; charset=UTF-8');
+		die('[' . implode(',', $data) . ']');
 	}
 
 }

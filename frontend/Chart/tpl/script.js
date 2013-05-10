@@ -4,7 +4,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.1-10-gd62a54c 2013-04-30 22:28:01 +0200 Knut Kohl $
+ * @version     $Id: v1.0.0.2-19-gf67765b 2013-05-05 22:03:31 +0200 Knut Kohl $
  */
 
 /* ------------------------------------------------------------------------ */
@@ -80,13 +80,11 @@ var
 				fillOpacity: 0.2
 			},
 			bar: {
-			    minPointLength: 3,
 				groupPadding: 0.1
 			}
 		},
 		xAxis : {
-			type: 'datetime',
-			maxZoom: 3600 * 1000 /* 1 hour */
+			type: 'datetime'
 		},
 		tooltip: {
 			useHTML: true,
@@ -227,7 +225,7 @@ function updateChart() {
 
 	var channels_new = [], yAxisMap = [], yAxis = [],
 		channel, channel_clone, buffer = [],
-		period = $('#periodcnt').val() + $('#period').val();
+		period = $('#period').val();
 
 	/* reset consumption and costs data */
 	$('.consumption, .costs, #costs').each(function(id, el) {
@@ -309,7 +307,7 @@ function updateChart() {
 		}
 	}
 
-	var res = xAxisResolution[$('#period').val()];
+	var res = xAxisResolution[period];
 
 	if (changed) {
 		/* use UTC for timestamps with a period >= day to avoid wrong hours in hint */
@@ -338,7 +336,7 @@ function updateChart() {
 			{
 				start:	$('#fromdate').attr('value'),
 				end:	$('#todate').attr('value') + '+1day',
-				period: (channel.type != 'scatter') ? period : '',
+				period: (channel.type != 'scatter') ? $('#periodcnt').val() + period : '',
 				full:   period,
 				_ts:	(new Date).getTime()
 			},
@@ -625,6 +623,13 @@ $(function() {
 	$('#btn-clear').button({
 		icons: {
 			primary: 'ui-icon-trash'
+		},
+		text: false
+	});
+
+	$('#btn-go').button({
+		icons: {
+			primary: 'ui-icon-folder-open'
 		},
 		text: false
 	});

@@ -4,7 +4,7 @@
  * @author		 Knut Kohl <knutkohl@users.sourceforge.net>
  * @copyright	2012 Knut Kohl
  * @license		GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version		$Id$
+ * @version		$Id: v1.0.0.2-22-g7bc4608 2013-05-05 22:07:15 +0200 Knut Kohl $
  */
 </script>
 
@@ -59,7 +59,7 @@ $(function() {
 		}
 	});
 
-	$("#dialog-confirm").dialog({
+	$('#dialog-confirm').dialog({
 		autoOpen: false,
 		resizable: false,
 		width: 480,
@@ -70,7 +70,7 @@ $(function() {
 		}
 	});
 
-	$( "#dialog-guid" ).dialog({
+	$('#dialog-guid').dialog({
 		autoOpen: false,
 		resizable: false,
 		width: 480,
@@ -78,6 +78,12 @@ $(function() {
 		buttons: {
 			Ok: function() { $(this).dialog('close'); }
 		}
+	});
+
+	$('#show-guid').focus(function() {
+		$(this).select();
+	}).mouseup(function(e) {
+		e.preventDefault();
 	});
 
 	$('.delete-form').submit(function(){
@@ -100,7 +106,7 @@ function addChild( node ) {
  *
  */
 function showGUID( guid ) {
-	$('#show-guid').html(guid);
+	$('#show-guid').val(guid);
 	$('#dialog-guid').dialog('open');
 }
 

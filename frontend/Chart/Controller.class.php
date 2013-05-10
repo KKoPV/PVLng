@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.1-9-g08f2434 2013-04-30 21:45:01 +0200 Knut Kohl $
+ * @version     $Id: v1.0.0.2-19-gf67765b 2013-05-05 22:03:31 +0200 Knut Kohl $
  */
 class Chart_Controller extends ControllerAuth {
 
@@ -17,6 +17,7 @@ class Chart_Controller extends ControllerAuth {
 
 		$this->Tree = NestedSet::getInstance();
 		$this->channels = array();
+		$this->views = $this->model->getViews();
 	}
 
 	/**

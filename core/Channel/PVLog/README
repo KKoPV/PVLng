@@ -1,0 +1,5 @@
+Fill your UTC offset in seconds in file utc_offset
+
+Here 3600 for Europe/Berlin
+
+DON'T add daylight savings time offset, this will be handled internal.

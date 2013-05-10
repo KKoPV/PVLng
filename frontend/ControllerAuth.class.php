@@ -4,7 +4,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.2-24-gffc9108 2013-05-05 22:20:01 +0200 Knut Kohl $
  */
 class ControllerAuth extends Controller {
 
@@ -29,7 +29,7 @@ class ControllerAuth extends Controller {
 				$this->User = $this->config->Admin_User;
 			} else {
 				// Login!
-				Session::set('returnto', $this->router->Route);
+				Session::set('returnto', $this->router->Route == 'logout' ? 'index' : $this->router->Route);
 				$this->redirect('login');
 			}
 		}
@@ -41,20 +41,7 @@ class ControllerAuth extends Controller {
 	 *
 	 */
 	public function after() {
-
-		if ($this->User == '') {
-			unset($_COOKIE[Session::token()]);
-			Session::regenerate();
-			Session::set('user');
-		} else {
-			if (isset($_SESSION['returnto'])) {
-				$r = $_SESSION['returnto'];
-				unset($_SESSION['returnto']);
-				$this->redirect($r);
-			}
-		}
 		$this->view->User = $this->User;
-
 		parent::after();
 	}
 

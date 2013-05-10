@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.2-22-g7bc4608 2013-05-05 22:07:15 +0200 Knut Kohl $
  */
 class Index_Controller extends ControllerAuth {
 
@@ -15,6 +15,21 @@ class Index_Controller extends ControllerAuth {
 	public function before() {
 		parent::before();
 		$this->Tree = NestedSet::getInstance();
+	}
+
+	/**
+	 *
+	 */
+	public function after() {
+		if ($this->Tree->isError()) {
+			foreach ($this->Tree->getError() as $value) {
+				if (strstr($value, 'NestedSet::checkRootNode()') == '')
+					Messages::Error($value);
+			}
+		}
+
+		$this->view->Entities = $this->rows2view($this->model->getEntities());
+		parent::after();
 	}
 
 	/**
@@ -141,21 +156,6 @@ class Index_Controller extends ControllerAuth {
 	/**
 	 *
 	 */
-	public function after() {
-		if ($this->Tree->isError()) {
-			foreach ($this->Tree->getError() as $value) {
-				if (strstr($value, 'NestedSet::checkRootNode()') == '')
-					Messages::Error($value);
-			}
-		}
-
-		$this->view->Entities = $this->rows2view($this->model->getEntities());
-		parent::after();
-	}
-
-	/**
-	 *
-	 */
 	public function Login_Post_Action() {
 
 		$hasher = new PasswordHash();
@@ -164,17 +164,19 @@ class Index_Controller extends ControllerAuth {
 		    $hasher->CheckPassword($this->request('pass'), $this->config->Admin_Password)) {
 
 			$this->User = $this->request('user');
-
-			Session::regenerate();
 			Session::set('user', $this->User);
 
 			if ($this->request('save')) {
 				setcookie(Session::token(), 1, time()+60*60*24*7, '/');
-			} else {
-				setcookie(Session::token(), '', time()-60*60*24, '/');
+			}
+			Messages::Success(I18N::_('Welcome', $this->User));
+
+			if ($r = Session::get('returnto')) {
+				// clear before redirect
+				Session::set('returnto');
+				$this->redirect($r);
 			}
 
-			Messages::Success(I18N::_('Welcome', $this->User));
 		} else {
 			Messages::Error(I18N::_('UnknownUser'));
 		}
@@ -184,11 +186,11 @@ class Index_Controller extends ControllerAuth {
 	 *
 	 */
 	public function Logout_Action() {
-		if ($this->User == '') return;
-
-		$this->view->User = $this->User;
-		Messages::fSuccess(I18N::_('LogoutSuccessful', $this->User));
+		if ($this->User) {
+			$this->view->Message = I18N::_('LogoutSuccessful', $this->User);
+		}
 		$this->User = '';
+		Session::destroy();
 		setcookie(Session::token(), '', time()-60*60*24, '/');
 	}
 
