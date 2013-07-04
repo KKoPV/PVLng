@@ -49,6 +49,8 @@ class Controller extends yMVC\Controller {
 	public function before() {
 		parent::before();
 
+		$this->config->load(APP_DIR . DS . 'config.php', FALSE);
+
 		$this->config->loadNamespace('Controller.'.$this->router->Controller,
 		                             APP_DIR . DS . $this->router->Controller . DS . 'config.php',
 		                             FALSE);
@@ -104,8 +106,8 @@ class Controller extends yMVC\Controller {
 
 		// Check for new version once a day
 		if (!API AND Session::get('VersionCheck', 0)+86400 < time()) {
-            $version = file('http://pvlng.com/version', FILE_IGNORE_NEW_LINES);
-			$this->db->VersionNew = $version[0];
+            $version = $this->checkVersion();
+			$this->db->VersionNew = isset($version[0]) ? $version[0] : FALSE;
 		    Session::set('VersionCheck', time());
 		}
 		$v = $this->db->VersionNew;
@@ -136,6 +138,26 @@ class Controller extends yMVC\Controller {
 	 *
 	 */
 	protected $db;
+
+	/**
+	 *
+	 */
+	protected function checkVersion() {
+		$url = "https://raw.github.com/K-Ko/PVLng/master/.version";
+
+		$ch = curl_init($url);
+
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+		curl_setopt($ch, CURLOPT_HEADER, FALSE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+		$version = explode("\n", curl_exec($ch));
+
+		curl_close($ch);
+
+		return $version;
+	}
 
 	/**
 	 *
