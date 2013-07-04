@@ -22,17 +22,15 @@ class Channel_Controller extends ControllerAuth {
 		$this->fields = array();
 
 		foreach ($fields as $key=>$field) {
-			$field = array_merge(array(
-				'visible'  => TRUE,
-				'field'    => $key,
-				'radio'    => FALSE,
-				'default'  => '',
-				'required' => FALSE,
-				'Name'     => I18N::_('channel::'.$key),
-				'Hint'     => I18N::_('channel::'.$key.'Hint'),
-			), $field);
-
-			$this->fields[$key] = array_change_key_case($field, CASE_UPPER);
+			$this->fields[$key] = array_merge(array(
+				'VISIBLE'  => TRUE,
+				'FIELD'    => $key,
+				'RADIO'    => FALSE,
+				'DEFAULT'  => '',
+				'REQUIRED' => FALSE,
+				'NAME'     => I18N::_('channel::'.$key),
+				'HINT'     => I18N::_('channel::'.$key.'Hint'),
+			), array_change_key_case($field, CASE_UPPER));
 		}
 	}
 
@@ -48,11 +46,12 @@ class Channel_Controller extends ControllerAuth {
 	 */
 	public function Add_Post_Action() {
 		if ($this->type = $this->request('type')) {
+			$this->prepareFields();
 			foreach ($this->fields as &$data) {
 				$data['VALUE'] = $data['DEFAULT'];
 			}
 
-			/* preset channel unit */
+			// Preset channel unit
 			$q = new DBQuery('pvlng_type', 'unit');
 			$q->whereEQ('id', $this->type);
 			$this->fields['unit']['VALUE'] = $this->db->queryOne($q);
@@ -68,7 +67,7 @@ class Channel_Controller extends ControllerAuth {
 		$this->view->SubTitle = I18N::_('CreateChannel');
 
 		$q = new DBQuery;
-		$q->select('pvlng_type')->whereNE('id',0)->order('id');
+		$q->select('pvlng_type')->whereNE('id', 0)->order('id');
 
 		$this->view->EntityTypes = $this->rows2view($this->db->queryRows($q));
 
@@ -126,8 +125,8 @@ class Channel_Controller extends ControllerAuth {
 				}
 			}
 
-			$this->prepareFields($entity);
 			$this->type = $entity->type;
+			$this->prepareFields($entity);
 			$this->view->Id = $entity->id;
 			$this->view->Fields = $this->fields;
 		}
@@ -197,8 +196,8 @@ class Channel_Controller extends ControllerAuth {
 	/**
 	 *
 	 */
-	protected function prepareFields( $entity ) {
-		$type = new PVLng\EntityType($entity->type);
+	protected function prepareFields( $entity=NULL ) {
+		$type = new PVLng\EntityType($this->type);
 
 		$attr = include CORE_DIR . DS . 'Channel' . DS
 		              . str_replace('\\', DS, $type->model?:'_') . '.conf.php';
@@ -214,10 +213,12 @@ class Channel_Controller extends ControllerAuth {
 			}
 		}
 
-		foreach ($this->fields as $key=>&$data) {
-			$data['VALUE'] = isset($entity->$key)
-			               ? htmlspecialchars($entity->$key)
-			               : htmlspecialchars($data['DEFAULT']);
+		if ($entity) {
+			foreach ($this->fields as $key=>&$data) {
+				$data['VALUE'] = isset($entity->$key)
+				               ? htmlspecialchars($entity->$key)
+				               : htmlspecialchars($data['DEFAULT']);
+			}
 		}
 	}
 

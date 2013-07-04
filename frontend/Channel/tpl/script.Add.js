@@ -15,7 +15,6 @@ $(function() {
 	$('#dataTable').DataTable({
 		bPaginate: false,
 		bFilter: false,
-		bSort: false,
 		bLengthChange: false,
 		bInfo: false,
 		bJQueryUI: true
