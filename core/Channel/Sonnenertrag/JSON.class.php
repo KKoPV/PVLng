@@ -1,8 +1,14 @@
 <?php
 /**
- * http://wiki.sonnenertrag.eu/datenimport:json
+ * Delivers the daily production in Wh/kWh
  *
- * Delivers the daily production in Wh
+ * URL format:
+ *   .../<GUID>.json?m=            for Wh data
+ *   .../<GUID>.json?u=kWh&m=      for kWh data
+ *
+ * kWh format is hightly suggested!
+ *
+ * http://wiki.sonnenertrag.eu/datenimport:json
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
@@ -43,7 +49,12 @@ class JSON extends \Channel {
 	public function read( $request, $attributes=FALSE ) {
 
 		$year = date('Y');
-		$month = (array_key_exists('m', $request) AND $request['m']) ? $request['m'] : date('n');
+		$month = (array_key_exists('m', $request) AND $request['m'])
+		       ? $request['m']
+		       : date('n');
+		$factor = (array_key_exists('u', $request) AND $request['u'] == 'kWh')
+		        ? 1000
+		        : 1;
 		if ($month > date('n')) $year--;
 
 		$request['start']  = $year . '-' . $month . '-01';
@@ -128,12 +139,16 @@ class JSON extends \Channel {
 		$data = array();
 		while ($row = fgets($result)) {
 			$this->decode($row, $id);
-			$data[] = round($row['consumption']/1000, 3);
+			$data[] = round($row['consumption'] / $factor, 3);
 		}
 
-		// Don't return to JSON view, output directly
-		Header('Content-Type: application/x-json; charset=UTF-8');
-		die('[' . implode(',', $data) . ']');
+		// Provide full information...
+		return array(
+			'un'  => $factor == 1 ? 'Wh' : 'kWh',
+			'tm'  => sprintf('%04d-%02d-01T00:00:00', $year, $month),
+			'dt'  => 86400,
+			'val' => $data
+		);
 	}
 
 }

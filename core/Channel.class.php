@@ -57,11 +57,29 @@ class Channel {
 	 *
 	 */
 	public function getAttributes( $attribute='' ) {
-		$attr = array();
-
-		foreach ($this as $key=>$value) {
-			if (is_scalar($value)) $attr[$key] = is_numeric($value) ? +$value : $value;
-		}
+		$attr = array(
+	        'guid'        => $this->guid,
+	        'name'        => $this->name,
+	        'serial'      => $this->serial,
+	        'channel'     => $this->channel,
+	        'description' => $this->description,
+	        'type'        => $this->type,
+	        'unit'        => $this->unit,
+	        'numeric'     => $this->numeric,
+	        'meter'       => $this->meter,
+	        'resolution'  => $this->resolution,
+	        'threshold'   => $this->threshold,
+	        'cost'        => $this->cost,
+	        'childs'      => $this->childs,
+	        'read'        => $this->read,
+	        'write'       => $this->write,
+	        'graph'       => $this->graph,
+	        'icon'        => $this->icon,
+	        'start'       => $this->start,
+	        'end'         => $this->end,
+	        'consumption' => 0,
+	        'costs'       => 0
+		);
 
 		return ($attribute == '' OR $attribute == '*')
 		     ? $attr
@@ -154,39 +172,42 @@ class Channel {
 			$q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
 			  ->get($q->MIN('timestamp'), 'timestamp');
 
-			if ($this->meter) {
+			if (!$this->numeric) {
+				$q->get('data');
+			} elseif ($this->meter) {
 				$q->get($q->MAX('data'), 'data');
 			} elseif ($this->counter) {
-				$q->get($q->SUM('data'), 'data');
+				$q->get($q->ROUND($q->SUM('data'), 4), 'data');
 			} else {
-				$q->get($q->AVG('data'), 'data');
+				$q->get($q->ROUND($q->AVG('data'), 4), 'data');
 			}
 
 			$q->get($q->MIN('data'), 'min')
 			  ->get($q->MAX('data'), 'max')
 			  ->get($q->COUNT('id'), 'count')
 			  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff', TRUE)
-			  ->get($grouping, 'g')
+			  #->get($grouping, 'g')
 			  ->group($grouping);
 		}
 
 		$q->whereEQ('id', $this->entity);
 
 		if ($this->period[1] != 8) {
-			  // Time is only relevant for select <> period=all
-			  // BETWEEN is  start <= ? <= end  incl. end
-			  // subtract 1 second for excluding end
-			$q->whereBT('timestamp', $this->start, $this->end-1)
+		    // Time is only relevant for select <> period=all
+		    // BETWEEN is  start <= ? <= end  incl. end!
+		    // Subtract 1 second for excluding end!
+ 			$q->whereBT('timestamp', $this->start, $this->end-1)
               ->order('timestamp');
 		}
 
-		if (array_key_exists('sql', $request) AND $request['sql']) echo $q, PHP_EOL;
+ 		$tmpfile = $this->tmpfile();
 
-		$tmpfile = $this->tmpfile();
+		if (array_key_exists('sql', $request) AND $request['sql']) $this->sql = (string) $q;
 
 		if ($res = $this->db->query($q)) {
 
 			$offset = $last = 0;
+
 			while ($row = $res->fetch_assoc()) {
 
 				$data = $row;
@@ -194,16 +215,17 @@ class Channel {
 
 				if ($this->meter) {
 					// calc meter offset for uncompressed data
-					if ($offset == 0) {
-						$offset = $data['data'];
-					}
-					$data['data'] -= $offset;
+					if ($offset == 0) $offset = $data['data'];
+
+					if ($res->num_rows > 1) {
+    					$data['data'] = round($data['data'] - $offset, 4);
+                    }
 
 					// calc consumption from previous max value
 				    if ($last == 0) {
-						$data['consumption'] = $data['max'] - $data['min'];
+						$data['consumption'] = round($data['max'] - $data['min'], 4);
 					} else {
-						$data['consumption'] = $data['max'] - $last;
+						$data['consumption'] = round($data['max'] - $last, 4);
 					}
 					$last = $data['max'];
 				}
@@ -260,12 +282,22 @@ class Channel {
 	protected $full;
 
 	/**
+	 *
+	 */
+	protected $mobile;
+
+	/**
+	 *
+	 */
+	protected $sql;
+
+	/**
 	 * Grouping SQLs
 	 */
 	protected $GroupBy = array(
 		/* last */         -1 => '',
 		/* no grouping */   0 => '',
-		/* minute */	    1 => '(`timestamp` - UNIX_TIMESTAMP()) DIV (60 * %d)',
+		/* minute */	    1 => '`timestamp` DIV (60 * %d)',
 		/* hour */	        2 => '`timestamp` DIV (3600 * %f)',
 		/* day */	        3 => '`timestamp` DIV (86400 * %d)',
 		/* week */	        4 => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
@@ -375,6 +407,7 @@ class Channel {
 		}
 
 		$this->full = (array_key_exists('full', $request) AND $request['full']);
+		$this->mobile = (array_key_exists('mobile', $request) AND $request['mobile']);
 	}
 
 	/**
@@ -382,7 +415,7 @@ class Channel {
 	 */
 	protected function after_read( $tmpfile, $attributes ) {
 
-		$tmpfile2 = $this->tmpfile();
+		$datafile = $this->tmpfile();
 
 		$last = $consumption = 0;
 		$lastrow = '';
@@ -410,48 +443,111 @@ class Channel {
 
 			$row['data'] = $this->valid($row['data']);
 
-			fwrite($tmpfile2, $this->encode($row, $id));
+			fwrite($datafile, $this->encode($row, $id));
 
 			$lastrow = $row;
 		}
 
 		fclose($tmpfile);
 
-		if ($attributes) {
-			$attr = $this->getAttributes();
-			$attr['consumption'] = $consumption * $this->resolution;
-			$attr['costs'] = $attr['consumption'] * $this->cost;
-		}
-
 		if ($this->period[1] == -1) {
 			// recreate temp. file with last row only
-			fclose($tmpfile2);
-			$tmpfile2 = $this->tmpfile();
-			fwrite($tmpfile2, $this->encode($lastrow, $id));
+			fclose($datafile);
+			$datafile = $this->tmpfile();
+			fwrite($datafile, $this->encode($lastrow, $id));
 		}
 
-		if ($attributes) {
-			$tmpfile3 = $this->tmpfile();
+		if (!$attributes) return $datafile;
 
-			fwrite($tmpfile3, serialize($attr) . PHP_EOL);
+		// -------------------------------------------------------------------
+		// Last call, return attributes and data
 
-			rewind($tmpfile2);
-			while ($row = fgets($tmpfile2)) {
-				$this->decode($row, $id);
-				if (!$this->full) {
-					// default result: only timestamp and data
-					$row = array(
-						'timestamp' => $row['timestamp'],
-						'data'      => $row['data'],
-					);
+		$attr = $this->getAttributes();
+		$attr['consumption'] = $consumption * $this->resolution;
+		$attr['costs'] = $attr['consumption'] * $this->cost;
+		// remover newlines, they will not correct serialized
+		if ($this->sql != '') $attr['sql'] = preg_replace('~\s+~s', ' ', $this->sql);
+
+		$tmpfile = $this->tmpfile();
+
+		fwrite($tmpfile, serialize($attr) . PHP_EOL);
+
+		rewind($datafile);
+
+		// Bitmask : 00000011
+		//                  ^----- Full
+		//                 ^------ Mobile
+		$mode = 0;
+		if ($this->full)   $mode |= 1;
+		if ($this->mobile) $mode |= 2;
+
+		// optimized flow...
+		switch ($mode) {
+			// -------------------
+			case 3: // Full mobile
+
+				while ($row = fgets($datafile)) {
+					$this->decode($row, $id);
+					fwrite($tmpfile, serialize(array(
+						'dt' => $row['datetime'],
+						't'  => $row['timestamp'],
+						'd'  => $row['data'],
+						'i'  => $row['min'],
+						'a'  => $row['max'],
+						'c'  => $row['count'],
+						'td' => $row['timediff'],
+						'c'  => $row['consumption']
+					)) . PHP_EOL);
 				}
-				fwrite($tmpfile3, serialize($row) . PHP_EOL);
-			}
-			fclose($tmpfile2);
-			return $tmpfile3;
-		}
+				break;
 
-		return $tmpfile2;
+			// -------------------
+			case 2: // Short mobile
+
+				while ($row = fgets($datafile)) {
+					$this->decode($row, $id);
+					// default mobile result: only timestamp and data
+					fwrite($tmpfile, serialize(array(
+						't' => $row['timestamp'],
+						'd' => $row['data']
+					)) . PHP_EOL);
+				}
+				break;
+
+			// -------------------
+			case 1: // Full
+				// do nothing with $row
+				while ($row = fgets($datafile)) {
+					$this->decode($row, $id);
+					fwrite($tmpfile, serialize(array(
+						'datetime'    => $row['datetime'],
+						'timestamp'   => $row['timestamp'],
+						'data'        => $row['data'],
+						'min'         => $row['min'],
+						'max'         => $row['max'],
+						'count'       => $row['count'],
+						'timediff'    => $row['timediff'],
+						'consumption' => $row['consumption']
+					)) . PHP_EOL);
+				}
+				break;
+
+			// -------------------
+			default: // Short, default
+				while ($row = fgets($datafile)) {
+					$this->decode($row, $id);
+					// default result: only timestamp and data
+					fwrite($tmpfile, serialize(array(
+						'timestamp' => $row['timestamp'],
+						'data'      => $row['data']
+					)) . PHP_EOL);
+				}
+				break;
+
+		}
+		fclose($datafile);
+
+		return $tmpfile;
 	}
 
 	/**

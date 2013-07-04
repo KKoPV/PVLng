@@ -71,9 +71,7 @@ class Accumulator extends \Channel {
 
 			$result = $this->tmpfile();
 
-			$done = ($row1 == '' AND $row2 == '');
-
-			while (!$done) {
+			while ($row1 != '' OR $row2 != '') {
 
 				if ($id1 == $id2) {
 
@@ -110,8 +108,6 @@ class Accumulator extends \Channel {
 					$this->decode($row2, $id2);
 
 				}
-
-				$done = ($row1 == '' AND $row2 == '');
 			}
 
 			$tmpfile_1 = $result;
