@@ -1,20 +1,20 @@
 <?php
 /**
  *
- * @author      Knut Kohl <github@knutkohl.de>
+ * @author	  Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @license	 GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version	 $Id$
  */
 namespace yMVC;
 
 /**
  *
  *
- * @author      Knut Kohl <github@knutkohl.de>
+ * @author	  Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @license	 GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version	 $Id$
  */
 class Config {
 
@@ -40,7 +40,7 @@ class Config {
 		if (isset($file) AND (file_exists($file) OR $required)) {
 			$data = include $file;
 			$data = $this->array_change_key_case_deep($data);
-			$this->data = array_merge($this->data, $data);
+			$this->data = $this->array_replace_deep($this->data, $data);
 		}
 		return $this;
 	}
@@ -52,7 +52,7 @@ class Config {
 		if (isset($file) AND (file_exists($file) OR $required)) {
 			$data = include $file;
 			$data = $this->array_change_key_case_deep($data);
-			$this->set($namespace, array_merge((array)$this->get($namespace), $data));
+			$this->set($namespace, $this->array_replace_deep($this->get($namespace), $data));
 		}
 		return $this;
 	}
@@ -107,14 +107,34 @@ class Config {
 	/**
 	 *
 	 */
-	protected static function array_change_key_case_deep( $data ) {
+	protected function array_change_key_case_deep( $data ) {
 		if (!is_array($data)) return $data;
 
 		$arr = array();
 		foreach ($data as $key=>$value) {
-			$arr[mb_strtolower($key)] = self::array_change_key_case_deep($value);
+			$arr[mb_strtolower($key)] = $this->array_change_key_case_deep($value);
 		}
 		return $arr;
+	}
+
+	/**
+	 *
+	 */
+	protected function array_replace_deep($base, $replace) {
+		// Loop through array key/value pairs
+		foreach ($replace as $key=>$value) {
+			if (is_array($value)) {
+				// Value is an array
+				// Traverse the array; replace or add result to original array
+				$base[$key] = $this->array_replace_deep(isset($base[$key])?$base[$key]:array(), $value);
+			} else {
+				// Value is not an array
+				// Replace or add current value to original array
+				$base[$key] = $value;
+			}
+		}
+		// Return the joined array
+		return $base;
 	}
 
 	// -------------------------------------------------------------------------
