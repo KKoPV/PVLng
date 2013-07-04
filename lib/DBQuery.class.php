@@ -318,13 +318,13 @@ class DBQuery {
 	 */
 	protected function SelectSQL() {
 		return 'SELECT '
-				 . $this->_get()
-				 . "\n".'	FROM `' . $this->table . '`'
-				 . $this->_where()
-				 . $this->_group()
-				 . $this->_having()
-				 . $this->_order()
-				 . $this->_limit();
+		     . $this->_get()
+		     . "\n".'  FROM `' . $this->table . '`'
+		     . $this->_where()
+		     . $this->_group()
+		     . $this->_having()
+		     . $this->_order()
+		     . $this->_limit();
 	}
 
 	/**
@@ -332,12 +332,12 @@ class DBQuery {
 	 */
 	protected function InsertSQL( $mode='INSERT' ) {
 		$sql = $this->sql . ' INTO `' . $this->table . '` (`'
-				 . implode('`,`', array_keys($this->set)) . '`) ';
+		     . implode('`,`', array_keys($this->set)) . '`) ';
 		$sql .= 'VALUES (';
 		foreach ($this->set as $value) {
-			$sql .= $value[1] ? $value[0] : $this->quote($value[0]);
-			$sql .= ', ';
+			$sql .= ($value[1] ? $value[0] : $this->quote($value[0])) . ', ';
 		}
+		// remove trailing comma
 		$sql = substr($sql, 0, -2) . ')';
 		return $sql;
 	}
@@ -349,12 +349,13 @@ class DBQuery {
 		$sql = 'UPDATE `' . $this->table . '` SET ';
 		foreach ($this->set as $key=>$value) {
 			$sql .= '`' . $key . '` = '
-						. ($value[1] ? $value[0] : $this->quote($value[0]));
-			$sql .= ', ';
+			      . ($value[1] ? $value[0] : $this->quote($value[0]))
+			      . ', ';
 		}
+		// remove trailing comma
 		$sql = substr($sql, 0, -2)
-				 . $this->_where()
-				 . $this->_limit();
+		     . $this->_where()
+		     . $this->_limit();
 		return $sql;
 	}
 
@@ -363,9 +364,9 @@ class DBQuery {
 	 */
 	protected function DeleteSQL() {
 		return 'DELETE '
-				 . "\n".'	FROM `' . $this->table . '`'
-				 . $this->_where()
-				 . $this->_limit();
+		     . "\n".'	FROM `' . $this->table . '`'
+		     . $this->_where()
+		     . $this->_limit();
 	}
 
 	/**
@@ -392,7 +393,7 @@ class DBQuery {
 	 *
 	 */
 	protected function _get() {
-		$s = implode("\n".'			,', $this->get);
+		$s = implode("\n".'      ,', $this->get);
 		return $s ? $s : '*';
 	}
 
@@ -400,7 +401,7 @@ class DBQuery {
 	 *
 	 */
 	protected function _where() {
-		$s = implode("\n".'	 AND ', $this->where);
+		$s = implode("\n".'   AND ', $this->where);
 		return $s ? "\n" . ' WHERE ' . $s : '';
 	}
 
@@ -408,7 +409,7 @@ class DBQuery {
 	 *
 	 */
 	protected function _group() {
-		$s = implode("\n".'				 ,', $this->group);
+		$s = implode("\n".'       ,', $this->group);
 		return $s ? "\n" . ' GROUP BY ' . $s : '';
 	}
 
