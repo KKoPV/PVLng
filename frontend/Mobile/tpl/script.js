@@ -238,7 +238,7 @@ function updateChart() {
 			url,
 			{
 			    period: (channel.type != 'scatter') ? Period : '',
-				full: Period,
+				mobile: true,
 				_ts: (new Date).getTime()
 			},
 			function(data) {
@@ -296,17 +296,17 @@ function updateChart() {
 				}
 
 				$(data).each(function(id, row) {
-					if ($.isNumeric(row.data)) {
+					if ($.isNumeric(row.d)) {
 						if (channel.type == 'areasplinerange') {
-							serie.data.push([row.timestamp*1000, row.min, row.max]);
+							serie.data.push([row.t*1000, row.i, row.a]);
 						} else {
-							serie.data.push([row.timestamp*1000, row.data]);
+							serie.data.push([row.t*1000, row.d]);
 						}
 					} else {
 						serie.data.push({
-							x: row.timestamp*1000,
+							x: row.t*1000,
 							y: 0,
-							name: row.data
+							name: row.d
 						});
 					}
 				});
