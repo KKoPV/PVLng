@@ -220,10 +220,16 @@ class DBQuery {
 	/**
 	 * Wrap SQL functions
 	 *
-	 * $this->MAX('field') => MAX(`field`)
+	 * $this->MAX('field')      => MAX(`field`)
+	 * $this->ROUND('field', 4) => ROUND(`field`, 4)
 	 */
 	public function __call( $method, $params ) {
-		return $method.'('.$this->field($params[0]).')';
+		$result = $method . '(' . $this->field($params[0]);
+		$count = count($params);
+		for ($i=1; $i<$count; $i++) {
+			$result .= ', ' . $this->quote($params[$i]);
+		}
+		return $result . ')';
 	}
 
 	/**
