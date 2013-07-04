@@ -16,7 +16,7 @@ pwd=$(dirname $0)
 SYSTEMID=
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 
 while getopts "tvxh" OPTION; do
   case "$OPTION" in

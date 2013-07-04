@@ -12,7 +12,7 @@
 pwd=$(dirname $0)
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 
 S0=$(which S0)
 test "$S0" || error_exit 'Missing "S0" binary!'
@@ -130,7 +130,6 @@ while test $i -lt $GUID_N; do
 			if test $IMPULSES -eq 0; then
 				# log average power
 				PVLngPUT1 $GUID $power
-				PVLngPUT1 '899c-76be-730f-8f3c-2554-6a1b-5ff6-7ce3' $impulse
 			else
 				# log impulses
 				PVLngPUT1 $GUID $impulse

@@ -33,7 +33,7 @@ echo '1. Load this URL in your browser:'
 echo
 echo '   '$($curlicue -f $consumer_tmp -f $request_token_tmp -e "$authorize_url")
 echo
-read -p '2. Enter here the PIN you got there: ' pin
+read -p '2. Copy PIN you got there and paste here: ' pin
 echo
 
 $curlicue -f $consumer_tmp -f $request_token_tmp \

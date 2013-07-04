@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ##############################################################################
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2013 Knut Kohl
@@ -12,7 +12,7 @@
 pwd=$(dirname $0)
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 . $pwd/twitter.items
 
 while getopts "lftvxh" OPTION; do
@@ -70,7 +70,7 @@ while test $ITEMS -lt $ITEM_N; do
   log 1 "GUID  : $GUID"
 
   value=$(twitter_$ITEM $GUID)
-  value=$(int $value)
+#  value=$(int $value)
   log 1 "Value : $value"
 
   ### Exit if no value is found, e.g. no actual power outside daylight times

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ##############################################################################
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2013 Knut Kohl
@@ -14,7 +14,7 @@ WEBBOX="192.168.0.168:80"
 GUID_N=0
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 
 while getopts "tvxh" OPTION; do
   case "$OPTION" in

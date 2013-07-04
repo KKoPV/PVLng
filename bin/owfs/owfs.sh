@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ##############################################################################
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2013 Knut Kohl
@@ -13,7 +13,7 @@ pwd=$(dirname $0)
 GUID_N=0
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 
 CACHED=false
 
@@ -33,7 +33,7 @@ fi
 
 read_config "$pwd/owfs.conf"
 
-test $SERVER || SERVER=4304
+test $SERVER || SERVER="localhost:4304"
 
 GUID_N=$(int "$GUID_N")
 test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"

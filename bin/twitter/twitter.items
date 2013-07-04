@@ -71,11 +71,11 @@ function twitter_today {
 ### Overall production in MWh
 ##############################################################################
 function twitter_overall {
-  url="$PVLngURL1/$1.tsv?period=all"
+  url="$PVLngURL1/$1.tsv?start=0&period=1000y"
   log 1 "$url"
 
-  ### get attribtues line, get 24th value - consumption
-  value=$($curl $url | head -n1 | cut -f24)
+  ### skip attribtues line, get last line, get 2nd value
+  value=$($curl $url | tail -n+2 | tail -n1 | cut -f2)
   log 1 "=> $value"
 
   echo $value
