@@ -1,0 +1,83 @@
+##############################################################################
+### @author Knut Kohl <github@knutkohl.de>
+### @copyright 2012-2013 Knut Kohl
+### @license GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version $Id$
+##############################################################################
+
+##############################################################################
+### Count of following sections
+##############################################################################
+GUID_N 0
+
+##############################################################################
+### Reapeat the follwing settings for each sensor to read.
+### Give all belonging parameters same _<#>
+##############################################################################
+
+### copy >>>
+
+##############################################################################
+### PVLng sensor GUID
+### optional, empty GUID skips processing of a section
+##############################################################################
+GUID_1        ""
+
+##############################################################################
+### This condition must met to fire an alert
+### required, use {VALUE} as placeholder for actual channel value
+###
+### Accepted syntax
+###
+### - Numeric channels
+###   {VALUE} -lt INTEGER    {VALUE} is less than INTEGER
+###   {VALUE} -le INTEGER    {VALUE} is less than or equal to INTEGER
+###   {VALUE} -ge INTEGER    {VALUE} is greater than or equal to INTEGER
+###   {VALUE} -gt INTEGER    {VALUE} is greater than INTEGER
+###   {VALUE} -eq INTEGER    {VALUE} is equal to INTEGER
+###   {VALUE} -ne INTEGER    {VALUE} is not equal to INTEGER
+###
+### - Non numeric channels
+###   -n {VALUE}             The length of {VALUE} is nonzero
+###   -z {VALUE}             The length of {VALUE} is zero
+###   {VALUE} = STRING       The strings are equal
+###   {VALUE} != STRING      The strings are not equal
+###
+### Examples
+###
+### - Alert on (numeric) channel value is greater than or equal to 30
+###   "{VALUE} -ge 30"
+### - Alert on (non-numeric) channel value is set, e.g. an error channel
+###   "-n {VALUE}"
+###
+##############################################################################
+CONDITION_1    ""
+
+##############################################################################
+### Fire alert only once if condition is met first time
+### If set to 1, all further alerts will be suppressed until the condition
+### fails.
+### Accepted values: [0|1]
+### optional, default 0
+##############################################################################
+ONCE_1         0
+
+##############################################################################
+### Command to execute
+### optional, default "log" (log into PVLng database log table)
+### Use {VALUE} as placeholder for actual channel value
+###
+### Examples
+###
+### - Send email, e.g. if a temperature exceeds a limit
+###   "echo "Temperature limit exceeded: {VALUE} °C" | mail -s "[PVLng] Channel XYZ alert!" email@example.com"
+### - Make entry in the system log, tagged with PVLng
+###   "logger -t PVLng "Temperature of XYZ exceeded {VALUE} °C""
+##############################################################################
+### How many commands
+COMMAND_1_N    0
+
+COMMAND_1_1    ""
+COMMAND_1_2    ""
+
+### <<< copy
