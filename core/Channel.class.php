@@ -186,7 +186,7 @@ class Channel {
 			  ->get($q->MAX('data'), 'max')
 			  ->get($q->COUNT('id'), 'count')
 			  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff', TRUE)
-			  #->get($grouping, 'g')
+			  ->get($grouping, 'g') // Also as row id used!
 			  ->group($grouping);
 		}
 
@@ -488,6 +488,7 @@ class Channel {
 
 				while ($row = fgets($datafile)) {
 					$this->decode($row, $id);
+/*
 					fwrite($tmpfile, serialize(array(
 						'dt' => $row['datetime'],
 						't'  => $row['timestamp'],
@@ -498,6 +499,18 @@ class Channel {
 						'td' => $row['timediff'],
 						'c'  => $row['consumption']
 					)) . PHP_EOL);
+*/
+					fwrite($tmpfile, serialize(array(
+						/* 0 */ $row['datetime'],
+						/* 1 */ $row['timestamp'],
+						/* 2 */ $row['data'],
+						/* 3 */ $row['min'],
+						/* 4 */ $row['max'],
+						/* 5 */ $row['count'],
+						/* 6 */ $row['timediff'],
+						/* 7 */ $row['consumption']
+					)) . PHP_EOL);
+
 				}
 				break;
 
@@ -507,10 +520,17 @@ class Channel {
 				while ($row = fgets($datafile)) {
 					$this->decode($row, $id);
 					// default mobile result: only timestamp and data
+/*
 					fwrite($tmpfile, serialize(array(
 						't' => $row['timestamp'],
 						'd' => $row['data']
 					)) . PHP_EOL);
+*/
+					fwrite($tmpfile, serialize(array(
+						/* 0 */ $row['timestamp'],
+						/* 1 */ $row['data']
+					)) . PHP_EOL);
+
 				}
 				break;
 

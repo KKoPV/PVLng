@@ -239,6 +239,7 @@ function updateChart() {
 			{
 			    period: (channel.type != 'scatter') ? Period : '',
 				mobile: true,
+				full: true,
 				_ts: (new Date).getTime()
 			},
 			function(data) {
@@ -296,17 +297,17 @@ function updateChart() {
 				}
 
 				$(data).each(function(id, row) {
-					if ($.isNumeric(row.d)) {
+					if ($.isNumeric(row[2])) {
 						if (channel.type == 'areasplinerange') {
-							serie.data.push([row.t*1000, row.i, row.a]);
+							serie.data.push([row[1]*1000, row[3], row[4]]);
 						} else {
-							serie.data.push([row.t*1000, row.d]);
+							serie.data.push([row[1]*1000, row[2]]);
 						}
 					} else {
 						serie.data.push({
-							x: row.t*1000,
+							x: row[1]*1000,
 							y: 0,
-							name: row.d
+							name: row[2]
 						});
 					}
 				});
