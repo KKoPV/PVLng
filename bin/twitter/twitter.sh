@@ -70,7 +70,7 @@ while test $ITEMS -lt $ITEM_N; do
   log 1 "GUID  : $GUID"
 
   value=$(twitter_$ITEM $GUID)
-#  value=$(int $value)
+  value=$(int $value)
   log 1 "Value : $value"
 
   ### Exit if no value is found, e.g. no actual power outside daylight times
