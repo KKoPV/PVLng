@@ -10,13 +10,12 @@
 ### Init
 ##############################################################################
 pwd=$(dirname $0)
-APIURL=
+APIENDPOINT=
 APIKEY=
-FEED=
 GUID_N=0
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 
 CACHED=false
 
@@ -37,12 +36,8 @@ read_config "$1"
 ##############################################################################
 ### Check config data
 ##############################################################################
-test "$APIURL" || error_exit "Cosm API URL is required (APIURL)!"
-test "$APIKEY" || error_exit "Cosm ApiKey is required (APIKEY)!"
-
-test "$FEED" || error_exit "Feed Id must be set (FEED)!"
-FEED=$(int "$FEED")
-test $FEED -gt 0 || error_exit "Feed Id must > 0 (FEED)!"
+test "$APIENDPOINT" || error_exit "Xively API Endpoint is required (APIENDPOINT)!"
+test "$APIKEY" || error_exit "Xively API key is required (APIKEY)!"
 
 test "$INTERVAL" || error_exit "Update interval must be set (INTERVAL)!"
 INTERVAL=$(int "$INTERVAL")
@@ -56,11 +51,11 @@ test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
 ##############################################################################
 test "$TRACE" && set -x
 
-curl=$(curl_cmd)
-
 LC_NUMERIC=en_US
 
+curl=$(curl_cmd)
 i=0
+found=
 
 while test $i -lt $GUID_N; do
 
@@ -68,32 +63,39 @@ while test $i -lt $GUID_N; do
 
 	log 1 "--- $i ---"
 
+	### required parameters
 	eval GUID=\$GUID_$i
 	log 2 "GUID     : $GUID"
 	test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 
-	eval STREAM=\$STREAM_$i
-	log 2 "Stream   : $STREAM"
-	test "$STREAM" || error_exit "Cosm datastream Id is required (STREAM_$i)"
-
-	eval FORMAT=\$FORMAT_$i
-	log 2 "Format   : $FORMAT"
+	eval CHANNEL=\$CHANNEL_$i
+	log 2 "Channel  : $CHANNEL"
+	test "$CHANNEL" || error_exit "Xively channel name is required (CHANNEL_$i)"
 
 	### read value
-	url="$PVLngURL1/$GUID.tsv?period=${INTERVAL}minutes"
+	url="$PVLngURL2/$GUID/data?period=${INTERVAL}minutes"
 	log 2 "Get-URL  : $url"
 
-	### skip attributes row, get last row
-	row=$($curl $url | tail -n+2 | tail -n1)
+	### get last row
+	row=$($curl --header "Accept: application/tsv"  $url | tail -n1)
+	log 2 "$row"
 
 	### Just after 0:00 no data for today yet
 	test "$row" || continue
+
+	if echo "$row" | egrep -q '[[:alpha:]]'; then
+		error_exit "$row"
+	fi
 
 	### set timestamp and data to $1 and $2
 	set $row
 	timestamp=$1
 
+	### Format for this channel defined?
+	eval FORMAT=\$FORMAT_$i
+
 	if test "$FORMAT"; then
+		log 2 "Format   : $FORMAT"
 	    value=$(printf "$FORMAT" "$2")
 	else
         value=$2
@@ -112,29 +114,36 @@ while test $i -lt $GUID_N; do
 
 	log 1 "Value    : $value"
 
-	URL="${APIURL}/${FEED}/datastreams/${STREAM}.csv"
-	log 1 "Feed-URL : $URL"
+	echo $CHANNEL,$value >>$TMPFILE
 
-	test "$TEST" && continue
-
-	### Send
-	rc=$($curl --request PUT \
-	           --header "X-ApiKey: $APIKEY" \
-	           --write-out %{http_code} \
-	           --output $TMPFILE \
-	           --data-binary "$value" \
-	           $URL)
-
-	### Check result, ONLY 200 is ok
-	if test $rc -eq 200; then
-		### Ok, data added
-		log 1 "Ok"
-	else
-		### log error
-		save_log "Cosm" "Failed: $(cat $TMPFILE)"
-	fi
+	found=y
 
 done
+
+### found at least one "active" channel
+test "$found" || exit
+
+log 2 "Send data:"
+log 2 "$(cat $TMPFILE)"
+
+test "$TEST" && exit
+
+### Send
+set $($curl --request PUT \
+            --header "X-ApiKey: $APIKEY" \
+            --write-out %{http_code} \
+            --data-binary @$TMPFILE \
+            --output $TMPFILE \
+            $APIENDPOINT.csv)
+
+### Check result, ONLY 200 is ok
+if test $1 -eq 200; then
+	### Ok, data added
+	log 1 "Ok"
+else
+	### log error
+	save_log "Xively" "Failed: $(cat $TMPFILE)"
+fi
 
 set +x
 
@@ -143,20 +152,18 @@ exit
 ##############################################################################
 # USAGE >>
 
-Push channel data to datastreams on Cosm.com
+Push PVLng channel data to device channels on Xively.com
 
 Usage: $scriptname [options] config_file
 
 Options:
 
-	-t  Test mode, don't save to PVLng
+	-t  Test mode, don't put to Xively
 	    Sets verbosity to info level
 	-v  Set verbosity level to info level
 	-vv Set verbosity level to debug level
 	-h  Show this help
 
-Requires a configuation file $pwd/cosm.conf
-
-See $pwd/cosm.conf.dist for details.
+See $pwd/device.conf.dist for details.
 
 # << USAGE
