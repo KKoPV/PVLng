@@ -1,0 +1,93 @@
+{
+    "calls": [
+        {
+            "pattern": "/api/r2",
+            "description": "Show this help",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/help",
+            "description": "Show this help",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/log",
+            "description": "Write Log entry, 'scope' and 'message' required",
+            "methods": [ "PUT" ],
+            "headers": [ "X-PVLng-key" ]
+        },
+        {
+            "pattern": "/api/r2/config/:key",
+            "description": "Create, update or delete a configuration value in database, :key is case sensitive",
+            "methods": [ "PUT", "POST", "DELETE" ],
+            "headers": [ "X-PVLng-key" ]
+        },
+        {
+            "pattern": "/api/r2/config/:key",
+            "description": "Read a configuration value from database, :key is case sensitive",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/save",
+            "description": "Save a reading value",
+            "methods": [ "PUT" ],
+            "headers": [ "X-PVLng-key" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/batch",
+            "description": "Save multiple reading values",
+            "methods": [ "PUT" ],
+            "headers": [ "X-PVLng-key" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/attributes",
+            "description": "Read all channel attributes",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/attributes/:name",
+            "description": "Read only channel attribute :name",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/data?:parameters",
+            "description": "Read only 'timestamp' and 'data' values, return named array",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/data/full?:parameters",
+            "description": "Read full data, return named array",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/data/short?:parameters",
+            "description": "Read only 'timestamp' and 'data' values, return numeric indexed array",
+            "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/:guid/data/fullshort?:parameters",
+            "description": "Read full data, return numeric indexed array",
+            "methods": [ "GET" ]
+        }
+    ],
+    "parameters": [
+        {
+            "name": "start",
+            "description": "Start timestamp for readout, default today 00:00",
+			"required": false,
+            "value": [ "YYYY-mm-dd HH:ii:ss", "seconds since 1970", "relative from now" ]
+        },
+        {
+            "name": "end",
+            "description": "End timestamp for readout, default today midnight",
+			"required": false,
+            "value": [ "yyyy-mm-dd hh:mm:ss", "seconds since 1970", "relative from now" ]
+        },
+        {
+            "name": "period",
+            "description": "aggregation period, replace ? with digit to multiply",
+			"required": false,
+            "value": [ "?minutes", "?hours", "?days", "?weeks", "?month", "?quarters", "?years", "last" ]
+        }
+    ]
+}

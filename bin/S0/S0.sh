@@ -49,7 +49,8 @@ while test $i -lt $GUID_N; do
 	test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 	log 1 "GUID    : $GUID"
 
-	DEVICE=$($(curl_cmd) "$PVLngURL1/$GUID.csv?attributes=channel")
+	### Get single attribute as simple plain text
+	DEVICE=$($(curl_cmd) --header "Accept: plain/text" "$PVLngURL2/$GUID/attributes/channel")
 	test "$DEVICE" || error_exit "Device is required (DEVICE_$i)"
 	log 1 "Device  : $DEVICE"
 
@@ -129,10 +130,10 @@ while test $i -lt $GUID_N; do
 		else
 			if test $IMPULSES -eq 0; then
 				# log average power
-				PVLngPUT1 $GUID $power
+				PVLngPUT2 $GUID $power
 			else
 				# log impulses
-				PVLngPUT1 $GUID $impulse
+				PVLngPUT2 $GUID $impulse
 			fi
 		fi
 

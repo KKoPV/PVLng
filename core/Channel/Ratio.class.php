@@ -22,19 +22,17 @@ class Ratio extends \Channel {
 
 		$childs = $this->getChilds();
 
-		$tmpfile_1 = $childs[0]->read($request);
+		$child1 = $childs[0]->read($request);
 
-		rewind($tmpfile_1);
-		$row1 = fgets($tmpfile_1);
-		$this->decode($row1, $id1);
+		\Buffer::rewind($child1);
+		\Buffer::read($child1, $row1, $id1);
 
-		$tmpfile_2 = $childs[1]->read($request);
+		$child2 = $childs[1]->read($request);
 
-		rewind($tmpfile_2);
-		$row2 = fgets($tmpfile_2);
-		$this->decode($row2, $id2);
+		\Buffer::rewind($child2);
+		\Buffer::read($child2, $row2, $id2);
 
-		$result = $this->tmpfile();
+		$result = \Buffer::create();
 
 		while ($row1 != '' OR $row2 != '') {
 
@@ -52,32 +50,26 @@ class Ratio extends \Channel {
 				              ? $row1['max'] / $row2['max']
 				              : 0;
 
-				fwrite($result, $this->encode($row1, $id1));
+				\Buffer::write($result, $row1, $id1);
 
 				// read both next rows
-				$row1 = fgets($tmpfile_1);
-				$this->decode($row1, $id1);
-
-				$row2 = fgets($tmpfile_2);
-				$this->decode($row2, $id2);
+				\Buffer::read($child1, $row1, $id1);
+				\Buffer::read($child2, $row2, $id2);
 
 			} elseif ($id1 < $id2) {
 
 				// read only row 1
-				$row1 = fgets($tmpfile_1);
-				$this->decode($row1, $id1);
+				\Buffer::read($child1, $row1, $id1);
 
 			} else /* $id1 > $id2 */ {
 
 				// read only row 2
-				$row2 = fgets($tmpfile_2);
-				$this->decode($row2, $id2);
+				\Buffer::read($child2, $row2, $id2);
 
 			}
 		}
-
-		fclose($tmpfile_1);
-		fclose($tmpfile_2);
+		\Buffer::close($child1);
+		\Buffer::close($child2);
 
 		return $this->after_read($result, $attributes);
 	}

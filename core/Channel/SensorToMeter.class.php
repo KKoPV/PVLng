@@ -23,15 +23,15 @@ class SensorToMeter extends \Channel {
 
 		$childs = $this->getChilds();
 
-		$tmpfile = $childs[0]->read($request);
+		$child = $childs[0]->read($request);
 
-		$result = $this->tmpfile();
+		$result = \Buffer::create();
 
 		$last = $consumption = $sum = 0;
 
-		rewind($tmpfile);
-		while ($row = fgets($tmpfile)) {
-			$this->decode($row, $id);
+		\Buffer::rewind($child);
+
+		while (\Buffer::read($child, $row, $id)) {
 
 			if ($last) {
 				$consumption = ($row['timestamp'] - $last) / 3600 * $row['data'];
@@ -40,12 +40,11 @@ class SensorToMeter extends \Channel {
 
 			$row['data']        = $sum;
 			$row['consumption'] = $consumption * $this->resolution;
-			fwrite($result, $this->encode($row, $id));
+			\Buffer::write($result, $row, $id);
 
 			$last = $row['timestamp'];
 		}
-
-		fclose($tmpfile);
+		\Buffer::close($child);
 
 		return $this->after_read($result, $attributes);
 	}
@@ -60,7 +59,12 @@ class SensorToMeter extends \Channel {
 	protected function __construct( $guid ) {
 		parent::__construct($guid);
 		$this->meter = TRUE;
-		$this->resolution = 1 / $this->resolution;
+		try {
+			$this->resolution = 1 / $this->resolution;
+		} catch (\Exception $e) {
+		    // Division by zero...
+		    $this->resolution = 1;
+		}
 	}
 
 }

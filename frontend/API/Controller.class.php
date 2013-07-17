@@ -22,17 +22,19 @@ class API_Controller extends Controller {
 
 			switch ($this->Rest->RequestMethod()) {
 				// --------------
+				case Rest::GET:
+					// nothing to do
+					break;
+				// --------------
 				case Rest::PUT:
+				case Rest::POST:
+				case Rest::DELETE:
 					// check API key
 					if (!isset($_SERVER['HTTP_X_PVLNG_KEY'])) {
 						throw new \Exception(I18N::_('MissingAPIkey'), 401);
 					} elseif (trim($_SERVER['HTTP_X_PVLNG_KEY']) != $this->model->getAPIkey()) {
 						throw new \Exception(I18N::_('NotAuthorized'), 401);
 					}
-					break;
-				// --------------
-				case Rest::GET:
-					// nothing to do
 					break;
 				// --------------
 				default:
@@ -111,18 +113,74 @@ class API_Controller extends Controller {
 						// Default
 						$ViewClass = 'yMVC\View\CSV';
 					}
+
 					if (!class_exists($ViewClass))
 						throw new Exception('Unsupported request format, '
-															 .'missing class: '.$ViewClass.')', 400);
+						                   .'missing class: '.$ViewClass.')', 400);
 
 					$this->view = new $ViewClass;
 					$this->view->content = array_key_exists('attributes', $request)
-															 ? $channel->getAttributes($request['attributes'])
-															 : $channel->read($request, TRUE);
+					                     ? $channel->getAttributes($request['attributes'])
+					                     : $channel->read($request, TRUE);
 					break;
 			}
 
-		} catch(Exception $exception) {
+			Header('X-Version: PVLng ' . PVLNG_VERSION . ' API r1');
+
+		} catch (Exception $exception) {
+			$this->ErrorResponse($exception);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function Index_r2_Action() {
+
+		try {
+
+			$ts = microtime(TRUE);
+
+			// Remove api/r2 and pad right
+			$PathInfo = array_pad(array_slice($this->Rest->PathInfo(), 2), 5, '');
+
+			$GUID = preg_match('~^[a-z\d]{4}(?:-[a-z\d]{4}){7}$~', $PathInfo[0])
+			      ? array_shift($PathInfo)
+			      : '';
+			$action = array_shift($PathInfo);
+
+			$request = array_merge($this->Rest->Request(), $PathInfo);
+
+			if ($data = $this->Rest->Data()) {
+			    $request['data'] = $data;
+			}
+
+			$r2Class = 'API\r2\\' . ucwords($action?:'Help');
+
+			if (!class_exists($r2Class))
+				throw new Exception('Unsupported request "'.$action.'"!', 400);
+
+			$r2Class = new $r2Class($GUID);
+			$content = $r2Class->{$this->Rest->RequestMethod()}($request);
+
+			if (preg_match('~(\w+)$~', $request['format'])) {
+				$ViewClass = 'yMVC\View\\'.strtoupper($request['format']);
+			} else {
+				// Default
+				$ViewClass = 'yMVC\View\TEXT';
+			}
+
+			if (!class_exists($ViewClass))
+				throw new Exception('Unsupported request format, '
+				                   .'missing class: '.$ViewClass.')', 400);
+
+			$this->view = new $ViewClass;
+			$this->view->content = $content;
+
+			Header('X-Version: PVLng ' . PVLNG_VERSION . ' API r2');
+			Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $ts) * 1000));
+
+		} catch (Exception $exception) {
 			$this->ErrorResponse($exception);
 		}
 	}
@@ -155,7 +213,7 @@ class API_Controller extends Controller {
 	protected function ErrorResponse( Exception $exception ) {
 		$code = $exception->getCode() ?: 500;
 		$msg  = $exception->getMessage();
-		$msg  = $this->Rest->StatusMessage($code) . ( $msg ? ' - ' . $msg : '' );
+#		$msg  = $this->Rest->StatusMessage($code) . ( $msg ? ' - ' . $msg : '' );
 		$this->Rest->response($code, $msg);
 	}
 

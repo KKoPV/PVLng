@@ -35,7 +35,7 @@ class Channel {
 			return new $model($guid);
 		}
 
-		throw new \Exception('No channel found for GuiD '.$guid, 400);
+		throw new \Exception('No channel found for GUID "'.$guid.'"!', 400);
 	}
 
 	/**
@@ -65,6 +65,7 @@ class Channel {
 	        'description' => $this->description,
 	        'type'        => $this->type,
 	        'unit'        => $this->unit,
+	        'decimals'    => $this->decimals,
 	        'numeric'     => $this->numeric,
 	        'meter'       => $this->meter,
 	        'resolution'  => $this->resolution,
@@ -77,8 +78,8 @@ class Channel {
 	        'icon'        => $this->icon,
 	        'start'       => $this->start,
 	        'end'         => $this->end,
-	        'consumption' => 0,
-	        'costs'       => 0
+			'consumption' => 0,
+			'costs'       => 0
 		);
 
 		return ($attribute == '' OR $attribute == '*')
@@ -197,10 +198,10 @@ class Channel {
 		    // BETWEEN is  start <= ? <= end  incl. end!
 		    // Subtract 1 second for excluding end!
  			$q->whereBT('timestamp', $this->start, $this->end-1)
-              ->order('timestamp');
+			  ->order('timestamp');
 		}
 
- 		$tmpfile = $this->tmpfile();
+ 		$buffer = Buffer::create();
 
 		if (array_key_exists('sql', $request) AND $request['sql']) $this->sql = (string) $q;
 
@@ -232,11 +233,12 @@ class Channel {
 				// remove grouping value
 				$id = $data['g'];
 				unset($data['g']);
-				fwrite($tmpfile, $this->encode($data, $id));
+
+				Buffer::write($buffer, $data, $id);
 			}
 		}
 
-		return $this->after_read($tmpfile, $attributes);
+		return $this->after_read($buffer, $attributes);
 	}
 
 	// -------------------------------------------------------------------------
@@ -292,6 +294,11 @@ class Channel {
 	protected $sql;
 
 	/**
+	 *
+	 */
+	protected $time;
+
+	/**
 	 * Grouping SQLs
 	 */
 	protected $GroupBy = array(
@@ -311,6 +318,7 @@ class Channel {
 	 *
 	 */
 	protected function __construct( $guid ) {
+		$this->time = microtime(TRUE);
 		$this->db = yMVC\MySQLi::getInstance();
 
 		$model = new Model;
@@ -346,15 +354,6 @@ class Channel {
 			->limit(1);
 
 		return $this->db->queryOne($q);
-	}
-
-	/**
-	 * Use PHPs internal temp stream, use file for data greater 5 MB
-	 */
-	protected function tmpfile() {
-	    // 5 MB
-		$size = 5 * 1024 * 1024;
-	    return fopen('php://temp/maxmemory:'.$size, 'w+');
 	}
 
 	/**
@@ -406,23 +405,25 @@ class Channel {
 			}
 		}
 
-		$this->full = (array_key_exists('full', $request) AND $request['full']);
-		$this->mobile = (array_key_exists('mobile', $request) AND $request['mobile']);
+		$this->full   = (array_key_exists('full', $request) OR
+		                 array_search('full', $request) !== FALSE);
+		$this->mobile = (array_key_exists('mobile', $request) OR
+		                 array_search('short', $request) !== FALSE);
 	}
 
 	/**
 	 *
 	 */
-	protected function after_read( $tmpfile, $attributes ) {
+	protected function after_read( $buffer, $attributes ) {
 
-		$datafile = $this->tmpfile();
+		$datafile = Buffer::create();
 
 		$last = $consumption = 0;
-		$lastrow = '';
+		$lastrow = FALSE;
 
-		rewind($tmpfile);
-		while ($row = fgets($tmpfile)) {
-			$this->decode($row, $id);
+		Buffer::rewind($buffer);
+
+		while (Buffer::read($buffer, $row, $id)) {
 
 			if ($this->meter) {
 				/* check meter values raising */
@@ -443,36 +444,33 @@ class Channel {
 
 			$row['data'] = $this->valid($row['data']);
 
-			fwrite($datafile, $this->encode($row, $id));
+			Buffer::write($datafile, $row, $id);
 
 			$lastrow = $row;
 		}
 
-		fclose($tmpfile);
+		Buffer::close($buffer);
 
-		if ($this->period[1] == -1) {
+		if ($lastrow AND $this->period[1] == -1 /* last */) {
 			// recreate temp. file with last row only
-			fclose($datafile);
-			$datafile = $this->tmpfile();
-			fwrite($datafile, $this->encode($lastrow, $id));
+			Buffer::close($datafile);
+			$datafile = Buffer::create();
+			Buffer::write($datafile, $lastrow, 0);
 		}
 
 		if (!$attributes) return $datafile;
 
 		// -------------------------------------------------------------------
-		// Last call, return attributes and data
+		// Mostly last call, return attributes and data
+		$buffer = Buffer::create();
 
 		$attr = $this->getAttributes();
 		$attr['consumption'] = $consumption * $this->resolution;
 		$attr['costs'] = $attr['consumption'] * $this->cost;
-		// remover newlines, they will not correct serialized
+		// remover newlines, they will not correct serialized...
 		if ($this->sql != '') $attr['sql'] = preg_replace('~\s+~s', ' ', $this->sql);
 
-		$tmpfile = $this->tmpfile();
-
-		fwrite($tmpfile, serialize($attr) . PHP_EOL);
-
-		rewind($datafile);
+		Buffer::swrite($buffer, $attr);
 
 		// Bitmask : 00000011
 		//                  ^----- Full
@@ -481,26 +479,15 @@ class Channel {
 		if ($this->full)   $mode |= 1;
 		if ($this->mobile) $mode |= 2;
 
+		Buffer::rewind($datafile);
+
 		// optimized flow...
 		switch ($mode) {
 			// -------------------
 			case 3: // Full mobile
 
-				while ($row = fgets($datafile)) {
-					$this->decode($row, $id);
-/*
-					fwrite($tmpfile, serialize(array(
-						'dt' => $row['datetime'],
-						't'  => $row['timestamp'],
-						'd'  => $row['data'],
-						'i'  => $row['min'],
-						'a'  => $row['max'],
-						'c'  => $row['count'],
-						'td' => $row['timediff'],
-						'c'  => $row['consumption']
-					)) . PHP_EOL);
-*/
-					fwrite($tmpfile, serialize(array(
+				while (Buffer::read($datafile, $row, $id)) {
+					Buffer::swrite($buffer, array(
 						/* 0 */ $row['datetime'],
 						/* 1 */ $row['timestamp'],
 						/* 2 */ $row['data'],
@@ -509,7 +496,7 @@ class Channel {
 						/* 5 */ $row['count'],
 						/* 6 */ $row['timediff'],
 						/* 7 */ $row['consumption']
-					)) . PHP_EOL);
+					));
 
 				}
 				break;
@@ -517,19 +504,12 @@ class Channel {
 			// -------------------
 			case 2: // Short mobile
 
-				while ($row = fgets($datafile)) {
-					$this->decode($row, $id);
+				while (Buffer::read($datafile, $row, $id)) {
 					// default mobile result: only timestamp and data
-/*
-					fwrite($tmpfile, serialize(array(
-						't' => $row['timestamp'],
-						'd' => $row['data']
-					)) . PHP_EOL);
-*/
-					fwrite($tmpfile, serialize(array(
+					Buffer::swrite($buffer, array(
 						/* 0 */ $row['timestamp'],
 						/* 1 */ $row['data']
-					)) . PHP_EOL);
+					));
 
 				}
 				break;
@@ -537,9 +517,8 @@ class Channel {
 			// -------------------
 			case 1: // Full
 				// do nothing with $row
-				while ($row = fgets($datafile)) {
-					$this->decode($row, $id);
-					fwrite($tmpfile, serialize(array(
+				while (Buffer::read($datafile, $row, $id)) {
+					Buffer::swrite($buffer, array(
 						'datetime'    => $row['datetime'],
 						'timestamp'   => $row['timestamp'],
 						'data'        => $row['data'],
@@ -548,58 +527,39 @@ class Channel {
 						'count'       => $row['count'],
 						'timediff'    => $row['timediff'],
 						'consumption' => $row['consumption']
-					)) . PHP_EOL);
+					));
 				}
 				break;
 
 			// -------------------
 			default: // Short, default
-				while ($row = fgets($datafile)) {
-					$this->decode($row, $id);
+				while (Buffer::read($datafile, $row, $id)) {
 					// default result: only timestamp and data
-					fwrite($tmpfile, serialize(array(
+					Buffer::swrite($buffer, array(
 						'timestamp' => $row['timestamp'],
 						'data'      => $row['data']
-					)) . PHP_EOL);
+					));
 				}
 				break;
 
 		}
-		fclose($datafile);
+		Buffer::close($datafile);
 
-		return $tmpfile;
+		Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $this->time) * 1000));
+
+		return $buffer;
 	}
 
 	/**
 	 *
 	 */
 	protected function valid( $data ) {
-        if (!is_null($this->valid_from) AND $data < $this->valid_from) {
-          return $this->valid_from;
-        } elseif (!is_null($this->valid_to) AND $data > $this->valid_to) {
-          return $this->valid_to;
-        }
-		return $data;
-	}
-
-	/**
-	 *
-	 */
-	protected function encode( $row, $id ) {
-		return $id . "\x00" . serialize($row) . PHP_EOL;
-	}
-
-	/**
-	 *
-	 */
-	protected function decode( &$row, &$id ) {
-		if ($row == '') {
-			$id = '';
-			return;
+		if (!is_null($this->valid_from) AND $data < $this->valid_from) {
+			return $this->valid_from;
+		} elseif (!is_null($this->valid_to) AND $data > $this->valid_to) {
+			return $this->valid_to;
 		}
-
-		list($id, $row) = explode("\x00", $row);
-		$row = unserialize($row);
+		return $data;
 	}
 
 	// -------------------------------------------------------------------------

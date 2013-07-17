@@ -46,30 +46,28 @@ class Differentiator extends \Channel {
 
 		// no childs, return empty file
 		if (count($childs) == 0) {
-			return $this->after_read($this->tmpfile(), $attributes);
+			return $this->after_read(\Buffer::create(), $attributes);
 		}
 
-		$tmpfile_1 = $childs[0]->read($request);
+		$child1 = $childs[0]->read($request);
 
 		// only one child, return as is
 		if (count($childs) == 1) {
-			return $this->after_read($tmpfile_1, $attributes);
+			return $this->after_read($child1, $attributes);
 		}
 
 		// combine all data for same timestamp
 		for ($i=1; $i<count($childs); $i++) {
 
-			rewind($tmpfile_1);
-			$row1 = fgets($tmpfile_1);
-			$this->decode($row1, $id1);
+			\Buffer::rewind($child1);
+			\Buffer::read($child1, $row1, $id1);
 
-			$tmpfile_2 = $childs[$i]->read($request);
+			$child2 = $childs[$i]->read($request);
 
-			rewind($tmpfile_2);
-			$row2 = fgets($tmpfile_2);
-			$this->decode($row2, $id2);
+			\Buffer::rewind($child2);
+			\Buffer::read($child2, $row2, $id2);
 
-			$result = $this->tmpfile();
+			$result = \Buffer::create();
 
 			while ($row1 != '' OR $row2 != '') {
 
@@ -80,32 +78,29 @@ class Differentiator extends \Channel {
 					$row1['min']         -= $row2['min'];
 					$row1['max']         -= $row2['max'];
 					$row1['consumption'] -= $row2['consumption'];
-					fwrite($result, $this->encode($row1, $id1));
+					\Buffer::write($result, $row1, $id1);
 
 					// read both next rows
-					$row1 = fgets($tmpfile_1);
-					$this->decode($row1, $id1);
-					$row2 = fgets($tmpfile_2);
-					$this->decode($row2, $id2);
+					\Buffer::read($child1, $row1, $id1);
+					\Buffer::read($child2, $row2, $id2);
 
 				} elseif ($id1 AND $id1 < $id2 OR $id2 == '') {
 
 					// missing row 2, skip
 					// read only row 1
-					$row1 = fgets($tmpfile_1);
-					$this->decode($row1, $id1);
+					\Buffer::read($child1, $row1, $id1);
 
 				} else /* $id1 > $id2 */ {
 
 					// missing row 1, skip
 					// read only row 2
-					$row2 = fgets($tmpfile_2);
-					$this->decode($row2, $id2);
+					\Buffer::read($child2, $row2, $id2);
 
 				}
 			}
+			\Buffer::close($child2);
 
-			$tmpfile_1 = $result;
+			$child1 = $result;
 		}
 
 		return $this->after_read($result, $attributes);

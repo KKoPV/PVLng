@@ -15,6 +15,9 @@ GUID_N=0
 . $pwd/../PVLng.conf
 . $pwd/../PVLng.sh
 
+owread=$(which owread)
+test "$owread" || error_exit "Missing owread binary!"
+
 CACHED=false
 
 while getopts "tvxh" OPTION; do
@@ -61,11 +64,13 @@ while test $i -lt $GUID_N; do
 	CHANNEL=$($(curl_cmd) "$PVLngURL1/$GUID.csv?attributes=channel")
 
 	### read value
-	value=$(owread -s $SERVER ${CACHED}/${SERIAL}/$CHANNEL)
-	log 1 "Read : owread -s $SERVER ${CACHED}/${SERIAL}/$CHANNEL => $value"
+	cmd="$owread -s $SERVER ${CACHED}/${SERIAL}/$CHANNEL"
+	log 2 $cmd 
+	value=$($cmd)
+	log 1 "Value        = $value"
 
 	### Save data
-	test "$TEST" || PVLngPUT1 $GUID $value
+	test "$TEST" || PVLngPUT2 $GUID $value
 
 done
 

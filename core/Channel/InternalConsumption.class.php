@@ -37,19 +37,17 @@ class InternalConsumption extends \Channel {
 
 		$childs = $this->getChilds();
 
-		$tmpfile_1 = $childs[0]->read($request);
+		$child1 = $childs[0]->read($request);
 
-		rewind($tmpfile_1);
-		$row1 = fgets($tmpfile_1);
-		$this->decode($row1, $id1);
+		\Buffer::rewind($child1);
+		\Buffer::read($child1, $row1, $id1);
 
-		$tmpfile_2 = $childs[1]->read($request);
+		$child2 = $childs[1]->read($request);
 
-		rewind($tmpfile_2);
-		$row2 = fgets($tmpfile_2);
-		$this->decode($row2, $id2);
+		\Buffer::rewind($child2);
+		\Buffer::read($child2, $row2, $id2);
 
-		$result = $this->tmpfile();
+		$result = \Buffer::create();
 
 		$last = 0;
 
@@ -68,14 +66,11 @@ class InternalConsumption extends \Channel {
 				}
 				$last = $row1['data'];
 
-				fwrite($result, $this->encode($row1, $id1));
+				\Buffer::write($result, $row1, $id1);
 
 				// read both next rows
-				$row1 = fgets($tmpfile_1);
-				$this->decode($row1, $id1);
-
-				$row2 = fgets($tmpfile_2);
-				$this->decode($row2, $id2);
+				\Buffer::read($child1, $row1, $id1);
+				\Buffer::read($child2, $row2, $id2);
 
 			} elseif ($id2 == '' OR $id1 < $id2) {
 
@@ -88,20 +83,20 @@ class InternalConsumption extends \Channel {
 				$last = $row1['data'];
 
 				// missing row 2, save row 1 as is
-				fwrite($result, $this->encode($row1, $id1));
+				\Buffer::write($result, $row1, $id1);
 
 				// read only row 1
-				$row1 = fgets($tmpfile_1);
-				$this->decode($row1, $id1);
+				\Buffer::read($child1, $row1, $id1);
 
 			} else /* $id1 > $id2 */ {
 
 				// read only row 2
-				$row2 = fgets($tmpfile_2);
-				$this->decode($row2, $id2);
+				\Buffer::read($child2, $row2, $id2);
 
 			}
 		}
+		\Buffer::close($child1);
+		\Buffer::close($child2);
 
 		return $this->after_read($result, $attributes);
 	}

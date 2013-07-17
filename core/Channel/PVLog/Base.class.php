@@ -33,6 +33,13 @@ class Base extends \Channel {
 	public $UTC_Offset = 0;
 
 	/**
+	 * r2
+	 */
+	public function GET( $request ) {
+	    return $this->read($request);
+	}
+
+	/**
 	 * Fetch data for one inverter
 	 *
 	 * @param $request array Holds the date to extract
@@ -107,18 +114,17 @@ class Base extends \Channel {
 	 *
 	 */
 	protected function calcTimesAndPowers( $fh, $obj ) {
-		rewind($fh);
+		\Buffer::rewind($fh);
 		$start = PHP_INT_MAX;
 		$end   = 0;
-		while ($row = fgets($fh)) {
-			$this->decode($row, $id);
+		while (\Buffer::read($fh, $row, $id)) {
 			$start = min($start, $row['timestamp']);
 			$end   = max($end,   $row['timestamp']);
 			$obj->addPowerValue($row['data']);
 		}
 		$obj->setTimestampStart($start);
 		$obj->setTimestampEnd($end);
-		fclose($fh);
+		\Buffer::close($fh);
 	}
 
 	/**

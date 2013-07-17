@@ -48,19 +48,22 @@ class JSON extends \Channel {
 	 */
 	public function read( $request, $attributes=FALSE ) {
 
-		$year = date('Y');
-		$month = (array_key_exists('m', $request) AND $request['m'])
-		       ? $request['m']
-		       : date('n');
-		$factor = (array_key_exists('u', $request) AND $request['u'] == 'kWh')
-		        ? 1000
-		        : 1;
-		if ($month > date('n')) $year--;
+		$this->year  = date('Y');
+		$this->month = (array_key_exists('m', $request) AND $request['m'])
+		             ? $request['m']
+		             : date('n');
 
-		$request['start']  = $year . '-' . $month . '-01';
-		$request['end']    = $year . '-' . $month . '-01+1month';
+		$this->factor = (array_key_exists('u', $request) AND $request['u'] == 'kWh')
+		              ? 1000
+		              : 1;
+
+		if ($this->month > date('n')) $this->year--;
+
+		$request['start']  = $this->year . '-' . $this->month . '-01';
+		$request['end']    = $this->year . '-' . $this->month . '-01+1month';
 		$request['period'] = '1day';
 		$request['full']   = TRUE;
+		$request['format'] = 'json';
 
 		$this->before_read($request);
 
@@ -68,87 +71,93 @@ class JSON extends \Channel {
 
 		// no childs, return empty file
 		if (count($childs) == 0) {
-			return $this->after_read($this->tmpfile(), $attributes);
+			return $this->finish();
 		}
 
-		$tmpfile_1 = $childs[0]->read($request);
+		$child1 = $childs[0]->read($request);
 
 		// only one child, return as is
 		if (count($childs) == 1) {
-			return $this->after_read($tmpfile_1, $attributes);
+			$result = $child1;
 		}
 
 		// combine all data for same timestamp
 		for ($i=1; $i<count($childs); $i++) {
 
-			rewind($tmpfile_1);
-			$row1 = fgets($tmpfile_1);
-			$this->decode($row1, $id1);
+			\Buffer::rewind($child1);
+			\Buffer::read($child1, $row1, $id1);
 
-			$tmpfile_2 = $childs[$i]->read($request);
+			$child2 = $childs[$i]->read($request);
 
-			rewind($tmpfile_2);
-			$row2 = fgets($tmpfile_2);
-			$this->decode($row2, $id2);
+			\Buffer::rewind($child2);
+			\Buffer::read($child2, $row2, $id2);
 
-			$result = $this->tmpfile();
+			$result = \Buffer::create();
 
-			$done = ($row1 == '' AND $row2 == '');
+			while ($row1 != '' OR $row2 != '') {
 
-			while (!$done) {
 				if ($id1 == $id2) {
 
 					// same timestamp, combine
 					$row1['consumption'] += $row2['consumption'];
-					fwrite($result, $this->encode($row1, $id1));
+					\Buffer::write($result, $row1, $id1);
 
 					// read both next rows
-					$row1 = fgets($tmpfile_1);
-					$this->decode($row1, $id1);
-
-					$row2 = fgets($tmpfile_2);
-					$this->decode($row2, $id2);
+					\Buffer::read($child1, $row1, $id1);
+					\Buffer::read($child2, $row2, $id2);
 
 				} elseif ($id1 AND $id1 < $id2 OR $id2 == '') {
 
 					// missing row 2, save row 1 as is
-					fwrite($result, $this->encode($row1, $id1));
+					\Buffer::write($result, $row1, $id1);
 
 					// read only row 1
-					$row1 = fgets($tmpfile_1);
-					$this->decode($row1, $id1);
+					\Buffer::read($child1, $row1, $id1);
 
 				} else /* $id1 > $id2 */ {
 
 					// missing row 1, save row 2 as is
-					fwrite($result, $this->encode($row2, $id2));
+					\Buffer::write($result, $row2, $id2);
 
 					// read only row 2
-					$row2 = fgets($tmpfile_2);
-					$this->decode($row2, $id2);
+					\Buffer::read($child2, $row2, $id2);
 
 				}
-
-				$done = ($row1 == '' AND $row2 == '');
 			}
 
-			$tmpfile_1 = $result;
+			$child1 = $result;
 		}
 
-		rewind($result);
+		\Buffer::rewind($result);
+
 		$data = array();
-		while ($row = fgets($result)) {
-			$this->decode($row, $id);
-			$data[] = round($row['consumption'] / $factor, 3);
+
+		while (\Buffer::read($result, $row, $id)) {
+			$data[] = round($row['consumption'] / $this->factor, 3);
 		}
 
+		return $this->finish($data);
+	}
+
+	/**
+	 * r2
+	 */
+	public function GET ( &$request ) {
+		$request['format'] = 'json';
+		return $this->read($request);
+	}
+
+	// -----------------------------------------------------------------------
+	// PROTECTED
+	// -----------------------------------------------------------------------
+
+	protected function finish( $data=array() ) {
 		// Provide full information...
 		return array(
-			'un'  => $factor == 1 ? 'Wh' : 'kWh',
-			'tm'  => sprintf('%04d-%02d-01T00:00:00', $year, $month),
+			'un'  => $this->factor == 1 ? 'Wh' : 'kWh',
+			'tm'  => sprintf('%04d-%02d-01T00:00:00', $this->year, $this->month),
 			'dt'  => 86400,
 			'val' => $data
 		);
 	}
-
 }

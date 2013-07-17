@@ -37,6 +37,10 @@ return array(
 	'unit' => array(
 	),
 
+	'decimals' => array(
+		'default'  => 2
+	),
+
 	'meter' => array(
 		'radio'    => TRUE,
 		'required' => TRUE,

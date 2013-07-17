@@ -64,14 +64,14 @@ while test $i -lt $vMax; do
     test "$FACTOR" || FACTOR=1
     log 1 "$(printf 'FACTOR  %2d: %s' $i $FACTOR)"
 
-    url="$PVLngURL1/$GUID.tsv?period=${INTERVAL}minutes"
+    url="$PVLngURL2/$GUID/data?period=${INTERVAL}minutes"
     log 2 "$url"
 
     ### empty temp. file
     echo -n >$TMPFILE
 
-    ### skip attributes row, extract 2nd value == data from last row, if exists
-    value=$($curl $url | tail -n+2 | tail -n1 | cut -f2)
+    ### extract 2nd value == data from last row, if exists
+    value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
 
     ### unset only zero values for v1 .. v4
     if test $i -le 4; then
@@ -111,8 +111,7 @@ test -z "$TEST" || exit
 ### Send
 $curl --header "X-Pvoutput-Apikey: $APIKEY" \
       --header "X-Pvoutput-SystemId: $SYSTEMID" \
-      --output $TMPFILE \
-      $DATA $APIURL
+      --output $TMPFILE $DATA $APIURL
 rc=$?
 
 log 1 $(cat $TMPFILE)

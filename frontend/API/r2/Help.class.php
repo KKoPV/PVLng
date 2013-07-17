@@ -7,14 +7,20 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     $Id$
  */
+namespace API\r2;
 
 /**
- * '{route}' => array( '{controller}', '{action}' ),
+ *
  */
-return array(
+class Help extends Handler {
 
-	'api/r1/*' => array( 'API', 'Index_r1' ),
-	'api/r2/*' => array( 'API', 'Index_r2' ),
-	'api/log'  => array( 'API', 'Log' ),
+	/**
+	 *
+	 */
+	public function GET( &$request ) {
+		$request['format'] = 'json';
 
-);
+		return json_decode(file_get_contents(__DIR__ . DS . 'Help.json'));
+	}
+
+}

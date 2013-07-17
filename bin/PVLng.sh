@@ -6,6 +6,7 @@
 ##############################################################################
 
 PVLngURL1="$PVLngHost/api/r1"
+PVLngURL2="$PVLngHost/api/r2"
 
 CURL="$(which curl)"
 test -z "$CURL" && echo "Missing curl executable!" && exit 1
@@ -80,14 +81,6 @@ function int {
 }
 
 ##############################################################################
-### force paramter $1 as integer
-##############################################################################
-function as_int {
-	test -n "$1" && t=$(expr "$1" \* 1 2>/dev/null)
-	test -z "$t" && echo 0 || echo $t
-}
-
-##############################################################################
 function curl_cmd {
 	v=$(int "$VERBOSE")
 	test $v -le 2 && cmd="$CURL --silent" || cmd="$CURL --verbose"
@@ -137,6 +130,38 @@ function PVLngPUT1 {
 		### 200/201/202 ok
 		log 1 HTTP code : $rc
 		log 1 "$(cat $TMPFILE)"
+	else
+		### errors
+		log -1 HTTP code : $rc
+		log -1 "$(cat $TMPFILE)"
+		save_log "$1" @$TMPFILE
+	fi
+
+}
+
+##############################################################################
+### Save data to PVLng
+### $1 = GUID
+### $2 = date
+##############################################################################
+function PVLngPUT2 {
+
+	log 2 "GUID	 : $1"
+	log 2 "Data	 : $2"
+
+	local data=
+
+	test "${2:0:1}" != "@" && data="data=\"$2\"" || data="data$2"
+
+	cmd=$(curl_cmd)
+
+	rc=$($cmd --header "X-PVLng-key: $PVLngAPIkey" --request PUT \
+						--write-out %{http_code} --output $TMPFILE \
+						--data-urlencode $data $PVLngURL2/$1/save)
+
+	if echo "$rc" | grep -qe '^20[012]'; then
+		### 200/201/202 ok
+		log 1 HTTP code : $rc
 	else
 		### errors
 		log -1 HTTP code : $rc
