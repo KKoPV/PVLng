@@ -328,7 +328,7 @@ function updateChart() {
 
 		$('#s'+channel.id).show();
 
-		var url = PVLngAPI + channel.guid + '.json';
+		var url = PVLngAPI + channel.guid + '/data/full/attributes';
 		_log('Fetch: '+url);
 
 		$.getJSON(
@@ -347,7 +347,7 @@ function updateChart() {
 				_log('Data: ', data);
 
 				if (attr.consumption) {
-					$('#cons'+channel.id).html(Highcharts.numberFormat(attr.consumption, 2));
+					$('#cons'+channel.id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
 				}
 
 				if (attr.costs) {
@@ -655,6 +655,26 @@ $(function() {
 			label: 'PVLng | ' + this.value,
 			disabled: (this.value == '')
 		}).prop('href', el.data('url') + encodeURIComponent(this.value));
+	});
+
+	$('#togglewrapper').click(function() {
+	    var visible = ! $('#wrapper').is(':visible');
+	    var link = $(this);
+
+		$('#wrapper').animate(
+			{ height: 'toggle', opacity: 'toggle' }, 'slow', 'linear',
+			function() {
+			    if (visible) {
+			        link.html('{{HideChannels}}');
+					$('#wrapper').css('visibility', 'visible');
+				} else {
+			        link.html('{{ShowChannels}}');
+					$('#wrapper').css('visibility', 'hidden');
+				}
+			}
+		);
+
+		return false;
 	});
 
 });

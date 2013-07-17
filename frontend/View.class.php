@@ -53,6 +53,7 @@ class View extends yMVC\View {
 
 		$this->content = $this->render($this->layout.'.tpl');
 
+		Header('X-Version: ' . PVLNG_VERSION);
 		Header('Content-type: text/html; charset=UTF-8');
 
 		parent::output();

@@ -198,7 +198,7 @@
 
 <script>
 
-	var PVLngAPI = 'http://{SERVERNAME}/api/r1/';
+	var PVLngAPI = 'http://{SERVERNAME}/api/r2/';
 
 	{SCRIPTS}
 

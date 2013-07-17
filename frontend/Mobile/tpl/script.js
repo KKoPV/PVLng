@@ -229,52 +229,69 @@ function updateChart() {
 	/* get data */
 	$(channels).each(function(id, channel) {
 
-		$('#s'+channel.id).show();
-
-		var url = PVLngAPI + channel.guid + '.json';
-		_log('Fetch: '+url);
+		var url = PVLngAPI + channel.guid + '/data/fullshort/attributes/';
+		_log('Fetch: ' + url);
 
 		$.getJSON(
+			/* Fetch channel data with attributes */
 			url,
 			{
 			    period: (channel.type != 'scatter') ? Period : '',
-				mobile: true,
-				full: true,
-				_ts: (new Date).getTime()
+				_ts: (new Date).getTime() /* force reload */
 			},
 			function(data) {
-				/* pop out 1st row with attributes */
-				attr = data.shift();
+				var attr = data.shift();
 				_log('Attributes:', attr);
-				_log('Data: ', data);
+				_log('Data:', data);
 
-				var tr;
+				var serie = { /* HTML decode channel name */
+				    	name:  $('<div/>').html(attr.name).text(),
+				    	color: channel.color,
+				    	type:  channel.type,
+				    	yAxis: channel.axis,
+				    	data:  []
+				    },
+				    tr;
+
+				$(data).each(function(id, row) {
+					if ($.isNumeric(row[2])) {
+						if (channel.type == 'areasplinerange') {
+							serie.data.push([row[1]*1000, row[3], row[4]]);
+						} else {
+							serie.data.push([row[1]*1000, row[2]]);
+						}
+					} else {
+						serie.data.push({
+							x: row[1]*1000,
+							y: 0,
+							name: row[2]
+						});
+					}
+				});
 
 				if (attr.consumption) {
 				    tr = $('<tr/>');
-				    tr.append($('<th/>')
-					  .html(attr.name));
-					tr.append($('<td/>')
-					  .addClass('r')
-					  .html(Highcharts.numberFormat(attr.consumption, 2)));
+				    tr.append(
+						$('<th/>')
+						.html(attr.name)
+					);
+					tr.append(
+						$('<td/>')
+						.addClass('r')
+						.html(Highcharts.numberFormat(attr.consumption, attr.decimals) + ' ' + attr.unit)
+					);
 				}
 
 				if (attr.costs) {
 					costs += +attr.costs.toFixed(2);
-					tr.append($('<td/>')
-					  .addClass('cost')
-					  .html(Highcharts.numberFormat(attr.costs, 2)));
+					tr.append(
+						$('<td/>')
+					    .addClass('cost')
+					    .html(Highcharts.numberFormat(attr.costs, 2))
+					);
 				}
 
 				if (tr) $('#table-cons tbody').append(tr);
-
-				var serie = { /* HTML decode channel name */
-					name:	$('<div/>').html(attr.name).text(),
-					color:	channel.color,
-					type:	channel.type,
-					yAxis:	channel.axis,
-					data:	[]
-				};
 
 				if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
 				if (attr.unit) serie.tooltip = { valueSuffix: attr.unit };
@@ -296,22 +313,6 @@ function updateChart() {
 					                : defaults.line.normal;
 				}
 
-				$(data).each(function(id, row) {
-					if ($.isNumeric(row[2])) {
-						if (channel.type == 'areasplinerange') {
-							serie.data.push([row[1]*1000, row[3], row[4]]);
-						} else {
-							serie.data.push([row[1]*1000, row[2]]);
-						}
-					} else {
-						serie.data.push({
-							x: row[1]*1000,
-							y: 0,
-							name: row[2]
-						});
-					}
-				});
-
 				if (channel.type != 'areasplinerange' && (channel.min || channel.max)) {
 					serie = setMinMax(serie, channel.min, channel.max);
 				}
@@ -319,13 +320,11 @@ function updateChart() {
 				_log('Serie: ', serie);
 
 				series[id] = serie;
-
-				$('#s'+channel.id).hide();
 			}
 		).always(function() {
 			/* check real count of elements in series array! */
 			var completed = series.filter(function(a){ return a !== undefined }).length;
-			_log(completed+' completed');
+			_log(completed + ' completed');
 
 			loading = loading.substring(0, loading.length-1);
 			chart.showLoading(loading);
@@ -336,9 +335,11 @@ function updateChart() {
 				if (costs) {
 					$('#table-cons tbody').append(
 						$('<tr/>')
-						.append($('<td colspan="3" />')
-						.html(costs)
-						.addClass('costs'))
+						.append(
+							$('<td colspan="3" />')
+							.html(costs)
+							.addClass('costs')
+						)
 					);
 				}
 				var t = $('#from').val();

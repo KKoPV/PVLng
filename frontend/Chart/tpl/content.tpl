@@ -17,12 +17,6 @@
 
 	<table style="width:100%">
 	<tr>
-<!--
-		<td>
-			<a id="btn-clear" href="/chart">{{Clear}}</a>
-			&nbsp; {{Period}}:
-		</td>
--->
 		<td>
 			<span class="ui-icon ui-icon-triangle-1-w tip"
 			      title="{{PrevDay}}" onclick="changeDates(-1)"></span>
@@ -57,74 +51,82 @@
 	</div>
 </div>
 
-<div class="push_4 grid_6" style="margin-top:1em;margin-bottom:1em">
+<div class="alpha grid_4" style="margin-top:1em;margin-bottom:1em">
+	<a id="togglewrapper" href="#">{{HideChannels}}</a>
+</div>
+
+<div class="grid_6 omega" style="margin-top:1em;margin-bottom:1em;text-align:right">
 	<input id="az" type="checkbox" />&nbsp;<label for="az">{{SetAxisMinZero}}</label>
 </div>
 
 <div class="clear"></div>
 
-<table id="tree" class="dataTable treeTable">
-	<thead>
-	<tr>
-		<th>
-			<img id="treetoggle" src="/images/ico/toggle.png"
-			     class="tip" onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
-			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
-		</th>
-		<th style="width:99%;padding-left:0" class="l">
-			<span class="indenter" style="padding-left: 0px;"></span>
-			{{Channel}}
-		</th>
-		<th class="r">{{Amount}}</th>
-		<th class="l">{{Unit}}</th>
-		<th class="r">{{Cost}}</th>
-		<th><img src="/images/ico/node_design.png" alt="" /></th>
-	</tr>
-	</thead>
+<div id="wrapper">
 
-	<tbody>
-
-	<!-- BEGIN DATA -->
-
-	<tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
-		<td>
-			<!-- IF {GRAPH} -->
-			<input id="c{ID}" class="channel iCheck" type="checkbox"	name="v[{ID}]"
-			       data-id="{ID}" data-guid="{GUID}" data-unit="{UNIT}"
-			       value='{PRESENTATION}'
-						 <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
-			<!-- ENDIF -->
-		</td>
-		<td style="padding:0.4em 0">
-			<img style="vertical-align:middle" class="tip"
-			     src="/images/ico/{ICON}" alt="" title="{TYPE}" />
-			<span class="tip" title="{GUID}">{NAME}, {DESCRIPTION}</span>
-			<img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" />
-		</td>
-		<td id="cons{ID}" class="consumption r"></td>
-		<td id="u{ID}">{UNIT}</td>
-		<td id="costs{ID}" class="costs r"></td>
-		<td>
-			<!-- IF {GRAPH} -->
-			<img src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
-					 class="tip" title="{{ChartSettingsTip}}" style="cursor:pointer"/>
-			<!-- ENDIF -->
-		</td>
-	</tr>
-
-	<!-- END -->
-
-	</tbody>
-
-	<tfoot>
+	<table id="tree" class="dataTable treeTable">
+		<thead>
 		<tr>
-			<th colspan="2">&nbsp;</th>
-			<th colspan="2" class="l">{{Total}}</th>
-			<th id="costs" style="padding-right:10px" class="r"></th>
-			<th></th>
+			<th>
+				<img id="treetoggle" src="/images/ico/toggle.png"
+				     class="tip" onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
+				<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
+			</th>
+			<th style="width:99%;padding-left:0" class="l">
+				<span class="indenter" style="padding-left: 0px;"></span>
+				{{Channel}}
+			</th>
+			<th class="r">{{Amount}}</th>
+			<th class="l">{{Unit}}</th>
+			<th class="r">{{Cost}}</th>
+			<th><img src="/images/ico/node_design.png" alt="" /></th>
 		</tr>
-	<tfoot>
-</table>
+		</thead>
+
+		<tbody>
+
+		<!-- BEGIN DATA -->
+
+		<tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
+			<td>
+				<!-- IF {GRAPH} -->
+				<input id="c{ID}" class="channel iCheck" type="checkbox"	name="v[{ID}]"
+				       data-id="{ID}" data-guid="{GUID}" data-unit="{UNIT}"
+				       value='{PRESENTATION}'
+							 <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
+				<!-- ENDIF -->
+			</td>
+			<td style="padding:0.4em 0">
+				<img style="vertical-align:middle" class="tip"
+				     src="/images/ico/{ICON}" alt="" title="{TYPE}" />
+				<span class="tip" title="{GUID}">{NAME}, {DESCRIPTION}</span>
+				<img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" />
+			</td>
+			<td id="cons{ID}" class="consumption r"></td>
+			<td id="u{ID}">{UNIT}</td>
+			<td id="costs{ID}" class="costs r"></td>
+			<td>
+				<!-- IF {GRAPH} -->
+				<img src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
+						 class="tip" title="{{ChartSettingsTip}}" style="cursor:pointer"/>
+				<!-- ENDIF -->
+			</td>
+		</tr>
+
+		<!-- END -->
+
+		</tbody>
+
+		<tfoot>
+			<tr>
+				<th colspan="2">&nbsp;</th>
+				<th colspan="2" class="l">{{Total}}</th>
+				<th id="costs" style="padding-right:10px" class="r"></th>
+				<th></th>
+			</tr>
+		<tfoot>
+	</table>
+
+</div>
 
 <h3>
 	<a name="view"></a>
