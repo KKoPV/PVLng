@@ -36,6 +36,7 @@
 			      ,`c`.`meter`
 			      ,`c`.`numeric`
 			      ,`c`.`unit`
+			      ,`c`.`decimals`
 			      ,`c`.`threshold`
 			      ,`c`.`valid_from`
 			      ,`c`.`valid_to`
@@ -44,6 +45,7 @@
 			      ,`t`.`childs`
 			      ,`t`.`read`
 			      ,`t`.`write`
+			      ,`t`.`graph`
 			      ,`t`.`icon`
 			  FROM `pvlng_tree` AS `tree`
 			  JOIN `pvlng_channel` AS `c` ON `tree`.`entity` = `c`.`id`
@@ -65,6 +67,7 @@
 			      ,`c`.`meter`
 			      ,`c`.`numeric`
 			      ,`c`.`unit`
+			      ,`c`.`decimals`
 			      ,`c`.`threshold`
 			      ,`c`.`valid_from`
 			      ,`c`.`valid_to`
@@ -73,6 +76,7 @@
 			      ,`t`.`childs`
 			      ,`t`.`read`
 			      ,`t`.`write`
+			      ,`t`.`graph`
 			      ,`t`.`icon`
 			  FROM `pvlng_tree` AS `tree`
 			  JOIN `pvlng_channel` AS `c` ON `tree`.`entity` = `c`.`id`
@@ -95,6 +99,7 @@
 			      ,`c`.`meter`
 			      ,`c`.`numeric`
 			      ,`c`.`unit`
+			      ,`c`.`decimals`
 			      ,`c`.`threshold`
 			      ,`c`.`valid_from`
 			      ,`c`.`valid_to`
@@ -103,6 +108,7 @@
 			      ,`t`.`childs`
 			      ,`t`.`read`
 			      ,`t`.`write`
+			      ,`t`.`graph`
 			      ,`t`.`icon`
 			  FROM `pvlng_tree` AS `tree`
 			  JOIN `pvlng_channel` AS `c` ON `tree`.`entity` = `c`.`id`
@@ -123,6 +129,7 @@
 			      ,`c`.`cost`
 			      ,`c`.`numeric`
 			      ,`c`.`unit`
+			      ,`c`.`decimals`
 			      ,`c`.`meter`
 			      ,`c`.`threshold`
 			      ,`c`.`valid_from`
@@ -152,6 +159,7 @@
 			      ,`c`.`cost`
 			      ,`c`.`numeric`
 			      ,`c`.`unit`
+			      ,`c`.`decimals`
 			      ,`c`.`meter`
 			      ,`c`.`threshold`
 			      ,`c`.`valid_from`

@@ -90,14 +90,13 @@ class Rest {
 			$accept = array();
 
 			// break up string into pieces (content type and q factors)
-			if (preg_match_all('~([^; ]+)\s*(?:;\s*q\s*=\s*([.0-9]+),?)?~i',
-												 $_SERVER['HTTP_ACCEPT'], $args, PREG_SET_ORDER)) {
+			if (preg_match_all('~([^;, ]+)\s*(?:;\s*q\s*=\s*([.0-9]+),?)?~i',
+			                   $_SERVER['HTTP_ACCEPT'], $args, PREG_SET_ORDER)) {
 
 				foreach ($args as $arg) {
 					// set default to 1 for any without q factor
 					$accept[$arg[1]] = isset($arg[2]) ? $arg[2] : 1;
 				}
-
 				// sort list based on q factor
 				arsort($accept, SORT_NUMERIC);
 
@@ -105,25 +104,30 @@ class Rest {
 					switch ($key) {
 						// ----------------------
 						case 'application/json':
-						case 'text/json':
+							$this->ContentType = 'application/json';
 							$this->request['format'] = 'json';
 							break 2; // switch & foreach
 						// ----------------------
 						case 'application/csv':
-						case 'text/csv':
 						case 'text/comma-separated-values':
+							$this->ContentType = 'application/csv';
 							$this->request['format'] = 'csv';
 							break 2; // switch & foreach
 						// ----------------------
 						case 'application/tsv':
-						case 'text/tsv':
 						case 'text/tab-separated-values':
+							$this->ContentType = 'application/tsv';
 							$this->request['format'] = 'tsv';
 							break 2; // switch & foreach
 						// ----------------------
 						case 'application/xml':
-						case 'text/xml':
+							$this->ContentType = 'application/xml';
 							$this->request['format'] = 'xml';
+							break 2; // switch & foreach
+						// ----------------------
+						case 'text/plain':
+							$this->ContentType = 'text/plain';
+							$this->request['format'] = 'text';
 							break 2; // switch & foreach
 					}
 				}
@@ -137,8 +141,12 @@ class Rest {
 	public function response( $code=200, $data='' ) {
 		Header('HTTP/1.1 '.$this->StatusMessage($code));
 		Header('Content-Type: '.$this->ContentType.'; charset=UTF-8');
-		Header('Content-Length: '.strlen($data));
-		die($data);
+		if ($data != '') {
+			Header('Content-Length: '.strlen($data));
+            die($data);
+		} else {
+			exit;
+		}
 	}
 
 	/**

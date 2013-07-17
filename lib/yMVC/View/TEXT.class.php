@@ -25,13 +25,26 @@ use yMVC\View;
  */
 class TEXT extends View {
 
-	// -------------------------------------------------------------------------
-	// PROTECTED
-	// -------------------------------------------------------------------------
-
 	/**
 	 *
 	 */
-	protected $ContentType = 'text/plain';
+	public function output() {
+		if ($this->filename != '' AND !$this->Plain) {
+			Header('Cache-Control: no-cache, must-revalidate');
+			Header('Expires: Sat, 01 Jan 2000 00:00:00 GMT');
+			Header('Content-Disposition: attachment; filename=' . $this->filename);
+		}
+
+		Header('Content-Type: text/plain; charset=UTF-8');
+
+		if (is_resource($this->content)) {
+			rewind($this->content);
+			while ($row = fgets($this->content)) {
+				echo implode(' ', unserialize($row)), PHP_EOL;
+			}
+		} else {
+			echo implode(PHP_EOL, (array) $this->content);
+		}
+	}
 
 }

@@ -2,7 +2,7 @@
 /**
  *
  *
- * @author		 Knut Kohl <knutkohl@users.sourceforge.net>
+ * @author      Knut Kohl <knutkohl@users.sourceforge.net>
  * @copyright	2012 Knut Kohl
  * @license		GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version		$Id: v1.0.0.2-24-gffc9108 2013-05-05 22:20:01 +0200 Knut Kohl $
@@ -11,10 +11,6 @@ namespace yMVC\View;
 
 /**
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-24-gffc9108 2013-05-05 22:20:01 +0200 Knut Kohl $
  */
 use yMVC\View;
 
@@ -22,11 +18,6 @@ use yMVC\View;
  * Uses this vars:
  * - content - convert to JSON (required)
  * - jsonp	 - JSON padded (optional)
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-24-gffc9108 2013-05-05 22:20:01 +0200 Knut Kohl $
  */
 class JSON extends View {
 
@@ -58,10 +49,12 @@ class JSON extends View {
 				}
 				// make numeric
 				if (is_array($row)) {
-					array_walk($row, function(&$d) {
-						if ((string) $d == (string) +$d) $d = +$d;
-					});
-				}
+				    array_walk($row, function(&$d) {
+				        if ((string) $d == (string) +$d) $d = +$d;
+                    });
+                } else {
+                    if ((string) $row == (string) +$row) $row = +$row;
+                }
 				echo json_encode($row);
 			}
 			echo ']';
