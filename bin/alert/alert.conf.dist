@@ -30,23 +30,23 @@ GUID_1        ""
 ### Accepted syntax
 ###
 ### - Numeric channels
-###   {VALUE} -lt INTEGER    {VALUE} is less than INTEGER
-###   {VALUE} -le INTEGER    {VALUE} is less than or equal to INTEGER
-###   {VALUE} -ge INTEGER    {VALUE} is greater than or equal to INTEGER
-###   {VALUE} -gt INTEGER    {VALUE} is greater than INTEGER
-###   {VALUE} -eq INTEGER    {VALUE} is equal to INTEGER
-###   {VALUE} -ne INTEGER    {VALUE} is not equal to INTEGER
+###   {VALUE} <  READING    {VALUE} is less than READING
+###   {VALUE} <= READING    {VALUE} is less than or equal to READING
+###   {VALUE} >= READING    {VALUE} is greater than or equal to READING
+###   {VALUE} >  READING    {VALUE} is greater than READING
+###   {VALUE} =  READING    {VALUE} is equal to READING
+###   {VALUE} != READING    {VALUE} is not equal to READING
 ###
 ### - Non numeric channels
-###   -n {VALUE}             The length of {VALUE} is nonzero
-###   -z {VALUE}             The length of {VALUE} is zero
-###   {VALUE} = STRING       The strings are equal
-###   {VALUE} != STRING      The strings are not equal
+###   -n '{VALUE}'            The length of {VALUE} is nonzero
+###   -z '{VALUE}'            The length of {VALUE} is zero
+###   {VALUE} = READING     The strings are equal
+###   {VALUE} != READING    The strings are not equal
 ###
 ### Examples
 ###
 ### - Alert on (numeric) channel value is greater than or equal to 30
-###   "{VALUE} -ge 30"
+###   "{VALUE} >= 30"
 ### - Alert on (non-numeric) channel value is set, e.g. an error channel
 ###   "-n {VALUE}"
 ###

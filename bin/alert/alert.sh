@@ -11,18 +11,14 @@
 ##############################################################################
 pwd=$(dirname $0)
 
-test -d $pwd/run || mkdir -p $pwd/run
-if test ! -d $pwd/run; then
-	error_exit "Can't create run dir: $pwd/run"
-fi
-
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 
-while getopts "tvxh" OPTION; do
+while getopts "tvrxh" OPTION; do
 	case "$OPTION" in
-		t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-		v) VERBOSE=$(expr $VERBOSE + 1) ;;
+		t) TEST=y; VERBOSE=$((VERBOSE+1)) ;;
+		v) VERBOSE=$((VERBOSE+1)) ;;
+		r) RESET=y ;;
 		x) TRACE=y ;;
 		h) usage; exit ;;
 		?) usage; exit 1 ;;
@@ -41,18 +37,36 @@ test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
 ##############################################################################
 ### Start
 ##############################################################################
+test "$TRACE" && set -x
+
+### Prepare conditions
 function replace_vars {
-	echo "$1" | sed -e "s/[{]VALUE[}]/$value/g" \
-	                -e "s/[{]NAME[}]/$name/g" -e "s/[{]LAST[}]/$last/g"
+	echo "$1" | sed -e "s~[{]VALUE[}]~$value~g" \
+	                -e "s~[{]NAME[}]~$name~g" -e "s~[{]LAST[}]~$last~g"
 }
 
-test "$TRACE" && set -x
+### Reset run files
+function reset {
+	files=$pwd/run/$hash*
+	log 1 Reset, delete $files ...
+	rm $files
+}
+
+### Create unique hash
+hash=$(echo $(basename "$1") | sed -e 's~[.].*$~~g' -e 's~[^A-Za-z0-9-]~_~g').$i
+
+if test "$RESET"; then
+	reset
+	exit
+fi
+
+curl=$(curl_cmd)
 
 i=0
 
 while test $i -lt $GUID_N; do
 
-	i=$(expr $i + 1)
+	i=$((i+1))
 
 	log 1 "=== GUID $i ==="
 
@@ -65,33 +79,39 @@ while test $i -lt $GUID_N; do
 	eval CONDITION=\$CONDITION_$i
 	test "$CONDITION" || error_exit "Condition is required (CONDITION_$i)"
 
-	url="$PVLngURL1/$GUID.tsv?period=last"
+	### Use last readings for the same GUID
+	if test "$GUID" != "$LASTGUID"; then
 
-	$(curl_cmd) $url >$TMPFILE
+		url="$PVLngURL2/$GUID"
 
-	### detect numeric channel
-	numeric=$(cat $TMPFILE | head -n1 | cut -f8)
+		numeric=$($curl "$url/attributes/numeric")
 
-	### Check, if data was received
-	test -n "$numeric" || continue
+		if echo "$numeric" | grep -qe '[[:alpha:]]'; then
+		    ### An error occured
+		    error_exit "$numeric"
+		fi
 
-	### get attributes row, extract 2nd value == channel name
-	name=$(cat $TMPFILE | head -n1 | cut -f2)
-	name="$name ($(cat $TMPFILE | head -n1 | cut -f5))"
-	### skip attributes row, extract 2nd value == data from last row, if exists
-	value=$(cat $TMPFILE | tail -n+2 | tail -n1 | cut -f2)
+		### Check, if data was received
+		test -n "$numeric" || continue
 
-	log 2 "URL    : $url"
-	log 2 "Result : $name, $value"
+		name="$($curl "$url/attributes/name") ($($curl "$url/attributes/description"))"
 
-	### Create unique hash
-	filename=$(echo $(basename "$1" '.conf') | sed -e 's/[^A-Za-z0-9-]/_/g').$i
-	lastfile=$pwd/run/$filename.last
-	flagfile=$pwd/run/$filename.sem
+		### extract 2nd value == data from last row, if exists
+		data=$($curl --header "Accept: application/tsv" "$url/data?period=last")
+		value=$(echo "$data" | cut -f2)
+
+		LASTGUID=$GUID
+
+	fi
+
+	log 2 "Result : $name - $value"
+
+	lastfile=$pwd/run/$hash$i.last
+	flagfile=$pwd/run/$hash$i.once
 
 	test -f $lastfile && last=$(<$lastfile)
 
-	echo "$value" >$lastfile
+	echo -n "$value" >$lastfile
 
 	### Prepare condition
 	CONDITION=$(replace_vars "$CONDITION")
@@ -135,15 +155,15 @@ while test $i -lt $GUID_N; do
 
 	while test $j -lt $ACTION_N; do
 
-		j=$(expr $j + 1)
+		j=$((j+1))
 
-		log 1 "--- ACTION $j ---"
+		log 1 "--- Action $j ---"
 
 		eval ACTION=\$ACTION_${i}_${j}
 
 		if test "${ACTION:-log}" = "log"; then
 			### Save data to PVLng log
-			test "$TEST" && log 1 "log alert: $GUID - $value" || save_log 'Alert' "$name ($GUID): $value"
+			test "$TEST" && log 1 "Log alert: $GUID - $value" || save_log 'Alert' "[$GUID] $name: $value"
 		else
 			### Prepare command
 			ACTION=$(replace_vars "$ACTION")
@@ -155,6 +175,8 @@ while test $i -lt $GUID_N; do
 	done
 
 done
+
+test "$TEST" && reset
 
 set +x
 
