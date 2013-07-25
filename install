@@ -1,5 +1,4 @@
 #############################################################################
-#
 # Install script
 #
 # @author      Knut Kohl <github@knutkohl.de>
@@ -37,12 +36,10 @@ e '- Import SQL definitions ...'
 
 mysql -h $dbhost -u $dbuser $p $dbname <$PWD/sql/pvlng.sql
 
-e '- Prepare config/config.php, set database credentials'
+e '- Prepare config/config.php and set database credentials ...'
 
-sed -e "s/\('Host' *=> *'\)[^']*\('\)/\1$dbhost\2/g" \
-    -e "s/\('Username' *=> *'\)[^']*\('\)/\1$dbuser\2/g" \
-    -e "s/\('Password' *=> *'\)[^']*\('\)/\1$dbpass\2/g" \
-    -e "s/\('Database' *=> *'\)[^']*\('\)/\1$dbname\2/g" \
+sed -e "s/<HOST>/$dbhost/g" -e "s/<USER>/$dbuser/g" \
+    -e "s/<PASSWORD>/$dbpass/g" -e "s/<DATABASE>/$dbname/g" \
     $PWD/config/config.php.dist >$PWD/config/config.php
 
 e 'Finished!'

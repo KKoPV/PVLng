@@ -22,10 +22,10 @@ return array(
 	 * 1. Change the database credentials for your needs
 	 */
 	'Database' => array(
-		'Host'     => 'localhost',
-		'Username' => 'root',
-		'Password' => '',
-		'Database' => ''
+		'Host'     => '<HOST>',
+		'Username' => '<USER>',
+		'Password' => '<PASSWORD>',
+		'Database' => '<DATABASE>'
 	),
 
 	/**
