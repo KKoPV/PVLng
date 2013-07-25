@@ -42,6 +42,10 @@ class XML extends View {
 
 		$node = $this->config->get('View.XML.Node', 'readout');
 
+		if ($this->content instanceof \Buffer) {
+			$this->content = $this->content->ressource();
+		}
+
 		if (is_resource($this->content)) {
 			echo '<?xml version="1.0" encoding="UTF-8" ?'.'>' . PHP_EOL;
 			echo '<data>' . PHP_EOL;

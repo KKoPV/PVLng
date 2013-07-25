@@ -36,6 +36,10 @@ class JSON extends View {
 		// With padding?
 		if ($jsonp = $this->jsonp) echo $jsonp, '(';
 
+		if ($this->content instanceof \Buffer) {
+			$this->content = $this->content->ressource();
+		}
+
 		if (is_resource($this->content)) {
 			echo '[';
 			$first = TRUE;

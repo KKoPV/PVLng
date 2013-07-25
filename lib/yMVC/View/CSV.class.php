@@ -37,6 +37,10 @@ class CSV extends View {
 
 		Header('Content-Type: application/csv; charset=UTF-8');
 
+		if ($this->content instanceof \Buffer) {
+			$this->content = $this->content->ressource();
+		}
+
 		if (is_resource($this->content)) {
 			rewind($this->content);
 			while ($row = fgets($this->content)) {
