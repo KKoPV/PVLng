@@ -94,11 +94,11 @@ class Random extends \Channel {
 	/**
 	 *
 	 */
-	protected function after_read( $tmpfile, $attributes ) {
+	protected function after_read( Buffer $buffer, $attributes ) {
 
 		$this->db->query('TRUNCATE `'.$this->table[$this->numeric].'`');
 
-		return parent::after_read($tmpfile, $attributes);
+		return parent::after_read($buffer, $attributes);
 	}
 
 }

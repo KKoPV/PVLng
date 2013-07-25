@@ -12,86 +12,95 @@ class Buffer {
 	/**
 	 * Use PHPs internal temp stream, use file for data greater 5 MB
 	 */
-	public static function create( $size=5 ) {
-		return fopen('php://temp/maxmemory:'.(1024 * 1024 * $size), 'w+');
+	public function __construct( $size=5 ) {
+		$this->fh = fopen('php://temp/maxmemory:'.(1024 * 1024 * $size), 'w+');
 	}
 
 	/**
 	 *
 	 */
-	public static function rewind( $fh ) {
-		return rewind($fh);
+	public function rewind() {
+		return rewind($this->fh);
 	}
 
 	/**
 	 *
 	 */
-	public static function close( $fh ) {
-		return fclose($fh);
+	public function close() {
+		fclose($this->fh);
+		unset($this);
 	}
 
 	/**
 	 *
 	 */
-	public static function encode( $row, $id ) {
-		return $id . self::$SEP1
-		     . implode(self::$SEP2, array_keys($row)) . self::$SEP1
-		     . implode(self::$SEP2, array_values($row));
+	public function write( $row, $id ) {
+	    if ($row != '') {
+			$encoded = $id . self::SEP1
+			         . implode(self::SEP2, array_keys($row)) . self::SEP1
+			         . implode(self::SEP2, array_values($row));
+	    	return fwrite($this->fh, $encoded . PHP_EOL);
+		}
+		return FALSE;
 	}
 
 	/**
 	 *
 	 */
-	public static function write( $fh, $row, $id ) {
-	    return ($row != '')
-		     ? fwrite($fh, self::encode($row, $id) . PHP_EOL)
-		     : TRUE;
-	}
-
-	/**
-	 *
-	 */
-	public static function swrite( $fh, $data ) {
+	public function swrite( $data ) {
 	    return !empty($data)
-		     ? fwrite($fh, serialize($data) . PHP_EOL)
+		     ? fwrite($this->fh, serialize($data) . PHP_EOL)
 		     : TRUE;
 	}
 
 	/**
 	 *
 	 */
-	public static function decode( &$row, &$id ) {
+	public function decode( &$row, &$id ) {
 	    $row = trim($row);
 		$id = '';
 		if ($row != '') {
-			list($id, $keys, $values) = explode(self::$SEP1, $row);
-			$row = array_combine(explode(self::$SEP2, $keys),
-			                     explode(self::$SEP2, $values));
+			list($id, $keys, $values) = explode(self::SEP1, $row);
+			$row = array_combine(explode(self::SEP2, $keys),
+			                     explode(self::SEP2, $values));
 		}
 	}
 
 	/**
 	 *
 	 */
-	public static function read( $fh, &$row, &$id ) {
-	    $row = fgets($fh);
-	    self::decode($row, $id);
+	public function read( &$row, &$id, $rewind=FALSE ) {
+	    if ($rewind) $this->rewind();
+	    $row = trim(fgets($this->fh));
+		$id = '';
+		if ($row != '') {
+			list($id, $keys, $values) = explode(self::SEP1, $row);
+			$row = array_combine(explode(self::SEP2, $keys),
+			                     explode(self::SEP2, $values));
+		}
 	    return ($row != '');
 	}
 
 	/**
 	 *
 	 */
-	public static function size( $fh ) {
-		fseek($fh, 0, SEEK_END);
-		return ftell($fh);
+	public function size() {
+		fseek($this->fh, 0, SEEK_END);
+		return ftell($this->fh);
+	}
+
+	/**
+	 *
+	 */
+	public function ressource() {
+		return $this->fh;
 	}
 
 	// -----------------------------------------------------------------------
 	// PROTECTED
 	// -----------------------------------------------------------------------
 
-	protected static $SEP1 = "\x00";
-	protected static $SEP2 = "\x01";
+	const SEP1 = "\x00";
+	const SEP2 = "\x01";
 
 }

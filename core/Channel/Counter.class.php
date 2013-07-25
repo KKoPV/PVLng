@@ -21,15 +21,14 @@ class Counter extends \Channel {
 
 		$this->before_read($request);
 
-		$buffer = parent::read($request);
-
-		$result = \Buffer::create();
+		$result = new \Buffer;
 
 		$last = 0;
 
-		\Buffer::rewind($buffer);
+		$buffer = parent::read($request);
+		$buffer->rewind();
 
-		while (\Buffer::read($buffer, $row, $id)) {
+		while ($buffer->read($row, $id)) {
 
 			// skip 1st row for plain data
 			if ($row['timediff'] OR $last) {
@@ -49,11 +48,12 @@ class Counter extends \Channel {
 				$row['max']         *= $factor;
 				$row['consumption'] *= $factor;
 
-				\Buffer::write($result, $row, $id);
+				$result->write($row, $id);
 			}
 
 			$last = $row['timestamp'];
 		}
+		$buffer->close();
 
 		return $this->after_read($result, $attributes);
 	}

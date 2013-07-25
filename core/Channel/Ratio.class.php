@@ -23,16 +23,12 @@ class Ratio extends \Channel {
 		$childs = $this->getChilds();
 
 		$child1 = $childs[0]->read($request);
-
-		\Buffer::rewind($child1);
-		\Buffer::read($child1, $row1, $id1);
+		$child1->read($row1, $id1, TRUE);
 
 		$child2 = $childs[1]->read($request);
+		$child2->read($row2, $id2, TRUE);
 
-		\Buffer::rewind($child2);
-		\Buffer::read($child2, $row2, $id2);
-
-		$result = \Buffer::create();
+		$result = new \Buffer;
 
 		while ($row1 != '' OR $row2 != '') {
 
@@ -50,26 +46,26 @@ class Ratio extends \Channel {
 				              ? $row1['max'] / $row2['max']
 				              : 0;
 
-				\Buffer::write($result, $row1, $id1);
+				$result->write($row1, $id1);
 
 				// read both next rows
-				\Buffer::read($child1, $row1, $id1);
-				\Buffer::read($child2, $row2, $id2);
+				$child1->read($row1, $id1);
+				$child2->read($row2, $id2);
 
 			} elseif ($id1 < $id2) {
 
 				// read only row 1
-				\Buffer::read($child1, $row1, $id1);
+				$child1->read($row1, $id1);
 
 			} else /* $id1 > $id2 */ {
 
 				// read only row 2
-				\Buffer::read($child2, $row2, $id2);
+				$child2->read($row2, $id2);
 
 			}
 		}
-		\Buffer::close($child1);
-		\Buffer::close($child2);
+		$child1->close();
+		$child2->close();
 
 		return $this->after_read($result, $attributes);
 	}

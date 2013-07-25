@@ -61,7 +61,6 @@ class API_Controller extends Controller {
 			$channel = Channel::byGUID($PathInfo[2]);
 
 			switch ($this->Rest->RequestMethod()) {
-
 				// ------------
 				case Rest::PUT:
 				    if ($data = $this->Rest->Data()) {
@@ -147,18 +146,17 @@ class API_Controller extends Controller {
 			$GUID = preg_match('~^[a-z\d]{4}(?:-[a-z\d]{4}){7}$~', $PathInfo[0])
 			      ? array_shift($PathInfo)
 			      : '';
+
 			$action = array_shift($PathInfo);
-
-			$request = array_merge($this->Rest->Request(), $PathInfo);
-
-			if ($data = $this->Rest->Data()) {
-			    $request['data'] = $data;
-			}
 
 			$r2Class = 'API\r2\\' . ucwords($action?:'Help');
 
 			if (!class_exists($r2Class))
 				throw new Exception('Unsupported request "'.$action.'"!', 400);
+
+			$request = array_merge($this->Rest->Request(), $PathInfo);
+
+			if ($data = $this->Rest->Data()) $request['data'] = $data;
 
 			$r2Class = new $r2Class($GUID);
 			$content = $r2Class->{$this->Rest->RequestMethod()}($request);

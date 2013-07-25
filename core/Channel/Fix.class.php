@@ -27,12 +27,12 @@ class Fix extends \Channel {
 		// Buffer $this->db->TimeStep, at least 60 seconds
 		$TimeStep = max(60, $this->db->TimeStep);
 
- 		$result = \Buffer::create();
+ 		$result = new \Buffer;
 
 		// Align start to full minutes
 		$ts = floor($this->start / $TimeStep) * $TimeStep;
 
-		\Buffer::write($result, array(
+		$result->write(array(
 			'datetime'    => date('Y-m-d H:i:s', $ts),
 			'timestamp'   => $ts,
 			'data'        => 1,
@@ -46,7 +46,7 @@ class Fix extends \Channel {
 		// Align end to full minutes
 		$ts = floor($this->end / $TimeStep) * $TimeStep;
 
-		\Buffer::write($result, array(
+		$result->write(array(
 			'datetime'    => date('Y-m-d H:i:s', $ts),
 			'timestamp'   => $ts,
 			'data'        => 1,

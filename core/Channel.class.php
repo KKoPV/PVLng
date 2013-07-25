@@ -94,9 +94,10 @@ class Channel {
 	 *
 	 */
 	public function write( $value, $timestamp=NULL ) {
+
 		if (!$this->write)
 			throw new \Exception('Can\'t write data to "'.$this->name.'", '
-													.'instance of "'.get_class($this).'"!', 400);
+			                    .'instance of "'.get_class($this).'"!', 400);
 
 		if (!is_scalar($value))
 			throw new \Exception('Missing "data" parameter!', 400);
@@ -201,7 +202,7 @@ class Channel {
 			  ->order('timestamp');
 		}
 
- 		$buffer = Buffer::create();
+ 		$buffer = new Buffer;
 
 		if (array_key_exists('sql', $request) AND $request['sql']) $this->sql = (string) $q;
 
@@ -234,7 +235,7 @@ class Channel {
 				$id = $data['g'];
 				unset($data['g']);
 
-				Buffer::write($buffer, $data, $id);
+				$buffer->write($data, $id);
 			}
 		}
 
@@ -414,16 +415,16 @@ class Channel {
 	/**
 	 *
 	 */
-	protected function after_read( $buffer, $attributes ) {
+	protected function after_read( Buffer $buffer, $attributes ) {
 
-		$datafile = Buffer::create();
+		$datafile = new Buffer;
 
 		$last = $consumption = 0;
 		$lastrow = FALSE;
 
-		Buffer::rewind($buffer);
+		$buffer->rewind();
 
-		while (Buffer::read($buffer, $row, $id)) {
+		while ($buffer->read($row, $id)) {
 
 			if ($this->meter) {
 				/* check meter values raising */
@@ -444,25 +445,24 @@ class Channel {
 
 			$row['data'] = $this->valid($row['data']);
 
-			Buffer::write($datafile, $row, $id);
+			$datafile->write($row, $id);
 
 			$lastrow = $row;
 		}
-
-		Buffer::close($buffer);
+		$buffer->close();
 
 		if ($lastrow AND $this->period[1] == -1 /* last */) {
 			// recreate temp. file with last row only
-			Buffer::close($datafile);
-			$datafile = Buffer::create();
-			Buffer::write($datafile, $lastrow, 0);
+			$datafile->close();
+			$datafile = new Buffer;
+			$datafile->write($lastrow, 0);
 		}
 
 		if (!$attributes) return $datafile;
 
 		// -------------------------------------------------------------------
 		// Mostly last call, return attributes and data
-		$buffer = Buffer::create();
+		$buffer = new Buffer;
 
 		$attr = $this->getAttributes();
 		$attr['consumption'] = $consumption * $this->resolution;
@@ -470,7 +470,7 @@ class Channel {
 		// remover newlines, they will not correct serialized...
 		if ($this->sql != '') $attr['sql'] = preg_replace('~\s+~s', ' ', $this->sql);
 
-		Buffer::swrite($buffer, $attr);
+		$buffer->swrite($attr);
 
 		// Bitmask : 00000011
 		//                  ^----- Full
@@ -479,34 +479,24 @@ class Channel {
 		if ($this->full)   $mode |= 1;
 		if ($this->mobile) $mode |= 2;
 
-		Buffer::rewind($datafile);
+		$datafile->rewind();
 
 		// optimized flow...
 		switch ($mode) {
 			// -------------------
 			case 3: // Full mobile
 
-				while (Buffer::read($datafile, $row, $id)) {
-					Buffer::swrite($buffer, array(
-						/* 0 */ $row['datetime'],
-						/* 1 */ $row['timestamp'],
-						/* 2 */ $row['data'],
-						/* 3 */ $row['min'],
-						/* 4 */ $row['max'],
-						/* 5 */ $row['count'],
-						/* 6 */ $row['timediff'],
-						/* 7 */ $row['consumption']
-					));
-
+				while ($datafile->read($row, $id)) {
+					$buffer->swrite(array_values($row));
 				}
 				break;
 
 			// -------------------
 			case 2: // Short mobile
 
-				while (Buffer::read($datafile, $row, $id)) {
+				while ($datafile->read($row, $id)) {
 					// default mobile result: only timestamp and data
-					Buffer::swrite($buffer, array(
+					$buffer->swrite(array(
 						/* 0 */ $row['timestamp'],
 						/* 1 */ $row['data']
 					));
@@ -517,25 +507,16 @@ class Channel {
 			// -------------------
 			case 1: // Full
 				// do nothing with $row
-				while (Buffer::read($datafile, $row, $id)) {
-					Buffer::swrite($buffer, array(
-						'datetime'    => $row['datetime'],
-						'timestamp'   => $row['timestamp'],
-						'data'        => $row['data'],
-						'min'         => $row['min'],
-						'max'         => $row['max'],
-						'count'       => $row['count'],
-						'timediff'    => $row['timediff'],
-						'consumption' => $row['consumption']
-					));
+				while ($datafile->read($row, $id)) {
+					$buffer->swrite($row);
 				}
 				break;
 
 			// -------------------
 			default: // Short, default
-				while (Buffer::read($datafile, $row, $id)) {
+				while ($datafile->read($row, $id)) {
 					// default result: only timestamp and data
-					Buffer::swrite($buffer, array(
+					$buffer->swrite(array(
 						'timestamp' => $row['timestamp'],
 						'data'      => $row['data']
 					));
@@ -543,7 +524,7 @@ class Channel {
 				break;
 
 		}
-		Buffer::close($datafile);
+		$datafile->close();
 
 		Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $this->time) * 1000));
 
