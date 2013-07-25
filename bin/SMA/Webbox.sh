@@ -11,22 +11,23 @@
 ##############################################################################
 pwd=$(dirname $0)
 WEBBOX="192.168.0.168:80"
-GUID_N=0
 
 . $pwd/../PVLng.conf
 . $pwd/../PVLng.sh
 
 while getopts "tvxh" OPTION; do
-  case "$OPTION" in
-    t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-    v) VERBOSE=$(expr $VERBOSE + 1) ;;
-    x) TRACE=y ;;
-    h) usage; exit ;;
-    ?) usage; exit 1 ;;
-  esac
+	case "$OPTION" in
+    	t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+    	v) VERBOSE=$((VERBOSE + 1)) ;;
+		x) TRACE=y ;;
+		h) usage; exit ;;
+		?) usage; exit 1 ;;
+	esac
 done
 
-read_config "$pwd/Webbox.conf"
+shift $((OPTIND-1))
+
+read_config "$1"
 
 GUID_N=$(int "$GUID_N")
 test $GUID_N -gt 0  || error_exit "No GUIDs defined"
@@ -51,9 +52,9 @@ i=0
 
 while test $i -lt $GUID_N; do
 
-	i=$(expr $i + 1)
+	i=$((i + 1))
 
-	log 1 "--- Section $i ---"
+	log 1 "--- $i ---"
 
 	eval GUID=\$GUID_$i
 	test "$GUID" || error_exit "Equipment GUID is required (GUID_$i)"
@@ -99,18 +100,14 @@ exit
 ##############################################################################
 # USAGE >>
 
-Read Inverter/Sensorbox data from Webbox
+Read Inverter or Sensorbox data from SMA Webbox
 
-Usage:
-    $0 [options]
+Usage: $scriptname [options] config_file
 
 Options:
-
-    -t  Test mode, read only from Webbox and show the results, don't send data
-    -v  Make execution verbose
-    -h  This help
-
-Uses Webbox.conf as config file.
+	-t  Test mode, read only from Webbox and show the results, don't send data
+	-v  Make execution verbose
+	-h  This help
 
 See Webbox.conf.dist for reference.
 

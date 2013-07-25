@@ -54,6 +54,8 @@ function read_config {
 	test "$1"    || error_exit 'Missing config file!'
 	test -r "$1" || error_exit 'Configuration file is not readable!'
 
+	log 2 "--- $1 ---"
+
 	while read var value; do
 		test -n "$var" -a "${var:0:1}" != '#' || continue
 		value=$(echo "$value" | sed -e 's/^"[ \t]*//g' -e 's/[ \t]*"$//g')
@@ -78,6 +80,13 @@ function bool {
 function int {
 	test -n "$1" && t=$(expr "$1" \* 1 2>/dev/null)
 	test -z "$t" && echo 0 || echo $t
+}
+
+##############################################################################
+### build md5sum of file
+##############################################################################
+function hash {
+	md5sum "$1" | cut -d' ' -f1
 }
 
 ##############################################################################
@@ -154,6 +163,8 @@ function PVLngPUT2 {
 	test "${2:0:1}" != "@" && data="data=\"$2\"" || data="data$2"
 
 	cmd=$(curl_cmd)
+
+	log 2 "Send	 : $data"
 
 	rc=$($cmd --header "X-PVLng-key: $PVLngAPIkey" --request PUT \
 						--write-out %{http_code} --output $TMPFILE \

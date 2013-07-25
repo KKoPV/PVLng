@@ -8,7 +8,7 @@
 ##############################################################################
 ### Count of following sections
 ##############################################################################
-GUID_N 0
+GUID_N        0
 
 ##############################################################################
 ### Reapeat the follwing settings for each sensor to read.
@@ -38,17 +38,17 @@ GUID_1        ""
 ###   {VALUE} != READING    {VALUE} is not equal to READING
 ###
 ### - Non numeric channels
-###   -n '{VALUE}'            The length of {VALUE} is nonzero
-###   -z '{VALUE}'            The length of {VALUE} is zero
-###   {VALUE} = READING     The strings are equal
-###   {VALUE} != READING    The strings are not equal
+###   '{VALUE}'             The length of {VALUE} is nonzero
+###   -z '{VALUE}'          The length of {VALUE} is zero
+###   '{VALUE}' = READING   The strings are equal
+###   '{VALUE}' != READING  The strings are not equal
 ###
 ### Examples
 ###
 ### - Alert on (numeric) channel value is greater than or equal to 30
 ###   "{VALUE} >= 30"
 ### - Alert on (non-numeric) channel value is set, e.g. an error channel
-###   "-n {VALUE}"
+###   "'{VALUE}'"
 ###
 ##############################################################################
 CONDITION_1    ""
@@ -79,5 +79,15 @@ COMMAND_1_N    0
 
 COMMAND_1_1    ""
 COMMAND_1_2    ""
+
+### Example: Send email
+ACTION_1_1          "mail"
+ACTION_1_1_EMAIL    ""
+ACTION_1_1_SUBJECT  ""
+ACTION_1_1_BODY     ""
+
+### Example: syslog
+ACTION_1_1          "logger"
+ACTION_1_1_MESSAGE  ""
 
 ### <<< copy

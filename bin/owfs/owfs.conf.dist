@@ -41,7 +41,7 @@ GUID_N        0
 ##############################################################################
 ### PVLng sensor GUID
 ### Read Serial and Channel from API!
-### Maintain Serial as 28CA2307040000E0 - NOT 28.CA2307040000
+### Maintain the REAL Serial as 28CA2307040000E0 - NOT 28.CA2307040000 !
 ### required
 ##############################################################################
 GUID_1        ""

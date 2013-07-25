@@ -10,9 +10,6 @@
 ### Init
 ##############################################################################
 pwd=$(dirname $0)
-APIENDPOINT=
-APIKEY=
-GUID_N=0
 
 . $pwd/../PVLng.conf
 . $pwd/../PVLng.sh
@@ -21,8 +18,8 @@ CACHED=false
 
 while getopts "tvxh" OPTION; do
 	case "$OPTION" in
-		t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-		v) VERBOSE=$(expr $VERBOSE + 1) ;;
+		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+		v) VERBOSE=$((VERBOSE + 1)) ;;
 		x) TRACE=y ;;
 		h) usage; exit ;;
 		?) usage; exit 1 ;;
@@ -39,10 +36,6 @@ read_config "$1"
 test "$APIENDPOINT" || error_exit "Xively API Endpoint is required (APIENDPOINT)!"
 test "$APIKEY" || error_exit "Xively API key is required (APIKEY)!"
 
-test "$INTERVAL" || error_exit "Update interval must be set (INTERVAL)!"
-INTERVAL=$(int "$INTERVAL")
-test $INTERVAL -gt 0 || error_exit "Update interval must > 0 (INTERVAL)!"
-
 GUID_N=$(int "$GUID_N")
 test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
 
@@ -50,6 +43,12 @@ test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
+
+NOW=$(date +%s)
+LASTFILE=/tmp/$(hash "$1")
+test -f "$LASTFILE" && LAST=$(<$LASTFILE) || LAST=$NOW
+INTERVAL=$(echo "scale=0; ( $NOW - $LAST ) / 60" | bc -l)
+echo $NOW >$LASTFILE
 
 LC_NUMERIC=en_US
 
@@ -59,7 +58,7 @@ found=
 
 while test $i -lt $GUID_N; do
 
-	i=$(expr $i + 1)
+	i=$((i + 1))
 
 	log 1 "--- $i ---"
 
@@ -74,7 +73,7 @@ while test $i -lt $GUID_N; do
 
 	### read value
 	url="$PVLngURL2/$GUID/data?period=${INTERVAL}minutes"
-	log 2 "Get-URL  : $url"
+	log 2 "URL      : $url"
 
 	### get last row
 	row=$($curl --header "Accept: application/tsv"  $url | tail -n1)
@@ -101,7 +100,7 @@ while test $i -lt $GUID_N; do
         value=$2
 	fi
 
-	age=$(echo "scale=0;($(date +%s)-$timestamp)/60" | bc -l)
+	age=$(echo "scale=0; ( $NOW - $timestamp ) / 60" | bc -l)
 	log 2 "Last     : $(date -d @$timestamp)"
 	log 2 "Age      : $age min."
 

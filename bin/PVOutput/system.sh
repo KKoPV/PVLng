@@ -13,24 +13,24 @@ vMax=12
 ### Init
 ##############################################################################
 pwd=$(dirname $0)
-SYSTEMID=
 
 . $pwd/../PVLng.conf
 . $pwd/../PVLng.sh
 
 while getopts "tvxh" OPTION; do
-  case "$OPTION" in
-    t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-    v) VERBOSE=$(expr $VERBOSE + 1) ;;
-    x) TRACE=y ;;
-    h) usage; exit ;;
-    ?) usage; exit 1 ;;
-  esac
+	case "$OPTION" in
+		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+		v) VERBOSE=$((VERBOSE + 1)) ;;
+		x) TRACE=y ;;
+		h) usage; exit ;;
+		?) usage; exit 1 ;;
+	esac
 done
+
+read_config $pwd/pvoutput.conf
 
 shift $((OPTIND-1))
 
-read_config $pwd/pvoutput.conf
 read_config "$1"
 
 ##############################################################################
@@ -38,12 +38,15 @@ read_config "$1"
 ##############################################################################
 test "$TRACE" && set -x
 
-test "$APIURL"   || error_exit "pvoutput.org API URL is required, see pvoutput.conf.dist"
-test "$APIKEY"   || error_exit "pvoutput.org API key is required, see pvoutput.conf.dist"
+test "$APIURL"	 || error_exit "pvoutput.org API URL is required, see pvoutput.conf.dist"
+test "$APIKEY"	 || error_exit "pvoutput.org API key is required, see pvoutput.conf.dist"
 test "$SYSTEMID" || error_exit "pvoutput.org Plant Id is required"
-test "$INTERVAL" || error_exit "pvoutput.org System interval is required"
-INTERVAL=$(int "$INTERVAL")
-test $INTERVAL -gt 0 || error_exit "System interval must be greater 0"
+
+NOW=$(date +%s)
+LASTFILE=/tmp/$(hash "$1")
+test -f "$LASTFILE" && LAST=$(<$LASTFILE) || LAST=$NOW
+INTERVAL=$(echo "scale=0; ( $NOW - $LAST ) / 60" | bc -l)
+echo $NOW >$LASTFILE
 
 curl="$(curl_cmd)"
 
@@ -52,51 +55,54 @@ i=0
 check=
 
 while test $i -lt $vMax; do
-  i=$(expr $i + 1)
 
-  eval GUID=\$GUID_$i
+	i=$((i + 1))
 
-  if test "$GUID"; then
-  
-    log 1 "$(printf 'GUID    %2d: %s' $i $GUID)"
+	log 1 "--- $i ---"
 
-    eval FACTOR=\$FACTOR_$i
-    test "$FACTOR" || FACTOR=1
-    log 1 "$(printf 'FACTOR  %2d: %s' $i $FACTOR)"
+	eval GUID=\$GUID_$i
 
-    url="$PVLngURL2/$GUID/data?period=${INTERVAL}minutes"
-    log 2 "$url"
+	if test "$GUID"; then
+	
+		log 1 "$(printf 'GUID    %2d: %s' $i $GUID)"
 
-    ### empty temp. file
-    echo -n >$TMPFILE
+		eval FACTOR=\$FACTOR_$i
+		test "$FACTOR" || FACTOR=1
+		log 1 "$(printf 'FACTOR  %2d: %s' $i $FACTOR)"
 
-    ### extract 2nd value == data from last row, if exists
-    value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
+		url="$PVLngURL2/$GUID/data?period=${INTERVAL}minutes"
+		log 2 "$url"
 
-    ### unset only zero values for v1 .. v4
-    if test $i -le 4; then
-      test "$value" = "0" && value=
-    fi
+		### empty temp. file
+		echo -n >$TMPFILE
 
-    if test "$value"; then
-      value=$(echo "scale=3; $value * $FACTOR" | bc -l)
-      DATA="$DATA -d v$i=$value"
-    fi
-    log 1 "$(printf 'VALUE   %2d: %s' $i $value)"
+		### extract 2nd value == data from last row, if exists
+		value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
 
-    check="$check$value"
-  fi
+		### unset only zero values for v1 .. v4
+		if test $i -le 4; then
+			test "$value" = "0" && value=
+		fi
 
-  ### Check if at least one of v1...v4 is set
-  if test $i -eq 4; then
-    if test "$check"; then
-      log 1 "OK        : At least one of v1 .. v4 is filled ..."
-    else
-      ### skip further processing
-      log 1 "SKIP      : All of v1 .. v4 are empty!"
-      exit
-    fi
-  fi
+		if test "$value"; then
+			value=$(echo "scale=3; $value * $FACTOR" | bc -l)
+			DATA="$DATA -d v$i=$value"
+		fi
+		log 1 "$(printf 'VALUE   %2d: %s' $i $value)"
+
+		check="$check$value"
+	fi
+
+	### Check if at least one of v1...v4 is set
+	if test $i -eq 4; then
+		if test "$check"; then
+			log 1 "OK        : At least one of v1 .. v4 is filled ..."
+		else
+			### skip further processing
+			log 1 "SKIP      : All of v1 .. v4 are empty!"
+			exit
+		fi
+	fi
 
 done
 
@@ -118,17 +124,17 @@ log 1 $(cat $TMPFILE)
 
 ### Check curl exit code
 if test $rc -ne 0; then
-  . $pwd/../curl-errors
-  save_log "PVOutput" "Curl error ($rc): ${curl_rc[$rc]}"
+	. $pwd/../curl-errors
+	save_log "PVOutput" "Curl error ($rc): ${curl_rc[$rc]}"
 fi
 
 ### Check result, ONLY 200 is ok
 if cat $TMPFILE | grep -q '200:'; then
-  ### Ok, state added
-  :
+	### Ok, state added
+	log 1 "Ok"
 else
-  ### log error
-  save_log "PVOutput / $SYSTEMID" "Update plant failed: $(cat $TMPFILE)"
+	### log error
+	save_log "PVOutput / $SYSTEMID" "Update plant failed: $(cat $TMPFILE)"
 fi
 
 set +x
@@ -138,17 +144,16 @@ exit
 ##############################################################################
 # USAGE >>
 
-Fetch 1-wire sensor data
+Update PVOutput.org system
 
 Usage: $scriptname [options] config_file
 
 Options:
-
-    -t   Test mode, don't push to PVOutput
-         Sets verbosity to info level
-    -v   Set verbosity level to info level
-    -vv  Set verbosity level to debug level
-    -h   Show this help
+	-t   Test mode, don't push to PVOutput
+	     Sets verbosity to info level
+	-v   Set verbosity level to info level
+	-vv  Set verbosity level to debug level
+	-h   Show this help
 
 See system.conf.dist for reference.
 

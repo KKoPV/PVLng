@@ -20,15 +20,17 @@ test "$S0" || error_exit 'Missing "S0" binary!'
 while getopts "rtvxh" OPTION; do
 	case "$OPTION" in
 		r) RESET=y ;;
-		t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-		v) VERBOSE=$(expr $VERBOSE + 1) ;;
+		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+		v) VERBOSE=$((VERBOSE + 1)) ;;
 		x) TRACE=y ;;
 		h) usage; exit ;;
 		?) usage; exit 1 ;;
 	esac
 done
 
-read_config "$pwd/S0.conf"
+shift $((OPTIND-1))
+
+read_config "$1"
 
 GUID_N=$(int "$GUID_N")
 test $GUID_N -gt 0	|| error_exit "No sections defined"
@@ -41,7 +43,8 @@ test "$TRACE" && set -x
 i=0
 
 while test $i -lt $GUID_N; do
-	i=$(expr $i + 1)
+
+	i=$((i + 1))
 
 	log 1 "--- Section $i ---"
 
@@ -78,7 +81,7 @@ while test $i -lt $GUID_N; do
 	### Go
 	##############################################################################
 	### log file for measuring data
-	LOG=/tmp/$GUID
+	LOG=$pwd/run/$i.log
 	log 1 "Log     : $LOG"
 
 	### Identify S0 process by device attached to!
@@ -94,7 +97,7 @@ while test $i -lt $GUID_N; do
 			log 0 "Reset"
 			log 0 "- Kill process $pid"
 			kill $pid
-			log 0 "- Remove log	 $LOG"
+			log 0 "- Remove log	$LOG"
 			rm $LOG
 			exit
 		fi
@@ -162,13 +165,12 @@ exit
 
 Read S0 impulses
 
-Usage: $scriptname [options]
+Usage: $scriptname [options] config_file
 
 Options:
-
-		-r	Reset script, kill all running S0 processes
-		-t	Test mode
-		-v	Make processing verbose
-		-h	Show this help
+	-r	Reset script, kill all running S0 processes
+	-t	Test mode
+	-v	Make processing verbose
+	-h	Show this help
 
 # << USAGE

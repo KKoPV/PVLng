@@ -22,8 +22,8 @@ CACHED=false
 
 while getopts "tvxh" OPTION; do
 	case "$OPTION" in
-		t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-		v) VERBOSE=$(expr $VERBOSE + 1) ;;
+    	t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+    	v) VERBOSE=$((VERBOSE + 1)) ;;
 		x) TRACE=y ;;
 		h) usage; exit ;;
 		?) usage; exit 1 ;;
@@ -34,7 +34,9 @@ if test "$TEST" && test -z "$(which owread)"; then
 	error_exit "Missing owread binary from OWFS. Is OWFS is properly installed?"
 fi
 
-read_config "$pwd/owfs.conf"
+shift $((OPTIND-1))
+
+read_config "$1"
 
 test $SERVER || SERVER="localhost:4304"
 
@@ -49,6 +51,7 @@ test "$TRACE" && set -x
 test $(bool "$CACHED") -eq 0 && CACHED='/uncached' || CACHED=
 test -z "$CACHED" && log 1 "Use cached channel values"
 
+curl=$(curl_cmd)
 i=0
 
 while test $i -lt $GUID_N; do
@@ -60,8 +63,8 @@ while test $i -lt $GUID_N; do
 	eval GUID=\$GUID_$i
 	test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 
-	SERIAL=$($(curl_cmd) "$PVLngURL1/$GUID.csv?attributes=serial")
-	CHANNEL=$($(curl_cmd) "$PVLngURL1/$GUID.csv?attributes=channel")
+	SERIAL=$($curl --header "Accept: text/plain" "$PVLngURL2/$GUID/attributes/serial")
+	CHANNEL=$($curl --header "Accept: text/plain" "$PVLngURL2/$GUID/attributes/channel")
 
 	### read value
 	cmd="$owread -s $SERVER ${CACHED}/${SERIAL}/$CHANNEL"

@@ -27,8 +27,6 @@ done
 
 shift $((OPTIND-1))
 
-SYSTEMID=
-
 read_config "$1"
 
 GUID_N=$(int "$GUID_N")
@@ -161,16 +159,58 @@ while test $i -lt $GUID_N; do
 
 		eval ACTION=\$ACTION_${i}_${j}
 
-		if test "${ACTION:-log}" = "log"; then
-			### Save data to PVLng log
-			test "$TEST" && log 1 "Log alert: $GUID - $value" || save_log 'Alert' "[$GUID] $name: $value"
-		else
-			### Prepare command
-			ACTION=$(replace_vars "$ACTION")
-			### Execute command
-			log 1 "$ACTION"
-			test "$TEST" || eval "$ACTION"
-		fi
+		case ${ACTION:-log} in
+
+			log)
+				### Save data to PVLng log
+				if test "$TEST"; then
+					log 1 "Log: $GUID - $value"
+				else
+					save_log 'Alert' "[$GUID] $name: $value"
+				fi
+				;;
+
+			logger)
+				eval MESSAGE=\$ACTION_${i}_${j}_MESSAGE
+				test "$MESSAGE" || MESSAGE="[$GUID] $name: $value"
+				MESSAGE=$(replace_vars "$MESSAGE")
+
+				if test "$TEST"; then
+				    log 1 "Logger: $MESSAGE"
+				else
+					logger -t PVLng "$MESSAGE"
+				fi
+				;;
+
+			mail)
+				eval EMAIL=\$ACTION_${i}_${j}_EMAIL
+				test "$EMAIL" || error_exit "Email is required! (ACTION_${i}_${j}_EMAIL)"
+
+				eval SUBJECT=\$ACTION_${i}_${j}_SUBJECT
+				test "$SUBJECT" || SUBJECT="[$GUID] $name: $value"
+				SUBJECT=$(replace_vars "$SUBJECT")
+
+				eval BODY=\$ACTION_${i}_${j}_BODY
+				BODY=$(replace_vars "$BODY")
+
+				if test "$TEST"; then
+				    log 1 "Send email to $EMAIL"
+					log 1 "Subject: $SUBJECT"
+					log 1 "Body:"
+					log 1 "$BODY"
+				else
+				    echo "$BODY" | mail -s "[PVLng] $SUBJECT" $EMAIL >/dev/null
+				fi
+				;;
+
+			*)
+				### Prepare command
+				ACTION=$(replace_vars "$ACTION")
+				### Execute command
+				log 1 "$ACTION"
+				test "$TEST" || eval "$ACTION"
+				;;
+		esac
 
 	done
 

@@ -13,15 +13,6 @@
 SYSTEMID      ""
 
 ##############################################################################
-### PVOutput System status interval in minutes
-### Settings > Registered Systems > [Edit] > Live Settings > Status Interval
-### (5|10|15), required
-##############################################################################
-#INTERVAL      "5"
-#INTERVAL      "10"
-#INTERVAL      "15"
-
-##############################################################################
 ### Additional data to post to PVOutput, available are v1 ... v12
 ### see http://pvoutput.org/help.html#api-addstatus
 ###
@@ -34,37 +25,35 @@ SYSTEMID      ""
 ###
 ### At least one of v1 .. v4 must be filled to update PVOutput!
 ##############################################################################
-### v1  - Energy Generation
+### v1  - Energy Generation, watt hours
 ### Inverter today
 GUID_1        ""
-CHANNEL_1     "today:max"
-### If your today is in kilo watt hours, multiply with 1000!
-### PVOutput expects watt hours!
-FACTOR_1      1000
+### kilo watt hours => watt hours == 1000
+#FACTOR_1      1000
 
-### v2  - Power Generation
+### v2  - Power Generation, watts
 ### Inverter power
 GUID_2        ""
-CHANNEL_2     "pac:avg"
-FACTOR_2      1
+### kilo watt => watt == 1000
+#FACTOR_2      1000
 
-### v3	- Energy Consumption
+### v3	- Energy Consumption, watt hours
 GUID_3        ""
-CHANNEL_3     "data:avg"
+### kilo watt hours => watt hours == 1000
+#FACTOR_3      1000
 
-### v4	- Power Consumption
+### v4	- Power Consumption, watts
 ### Consumption
 GUID_4        ""
-CHANNEL_4     "data:avg"
+### kilo watt => watt == 1000
+#FACTOR_4      1000
 
 ### v5	- Temperature
-### Inverter temperature
+### Inverter temperature, celsius
 GUID_5        ""
-CHANNEL_5     "data:avg"
 
-### v6	- Voltage
+### v6	- Voltage, volts
 GUID_6        ""
-CHANNEL_6     "data:avg"
 
 ##############################################################################
 ### Values 7 .. 12 are available in donation mode
@@ -74,29 +63,20 @@ CHANNEL_6     "data:avg"
 ### v7	- Extended Value 1
 ### Irradiation
 GUID_7        ""
-#CHANNEL_7     "irradiation:avg"
-CHANNEL_7     "data:avg"
 
 ### v8	- Extended Value 2
 ### Module temperature
 GUID_8        ""
-#CHANNEL_8     "tempm:avg"
-CHANNEL_8     "data:avg"
 
 ### v9	- Extended Value 3
 ### Outside temperature
 GUID_9        ""
-#CHANNEL_9     "tempo:avg"
-CHANNEL_9     "data:avg"
 
 ### v10	- Extended Value 4
 GUID_10       ""
-CHANNEL_10    "data:avg"
 
 ### v11	- Extended Value 5
 GUID_11       ""
-CHANNEL_11    "data:avg"
 
 ### v12	- Extended Value 6
 GUID_12       ""
-CHANNEL_12    "data:avg"

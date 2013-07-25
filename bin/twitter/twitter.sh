@@ -16,18 +16,18 @@ pwd=$(dirname $0)
 . $pwd/twitter.items
 
 while getopts "lftvxh" OPTION; do
-  case "$OPTION" in
-    l) printf '\nImplemented items:\n\n'
-       typeset -F | grep ' twitter_' | sed -e 's/.*twitter_/  - /'
-       printf "\nSee $pwd/twitter.items for details\n"
-       exit ;;
-    f) FORCE=y ;;
-    t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-    v) VERBOSE=$(expr $VERBOSE + 1) ;;
-    x) TRACE=y ;;
-    h) usage; exit ;;
-    ?) usage; exit 1 ;;
-  esac
+	case "$OPTION" in
+		l) printf '\nImplemented items:\n\n'
+		   typeset -F | grep ' twitter_' | sed -e 's/.*twitter_/  - /'
+		   printf "\nSee $pwd/twitter.items for details\n"
+		   exit ;;
+		f) FORCE=y ;;
+		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+		v) VERBOSE=$((VERBOSE + 1)) ;;
+		x) TRACE=y ;;
+		h) usage; exit ;;
+		?) usage; exit 1 ;;
+	esac
 done
 
 shift $((OPTIND-1))
@@ -56,27 +56,27 @@ curl="$(curl_cmd)"
 
 LC_NUMERIC=en_US
 
-ITEMS=0
+i=0
 
-while test $ITEMS -lt $ITEM_N; do
+while test $i -lt $ITEM_N; do
 
-  ITEMS=$(expr $ITEMS + 1)
-  log 1 "--- $ITEMS ---"
+  i=$((i + 1))
 
-  eval ITEM=\$ITEM_$ITEMS
+  log 1 "--- $i ---"
+
+  eval ITEM=\$ITEM_$i
   log 1 "Item  : $ITEM"
 
-  eval GUID=\$GUID_$ITEMS
+  eval GUID=\$GUID_$i
   log 1 "GUID  : $GUID"
 
   value=$(twitter_$ITEM $GUID)
-#  value=$(int $value)
   log 1 "Value : $value"
 
   ### Exit if no value is found, e.g. no actual power outside daylight times
   test "$value" && test "$value" != "0" || test "$FORCE" || exit
 
-  eval FACTOR=\$FACTOR_$ITEMS
+  eval FACTOR=\$FACTOR_$i
   log 1 "Factor: $FACTOR"
 
   if test "$FACTOR"; then
@@ -105,8 +105,7 @@ $(dirname $0)/twitter.php \
   --consumer_secret=$CONSUMER_SECRET \
   --oauth_token=$OAUTH_TOKEN \
   --oauth_secret=$OAUTH_TOKEN_SECRET \
-  --status="$STATUS" \
-  --lat=$LAT --long=$LONG
+  --status="$STATUS" --lat=$LAT --long=$LONG
 
 set +x
 
@@ -120,13 +119,12 @@ Post status to twitter
 Usage: $scriptname [options] config_file
 
 Options:
-
-    -l   List implemented items
-    -t   Test mode, don't post
-         Sets verbosity to info level
-    -v   Set verbosity level to info level
-    -vv  Set verbosity level to debug level
-    -h   Show this help
+	-l   List implemented items
+	-t   Test mode, don't post
+	     Sets verbosity to info level
+	-v   Set verbosity level to info level
+	-vv  Set verbosity level to debug level
+	-h   Show this help
 
 See $pwd/twitter.conf.dist for details.
 
