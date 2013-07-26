@@ -223,7 +223,8 @@ function updateChart() {
 
 	clearTimeout(timeout);
 
-	var channels_new = [], yAxisMap = [], yAxis = [],
+	var ts = (new Date).getTime(),
+	    channels_new = [], yAxisMap = [], yAxis = [],
 		channel, channel_clone, buffer = [],
 		period = $('#period').val();
 
@@ -429,7 +430,9 @@ function updateChart() {
 			/* check if all getJSON() calls finished */
 			if (completed == channels.length) {
 				$.pnotify({
-					text: completed + ' channels loaded.'
+					type: 'success',
+					text: completed + ' channels loaded ' +
+					      '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
 				});
 				$('#costs').html(costs ? Highcharts.numberFormat(costs, 2) : '');
 				var t = $('#from').val();
