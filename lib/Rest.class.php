@@ -53,13 +53,23 @@ class Rest {
 			// ---------------
 			case self::PUT:
 			case self::DELETE:
-				parse_str(file_get_contents('php://input'),$this->request);
+			    if (isset($_SERVER['CONTENT_TYPE']) AND 
+			        $_SERVER['CONTENT_TYPE'] == 'application/json') {
+    	    		$this->request = json_decode(file_get_contents('php://input'), TRUE);
+        			if (json_last_error() != JSON_ERROR_NONE) {
+    	    		    $this->request = array();
+                    }
+                } else {
+    				parse_str(file_get_contents('php://input'), $this->request);
+                }
+
+                // Deep clean
 				$this->request = $this->cleanInputs($this->request);
 				break;
 
 			// ---------------
 			default:
-				$this->response(406, 'Only GET, POST, PUT and DELETE are supported.');
+				$this->response(406, 'Only PUT, GET, POST and DELETE are supported.');
 		}
 
 		if (isset($this->request['data'])) {
@@ -104,29 +114,27 @@ class Rest {
 					switch ($key) {
 						// ----------------------
 						case 'application/json':
-							$this->ContentType = 'application/json';
+    					    $this->ContentType = $key;
 							$this->request['format'] = 'json';
 							break 2; // switch & foreach
 						// ----------------------
 						case 'application/csv':
-						case 'text/comma-separated-values':
-							$this->ContentType = 'application/csv';
+    					    $this->ContentType = $key;
 							$this->request['format'] = 'csv';
 							break 2; // switch & foreach
 						// ----------------------
 						case 'application/tsv':
-						case 'text/tab-separated-values':
-							$this->ContentType = 'application/tsv';
+    					    $this->ContentType = $key;
 							$this->request['format'] = 'tsv';
 							break 2; // switch & foreach
 						// ----------------------
 						case 'application/xml':
-							$this->ContentType = 'application/xml';
+    					    $this->ContentType = $key;
 							$this->request['format'] = 'xml';
 							break 2; // switch & foreach
 						// ----------------------
 						case 'text/plain':
-							$this->ContentType = 'text/plain';
+    					    $this->ContentType = $key;
 							$this->request['format'] = 'text';
 							break 2; // switch & foreach
 					}
@@ -271,7 +279,7 @@ class Rest {
 		$clean_input = array();
 		if (is_array($data)) {
 			foreach ($data as $k => $v) {
-				$clean_input[$k] = $this->cleanInputs($v);
+                $clean_input[$k] = $this->cleanInputs($v);
 			}
 		} else {
 			if (get_magic_quotes_gpc()) {

@@ -93,14 +93,16 @@ class Channel {
 	/**
 	 *
 	 */
-	public function write( $value, $timestamp=NULL ) {
+	public function write( $request, $timestamp=NULL ) {
 
 		if (!$this->write)
 			throw new \Exception('Can\'t write data to "'.$this->name.'", '
 			                    .'instance of "'.get_class($this).'"!', 400);
 
-		if (!is_scalar($value))
-			throw new \Exception('Missing "data" parameter!', 400);
+		$value = isset($request['data']) ? $request['data'] : NULL;
+
+		if (is_null($value) OR !is_scalar($value))
+			throw new \Exception('Missing data value!', 400);
 
 		if ($this->numeric) {
 			// make numeric
@@ -123,7 +125,7 @@ class Channel {
 					($value < $this->valid_from OR $value > $this->valid_to)) {
 
 				$msg = sprintf('Value "%s" outside valid range: %f <= value <= %f',
-											 $value, $this->valid_from, $this->valid_to);
+				               $value, $this->valid_from, $this->valid_to);
 
 				$cfg = new \PVLng\Config('LogInvalid');
 				if ($cfg->value != 0) {

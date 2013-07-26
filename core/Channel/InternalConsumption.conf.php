@@ -27,13 +27,10 @@ return array(
 	'numeric' => array(
 		'visible' => FALSE,
 	),
-	'cost' => array(
-		'visible' => FALSE,
-	),
 	'threshold' => array(
 		'visible' => FALSE,
 	),
-	'vaild_from' => array(
+	'valid_from' => array(
 		'visible' => FALSE,
 	),
 	'valid_to' => array(

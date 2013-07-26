@@ -20,13 +20,13 @@ class Save extends Handler {
 	public function PUT( &$request ) {
 		$channel = \Channel::byGUID($this->GUID);
 
-		if (isset($request['data']) AND $channel->write($request['data'])) {
+		if ($channel->write($request)) {
 			// Created
 			$this->send(201);
 		}
 
 		// Accepted but no data or not saved (inside update interval)
-		return '';
+		$this->send(200);
 	}
 
 }

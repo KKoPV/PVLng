@@ -18,6 +18,7 @@ class Log extends Handler {
 	 *
 	 */
 	public function PUT( &$request ) {
+
 		// pre trim for test if empty
 		$message = !empty($request['message']) ? trim($request['message']) : '';
 

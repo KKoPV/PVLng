@@ -17,9 +17,10 @@ class Webbox extends \Channel {
 	/**
 	 *
 	 */
-	public function write( $value, $timestamp=NULL ) {
-		if (!isset($value['result']['devices'][0]['channels']))
-			throw new \Exception('Invalid Webbox response:'."\n\n".print_r($value, TRUE), 400);
+	public function write( $request, $timestamp=NULL ) {
+
+		if (!isset($request['result']['devices'][0]['channels']))
+			throw new \Exception('Invalid Webbox response:'."\n\n".print_r($request, TRUE), 400);
 
 		// find valid child channels
 		$channels = array();
@@ -30,13 +31,13 @@ class Webbox extends \Channel {
 		$ok = 0;
 
 		// check for a suitable channel object
-		foreach ($value['result']['devices'][0]['channels'] as $channel) {
+		foreach ($request['result']['devices'][0]['channels'] as $channel) {
 			// Look for a suitable child channel
 			$name = $channel['meta'];
 			if (isset($channels[$name]) AND
 					(!$channels[$name]->numeric OR $channel['value'] != '')) {
-				try {
-					$ok += $channels[$name]->write($channel['value'], $timestamp);
+				try {                              // Simulate $request['data']
+					$ok += $channels[$name]->write(array('data'=>$channel['value']), $timestamp);
 				} catch (\Exception $e) {
 					$code = $e->getCode();
 					if ($code != 200 AND $code != 201) throw $e;

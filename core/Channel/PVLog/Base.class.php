@@ -69,11 +69,9 @@ class Base extends \Channel {
 		$child = array_shift($childs);
 		$fh = $child->read($request, TRUE);
 		// get only attributes line
-		rewind($fh);
-		$row = fgets($fh);
-		fclose($fh);
+		$fh->sread($row, TRUE);
+		$fh->close();
 
-		$row = unserialize($row);
 		$inverter->setCurrentTotalWattHours($row['consumption']);
 
 		// 2nd child: Pac power
@@ -114,17 +112,17 @@ class Base extends \Channel {
 	 *
 	 */
 	protected function calcTimesAndPowers( $fh, $obj ) {
-		\Buffer::rewind($fh);
+		$fh->rewind();
 		$start = PHP_INT_MAX;
 		$end   = 0;
-		while (\Buffer::read($fh, $row, $id)) {
+		while ($fh->read($row, $id)) {
 			$start = min($start, $row['timestamp']);
 			$end   = max($end,   $row['timestamp']);
 			$obj->addPowerValue($row['data']);
 		}
 		$obj->setTimestampStart($start);
 		$obj->setTimestampEnd($end);
-		\Buffer::close($fh);
+		$fh->close();
 	}
 
 	/**

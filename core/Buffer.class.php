@@ -47,28 +47,6 @@ class Buffer {
 	/**
 	 *
 	 */
-	public function swrite( $data ) {
-	    return !empty($data)
-		     ? fwrite($this->fh, serialize($data) . PHP_EOL)
-		     : TRUE;
-	}
-
-	/**
-	 *
-	 */
-	public function decode( &$row, &$id ) {
-	    $row = trim($row);
-		$id = '';
-		if ($row != '') {
-			list($id, $keys, $values) = explode(self::SEP1, $row);
-			$row = array_combine(explode(self::SEP2, $keys),
-			                     explode(self::SEP2, $values));
-		}
-	}
-
-	/**
-	 *
-	 */
 	public function read( &$row, &$id, $rewind=FALSE ) {
 	    if ($rewind) $this->rewind();
 	    $row = trim(fgets($this->fh));
@@ -78,6 +56,25 @@ class Buffer {
 			$row = array_combine(explode(self::SEP2, $keys),
 			                     explode(self::SEP2, $values));
 		}
+	    return ($row != '');
+	}
+
+	/**
+	 *
+	 */
+	public function swrite( $data ) {
+	    return !empty($data)
+		     ? fwrite($this->fh, serialize($data) . PHP_EOL)
+		     : TRUE;
+	}
+
+	/**
+	 *
+	 */
+	public function sread( &$row, $rewind=FALSE ) {
+	    if ($rewind) $this->rewind();
+	    $row = trim(fgets($this->fh));
+		if ($row != '') $row = unserialize($row);
 	    return ($row != '');
 	}
 
@@ -100,6 +97,9 @@ class Buffer {
 	// PROTECTED
 	// -----------------------------------------------------------------------
 
+	/**
+	 * Separators for encoding/decoding row data
+	 */
 	const SEP1 = "\x00";
 	const SEP2 = "\x01";
 
