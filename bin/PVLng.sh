@@ -97,22 +97,39 @@ function curl_cmd {
 }
 
 ##############################################################################
+### Quote data for JSON requests
+### $1 = data string
+##############################################################################
+function JSON_quote {
+	### Quote " to \\"
+	echo "$1" | sed -e 's~"~\\"~g'
+}
+
+##############################################################################
 ### Save a log message to PVLng
 ### $1 = scope
 ### $2 = message
 ##############################################################################
 function save_log {
-	log 1 "Scope   : $1"
-	log 1 "Message : $2"
+
+	local scope=$(JSON_quote "$1")
+	local message=
 
 	### detect @filename or "normal string" to post
-	test "${2:0:1}" == '@' && msg="$2" || msg="=\"$2\""
+	if test "${2:0:1}" == '@'; then
+		message=$(JSON_quote "$(<$2)")
+	else
+		message=$(JSON_quote "$2")
+	fi
+
+	log 1 "Scope   : $scope"
+	log 1 "Message : $message"
 
 	$(curl_cmd) --request PUT \
                 --header "X-PVLng-key: $PVLngAPIkey" \
-                --data-urlencode scope="$1" \
-                --data-urlencode "message$msg" \
-                $PVLngHost/api/log
+                --header "Content-Type: application/json" \
+                --data "{\"scope\":\"$scope\",\"message\":\"$message\"}" \
+                $PVLngHost/api/r2/log
 }
 
 ##############################################################################
@@ -151,33 +168,42 @@ function PVLngPUT1 {
 ##############################################################################
 ### Save data to PVLng
 ### $1 = GUID
-### $2 = date
+### $2 = value or @file_name with JSON data
 ##############################################################################
 function PVLngPUT2 {
 
-	log 2 "GUID	 : $1"
-	log 2 "Data	 : $2"
+	local GUID="$1"
+	local raw="$2"
+	local data="$2"
 
-	local data=
+	log 2 "GUID	 : $GUID"
+	log 2 "Data	 : $data"
 
-	test "${2:0:1}" != "@" && data="data=\"$2\"" || data="data$2"
-
-	cmd=$(curl_cmd)
+	test "${2:0:1}" != "@" && data="{\"data\":\"$(JSON_quote "$data")\"}" || data="$data"
 
 	log 2 "Send	 : $data"
 
-	rc=$($cmd --header "X-PVLng-key: $PVLngAPIkey" --request PUT \
-						--write-out %{http_code} --output $TMPFILE \
-						--data-urlencode $data $PVLngURL2/$1/save)
+	### clear TMPFILE
+	echo -n >$TMPFILE
 
-	if echo "$rc" | grep -qe '^20[012]'; then
+	set $($(curl_cmd) --request PUT \
+	                  --header "X-PVLng-key: $PVLngAPIkey" \
+	                  --header "Content-Type: application/json" \
+	                  --write-out %{http_code} \
+	                  --output $TMPFILE \
+	                  --data $data \
+	                  $PVLngURL2/$GUID/save)
+
+	if echo "$1" | grep -qe '^20[012]'; then
 		### 200/201/202 ok
-		log 1 HTTP code : $rc
+		log 1 HTTP code : $1
+		log 2 $(<$TMPFILE)
 	else
 		### errors
-		log -1 HTTP code : $rc
-		log -1 "$(cat $TMPFILE)"
-		save_log "$1" @$TMPFILE
+		log -1 HTTP code : $1
+		log -1 $(<$TMPFILE)
+		save_log "$GUID" "raw: $raw"
+		save_log "$GUID" @$TMPFILE
 	fi
 
 }
