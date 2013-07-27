@@ -226,18 +226,18 @@ abstract class View extends Base {
 				}
 			}
 
-			// <!-- IF ... -->...<!-- ELSE -->...<!-- ENDIF -->
-			if (preg_match_all('~<!-- IF (.*?) -->~', $html, $ifs, PREG_SET_ORDER)) {
+			// <!-- (ELSE)?IF ... -->...<!-- ELSE -->...<!-- ENDIF -->
+			if (preg_match_all('~<!-- (ELSE)?IF (.*?) -->~', $html, $ifs, PREG_SET_ORDER)) {
 				foreach ($ifs as $if) {
-					if (preg_match_all('~'.$this->RegexVar.'~', $if[1], $matches, PREG_SET_ORDER)) {
+					if (preg_match_all('~'.$this->RegexVar.'~', $if[2], $matches, PREG_SET_ORDER)) {
 						foreach ($matches as $match) {
-							$if[1] = str_replace($match[0], '$this->__get(\''.$match[1].'\')', $if[1]);
+							$if[2] = str_replace($match[0], '$this->__get(\''.$match[1].'\')', $if[2]);
 						}
 					}
-					$html = str_replace($if[0], '<?php if ('.$if[1].'): ?'.'>', $html);
+					$html = str_replace($if[0], '<?php '.$if[1].'IF ('.$if[2].'): ?'.'>', $html);
 				}
-				$html = str_replace('<!-- ELSE -->', '<?php else: ?'.'>', $html);
-				$html = str_replace('<!-- ENDIF -->', '<?php endif; ?'.'>', $html);
+				$html = str_replace('<!-- ELSE -->', '<?php ELSE: ?'.'>', $html);
+				$html = str_replace('<!-- ENDIF -->', '<?php ENDIF; ?'.'>', $html);
 			}
 
 			// Functions
