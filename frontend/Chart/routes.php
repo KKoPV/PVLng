@@ -13,6 +13,10 @@
  */
 return array(
 
+	''            => array( 'Chart', 'Index' ),
+	'index'       => array( 'Chart', 'Index' ),
+	'index/index' => array( 'Chart', 'Index' ),
+
 	'chart'       => array( 'Chart', 'Index' ),
 	'chart/:view' => array( 'Chart', 'Index' ),
 
