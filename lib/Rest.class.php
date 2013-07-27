@@ -53,14 +53,12 @@ class Rest {
 			// ---------------
 			case self::PUT:
 			case self::DELETE:
-			    if (isset($_SERVER['CONTENT_TYPE']) AND 
-			        $_SERVER['CONTENT_TYPE'] == 'application/json') {
-    	    		$this->request = json_decode(file_get_contents('php://input'), TRUE);
-        			if (json_last_error() != JSON_ERROR_NONE) {
-    	    		    $this->request = array();
-                    }
-                } else {
-    				parse_str(file_get_contents('php://input'), $this->request);
+			    $request = file_get_contents('php://input');
+			    // Try to interpret as raw JSON
+   	    		$this->request = json_decode($request, TRUE);
+                if (json_last_error() != JSON_ERROR_NONE) {
+                    // assume parameter=value data
+    				parse_str($request, $this->request);
                 }
 
                 // Deep clean
