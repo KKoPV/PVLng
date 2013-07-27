@@ -24,7 +24,7 @@
 
 	<SaveView>
 		<![CDATA[
-			REPLACE INTO `pvlng_view` VALUES( "{1}", "{2}" )
+			REPLACE INTO `pvlng_view` VALUES( "{1}", "{2}", "{3}" )
 		]]>
 	</SaveView>
 
