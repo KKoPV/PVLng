@@ -584,11 +584,9 @@ $(function() {
 		}
 	});
 
-	var d = new Date;
-
-	/* Subtract 14 days from now */
-	$('#from').datepicker("setDate", d);
-	$('#to').datepicker("setDate", d);
+	var d = new Date('{DATE}');
+	$("#from").datepicker('setDate', d);
+	$("#to").datepicker('setDate', d);
 
 	$('.numbersOnly').keyup(function () {
 			if (this.value != this.value.replace(/[^0-9\.]/g, '')) {

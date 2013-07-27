@@ -18,6 +18,7 @@ class Chart_Controller extends Controller {
 		$this->Tree = NestedSet::getInstance();
 		$this->channels = array();
 		$this->views = $this->model->getViews();
+		$this->date = time();
 	}
 
 	/**
@@ -38,6 +39,8 @@ class Chart_Controller extends Controller {
 				)
 			);
 
+		$this->view->Date = date('m/d/Y', $this->date);
+
 		parent::after();
 	}
 
@@ -52,6 +55,9 @@ class Chart_Controller extends Controller {
 			} else {
 				Messages::Error(I18N::_('UnknownView', $view));
 			}
+		}
+		if ($date = $this->request('date')) {
+			$this->date = strtotime($date);
 		}
 	}
 
@@ -153,5 +159,10 @@ class Chart_Controller extends Controller {
 	 *
 	 */
 	protected $actView;
+
+	/**
+	 *
+	 */
+	protected $date;
 
 }
