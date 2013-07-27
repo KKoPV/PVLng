@@ -191,7 +191,7 @@ function PVLngPUT2 {
 	                  --header "Content-Type: application/json" \
 	                  --write-out %{http_code} \
 	                  --output $TMPFILE \
-	                  --data $data \
+	                  --data-binary $data \
 	                  $PVLngURL2/$GUID/save)
 
 	if echo "$1" | grep -qe '^20[012]'; then
