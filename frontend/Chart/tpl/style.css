@@ -6,27 +6,28 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     $Id$
  */
+
 #nav {
-  text-align: center;
+	text-align: center;
 }
 
 #nav table {
-  margin: 0 auto;
+	margin: 0 auto;
 }
 
 #nav table td {
-  vertical-align: middle;
+	vertical-align: middle;
 }
 
 #chart-placeholder {
-  padding: 1em;
-  font-weight: bold;
-  text-align: center;
-  border: dashed gray 1px;
-  background-color: white;
+	padding: 1em;
+	margin-bottom: 1em;
+	font-weight: bold;
+	text-align: center;
+	border: dashed gray 1px;
 }
 
 #d-table td {
-  padding: .5em .5em;
-  vertical-align: top;
+	padding: .5em .5em;
+	vertical-align: top;
 }

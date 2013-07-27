@@ -55,4 +55,3 @@ class ControllerAuth extends Controller {
 	protected $User;
 
 }
-

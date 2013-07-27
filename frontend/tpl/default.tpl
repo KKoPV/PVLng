@@ -92,17 +92,23 @@
 
 	<div class="grid_8">
 		<span class="toolbar">
-			<a class="tipbtn" title="{{OverviewHint}}" href="/">{{Overview}}</a>
+			<a class="tipbtn" title="{{ChartHint}}" href="/">{{Charts}}</a>
+			<!-- IF {USER} -->
+			<a class="tipbtn" title="{{OverviewHint}}" href="/index">{{Overview}}</a>
 			<a class="tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
-			<a class="tipbtn" title="{{ChartHint}}" href="/chart">{{Charts}}</a>
 			<a class="tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
+			<!-- ENDIF -->
 		</span>
 	</div>
 	<div class="grid_2 r">
 		<span class="toolbar">
 			<a class="tipbtn" title="Deutsch" href="?lang=de"><img src="/images/de.png" alt="D" /></a>
 			<a class="tipbtn" title="English" href="?lang=en"><img src="/images/en.png" alt="E" /></a>
+			<!-- IF {USER} == "" -->
+			<a class="tipbtn" title="Login" href="/login"><img src="/images/logout.png" alt="L"/></a>
+			<!-- ELSE -->
 			<a class="tipbtn" title="Logout {USER}" href="/logout"><img src="/images/logout.png" alt="L"/></a>
+			<!-- ENDIF -->
 		</span>
 	</div>
 

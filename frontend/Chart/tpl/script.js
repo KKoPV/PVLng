@@ -329,7 +329,7 @@ function updateChart() {
 
 		$('#s'+channel.id).show();
 
-		var url = PVLngAPI + channel.guid + '/data/full/attributes';
+		var t, url = PVLngAPI + channel.guid + '/data/full/attributes';
 		_log('Fetch: '+url);
 
 		$.getJSON(
@@ -356,8 +356,10 @@ function updateChart() {
 					$('#costs'+channel.id).html(Highcharts.numberFormat(attr.costs, 2));
 				}
 
+				t = (attr.description) ? ' (' + attr.description + ')' : '';
+
 				var serie = { /* HTML decode channel name */
-					name:	$("<div/>").html(attr.name).text(),
+					name:	$("<div/>").html(attr.name + t).text(),
 					color:	channel.color,
 					type:	channel.type,
 					yAxis:	channel.axis,
@@ -438,7 +440,7 @@ function updateChart() {
 				var t = $('#from').val();
 				var s = $('#to').val();
 				if (t != s) t += ' - ' + s;
-				chart.setTitle({ text: t }, { text: $('#loadview').val() });
+				chart.setTitle({ text: $('#loadview').val() }, { text: t });
 
 				_log('Apply series');
 
