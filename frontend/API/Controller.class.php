@@ -161,26 +161,29 @@ class API_Controller extends Controller {
 			$r2Class = new $r2Class($GUID);
 			$content = $r2Class->{$this->Rest->RequestMethod()}($request);
 
-			if (preg_match('~(\w+)$~', $request['format'])) {
-				$ViewClass = 'yMVC\View\\'.strtoupper($request['format']);
-			} else {
-				// Default
-				$ViewClass = 'yMVC\View\TEXT';
-			}
+		} catch (Exception $exception) {
+    		$code = $exception->getCode() ?: 500;
+	    	$content  = $exception->getMessage();
+            Header('HTTP/1.1 '.$this->Rest->StatusMessage($code));
+#			$this->ErrorResponse($exception);
+		}
 
-			if (!class_exists($ViewClass))
-				throw new Exception('Unsupported request format, '
+		if (preg_match('~(\w+)$~', $request['format'])) {
+			$ViewClass = 'yMVC\View\\'.strtoupper($request['format']);
+		} else {
+			// Default
+			$ViewClass = 'yMVC\View\TEXT';
+		}
+
+		if (!class_exists($ViewClass))
+			throw new Exception('Unsupported request format, '
 				                   .'missing class: '.$ViewClass.')', 400);
 
-			$this->view = new $ViewClass;
-			$this->view->content = $content;
+		$this->view = new $ViewClass;
+		$this->view->content = $content;
 
-			Header('X-Version: PVLng ' . PVLNG_VERSION . ' API r2');
-			Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $ts) * 1000));
-
-		} catch (Exception $exception) {
-			$this->ErrorResponse($exception);
-		}
+		Header('X-Version: PVLng ' . PVLNG_VERSION . ' API r2');
+		Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $ts) * 1000));
 	}
 
 	/**

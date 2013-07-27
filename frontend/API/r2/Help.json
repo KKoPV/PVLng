@@ -1,41 +1,13 @@
 {
     "calls": [
         {
-            "pattern": "/api/r2",
-            "description": "Show this help",
-            "methods": [ "GET" ]
-        },
-        {
             "pattern": "/api/r2/help",
-            "description": "Show this help",
+            "description": "Help about API calls",
             "methods": [ "GET" ]
         },
         {
-            "pattern": "/api/r2/log",
-            "description": "Write Log entry, 'scope' and 'message' required",
-            "methods": [ "PUT" ],
-            "headers": [ "X-PVLng-key" ]
-        },
-        {
-            "pattern": "/api/r2/config/:key",
-            "description": "Create, update or delete a configuration value in database, :key is case sensitive",
-            "methods": [ "PUT", "POST", "DELETE" ],
-            "headers": [ "X-PVLng-key" ]
-        },
-        {
-            "pattern": "/api/r2/config/:key",
-            "description": "Read a configuration value from database, :key is case sensitive",
-            "methods": [ "GET" ]
-        },
-        {
-            "pattern": "/api/r2/:guid/save",
+            "pattern": "/api/r2/:guid",
             "description": "Save a reading value",
-            "methods": [ "PUT" ],
-            "headers": [ "X-PVLng-key" ]
-        },
-        {
-            "pattern": "/api/r2/:guid/batch",
-            "description": "Save multiple reading values",
             "methods": [ "PUT" ],
             "headers": [ "X-PVLng-key" ]
         },
@@ -51,43 +23,64 @@
         },
         {
             "pattern": "/api/r2/:guid/data?:parameters",
-            "description": "Read only 'timestamp' and 'data' values, return named array",
+            "description": "Read only 'timestamp' and 'data' values",
             "methods": [ "GET" ]
         },
         {
             "pattern": "/api/r2/:guid/data/full?:parameters",
-            "description": "Read full data, return named array",
+            "description": "Read full data",
             "methods": [ "GET" ]
         },
         {
             "pattern": "/api/r2/:guid/data/short?:parameters",
-            "description": "Read only 'timestamp' and 'data' values, return numeric indexed array",
+            "description": "Read minimized data as array",
             "methods": [ "GET" ]
         },
         {
-            "pattern": "/api/r2/:guid/data/fullshort?:parameters",
-            "description": "Read full data, return numeric indexed array",
+            "pattern": "/api/r2/log",
+            "description": "Log a message",
+            "methods": [ "PUT" ],
+            "headers": [ "X-PVLng-key" ]
+        },
+        {
+            "pattern": "/api/r2/log/{id}",
+            "description": "Get a logged message",
             "methods": [ "GET" ]
+        },
+        {
+            "pattern": "/api/r2/log/{id}",
+            "description": "Update a logged message",
+            "methods": [ "POST" ],
+            "headers": [ "X-PVLng-key" ]
+        },
+        {
+            "pattern": "/api/r2/log/{id}",
+            "description": "Delete a logged message",
+            "methods": [ "DELETE" ],
+            "headers": [ "X-PVLng-key" ]
+        },
+        {
+            "pattern": "/api/r2/log",
+            "description": "Delete all logged messages of scope or all messages if scope is empty",
+            "methods": [ "DELETE" ],
+            "headers": [ "X-PVLng-key" ]
         }
     ],
     "parameters": [
         {
             "name": "start",
             "description": "Start timestamp for readout, default today 00:00",
-			"required": false,
             "value": [ "YYYY-mm-dd HH:ii:ss", "seconds since 1970", "relative from now" ]
         },
         {
             "name": "end",
             "description": "End timestamp for readout, default today midnight",
-			"required": false,
-            "value": [ "yyyy-mm-dd hh:mm:ss", "seconds since 1970", "relative from now" ]
+            "value": [ "YYYY-mm-dd HH:ii:ss", "seconds since 1970", "relative from now" ]
         },
         {
             "name": "period",
-            "description": "aggregation period, replace ? with digit to multiply",
-			"required": false,
-            "value": [ "?minutes", "?hours", "?days", "?weeks", "?month", "?quarters", "?years", "last" ]
+            "description": "aggregation period, default none",
+            "value": [ "\d*minutes", "\d*hours", "\d*days", "\d*weeks", "\d*month", "\d*quarters", "\d*years", "last" ]
         }
     ]
 }
