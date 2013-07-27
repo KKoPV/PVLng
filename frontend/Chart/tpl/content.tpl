@@ -51,17 +51,19 @@
 	</div>
 </div>
 
-<div class="alpha grid_4" style="margin-top:1em;margin-bottom:1em">
-	<a id="togglewrapper" href="#">{{HideChannels}}</a>
+<div class="alpha grid_4">
+	<!-- IF {USER} -->
+		<a id="togglewrapper" href="#">{{HideChannels}}</a>
+	<!-- ENDIF -->
 </div>
 
-<div class="grid_6 omega" style="margin-top:1em;margin-bottom:1em;text-align:right">
+<div class="grid_6 omega" style="text-align:right">
 	<input id="az" type="checkbox" />&nbsp;<label for="az">{{SetAxisMinZero}}</label>
 </div>
 
 <div class="clear"></div>
 
-<div id="wrapper">
+<div id="wrapper" style="padding-top:1em<!-- IF {USER} == "" -->;display:none<!-- ENDIF -->">
 
 	<table id="tree" class="dataTable treeTable">
 		<thead>
@@ -98,7 +100,9 @@
 			<td style="padding:0.4em 0">
 				<img style="vertical-align:middle" class="tip"
 				     src="/images/ico/{ICON}" alt="" title="{TYPE}" />
-				<span class="tip" title="{GUID}">{NAME}, {DESCRIPTION}</span>
+				<span class="tip" title="{GUID}">
+					{NAME} <!-- IF {DESCRIPTION} -->({DESCRIPTION})<!-- ENDIF -->
+				</span>
 				<img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" />
 			</td>
 			<td id="cons{ID}" class="consumption r"></td>
@@ -128,26 +132,53 @@
 
 </div>
 
+<!-- IF {USER} -->
 <h3>
 	<a name="view"></a>
-	{{Variant}}
-	<img src="/images/ico/information_frame.png" class="tip"
-	     title="{{MobileVariantHint}}" />
+		{{Variants}}
+		<img src="/images/ico/information_frame.png" class="tip"
+		     title="{{MobileVariantHint}}" />
 </h3>
-
 <p>
-	<input id="saveview" type="text" name="saveview" value="{VIEW}"/>
-	<input type="submit" name="save" value="{{Save}}" />
+<!-- ELSE -->
+<p>
+	<span style="margin-right:1em">{{VariantsPublic}}:</span>
+<!-- ENDIF -->
 
-	<select style="margin-left:2em" id="loadview" name="loadview">
+	<!-- IF {USER} -->
+	<input id="saveview" type="text" name="saveview" value="{VIEW}"/>
+	<input id="public" type="checkbox" name="public" value="1" 
+		<!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF -->
+	/>
+	<label for="public">{{public}}</label>
+	<img src="/images/ico/information_frame.png" class="tip"
+	     title="{{publicHint}}" />
+	<input type="submit" name="save" value="{{Save}}" style="margin-right:2em" />
+	<!-- ENDIF -->
+
+	<select id="loadview" name="loadview">
 		<option value="">--- {{Select}} ---</option>
 		<!-- BEGIN VIEWS -->
-		<option <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>{NAME}</option>
+			<!-- IF {__USER} -->
+				<!-- show all charts and mark public charts -->
+				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+					{NAME} <!-- IF {PUBLIC} -->({{public}})<!-- ENDIF -->
+				</option>
+			<!-- ELSEIF {PUBLIC} -->
+				<!-- show only public charts -->
+				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+					{NAME}
+				</option>
+			<!-- ENDIF -->
 		<!-- END -->
 	</select>
-	<input type="submit" name="load" value="{{Load}}" />
-	<input type="submit" name="delete" value="{{Delete}}" />
-	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">PVLng | {VIEW}</a>
+	<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
+	<!-- IF {USER} -->
+	<input type="submit" name="delete" value="{{Delete}}" style="margin-left:.5em" />
+	<!-- ENDIF -->
+	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">
+		PVLng | {VIEW}
+	</a>
 </p>
 
 </form>

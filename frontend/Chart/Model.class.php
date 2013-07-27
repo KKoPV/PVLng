@@ -42,8 +42,8 @@ class Chart_Model extends Model {
 	/**
 	 *
 	 */
-	public function saveView( $name, $data ) {
-		return $this->db->query($this->db->SQL->SaveView, $name, json_encode($data));
+	public function saveView( $name, $data, $public ) {
+		return $this->db->query($this->db->SQL->SaveView, $name, json_encode($data), $public);
 	}
 
 	/**

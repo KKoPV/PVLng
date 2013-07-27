@@ -240,7 +240,7 @@ function updateChart() {
 				_ts: (new Date).getTime() /* force reload */
 			},
 			function(data) {
-				var attr = data.shift();
+				var t, attr = data.shift();
 				_log('Attributes:', attr);
 				_log('Data:', data);
 
@@ -271,9 +271,10 @@ function updateChart() {
 
 				if (attr.consumption) {
 				    tr = $('<tr/>');
+				    t = (attr.description) ? ' (' + attr.description + ')' : '';
 				    tr.append(
 						$('<th/>')
-						.html(attr.name)
+						.html(attr.name + t)
 					);
 					tr.append(
 						$('<td/>')
@@ -342,10 +343,12 @@ function updateChart() {
 						)
 					);
 				}
+				/*
 				var t = $('#from').val();
 				var s = $('#to').val();
 				if (t != s) t += ' - ' + s;
-				/* chart.setTitle({ text: t }, { text: $('#view-choice').val() }); */
+				chart.setTitle({ text: t }, { text: $('#view-choice').val() });
+				*/
 
 				_log('Apply series');
 

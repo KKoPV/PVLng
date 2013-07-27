@@ -7,7 +7,7 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     $Id: v1.0.0.2-19-gf67765b 2013-05-05 22:03:31 +0200 Knut Kohl $
  */
-class Chart_Controller extends ControllerAuth {
+class Chart_Controller extends Controller {
 
 	/**
 	 *
@@ -65,7 +65,7 @@ class Chart_Controller extends ControllerAuth {
 			if ($channels = $this->request('v')) {
 				$this->actView = $this->request('saveview');
 				// save ...
-				$this->model->saveView($this->actView, $channels);
+				$this->model->saveView($this->actView, $channels, $this->request('public'));
 				// ... and read back
 				$this->Channels = $this->model->getView($this->actView)->data;
 			}
@@ -121,8 +121,12 @@ class Chart_Controller extends ControllerAuth {
 		foreach ($this->model->getViews() as $row) {
 			$views[] = array(
 				'NAME'     => $row->name,
+				'PUBLIC'   => $row->public,
 				'SELECTED' => ($row->name == $this->actView)
 			);
+			if ($row->name == $this->actView AND $row->public) {
+				$this->view->ViewPublic = TRUE;
+			}
 		}
 		$this->view->View = $this->actView;
 		$this->view->Views = $views;

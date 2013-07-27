@@ -113,7 +113,12 @@ class Controller extends yMVC\Controller {
 		$v = $this->db->VersionNew;
 		if ($v AND $v != PVLNG_VERSION) $this->view->VersionNew = $v;
 
-		parent::after();
+		if (Session::get('user') == $this->config->Admin_User) {
+    		// Ok, we have a validated user session
+            $this->view->User = Session::get('user');
+        }
+
+   		parent::after();
 	}
 
 	/**

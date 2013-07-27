@@ -175,7 +175,10 @@ class Index_Controller extends ControllerAuth {
 				// clear before redirect
 				Session::set('returnto');
 				$this->redirect($r);
+			} else {
+				$this->redirect('');
 			}
+			
 
 		} else {
 			Messages::Error(I18N::_('UnknownUser'));

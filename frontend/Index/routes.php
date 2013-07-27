@@ -13,10 +13,6 @@
  */
 return array(
 
-	''                  => array( 'Index', 'Index' ),
-	'index'             => array( 'Index', 'Index' ),
-	'index/index'       => array( 'Index', 'Index' ),
-
 	'login'             => array( 'Index', 'Login' ),
 	'logout'            => array( 'Index', 'Logout' ),
 
