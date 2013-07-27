@@ -1,3 +1,4 @@
 config.php
 tmp/*
 !tmp/.githold
+description.md

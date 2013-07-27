@@ -98,6 +98,7 @@
 			<a class="tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
 			<a class="tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
 			<!-- ENDIF -->
+			<a class="tipbtn" title="{{PlantDesciptionHint}}" href="/description">{{Description}}</a>
 		</span>
 	</div>
 	<div class="grid_2 r">
