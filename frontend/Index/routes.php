@@ -16,6 +16,7 @@ return array(
 	'login'             => array( 'Index', 'Login' ),
 	'logout'            => array( 'Index', 'Logout' ),
 
+	'index'             => array( 'Index', 'Index' ),
 	'index/:Action'     => array( 'Index', NULL ),
 	'index/:Action/#id' => array( 'Index', NULL ),
 

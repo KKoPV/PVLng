@@ -54,6 +54,21 @@ class Controller extends yMVC\Controller {
 		$this->config->loadNamespace('Controller.'.$this->router->Controller,
 		                             APP_DIR . DS . $this->router->Controller . DS . 'config.php',
 		                             FALSE);
+
+		if ($returnto = $this->request('returnto')) {
+		    Session::set('returnto', $returnto);
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function after_POST() {
+		if ($returnto = Session::get('returnto')) {
+		    Session::set('returnto');
+		    $this->redirect($returnto);
+		}
+		parent::after_POST();
 	}
 
 	/**

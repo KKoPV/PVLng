@@ -74,14 +74,7 @@ class Index_Controller extends ControllerAuth {
 				$child = $this->request('child')) {
 			$this->Tree->insertChildNode($child, $parent);
 		}
-		$this->redirect();
-	}
-
-	/**
-	 * Add an entity into the tree
-	 */
-	public function AddChild_Action() {
-		$this->foreward();
+		$this->redirect('index');
 	}
 
 
@@ -92,14 +85,7 @@ class Index_Controller extends ControllerAuth {
 		if ($id = $this->request('id')) {
 			$this->Tree->DeleteNode($id);
 		}
-		$this->redirect();
-	}
-
-	/**
-	 * Add an entity into the tree
-	 */
-	public function Delete_Action() {
-		$this->foreward();
+		$this->redirect('index');
 	}
 
 	/**
@@ -109,14 +95,7 @@ class Index_Controller extends ControllerAuth {
 		if ($id = $this->request('id')) {
 			$this->Tree->DeleteBranch($id);
 		}
-		$this->redirect();
-	}
-
-	/**
-	 * Add an entity into the tree
-	 */
-	public function DeleteBranch_Action() {
-		$this->foreward();
+		$this->redirect('index');
 	}
 
 	/**
@@ -124,16 +103,11 @@ class Index_Controller extends ControllerAuth {
 	 */
 	public function MoveLeft_Post_Action() {
 		if ($id = $this->request('id')) {
-			$this->Tree->moveLft($id);
+		    for ($i=$this->request('count', 1); $i>0; $i--) {
+				$this->Tree->moveLft($id);
+			}
 		}
-		$this->redirect();
-	}
-
-	/**
-	 * Move an entity down in tree
-	 */
-	public function MoveLeft_Action() {
-		$this->foreward();
+		$this->redirect('index');
 	}
 
 	/**
@@ -141,16 +115,31 @@ class Index_Controller extends ControllerAuth {
 	 */
 	public function MoveRight_Post_Action() {
 		if ($id = $this->request('id')) {
-			$this->Tree->moveRgt($id);
+		    for ($i=$this->request('count', 1); $i>0; $i--) {
+				$this->Tree->moveRgt($id);
+			}
 		}
-		$this->redirect();
+		$this->redirect('index');
 	}
 
 	/**
 	 * Move an entity up in tree
 	 */
-	public function MoveRight_Action() {
-		$this->foreward();
+	public function MoveUp_Post_Action() {
+		if ($id = $this->request('id')) {
+			$this->Tree->moveUp($id);
+		}
+		$this->redirect('index');
+	}
+
+	/**
+	 * Move an entity down in tree
+	 */
+	public function MoveDown_Post_Action() {
+		if ($id = $this->request('id')) {
+			$this->Tree->moveDown($id);
+		}
+		$this->redirect('index');
 	}
 
 	/**
