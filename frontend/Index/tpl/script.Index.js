@@ -87,9 +87,19 @@ $(function() {
 	});
 
 	$('.delete-form').submit(function(){
-		currentForm = this;
 		$('#dialog-confirm').data('form', this).dialog('open');
 		return false;
+	});
+
+	$('#dialog-move').dialog({
+		autoOpen: false,
+		resizable: false,
+		width: 480,
+		modal: true,
+		buttons: {
+			'{{Ok}}': function() { $('#form-movechild').submit(); },
+			'{{Cancel}}': function() { $(this).dialog('close'); }
+		}
 	});
 
 });
@@ -108,6 +118,16 @@ function addChild( node ) {
 function showGUID( guid ) {
 	$('#show-guid').val(guid);
 	$('#dialog-guid').dialog('open');
+}
+
+/**
+ *
+ */
+function moveChild( id, action ) {
+	var form = $('#form-movechild');
+	form.attr('action', '/index/' + action);
+	form.find('input[name="id"]').val(id);
+	$('#dialog-move').dialog('open');
 }
 
 /**

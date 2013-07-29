@@ -65,6 +65,7 @@ class Router {
 	 */
 	public function URL( $controller='', $action='', $params=array() ) {
 		$url = '/' . ($controller?:'index') . '/' . $action;
+		
         if (!empty($params)) {
 			if (array_key_exists('#', $params)) {
 				$anchor = '#' . $params['#'];

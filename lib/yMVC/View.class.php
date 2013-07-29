@@ -73,7 +73,8 @@ abstract class View extends Base {
 	public function render( $template ) {
 		ob_start();
 		$this->show($template);
-		return ob_get_clean();
+		$content = ob_get_clean();
+		return $content ?: NULL;
 	}
 
 	/**
@@ -94,7 +95,7 @@ abstract class View extends Base {
 			}
 		}
 
-		if ($TplFile == '') return '';
+		if ($TplFile == '') return;
 
 		$TplFile = realpath($TplFile);
 		$TplCompiled = str_replace(APP_DIR, '', $TplFile);
@@ -145,7 +146,8 @@ abstract class View extends Base {
 	 * @param string $file File name
 	 */
 	public function assign( $name, $file ) {
-		$this->__set($name, $this->render($file));
+	    $content = $this->render($file);
+		if ($content !== NULL) $this->__set($name, $content);
 	}
 
 	/**
