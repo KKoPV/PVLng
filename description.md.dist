@@ -1,1 +1,43 @@
+
 Add here some public description of your environment, if you like :-)
+
+Markdown syntax: <http://daringfireball.net/projects/markdown/syntax>
+
+Some examples
+
+# Header 1
+
+## Header 2
+
+> This is a blockquote with two paragraphs.
+
+> Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit 
+mi posuere lectus.
+
+Unordered list
+
+- Red
+- Green
+- Blue
+
+Ordered list
+
+1. Bird
+2. McHale
+3. Parish
+
+Horizontal rule:
+
+- - -
+
+    This is a code block. (indent every line of the block by at least 4 spaces...)
+
+	This is another code block. (... or 1 tab)
+
+This is [an example](http://example.com/ "Title") inline link.
+
+*italic*, _italic_, **strong**, __strong__
+
+Inline code: Use the `printf()` function.
+
+Image: ![Alt text](http://placekitten.com/100/100 "Optional title")
