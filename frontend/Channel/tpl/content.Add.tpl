@@ -9,9 +9,11 @@
  */
 -->
 
+<h2>{{SelectEntityType}}</h2>
+
 <form action="/channel/add" method="post">
 
-<h2>{{SelectEntityType}}</h2>
+<input type="hidden" name="action" value="add" />
 
 <table id="dataTable" class="dataTable">
 	<thead>

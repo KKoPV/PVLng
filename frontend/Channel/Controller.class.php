@@ -25,13 +25,22 @@ class Channel_Controller extends ControllerAuth {
 			$this->fields[$key] = array_merge(array(
 				'VISIBLE'  => TRUE,
 				'FIELD'    => $key,
-				'RADIO'    => FALSE,
+				'TYPE'     => 'text',
 				'DEFAULT'  => '',
 				'REQUIRED' => FALSE,
 				'NAME'     => I18N::_('channel::'.$key),
 				'HINT'     => I18N::_('channel::'.$key.'Hint'),
 			), array_change_key_case($field, CASE_UPPER));
 		}
+	}
+
+	/**
+	 *
+	 */
+	public function after_Post() {
+	    // Handle returnto (Edit from Overview)
+	    parent::after_POST();
+	    if ($this->request('action') == 'edit') $this->redirect('channel');
 	}
 
 	/**
@@ -100,8 +109,6 @@ class Channel_Controller extends ControllerAuth {
 		if ($channel = $this->request('c')) {
 			$ok = TRUE;
 
-			$attr = include CORE_DIR . DS . 'type.conf.php';
-
 			/* check required fields */
 			foreach ($this->fields as $key=>$data) {
 				if ($data['REQUIRED'] AND $channel[$key] == '') {
@@ -114,14 +121,13 @@ class Channel_Controller extends ControllerAuth {
 			foreach ($channel as $key=>$value) $entity->set($key, $value);
 
 			if ($ok) {
-				if ($entity->id) $entity->update(); else $entity->insert();
+			    // CAN'T simply replace because of the foreign key in the tree!
+			    if ($entity->id) $entity->update(); else $entity->insert();
 
 				if (!$entity->isError()) {
 					Messages::Success(I18N::_('ChannelSaved'));
-					$this->redirect('channel');
 				} else {
 					Messages::Error($entity->Error());
-					#Messages::Info(print_r($entity, 1));
 				}
 			}
 

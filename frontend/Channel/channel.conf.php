@@ -11,8 +11,8 @@ return array(
 
 	/**
 	 * Possible keys:
-	 * - radio    : (TRUE|FALSE), default FALSE
-	 * - default  : default value
+	 * - type     : (text|radio|textarea), default text
+	 * - default  : a default value
 	 * - required : (TRUE|FALSE), default FALSE
 	 */
 
@@ -42,13 +42,13 @@ return array(
 	),
 
 	'meter' => array(
-		'radio'    => TRUE,
+		'type'     => 'radio',
 		'required' => TRUE,
 		'default'  => 0
 	),
 
 	'numeric' => array(
-		'radio'    => TRUE,
+		'type'     => 'radio',
 		'required' => TRUE,
 		'default'  => 1
 	),
@@ -63,6 +63,10 @@ return array(
 	),
 
 	'valid_to' => array(
+	),
+
+	'comment' => array(
+		'type'     => 'textarea',
 	),
 
 );

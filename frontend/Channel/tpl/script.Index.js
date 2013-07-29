@@ -39,7 +39,6 @@ $(function() {
 	$("#dialog-confirm").dialog({
 		autoOpen: false,
 		resizable: false,
-		height: 200,
 		width: 480,
 		modal: true,
 		buttons: {
