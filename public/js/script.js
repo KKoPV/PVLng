@@ -16,6 +16,7 @@ $.pnotify.defaults.stack.spacing1 = 5;
 $.pnotify.defaults.stack.spacing2 = 15;
 
 $(function() {
+
 	/* Inititilize Tooltips */
 	$('.tip, .tipbtn').tipTip({
 		attribute: 'tip',
@@ -26,7 +27,7 @@ $(function() {
 
 	$('button, a.button, input[type="submit"]').button();
 	$('.toolbar').buttonset();
-	$('input[type=text], input[type=password], select').addClass('ui-corner-all');
+	$('input[type=text], input[type=password], select, textarea').addClass('ui-corner-all');
 
 	$(messages).each(function(id, msg) {
 		if (msg.type == 'error') {
@@ -35,6 +36,13 @@ $(function() {
 		}
 		$.pnotify(msg);
 	});
+
+	$('.numbersOnly').keyup(function () {
+			if (this.value != this.value.replace(/[^0-9\.]/g, '')) {
+				 this.value = this.value.replace(/[^0-9\.]/g, '');
+			}
+	});
+
 });
 
 /**

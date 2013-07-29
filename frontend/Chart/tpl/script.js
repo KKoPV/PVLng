@@ -588,12 +588,6 @@ $(function() {
 	$("#from").datepicker('setDate', d);
 	$("#to").datepicker('setDate', d);
 
-	$('.numbersOnly').keyup(function () {
-			if (this.value != this.value.replace(/[^0-9\.]/g, '')) {
-				 this.value = this.value.replace(/[^0-9\.]/g, '');
-			}
-	});
-
 	Highcharts.setOptions({
 		global: {
 			alignTicks: false
