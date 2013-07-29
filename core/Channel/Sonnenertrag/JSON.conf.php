@@ -26,6 +26,9 @@ return array(
 	'unit' => array(
 		'visible' => FALSE,
 	),
+	'decimals' => array(
+		'visible' => FALSE,
+	),
 	'meter' => array(
 		'visible' => FALSE,
 	),

@@ -12,6 +12,9 @@ return array(
 	'channel' => array(
 		'visible' => FALSE,
 	),
+	'serial' => array(
+		'visible' => FALSE,
+	),
 	'resolution' => array(
 		'visible' => FALSE,
 	),
@@ -25,6 +28,9 @@ return array(
 		'visible' => FALSE,
 	),
 	'cost' => array(
+		'visible' => FALSE,
+	),
+	'decimals' => array(
 		'visible' => FALSE,
 	),
 	'threshold' => array(
