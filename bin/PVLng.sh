@@ -30,7 +30,7 @@ TRACE=
 function log {
 	test $(int "$VERBOSE") -ge $1 || return
 	shift
-	echo $(date +"[%d-%b %H:%M:%S]") "$*" >&2
+	echo -e $(date +"[%d-%b %H:%M:%S]") "$*" >&2
 }
 
 ##############################################################################
@@ -58,7 +58,7 @@ function read_config {
 
 	while read var value; do
 		test -n "$var" -a "${var:0:1}" != '#' || continue
-		value=$(echo "$value" | sed -e 's/^"[ \t]*//g' -e 's/[ \t]*"$//g')
+		value=$(echo -e "$value" | sed -e 's/^"[ \t]*//g' -e 's/[ \t]*"$//g')
 		log 2 "$(printf '%-12s = %s' $var "$value")"
 		eval "$var=\$value"
 	done <"$1"

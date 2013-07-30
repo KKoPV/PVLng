@@ -39,8 +39,9 @@ test "$TRACE" && set -x
 
 ### Prepare conditions
 function replace_vars {
-	echo "$1" | sed -e "s~[{]VALUE[}]~$value~g" \
-	                -e "s~[{]NAME[}]~$name~g" -e "s~[{]LAST[}]~$last~g"
+	echo "$1" | sed -e "s~[{]VALUE_1[}]~$value_1~g" -e "s~[{]VALUE_2[}]~$value_2~g" \
+	                -e "s~[{]NAME_1[}]~$name_1~g" -e "s~[{]NAME_2[}]~$name_2~g" \
+	                -e "s~[{]LAST[}]~$last~g"
 }
 
 ### Reset run files
@@ -66,19 +67,22 @@ while test $i -lt $GUID_N; do
 
 	i=$((i+1))
 
-	log 1 "=== GUID $i ==="
+	log 1 "--- $i ---"
 
-	eval GUID=\$GUID_$i
-	if test -z "$GUID"; then
-		log 1 "GUID is empty, skip"
+	eval GUID_i_N=\$GUID_${i}_N
+	GUID_i_N=$(int "$GUID_i_N")
+
+	if test $GUID_i_N -eq 0; then
 		continue
 	fi
 
-	eval CONDITION=\$CONDITION_$i
-	test "$CONDITION" || error_exit "Condition is required (CONDITION_$i)"
+	j=0
 
-	### Use last readings for the same GUID
-	if test "$GUID" != "$LASTGUID"; then
+	while test $j -lt $GUID_i_N; do
+
+		j=$((j+1))
+
+		eval GUID=\$GUID_${i}_${j}
 
 		url="$PVLngURL2/$GUID"
 
@@ -93,16 +97,17 @@ while test $i -lt $GUID_N; do
 		test -n "$numeric" || continue
 
 		name="$($curl "$url/attributes/name") ($($curl "$url/attributes/description"))"
+		eval name_$j="\$name"
 
 		### extract 2nd value == data from last row, if exists
 		data=$($curl --header "Accept: application/tsv" "$url/data?period=last")
 		value=$(echo "$data" | cut -f2)
 
-		LASTGUID=$GUID
+		log 2 "Result : $name - $value"
 
-	fi
+		eval value_$j="\$value"
 
-	log 2 "Result : $name - $value"
+	done
 
 	lastfile=$pwd/run/$hash$i.last
 	flagfile=$pwd/run/$hash$i.once
@@ -112,19 +117,24 @@ while test $i -lt $GUID_N; do
 	echo -n "$value" >$lastfile
 
 	### Prepare condition
+	eval CONDITION=\$CONDITION_$i
+	test "$CONDITION" || error_exit "Condition is required (CONDITION_$i)"
+
 	CONDITION=$(replace_vars "$CONDITION")
+	log 1 "Condition: $CONDITION"
 
 	if test $numeric -eq 1; then
-		result=$(echo "$CONDITION" | bc -l)
+		result=$(echo "scale=4; $CONDITION" | bc -l)
 	else
 		test $CONDITION
 		test $? -eq 0 && result=1 || result=0
-		test -z "$value" && value='<empty>'
+		test -z "$value_1" && value_1='<empty>'
+		test -z "$value_2" && value_2='<empty>'
 	fi
 
 	### Skip if condition is not true
 	if test $result -eq 0; then
-		log 1 "Skip, condition '$CONDITION' not apply"
+		log 1 "Skip, condition not apply."
 		### remove flag file
 		test -f $flagfile && rm $flagfile
 		continue
@@ -166,13 +176,13 @@ while test $i -lt $GUID_N; do
 				if test "$TEST"; then
 					log 1 "Log: $GUID - $value"
 				else
-					save_log 'Alert' "[$GUID] $name: $value"
+					save_log 'Alert' "{NAME_1}: {VALUE_1}"
 				fi
 				;;
 
 			logger)
 				eval MESSAGE=\$ACTION_${i}_${j}_MESSAGE
-				test "$MESSAGE" || MESSAGE="[$GUID] $name: $value"
+				test "$MESSAGE" || MESSAGE="{NAME_1}: {VALUE_1}"
 				MESSAGE=$(replace_vars "$MESSAGE")
 
 				if test "$TEST"; then
@@ -187,7 +197,7 @@ while test $i -lt $GUID_N; do
 				test "$EMAIL" || error_exit "Email is required! (ACTION_${i}_${j}_EMAIL)"
 
 				eval SUBJECT=\$ACTION_${i}_${j}_SUBJECT
-				test "$SUBJECT" || SUBJECT="[$GUID] $name: $value"
+				test "$SUBJECT" || SUBJECT="{NAME_1}: {VALUE_1}"
 				SUBJECT=$(replace_vars "$SUBJECT")
 
 				eval BODY=\$ACTION_${i}_${j}_BODY
@@ -199,7 +209,7 @@ while test $i -lt $GUID_N; do
 					log 1 "Body:"
 					log 1 "$BODY"
 				else
-				    echo "$BODY" | mail -s "[PVLng] $SUBJECT" $EMAIL >/dev/null
+				    echo -e "$BODY" | mail -s "[PVLng] $SUBJECT" $EMAIL >/dev/null
 				fi
 				;;
 
