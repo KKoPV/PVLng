@@ -9,7 +9,7 @@
  */
 -->
 
-<form method="post">
+<form method="post" action="/chart">
 
 <div id="nav" style="margin-top:1em">
 	<input type="hidden" id="fromdate" name="fromdate" />
@@ -35,10 +35,11 @@
 			      title="{{NextDay}}" onclick="changeDates(1)"></span>
 		</td>
 		<td style="width:99%;text-align:right">
-			<label for="periodcnt" style="margin-left:1em" >{{Aggregation}}:</label>
-			<input class="numbersOnly r" type="text" id="periodcnt" name="periodcnt"
-						 value="1" size="2" />
-			{PERIODSELECT} &nbsp; <button id="btn-refresh" onclick="updateChart(); return false">{{Refresh}}</button>
+			<label for="periodcnt" style="margin-right:1em" >{{Aggregation}}:</label>
+			<input class="numbersOnly r" style="margin-right:.5em" type="text"
+			       id="periodcnt" name="periodcnt" value="1" size="2" />
+			{PERIODSELECT} &nbsp;
+			<button id="btn-refresh" onclick="updateChart(); return false">{{Refresh}}</button>
 		</td>
 	</tr>
 	</table>
@@ -98,11 +99,10 @@
 				<!-- ENDIF -->
 			</td>
 			<td style="padding:0.4em 0">
-				<img style="vertical-align:middle" class="tip"
+				<img style="vertical-align:middle" class="imgbar tip"
 				     src="/images/ico/{ICON}" alt="" title="{TYPE}" />
-				<span class="tip" title="{GUID}">
-					{NAME} <!-- IF {DESCRIPTION} -->({DESCRIPTION})<!-- ENDIF -->
-				</span>
+				<strong class="tip" title="{GUID}">{NAME}</strong>
+				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
 				<img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" />
 			</td>
 			<td id="cons{ID}" class="consumption r"></td>
@@ -136,7 +136,7 @@
 <h3>
 	<a name="view"></a>
 		{{Variants}}
-		<img src="/images/ico/information_frame.png" class="tip"
+		<img src="/images/ico/information_frame.png" class="tip" style="margin-left:.5em"
 		     title="{{MobileVariantHint}}" />
 </h3>
 <p>
@@ -147,13 +147,13 @@
 
 	<!-- IF {USER} -->
 	<input id="saveview" type="text" name="saveview" value="{VIEW}"/>
-	<input id="public" type="checkbox" name="public" value="1" 
+	<input style="margin-left:.5em" id="public" type="checkbox" name="public" value="1"
 		<!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF -->
 	/>
 	<label for="public">{{public}}</label>
-	<img src="/images/ico/information_frame.png" class="tip"
+	<img src="/images/ico/information_frame.png" class="tip" style="margin-left:.5em"
 	     title="{{publicHint}}" />
-	<input type="submit" name="save" value="{{Save}}" style="margin-right:2em" />
+	<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
 	<!-- ENDIF -->
 
 	<select id="loadview" name="loadview">

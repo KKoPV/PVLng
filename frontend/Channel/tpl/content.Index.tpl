@@ -25,8 +25,6 @@
 		<th class="l">{{Serial}}</th>
 		<th class="l">{{Description}}</th>
 		<th style="width:1%"></th>
-		<th style="width:1%"></th>
-		<th style="width:1%"></th>
 	</tr>
 	</thead>
 
@@ -44,17 +42,13 @@
 		<td>{TYPE}</td>
 		<td>{SERIAL}</td>
 		<td>{DESCRIPTION}</td>
-		<td>
-			<a href="/channel/edit/{ID}" class="tip" title="{{EditEntity}}">
-				<img src="/images/ico/node_design.png" alt="E" width="16" height="16" />
+		<td style="white-space:nowrap">
+			<a href="/channel/edit/{ID}" class="imgbar tip" title="{{EditEntity}}">
+				<img src="/images/ico/node_design.png" alt="e" width="16" height="16" />
 			</a>
-		</td>
-		<td>
-			<a href="/channel/add/{ID}" class="tip" title="{{CloneEntity}}">
-				<img src="/images/ico/node_select_child.png" alt="C" width="16" height="16" />
+			<a href="/channel/add/{ID}" class="imgbar tip" title="{{CloneEntity}}">
+				<img src="/images/ico/node_select_child.png" alt="c" width="16" height="16" />
 			</a>
-		</td>
-		<td>
 			<form id="df{ID}" action="/channel/delete" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
 			<input type="image" src="/images/ico/node_delete.png" alt="-"

@@ -12,18 +12,23 @@
 
 <script>
 
+var oTable;
+
 /**
  *
  */
 $(function() {
 
-	$('#tree').DataTable({
+	oTable = $('#tree').DataTable({
 		bPaginate: false,
 		bLengthChange: false,
 		bFilter: false,
 		bSort: false,
 		bInfo: false,
-		bJQueryUI: true
+		bJQueryUI: true,
+		aoColumnDefs: [
+			{ "bVisible": false, "aTargets": [ 4 ] }
+		]
 	});
 
 	$('#tree').treetable({
@@ -70,20 +75,16 @@ $(function() {
 		}
 	});
 
-	$('#dialog-guid').dialog({
-		autoOpen: false,
-		resizable: false,
-		width: 480,
-		modal: true,
-		buttons: {
-			Ok: function() { $(this).dialog('close'); }
+	$('#toggleGUID').click(function() {
+		var visible = $(this).is(':checked');
+		oTable.fnSetColumnVis( 4, visible);
+		if (visible) {
+			$('.guid').click(function() {
+				$(this).select();
+			}).mouseup(function(e) {
+				e.preventDefault();
+			});
 		}
-	});
-
-	$('#show-guid').focus(function() {
-		$(this).select();
-	}).mouseup(function(e) {
-		e.preventDefault();
 	});
 
 	$('.delete-form').submit(function(){
@@ -110,14 +111,6 @@ $(function() {
 function addChild( node ) {
 	$('#parent').attr('value', node);
 	$('#dialog-addchild').dialog('open');
-}
-
-/**
- *
- */
-function showGUID( guid ) {
-	$('#show-guid').val(guid);
-	$('#dialog-guid').dialog('open');
 }
 
 /**

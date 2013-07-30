@@ -21,26 +21,29 @@
 
 	<tbody>
 	<tr>
-		<td>{{APIURL}}</td>
+		<td style="vertical-align:top">{{APIURL}}</td>
 		<td>
-			<code>
-				http://{SERVERNAME}/api/r1/[GUID].[format]<br />
+			<code class="b">
+				http://{SERVERNAME}/api/r1/\{GUID\}.\{format\}<br />
+				http://{SERVERNAME}/api/r2/\{GUID\}/\{action\}
 			</code>
+			<br /><br />
+			{{SeeAPIReference}}
 		</td>
 	</tr>
 	<tr>
-		<td>{{YourAPIcode}}</td>
+		<td style="vertical-align:top">{{YourAPIcode}}</td>
 		<td>
-			<code>{APIKEY}</code>
+			<code class="b">{APIKEY}</code>
 			<form method="post" style="float:right">
 				<input type="hidden" name="regenerate" value="1" />
 				<input id="regenerate" type="submit" value="{{Regenerate}}" />
 			</form>
+			<div class="clear"/></div>
+			<p>
+				{{DontForgetUpdateAPIKey}}
+			</p>
 		</td>
-	</tr>
-	<tr>
-		<td></td>
-		<td>{{DontForgetUpdateAPIKey}}</td>
 	</tr>
 	</tbody>
 </table>

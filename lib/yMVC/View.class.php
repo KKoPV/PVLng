@@ -332,6 +332,7 @@ abstract class View extends Base {
 			$html = preg_replace('~<!--.*?-->~s', '', $html);
 			$html = preg_replace('~/\*.*?\*/~s', '', $html);
 			$html = preg_replace('~\s+~s', ' ', $html);
+			$html = preg_replace('~>\s+<~s', '><', $html);
 			$html = str_replace($pre[0], $pre[1], $html);
 		}
 		$html = trim($html);

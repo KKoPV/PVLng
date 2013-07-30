@@ -492,23 +492,6 @@ $(function() {
 		column: 1
 	});
 
-	$('input.iCheck').iCheck({
-		checkboxClass: 'icheckbox_flat-orange',
-		radioClass: 'iradio_minimal-orange'
-	});
-
-	$('input.iCheckLine').each(function(){
-		var self = $(this),
-		label = self.next(),
-		label_text = label.text();
-		label.remove();
-		self.iCheck({
-			checkboxClass: 'icheck_line-orange',
-			radioClass: 'icheck_line-orange',
-			insert: '<div class="icheck_line-icon"></div>' + label_text
-		});
-	});
-
 	$("#dialog-chart").dialog({
 		autoOpen: false,
 		width: 652, /* grid_7 */
