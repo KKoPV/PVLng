@@ -24,7 +24,29 @@ class Description_Controller extends Controller {
 		// Move all headers 2 levels deeper
 		$content = preg_replace('~^#+~m', '##$0', $content);
 
-		$this->view->Content = $md->transform($content);
+		// Prepare a simple TOC
+		$links = $toc = array();
+
+		if (preg_match_all('~^#+ +(.*?) *#*$~m', $content, $headers, PREG_SET_ORDER)) {
+			foreach ($headers as $header) {
+				$hash = substr(md5($header[0]), 0, 7);
+				$links[] = '<a href="#'.$hash.'">'.$header[1].'</a>';
+				$toc[$hash] = '<a name="'.$hash.'"></a>';
+				// Prepend the hash before the header
+				$content = str_replace($header[0], $hash."\n\n".$header[0], $content);
+				}
+		}
+
+		// Transform MarkDown
+		$content = $md->transform($content);
+
+		// Replace inserted hashes aginst the named link tags
+		$content = str_replace(array_keys($toc), array_values($toc), $content);
+
+		// Prepend TOC
+		$content = '<p>'.implode(' &nbsp; | &nbsp; ', $links).'</p>' . $content;
+
+		$this->view->Content = $content;
 	}
 
 }
