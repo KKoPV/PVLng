@@ -1,6 +1,15 @@
 
 Add here some public description of your environment, if you like :-)
 
+# Overview ...
+
+# Equipment ...
+
+# Sensors ...
+
+# Other online places ...
+
+
 Markdown syntax: <http://daringfireball.net/projects/markdown/syntax>
 
 Some examples
@@ -18,13 +27,11 @@ Unordered list
 
 - Red
 - Green
-- Blue
 
 Ordered list
 
 1. Bird
 2. McHale
-3. Parish
 
 Horizontal rule:
 
@@ -38,6 +45,6 @@ This is [an example](http://example.com/ "Title") inline link.
 
 *italic*, _italic_, **strong**, __strong__
 
-Inline code: Use the `printf()` function.
+This is an `inline code`.
 
 Image: ![Alt text](http://placekitten.com/100/100 "Optional title")
