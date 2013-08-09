@@ -59,7 +59,7 @@ function read_config {
 	while read var value; do
 		test -n "$var" -a "${var:0:1}" != '#' || continue
 		value=$(echo -e "$value" | sed -e 's/^"[ \t]*//g' -e 's/[ \t]*"$//g')
-		log 2 "$(printf '%-12s = %s' $var "$value")"
+		log 2 "$(printf '%-20s = %s' $var "$value")"
 		eval "$var=\$value"
 	done <"$1"
 }

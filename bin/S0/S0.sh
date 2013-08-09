@@ -17,9 +17,9 @@ pwd=$(dirname $0)
 S0=$(which S0)
 test "$S0" || error_exit 'Missing "S0" binary!'
 
-while getopts "rtvxh" OPTION; do
+while getopts "stvxh" OPTION; do
 	case "$OPTION" in
-		r) RESET=y ;;
+		s) STOP=y ;;
 		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
 		v) VERBOSE=$((VERBOSE + 1)) ;;
 		x) TRACE=y ;;
@@ -39,6 +39,9 @@ test $GUID_N -gt 0	|| error_exit "No sections defined"
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
+
+### Create unique hash from config file
+hash=S0.$(echo $(basename "$1") | sed -e 's~[.].*$~~g' -e 's~[^A-Za-z0-9-]~_~g')
 
 i=0
 
@@ -81,7 +84,8 @@ while test $i -lt $GUID_N; do
 	### Go
 	##############################################################################
 	### log file for measuring data
-	LOG=$pwd/run/$i.log
+	LOG=$pwd/../../run/$hash.$i.log
+
 	log 1 "Log     : $LOG"
 
 	### Identify S0 process by device attached to!
@@ -93,12 +97,13 @@ while test $i -lt $GUID_N; do
 		### Fine, S0 is running
 		############################################################################
 
-		if test "$RESET"; then
-			log 0 "Reset"
-			log 0 "- Kill process $pid"
+		if test "$STOP"; then
+			log 0 "Stop listening"
+			log 0 "Kill process $pid ..."
 			kill $pid
-			log 0 "- Remove log	$LOG"
+			log 0 "Remove log $LOG ..."
 			rm $LOG
+			log 0 "Done."
 			exit
 		fi
 
@@ -119,7 +124,7 @@ while test $i -lt $GUID_N; do
 			power=0
 			while read p; do
 				log 1 "power   : $p"
-				power=$(echo "scale=3; $power + $p" | bc -l)
+				power=$(echo "scale=4; $power + $p" | bc -l)
 			done <$TMPFILE
 
 			power=$(echo "scale=4; $power / $impulse" | bc -l)
@@ -148,7 +153,7 @@ while test $i -lt $GUID_N; do
 		if test "$TEST"; then
 			log 1 "TEST: $S0 -d $DEVICE -r $RESOLUTION -l $LOG"
 		else
-			### start read of device in watt mode!
+			### Start read of device in watt mode!
 			$S0 -d $DEVICE -r $RESOLUTION -l $LOG
 		fi
 
@@ -168,9 +173,10 @@ Read S0 impulses
 Usage: $scriptname [options] config_file
 
 Options:
-	-r	Reset script, kill all running S0 processes
+	-s	Stop listening, kill all running S0 processes
 	-t	Test mode
 	-v	Make processing verbose
+	-vv	Make processing more verbose
 	-h	Show this help
 
 # << USAGE

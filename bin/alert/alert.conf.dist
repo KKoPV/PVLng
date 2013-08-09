@@ -75,19 +75,42 @@ ONCE_1         0
 ###   "logger -t PVLng "Temperature of XYZ exceeded {VALUE} °C""
 ##############################################################################
 ### How many commands
-COMMAND_1_N    0
+ACTION_1_N    0
 
-COMMAND_1_1    ""
-COMMAND_1_2    ""
+ACTION_1_1    ""
+ACTION_1_2    ""
 
-### Example: Send email
-ACTION_1_1          "mail"
-ACTION_1_1_EMAIL    ""
-ACTION_1_1_SUBJECT  ""
-ACTION_1_1_BODY     ""
 
 ### Example: syslog
 ACTION_1_1          "logger"
+
+# required
 ACTION_1_1_MESSAGE  ""
+
+
+### Example: Send email
+ACTION_1_1          "mail"
+
+# required
+ACTION_1_1_EMAIL    ""
+
+# default: {NAME}: {VALUE}
+ACTION_1_1_SUBJECT  ""
+
+# default: empty
+ACTION_1_1_BODY     ""
+
+
+### Example: Save to file
+ACTION_1_1          "file"
+
+# required
+ACTION_1_1_DIR      ""
+
+# default: alert
+ACTION_1_1_PREFIX   ""
+
+# default: {NAME}: {VALUE}
+ACTION_1_1_TEXT     ""
 
 ### <<< copy

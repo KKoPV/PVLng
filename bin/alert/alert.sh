@@ -39,20 +39,47 @@ test "$TRACE" && set -x
 
 ### Prepare conditions
 function replace_vars {
-	echo "$1" | sed -e "s~[{]VALUE_1[}]~$value_1~g" -e "s~[{]VALUE_2[}]~$value_2~g" \
-	                -e "s~[{]NAME_1[}]~$name_1~g" -e "s~[{]NAME_2[}]~$name_2~g" \
-	                -e "s~[{]LAST[}]~$last~g"
+	local str="$1"
+	local i=1
+	local value=
+	local name=
+	local last=
+
+	### If only 1 is used, VALUE, NAME and LAST are allowed
+	str=$(echo "$str" | sed -e "s~[{]VALUE[}]~$value_1~g" \
+	                        -e "s~[{]NAME[}]~$name_1~g" \
+	                        -e "s~[{]LAST[}]~$last_1~g")
+
+	### max. 100 parameters :-)
+	while test $i -le 100; do
+
+		eval value="\$value_$i"
+		test -z "$value" && value='<empty>'
+
+		eval name="\$name_$i"
+		eval last="\$last_$i"
+
+		str=$(echo "$str" | sed -e "s~[{]VALUE_$i[}]~$value~g" \
+		                        -e "s~[{]NAME_$i[}]~$name~g" \
+		                        -e "s~[{]LAST_$i[}]~$last~g")
+		i=$((i+1))
+	done
+
+	echo "$str"
 }
 
 ### Reset run files
 function reset {
-	files=$pwd/run/$hash*
+	files=$run/$hash*
 	log 1 Reset, delete $files ...
 	rm $files
 }
 
-### Create unique hash
-hash=$(echo $(basename "$1") | sed -e 's~[.].*$~~g' -e 's~[^A-Za-z0-9-]~_~g').$i
+### Directory for working files
+run=$pwd/../../run
+
+### Create unique hash from config file
+hash=alert.$(echo $(basename "$1") | sed -e 's~[.].*$~~g' -e 's~[^A-Za-z0-9-]~_~g')
 
 if test "$RESET"; then
 	reset
@@ -82,9 +109,8 @@ while test $i -lt $GUID_N; do
 
 		j=$((j+1))
 
-		eval GUID=\$GUID_${i}_${j}
-
-		url="$PVLngURL2/$GUID"
+		eval url="\$PVLngURL2/\$GUID_${i}_${j}"
+		log 2 "URL: $url"
 
 		numeric=$($curl "$url/attributes/numeric")
 
@@ -107,14 +133,15 @@ while test $i -lt $GUID_N; do
 
 		eval value_$j="\$value"
 
+		lastfile=$run/$hash.$i.$j.last
+		test -f $lastfile && last=$(<$lastfile)
+		eval last_$j="\$last"
+
+		echo -n "$value" >$lastfile
+
 	done
 
-	lastfile=$pwd/run/$hash$i.last
-	flagfile=$pwd/run/$hash$i.once
-
-	test -f $lastfile && last=$(<$lastfile)
-
-	echo -n "$value" >$lastfile
+	flagfile=$run/$hash.$i.once
 
 	### Prepare condition
 	eval CONDITION=\$CONDITION_$i
@@ -128,8 +155,6 @@ while test $i -lt $GUID_N; do
 	else
 		test $CONDITION
 		test $? -eq 0 && result=1 || result=0
-		test -z "$value_1" && value_1='<empty>'
-		test -z "$value_2" && value_2='<empty>'
 	fi
 
 	### Skip if condition is not true
@@ -176,20 +201,18 @@ while test $i -lt $GUID_N; do
 				if test "$TEST"; then
 					log 1 "Log: $GUID - $value"
 				else
-					save_log 'Alert' "{NAME_1}: {VALUE_1}"
+					save_log 'Alert' "{NAME}: {VALUE}"
 				fi
 				;;
 
 			logger)
 				eval MESSAGE=\$ACTION_${i}_${j}_MESSAGE
-				test "$MESSAGE" || MESSAGE="{NAME_1}: {VALUE_1}"
+				test "$MESSAGE" || MESSAGE="{NAME}: {VALUE}"
 				MESSAGE=$(replace_vars "$MESSAGE")
 
-				if test "$TEST"; then
-				    log 1 "Logger: $MESSAGE"
-				else
-					logger -t PVLng "$MESSAGE"
-				fi
+			    log 1 "Logger: $MESSAGE"
+
+				test "$TEST" || logger -t PVLng "$MESSAGE"
 				;;
 
 			mail)
@@ -197,20 +220,37 @@ while test $i -lt $GUID_N; do
 				test "$EMAIL" || error_exit "Email is required! (ACTION_${i}_${j}_EMAIL)"
 
 				eval SUBJECT=\$ACTION_${i}_${j}_SUBJECT
-				test "$SUBJECT" || SUBJECT="{NAME_1}: {VALUE_1}"
+				test "$SUBJECT" || SUBJECT="{NAME}: {VALUE}"
 				SUBJECT=$(replace_vars "$SUBJECT")
 
 				eval BODY=\$ACTION_${i}_${j}_BODY
 				BODY=$(replace_vars "$BODY")
 
-				if test "$TEST"; then
-				    log 1 "Send email to $EMAIL"
-					log 1 "Subject: $SUBJECT"
-					log 1 "Body:"
-					log 1 "$BODY"
-				else
-				    echo -e "$BODY" | mail -s "[PVLng] $SUBJECT" $EMAIL >/dev/null
-				fi
+			    log 1 "Send email to $EMAIL"
+				log 1 "Subject: $SUBJECT"
+				log 1 "Body:"
+				log 1 "$BODY"
+
+				test "$TEST" || echo -e "$BODY" | mail -s "[PVLng] $SUBJECT" $EMAIL >/dev/null
+				;;
+
+			file)
+				eval DIR=\$ACTION_${i}_${j}_DIR
+				test "$DIR" || error_exit "Directory is required! (ACTION_${i}_${j}_DIR)"
+
+				eval PREFIX=\$ACTION_${i}_${j}_PREFIX
+				test "$PREFIX" || PREFIX="alert"
+
+				eval TEXT=\$ACTION_${i}_${j}_TEXT
+				test "$TEXT" || TEXT="{NAME}: {VALUE}"
+				TEXT=$(replace_vars "$TEXT")
+
+				file=$(mktemp $DIR/$PREFIX.$(date +"%F.%X").XXXXXX)
+
+				log 1 "Text: $TEXT"
+				log 1 "File: $file"
+
+				test "$TEST" || echo "$TEXT" >$file
 				;;
 
 			*)
@@ -246,8 +286,6 @@ Options:
 	-v  Set verbosity level to info level
 	-vv Set verbosity level to debug level
 	-h  Show this help
-
-Requires a writable directory: $pwd/run
 
 See $pwd/alert.conf.dist for details.
 

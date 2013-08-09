@@ -1,4 +1,5 @@
 config.php
+run/*
 tmp/*
-!tmp/.githold
 description.md
+!.githold
