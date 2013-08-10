@@ -24,12 +24,6 @@ var ChartHeight = '{MOBILE_CHARTHEIGHT}';
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
 
-<!--
-<script src="/js/highcharts.js"></script>
-<script src="/js/highcharts-more.js"></script>
-<script src="/js/highcharts-exporting.js"></script>
--->
-
 <script>
 
 var views = {
@@ -71,12 +65,7 @@ var views = {
 			}
 		},
 		xAxis : {
-			type: 'datetime',
-			/*
-			title: { text: '' },
-			labels: false,
-			lineWidth: 0,
-			maxZoom: 3600 * 1000 /* 1 hour */
+			type: 'datetime'
 		},
 		legend: {
 			enabled: false
@@ -172,7 +161,6 @@ function updateChart() {
 	/* build channels */
 	$(buffer).each(function(id, channel) {
 		/* axis from chart point of view */
-		var opposite = !(channel.axis & 1);
 		channel.axis = yAxisMap.indexOf(channel.axis);
 
 		if (channel.type == 'areasplinerange') {
@@ -183,14 +171,10 @@ function updateChart() {
 		/* prepare axis */
 		if (!yAxis[channel.axis]) {
 			yAxis[channel.axis] = {
-				title: { text: '' },
-				labels: false,
-				lineWidth: 0,
-				/* unit as axis title * /
-				title: { text: channel.unit },
+				title: false /* { text: channel.unit } */,
 				showEmpty: false,
 				/* odd axis on left, even on right side */
-				opposite: opposite
+				opposite: (channel.axis & 1)
 			};
 			/* only 1st left axis shows grid lines */
 			if (channel.axis != 0) {
@@ -198,6 +182,15 @@ function updateChart() {
 			}
 		}
 	});
+
+	if (yAxis.length > 1) {
+		/* Hide axes & labels when more than 1 axis is defined */
+		$.each(yAxis, function(i) {
+			/* yAxis[i].title = false; */
+			yAxis[i].labels = false;
+			yAxis[i].lineWidth = 0;
+		});
+	}
 
 	_log('Channels:', channels_new);
 	_log('yAxis:', yAxis);
@@ -244,14 +237,17 @@ function updateChart() {
 				_log('Attributes:', attr);
 				_log('Data:', data);
 
-				var serie = { /* HTML decode channel name */
-				    	name:  $('<div/>').html(attr.name).text(),
-				    	color: channel.color,
-				    	type:  channel.type,
-				    	yAxis: channel.axis,
-				    	data:  []
+				var serie = {  /* A trick to HTML-decode channel name */
+						id:       channel.id,
+						decimals: attr.decimals,
+						unit:     attr.unit,
+						name:     $('<div/>').html(attr.name).text(),
+						color:    channel.color,
+						type:     channel.type,
+						yAxis:    channel.axis,
+						data:     []
 				    },
-				    tr;
+				    tr, td;
 
 				$(data).each(function(id, row) {
 					if ($.isNumeric(row[2])) {
@@ -261,38 +257,46 @@ function updateChart() {
 							serie.data.push([row[1]*1000, row[2]]);
 						}
 					} else {
-						serie.data.push({
-							x: row[1]*1000,
-							y: 0,
-							name: row[2]
-						});
+						serie.data.push({ x: row[1]*1000, y: 0, name: row[2] });
 					}
 				});
 
-				if (attr.consumption) {
+				if (channel.min || channel.max || attr.consumption) {
 				    tr = $('<tr/>');
 				    t = (attr.description) ? ' (' + attr.description + ')' : '';
-				    tr.append(
-						$('<th/>')
-						.html(attr.name + t)
-					);
-					tr.append(
-						$('<td/>')
+					$('<th/>').html(attr.name + t).appendTo(tr);
+				}
+
+				if (channel.min) {
+					td = $('<td/>').attr('id', 'min'+channel.id).addClass('r');
+				} else {
+					td = $('<td/>');
+				}
+				td.appendTo(tr);
+
+				if (channel.max) {
+					td = $('<td/>').attr('id', 'max'+channel.id).addClass('r');
+				} else {
+					td = $('<td/>');
+				}
+				td.appendTo(tr);
+
+				if (attr.consumption) {
+					$('<td/>')
 						.addClass('r')
 						.html(Highcharts.numberFormat(attr.consumption, attr.decimals) + ' ' + attr.unit)
-					);
+						.appendTo(tr);
 				}
 
 				if (attr.costs) {
 					costs += +attr.costs.toFixed(2);
-					tr.append(
-						$('<td/>')
+					$('<td/>')
 					    .addClass('cost')
 					    .html(Highcharts.numberFormat(attr.costs, 2))
-					);
+						.appendTo(tr);
 				}
 
-				if (tr) $('#table-cons tbody').append(tr);
+				if (tr) tr.appendTo('#table-cons tbody');
 
 				if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
 				if (attr.unit) serie.tooltip = { valueSuffix: attr.unit };
@@ -334,15 +338,14 @@ function updateChart() {
 			if (completed == channels.length) {
 				costs = costs ? Highcharts.numberFormat(costs, 2) : false;
 				if (costs) {
-					$('#table-cons tbody').append(
-						$('<tr/>')
-						.append(
-							$('<td colspan="3" />')
-							.html(costs)
-							.addClass('costs')
-						)
-					);
+					tr = $('<tr/>');
+					$('<td colspan="5" />')
+						.addClass('costs')
+						.html(costs)
+						.appendTo(tr);
+					tr.appendTo('#table-cons tbody');
 				}
+
 				/*
 				var t = $('#from').val();
 				var s = $('#to').val();

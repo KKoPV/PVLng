@@ -42,7 +42,9 @@ PAGE 1
 			<thead>
 			<tr>
 			    <th>{{Channel}}</th>
-			    <th>{{Consumption}}</th>
+			    <th>{{Min}}</th>
+			    <th>{{Max}}</th>
+			    <th>{{Production}} / {{Consumption}}</th>
 			    <th>{{Cost}}</th>
 			</tr>
 			</thead>
