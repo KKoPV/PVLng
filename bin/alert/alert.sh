@@ -54,7 +54,7 @@ function replace_vars {
 	while test $i -le 100; do
 
 		eval value="\$value_$i"
-		test -z "$value" && value='<empty>'
+		test -z "$value" && value='[empty]'
 
 		eval name="\$name_$i"
 		eval last="\$last_$i"
