@@ -43,6 +43,15 @@ return array(
 	),
 
 	/**
+	 * Currency settings
+	 */
+	'Currency' => array(
+		'ISO'      => 'EUR',
+		'Symbol'   => '€',
+		'Decimals' => 2
+	),
+
+	/**
 	 * Default language, "en" or "de"
 	 *
 	 * Will be overwritten by browsers accept language settings if exists

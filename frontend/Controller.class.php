@@ -90,6 +90,10 @@ class Controller extends yMVC\Controller {
 
 		$this->view->Language = LANGUAGE;
 
+		$this->view->CurrencyISO = $this->config->Currency_ISO;
+		$this->view->CurrencySymbol = $this->config->Currency_Symbol;
+		$this->view->CurrencyDecimals = $this->config->Currency_Decimals;
+
 		$this->view->BaseDir = array(
 			APP_DIR . DS . $this->router->Controller . DS . 'tpl',
 			APP_DIR . DS . 'tpl'
@@ -121,17 +125,17 @@ class Controller extends yMVC\Controller {
 
 		// Check for new version once a day
 		if (!API AND Session::get('VersionCheck', 0)+86400 < time()) {
-            $version = $this->checkVersion();
+			$version = $this->checkVersion();
 			$this->db->VersionNew = isset($version[0]) ? $version[0] : FALSE;
-		    Session::set('VersionCheck', time());
+			Session::set('VersionCheck', time());
 		}
 		$v = $this->db->VersionNew;
 		if ($v AND $v != PVLNG_VERSION) $this->view->VersionNew = $v;
 
 		if (Session::get('user') == $this->config->Admin_User) {
-    		// Ok, we have a validated user session
-            $this->view->User = Session::get('user');
-        }
+			// Ok, we have a validated user session
+			$this->view->User = Session::get('user');
+		}
 
    		parent::after();
 	}
