@@ -21,9 +21,7 @@ class SensorToMeter extends \Channel {
 
 		$this->before_read($request);
 
-		$childs = $this->getChilds();
-
-		$buffer = $childs[0]->read($request);
+		$buffer = $this->getChild(1)->read($request);
 		$buffer->rewind();
 
 		$result = new \Buffer;

@@ -330,7 +330,7 @@ class Channel {
 		}
 
 		$this->start = strtotime('00:00');
-		$this->end	 = strtotime('24:00');
+		$this->end   = strtotime('24:00');
 	}
 
 	/**
@@ -344,6 +344,14 @@ class Channel {
 			}
 		}
 		return $this->_childs;
+	}
+
+	/**
+	 * Lazy load child on request, 1 based!
+	 */
+	protected function getChild( $id ) {
+		$this->getChilds();
+		return isset($this->_childs[$id-1]) ? $this->_childs[$id-1] : FALSE;
 	}
 
 	/**
@@ -368,7 +376,7 @@ class Channel {
 			                    .'instance of "'.get_class($this).'"!', 400);
 
 		if ($this->childs >= 0 AND
-				count($this->getChilds()) != $this->childs)
+		    count($this->getChilds()) != $this->childs)
 			throw new \Exception('"'.$this->name.'" must have '.$this->childs.' child(s)!', 400);
 
 		if (isset($request['start'])) {
@@ -437,11 +445,10 @@ class Channel {
 				$consumption += $row['consumption'];
 				$last = $row['data'];
 			}
-
 			if ($this->numeric AND $this->resolution != 1) {
-				$row['data'] *= $this->resolution;
-				$row['min']  *= $this->resolution;
-				$row['max']  *= $this->resolution;
+				$row['data']        *= $this->resolution;
+				$row['min']         *= $this->resolution;
+				$row['max']         *= $this->resolution;
 				$row['consumption'] *= $this->resolution;
 			}
 

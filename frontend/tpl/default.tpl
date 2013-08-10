@@ -94,7 +94,7 @@
 		<span class="toolbar">
 			<a class="tipbtn" title="{{ChartHint}}" href="/">{{Charts}}</a>
 			<!-- IF {USER} -->
-			<a class="tipbtn" title="{{OverviewHint}}" href="/index">{{Overview}}</a>
+			<a class="tipbtn" title="{{OverviewHint}}" href="/overview">{{Overview}}</a>
 			<a class="tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
 			<a class="tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
 			<!-- ENDIF -->

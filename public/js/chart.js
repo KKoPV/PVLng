@@ -56,29 +56,6 @@ function setExtremes() {
 			}
 		}
 	});
-
-	if (chart.yAxis.length == 2) {return;
-		var i = 15;
-		while (chart.yAxis[1].translate(0) != chart.yAxis[0].translate(0) && i > 0) {
-			chart.yAxis[0].setExtremes(chart.yAxis[0].getExtremes().min -
-																 chart.yAxis[0].translate(chart.yAxis[1].translate(0), true));
-			i--;
-			/* console.log(chart.yAxis[1].translate(0), chart.yAxis[0].translate(0), i); */
-		}
-	}
-}
-
-/**
- *
- */
-function trimDecimal( value ) {
-	switch (true) {
-		case (Math.abs(value) <   10):  var factor = 1000;  break;
-		case (Math.abs(value) <  100):  var factor =  100;  break;
-		case (Math.abs(value) < 1000):  var factor =   10;  break;
-		default:                        var factor =    1;  break;
-	}
-	return Math.round(value * factor) / factor;
 }
 
 /**
@@ -87,11 +64,15 @@ function trimDecimal( value ) {
 function setMinMax( serie, setMin, setMax ) {
 
 	var
+		ts  = { min: Number.MAX_VALUE, max: -Number.MAX_VALUE },
 		min = { id: null, x: null, y:  Number.MAX_VALUE },
 		max = { id: null, x: null, y: -Number.MAX_VALUE };
 
 	/* search min. and max. values */
 	$.each(serie.data, function(i, point) {
+		ts.min = Math.min(ts.min, point[0]);
+		ts.max = Math.max(ts.max, point[0]);
+
 		if (setMin && (point[1] < min.y)) {
 			min = { id: i, x: point[0], y: point[1] }
 		} else if (setMax && (point[1] > max.y)) {
@@ -101,6 +82,8 @@ function setMinMax( serie, setMin, setMax ) {
 
 	if (min.id != null) {
 
+		var left = ((ts.min + (ts.max - ts.min)/2 - min.x) > 0);
+
 		serie.data[min.id] = {
 			marker: {
 				enabled: true,
@@ -109,10 +92,12 @@ function setMinMax( serie, setMin, setMax ) {
 			},
 			dataLabels: {
 				enabled: true,
-				formatter: function() { return Highcharts.numberFormat(this.y, -1) },
+				formatter: function() {
+					return Highcharts.numberFormat(+this.y, this.series.options.decimals)
+				},
 				color: serie.color,
 				style: { fontWeight: 'bold' },
-				align: 'center',
+				align: left ? 'left' : 'right',
 				y: 26,
 				borderRadius: 3,
 				backgroundColor: 'rgba(252, 255, 197, 0.7)',
@@ -120,11 +105,15 @@ function setMinMax( serie, setMin, setMax ) {
 				borderColor: '#AAA'
 			},
 			x: min.x,
-			y: trimDecimal(min.y)
+			y: min.y
 		};
+
+		$('#min'+serie.id).html(Highcharts.numberFormat(min.y, serie.decimals) + ' ' + serie.unit);
 	}
 
 	if (max.id != null) {
+
+		var left = ((ts.min + (ts.max - ts.min)/2 - max.x) > 0);
 
 		serie.data[max.id] = {
 			marker: {
@@ -134,10 +123,12 @@ function setMinMax( serie, setMin, setMax ) {
 			},
 			dataLabels: {
 				enabled: true,
-				formatter: function() { return Highcharts.numberFormat(this.y, -1) },
+				formatter: function() {
+					return Highcharts.numberFormat(+this.y, this.series.options.decimals)
+				},
 				color: serie.color,
 				style: { fontWeight: 'bold' },
-				align: 'center',
+				align: left ? 'left' : 'right',
 				y: -7,
 				borderRadius: 3,
 				backgroundColor: 'rgba(252, 255, 197, 0.7)',
@@ -145,8 +136,10 @@ function setMinMax( serie, setMin, setMax ) {
 				borderColor: '#AAA'
 			},
 			x: max.x,
-			y: trimDecimal(max.y)
+			y: max.y
 		};
+
+		$('#max'+serie.id).html(Highcharts.numberFormat(max.y, serie.decimals) + ' ' + serie.unit);
 	}
 
 	return serie;

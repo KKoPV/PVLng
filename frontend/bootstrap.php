@@ -124,6 +124,13 @@ $version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
 define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
+// GZip compress content if applicable
+if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) AND
+    strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') AND
+    extension_loaded('zlib') ) {
+	ob_start('ob_gzhandler');
+}
+
 // ---------------------------------------------------------------------------
 // FUNCTIONS
 // ---------------------------------------------------------------------------
