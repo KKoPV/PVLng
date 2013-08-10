@@ -113,4 +113,9 @@ ACTION_1_1_PREFIX   ""
 # default: {NAME}: {VALUE}
 ACTION_1_1_TEXT     ""
 
+# Common for all action types handling non-numeric values:
+# Replacement string for empty values
+# default: <empty>
+ACTION_1_1_EMPTY     ""
+
 ### <<< copy

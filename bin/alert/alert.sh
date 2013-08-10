@@ -39,22 +39,20 @@ test "$TRACE" && set -x
 
 ### Prepare conditions
 function replace_vars {
-	local str="$1"
-	local i=1
+	local str="$1" ### save for looping
+	local i=0
 	local value=
 	local name=
 	local last=
 
-	### If only 1 is used, VALUE, NAME and LAST are allowed
-	str=$(echo "$str" | sed -e "s~[{]VALUE[}]~$value_1~g" \
-	                        -e "s~[{]NAME[}]~$name_1~g" \
-	                        -e "s~[{]LAST[}]~$last_1~g")
+	### On replacing in Condition, $EMPTY is not set, so it works on real data
 
 	### max. 100 parameters :-)
-	while test $i -le 100; do
+	while test $i -lt 100; do
+		i=$((i+1))
 
 		eval value="\$value_$i"
-		test -z "$value" && value='[empty]'
+		test -z "$value" && value=$EMPTY
 
 		eval name="\$name_$i"
 		eval last="\$last_$i"
@@ -62,8 +60,13 @@ function replace_vars {
 		str=$(echo "$str" | sed -e "s~[{]VALUE_$i[}]~$value~g" \
 		                        -e "s~[{]NAME_$i[}]~$name~g" \
 		                        -e "s~[{]LAST_$i[}]~$last~g")
-		i=$((i+1))
 	done
+
+	### If only 1 is used, VALUE, NAME and LAST are also allowed
+	test -z "$value_1" && value_1=$EMPTY
+	str=$(echo "$str" | sed -e "s~[{]VALUE[}]~$value_1~g" \
+	                        -e "s~[{]NAME[}]~$name_1~g" \
+	                        -e "s~[{]LAST[}]~$last_1~g")
 
 	echo "$str"
 }
@@ -93,6 +96,8 @@ i=0
 while test $i -lt $GUID_N; do
 
 	i=$((i+1))
+
+	EMPTY=
 
 	log 1 "--- $i ---"
 
@@ -134,7 +139,7 @@ while test $i -lt $GUID_N; do
 		eval value_$j="\$value"
 
 		lastfile=$run/$hash.$i.$j.last
-		test -f $lastfile && last=$(<$lastfile)
+		test -f $lastfile && last=$(<$lastfile) || last=
 		eval last_$j="\$last"
 
 		echo -n "$value" >$lastfile
@@ -193,6 +198,9 @@ while test $i -lt $GUID_N; do
 		log 1 "--- Action $j ---"
 
 		eval ACTION=\$ACTION_${i}_${j}
+
+		eval EMPTY=\$ACTION_${i}_${j}_EMPTY
+		test "$EMPTY" || EMPTY="<empty>"
 
 		case ${ACTION:-log} in
 
