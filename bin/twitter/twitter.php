@@ -61,7 +61,7 @@ if (count($loc) == 2) {
 
 require_once __DIR__.'/contrib/twitteroauth.php';
 
-$try = 3;
+$try = 6;
 
 while ($try-- > 0) {
 
@@ -82,6 +82,8 @@ while ($try-- > 0) {
 
 if ($rc) {
   echo 'Twitter connect failed.', PHP_EOL, PHP_EOL;
+} elseif ($args->t) {
+  echo 'Would send: ', PHP_EOL, print_r($status, TRUE), PHP_EOL;
 } else {
   $res = $conn->post('statuses/update', $status);
 
