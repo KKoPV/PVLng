@@ -37,12 +37,6 @@ var RefreshTimeout = 300;
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
-<!--
-<script src="/js/highcharts.js"></script>
-<script src="/js/highcharts-more.js"></script>
-<script src="/js/highcharts-exporting.js"></script>
--->
-
 <script>
 
 var
@@ -98,10 +92,10 @@ var
 				$.each(this.points, function(id, point) {
 					var c = 'color:' + point.series.color;
 					if (point.point.low != undefined && point.point.high != undefined) {
-						v = Highcharts.numberFormat(+point.point.low.toFixed(defaults.HintDecimals), -1) + ' - ' +
-							Highcharts.numberFormat(+point.point.high.toFixed(defaults.HintDecimals), -1);
+						v = Highcharts.numberFormat(+point.point.low, point.series.options.decimals) + ' - ' +
+							Highcharts.numberFormat(+point.point.high, point.series.options.decimals);
 					} else if (point.y != undefined) {
-						v = Highcharts.numberFormat(+point.y.toFixed(defaults.HintDecimals), -1);
+						v = Highcharts.numberFormat(+point.y, point.series.options.decimals);
 					} else {
 						return;
 					}
@@ -229,7 +223,7 @@ function updateChart() {
 		period = $('#period').val();
 
 	/* reset consumption and costs data */
-	$('.consumption, .costs, #costs').each(function(id, el) {
+	$('.minmax, .consumption, .costs, #costs').each(function(id, el) {
 		$(el).html('');
 	});
 
@@ -251,7 +245,6 @@ function updateChart() {
 	/* build channels */
 	$(buffer).each(function(id, channel) {
 		/* axis from chart point of view */
-		var opposite = !(channel.axis & 1);
 		channel.axis = yAxisMap.indexOf(channel.axis);
 
 		if (channel.type == 'areasplinerange') {
@@ -280,8 +273,8 @@ function updateChart() {
 				title: { text: channel.unit },
 				lineColor:channel.color,
 				/* odd axis on left, even on right side */
-				opposite: opposite,
-				showEmpty:false
+				opposite: (channel.axis & 1),
+				showEmpty: false
 			};
 			/* only 1st left axis shows grid lines */
 			if (channel.axis != 0) {
@@ -352,18 +345,21 @@ function updateChart() {
 				}
 
 				if (attr.costs) {
-					costs += +attr.costs.toFixed(2);
-					$('#costs'+channel.id).html(Highcharts.numberFormat(attr.costs, 2));
+					costs += +attr.costs.toFixed({CURRENCYDECIMALS});
+					$('#costs'+channel.id).html(Highcharts.numberFormat(attr.costs, {CURRENCYDECIMALS}));
 				}
 
 				t = (attr.description) ? ' (' + attr.description + ')' : '';
 
 				var serie = { /* HTML decode channel name */
-					name:	$("<div/>").html(attr.name + t).text(),
-					color:	channel.color,
-					type:	channel.type,
-					yAxis:	channel.axis,
-					data:	[]
+				    id:       channel.id,
+				    decimals: attr.decimals,
+					unit:     attr.unit,
+					name:     $("<div/>").html(attr.name + t).text(),
+					color:    channel.color,
+					type:     channel.type,
+					yAxis:    channel.axis,
+					data:     []
 				};
 
 				if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
@@ -436,7 +432,7 @@ function updateChart() {
 					text: completed + ' channels loaded ' +
 					      '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
 				});
-				$('#costs').html(costs ? Highcharts.numberFormat(costs, 2) : '');
+				$('#costs').html(costs ? Highcharts.numberFormat(costs, {CURRENCYDECIMALS}) : '');
 				var t = $('#from').val();
 				var s = $('#to').val();
 				if (t != s) t += ' - ' + s;
@@ -462,7 +458,8 @@ function updateChart() {
 
 				chart.hideLoading();
 				chart.redraw();
-				setTimeout(setExtremes, channels.length*100);
+				setExtremes();
+				/* setTimeout(setExtremes, channels.length*100); */
 
 				if (RefreshTimeout > 0) {
 					timeout = setTimeout(updateChart, RefreshTimeout*1000);
@@ -486,7 +483,7 @@ $(function() {
 		bJQueryUI: true
 	});
 
-	$('#tree').treetable({
+	$('.treeTable').treetable({
 		initialState: 'expanded',
 		indent: 24,
 		column: 1

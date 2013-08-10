@@ -5,211 +5,140 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-22-g7bc4608 2013-05-05 22:07:15 +0200 Knut Kohl $
+ * @version     $Id: v1.0.0.2-19-gf67765b 2013-05-05 22:03:31 +0200 Knut Kohl $
  */
-class Index_Controller extends ControllerAuth {
+class Index_Controller extends Controller {
 
 	/**
 	 *
 	 */
 	public function before() {
 		parent::before();
+
 		$this->Tree = NestedSet::getInstance();
+		$this->channels = array();
+		$this->views = $this->model->getViews();
+		$this->date = time();
 	}
 
 	/**
 	 *
 	 */
 	public function after() {
-		if ($this->Tree->isError()) {
-			foreach ($this->Tree->getError() as $value) {
-				if (strstr($value, 'NestedSet::checkRootNode()') == '')
-					Messages::Error($value);
-			}
-		}
+		$this->view->PeriodCount = isset($this->Channels->c) ? $this->Channels->c : 1;
 
-		$this->view->Entities = $this->rows2view($this->model->getEntities());
+		$this->view->PeriodSelect =
+			BabelKitMySQLi::getInstance()->select(
+				'period',
+				LANGUAGE,
+				array(
+					'var_name'     => 'v[p]',
+					'blank_prompt' => I18N::_('None'),
+					'value'        => isset($this->Channels->p) ? $this->Channels->p : '',
+					'options'      => 'id="period"'
+				)
+			);
+
+		$this->view->Date = date('m/d/Y', $this->date);
+
 		parent::after();
 	}
 
 	/**
 	 *
 	 */
-	public function Index_Action() {
+	public function Index_GET_Action() {
+		if ($view = $this->request('view')) {
+			if ($data = $this->model->getView($view)) {
+				$this->actView = $view;
+				$this->Channels = $data->data;
+			} else {
+				Messages::Error(I18N::_('UnknownView', $view));
+			}
+		}
+		if ($date = $this->request('date')) {
+			$this->date = strtotime($date);
+		}
+	}
 
-		$this->view->SubTitle = I18N::_('Overview');
+	/**
+	 *
+	 */
+	public function Index_POST_Action() {
+
+		if ($this->request('save') AND $this->request('saveview')) {
+			// Allowed only for logged in user
+			if (!Session::get('user')) return;
+		    // Save view
+			if ($channels = $this->request('v')) {
+				$this->actView = $this->request('saveview');
+				// Save ...
+				$this->model->saveView($this->actView, $channels, $this->request('public'));
+				// ... and read back
+				$this->Channels = $this->model->getView($this->actView)->data;
+			}
+
+		} elseif ($this->request('load') AND $this->request('loadview')) {
+			// Load view
+			$this->actView = $this->request('loadview');
+			$this->Channels = $this->model->getView($this->actView)->data;
+
+		} elseif ($this->request('delete') AND $this->request('loadview')) {
+			// Allowed only for logged in user
+			if (!Session::get('user')) return;
+			// Delete view
+			$this->model->deleteView($this->request('loadview'));
+
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function Index_Action() {
+		$this->view->SubTitle = I18N::_('Charts');
 
 		$tree = $this->Tree->getFullTree();
 		array_shift($tree);
-
 		$parent = array( 1 => 0 );
 
 		$data = array();
-		foreach ($tree as $i=>$node) {
+		foreach ($tree as $node) {
 
 			$parent[$node['level']] = $node['id'];
 			$node['parent'] = $parent[$node['level']-1];
 
 			if ($entity = $this->model->getEntity($node['entity'])) {
-				$node['type']         = $entity->type;
-				$node['name']         = $entity->name;
-				$node['unit']         = $entity->unit;
-				$node['description']  = $entity->description;
-				$node['guid']         = $node['guid'] ?: $entity->guid;
-				$node['acceptchilds'] = $entity->childs;
-				$node['read']         = $entity->read;
-				$node['write']        = $entity->write;
-				$node['icon']         = $entity->icon;
+				// remove id, is the same as $node[entity]
+				unset($entity->id);
+				$guid = $node['guid'] ?: $entity->guid;
+				$node = array_merge($node, (array) $entity);
+				$node['guid'] = $guid;
+				$id = $node['id'];
+				if (isset($this->Channels->$node['id'])) {
+					$node['checked'] = 'checked';
+					$node['presentation'] = $this->Channels->$id;
+				}
 			}
+
 			$data[] = array_change_key_case($node, CASE_UPPER);
 		}
 		$this->view->Data = $data;
-	}
 
-	/**
-	 * Add an entity into the tree
-	 */
-	public function AddChild_Post_Action() {
-		if ($parent = $this->request('parent') AND
-				$child = $this->request('child')) {
-			$this->Tree->insertChildNode($child, $parent);
-		}
-		$this->redirect('index');
-	}
-
-
-	/**
-	 * Delete an entity from the tree
-	 */
-	public function Delete_Post_Action() {
-		if ($id = $this->request('id')) {
-			$this->Tree->DeleteNode($id);
-		}
-		$this->redirect('index');
-	}
-
-	/**
-	 * Delete an entity and his childs from the tree
-	 */
-	public function DeleteBranch_Post_Action() {
-		if ($id = $this->request('id')) {
-			$this->Tree->DeleteBranch($id);
-		}
-		$this->redirect('index');
-	}
-
-	/**
-	 * Move an entity down in tree
-	 */
-	public function MoveLeft_Post_Action() {
-		if ($id = $this->request('id')) {
-		    for ($i=$this->request('count', 1); $i>0; $i--) {
-				$this->Tree->moveLft($id);
+		$views = array();
+		foreach ($this->model->getViews() as $row) {
+			$views[] = array(
+				'NAME'     => $row->name,
+				'PUBLIC'   => $row->public,
+				'SELECTED' => ($row->name == $this->actView)
+			);
+			if ($row->name == $this->actView AND $row->public) {
+				$this->view->ViewPublic = TRUE;
 			}
 		}
-		$this->redirect('index');
-	}
-
-	/**
-	 * Move an entity down in tree
-	 */
-	public function MoveRight_Post_Action() {
-		if ($id = $this->request('id')) {
-		    for ($i=$this->request('count', 1); $i>0; $i--) {
-				$this->Tree->moveRgt($id);
-			}
-		}
-		$this->redirect('index');
-	}
-
-	/**
-	 * Move an entity up in tree
-	 */
-	public function MoveUp_Post_Action() {
-		if ($id = $this->request('id')) {
-			$this->Tree->moveUp($id);
-		}
-		$this->redirect('index');
-	}
-
-	/**
-	 * Move an entity down in tree
-	 */
-	public function MoveDown_Post_Action() {
-		if ($id = $this->request('id')) {
-			$this->Tree->moveDown($id);
-		}
-		$this->redirect('index');
-	}
-
-	/**
-	 *
-	 */
-	public function Login_Post_Action() {
-
-		$hasher = new PasswordHash();
-
-		if ($this->config->Admin_User == $this->request('user') AND
-		    $hasher->CheckPassword($this->request('pass'), $this->config->Admin_Password)) {
-
-			$this->User = $this->request('user');
-			Session::set('user', $this->User);
-
-			if ($this->request('save')) {
-				setcookie(Session::token(), 1, time()+60*60*24*7, '/');
-			}
-			Messages::Success(I18N::_('Welcome', $this->User));
-
-			if ($r = Session::get('returnto')) {
-				// clear before redirect
-				Session::set('returnto');
-				$this->redirect($r);
-			} else {
-				$this->redirect('');
-			}
-			
-
-		} else {
-			Messages::Error(I18N::_('UnknownUser'));
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function Logout_Action() {
-		if ($this->User) {
-			$this->view->Message = I18N::_('LogoutSuccessful', $this->User);
-		}
-		$this->User = '';
-		Session::destroy();
-		setcookie(Session::token(), '', time()-60*60*24, '/');
-	}
-
-	/**
-	 *
-	 */
-	public function AdminPassword_POST_Action() {
-		if ($this->request('u') == '' OR $this->request('p1') == '' OR $this->request('p2') == '') {
-			Messages::Error(I18N::_('AdminAndPasswordRequired'), TRUE);
-			return;
-		}
-
-		if ($this->request('p1') != $this->request('p2')) {
-			Messages::Error(I18N::_('PasswordsNotEqual'), TRUE);
-			return;
-		}
-
-		$hasher = new PasswordHash();
-		$this->view->AdminPass = $hasher->HashPassword($this->request('p1'));
-	}
-
-	/**
-	 *
-	 */
-	public function AdminPassword_Action() {
-		$this->view->SubTitle = I18N::_('GenerateAdminHash');
-		$this->view->AdminUser = $this->request('u');
+		$this->view->View = $this->actView;
+		$this->view->Views = $views;
+		$this->view->NotifyLoad = $this->config->Controller_Chart_NotifyLoad;
 	}
 
 	// -------------------------------------------------------------------------
@@ -220,5 +149,20 @@ class Index_Controller extends ControllerAuth {
 	 *
 	 */
 	protected $Tree;
+
+	/**
+	 *
+	 */
+	protected $Channels;
+
+	/**
+	 *
+	 */
+	protected $actView;
+
+	/**
+	 *
+	 */
+	protected $date;
 
 }

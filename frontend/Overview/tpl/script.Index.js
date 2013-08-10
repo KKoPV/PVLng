@@ -79,7 +79,10 @@ $(function() {
 		var visible = $(this).is(':checked');
 		oTable.fnSetColumnVis( 4, visible);
 		if (visible) {
+			/* show after re-insert into table */
+			$('.td-guid').show();
 			$('.guid').click(function() {
+				/* select GUID, make ready for copy */
 				$(this).select();
 			}).mouseup(function(e) {
 				e.preventDefault();

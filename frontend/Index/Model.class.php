@@ -7,7 +7,7 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     $Id$
  */
-class Chart_Model extends Model {
+class Index_Model extends Model {
 
 	/**
 	 *

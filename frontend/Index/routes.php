@@ -5,21 +5,23 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     $Id: v1.0.0.2-14-g2a8e482 2013-05-01 20:44:21 +0200 Knut Kohl $
  */
 
 /**
- * '{route}' => array( '{controller}', '{action}' ),
+ * <route> => array( <Controller>, <Action> ),
  */
 return array(
 
-	'login'             => array( 'Index', 'Login' ),
-	'logout'            => array( 'Index', 'Logout' ),
+	''                  => array( 'Index', 'Index' ),
+	'index'             => array( 'Index', 'Index' ),
+	'index/index'       => array( 'Index', 'Index' ),
 
 	'index'             => array( 'Index', 'Index' ),
-	'index/:Action'     => array( 'Index', NULL ),
-	'index/:Action/#id' => array( 'Index', NULL ),
+	'index/:view'       => array( 'Index', 'Index' ),
+	'index/:view/:date' => array( 'Index', 'Index' ),
 
-	'adminpass'         => array( 'Index', 'AdminPassword' )
+	'chart/:view'       => array( 'Index', 'Index' ),
+	'chart/:view/:date' => array( 'Index', 'Index' ),
 
 );

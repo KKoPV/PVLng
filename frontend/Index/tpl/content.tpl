@@ -9,7 +9,7 @@
  */
 -->
 
-<form method="post" action="/chart">
+<form method="post" action="/">
 
 <div id="nav" style="margin-top:1em">
 	<input type="hidden" id="fromdate" name="fromdate" />
@@ -64,7 +64,53 @@
 
 <div class="clear"></div>
 
-<div id="wrapper" style="padding-top:1em<!-- IF {USER} == "" -->;display:none<!-- ENDIF -->">
+<div id="wrapper" style="padding-top:1em">
+
+<!-- IF {USER} == "" -->
+
+	<!--
+	Show only channels in public charts and NOT all channel GUIDs
+	-->
+
+	<table id="tree" class="dataTable">
+
+		<thead>
+		<tr>
+			<th class="l" style="width:99%">{{Channel}}</th>
+			<th class="r">{{Amount}}</th>
+			<th class="l">{{Unit}}</th>
+		</tr>
+		</thead>
+
+		<tbody>
+
+		<!-- BEGIN DATA -->
+
+		<!-- IF {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
+		<tr>
+			<td>
+				<input id="c{ID}" style="display:none" class="channel"
+				       type="checkbox" checked="checked"
+				       data-id="{ID}" data-guid="{GUID}" data-unit="{UNIT}"
+				       value='{PRESENTATION}' />
+				<img style="vertical-align:middle" class="imgbar tip"
+				     src="/images/ico/{ICON}" alt="" title="{TYPE}" />
+				<strong class="tip" title="{GUID}">{NAME}</strong>
+				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+				<img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" />
+			</td>
+			<td id="cons{ID}" class="consumption r"></td>
+			<td id="u{ID}">{UNIT}</td>
+		</tr>
+		<!-- ENDIF -->
+
+		<!-- END -->
+
+		</tbody>
+
+	</table>
+
+<!-- ELSE -->
 
 	<table id="tree" class="dataTable treeTable">
 		<thead>
@@ -80,7 +126,7 @@
 			</th>
 			<th class="r">{{Amount}}</th>
 			<th class="l">{{Unit}}</th>
-			<th class="r">{{Cost}}</th>
+			<th class="r">{{Earning}}&nbsp;/ {{Cost}}</th>
 			<th><img src="/images/ico/node_design.png" alt="" /></th>
 		</tr>
 		</thead>
@@ -92,7 +138,7 @@
 		<tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
 			<td>
 				<!-- IF {GRAPH} -->
-				<input id="c{ID}" class="channel iCheck" type="checkbox"	name="v[{ID}]"
+				<input id="c{ID}" class="channel iCheck" type="checkbox" name="v[{ID}]"
 				       data-id="{ID}" data-guid="{GUID}" data-unit="{UNIT}"
 				       value='{PRESENTATION}'
 							 <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
@@ -130,7 +176,9 @@
 		<tfoot>
 	</table>
 
-</div>
+<!-- ENDIF -->
+
+</div> <!-- wrapper -->
 
 <!-- IF {USER} -->
 <h3>
@@ -175,9 +223,9 @@
 	<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
 	<!-- IF {USER} -->
 	<input type="submit" name="delete" value="{{Delete}}" style="margin-left:.5em" />
-	<!-- ENDIF -->
 	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">
 		PVLng | {VIEW}
+	<!-- ENDIF -->
 	</a>
 </p>
 

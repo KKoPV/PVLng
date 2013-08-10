@@ -31,9 +31,10 @@
 		<th></th>
 		<th></th>
 		<th></th>
-		<th>GUID</th>
+		<th class="td-guid" style="display:none">GUID</th>
 	</tr>
 	</thead>
+
 	<tbody>
 
 	<!-- BEGIN DATA -->
@@ -55,7 +56,7 @@
 		</td>
 
 		<td style="white-space:nowrap">
-			<a href="/channel/edit/{ENTITY}?returnto=index" class="tip" title="{{EditEntity}}">
+			<a href="/channel/edit/{ENTITY}?returnto=overview" class="tip" title="{{EditEntity}}">
 				<img src="/images/ico/node_design.png" class="imgbar" alt="edit" width="16" height="16" />
 			</a>
 
@@ -114,7 +115,7 @@
 			<!-- ENDIF -->
 		</td>
 
-		<td style="white-space:nowrap">
+		<td class="td-guid" style="white-space:nowrap;display:none">
 			<input style="background-color:transparent;border:0;width:24em;font-family:monospace;font-size:smaller"
 			       class="guid"  value="{GUID}" readonly="readonly" />
 		</td>
@@ -129,16 +130,10 @@
 				<img src="/images/ico/plus_circle_frame.png" alt="add" width="16" height="16" />
 			</a>
 		</td>
-		<!-- IF {DATA} -->
-		<td></td>
-		<!-- ELSE -->
-		<td style="width:99%">
-			<span style="font-size:150%">&laquo; </span> {{Add1Channel}}
-		</td>
-		<!-- ENDIF -->
 		<td></td>
 		<td></td>
 		<td></td>
+		<td class="td-guid" style="display:none"></td>
 	</tr>
 	</tbody>
 
