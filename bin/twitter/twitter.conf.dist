@@ -28,11 +28,10 @@ STATUS  "Leistung aktuell: %.0f W • Ø Stunde: %.0f W • Heute: %.1f kWh (%.2
 GUID             ""
 
 ##############################################################################
-### Loaction
-### decimal, optional
+### Loaction, latitude,longitude
+### 2 decimals: 1.2345,1.2345, optional
 ##############################################################################
-LAT              ""
-LONG             ""
+LAT_LON          ""
 
 ##############################################################################
 ### How many items are used in status

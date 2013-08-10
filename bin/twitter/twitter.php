@@ -32,21 +32,22 @@ $args->add('c', 'Twitter consumer key', 'consumer_key', TRUE)
      ->add('o', 'OAuth token', 'oauth_token', TRUE)
      ->add('u', 'OAuth secret', 'oauth_secret', TRUE)
      ->add('s', 'Status to post', 'status', TRUE)
-     ->add('x', 'Location latitude', 'lat')
-     ->add('y', 'Location longitude', 'long')
+     ->add('l', 'Location: latitude,longitude', 'location')
      ->add('t', 'Activate test mode', 'test')
      ->add('d', 'Activate debug mode', 'debug')
      ->add('h', 'This help', 'help')
      ->run();
 
-if ($args->d) print_r($args->getAll());
+if ($args->d) echo PHP_EOL, print_r($args->getAll(), TRUE);
 
-if ($args->x != '' AND $args->y != '') {
+$loc = explode(',', $args->l);
+
+if (count($loc) == 2) {
 
   $status = array(
     'status' => $args->s,
-    'lat'    => $args->x,
-    'long'   => $args->y,
+    'lat'    => $loc[0],
+    'long'   => $loc[1],
     'display_coordinates' => 'true',
   );
 
@@ -72,7 +73,7 @@ while ($try-- > 0) {
   $res = $conn->get('account/verify_credentials');
 
   $rc = ($conn->http_code == 200) ? 0 : 3;
-  if ($args->d) printf("Verify credentials: %d\n", $rc);
+  if ($args->d) printf("Verify credentials HTTP code: %d\n", $conn->http_code);
 
   ($rc == 0) && $try = 0;
 
@@ -86,6 +87,9 @@ if ($rc) {
 
   $rc = ($conn->http_code == 200) ? 0 : 4;
   if ($rc) {
-    echo 'Twitter update failed.', PHP_EOL, PHP_EOL;
+    echo 'Twitter update failed.', PHP_EOL;
+    echo $conn->http_header['status'], PHP_EOL;
   }
 }
+
+if ($args->d) echo PHP_EOL, print_r($conn, TRUE), PHP_EOL;

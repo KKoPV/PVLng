@@ -13,7 +13,12 @@ pwd=$(dirname $0)
 
 . $pwd/../PVLng.conf
 . $pwd/../PVLng.sh
+
+test -f $pwd/.tokens || error_exit "Missing token file! Did you run setup.sh?"
+
 . $pwd/twitter.items
+. $pwd/.pvlng
+. $pwd/.tokens
 
 while getopts "lftvxh" OPTION; do
 	case "$OPTION" in
@@ -34,6 +39,10 @@ shift $((OPTIND-1))
 
 read_config "$1"
 
+test "$OAUTH_TOKEN"        || error_exit "Missing OAuth token! Did you run setup.sh?"
+test "$OAUTH_TOKEN_SECRET" || error_exit "Missing OAuth secret! Did you run setup.sh?"
+test "$STATUS"             || error_exit "Missing status!"
+
 ITEM_N=$(int "$ITEM_N")
 test $ITEM_N -gt 0  || error_exit "No items defined"
 
@@ -41,14 +50,6 @@ test $ITEM_N -gt 0  || error_exit "No items defined"
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
-
-test "$OAUTH_TOKEN"        || error_exit "Missing OAuth token!"
-test "$OAUTH_TOKEN_SECRET" || error_exit "Missing OAuth secret!"
-test "$STATUS"             || error_exit "Missing status!"
-
-### App tokens
-CONSUMER_KEY="4Qs7FkTWVyJKfZKYSadAw"
-CONSUMER_SECRET="baUNgkJxIbSiPau7VXBq1I1h4byWDNHRuqq2vmGA"
 
 TWITTER_URL="https://api.twitter.com/1/statuses/update.json"
 
@@ -100,12 +101,14 @@ log 1 "Length   : $(echo $STATUS | wc -c)"
 
 test "$TEST" && exit
 
-$(dirname $0)/twitter.php \
+test $VERBOSE -ne 0 && debug='--debug'
+
+$(dirname $0)/twitter.php $debug \
   --consumer_key=$CONSUMER_KEY \
   --consumer_secret=$CONSUMER_SECRET \
   --oauth_token=$OAUTH_TOKEN \
   --oauth_secret=$OAUTH_TOKEN_SECRET \
-  --status="$STATUS" --lat=$LAT --long=$LONG
+  --status="$STATUS" --location=$LAT_LON
 
 set +x
 

@@ -6,8 +6,9 @@
 ### @version     $Id$
 ##############################################################################
 
-key='4Qs7FkTWVyJKfZKYSadAw'
-secret='baUNgkJxIbSiPau7VXBq1I1h4byWDNHRuqq2vmGA'
+pwd=$(dirname $0)
+
+. $pwd/.pvlng
 
 request_token_url='https://api.twitter.com/oauth/request_token' \
 authorize_url='https://api.twitter.com/oauth/authorize?oauth_token=$oauth_token' \
@@ -21,7 +22,7 @@ trap 'rm $consumer_tmp $request_token_tmp $access_token_tmp' 0
 
 curlicue=$(dirname $0)/contrib/curlicue
 
-echo "oauth_consumer_key=$key&oauth_consumer_secret=$secret" > $consumer_tmp
+echo "oauth_consumer_key=$CONSUMER_KEY&oauth_consumer_secret=$CONSUMER_SECRET" > $consumer_tmp
 
 $curlicue -f $consumer_tmp -p 'oauth_callback=oob' -- \
           -s -d '' "$request_token_url" > $request_token_tmp
@@ -51,15 +52,19 @@ if cat $access_token_tmp | grep -vq 'oauth_token='; then
 fi
 
 IFS='&'
-a=($(cat $access_token_tmp))
+a=($(<$access_token_tmp))
 
-echo '3. Add the following 2 lines into your config file:'
+( IFS='='
+  for t in "${a[@]}"; do
+    set $t
+    if echo $1 | grep -q 'oauth'; then
+      printf '%s="%s"\n' $(echo $1 | tr a-z A-Z) "$2"
+    fi
+  done
+) >$pwd/.tokens
+
+cat $pwd/.tokens
 echo
 
-IFS='='
-for t in "${a[@]}"; do
-  set $t
-  if echo $1 | grep -q 'oauth'; then
-    printf '%-20s"%s"\n' $(echo $1 | tr a-z A-Z) $2
-  fi
-done
+echo '3. Wrote your tokens to .tokens'
+echo
