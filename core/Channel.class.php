@@ -452,11 +452,12 @@ class Channel {
 				$row['consumption'] *= $this->resolution;
 			}
 
-			$row['data'] = $this->valid($row['data']);
-
-			$datafile->write($row, $id);
-
-			$lastrow = $row;
+			// Skip invalid rows
+			if ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
+			    (is_null($this->valid_to) OR $row['data'] <= $this->valid_to)) {
+				$datafile->write($row, $id);
+				$lastrow = $row;
+			}
 		}
 		$buffer->close();
 
@@ -538,18 +539,6 @@ class Channel {
 		Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $this->time) * 1000));
 
 		return $buffer;
-	}
-
-	/**
-	 *
-	 */
-	protected function valid( $data ) {
-		if (!is_null($this->valid_from) AND $data < $this->valid_from) {
-			return $this->valid_from;
-		} elseif (!is_null($this->valid_to) AND $data > $this->valid_to) {
-			return $this->valid_to;
-		}
-		return $data;
 	}
 
 	// -------------------------------------------------------------------------
