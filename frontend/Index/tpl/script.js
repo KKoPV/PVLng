@@ -436,7 +436,7 @@ function updateChart() {
 				var t = $('#from').val();
 				var s = $('#to').val();
 				if (t != s) t += ' - ' + s;
-				chart.setTitle({ text: $('#loadview').val() }, { text: t });
+				chart.setTitle({ text: $('#loaddeleteview').val() }, { text: t });
 
 				_log('Apply series');
 
@@ -580,7 +580,7 @@ $(function() {
 		}
 	});
 
-	if ($('#loadview').val()) {
+	if ($('#loaddeleteview').val()) {
 		ToggleTree(false);
 		updateChart();
 	}
@@ -604,13 +604,6 @@ $(function() {
 		text: false
 	});
 
-	$('#btn-go').button({
-		icons: {
-			primary: 'ui-icon-folder-open'
-		},
-		text: false
-	});
-
 	$('#btn-refresh').button({
 		icons: {
 			primary: 'ui-icon-refresh'
@@ -626,7 +619,7 @@ $(function() {
 		disabled: ('{VIEW}' == '')
 	}).prop('href', $('#btn-bookmark').data('url') + encodeURIComponent('{VIEW}'));
 
-	$('#loadview').change(function() {
+	$('#loaddeleteview').change(function() {
 		var el = $('#btn-bookmark');
 		el.button({
 			label: 'PVLng | ' + this.value,

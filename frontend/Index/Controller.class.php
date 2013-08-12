@@ -66,28 +66,37 @@ class Index_Controller extends Controller {
 	 */
 	public function Index_POST_Action() {
 
-		if ($this->request('save') AND $this->request('saveview')) {
+		if ($view = $this->request('loadview')) {
+			// Load view from top select
+			$this->actView = $view;
+			$this->Channels = $this->model->getView($view)->data;
+
+		} elseif ($this->request('save') AND $view = $this->request('saveview')) {
 			// Allowed only for logged in user
 			if (!Session::get('user')) return;
 		    // Save view
 			if ($channels = $this->request('v')) {
-				$this->actView = $this->request('saveview');
+				$this->actView = $view;
 				// Save ...
-				$this->model->saveView($this->actView, $channels, $this->request('public'));
+				$this->model->saveView($view, $channels, $this->request('public'));
 				// ... and read back
-				$this->Channels = $this->model->getView($this->actView)->data;
+				$this->Channels = $this->model->getView($view)->data;
 			}
 
-		} elseif ($this->request('load') AND $this->request('loadview')) {
+		} elseif ($this->request('load') AND $view = $this->request('loaddeleteview')) {
 			// Load view
-			$this->actView = $this->request('loadview');
-			$this->Channels = $this->model->getView($this->actView)->data;
+			$this->actView = $view;
+			$this->Channels = $this->model->getView($view)->data;
 
-		} elseif ($this->request('delete') AND $this->request('loadview')) {
+		} elseif ($this->request('delete') AND $view = $this->request('loaddeleteview')) {
 			// Allowed only for logged in user
 			if (!Session::get('user')) return;
 			// Delete view
-			$this->model->deleteView($this->request('loadview'));
+			if ($this->model->deleteView($view)) {
+				Messages::Success(I18N::_('ViewDeleted', $view));
+			} else {
+				Messages::Error(I18N::_('DeleteViewFailed', $view));
+			}
 
 		}
 	}

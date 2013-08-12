@@ -47,8 +47,38 @@
 
 <div id="chart" style="margin-top: 1em">
 	<div id="chart-placeholder">
-		{{NoChannelsSelectedYet}} &nbsp;
-		<a id="btn-go" href="#view">{{GoToVariants}}</a>
+		<!-- IF {VIEW} -->
+		<p><img src="/images/spinner.gif" alt="{{JustAMoment}}" /></p>
+		<!-- ELSE -->
+		<!-- IF {USER} -->
+			{{NoChannelsSelectedYet}}
+		<!-- ELSE -->
+			{{NoViewSelectedYet}}
+		<!-- ENDIF -->
+		<br /><br />
+
+		<span style="margin-right:1em">{{Variants}}:</span>
+
+		<select name="loadview" onChange="this.form.submit()">
+			<option value="">--- {{Select}} ---</option>
+			<!-- BEGIN VIEWS -->
+				<!-- IF {__USER} -->
+					<!-- show all charts and mark public charts -->
+					<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+						{NAME} <!-- IF {PUBLIC} -->({{public}})<!-- ENDIF -->
+					</option>
+				<!-- ELSEIF {PUBLIC} -->
+					<!-- show only public charts -->
+					<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+						{NAME}
+					</option>
+				<!-- ENDIF -->
+			<!-- END -->
+		</select>
+		<noscript>
+			<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
+		</noscript>
+		<!-- ENDIF -->
 	</div>
 </div>
 
@@ -204,7 +234,7 @@
 	<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
 	<!-- ENDIF -->
 
-	<select id="loadview" name="loadview">
+	<select id="loaddeleteview" name="loaddeleteview">
 		<option value="">--- {{Select}} ---</option>
 		<!-- BEGIN VIEWS -->
 			<!-- IF {__USER} -->
