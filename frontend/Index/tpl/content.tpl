@@ -48,7 +48,10 @@
 <div id="chart" style="margin-top: 1em">
 	<div id="chart-placeholder">
 		<!-- IF {VIEW} -->
-		<p><img src="/images/spinner.gif" alt="{{JustAMoment}}" /></p>
+		<p>
+			<img style="width:16px;height16px" src="/images/spinner.gif"
+			     alt="{{JustAMoment}}" width="16" height="16" />
+		</p>
 		<!-- ELSE -->
 		<!-- IF {USER} -->
 			{{NoChannelsSelectedYet}}
@@ -123,11 +126,14 @@
 				       type="checkbox" checked="checked"
 				       data-id="{ID}" data-guid="{GUID}" data-unit="{UNIT}"
 				       value='{PRESENTATION}' />
-				<img style="vertical-align:middle" class="imgbar tip"
-				     src="/images/ico/{ICON}" alt="" title="{TYPE}" />
+				<img style="vertical-align:middle;width:16px;height:16px"
+				     class="imgbar tip" src="/images/ico/{ICON}" alt=""
+				     title="{TYPE}" width="16" height="16" />
 				<strong class="tip" title="{GUID}">{NAME}</strong>
 				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
-				<img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" />
+				<img id="s{ID}" src="/images/spinner.gif"
+				     style="float:right;display:none;width:16px;height:16px"
+				     width="16" height="16" />
 			</td>
 			<td id="cons{ID}" class="consumption r"></td>
 			<td id="u{ID}">{UNIT}</td>
@@ -147,7 +153,9 @@
 		<tr>
 			<th>
 				<img id="treetoggle" src="/images/ico/toggle.png"
-				     class="tip" onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
+					 style="width:16px;height:16px"
+				     class="tip" onclick="ToggleTree()" alt="[+]"
+					 title="#tiptoggle" width="16" height="16" />
 				<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 			</th>
 			<th style="width:99%;padding-left:0" class="l">
@@ -157,7 +165,10 @@
 			<th class="r">{{Amount}}</th>
 			<th class="l">{{Unit}}</th>
 			<th class="r">{{Earning}}&nbsp;/ {{Cost}}</th>
-			<th><img src="/images/ico/node_design.png" alt="" /></th>
+			<th>
+				<img style="width:16px;height:16px" src="/images/ico/node_design.png"
+				     alt="" width="16" height="16" />
+			</th>
 		</tr>
 		</thead>
 
@@ -175,19 +186,22 @@
 				<!-- ENDIF -->
 			</td>
 			<td style="padding:0.4em 0">
-				<img style="vertical-align:middle" class="imgbar tip"
-				     src="/images/ico/{ICON}" alt="" title="{TYPE}" />
+				<img style="vertical-align:middle;width:16px;height:16px"
+				     class="imgbar tip" src="/images/ico/{ICON}" alt=""
+				     title="{TYPE}" width="16" height="16"/>
 				<strong class="tip" title="{GUID}">{NAME}</strong>
 				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
-				<img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" />
+				<img id="s{ID}" src="/images/spinner.gif" width="16" height="16"
+				     style="float:right;display:none;width:16px;height:16px" />
 			</td>
 			<td id="cons{ID}" class="consumption r"></td>
 			<td id="u{ID}">{UNIT}</td>
 			<td id="costs{ID}" class="costs r"></td>
 			<td>
 				<!-- IF {GRAPH} -->
-				<img src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
-						 class="tip" title="{{ChartSettingsTip}}" style="cursor:pointer"/>
+				<img style="cursor:pointer;width:16px;height:16px"
+				     src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
+				     class="tip" title="{{ChartSettingsTip}}" width="16" height="16" />
 				<!-- ENDIF -->
 			</td>
 		</tr>
@@ -212,10 +226,10 @@
 
 <!-- IF {USER} -->
 <h3>
-	<a name="view"></a>
-		{{Variants}}
-		<img src="/images/ico/information_frame.png" class="tip" style="margin-left:.5em"
-		     title="{{MobileVariantHint}}" />
+	{{Variants}}
+	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
+	     src="/images/ico/information_frame.png" width="16" height="16"
+	     title="{{MobileVariantHint}}" />
 </h3>
 <p>
 <!-- ELSE -->
@@ -229,7 +243,8 @@
 		<!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF -->
 	/>
 	<label for="public">{{public}}</label>
-	<img src="/images/ico/information_frame.png" class="tip" style="margin-left:.5em"
+	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
+	     src="/images/ico/information_frame.png" width="16" height="16"
 	     title="{{publicHint}}" />
 	<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
 	<!-- ENDIF -->
@@ -274,7 +289,8 @@
 				<input type="radio" name="d-axis" value="5" />
 				<input type="radio" name="d-axis" value="3" />
 				<input type="radio" name="d-axis" value="1" />
-				<img style="margin:0 0.5em 0.7em;vertical-align:top" src="/images/chart.png" width="35" height="18" />
+				<img style="margin:0 0.5em 0.7em;vertical-align:top;width:35px;height:18px"
+				     src="/images/chart.png" width="35" height="18" />
 				<input type="radio" name="d-axis" value="2" />
 				<input type="radio" name="d-axis" value="4" />
 				<input type="radio" name="d-axis" value="6" />
@@ -306,8 +322,9 @@
 					<input type="checkbox" id="d-cons" class="iCheckLine tip" />
 					<label for="d-cons">{{ShowConsumption}}</label>
 				</div>
-				<img src="/images/ico/information_frame.png" class="tip"
-				     style="margin-left:.5em" title="{{ShowConsumptionHint}}" />
+				<img style="margin-left:.5em;width:16px;height:16px" class="tip"
+				     src="/images/ico/information_frame.png" width="16" height="16"
+				     title="{{ShowConsumptionHint}}" />
 			</td>
 		</tr>
 		<tr>

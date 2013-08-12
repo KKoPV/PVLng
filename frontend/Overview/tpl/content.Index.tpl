@@ -23,8 +23,9 @@
 	<thead>
 	<tr>
 		<th style="width:99%;text-align:left !important;padding-left:18px !important">
-			<img src="/images/ico/toggle.png" id="treetoggle" class="tip"
-					 onclick="return ToggleTree()" tip="#tiptoggle" alt="[+]" />
+			<img src="/images/ico/toggle.png" id="treetoggle"
+			     style="width:16px;height:16px" width="16p" height="16" class="tip"
+			     onclick="return ToggleTree()" tip="#tiptoggle" alt="[+]" />
 			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 			&nbsp; {{Channels}}
 		</th>
@@ -42,7 +43,7 @@
 	<tr data-tt-id="{ID}"
 	    <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
 		<td style="padding:0.4em 0;width:99%">
-			<img style="vertical-align:top" width="16" height="16"
+			<img style="vertical-align:top;width:16px;height:16px" width="16" height="16"
 			     src="/images/ico/{ICON}" alt="" class="imgbar tip" title="{TYPE}" />
 			<strong>{NAME}</strong>
 			<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
@@ -50,14 +51,18 @@
 		</td>
 		<td>
 			<!-- IF {ACCEPTCHILDS} -->
-			<a href="#" onclick="addChild({ID}); return false" class="tip" title="{{AssignEntity}}">
-			<img src="/images/ico/node_insert_next.png" alt="add" width="16" height="16" /></a>
+			<a href="#" onclick="addChild({ID}); return false" class="tip"
+			   title="{{AssignEntity}}">
+				<img src="/images/ico/node_insert_next.png" alt="add"
+				     style="width:16px;height:16px" width="16p" height="16" />
+			</a>
 			<!-- ENDIF -->
 		</td>
 
 		<td style="white-space:nowrap">
 			<a href="/channel/edit/{ENTITY}?returnto=overview" class="tip" title="{{EditEntity}}">
-				<img src="/images/ico/node_design.png" class="imgbar" alt="edit" width="16" height="16" />
+				<img src="/images/ico/node_design.png" class="imgbar" alt="edit"
+				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
 
 			<!-- IF {CHILDS} == "0" -->
@@ -79,19 +84,23 @@
 			<!-- IF {LEVEL} != "1" AND {UPPER} != "0" -->
 			<a href="/index/moveleft" title="{{MoveEntityUp}}" class="tip"
 			   onclick="moveChild({ID}, 'moveleft'); return false">
-				<img src="/images/ico/navigation_090_frame.png" class="imgbar" alt="u" />
+				<img src="/images/ico/navigation_090_frame.png" class="imgbar" alt="u"
+				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
 			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt="" />
+			<img src="/images/ico/16x16.png" class="imgbar" alt=""
+			     style="width:16px;height:16px" width="16p" height="16" />
 			<!-- ENDIF -->
 
 			<!-- IF {LEVEL} != "1" AND {LOWER} != "0" -->
 			<a href="/index/moveright" title="{{MoveEntityDown}}" class="tip"
 			   onclick="moveChild({ID}, 'moveright'); return false">
-				<img src="/images/ico/navigation_270_frame.png" class="imgbar" alt="d" />
+				<img src="/images/ico/navigation_270_frame.png" class="imgbar" alt="d"
+				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
 			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt="" />
+			<img src="/images/ico/16x16.png" class="imgbar" alt=""
+			     style="width:16px;height:16px" width="16p" height="16" />
 			<!-- ENDIF -->
 
 			<!-- IF {LEVEL} > "2" -->
@@ -101,7 +110,8 @@
 			       class="imgbar tip" title="{{MoveEntityLeft}}" style="background-color:transparent" />
 			</form>
 			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt="" />
+			<img src="/images/ico/16x16.png" class="imgbar" alt=""
+			     style="width:16px;height:16px" width="16p" height="16" />
 			<!-- ENDIF -->
 
 			<!-- IF {UPPER} != "0" -->
@@ -111,7 +121,8 @@
 			       class="tip" title="{{MoveEntityRight}}" style="background-color:transparent" />
 			</form>
 			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" alt="" />
+			<img src="/images/ico/16x16.png" alt=""
+			     style="width:16px;height:16px" width="16p" height="16" />
 			<!-- ENDIF -->
 		</td>
 
@@ -127,7 +138,8 @@
 		<td style="padding:16px 0">
 			<span class="indenter" style="padding-left: 0px;"></span>
 			<a href="#" title="{{AddEntity}}" class="tip" onclick="addChild(1); return false">
-				<img src="/images/ico/plus_circle_frame.png" alt="add" width="16" height="16" />
+				<img src="/images/ico/plus_circle_frame.png" alt="add"
+				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
 		</td>
 		<td></td>
