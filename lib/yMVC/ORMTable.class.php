@@ -30,13 +30,15 @@ abstract class ORMTable {
 			$res = $this->db->query('SHOW COLUMNS FROM `'.$this->table.'`');
 			while ($row = $res->fetch_object()) {
 				$this->fields[$row->Field] = NULL;
+				$this->nullable[$row->Field] = ($row->Null == 'YES');
 				if ($row->Key   == 'PRI') $this->primary[] = $row->Field;
 				if ($row->Extra == 'auto_increment') $this->autoinc = $row->Field;
 			}
 			file_put_contents($schemafile,
-			                  serialize(array($this->fields, $this->primary, $this->autoinc)));
+			                  serialize(array($this->fields, $this->nullable,
+			                            $this->primary, $this->autoinc)));
 		} else {
-			list($this->fields, $this->primary, $this->autoinc) =
+			list($this->fields, $this->nullable, $this->primary, $this->autoinc) =
 				unserialize(file_get_contents($schemafile));
 		}
 
@@ -146,7 +148,11 @@ abstract class ORMTable {
 			// Skip primary key(s) and not changed values
 			if (!in_array($field, $this->primary) AND
 			    (string) $value != (string) $this->oldfields[$field]) {
-				$set[] = sprintf('`%s`="%s"', $field, $this->db->real_escape_string($value));
+				if ($value == '' AND $this->nullable[$field]) {
+					$set[] = sprintf('`%s` = NULL', $field);
+				} else {
+					$set[] = sprintf('`%s` = "%s"', $field, $this->db->real_escape_string($value));
+				}
 			}
 		}
 
@@ -289,6 +295,11 @@ abstract class ORMTable {
 	 *
 	 */
 	protected $fields = array();
+
+	/**
+	 *
+	 */
+	protected $nullable = array();
 
 	/**
 	 *
