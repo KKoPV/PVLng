@@ -95,7 +95,9 @@ class Controller extends yMVC\Controller {
 		$this->view->CurrencyDecimals = $this->config->Currency_Decimals;
 
 		$this->view->BaseDir = array(
+			APP_DIR . DS . $this->router->Controller . DS . 'tpl' . DS . 'custom',
 			APP_DIR . DS . $this->router->Controller . DS . 'tpl',
+			APP_DIR . DS . 'tpl' . DS . 'custom',
 			APP_DIR . DS . 'tpl'
 		);
 
