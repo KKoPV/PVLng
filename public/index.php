@@ -8,6 +8,8 @@
  * @version		 $Id$
  */
 
+$start = microtime(TRUE);
+
 ini_set('display_startup_errors', 0);
 ini_set('display_errors', 0);
 error_reporting(0);
@@ -53,3 +55,12 @@ include APP_DIR . DS . 'bootstrap.php';
  * Run application
  */
 yMVC\App::run();
+
+if (!API) {
+	printf(PHP_EOL
+	      .'<!-- Time: %.3f s, Queries: %d, Memory: %.1f kByte, Memory max: %.1f kByte -->',
+	       (microtime(TRUE)-$start),
+	       count(yMVC\MySQLi::getInstance()->Queries()),
+		   memory_get_usage(TRUE)/1024,
+           memory_get_peak_usage(TRUE)/1024);
+}

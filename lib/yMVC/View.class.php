@@ -62,7 +62,6 @@ abstract class View extends Base {
 		if ($this->Plain) $this->ContentType = 'text/plain';
 
 		Header('Content-Type: ' . $this->ContentType . '; charset=UTF-8');
-		Header('Content-Length: ' . strlen($this->content));
 
 		echo $this->content;
 	}
