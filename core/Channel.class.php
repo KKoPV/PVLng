@@ -121,8 +121,8 @@ class Channel {
 			}
 
 			// ... check that new value is inside the valid range
-			if (!is_null($this->valid_from) AND !is_null($this->valid_to) AND
-					($value < $this->valid_from OR $value > $this->valid_to)) {
+			if ((!is_null($this->valid_from) AND $value < $this->valid_from) OR
+			    (!is_null($this->valid_to)   AND $value > $this->valid_to)) {
 
 				$msg = sprintf('Value "%s" outside valid range: %f <= value <= %f',
 				               $value, $this->valid_from, $this->valid_to);
