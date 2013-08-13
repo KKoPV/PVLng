@@ -21,11 +21,9 @@
 		<th></th>
 		<th>{{EntityType}}</th>
 		<th>{{Unit}}</th>
-		<th></th>
 		<th>{{Model}}</th>
 		<th></th>
-		<th></th>
-		<th></th>
+		<th>{{DESCRIPTION}}</th>
 	</tr>
 	</thead>
 	<tbody>
@@ -39,30 +37,32 @@
 			     src="/images/ico/{ICON}" width="16" height="16" alt="" />
 			<strong>{NAME}</strong>
 		</td>
-		<td>
-			{UNIT}
-		</td>
-		<td>
-			<small>{DESCRIPTION}</small>
-		</td>
-		<td>
-			<small>{MODEL}</small>
-		</td>
-		<td>
+		<td>{UNIT}</td>
+		<td>{MODEL}</td>
+		<td nowrap>
 			<!-- IF {CHILDS} -->
-			<img src="/images/ico/node_select_child.png" alt="childs" class="tip" title="{{CanHaveChilds}}" />
+			<img src="/images/ico/node_select_child.png" class="imgbar tip"
+				 style="width:16px;height:16px" width="16p" height="16"
+			     alt="c" title="{{CanHaveChilds}}" />
+			<!-- ELSE -->
+			<img src="/images/ico/16x16.png" class="imgbar" alt=""
+				 style="width:16px;height:16px" width="16p" height="16" />
 			<!-- ENDIF -->
-		</td>
-		<td>
 			<!-- IF {WRITE} -->
-			<img src="/images/ico/write.png" alt="write" class="tip" title="{{WritableEntity}}" />
+			<img src="/images/ico/write.png" class="imgbar tip"
+				 style="width:16px;height:16px" width="16p" height="16"
+			     alt="w" title="{{WritableEntity}}" />
+			<!-- ELSE -->
+			<img src="/images/ico/16x16.png" class="imgbar" alt=""
+				 style="width:16px;height:16px" width="16p" height="16" />
 			<!-- ENDIF -->
-		</td>
-		<td>
 			<!-- IF {READ} -->
-			<img src="/images/ico/read.png" alt="read" class="tip" title="{{ReadableEntity}}" />
+			<img src="/images/ico/read.png" class="tip"
+				 style="width:16px;height:16px" width="16p" height="16"
+			     alt="r" title="{{ReadableEntity}}" />
 			<!-- ENDIF -->
 		</td>
+		<td><small>{DESCRIPTION}</small></td>
 	</tr>
 	<!-- END -->
 	</tbody>

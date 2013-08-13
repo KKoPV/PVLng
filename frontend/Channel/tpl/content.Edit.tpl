@@ -27,9 +27,9 @@
 <table id="dataTable" class="dataTable">
 	<thead>
 	<tr>
-		<th class="l" style="width:20%">{{channel::Param}}</th>
-		<th class="l">{{channel::Value}}</th>
-		<th class="l">{{channel::Help}}</th>
+		<th style="width:20%">{{channel::Param}}</th>
+		<th>{{channel::Value}}</th>
+		<th>{{channel::Help}}</th>
 	</tr>
 	</thead>
 
@@ -55,7 +55,8 @@
 				<input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="50" />
 			<!-- ENDIF -->
 			<!-- IF {REQUIRED} -->
-				<img src="/images/required.gif" alt="(required)" />
+				<img style="width:16px;height:16px" width="16" height="16"
+				     src="/images/required.gif" alt="*" />
 			<!-- ENDIF -->
 		</td>
 		<td>
@@ -69,9 +70,13 @@
 
 	<tfoot>
 	<tr>
-		<th class="l" colspan="3">
-			<img src="/images/required.gif" alt="(required)" /> <small>{{Required}}</small>
+		<th></th>
+		<th class="l">
+			<img style="width:16px;height:16px" width="16" height="16"
+			     src="/images/required.gif" alt="*" />
+			<small>{{Required}}</small>
 		</th>
+		<th></th>
 	</tr>
 	</tfoot>
 

@@ -42,7 +42,8 @@
 	<link rel="stylesheet" href="/css/960.10.css" />
 	<link rel="stylesheet" href="/css/jquery-ui.css" />
 
-	<link rel="stylesheet" href="/css/jquery.DataTables.css" />
+	<link rel="stylesheet" href="/css/jquery.dataTables.css" />
+	<link rel="stylesheet" href="/css/jquery.dataTables_themeroller.css" />
 	<link rel="stylesheet" href="/css/superfish.css" />
 	<link rel="stylesheet" href="/css/tipTip.css" />
 
@@ -205,7 +206,7 @@
 </script>
 <script src="/js/jquery-ui.min.js"></script>
 <script src="/js/jquery.tipTip.js"></script>
-<script src="/js/jquery.dataTables.min.js"></script>
+<script src="/js/jquery.dataTables.js"></script>
 <script src="/js/dataTables.js"></script>
 <script src="/js/hoverIntent.js"></script>
 <script src="/js/superfish.js"></script>

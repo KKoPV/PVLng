@@ -17,7 +17,16 @@ $(function() {
 		bFilter: false,
 		bLengthChange: false,
 		bInfo: false,
-		bJQueryUI: true
+		bJQueryUI: true,
+		aoColumns: [
+			{ 'asSorting': false },
+			null,
+			null,
+			null,
+			{ 'asSorting': false },
+			{ 'asSorting': false }
+		],
+		aaSorting: [[ 1, "asc" ]]
 	});
 
 });

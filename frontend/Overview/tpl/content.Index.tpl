@@ -137,7 +137,7 @@
 	<tr>
 		<td style="padding:16px 0">
 			<span class="indenter" style="padding-left: 0px;"></span>
-			<a href="#" title="{{AddEntity}}" class="tip" onclick="addChild(1); return false">
+			<a href="#" title="{{AddChannel}}" class="tip" onclick="addChild(1); return false">
 				<img src="/images/ico/plus_circle_frame.png" alt="add"
 				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
@@ -163,7 +163,10 @@
 		<select id="child" name="child" style="width:100%">
 		<!-- BEGIN ENTITIES -->
 			<option value="{ID}">
-				{TYPE}: {NAME} {DESCRIPTION} - {CHANNEL} [{UNIT}]
+				{TYPE}: {NAME}
+				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+				<!-- IF {CHANNEL} -->  - {CHANNEL}<!-- ENDIF -->
+				<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
 			</option>
 		<!-- END -->
 		</select>

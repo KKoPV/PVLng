@@ -24,16 +24,15 @@ $(function() {
 		bPaginate: false,
 		bLengthChange: false,
 		bJQueryUI: true,
-		'aoColumns': [
-			{ 'asSorting': '' },
-			null,
-			null,
-			null,
-			null,
+		aoColumns: [
 			{ 'asSorting': false },
-			{ 'asSorting': false },
+			null,
+			null,
+			null,
+			null,
 			{ 'asSorting': false }
 		],
+		aaSorting: [[ 1, "asc" ]]
 	});
 
 	$("#dialog-confirm").dialog({

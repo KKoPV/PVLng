@@ -109,9 +109,9 @@
 
 		<thead>
 		<tr>
-			<th class="l" style="width:99%">{{Channel}}</th>
-			<th class="r">{{Amount}}</th>
-			<th class="l">{{Unit}}</th>
+			<th style="width:99%">{{Channel}}</th>
+			<th>{{Amount}}</th>
+			<th>{{Unit}}</th>
 		</tr>
 		</thead>
 
