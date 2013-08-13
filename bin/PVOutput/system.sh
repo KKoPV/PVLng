@@ -6,6 +6,12 @@
 ### @version     $Id$
 ##############################################################################
 
+### URL to get system info
+GetSystemURL=http://pvoutput.org/service/r2/getsystem.jsp
+
+### URL to add system status
+AddStatusURL=http://pvoutput.org/service/r2/addstatus.jsp
+
 ### How many parameters are supported
 vMax=12
 
@@ -30,25 +36,35 @@ done
 read_config $pwd/pvoutput.conf
 
 shift $((OPTIND-1))
+CONFIG="$1"
 
-read_config "$1"
+read_config "$CONFIG"
 
 ##############################################################################
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
 
-test "$APIURL"	 || error_exit "pvoutput.org API URL is required, see pvoutput.conf.dist"
 test "$APIKEY"	 || error_exit "pvoutput.org API key is required, see pvoutput.conf.dist"
 test "$SYSTEMID" || error_exit "pvoutput.org Plant Id is required"
 
-NOW=$(date +%s)
-LASTFILE=/tmp/$(hash "$1")
-test -f "$LASTFILE" && LAST=$(<$LASTFILE) || LAST=$NOW
-INTERVAL=$(echo "scale=0; ( $NOW - $LAST ) / 60" | bc -l)
-echo $NOW >$LASTFILE
-
 curl="$(curl_cmd)"
+
+### Get system status interval
+ifile=$(run_file PVOutput "$CONFIG" interval)
+
+if test -f "$ifile"; then
+	INTERVAL=$(<$ifile)
+else
+	log 1 "Fetch System infos..."
+	### Extract status interval from response, 16th value
+	### http://pvoutput.org/help.html#api-getsystem
+	INTERVAL=$($curl --header "X-Pvoutput-Apikey: $APIKEY" \
+                     --header "X-Pvoutput-SystemId: $SYSTEMID" \
+                     $GetSystemURL | cut -d';' -f1 | cut -d',' -f16)
+	### Store valid status interval or set to maximum status interval until next run
+	test $(int "$INTERVAL") -ne 0 && echo $INTERVAL >$ifile || INTERVAL=15
+fi
 
 DATA=
 i=0
@@ -117,7 +133,7 @@ test -z "$TEST" || exit
 ### Send
 $curl --header "X-Pvoutput-Apikey: $APIKEY" \
       --header "X-Pvoutput-SystemId: $SYSTEMID" \
-      --output $TMPFILE $DATA $APIURL
+      --output $TMPFILE $DATA $AddStatusURL
 rc=$?
 
 log 1 $(cat $TMPFILE)

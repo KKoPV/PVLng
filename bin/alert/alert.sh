@@ -26,8 +26,9 @@ while getopts "tvrxh" OPTION; do
 done
 
 shift $((OPTIND-1))
+CONFIG="$1"
 
-read_config "$1"
+read_config "$CONFIG"
 
 GUID_N=$(int "$GUID_N")
 test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
@@ -73,16 +74,10 @@ function replace_vars {
 
 ### Reset run files
 function reset {
-	files=$run/$hash*
+	files=$(ls $(run_file alert $CONFIG '*'))
 	log 1 Reset, delete $files ...
 	rm $files
 }
-
-### Directory for working files
-run=$pwd/../../run
-
-### Create unique hash from config file
-hash=alert.$(echo $(basename "$1") | sed -e 's~[.].*$~~g' -e 's~[^A-Za-z0-9-]~_~g')
 
 if test "$RESET"; then
 	reset
@@ -138,7 +133,7 @@ while test $i -lt $GUID_N; do
 
 		eval value_$j="\$value"
 
-		lastfile=$run/$hash.$i.$j.last
+		lastfile=$(run_file alert $CONFIG "$i.$j.last")
 		test -f $lastfile && last=$(<$lastfile) || last=
 		eval last_$j="\$last"
 
@@ -146,7 +141,7 @@ while test $i -lt $GUID_N; do
 
 	done
 
-	flagfile=$run/$hash.$i.once
+	flagfile=$(run_file alert $CONFIG "$i.once")
 
 	### Prepare condition
 	eval CONDITION=\$CONDITION_$i

@@ -29,8 +29,9 @@ while getopts "stvxh" OPTION; do
 done
 
 shift $((OPTIND-1))
+CONFIG="$1"
 
-read_config "$1"
+read_config "$CONFIG"
 
 GUID_N=$(int "$GUID_N")
 test $GUID_N -gt 0	|| error_exit "No sections defined"
@@ -39,9 +40,6 @@ test $GUID_N -gt 0	|| error_exit "No sections defined"
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
-
-### Create unique hash from config file
-hash=S0.$(echo $(basename "$1") | sed -e 's~[.].*$~~g' -e 's~[^A-Za-z0-9-]~_~g')
 
 i=0
 
@@ -84,7 +82,7 @@ while test $i -lt $GUID_N; do
 	### Go
 	##############################################################################
 	### log file for measuring data
-	LOG=$pwd/../../run/$hash.$i.log
+	LOG=$(run_file S0 $CONFIG $i.log)
 
 	log 1 "Log     : $LOG"
 
