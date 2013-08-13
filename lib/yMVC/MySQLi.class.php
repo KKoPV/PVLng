@@ -51,22 +51,17 @@ class MySQLi extends \MySQLi {
 	/**
 	 *
 	 */
-	public static $ESCAPE = TRUE;
+	public static $QueryCount = 0;
 
 	/**
 	 *
 	 */
-	public static $QUERY = array();
+	public static $QueryTime = 0;
 
 	/**
 	 *
 	 */
-	/// public static $QueryCount = 0;
-
-	/**
-	 *
-	 */
-	/// public static $QueryTime = 0;
+	public static $Queries = array();
 
 	/**
 	 *
@@ -121,26 +116,11 @@ class MySQLi extends \MySQLi {
 	/**
 	 *
 	 */
-	public function escape( $escape=TRUE ) {
-		self::$ESCAPE = (bool) $escape;
-		return $this;
-	}
-
-	/**
-	 *
-	 */
 	public function load( $file ) {
 		foreach (simplexml_load_file($file) as $key=>$value) {
 			$this->SQL->$key = $value;
 		}
 		return $this;
-	}
-
-	/**
-	 *
-	 */
-	public function Queries() {
-		return self::$QUERY;
 	}
 
 	/**
@@ -160,9 +140,9 @@ class MySQLi extends \MySQLi {
 
 		if (isset($args[0])) {
 			if (is_array($args[0])) $args = $args[0];
-			if (self::$ESCAPE)
-				foreach ($args as &$value)
-					$value = $this->escape_string($value);
+			foreach ($args as &$value) {
+				$value = $this->real_escape_string($value);
+			}
 			$query = vsprintf($query, $args);
 		}
 
@@ -180,25 +160,21 @@ class MySQLi extends \MySQLi {
 
 		$query = $this->sql($query, $args);
 
-		// Set last query for reference
-		self::$QUERY[] = preg_replace('~\s+~', ' ', $query);
-
 		if (self::$DEBUG) {
 			echo $this->Cli ? "\n" : '<pre>';
-			echo date('H:i:s'), ' -- ', $query;
+			echo '[' . date('H:i:s'), '] ', $query;
 			echo $this->Cli ? "\n" : '</pre>';
 		}
 
-		/// $t = microtime(TRUE);
+		self::$QueryCount++;
+		self::$Queries[] = preg_replace('~\s+~', ' ', $query);
+
+		$t = microtime(TRUE);
+
 		$result = parent::query($query);
 		$this->error();
-		/* ///
-		self::$QueryCount++;
-		$duration = (microtime(TRUE) - $t) * 1000;
-		self::$QueryTime += $duration;
-		parent::query(sprintf('INSERT INTO query_log (`query`, `duration`) VALUES ("%s", "%s")',
-									$this->escape_string($query), $duration));
-		/// */
+
+		self::$QueryTime += (microtime(TRUE) - $t) * 1000;
 
 		return $result;
 	}
@@ -408,6 +384,10 @@ class SQLs {
 		$key = strtolower($key);
 		return isset($this->sql[$key]) ? $this->sql[$key] : '';
 	}
+
+	// -------------------------------------------------------------------------
+	// PROTECTED
+	// -------------------------------------------------------------------------
 
 	/**
 	 *

@@ -58,9 +58,7 @@ yMVC\App::run();
 
 if (!API) {
 	printf(PHP_EOL
-	      .'<!-- Time: %.3f s, Queries: %d, Memory: %.1f kByte, Memory max: %.1f kByte -->',
-	       (microtime(TRUE)-$start),
-	       count(yMVC\MySQLi::getInstance()->Queries()),
-		   memory_get_usage(TRUE)/1024,
-           memory_get_peak_usage(TRUE)/1024);
+	      .'<!-- Time: %.3f s, Queries: %d / %.3f s, Memory: %.1f kByte, Memory max: %.1f kByte -->',
+	       (microtime(TRUE)-$start), yMVC\MySQLi::$QueryCount, yMVC\MySQLi::$QueryTime/1000,
+	       memory_get_usage(TRUE)/1024, memory_get_peak_usage(TRUE)/1024);
 }

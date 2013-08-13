@@ -114,3 +114,5 @@ class App {
  *
  */
 class Exception extends \Exception {}
+
+defined('BASE_DIR') || define('BASE_DIR', $_SERVER['DOCUMENT_ROOT']);
