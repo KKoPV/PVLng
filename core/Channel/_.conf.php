@@ -23,6 +23,9 @@ return array(
 	'resolution' => array(
 		'visible' => FALSE,
 	),
+	'decimals' => array(
+		'visible' => FALSE,
+	),
 	'unit' => array(
 		'visible' => FALSE,
 	),
