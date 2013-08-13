@@ -27,9 +27,19 @@ return array(
 	 * View settings
 	 */
 	'View' => array(
+
+		// Compile templates and reuse unless changed
 		'ReuseCode'        => TRUE,
+
+		// Replace static images by base64 encoded inline code
+		// Only for images with max x/y of 16px
+		'InlineImages'     => 16,
+
+		// Don't compress HTML
 		'Verbose'          => FALSE,
-		'JavaScriptPacker' => 62, // FALSE, 0, 10, 62, (95 is not working with UTF-8)
+
+		// FALSE, 0, 10, 62, (95 is not working with UTF-8)
+		'JavaScriptPacker' => 62,
 
 		// XML View settings
 		'XML' => array(

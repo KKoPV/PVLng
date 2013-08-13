@@ -319,21 +319,40 @@ abstract class View extends Base {
 	 */
 	protected function compressCode( &$html ) {
 		if (!$this->config->View_Verbose) {
-			$pre = array(array(), array());
+			$pre = array();
 			// mask <pre>...</pre>
 			if (preg_match_all('~<pre.*?</pre>~is', $html, $matches)) {
 				foreach ($matches as $match) {
-					$pre[0][] = md5($match[0]);
-					$pre[1][] = $match[0];
+					$pre[md5($match[0])] = $match[0];
 				}
-				$html = str_replace($pre[1], $pre[0], $html);
+				$html = str_replace($pre, array_keys($pre), $html);
 			}
+			// Remove HTML comments
 			$html = preg_replace('~<!--.*?-->~s', '', $html);
+			// Remove JS/PHP comments
 			$html = preg_replace('~/\*.*?\*/~s', '', $html);
+			// Replace multiple white spaces with one space
 			$html = preg_replace('~\s+~s', ' ', $html);
+			// Remove whitespaces between tags
 			$html = preg_replace('~>\s+<~s', '><', $html);
-			$html = str_replace($pre[0], $pre[1], $html);
+			// Restore <pre>...</pre> sections
+			$html = str_replace(array_keys($pre), $pre, $html);
 		}
+
+		if ($xy = $this->config->View_InlineImages AND
+		    preg_match_all('~<img [^>]*src=(["\'])([^"\']+?)\\1~', $html, $images, PREG_SET_ORDER)) {
+			foreach ($images as $img) {
+				$file = BASE_DIR . DS . $img[2];
+				if (file_exists($file) AND
+				    $info = getimagesize(BASE_DIR . DS . $img[2]) AND
+					$info[0] <= $xy AND $info[1] <= $xy) {
+					$html = str_replace($img[2],
+					        'data:'.$info['mime'].';base64,'.base64_encode(file_get_contents($file)),
+					        $html);
+				}
+			}
+		}
+
 		$html = trim($html);
 	}
 
