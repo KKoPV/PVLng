@@ -30,13 +30,13 @@ class Base extends \Channel {
 	/**
 	 *
 	 */
-	public $UTC_Offset = 0;
+	public $UTC_Offset = NULL;
 
 	/**
 	 * r2
 	 */
 	public function GET( $request ) {
-	    return $this->read($request);
+		return $this->read($request);
 	}
 
 	/**
@@ -54,17 +54,16 @@ class Base extends \Channel {
 		}
 
 		// transform request date into start - end
-		$date = array_key_exists(0, $request) ? $request[0] : date('Y-m-d');
-		$request['start'] = $date;
-		$request['end']   = $date . '+1day';
-/*
-		$d = explode('-', $date);
-		$request['start'] = mktime(0, 0, 0, $d[1], $d[2], $d[0]);
-		$request['end']   = $date != date('Y-m-d')
-		                  ? $request['start'] + 86400
-						  : ceil(time() / 360) * 360;
-		$request['period'] = '6min';
-*/
+		$date = isset($request['mode']) ? $request['mode'] : date('Y-m-d');
+
+		if (strlen($date) <= 10) $date = '1-'.$date;
+
+		list($vJSON, $date) = explode('-', $date, 2);
+
+		$request['start']   = $date;
+		$request['end']     = $date . '+1day';
+#$request['period']  = '5i';
+
 		// 1st child: total production
 		$child = array_shift($childs);
 		$fh = $child->read($request, TRUE);
@@ -116,8 +115,10 @@ class Base extends \Channel {
 		$start = PHP_INT_MAX;
 		$end   = 0;
 		while ($fh->read($row, $id)) {
-			$start = min($start, $row['timestamp']);
-			$end   = max($end,   $row['timestamp']);
+			// Round down to next 5 minutes
+			$ts = floor($row['timestamp'] / 300) * 300;
+			$start = min($start, $ts);
+			$end   = max($end,   $ts);
 			$obj->addPowerValue($row['data']);
 		}
 		$obj->setTimestampStart($start);
@@ -131,7 +132,7 @@ class Base extends \Channel {
 	protected function finish( &$yield, $request ) {
 		$yield->setCreator('PVLng ' . PVLNG_VERSION);
 
-		$date = array_key_exists(0, $request) ? $request[0] : date('Y-m-d');
+		$date = isset($request['mode']) ? $request['mode'] : date('Y-m-d');
 		$yield->setDeleteDayBeforeImport(($date != date('Y-m-d')));
 #		$yield->setDeleteDayBeforeImport(1);
 
@@ -140,8 +141,8 @@ class Base extends \Channel {
 		$yield->getPlant()->setPowerValues(array());
 
 		// Emulate a UTC summer time
-		$yield->setUtcOffset(date('I', $yield->getPlant()->getTimestampStart())
-		                   ? $this->UTC_Offset + 3600 : $this->UTC_Offset);
+#		$yield->setUtcOffset(date('I', $yield->getPlant()->getTimestampStart())
+#		                   ? $this->UTC_Offset + 3600 : $this->UTC_Offset);
 
 		$result = $yield->asArray();
 #		$result['dbg']['QueryTime'] = sprintf('%.0f ms', (microtime(TRUE) - $this->ts) * 1000);

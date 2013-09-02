@@ -19,7 +19,9 @@ class Attributes extends Handler {
 	 */
 	public function GET( &$request ) {
 		$channel = \Channel::byGUID($this->GUID);
-		return $channel->getAttributes(isset($request[0]) ? $request[0] : '');
+		$attribute = isset($request['attribute']) ? $request['attribute'] : '';
+		$attributes = $channel->getAttributes($attribute);
+		return $attributes;
 	}
 
 }

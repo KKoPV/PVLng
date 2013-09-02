@@ -89,6 +89,27 @@ class DBQuery {
 	}
 
 	/**
+	 * @field string|array String => USING(...), array ==> ON $key = $value
+	 */
+	public function join( $table, $field, $dir='' ) {
+		$join = ($dir ? strtoupper($dir).' ' : '') . 'JOIN `' . $table . '` ';
+		if (is_array($field)) {
+			$join .= 'ON ';
+			$j = array();
+			foreach ($field as $key=>$value) {
+				$j[] = $this->_table() . '.' . $this->field($key) . ' = '
+					 . '`' . $table . '`.' . $this->field($value);
+            }
+			$join .= implode(' AND ', $j);
+		} else {
+			$join .= 'USING (' . $this->field($field) . ')';
+		}
+
+		$this->join[] = $join;
+		return $this;
+	}
+
+	/**
 	 *
 	 */
 	public function where( $field, $cond='', $value='' ) {
@@ -153,6 +174,16 @@ class DBQuery {
 	/**
 	 *
 	 */
+	public function whereNotBT( $field, $from, $to ) {
+		$this->where[] = 'NOT '
+		               . $this->field($field) . ' BETWEEN '
+		               . $this->quote($from) . ' AND ' . $this->quote($to);
+		return $this;
+	}
+
+	/**
+	 *
+	 */
 	public function whereNULL( $field ) {
 		if ($field != '') {
 			$this->where[] = $this->field($field) . ' IS NULL';
@@ -174,7 +205,32 @@ class DBQuery {
 	 *
 	 */
 	public function where_or() {
-		$this->where[] = 'OR';
+		if (($idx = count($this->where)) > 0) $this->whereExtra['or'][$idx] = TRUE;
+		return $this;
+	}
+
+	/**
+	 *
+	 */
+	public function where_open() {
+		$this->whereExtra['('][count($this->where)] = TRUE;
+		return $this;
+	}
+
+	/**
+	 *
+	 */
+	public function where_close() {
+		$this->whereExtra[')'][count($this->where)-1] = TRUE;
+		return $this;
+	}
+
+	/**
+	 *
+	 */
+	public function where_close_open() {
+		$this->whereExtra[')'][count($this->where)-1] = TRUE;
+		$this->whereExtra['('][count($this->where)] = TRUE;
 		return $this;
 	}
 
@@ -252,7 +308,7 @@ class DBQuery {
 	 * @return string SQL query
 	 */
 	public function __toString() {
-		return $this->SQL();
+		return $this->SQL() . ';';
 	}
 
 	// -------------------------------------------------------------------------
@@ -277,7 +333,17 @@ class DBQuery {
 	/**
 	 *
 	 */
+	protected $join = array();
+
+	/**
+	 *
+	 */
 	protected $where = array();
+
+	/**
+	 *
+	 */
+	protected $whereExtra = array('(' => array(), 'or' => array(), ')' => array());
 
 	/**
 	 *
@@ -320,6 +386,7 @@ class DBQuery {
 		return 'SELECT '
 		     . $this->_get()
 		     . "\n".'  FROM `' . $this->table . '`'
+		     . $this->_join()
 		     . $this->_where()
 		     . $this->_group()
 		     . $this->_having()
@@ -373,7 +440,7 @@ class DBQuery {
 	 *
 	 */
 	protected function field( $field ) {
-		return preg_match('~^[\w_]+$~', $field) ? '`' . $field . '`' : $field;
+		return preg_match('~^[[:alpha:]_][\w_]*$~', $field) ? '`' . $field . '`' : $field;
 	}
 
 	/**
@@ -392,6 +459,13 @@ class DBQuery {
 	/**
 	 *
 	 */
+	protected function _table() {
+		return '`' . $this->table . '`';
+	}
+
+	/**
+	 *
+	 */
 	protected function _get() {
 		$s = implode("\n".'      ,', $this->get);
 		return $s ? $s : '*';
@@ -400,16 +474,44 @@ class DBQuery {
 	/**
 	 *
 	 */
+	protected function _join() {
+		return implode("\n", $this->join);
+	}
+
+	/**
+	 *
+	 */
+	private function _whereGroup( $idx ) {
+		return (isset($this->whereExtra['('][$idx]) ? '( ' : '')
+			 . $this->where[$idx]
+			 . (isset($this->whereExtra[')'][$idx]) ? ' )' : '');
+	}
+
+	/**
+	 *
+	 */
 	protected function _where() {
-		$s = implode("\n".'   AND ', $this->where);
-		return $s ? "\n" . ' WHERE ' . $s : '';
+		if (empty($this->where)) return;
+
+		$s = $this->_whereGroup(0);
+
+		// buffer without 1st element
+		$_where = array_slice($this->where, 1);
+
+		foreach ($_where as $idx=>$where) {
+			$s .= "\n"
+			    . (isset($this->whereExtra['or'][$idx+1]) ? '    OR ' : '   AND ')
+			    . $this->_whereGroup($idx+1);
+		}
+
+		return "\n" . ' WHERE ' . $s;
 	}
 
 	/**
 	 *
 	 */
 	protected function _group() {
-		$s = implode("\n".'       ,', $this->group);
+		$s = implode("\n".'         ,', $this->group);
 		return $s ? "\n" . ' GROUP BY ' . $s : '';
 	}
 

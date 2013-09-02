@@ -18,14 +18,15 @@ class Switcher extends \Channel {
 	 *
 	 */
 	public function write( $request, $timestamp=NULL ) {
+
+		$this->before_write($request);
+
 		// Get last state and ...
 		$last = $this->getLastReading();
 
-		$value = isset($request['data']) ? $request['data'] : NULL;
-
 		// ... save only on changes
-		if ($this->numeric AND (float) $last  != (float) $value OR
-		    /* string */       (string) $last != (string) $value) {
+		if ($this->numeric AND (float) $last  != (float) $this->value OR
+		    /* string */       (string) $last != (string) $this->value) {
 			return parent::write($request, $timestamp);
 		}
 		return 0;

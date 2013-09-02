@@ -101,6 +101,12 @@ class Router {
 	protected function getMatch( $route ) {
 		foreach ($this->Routes as $regex=>$data) {
 			if (preg_match($regex, $route, $matches)) {
+
+#print_r(strtoupper($_SERVER['REQUEST_METHOD']));
+#print_r($data[0][2]);
+#                if (isset($_SERVER['REQUEST_METHOD']) AND
+#		            !in_array(strtoupper($_SERVER['REQUEST_METHOD']), $data[0][2])) continue;
+
 				// Defaults
 				$handler = array(
 					'Controller' => $data[0][0],
@@ -108,7 +114,7 @@ class Router {
 				);
 				// Named parameters
 				foreach ($data[1] as $id=>$param) {
-					if (isset($matches[$id+1])) $handler[$param] = $matches[$id+1];
+					$handler[$param] = isset($matches[$id+1]) ? $matches[$id+1] : '';
 				}
 				return $handler;
 			}
@@ -145,6 +151,8 @@ class Router {
 		}
 
 		foreach ($routes as $route=>$data) {
+
+			if (count($data) == 2) $data[] = array('GET');
 
 			$parameters = $matchUrl = array();
 
@@ -184,14 +192,14 @@ class Router {
 
 		if ($data = $this->getMatch($this->Route)) {
 			$this->Controller = $data['Controller'];
-			$this->Action		 = $data['Action'];
+			$this->Action     = $data['Action'];
 			foreach ($data as $key=>$value) {
 				$this->request[$key] = $value;
 			}
 		} elseif ($e = $this->config->get('Router.ErrorRoute') AND
 		          $data = $this->getMatch($e)) {
 			$this->Controller = $data['Controller'];
-			$this->Action		 = $data['Action'];
+			$this->Action     = $data['Action'];
 		}
 
 		$this->request = array_merge($this->request, $_GET, $_POST);

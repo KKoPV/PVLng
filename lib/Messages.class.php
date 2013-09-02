@@ -14,10 +14,10 @@ abstract class Messages {
 	 * @name Message type
 	 * @{
 	 */
-	const INFO		= 'info';
+	const INFO    = 'info';
 	const SUCCESS = 'success';
-	const ERROR	 = 'error';
-	const CODE		= 'code';
+	const ERROR   = 'error';
+	const CODE    = 'code';
 	/** @} */
 
 	/**
@@ -30,12 +30,12 @@ abstract class Messages {
 	/**
 	 * html code to format messages for output
 	 *
-	 * string param 1: message type: info|error|success
+	 * string param 1: message type: info|success|error|code
 	 * string param 2: message text
 	 *
-	 * @var string $OutHTML
+	 * @var string $toStrFormat
 	 */
-	public static $OutHTML = '<div class="msg%1$s">%2$s</div>';
+	public static $toStrFormat = '<div class="msg%1$s">%2$s</div>';
 
 	/**
 	 * Format message string
@@ -57,7 +57,7 @@ abstract class Messages {
 		}
 		$return = '';
 		foreach ((array)$msg as $m)
-			$return .= sprintf(self::$OutHTML, $type, $m)."\n";
+			$return .= sprintf(self::$toStrFormat, $type, $m)."\n";
 
 		return $return;
 	}
@@ -167,15 +167,9 @@ abstract class Messages {
 	public static function getRaw( $clear=TRUE ) {
 		$msgs = array();
 		foreach ((array) Session::get(self::$SessionVar) as $msg) {
-			$formated = FALSE;
-			if (strpos($msg[0], 'html:') === 0) {
-				$formated = TRUE;
-				list(, $msg[0]) = explode(':', $msg[0], 2);
-			}
-			if (!$formated) $msg[0] = htmlspecialchars($msg[0], ENT_QUOTES);
 			$msgs[] = array(
-				'type' => $msg[1],
-		 		'message' => $msg[0]
+				'type'    => $msg[1],
+				'message' => $msg[2] ? $msg[0] : htmlspecialchars($msg[0], ENT_QUOTES)
 			);
 		}
 		if ($clear) self::clear();

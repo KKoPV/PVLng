@@ -94,6 +94,8 @@ class Controller extends yMVC\Controller {
 		$this->view->CurrencySymbol = $this->config->Currency_Symbol;
 		$this->view->CurrencyDecimals = $this->config->Currency_Decimals;
 
+		$this->view->Title = $this->config->Title;
+
 		$this->view->BaseDir = array(
 			APP_DIR . DS . $this->router->Controller . DS . 'tpl' . DS . 'custom',
 			APP_DIR . DS . $this->router->Controller . DS . 'tpl',
@@ -105,7 +107,14 @@ class Controller extends yMVC\Controller {
 
 		$messages = array();
 		foreach (Messages::getRaw() as $message) {
-			$messages[] = array_change_key_case($message, CASE_UPPER);
+			$messages[] = array(
+				'TYPE'    => $message['type'],
+				'MESSAGE' => str_replace(
+				                 array('\'',    '"',      "\n"),
+				                 array('&#39;', '&quot;', '\\n'),
+				                 $message['message']
+				             )
+			);
 		}
 		$this->view->MessagesRaw = $messages;
 

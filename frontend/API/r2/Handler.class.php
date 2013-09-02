@@ -25,7 +25,7 @@ abstract class Handler {
 	 *
 	 */
 	public function __call( $method, $params ) {
-	    $this->send(405, 'Request method "'.$method.'" is not allowed here!');
+	    $this->send(405, 'Request method '.$method.' is not allowed here!');
 	}
 
 	/**

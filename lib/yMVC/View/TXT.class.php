@@ -23,7 +23,7 @@ use yMVC\View;
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     $Id$
  */
-class TEXT extends View {
+class TXT extends View {
 
 	/**
 	 *

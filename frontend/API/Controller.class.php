@@ -63,22 +63,22 @@ class API_Controller extends Controller {
 			switch ($this->Rest->RequestMethod()) {
 				// ------------
 				case Rest::PUT:
-				    if ($data = $this->Rest->Data()) {
+					if ($data = $this->Rest->Data()) {
 						if ($channel->write($data)) {
 							// Created
 							throw new Exception('', 201);
 						}
 					} elseif ($batch = $this->Rest->Request('batch')) {
 						$readings = array();
-					    foreach (explode(';', $batch) as $tupel) {
+						foreach (explode(';', $batch) as $tupel) {
 							if ($tupel == '') continue;
 
-					        $data = explode(',', $tupel);
-					        if (count($data) == 2) {
-						        // timestamp and data
+							$data = explode(',', $tupel);
+							if (count($data) == 2) {
+								// timestamp and data
 								$readings[$data[0]] = $data[1];
 							} elseif (count($data) == 3) {
-						        // date, time and data
+								// date, time and data
 								$timestamp = strtotime($data[0] . ' ' . $data[1]);
 								if ($timestamp === false) {
 									throw new Exception('Invalid timestamp in data: '.$tupel, 400);
@@ -88,10 +88,10 @@ class API_Controller extends Controller {
 								throw new Exception('Invalid batch data: '.$tupel, 400);
 							}
 						}
-					    $res = 0;
+						$res = 0;
 						foreach ($readings as $timestamp=>$data) {
-					        $res += $channel->write($data, $timestamp);
-                        }
+							$res += $channel->write($data, $timestamp);
+						}
 						if ($res) {
 							// Created
 							throw new Exception('Rows inserted: '.$res, 201);
@@ -136,48 +136,39 @@ class API_Controller extends Controller {
 	 */
 	public function Index_r2_Action() {
 
+		$ts = microtime(TRUE);
+
+		// Remove api/r2 and pad right
+		$PathInfo = array_slice($this->Rest->PathInfo(), 2);
+
+		$r2Class = 'API\r2\\' . ucwords(array_shift($PathInfo));
+
+		$request = array_merge($this->Rest->Request(), $this->request(), $PathInfo);
+
 		try {
 
-			$ts = microtime(TRUE);
+			$ViewClass = 'yMVC\View\\'.strtoupper($request['format']);
 
-			// Remove api/r2 and pad right
-			$PathInfo = array_pad(array_slice($this->Rest->PathInfo(), 2), 5, '');
-
-			$GUID = preg_match('~^[a-z\d]{4}(?:-[a-z\d]{4}){7}$~', $PathInfo[0])
-			      ? array_shift($PathInfo)
-			      : '';
-
-			$action = array_shift($PathInfo);
-
-			$r2Class = 'API\r2\\' . ucwords($action?:'Help');
+			if (!class_exists($ViewClass)) {
+				$h = $ViewClass;
+				$ViewClass = 'yMVC\View\CSV';
+				throw new Exception('Unsupported request format, '
+				                   .'missing view class: '.$h, 400);
+			}
 
 			if (!class_exists($r2Class))
-				throw new Exception('Unsupported request "'.$action.'"!', 400);
-
-			$request = array_merge($this->Rest->Request(), $PathInfo);
+				throw new Exception('Unsupported request: '.strtolower($r2Class), 400);
 
 			if ($data = $this->Rest->Data()) $request['data'] = $data;
 
-			$r2Class = new $r2Class($GUID);
+			$r2Class = new $r2Class($this->request('guid'));
 			$content = $r2Class->{$this->Rest->RequestMethod()}($request);
 
 		} catch (Exception $exception) {
-    		$code = $exception->getCode() ?: 500;
-	    	$content  = $exception->getMessage();
-            Header('HTTP/1.1 '.$this->Rest->StatusMessage($code));
-#			$this->ErrorResponse($exception);
+			$code    = $exception->getCode() ?: 500;
+			$content = array('error' => $exception->getMessage());
+			Header('HTTP/1.1 '.$this->Rest->StatusMessage($code));
 		}
-
-		if (preg_match('~(\w+)$~', $request['format'])) {
-			$ViewClass = 'yMVC\View\\'.strtoupper($request['format']);
-		} else {
-			// Default
-			$ViewClass = 'yMVC\View\TEXT';
-		}
-
-		if (!class_exists($ViewClass))
-			throw new Exception('Unsupported request format, '
-				                   .'missing class: '.$ViewClass.')', 400);
 
 		$this->view = new $ViewClass;
 		$this->view->content = $content;

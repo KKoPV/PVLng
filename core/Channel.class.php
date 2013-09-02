@@ -20,8 +20,7 @@ class Channel {
 			return new $model($entity->guid);
 		}
 
-		throw new \Exception('No channel found for Id '.$id, 400);
-
+		throw new \Exception('No channel found for Id: '.$id, 400);
 	}
 
 	/**
@@ -35,7 +34,7 @@ class Channel {
 			return new $model($guid);
 		}
 
-		throw new \Exception('No channel found for GUID "'.$guid.'"!', 400);
+		throw new \Exception('No channel found for GUID: '.$guid, 400);
 	}
 
 	/**
@@ -45,8 +44,8 @@ class Channel {
 		$childs = $this->getChilds();
 
 		if (count($this->getChilds()) == $this->childs) {
-			throw new \Exception('"'.$this->name.'" accepts only '
-			                    .$this->childs . ' child(s) at all!', 400);
+			throw new \Exception($this->name.' accepts only '
+			                    .$this->childs . ' child(s) at all', 400);
 		}
 
 		$new = self::byGUID($guid);
@@ -95,37 +94,36 @@ class Channel {
 	 */
 	public function write( $request, $timestamp=NULL ) {
 
-		if (!$this->write)
-			throw new \Exception('Can\'t write data to "'.$this->name.'", '
-			                    .'instance of "'.get_class($this).'"!', 400);
+		$this->before_write($request);
 
-		$value = isset($request['data']) ? $request['data'] : NULL;
-
-		if (is_null($value) OR !is_scalar($value))
-			throw new \Exception('Missing data value!', 400);
+		if (is_null($this->value) OR !is_scalar($this->value))
+			throw new \Exception('Missing data value', 400);
 
 		if ($this->numeric) {
 			// make numeric
-			$value = +$value;
+			$this->value = +$this->value;
 
 			if ($this->meter OR $this->threshold > 0) {
 				if ($last = $this->getLastReading()) {
 					if ($this->meter) {
 						// ... check that new value can't be lower than before
-						if ($value < $last) $value = $last;
+						if ($this->value < $last) $this->value = $last;
 					} elseif ($this->threshold > 0) {
 						// ... check that new value is inside the threshold range
-						if (abs($value-$last) > $this->threshold) $value = $last;
+						if (abs($this->value-$last) > $this->threshold) {
+							// Throw away invalid value
+							return;
+						}
 					}
 				}
 			}
 
 			// ... check that new value is inside the valid range
-			if ((!is_null($this->valid_from) AND $value < $this->valid_from) OR
-			    (!is_null($this->valid_to)   AND $value > $this->valid_to)) {
+			if ((!is_null($this->valid_from) AND $this->value < $this->valid_from) OR
+			    (!is_null($this->valid_to)   AND $this->value > $this->valid_to)) {
 
-				$msg = sprintf('Value "%s" outside valid range: %f <= value <= %f',
-				               $value, $this->valid_from, $this->valid_to);
+				$msg = sprintf('Value %s is outside of valid range: %f <= value <= %f',
+				               $this->value, $this->valid_from, $this->valid_to);
 
 				$cfg = new \PVLng\Config('LogInvalid');
 				if ($cfg->value != 0) {
@@ -143,9 +141,13 @@ class Channel {
 		$reading = $this->numeric ? new \PVLng\ReadingNum : new \PVLng\ReadingStr;
 		$reading->id = $this->entity;
 		$reading->timestamp = $timestamp;
-		$reading->data = $value;
+		$reading->data = $this->value;
 
-		return $reading->insert();
+		$rc = $reading->insert();
+
+		if ($rc) Hook::process('data_save_after', $this);
+
+		return $rc;
 	}
 
 	/**
@@ -176,7 +178,7 @@ class Channel {
 			$q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
 			  ->get($q->MIN('timestamp'), 'timestamp');
 
-			if (!$this->numeric) {
+if (!$this->numeric) {
 				$q->get('data');
 			} elseif ($this->meter) {
 				$q->get($q->MAX('data'), 'data');
@@ -214,30 +216,36 @@ class Channel {
 
 			while ($row = $res->fetch_assoc()) {
 
-				$data = $row;
-				$data['consumption'] = 0;
+				$this->value = +$row['data'];
+				$row['data'] = Hook::process('data_read_after', $this);
+
+				$row['consumption'] = 0;
 
 				if ($this->meter) {
 					// calc meter offset for uncompressed data
-					if ($offset == 0) $offset = $data['data'];
+					if ($offset == 0) {
+						$offset = $row['data'];
+					}
 
 					if ($res->num_rows > 1) {
-    					$data['data'] = round($data['data'] - $offset, 4);
-                    }
+						$row['data'] = round($row['data'] - $offset, 4);
+						$row['min']  = round($row['min'] - $offset, 4);
+						$row['max']  = round($row['max'] - $offset, 4);
+					}
 
 					// calc consumption from previous max value
-				    if ($last == 0) {
-						$data['consumption'] = round($data['max'] - $data['min'], 4);
+					if ($last == 0) {
+						$row['consumption'] = round($row['max'] - $row['min'], 4);
 					} else {
-						$data['consumption'] = round($data['max'] - $last, 4);
+						$row['consumption'] = round($row['max'] - $last, 4);
 					}
-					$last = $data['max'];
+					$last = $row['max'];
 				}
 				// remove grouping value
-				$id = $data['g'];
-				unset($data['g']);
+				$id = $row['g'];
+				unset($row['g']);
 
-				$buffer->write($data, $id);
+				$buffer->write($row, $id);
 			}
 		}
 
@@ -307,7 +315,7 @@ class Channel {
 	protected $GroupBy = array(
 		/* last */         -1 => '',
 		/* no grouping */   0 => '',
-		/* minute */	    1 => '`timestamp` DIV (60 * %d)',
+		/* minute */	    1 => '(FROM_UNIXTIME(`timestamp`) - UNIX_TIMESTAMP()) DIV (60 * %d)',
 		/* hour */	        2 => '`timestamp` DIV (3600 * %f)',
 		/* day */	        3 => '`timestamp` DIV (86400 * %d)',
 		/* week */	        4 => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
@@ -360,9 +368,9 @@ class Channel {
 	protected function getLastReading() {
 		$q = new \DBQuery($this->table[$this->numeric]);
 		$q->get('data')
-			->whereEQ('id', $this->entity)
-			->order('timestamp', FALSE)
-			->limit(1);
+		  ->whereEQ('id', $this->entity)
+		  ->order('timestamp', FALSE)
+		  ->limit(1);
 
 		return $this->db->queryOne($q);
 	}
@@ -370,14 +378,28 @@ class Channel {
 	/**
 	 *
 	 */
+	protected function before_write( $request ) {
+
+		if (!$this->write)
+			throw new \Exception('Can\'t write data to '.$this->name.', '
+			                    .'instance of '.get_class($this), 400);
+
+		$this->value = isset($request['data']) ? $request['data'] : NULL;
+
+		$this->value = Hook::process('data_save_before', $this);
+	}
+
+	/**
+	 *
+	 */
 	protected function before_read( $request ) {
 		if (!$this->read)
-			throw new \Exception('Can\'t read data from "'.$this->name.'", '
-			                    .'instance of "'.get_class($this).'"!', 400);
+			throw new \Exception('Can\'t read data from '.$this->name.', '
+			                    .'instance of '.get_class($this), 400);
 
 		if ($this->childs >= 0 AND
 		    count($this->getChilds()) != $this->childs)
-			throw new \Exception('"'.$this->name.'" must have '.$this->childs.' child(s)!', 400);
+			throw new \Exception($this->name.' must have '.$this->childs.' child(s)', 400);
 
 		if (isset($request['start'])) {
 			$this->start = is_numeric($request['start'])

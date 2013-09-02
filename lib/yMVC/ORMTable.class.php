@@ -228,15 +228,19 @@ abstract class ORMTable {
 	 *
 	 */
 	public function set( $field, $value='' ) {
+		if ($field == '') return $this;
+
 		if (is_array($field) AND func_num_args() == 1) {
 			foreach ($field as $key=>$value) $this->set($key, $value);
 			return $this;
 		}
 
-		// Silently ignore invalid fields
-		if (!in_array($field, array_keys($this->fields))) return $this;
-
-		$this->fields[$field] = $value;
+		if (!in_array($field, array_keys($this->fields))) {
+			// Create extra fields as property
+			$this->$field = $value;
+		} else {
+			$this->fields[$field] = $value;
+		}
 
 		return $this;
 	}

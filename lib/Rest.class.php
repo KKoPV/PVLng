@@ -80,10 +80,7 @@ class Rest {
 			$this->data = ($error == JSON_ERROR_NONE) ? $data : $this->request['data'];
 		}
 
-		$this->request['format'] = '';
-
-		if (empty($this->request['format']) AND
-				isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO']) {
+		if (isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO']) {
 			$this->path_info = explode('/', trim($_SERVER['PATH_INFO'], '/'));
 			$last = count($this->path_info)-1;
 			if ($last AND preg_match('~^(.*?)\.([^.]+)$~', $this->path_info[$last], $args)) {
@@ -93,52 +90,56 @@ class Rest {
 			}
 		}
 
-		if (isset($_SERVER['HTTP_ACCEPT'])) {
+		if (empty($this->request['format'])) {
+			$this->request['format'] = 'json';
+		};
 
-			$accept = array();
-
-			// break up string into pieces (content type and q factors)
-			if (preg_match_all('~([^;, ]+)\s*(?:;\s*q\s*=\s*([.0-9]+),?)?~i',
-			                   $_SERVER['HTTP_ACCEPT'], $args, PREG_SET_ORDER)) {
-
-				foreach ($args as $arg) {
-					// set default to 1 for any without q factor
-					$accept[$arg[1]] = isset($arg[2]) ? $arg[2] : 1;
-				}
-				// sort list based on q factor
-				arsort($accept, SORT_NUMERIC);
-
-				foreach (array_keys($accept) as $key) {
-					switch ($key) {
-						// ----------------------
-						case 'application/json':
-    					    $this->ContentType = $key;
-							$this->request['format'] = 'json';
-							break 2; // switch & foreach
-						// ----------------------
-						case 'application/csv':
-    					    $this->ContentType = $key;
-							$this->request['format'] = 'csv';
-							break 2; // switch & foreach
-						// ----------------------
-						case 'application/tsv':
-    					    $this->ContentType = $key;
-							$this->request['format'] = 'tsv';
-							break 2; // switch & foreach
-						// ----------------------
-						case 'application/xml':
-    					    $this->ContentType = $key;
-							$this->request['format'] = 'xml';
-							break 2; // switch & foreach
-						// ----------------------
-						case 'text/plain':
-    					    $this->ContentType = $key;
-							$this->request['format'] = 'text';
-							break 2; // switch & foreach
-					}
-				}
-			}
-		}
+// 		if (isset($_SERVER['HTTP_ACCEPT'])) {
+//
+// 			$accept = array();
+//
+// 			// break up string into pieces (content type and q factors)
+// 			if (preg_match_all('~([^;, ]+)\s*(?:;\s*q\s*=\s*([.0-9]+),?)?~i',
+// 			                   $_SERVER['HTTP_ACCEPT'], $args, PREG_SET_ORDER)) {
+//
+// 				foreach ($args as $arg) {
+// 					// set default to 1 for any without q factor
+// 					$accept[$arg[1]] = isset($arg[2]) ? $arg[2] : 1;
+// 				}
+// 				// sort list based on q factor
+// 				arsort($accept, SORT_NUMERIC);
+//
+// 				foreach (array_keys($accept) as $key) {
+// 					switch ($key) {
+// 						// ----------------------
+// 						case 'application/json':
+//     					    $this->ContentType = $key;
+// 							$this->request['format'] = 'json';
+// 							break 2; // switch & foreach
+// 						// ----------------------
+// 						case 'application/csv':
+//     					    $this->ContentType = $key;
+// 							$this->request['format'] = 'csv';
+// 							break 2; // switch & foreach
+// 						// ----------------------
+// 						case 'application/tsv':
+//     					    $this->ContentType = $key;
+// 							$this->request['format'] = 'tsv';
+// 							break 2; // switch & foreach
+// 						// ----------------------
+// 						case 'application/xml':
+//     					    $this->ContentType = $key;
+// 							$this->request['format'] = 'xml';
+// 							break 2; // switch & foreach
+// 						// ----------------------
+// 						case 'text/plain':
+//     					    $this->ContentType = $key;
+// 							$this->request['format'] = 'txt';
+// 							break 2; // switch & foreach
+// 					}
+// 				}
+// 			}
+//		}
 	}
 
 	/**

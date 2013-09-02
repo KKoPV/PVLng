@@ -17,6 +17,21 @@ class Data extends Handler {
 	/**
 	 *
 	 */
+	public function PUT( &$request ) {
+		$channel = \Channel::byGUID($this->GUID);
+
+		if ($channel->write($request)) {
+			// Created
+			$this->send(201);
+		}
+
+		// Accepted but no data or not saved (inside update interval)
+		$this->send(200);
+	}
+
+	/**
+	 *
+	 */
 	public function GET( &$request ) {
 		$channel = \Channel::byGUID($this->GUID);
 
@@ -26,6 +41,8 @@ class Data extends Handler {
 		    return $channel->GET($request);
 		}
 
+		$mode = isset($request['mode']) ? $request['mode'] : '';
+
 		$datafile = $channel->read($request);
 
 		$outfile = new \Buffer;
@@ -33,7 +50,7 @@ class Data extends Handler {
 		if (array_search('attributes', $request) !== FALSE) {
 			$attributes = $channel->getAttributes();
 
-			if (strstr($request[0], 'full')) {
+			if (strstr($mode, 'full')) {
 				// Calculate consumption and costs
 				$datafile->rewind();
 				while ($datafile->read($row, $id)) {
@@ -47,11 +64,11 @@ class Data extends Handler {
 		$datafile->rewind();
 
 		// optimized flow...
-		switch ($request[0]) {
+		switch ($mode) {
 			// -------------------
 			case 'full':
 
-				// do nothing with $row
+				// do nothing with $row, passtrough
 				while ($datafile->read($row, $id)) {
 					$outfile->swrite($row);
 				}
@@ -60,8 +77,8 @@ class Data extends Handler {
 			// -------------------
 			case 'short':
 
+				// default mobile result: only timestamp and data
 				while ($datafile->read($row, $id)) {
-					// default mobile result: only timestamp and data
 					$outfile->swrite(array(
 						/* 0 */ $row['timestamp'],
 						/* 1 */ $row['data']
@@ -73,6 +90,7 @@ class Data extends Handler {
 			// -------------------
 			case 'fullshort':
 
+				// passthrough all values
 				while ($datafile->read($row, $id)) {
 					$outfile->swrite(array_values($row));
 				}
@@ -81,8 +99,8 @@ class Data extends Handler {
 			// -------------------
 			default:
 
+				// default result: only timestamp and data
 				while ($datafile->read($row, $id)) {
-					// default result: only timestamp and data
 					$outfile->swrite(array(
 						'timestamp' => $row['timestamp'],
 						'data'      => $row['data']
@@ -92,8 +110,6 @@ class Data extends Handler {
 
 		}
 		$datafile->close();
-
-		$request['format'] = $request['format'] ?: 'csv';
 
 		Header('X-Buffer-Size:' . $outfile->size() . ' Bytes');
 
