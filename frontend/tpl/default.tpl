@@ -15,7 +15,7 @@
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-	<title>PVLng - {PVLNG} | {SUBTITLE}</title>
+	<title>PVLng - {TITLE} | {SUBTITLE}</title>
 	<meta name="description" content="{PVLNG}" />
 	<meta name="author" content="Knut Kohl" />
 
@@ -83,7 +83,7 @@
 		</div>
 		<div class="grid_8 omega">
 			<div class="r">
-				<span id="title1">{PVLNG}</span>
+				<span id="title1">{TITLE}</span>
 			</div>
 			<h3 class="alpha grid_6 c">{SUBTITLE}</h3>
 			<!-- IF {USER} -->

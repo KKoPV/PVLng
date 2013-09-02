@@ -71,10 +71,12 @@ class Overview_Controller extends ControllerAuth {
 	 */
 	public function AddChild_Post_Action() {
 		if ($parent = $this->request('parent') AND
-				$child = $this->request('child')) {
-			$this->Tree->insertChildNode($child, $parent);
+		    $childs = $this->request('child') AND is_array($childs)) {
+			foreach ($childs as $child) {
+				if ($child) $this->Tree->insertChildNode($child, $parent);
+            }
 		}
-		$this->redirect('index');
+		$this->redirect('overview');
 	}
 
 
@@ -85,7 +87,7 @@ class Overview_Controller extends ControllerAuth {
 		if ($id = $this->request('id')) {
 			$this->Tree->DeleteNode($id);
 		}
-		$this->redirect('index');
+		$this->redirect('overview');
 	}
 
 	/**
@@ -95,7 +97,7 @@ class Overview_Controller extends ControllerAuth {
 		if ($id = $this->request('id')) {
 			$this->Tree->DeleteBranch($id);
 		}
-		$this->redirect('index');
+		$this->redirect('overview');
 	}
 
 	/**
@@ -103,11 +105,13 @@ class Overview_Controller extends ControllerAuth {
 	 */
 	public function MoveLeft_Post_Action() {
 		if ($id = $this->request('id')) {
-		    for ($i=$this->request('count', 1); $i>0; $i--) {
-				$this->Tree->moveLft($id);
+			// Set an absurd high value, loop breaks anyway if can't move anymore...
+			$cnt = $this->request('countmax') ? 99999 : $this->request('count', 1);
+		    for ($i=$cnt; $i>0; $i--) {
+				if (!$this->Tree->moveLft($id)) break;
 			}
 		}
-		$this->redirect('index');
+		$this->redirect('overview');
 	}
 
 	/**
@@ -115,11 +119,13 @@ class Overview_Controller extends ControllerAuth {
 	 */
 	public function MoveRight_Post_Action() {
 		if ($id = $this->request('id')) {
-		    for ($i=$this->request('count', 1); $i>0; $i--) {
-				$this->Tree->moveRgt($id);
+			// Set an absurd high value, loop breaks anyway if can't move anymore...
+			$cnt = $this->request('countmax') ? 99999 : $this->request('count', 1);
+		    for ($i=$cnt; $i>0; $i--) {
+				if (!$this->Tree->moveRgt($id)) break;
 			}
 		}
-		$this->redirect('index');
+		$this->redirect('overview');
 	}
 
 	/**
@@ -129,7 +135,7 @@ class Overview_Controller extends ControllerAuth {
 		if ($id = $this->request('id')) {
 			$this->Tree->moveUp($id);
 		}
-		$this->redirect('index');
+		$this->redirect('overview');
 	}
 
 	/**
@@ -139,75 +145,7 @@ class Overview_Controller extends ControllerAuth {
 		if ($id = $this->request('id')) {
 			$this->Tree->moveDown($id);
 		}
-		$this->redirect('index');
-	}
-
-	/**
-	 *
-	 */
-	public function Login_Post_Action() {
-
-		$hasher = new PasswordHash();
-
-		if ($this->config->Admin_User == $this->request('user') AND
-		    $hasher->CheckPassword($this->request('pass'), $this->config->Admin_Password)) {
-
-			$this->User = $this->request('user');
-			Session::set('user', $this->User);
-
-			if ($this->request('save')) {
-				setcookie(Session::token(), 1, time()+60*60*24*7, '/');
-			}
-			Messages::Success(I18N::_('Welcome', $this->User));
-
-			if ($r = Session::get('returnto')) {
-				// clear before redirect
-				Session::set('returnto');
-				$this->redirect($r);
-			} else {
-				$this->redirect('');
-			}
-		} else {
-			Messages::Error(I18N::_('UnknownUser'));
-		}
-	}
-
-	/**
-	 *
-	 */
-	public function Logout_Action() {
-		if ($this->User) {
-			$this->view->Message = I18N::_('LogoutSuccessful', $this->User);
-		}
-		$this->User = '';
-		Session::destroy();
-		setcookie(Session::token(), '', time()-60*60*24, '/');
-	}
-
-	/**
-	 *
-	 */
-	public function AdminPassword_POST_Action() {
-		if ($this->request('u') == '' OR $this->request('p1') == '' OR $this->request('p2') == '') {
-			Messages::Error(I18N::_('AdminAndPasswordRequired'), TRUE);
-			return;
-		}
-
-		if ($this->request('p1') != $this->request('p2')) {
-			Messages::Error(I18N::_('PasswordsNotEqual'), TRUE);
-			return;
-		}
-
-		$hasher = new PasswordHash();
-		$this->view->AdminPass = $hasher->HashPassword($this->request('p1'));
-	}
-
-	/**
-	 *
-	 */
-	public function AdminPassword_Action() {
-		$this->view->SubTitle = I18N::_('GenerateAdminHash');
-		$this->view->AdminUser = $this->request('u');
+		$this->redirect('overview');
 	}
 
 	// -------------------------------------------------------------------------

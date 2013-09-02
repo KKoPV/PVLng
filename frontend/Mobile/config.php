@@ -10,9 +10,9 @@
 return array(
 
 	/**
-	 * Show hint for each laoded channel
+	 * Aggregation period, DON't use minutes, use the hour representation!
 	 */
-	'Period' => '6minutes',
+	'Period' => '0.1hour',
 
     /**
      * Chart canvas height

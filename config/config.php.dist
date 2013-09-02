@@ -43,6 +43,11 @@ return array(
 	),
 
 	/**
+	 * You title
+	 */
+	'Title' => 'PhotoVoltaic Logger new generation',
+
+	/**
 	 * Currency settings
 	 */
 	'Currency' => array(

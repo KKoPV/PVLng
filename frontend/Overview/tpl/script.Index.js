@@ -27,7 +27,7 @@ $(function() {
 		bInfo: false,
 		bJQueryUI: true,
 		aoColumnDefs: [
-			{ "bVisible": false, "aTargets": [ 4 ] }
+			{ "bVisible": false, "aTargets": [ 1 ] }
 		]
 	});
 
@@ -77,7 +77,7 @@ $(function() {
 
 	$('#toggleGUID').click(function() {
 		var visible = $(this).is(':checked');
-		oTable.fnSetColumnVis( 4, visible);
+		oTable.fnSetColumnVis( 1, visible);
 		if (visible) {
 			/* show after re-insert into table */
 			$('.td-guid').show();
@@ -121,7 +121,7 @@ function addChild( node ) {
  */
 function moveChild( id, action ) {
 	var form = $('#form-movechild');
-	form.attr('action', '/index/' + action);
+	form.attr('action', '/overview/' + action);
 	form.find('input[name="id"]').val(id);
 	$('#dialog-move').dialog('open');
 }

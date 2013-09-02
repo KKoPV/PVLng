@@ -32,15 +32,24 @@ class Channel_Controller extends ControllerAuth {
 				'HINT'     => I18N::_('channel::'.$key.'Hint'),
 			), array_change_key_case($field, CASE_UPPER));
 		}
+
+		if ($id = $this->request('id')) {
+			$this->view->Id = $id;
+			$entity = new PVLng\Entity($id);
+			$this->prepareFields($entity);
+		}
 	}
 
 	/**
 	 *
 	 */
 	public function after_Post() {
-	    // Handle returnto (Edit from Overview)
-	    parent::after_POST();
-	    if ($this->request('action') == 'edit') $this->redirect('channel');
+	    if (!$this->ignore_returnto) {
+		    // Handle returnto (Edit from Overview) ...
+			parent::after_POST();
+			// ... or redirect to channels list
+			$this->redirect('channel');
+		}
 	}
 
 	/**
@@ -54,17 +63,19 @@ class Channel_Controller extends ControllerAuth {
 	 *
 	 */
 	public function Add_Post_Action() {
-		if ($this->type = $this->request('type')) {
-			$this->prepareFields();
+		if ($type = $this->request('type')) {
+			$this->prepareFields($type);
 			foreach ($this->fields as &$data) {
 				$data['VALUE'] = $data['DEFAULT'];
 			}
 
+			$this->view->Type = $type;
+
 			// Preset channel unit
-			$q = new DBQuery('pvlng_type', 'unit');
-			$q->whereEQ('id', $this->type);
-			$this->fields['unit']['VALUE'] = $this->db->queryOne($q);
-			$this->view->Fields = $this->fields;
+			$type = new PVLng\EntityType($type);
+			$this->fields['unit']['VALUE'] = $type->unit;
+
+			$this->ignore_returnto = TRUE;
 			$this->foreward('Edit');
 		}
 	}
@@ -84,11 +95,10 @@ class Channel_Controller extends ControllerAuth {
 			$entity = new PVLng\Entity($id);
 			if ($entity->id) {
 				unset($entity->id, $entity->guid);
-				$this->type = $entity->type;
 				$this->prepareFields($entity);
+				$this->view->Type = $entity->type;
 			}
 
-			$this->view->Fields = $this->fields;
 			$this->foreward('Edit');
 		}
 	}
@@ -109,16 +119,20 @@ class Channel_Controller extends ControllerAuth {
 		if ($channel = $this->request('c')) {
 			$ok = TRUE;
 
+			$entity = new PVLng\Entity($channel['id']);
+
+			// set values
+			foreach ($channel as $key=>$value) $entity->set($key, $value);
+
+			$this->prepareFields($entity);
+
 			/* check required fields */
 			foreach ($this->fields as $key=>$data) {
-				if ($data['REQUIRED'] AND $channel[$key] == '') {
+				if ($data['REQUIRED'] AND $entity->$key == '') {
 					Messages::Error(I18N::_('channel::ParamIsRequired', $data['NAME']), TRUE);
 					$ok = FALSE;
 				}
 			}
-
-			$entity = new PVLng\Entity($channel['id']);
-			foreach ($channel as $key=>$value) $entity->set($key, $value);
 
 			if ($ok) {
 			    // CAN'T simply replace because of the foreign key in the tree!
@@ -128,13 +142,14 @@ class Channel_Controller extends ControllerAuth {
 					Messages::Success(I18N::_('ChannelSaved'));
 				} else {
 					Messages::Error($entity->Error());
+					$ok = FALSE;
 				}
 			}
 
-			$this->type = $entity->type;
-			$this->prepareFields($entity);
+			$this->ignore_returnto = !$ok;
+
 			$this->view->Id = $entity->id;
-			$this->view->Fields = $this->fields;
+			$this->view->Type = $entity->type;
 		}
 	}
 
@@ -143,21 +158,6 @@ class Channel_Controller extends ControllerAuth {
 	 */
 	public function Edit_Action() {
 		$this->view->SubTitle = I18N::_('EditChannel');
-
-		if ($id = $this->request('id')) {
-			$entity = new PVLng\Entity($id);
-			$this->view->Id = $id;
-			$this->type = $entity->type;
-			$this->prepareFields($entity);
-		}
-
-		$type = new PVLng\EntityType($this->type);
-		if ($type->id) {
-			$this->view->TypeName = $type->name;
-			if ($type->unit) $this->view->TypeName .= ' (' . $type->unit . ')';
-		}
-
-		$this->view->Type = $this->type;
 		$this->view->Fields = $this->fields;
 	}
 
@@ -182,6 +182,7 @@ class Channel_Controller extends ControllerAuth {
 				}
 			}
 		}
+
 		$this->redirect('channel');
 	}
 
@@ -197,16 +198,22 @@ class Channel_Controller extends ControllerAuth {
 	/**
 	 *
 	 */
-	protected $type = 0;
+	protected $ignore_returnto;
 
 	/**
 	 *
+	 * @param $entity integer|object Type Id or Channel object
 	 */
 	protected function prepareFields( $entity=NULL ) {
-		$type = new PVLng\EntityType($this->type);
+
+		if (!is_object($entity)) {
+			$type = new PVLng\EntityType($entity);
+		} else {
+			$type = new PVLng\EntityType($entity->type);
+		}
 
 		$attr = include CORE_DIR . DS . 'Channel' . DS
-		              . str_replace('\\', DS, $type->model?:'_') . '.conf.php';
+		              . str_replace('\\', DS, $type->model?:'NoModel') . '.conf.php';
 
 		// check all fields
 		foreach ($this->fields as $key=>$data) {
@@ -219,8 +226,20 @@ class Channel_Controller extends ControllerAuth {
 			}
 		}
 
-		if ($entity) {
+		$this->view->type = $type->id;
+		$this->view->TypeName = $type->name;
+		if ($type->unit) $this->view->TypeName .= ' (' . $type->unit . ')';
+
+		if (is_object($entity)) {
 			foreach ($this->fields as $key=>&$data) {
+				$h = 'model::'.$type->name.'_'.$key;
+				$name = I18N::_($h);
+				if ($name != $h) $data['NAME'] = $name;
+
+				$h = 'model::'.$type->name.'_'.$key.'_Hint';
+				$name = I18N::_($h);
+				if ($name != $h) $data['HINT'] = $name;
+
 				$data['VALUE'] = isset($entity->$key)
 				               ? htmlspecialchars($entity->$key)
 				               : htmlspecialchars($data['DEFAULT']);

@@ -17,8 +17,8 @@ return array(
 	'index'             => array( 'Index', 'Index' ),
 	'index/index'       => array( 'Index', 'Index' ),
 
-	'index'             => array( 'Index', 'Index' ),
-	'index/:view'       => array( 'Index', 'Index' ),
+	'index'             => array( 'Index', 'Index', array('GET', 'POST') ),
+	'index/:view'       => array( 'Index', 'Index', array('GET', 'POST') ),
 	'index/:view/:date' => array( 'Index', 'Index' ),
 
 	'chart/:view'       => array( 'Index', 'Index' ),

@@ -101,12 +101,9 @@ Highcharts.setOptions({
  *
  */
 var lock = false,
-	channels = [],
-	loading = '•';
+	channels = [];
 
 var chart = new Highcharts.Chart(options);
-
-chart.showLoading(loading);
 
 $('#page-home').on('pageshow', function( event, ui ) {
 	updateChart();
@@ -134,7 +131,7 @@ function updateChart() {
 
 	if (view == '') return;
 
-	loading = '•' + '•'.repeat(view.length);
+	var loading = view.length;
 	chart.showLoading(loading);
 
 	$('#table-cons tbody tr').remove();
@@ -160,6 +157,9 @@ function updateChart() {
 
 	/* build channels */
 	$(buffer).each(function(id, channel) {
+		/* axis on right side */
+		var is_right = !(channel.axis % 2);
+
 		/* axis from chart point of view */
 		channel.axis = yAxisMap.indexOf(channel.axis);
 
@@ -172,9 +172,9 @@ function updateChart() {
 		if (!yAxis[channel.axis]) {
 			yAxis[channel.axis] = {
 				title: false /* { text: channel.unit } */,
+				lineColor:channel.color,
 				showEmpty: false,
-				/* odd axis on left, even on right side */
-				opposite: (channel.axis & 1)
+				opposite: is_right
 			};
 			/* only 1st left axis shows grid lines */
 			if (channel.axis != 0) {
@@ -222,7 +222,7 @@ function updateChart() {
 	/* get data */
 	$(channels).each(function(id, channel) {
 
-		var url = PVLngAPI + channel.guid + '/data/fullshort/attributes/';
+		var url = PVLngAPI + 'data/' + channel.guid + '/attributes/fullshort.json';
 		_log('Fetch: ' + url);
 
 		$.getJSON(
@@ -327,12 +327,13 @@ function updateChart() {
 				series[id] = serie;
 			}
 		).always(function() {
+			// Force redraw
+			chart.hideLoading();
+			chart.showLoading(--loading);
+
 			/* check real count of elements in series array! */
 			var completed = series.filter(function(a){ return a !== undefined }).length;
 			_log(completed + ' completed');
-
-			loading = loading.substring(0, loading.length-1);
-			chart.showLoading(loading);
 
 			/* check if all getJSON() calls finished */
 			if (completed == channels.length) {

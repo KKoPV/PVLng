@@ -220,6 +220,7 @@ function updateChart() {
 	var ts = (new Date).getTime(),
 	    channels_new = [], yAxisMap = [], yAxis = [],
 		channel, channel_clone, buffer = [],
+		period_count = +$('#periodcnt').val(),
 		period = $('#period').val();
 
 	/* reset consumption and costs data */
@@ -244,6 +245,9 @@ function updateChart() {
 
 	/* build channels */
 	$(buffer).each(function(id, channel) {
+		/* axis on right side */
+		var is_right = !(channel.axis % 2);
+
 		/* axis from chart point of view */
 		channel.axis = yAxisMap.indexOf(channel.axis);
 
@@ -271,10 +275,9 @@ function updateChart() {
 			yAxis[channel.axis] = {
 				/* unit as axis title */
 				title: { text: channel.unit },
-				lineColor:channel.color,
-				/* odd axis on left, even on right side */
-				opposite: (channel.axis & 1),
-				showEmpty: false
+				lineColor: channel.color,
+				showEmpty: false,
+				opposite: is_right
 			};
 			/* only 1st left axis shows grid lines */
 			if (channel.axis != 0) {
@@ -303,6 +306,17 @@ function updateChart() {
 
 	var res = xAxisResolution[period];
 
+	if (period_count < 1) {
+		switch(period) {
+			case 'h':  res = null;  break;
+			case 'd':  res = xAxisResolution['h'];  break;
+			case 'w':  res = xAxisResolution['d'];  break;
+			case 'm':  res = xAxisResolution['w'];  break;
+			case 'q':  res = xAxisResolution['m'];  break;
+			case 'y':  res = xAxisResolution['q'];  break;
+		}
+	}
+
 	if (changed) {
 		/* use UTC for timestamps with a period >= day to avoid wrong hours in hint */
 		Highcharts.setOptions({	global: { useUTC: (res >= xAxisResolution.d) } });
@@ -313,7 +327,8 @@ function updateChart() {
 		chart = new Highcharts.Chart(options);
 	}
 
-	chart.showLoading('{{LOADING}}');
+	var loading = channels.length;
+	chart.showLoading('- ' + loading + ' -');
 
 	var series = [], costs = 0;
 
@@ -322,7 +337,7 @@ function updateChart() {
 
 		$('#s'+channel.id).show();
 
-		var t, url = PVLngAPI + channel.guid + '/data/full/attributes';
+		var t, url = PVLngAPI + 'data/' + channel.guid + '/attributes/full.json';
 		_log('Fetch: '+url);
 
 		$.getJSON(
@@ -330,8 +345,7 @@ function updateChart() {
 			{
 				start:	$('#fromdate').attr('value'),
 				end:	$('#todate').attr('value') + '+1day',
-				period: (channel.type != 'scatter') ? $('#periodcnt').val() + period : '',
-				full:   period,
+				period: (channel.type != 'scatter') ? period_count + period : '',
 				_ts:	(new Date).getTime()
 			},
 			function(data) {
@@ -371,7 +385,7 @@ function updateChart() {
 						align: 'left',
 						rotation: 270,
 						align: 'left',
-						x: 4,
+						x: 3,
 						y: -7,
 						formatter: function() { return this.point.name }
 					};
@@ -421,6 +435,10 @@ function updateChart() {
 		).fail(function(data, status) {
 		    _log('FAIL', data, status);
 		}).always(function(data, status) {
+			// Force redraw
+			chart.hideLoading();
+			chart.showLoading('- ' + (--loading) + ' -');
+
 			/* check real count of elements in series array! */
 			var completed = series.filter(function(a){ return a !== undefined }).length;
 			_log(completed+' series completed');

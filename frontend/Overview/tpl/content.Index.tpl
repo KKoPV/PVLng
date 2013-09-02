@@ -22,17 +22,17 @@
 <table id="tree" class="dataTable treeTable">
 	<thead>
 	<tr>
-		<th style="width:99%;text-align:left !important;padding-left:18px !important">
-			<img src="/images/ico/toggle.png" id="treetoggle"
-			     style="width:16px;height:16px" width="16p" height="16" class="tip"
+		<th style="text-align:left !important">
+			<img src="/images/ico/toggle.png" id="treetoggle" class="fl tip"
+			     style="width:16px;height:16px" width="16p" height="16"
 			     onclick="return ToggleTree()" tip="#tiptoggle" alt="[+]" />
+			<div class="c">{{ChannelHierarchy}}</div>
 			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
-			&nbsp; {{Channels}}
 		</th>
-		<th></th>
-		<th></th>
-		<th></th>
 		<th class="td-guid" style="display:none">GUID</th>
+		<th></th>
+		<th></th>
+		<th></th>
 	</tr>
 	</thead>
 
@@ -42,13 +42,19 @@
 
 	<tr data-tt-id="{ID}"
 	    <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
-		<td style="padding:0.4em 0;width:99%">
+		<td style="width:99%">
 			<img style="vertical-align:top;width:16px;height:16px" width="16" height="16"
 			     src="/images/ico/{ICON}" alt="" class="imgbar tip" title="{TYPE}" />
 			<strong>{NAME}</strong>
 			<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
 			<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
 		</td>
+
+		<td class="td-guid" style="white-space:nowrap;display:none">
+			<input style="background-color:transparent;border:0;width:24em;font-family:monospace"
+			       class="guid"  value="{GUID}" readonly="readonly" />
+		</td>
+
 		<td>
 			<!-- IF {ACCEPTCHILDS} -->
 			<a href="#" onclick="addChild({ID}); return false" class="tip"
@@ -66,13 +72,13 @@
 			</a>
 
 			<!-- IF {CHILDS} == "0" -->
-			<form action="/index/delete" method="post" class="delete-form">
+			<form action="/overview/delete" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
 			<input type="image" src="/images/ico/node_delete_next.png" alt="-"
 			       class="tip nb" title="{{DeleteEntity}}" style="background-color:transparent" />
 			</form>
 			<!-- ELSE -->
-			<form action="/index/deletebranch" method="post" class="delete-form">
+			<form action="/overview/deletebranch" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
 			<input type="image" src="/images/ico/node_delete.png" alt="-!"
 			       class="tip nb" title="{{DeleteBranch}}" style="background-color:transparent" />
@@ -82,7 +88,7 @@
 
 		<td style="white-space:nowrap">
 			<!-- IF {LEVEL} != "1" AND {UPPER} != "0" -->
-			<a href="/index/moveleft" title="{{MoveEntityUp}}" class="tip"
+			<a href="/overview/moveleft" title="{{MoveEntityUp}}" class="tip"
 			   onclick="moveChild({ID}, 'moveleft'); return false">
 				<img src="/images/ico/navigation_090_frame.png" class="imgbar" alt="u"
 				     style="width:16px;height:16px" width="16p" height="16" />
@@ -93,7 +99,7 @@
 			<!-- ENDIF -->
 
 			<!-- IF {LEVEL} != "1" AND {LOWER} != "0" -->
-			<a href="/index/moveright" title="{{MoveEntityDown}}" class="tip"
+			<a href="/overview/moveright" title="{{MoveEntityDown}}" class="tip"
 			   onclick="moveChild({ID}, 'moveright'); return false">
 				<img src="/images/ico/navigation_270_frame.png" class="imgbar" alt="d"
 				     style="width:16px;height:16px" width="16p" height="16" />
@@ -104,7 +110,7 @@
 			<!-- ENDIF -->
 
 			<!-- IF {LEVEL} > "2" -->
-			<form action="/index/moveup" method="post">
+			<form action="/overview/moveup" method="post">
 			<input type="hidden" name="id" value="{ID}" />
 			<input type="image" src="/images/ico/navigation_180_frame.png" alt="h"
 			       class="imgbar tip" title="{{MoveEntityLeft}}" style="background-color:transparent" />
@@ -115,7 +121,7 @@
 			<!-- ENDIF -->
 
 			<!-- IF {UPPER} != "0" -->
-			<form action="/index/movedown" method="post">
+			<form action="/overview/movedown" method="post">
 			<input type="hidden" name="id" value="{ID}" />
 			<input type="image" src="/images/ico/navigation_000_frame.png" alt="l"
 			       class="tip" title="{{MoveEntityRight}}" style="background-color:transparent" />
@@ -124,11 +130,6 @@
 			<img src="/images/ico/16x16.png" alt=""
 			     style="width:16px;height:16px" width="16p" height="16" />
 			<!-- ENDIF -->
-		</td>
-
-		<td class="td-guid" style="white-space:nowrap;display:none">
-			<input style="background-color:transparent;border:0;width:24em;font-family:monospace;font-size:smaller"
-			       class="guid"  value="{GUID}" readonly="readonly" />
 		</td>
 	</tr>
 
@@ -142,10 +143,10 @@
 				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
 		</td>
-		<td></td>
-		<td></td>
-		<td></td>
 		<td class="td-guid" style="display:none"></td>
+		<td></td>
+		<td></td>
+		<td></td>
 	</tr>
 	</tbody>
 
@@ -156,11 +157,13 @@
 </p>
 
 <div id="dialog-addchild" style="display:none" title="{{AddChild}}">
-	<form id="form-addchild" action="/index/addchild" method="post">
+	<form id="form-addchild" action="/overview/addchild" method="post">
+		<div id="add1child">
 		<p>
-		<label for="child">{{SelectEntity}}:</label>
-	</p>
-		<select id="child" name="child" style="width:100%">
+			<label for="child">{{SelectEntity}}:</label>
+		</p>
+		<select id="child" name="child[]" style="width:100%;margin-bottom:0.5em">
+			<option value="">--- {{Select}} ---</option>
 		<!-- BEGIN ENTITIES -->
 			<option value="{ID}">
 				{TYPE}: {NAME}
@@ -170,8 +173,13 @@
 			</option>
 		<!-- END -->
 		</select>
+		</div>
 		<input type="hidden" id="parent" name="parent" />
 	</form>
+	<img src="/images/ico/plus_circle_frame.png" alt="[new select]"
+	     style="width:16px;height:16px" width="16p" height="16"
+		 onclick="$('#form-addchild').append($('#child').clone().removeAttr('id')); return false"
+		 class="tip" title="{{AddAnotherChild}}" />
 </div>
 
 <div id="dialog-confirm" style="display:none" title="{{DeleteEntity}}">
@@ -185,9 +193,15 @@
 	<p>
 	    {{MoveChannelHowMuchRows}}
 	</p>
-	<p class="c">
-		<input type="number" step="1" style="width:3em"class="numbersOnly c" name="count" value="1" />
+	<p>
+		<input type="radio" name="countmax" value="0" checked="checked" />
+		<input type="number" step="1" style="width:3em"class="numbersOnly" name="count" value="1" />
 		{{Positions}}
 	</p>
+	<p>
+		<input type="radio" id="movecountmax" name="countmax" value="1" />
+		<label for="movecountmax">{{MoveChannelStartEnd}}</label>
+	</p>
+
 	</form>
 </div>
