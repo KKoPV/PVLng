@@ -47,9 +47,10 @@ FACTOR_1         1
 # GUID delivers watt hours * 0.001 = kilo watt hours
 #FACTOR_1         0.001
 
-### avg. last 60 minutes
-ITEM_2           "power_avg 60"
+### Start at today midnight and aggregate 24 hours > 1 row as result
+ITEM_2           "power_avg 00:00 24hours"
 GUID_2           ""
+PARAM_2          ""
 
 ITEM_3           "today"
 GUID_3           ""

@@ -17,9 +17,14 @@ function twitter_power {
 
 ##############################################################################
 ### Average power over the last $1 minutes (e.g. 60 for last hour)
+### $1 - Start time
+### $2 - Period for aggregation
+### $3 - GUID
+### Example params: 00:00 24hours
+### Start at today midnight and aggregate 24 hours > 1 row as result
 ##############################################################################
 function twitter_power_avg {
-	url="$PVLngURL2/data/$2.tsv?start=-${1}minutes&period=${1}minutes"
+	url="$PVLngURL2/data/$3.tsv?start=$1&period=$2"
 	value=$($curl $url | cut -f2)
 	log 1 "$url => $value"
 	echo $value
