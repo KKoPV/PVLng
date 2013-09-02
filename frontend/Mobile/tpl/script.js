@@ -222,15 +222,17 @@ function updateChart() {
 	/* get data */
 	$(channels).each(function(id, channel) {
 
-		var url = PVLngAPI + 'data/' + channel.guid + '/attributes/fullshort.json';
+		var url = PVLngAPI + 'data/' + channel.guid + '.json';
 		_log('Fetch: ' + url);
 
 		$.getJSON(
 			/* Fetch channel data with attributes */
 			url,
 			{
-			    period: (channel.type != 'scatter') ? Period : '',
-				_ts: (new Date).getTime() /* force reload */
+			    attributes: true,
+			    mode:       'fullshort',
+			    period:     (channel.type != 'scatter') ? Period : '',
+				_ts:        (new Date).getTime() /* force reload */
 			},
 			function(data) {
 				var t, attr = data.shift();

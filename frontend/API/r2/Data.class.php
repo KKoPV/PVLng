@@ -41,13 +41,14 @@ class Data extends Handler {
 		    return $channel->GET($request);
 		}
 
-		$mode = isset($request['mode']) ? $request['mode'] : '';
+		$mode = array_key_exists('mode', $request) ? $request['mode'] : '';
+		$attr = array_key_exists('attributes', $request) ? $request['attributes'] : FALSE;
 
 		$datafile = $channel->read($request);
 
 		$outfile = new \Buffer;
 
-		if (array_search('attributes', $request) !== FALSE) {
+		if ($attr) {
 			$attributes = $channel->getAttributes();
 
 			if (strstr($mode, 'full')) {

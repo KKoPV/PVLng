@@ -18,7 +18,9 @@ class Help extends Handler {
 	 *
 	 */
 	public function GET( &$request ) {
-		$request['format'] = 'json';
+		if ($request['format'] != 'json') {
+		    $this->send(400, 'Only request format JSON is supported here: /api/r2/help.json');
+		}
 
 		return json_decode(file_get_contents(__DIR__ . DS . 'Help.json'));
 	}

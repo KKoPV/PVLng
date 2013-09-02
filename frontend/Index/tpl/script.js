@@ -337,16 +337,18 @@ function updateChart() {
 
 		$('#s'+channel.id).show();
 
-		var t, url = PVLngAPI + 'data/' + channel.guid + '/attributes/full.json';
+		var t, url = PVLngAPI + 'data/' + channel.guid + '.json';
 		_log('Fetch: '+url);
 
 		$.getJSON(
 			url,
 			{
-				start:	$('#fromdate').attr('value'),
-				end:	$('#todate').attr('value') + '+1day',
-				period: (channel.type != 'scatter') ? period_count + period : '',
-				_ts:	(new Date).getTime()
+			    attributes: true,
+			    mode:       'full',
+				start:	    $('#fromdate').attr('value'),
+				end:        $('#todate').attr('value') + '+1day',
+				period:     (channel.type != 'scatter') ? period_count + period : '',
+				_ts:        (new Date).getTime()
 			},
 			function(data) {
 				/* pop out 1st row with attributes */

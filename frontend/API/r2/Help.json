@@ -12,28 +12,28 @@
             "headers": [ "X-PVLng-key" ]
         },
         {
-            "pattern": "/api/r2/:guid/attributes",
+            "pattern": "/api/r2/attributes/:guid",
             "description": "Read all channel attributes",
             "methods": [ "GET" ]
         },
         {
-            "pattern": "/api/r2/:guid/attributes/:name",
+            "pattern": "/api/r2/attributes/:guid/:name",
             "description": "Read only channel attribute :name",
             "methods": [ "GET" ]
         },
         {
-            "pattern": "/api/r2/:guid/data?:parameters",
+            "pattern": "/api/r2/data/:guid",
+            "description": "Read only 'timestamp' and 'data' values",
+            "methods": [ "PUT" ]
+        },
+        {
+            "pattern": "/api/r2/data/:guid?:parameters",
             "description": "Read only 'timestamp' and 'data' values",
             "methods": [ "GET" ]
         },
         {
-            "pattern": "/api/r2/:guid/data/full?:parameters",
-            "description": "Read full data",
-            "methods": [ "GET" ]
-        },
-        {
-            "pattern": "/api/r2/:guid/data/short?:parameters",
-            "description": "Read minimized data as array",
+            "pattern": "/api/r2/batch/:guid",
+            "description": "Read only 'timestamp' and 'data' values",
             "methods": [ "GET" ]
         },
         {
@@ -80,7 +80,18 @@
         {
             "name": "period",
             "description": "aggregation period, default none",
-            "value": [ "\d*minutes", "\d*hours", "\d*days", "\d*weeks", "\d*month", "\d*quarters", "\d*years", "last" ]
+            "value": [ "[0-9.]+minutes", "[0-9.]+hours", "[0-9.]+days", "[0-9.]+weeks",
+			           "[0-9.]+month", "[0-9.]+quarters", "[0-9.]+years", "last" ]
+        },
+        {
+            "name": "mode",
+            "description": "Data mode",
+            "value": [ "full", "short", "fullshort" ]
+        },
+        {
+            "name": "attributes",
+            "description": "Return channel attributes as 1st line",
+            "value": [ "1", "true", "yes" ]
         }
     ]
 }
