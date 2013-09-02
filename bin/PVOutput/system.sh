@@ -74,7 +74,7 @@ while test $i -lt $vMax; do
 
 	i=$((i + 1))
 
-	log 1 "--- $i ---"
+	log 1 "--- v$i ---"
 
 	eval GUID=\$GUID_$i
 
@@ -86,14 +86,12 @@ while test $i -lt $vMax; do
 		test "$FACTOR" || FACTOR=1
 		log 1 "$(printf 'FACTOR  %2d: %s' $i $FACTOR)"
 
-		url="$PVLngURL2/$GUID/data?period=${INTERVAL}minutes"
-		log 2 "$url"
-
 		### empty temp. file
 		echo -n >$TMPFILE
 
-		### extract 2nd value == data from last row, if exists
-		value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
+		url="$PVLngURL2/data/$GUID.tsv?period=${INTERVAL}minutes"
+
+		value=$($curl $url | tail -n1 | cut -f2)
 
 		### unset only zero values for v1 .. v4
 		if test $i -le 4; then

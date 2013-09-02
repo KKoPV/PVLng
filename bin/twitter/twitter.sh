@@ -16,7 +16,7 @@ pwd=$(dirname $0)
 
 test -f $pwd/.tokens || error_exit "Missing token file! Did you run setup.sh?"
 
-. $pwd/twitter.items
+. $pwd/twitter.items.sh
 . $pwd/.pvlng
 . $pwd/.tokens
 
@@ -97,15 +97,16 @@ STATUS=$(printf "$STATUS" $PARAMS)
 log 1 "Result   : $STATUS"
 log 1 "Length   : $(echo $STATUS | wc -c)"
 
-test "$TEST" && opts='--test'
-test $VERBOSE -gt 0 && opts="$opts --debug"
+if test -z "$TEST"; then
+	test $VERBOSE -gt 0 && opts="$opts --debug"
 
-$(dirname $0)/twitter.php $opts \
-  --consumer_key=$CONSUMER_KEY \
-  --consumer_secret=$CONSUMER_SECRET \
-  --oauth_token=$OAUTH_TOKEN \
-  --oauth_secret=$OAUTH_TOKEN_SECRET \
-  --status="$STATUS" --location="$LAT_LON"
+	$(dirname $0)/twitter.php $opts \
+	  --consumer_key=$CONSUMER_KEY \
+	  --consumer_secret=$CONSUMER_SECRET \
+	  --oauth_token=$OAUTH_TOKEN \
+	  --oauth_secret=$OAUTH_TOKEN_SECRET \
+	  --status="$STATUS" --location="$LAT_LON"
+fi
 
 set +x
 

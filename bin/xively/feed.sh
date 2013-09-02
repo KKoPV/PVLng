@@ -72,11 +72,11 @@ while test $i -lt $GUID_N; do
 	test "$CHANNEL" || error_exit "Xively channel name is required (CHANNEL_$i)"
 
 	### read value
-	url="$PVLngURL2/$GUID/data?period=${INTERVAL}minutes"
+	url="$PVLngURL2/data/$GUID.tsv?start=-${INTERVAL}minutes&period=${INTERVAL}minutes"
 	log 2 "URL      : $url"
 
 	### get last row
-	row=$($curl --header "Accept: application/tsv"  $url | tail -n1)
+	row=$($curl $url | tail -n1)
 	log 2 "$row"
 
 	### Just after 0:00 no data for today yet
@@ -105,7 +105,6 @@ while test $i -lt $GUID_N; do
 	log 2 "Age      : $age min."
 
 	### test for valid timestamp
-	### last readed timestamp must be greater or equal $valid
 	if test $age -gt $INTERVAL; then
 		log 1 "Skip timestamp outside update interval."
 		continue

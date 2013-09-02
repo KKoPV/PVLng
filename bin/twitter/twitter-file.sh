@@ -70,6 +70,7 @@ while test $i -lt $PATTERN_N; do
 
 		log 1 "--- $file ---"
 
+		### Trim status
 		STATUS=$(cat $file | sed -e 's~^ ~~' -e 's~ $~~')
 
 		log 1 "Status  : $STATUS"

@@ -63,11 +63,11 @@ while test $i -lt $GUID_N; do
 	eval GUID=\$GUID_$i
 	test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 
-	SERIAL=$($curl --header "Accept: text/plain" "$PVLngURL2/$GUID/attributes/serial")
-	CHANNEL=$($curl --header "Accept: text/plain" "$PVLngURL2/$GUID/attributes/channel")
+	SERIAL=$($curl "$PVLngURL2/attributes/$GUID/serial.txt")
+	CHANNEL=$($curl "$PVLngURL2/attributes/$GUID/channel.txt")
 
 	### read value
-	cmd="$owread -s $SERVER ${CACHED}/${SERIAL}/$CHANNEL"
+	cmd="$owread -s $SERVER ${CACHED}/${SERIAL}/${CHANNEL}"
 	log 2 $cmd 
 	value=$($cmd)
 	log 1 "Value        = $value"

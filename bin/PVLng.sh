@@ -199,7 +199,7 @@ function PVLngPUT2 {
 	                  --write-out %{http_code} \
 	                  --output $TMPFILE \
 	                  --data-binary $data \
-	                  $PVLngURL2/$GUID/save)
+	                  $PVLngURL2/data/$GUID)
 
 	if echo "$1" | grep -qe '^20[012]'; then
 		### 200/201/202 ok

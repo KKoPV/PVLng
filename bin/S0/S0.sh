@@ -53,8 +53,7 @@ while test $i -lt $GUID_N; do
 	test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 	log 1 "GUID    : $GUID"
 
-	### Get single attribute as simple plain text
-	DEVICE=$($(curl_cmd) --header "Accept: plain/text" "$PVLngURL2/$GUID/attributes/channel")
+	DEVICE=$($(curl_cmd) "$PVLngURL2/attributes/$GUID/channel.txt")
 	test "$DEVICE" || error_exit "Device is required (DEVICE_$i)"
 	log 1 "Device  : $DEVICE"
 

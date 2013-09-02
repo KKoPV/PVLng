@@ -104,32 +104,26 @@ while test $i -lt $GUID_N; do
 	fi
 
 	j=0
+	numeric=
 
 	while test $j -lt $GUID_i_N; do
 
 		j=$((j+1))
 
-		eval url="\$PVLngURL2/\$GUID_${i}_${j}"
-		log 2 "URL: $url"
+		eval GUID="\$GUID_${i}_${j}"
 
-		numeric=$($curl "$url/attributes/numeric")
-
-		if echo "$numeric" | grep -qe '[[:alpha:]]'; then
-		    ### An error occured
-		    error_exit "$numeric"
-		fi
-
-		### Check, if data was received
-		test -n "$numeric" || continue
-
-		name="$($curl "$url/attributes/name") ($($curl "$url/attributes/description"))"
+		name="$($curl "$PVLngURL2/attributes/$GUID/name.txt") ($($curl "$PVLngURL2/attributes/$GUID/description.txt"))"
 		eval name_$j="\$name"
 
-		### extract 2nd value == data from last row, if exists
-		data=$($curl --header "Accept: application/tsv" "$url/data?period=last")
-		value=$(echo "$data" | cut -f2)
+		### Extract 2nd value == data from last row, if exists
+		data=$($curl "$PVLngURL2/data/$GUID.tsv?period=last")
+		log 2 "Data   : $data"
 
+		value=$(echo "$data" | cut -f2)
 		log 2 "Result : $name - $value"
+
+		### Test for numerics
+        case $value in (*[0-9.]*) numeric=y;; esac
 
 		eval value_$j="\$value"
 
@@ -150,7 +144,7 @@ while test $i -lt $GUID_N; do
 	CONDITION=$(replace_vars "$CONDITION")
 	log 1 "Condition: $CONDITION"
 
-	if test $numeric -eq 1; then
+	if test "$numeric"; then
 		result=$(echo "scale=4; $CONDITION" | bc -l)
 	else
 		test $CONDITION

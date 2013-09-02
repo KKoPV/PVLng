@@ -9,92 +9,72 @@
 ### Actual power
 ##############################################################################
 function twitter_power {
-  url="$PVLngURL2/$1/data?period=last"
-  log 1 "$url"
-
-  ### get last line, get 2nd value
-  value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
-  log 1 "=> $value"
-
-  echo $value
+	url="$PVLngURL2/data/$1.tsv?period=last"
+	value=$($curl $url | cut -f2)
+	log 1 "$url => $value"
+	echo $value
 }
 
 ##############################################################################
 ### Average power over the last $1 minutes (e.g. 60 for last hour)
 ##############################################################################
 function twitter_power_avg {
-  url="$PVLngURL2/$2/data?start=-${1}minutes&period=${1}minutes"
-  log 1 "$url"
-
-  ### get last line, get 2nd value
-  value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
-  log 1 "=> $value"
-
-  echo $value
+	url="$PVLngURL2/data/$2.tsv?start=-${1}minutes&period=${1}minutes"
+	value=$($curl $url | cut -f2)
+	log 1 "$url => $value"
+	echo $value
 }
 
 ##############################################################################
 ### Max. power of today
 ##############################################################################
 function twitter_power_max {
-  url="$PVLngURL2/$1/data"
-  log 1 "$url"
+	url="$PVLngURL2/data/$1.tsv"
+	$curl $url >$TMPFILE
 
-  $($curl --header "Accept: application/tsv" $url >$TMPFILE)
+	max=0
+	while read line; do
+		value=$(echo "$line" | cut -f2)
+		test $value -gt $max && max=$value
+	done <$TMPFILE
 
-  max=0
-  while read line; do
-    value=$(echo "$line" | cut -f2)
-    test $(int $value) -gt $max && max=$value
-  done < $TMPFILE
-
-  log 1 "=> $max"
-  echo $max
+	log 1 "$url => $max"
+	echo $max
 }
 
 ##############################################################################
 ### Production today in kWh
 ##############################################################################
 function twitter_today {
-  url="$PVLngURL2/$1/data"
-  log 1 "$url"
-
-  ### get last line, get 2nd value
-  value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
-  log 1 "=> $value"
-
-  echo $value
+	url="$PVLngURL2/data/$1.tsv?period=last"
+	value=$($curl $url | cut -f2)
+	log 1 "$url => $value"
+	echo $value
 }
 
 ##############################################################################
 ### Overall production in MWh
 ##############################################################################
 function twitter_overall {
-  url="$PVLngURL2/$1/data?start=0&period=1000y"
-  log 1 "$url"
-
-  ### get last line, get 2nd value
-  value=$($curl --header "Accept: application/tsv" $url | tail -n1 | cut -f2)
-  log 1 "=> $value"
-
-  echo $value
+	url="$PVLngURL2/data/$1.tsv?start=0&period=99y"
+	value=$($curl $url | cut -f2)
+	log 1 "$url => $value"
+	echo $value
 }
 
 ##############################################################################
 ### Today working hours in hours :-)
 ##############################################################################
 function twitter_today_working_hours {
-  url="$PVLngURL2/$1/data"
-  log 1 "$url"
+	url="$PVLngURL2/data/$1.tsv"
+	$curl $url >$TMPFILE
 
-  $($curl --header "Accept: application/tsv" $url >$TMPFILE)
+	### get first line, get 1st value
+	min=$(cat $TMPFILE | head -n1 | cut -f1)
+	### get last line, get 1st value
+	max=$(cat $TMPFILE | tail -n1 | cut -f1)
+	log 1 "$url => $min - $max"
 
-  ### get first line, get 1st value
-  min=$(cat $TMPFILE | head -n1 | cut -f1)
-  ### get last line, get 1st value
-  max=$(cat $TMPFILE | tail -n1 | cut -f1)
-  log 1 "=> $min - $max"
-
-  ### to hours
-  echo "scale=3; ($max - $min) / 3600" | bc -l
+	### to hours
+	echo "scale=3; ($max - $min) / 3600" | bc -l
 }
