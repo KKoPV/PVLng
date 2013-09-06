@@ -61,7 +61,7 @@ function setExtremes() {
 /**
  *
  */
-function setMinMax( serie, setMin, setMax ) {
+function setMinMax( serie, channel ) {
 
 	var
 		ts  = { min: Number.MAX_VALUE, max: -Number.MAX_VALUE },
@@ -73,9 +73,9 @@ function setMinMax( serie, setMin, setMax ) {
 		ts.min = Math.min(ts.min, point[0]);
 		ts.max = Math.max(ts.max, point[0]);
 
-		if (setMin && (point[1] < min.y)) {
+		if (channel.min && (point[1] < min.y)) {
 			min = { id: i, x: point[0], y: point[1] }
-		} else if (setMax && (point[1] > max.y)) {
+		} else if (channel.max && (point[1] > max.y)) {
 			max = { id: i, x: point[0], y: point[1] }
 		}
 	});

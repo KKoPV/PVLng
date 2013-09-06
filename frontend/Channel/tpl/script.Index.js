@@ -30,6 +30,7 @@ $(function() {
 			null,
 			null,
 			null,
+			null,
 			{ 'asSorting': false }
 		],
 		aaSorting: [[ 1, "asc" ]]

@@ -113,8 +113,12 @@ textarea {
 	background-color: white;
 }
 
-.imgbar {
+img.imgbar {
 	margin-right: 4px;
+}
+
+td.imgbar {
+	white-space: nowrap;
 }
 
 .s {

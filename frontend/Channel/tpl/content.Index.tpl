@@ -22,6 +22,7 @@
 		<th style="width:1%"></th>
 		<th class="l">{{Channel}}</th>
 		<th class="l">{{Type}}</th>
+		<th></th>
 		<th class="l">{{Serial}}</th>
 		<th class="l">{{Description}}</th>
 		<th style="width:1%"></th>
@@ -40,6 +41,21 @@
 		</td>
 		<td class="b">{NAME}</td>
 		<td>{TYPE}</td>
+		<td class="imgbar">
+			<!-- IF {WRITE} -->
+			<img src="/images/ico/write.png" class="imgbar tip" alt="w"
+			     style="width:16px;height:16px" width="16p" height="16"
+			     title="{{writableChannel}}" />
+			<!-- ELSE -->
+			<img src="/images/ico/16x16.png" class="imgbar" alt=""
+			     style="width:16px;height:16px" width="16p" height="16" />
+			<!-- ENDIF -->
+			<!-- IF {READ} -->
+			<img src="/images/ico/read.png" class="imgbar tip" alt="r"
+			     style="width:16px;height:16px" width="16p" height="16"
+			     title="{{readableChannel}}" />
+			<!-- ENDIF -->
+		</td>
 		<td>{SERIAL}</td>
 		<td>{DESCRIPTION}</td>
 		<td style="white-space:nowrap">

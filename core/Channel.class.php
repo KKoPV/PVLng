@@ -17,7 +17,7 @@ class Channel {
 
 		if ($entity = $model->getTreeById($id)) {
 			$model = trim('Channel\\' . $entity->model,'\\');
-			return new $model($entity->guid);
+			return new $model($id);
 		}
 
 		throw new \Exception('No channel found for Id: '.$id, 400);
@@ -31,7 +31,7 @@ class Channel {
 
 		if ($entity = $model->getTreeByGUID($guid)) {
 			$model = trim('Channel\\' . $entity->model,'\\');
-			return new $model($guid);
+			return new $model($entity->id);
 		}
 
 		throw new \Exception('No channel found for GUID: '.$guid, 400);
@@ -94,6 +94,8 @@ class Channel {
 	 */
 	public function write( $request, $timestamp=NULL ) {
 
+		$this->performance->action = 'write';
+
 		$this->before_write($request);
 
 		if (is_null($this->value) OR !is_scalar($this->value))
@@ -155,6 +157,8 @@ class Channel {
 	 */
 	public function read( $request, $attributes=FALSE ) {
 
+		$this->performance->action = 'read';
+
 		$this->before_read($request);
 
 		$q = new \DBQuery($this->table[$this->numeric]);
@@ -178,7 +182,7 @@ class Channel {
 			$q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
 			  ->get($q->MIN('timestamp'), 'timestamp');
 
-if (!$this->numeric) {
+			if (!$this->numeric) {
 				$q->get('data');
 			} elseif ($this->meter) {
 				$q->get($q->MAX('data'), 'data');
@@ -315,7 +319,7 @@ if (!$this->numeric) {
 	protected $GroupBy = array(
 		/* last */         -1 => '',
 		/* no grouping */   0 => '',
-		/* minute */	    1 => '(FROM_UNIXTIME(`timestamp`) - UNIX_TIMESTAMP()) DIV (60 * %d)',
+		/* minute */	    1 => '(CAST(`timestamp` AS SIGNED) - UNIX_TIMESTAMP()) DIV (60 * %d)',
 		/* hour */	        2 => '`timestamp` DIV (3600 * %f)',
 		/* day */	        3 => '`timestamp` DIV (86400 * %d)',
 		/* week */	        4 => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
@@ -328,17 +332,32 @@ if (!$this->numeric) {
 	/**
 	 *
 	 */
-	protected function __construct( $guid ) {
+	protected function __construct( $id ) {
 		$this->time = microtime(TRUE);
 		$this->db = yMVC\MySQLi::getInstance();
 
 		$model = new Model;
-		foreach ($model->getTreeByGUID($guid) as $key=>$value) {
+		foreach ($model->getTreeById($id) as $key=>$value) {
 			$this->$key = $value;
 		}
 
 		$this->start = strtotime('00:00');
 		$this->end   = strtotime('24:00');
+
+		$this->performance = new \PVLng\Performance;
+	}
+
+	/**
+	 *
+	 */
+	public function __destruct() {
+		$time = microtime(TRUE) - $this->time;
+
+		$this->performance->entity = $this->entity;
+		$this->performance->time_used = $time;
+		$this->performance->insert();
+
+		Header(sprintf('X-Query-Time:%d ms', $time * 1000));
 	}
 
 	/**
@@ -557,8 +576,6 @@ if (!$this->numeric) {
 
 		}
 		$datafile->close();
-
-		Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $this->time) * 1000));
 
 		return $buffer;
 	}

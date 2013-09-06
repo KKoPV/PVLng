@@ -239,11 +239,11 @@ function updateChart() {
 				_log('Attributes:', attr);
 				_log('Data:', data);
 
-				var serie = {  /* A trick to HTML-decode channel name */
+				var serie = {     /* A trick to HTML-decode channel name */
+						name:     $('<div/>').html(attr.name).text(),
 						id:       channel.id,
 						decimals: attr.decimals,
 						unit:     attr.unit,
-						name:     $('<div/>').html(attr.name).text(),
 						color:    channel.color,
 						type:     channel.type,
 						yAxis:    channel.axis,
@@ -321,7 +321,7 @@ function updateChart() {
 				}
 
 				if (channel.type != 'areasplinerange' && (channel.min || channel.max)) {
-					serie = setMinMax(serie, channel.min, channel.max);
+					serie = setMinMax(serie, channel);
 				}
 
 				_log('Serie: ', serie);

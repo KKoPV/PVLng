@@ -420,7 +420,7 @@ function updateChart() {
 				});
 
 				if (channel.type != 'areasplinerange' && (channel.min || channel.max)) {
-					serie = setMinMax(serie, channel.min, channel.max);
+					serie = setMinMax(serie, channel);
 				}
 
 				_log('Serie: ', serie);

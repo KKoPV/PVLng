@@ -10,6 +10,11 @@
 namespace Channel\PVLog;
 
 /**
+ *
+ */
+use Channel;
+
+/**
  * Classes from PVLog
  */
 require_once CORE_DIR . DS . 'Yield.php';
@@ -20,7 +25,7 @@ require_once CORE_DIR . DS . 'Yield.php';
  * Fetch data for one inverter and transform many inverter data into correct
  * PV-Log JSON
  */
-class Base extends \Channel {
+class Base extends Channel {
 
 	/**
 	 * Skip strings details until PV-Log supports it!
@@ -54,15 +59,10 @@ class Base extends \Channel {
 		}
 
 		// transform request date into start - end
-		$date = isset($request['mode']) ? $request['mode'] : date('Y-m-d');
+		$this->date = isset($request['p1']) ? $request['p1'] : date('Y-m-d');
 
-		if (strlen($date) <= 10) $date = '1-'.$date;
-
-		list($vJSON, $date) = explode('-', $date, 2);
-
-		$request['start']   = $date;
-		$request['end']     = $date . '+1day';
-#$request['period']  = '5i';
+		$request['start'] = $this->date;
+		$request['end']   = $this->date . '+1day';
 
 		// 1st child: total production
 		$child = array_shift($childs);
@@ -101,6 +101,11 @@ class Base extends \Channel {
 	/**
 	 *
 	 */
+	protected $date;
+
+	/**
+	 *
+	 */
 	protected function __construct( $guid ) {
 		parent::__construct($guid);
 		$this->ts = microtime(TRUE);
@@ -132,20 +137,18 @@ class Base extends \Channel {
 	protected function finish( &$yield, $request ) {
 		$yield->setCreator('PVLng ' . PVLNG_VERSION);
 
-		$date = isset($request['mode']) ? $request['mode'] : date('Y-m-d');
-		$yield->setDeleteDayBeforeImport(($date != date('Y-m-d')));
-#		$yield->setDeleteDayBeforeImport(1);
+		$yield->setDeleteDayBeforeImport(($this->date != date('Y-m-d')));
 
 		// Force timestamp calculation
 		$yield->asArray();
 		$yield->getPlant()->setPowerValues(array());
 
 		// Emulate a UTC summer time
-#		$yield->setUtcOffset(date('I', $yield->getPlant()->getTimestampStart())
-#		                   ? $this->UTC_Offset + 3600 : $this->UTC_Offset);
+		$dst = date('I', $yield->getPlant()->getTimestampStart()) ? 3600 : 0;
+		$yield->setUtcOffset($this->UTC_Offset + $dst);
 
 		$result = $yield->asArray();
-#		$result['dbg']['QueryTime'] = sprintf('%.0f ms', (microtime(TRUE) - $this->ts) * 1000);
+		$result['dbg']['query_time'] = sprintf('%.0fms', (microtime(TRUE) - $this->ts) * 1000);
 		return $result;
 	}
 
