@@ -17,6 +17,18 @@ abstract class Handler {
 	/**
 	 *
 	 */
+	public static function formats() {
+	    return array( 'json', 'csv', 'tsv', 'xml' );
+	}
+
+	/**
+	 *
+	 */
+	public static function help() {}
+
+	/**
+	 *
+	 */
 	public function __construct( $GUID ) {
 	    $this->GUID = $GUID;
 	}

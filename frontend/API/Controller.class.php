@@ -147,27 +147,44 @@ class API_Controller extends Controller {
 
 		try {
 
-			$ViewClass = 'yMVC\View\\'.strtoupper($request['format']);
+			$format = $request['format'];
+
+			$ViewClass = 'yMVC\View\\'.strtoupper($format);
 
 			if (!class_exists($ViewClass)) {
 				$h = $ViewClass;
-				$ViewClass = 'yMVC\View\CSV';
-				throw new Exception('Unsupported request format, '
-				                   .'missing view class: '.$h, 400);
+				$ViewClass = 'yMVC\View\TXT';
+				throw new Exception(
+					'Unsupported request format, missing view class: '.$h,
+					400
+				);
 			}
 
 			if (!class_exists($r2Class))
-				throw new Exception('Unsupported request: '.strtolower($r2Class), 400);
+				throw new Exception(
+					'Unsupported request: '.strtolower($r2Class),
+					400
+				);
+
+			if (!in_array($format, $r2Class::formats())) {
+			    throw new Exception(
+					'Only types "'.implode('", "', $r2Class::formats()).'" '
+				   .'are supported for '.implode('/', $this->Rest->PathInfo()),
+				   415
+				);
+			}
 
 			if ($data = $this->Rest->Data()) $request['data'] = $data;
 
 			$r2Class = new $r2Class($this->request('guid'));
 			$content = $r2Class->{$this->Rest->RequestMethod()}($request);
 
-		} catch (Exception $exception) {
-			$code    = $exception->getCode() ?: 500;
-			$content = array('error' => $exception->getMessage());
-			Header('HTTP/1.1 '.$this->Rest->StatusMessage($code));
+		} catch (Exception $e) {
+			$code = $e->getCode() ?: 500;
+			$code = $this->Rest->StatusMessage($code);
+			$msg  = $e->getMessage();
+			$content = $msg ? array('error' => $msg, 'http_code' => $code) : '';
+			Header('HTTP/1.1 '.$code);
 		}
 
 		$this->view = new $ViewClass;

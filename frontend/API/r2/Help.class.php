@@ -17,12 +17,36 @@ class Help extends Handler {
 	/**
 	 *
 	 */
+	public static function formats() {
+	    return array( 'json', 'xml' );
+	}
+
+	/**
+	 *
+	 */
+	public static function help() {
+	    return array(
+			'[GET] /api/r2/help' => array(
+				'description' => 'This help, only JSON or XML supported',
+			),
+		);
+	}
+
+	/**
+	 *
+	 */
 	public function GET( &$request ) {
-		if ($request['format'] != 'json') {
-		    $this->send(400, 'Only request format JSON is supported here: /api/r2/help.json');
+		$help = array();
+
+		foreach (glob(__DIR__ . DS . '*.class.php') as $file) {
+			require_once $file;
+			preg_match('~'.DS.'([^'.DS.']+).class.php~', $file, $args);
+			if ($args[1] == 'Handler') continue;
+			$class = __NAMESPACE__ . '\\' . $args[1];
+			$help = array_merge($help, $class::help());
 		}
 
-		return json_decode(file_get_contents(__DIR__ . DS . 'Help.json'));
+		return $help;
 	}
 
 }

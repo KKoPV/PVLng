@@ -17,13 +17,39 @@ class Config extends Handler {
 	/**
 	 *
 	 */
+	public static function help() {
+	    return array(
+			'[PUT] /api/r2/config' => array(
+				'description' => 'Store new configuration value',
+				'payload'     => array(
+					'{"<key>":"<value>"}',
+				),
+			),
+			'[GET] /api/r2/config/:key' => array(
+				'description' => 'Read a configuration value',
+			),
+			'[POST] /api/r2/config' => array(
+				'description' => 'Update a configuration value',
+				'payload'     => array(
+					'{"<key>":"<value>"}',
+				),
+			),
+			'[DELETE] /api/r2/config/:key' => array(
+				'description' => 'Delete a configuration value',
+			),
+		);
+	}
+
+	/**
+	 *
+	 */
 	public function GET( &$request ) {
 		// Return the one value as text
 		$request['format'] = 'text';
 
-		if (empty($request[0])) return;
+		if (empty($request['key'])) return;
 
-		$cfg = new \PVLng\Config($request[0]);
+		$cfg = new \PVLng\Config($request['key']);
 		return $cfg->value;
 	}
 
@@ -34,13 +60,13 @@ class Config extends Handler {
 		// Return the one value as text
 		$request['format'] = 'text';
 
-		if (empty($request[0])) return;
+		if (empty($request['key'])) return;
 
-		$cfg = new \PVLng\Config($request[0]);
+		$cfg = new \PVLng\Config($request['key']);
 
-		if ($cfg->key) $this->send(400, 'Key "'.$request[0].'" still exists!');
+		if ($cfg->key) $this->send(400, 'Key "'.$request['key'].'" still exists!');
 
-		$cfg->key = $request[0];
+		$cfg->key = $request['key'];
 		if (isset($request['data'])) $cfg->value = $request['data'];
 		$this->send($cfg->insert() ? 201 : 400);
 	}
@@ -52,11 +78,11 @@ class Config extends Handler {
 		// Return the one value as text
 		$request['format'] = 'text';
 
-		if (empty($request[0])) return;
+		if (empty($request['key'])) return;
 
-		$cfg = new \PVLng\Config($request[0]);
+		$cfg = new \PVLng\Config($request['key']);
 
-		if (!$cfg->key) $this->send(400, 'Key "'.$request[0].'" not exists!');
+		if (!$cfg->key) $this->send(400, 'Key "'.$request['key'].'" not exists!');
 
 		if (isset($request['data'])) $cfg->value = $request['data'];
 		$this->send($cfg->replace() ? 201 : 400);
@@ -69,11 +95,11 @@ class Config extends Handler {
 		// Return the one value as text
 		$request['format'] = 'text';
 
-		if (empty($request[0])) return;
+		if (empty($request['key'])) return;
 
-		$cfg = new \PVLng\Config($request[0]);
+		$cfg = new \PVLng\Config($request['key']);
 
-		if (!$cfg->key) $this->send(204, 'Key "'.$request[0].'" not exists!');
+		if (!$cfg->key) $this->send(204, 'Key "'.$request['key'].'" not exists!');
 
 		$this->send($cfg->delete() ? 200 : 400);
 	}

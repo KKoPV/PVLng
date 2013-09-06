@@ -17,6 +17,21 @@ class Batch extends Handler {
 	/**
 	 *
 	 */
+	public static function help() {
+	    return array(
+			'[PUT] /api/r2/batch/:guid' => array(
+				'description' => 'Batch load of reading values',
+				'payload'     => array(
+					'<timestamp>,<value>;...'   => 'Semicolon separated timestamp and value data sets',
+					'<date>,<time>,<value>;...' => 'Semicolon separated date, time and value data sets',
+				),
+			),
+		);
+	}
+
+	/**
+	 *
+	 */
 	public function PUT( &$request ) {
 		$channel = \Channel::byGUID($this->GUID);
 
@@ -36,7 +51,7 @@ class Batch extends Handler {
 					case 3:
 						// date, time and data
 						$timestamp = strtotime($data[0] . ' ' . $data[1]);
-						if ($timestamp === false) {
+						if ($timestamp === FALSE) {
 							$this->send(400, 'Invalid timestamp in data: '.$dataset);
 						}
 						$readings[$timestamp] = $data[2];
@@ -61,7 +76,7 @@ class Batch extends Handler {
 		}
 
 		// Accepted but no data or not saved (inside update interval)
-		return '';
+		$this->send(200);
 	}
 
 }
