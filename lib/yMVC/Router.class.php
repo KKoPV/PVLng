@@ -102,10 +102,8 @@ class Router {
 		foreach ($this->Routes as $regex=>$data) {
 			if (preg_match($regex, $route, $matches)) {
 
-#print_r(strtoupper($_SERVER['REQUEST_METHOD']));
-#print_r($data[0][2]);
-#                if (isset($_SERVER['REQUEST_METHOD']) AND
-#		            !in_array(strtoupper($_SERVER['REQUEST_METHOD']), $data[0][2])) continue;
+                if (isset($_SERVER['REQUEST_METHOD']) AND
+		            !in_array(strtoupper($_SERVER['REQUEST_METHOD']), $data[0][2])) continue;
 
 				// Defaults
 				$handler = array(
@@ -167,15 +165,24 @@ class Router {
 					if (!isset($args[2])) $args[2] = '';
 					$expl = $args[2].'(\d+)'.$args[2];
 					$parameters[] = $args[1];
-				} elseif (preg_match('~\*~', $expl)) {
-					// Catch all parts
-					$expl = '?(.*)';
-					$parameters[] = '*';
 				}
 				$matchUrl[] = $expl;
 			}
-			$matchUrl = '~^'.implode('/', $matchUrl).'$~';
-			$this->Routes[$matchUrl] = array($data, $parameters);
+			$match = '~^'.implode('/', $matchUrl).'$~';
+			$this->Routes[$match] = array($data, $parameters);
+
+			if (isset($matchUrl[1]) AND $matchUrl[1] == 'index') {
+				// If Action is index, auto add Controler only route
+				// Route "foo/index" adds automatic valid route "foo"
+				unset($matchUrl[1]);
+				$match = '~^'.implode('/', $matchUrl).'$~';
+				$this->Routes[$match] = array($data, $parameters);
+			}
+			if (isset($matchUrl[0]) AND $matchUrl[0] == 'index') {
+				// If Controller is index, auto add empty route
+				// Route "index" adds automatic valid route ""
+				$this->Routes['~^$~'] = array($data, $parameters);
+			}
 		}
 
 		$this->Route = isset($_SERVER['PATH_INFO'])
@@ -188,7 +195,6 @@ class Router {
 		} else {
 			$this->Format = 'HTML';
 		}
-		//	$this->Route = preg_replace('~\.[^.]*$~', '', $this->Route);
 
 		if ($data = $this->getMatch($this->Route)) {
 			$this->Controller = $data['Controller'];

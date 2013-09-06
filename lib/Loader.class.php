@@ -12,9 +12,25 @@ class Loader {
 	/**
 	 *
 	 */
+	public static function autoload( $className ) {
+		// Handle namespaced and PEAR named classes the same way
+		$className = str_replace(array('\\','_'), DIRECTORY_SEPARATOR, $className);
+		$classMap = self::getClassMap();
+
+#		dbg('%s - %s', $className, isset($classMap[$className])?$classMap[$className]:'???');
+
+		if (isset($classMap[$className])) {
+			require_once $classMap[$className];
+			return TRUE;
+		}
+	}
+
+	/**
+	 *
+	 */
 	public static function register( $settings=array() ) {
 		self::$settings = array_merge(self::$settings, array_change_key_case($settings));
-		spl_autoload_register(array(__CLASS__, 'load'));
+		spl_autoload_register('Loader::autoload');
 	}
 
 	/**
@@ -22,19 +38,6 @@ class Loader {
 	 */
 	public static function ignore( $pattern ) {
 		self::$IgnorePattern[] = $pattern;
-	}
-
-	/**
-	 *
-	 */
-	public static function load( $className ) {
-		// Handle namespaced and PEAR named classes the same way
-		$className = str_replace(array('\\','_'), DIRECTORY_SEPARATOR, $className);
-		$classMap = self::getClassMap();
-
-#		dbg('%s - %s', $className, isset($classMap[$className])?$classMap[$className]:'???');
-
-		isset($classMap[$className]) && include_once $classMap[$className];
 	}
 
 	/**

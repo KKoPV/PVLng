@@ -12,6 +12,6 @@
  */
 return array(
 
-	'm' => array( 'Mobile', 'Index' ),
+	'm' => array( 'Mobile', 'Index', array('GET') ),
 
 );

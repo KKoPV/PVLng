@@ -11,7 +11,7 @@
  */
 return array(
 
-	'info'       => array( 'Info', 'Index' ),
-	'info/index' => array( 'Info', 'Index' ),
+#	'info'       => array( 'Info', 'Index' ),
+	'info/index' => array( 'Info', 'Index', array('GET') ),
 
 );

@@ -13,15 +13,14 @@
  */
 return array(
 
-	'channel'            => array( 'Channel', 'Index' ),
-	'channel/index'      => array( 'Channel', 'Index' ),
+	'channel/index'      => array( 'Channel', 'Index',  array('GET') ),
 
-	'channel/add'        => array( 'Channel', 'Add' ),
-	'channel/add/:clone' => array( 'Channel', 'Add' ),
+	'channel/add'        => array( 'Channel', 'Add',    array('GET', 'POST') ),
+	'channel/add/:clone' => array( 'Channel', 'Add',    array('GET') ),
 
-	'channel/edit'       => array( 'Channel', 'Edit' ),
-	'channel/edit/:id'   => array( 'Channel', 'Edit' ),
+	'channel/edit'       => array( 'Channel', 'Edit',   array('GET', 'POST') ),
+	'channel/edit/:id'   => array( 'Channel', 'Edit',   array('GET', 'POST') ),
 
-	'channel/delete'     => array( 'Channel', 'Delete' ),
+	'channel/delete'     => array( 'Channel', 'Delete', array('POST') ),
 
 );

@@ -13,8 +13,9 @@
  */
 return array(
 
-'overview'             => array( 'Overview', 'Index' ),
-	'overview/:Action'     => array( 'Overview', NULL ),
-	'overview/:Action/#id' => array( 'Overview', NULL ),
+	'overview'             => array( 'Overview', 'Index', array('GET') ),
+
+	'overview/:Action'     => array( 'Overview', NULL,    array('GET', 'POST') ),
+	'overview/:Action/#id' => array( 'Overview', NULL,    array('GET', 'POST') ),
 
 );

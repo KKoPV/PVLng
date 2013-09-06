@@ -13,8 +13,8 @@
  */
 return array(
 
-	'login'      => array( 'Admin', 'Login' ),
-	'logout'     => array( 'Admin', 'Logout' ),
-	'adminpass'  => array( 'Admin', 'AdminPassword' )
+	'login'      => array( 'Admin', 'Login',         array('GET', 'POST') ),
+	'logout'     => array( 'Admin', 'Logout',        array('GET') ),
+	'adminpass'  => array( 'Admin', 'AdminPassword', array('GET', 'POST') )
 
 );
