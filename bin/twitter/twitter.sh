@@ -39,7 +39,7 @@ shift $((OPTIND-1))
 
 read_config "$1"
 
-test "$STATUS"             || error_exit "Missing status!"
+test "$STATUS" || error_exit "Missing status!"
 
 ITEM_N=$(int "$ITEM_N")
 test $ITEM_N -gt 0  || error_exit "No items defined"

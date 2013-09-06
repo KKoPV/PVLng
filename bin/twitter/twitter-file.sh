@@ -80,13 +80,15 @@ while test $i -lt $PATTERN_N; do
 			continue
 		fi
 
+set -x
+
 		if test -z "$TEST"; then
 			$(dirname $0)/twitter.php \
 			  --consumer_key=$CONSUMER_KEY \
 			  --consumer_secret=$CONSUMER_SECRET \
 			  --oauth_token=$OAUTH_TOKEN \
 			  --oauth_secret=$OAUTH_TOKEN_SECRET \
-			  --status="$STATUS" --location="$LAT_LONG"
+			  --status="$STATUS" --location="$LAT_LON"
 
 			eval move="\$FILE_${i}_MOVE"
 
