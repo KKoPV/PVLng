@@ -25,12 +25,21 @@ VERBOSE=0
 TRACE=
 
 ##############################################################################
-### show message depending of verbosity level
+### show message depending of verbosity level on stderr
 ##############################################################################
 function log {
-	test $(int "$VERBOSE") -ge $1 || return
+	test $VERBOSE -ge $1 || return
+
 	shift
-	echo -e $(date +"[%d-%b %H:%M:%S]") "$*" >&2
+
+	{	### Detect if $1 is a "@filename"
+		if test "${1:0:1}" == '@'; then
+			echo $(date +"[%d-%b %H:%M:%S]") File: ${1:1}
+			cat ${1:1}
+		else
+			echo -e $(date +"[%d-%b %H:%M:%S]") "$*"
+		fi
+	} >&2
 }
 
 ##############################################################################
@@ -42,7 +51,7 @@ function log {
 ##############################################################################
 function usage {
 	s=$(cat "$0" | \
-        awk '{if($0~/^#+ +USAGE +>+/){while(getline>0){if($0~/^#+ *<+ *USAGE/)exit;print $0}}}')
+	    awk '{if($0~/^#+ +USAGE +>+/){while(getline>0){if($0~/^#+ *<+ *USAGE/)exit;print $0}}}')
 	eval s="$(echo \""$s"\")"
 	echo "$s" >&2
 }
@@ -69,8 +78,8 @@ function read_config {
 ##############################################################################
 function bool {
 	case $(echo "$1" | tr '[A-Z]' '[a-z]') in
-		1|on|yes|true) echo 1 ;;
-		*)             echo 0 ;;
+		1|x|on|yes|true) echo 1 ;;
+		*)               echo 0 ;;
 	esac
 }
 
@@ -124,7 +133,7 @@ function save_log {
 
 	### detect @filename or "normal string" to post
 	if test "${2:0:1}" == '@'; then
-		message=$(JSON_quote "$(<$2)")
+		message=$(JSON_quote "$(<${2:1})")
 	else
 		message=$(JSON_quote "$2")
 	fi
@@ -193,8 +202,8 @@ function PVLngPUT2 {
 
 	log 2 "Send	 : $data"
 
-	### Remove temp. file before
-	rm -f "$TMPFILE" 2>&1
+	### Clear temp. file before
+	rm $TMPFILE >/dev/null 2>&1
 
 	set $($(curl_cmd) --request PUT \
 	                  --header "X-PVLng-key: $PVLngAPIkey" \
@@ -206,12 +215,12 @@ function PVLngPUT2 {
 
 	if echo "$1" | grep -qe '^20[012]'; then
 		### 200/201/202 ok
-		log 1 HTTP code : $1
-		log 2 $(<$TMPFILE)
+		log 1 "HTTP code : $1"
+		test -f $TMPFILE && log 2 $(<$TMPFILE)
 	else
 		### errors
-		log -1 HTTP code : $1
-		log -1 $(<$TMPFILE)
+		log -1 "HTTP code : $1"
+		test -f $TMPFILE && log -1 $(<$TMPFILE)
 		save_log "$GUID" "raw: $raw"
 		save_log "$GUID" @$TMPFILE
 	fi
@@ -223,7 +232,7 @@ function PVLngPUT2 {
 ##############################################################################
 function clean_up {
 	### Clean up on program exit, accepts an exit status
-	rm -f "$TMPFILE" 2>&1
+	rm -f "$TMPFILE" >/dev/null 2>&1
 	exit $1
 }
 

@@ -69,7 +69,7 @@ while test $i -lt $GUID_N; do
   "params": { "devices": [ { "key": "$SERIAL", "channels": null } ] } }
 EOT
 
-	log 2 "$(cat $TMPFILE)"
+	log 2 @$TMPFILE
 
 	### Query webbox
 	$curl --output $RESPONSEFILE --data-urlencode RPC@$TMPFILE http://$WEBBOX/rpc
@@ -81,7 +81,7 @@ EOT
 
 	### Test mode
 	log 2 "Webbox response:"
-	log 2 $(cat $RESPONSEFILE)
+	log 2 @$RESPONSEFILE
 
 	### Check response for error object
 	if grep -q '"error"' $RESPONSEFILE; then
