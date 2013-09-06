@@ -186,12 +186,15 @@ function PVLngPUT2 {
 	log 2 "GUID	 : $GUID"
 	log 2 "Data	 : $data"
 
-	test "${2:0:1}" != "@" && data="{\"data\":\"$(JSON_quote "$data")\"}" || data="$data"
+	if test "${data:0:1}" != "@"; then
+	    ### No file
+		data="{\"data\":\"$(JSON_quote "$data")\"}"
+	fi
 
 	log 2 "Send	 : $data"
 
-	### clear TMPFILE
-	echo -n >$TMPFILE
+	### Remove temp. file before
+	rm -f "$TMPFILE" 2>&1
 
 	set $($(curl_cmd) --request PUT \
 	                  --header "X-PVLng-key: $PVLngAPIkey" \
@@ -199,7 +202,7 @@ function PVLngPUT2 {
 	                  --write-out %{http_code} \
 	                  --output $TMPFILE \
 	                  --data-binary $data \
-	                  $PVLngURL2/data/$GUID)
+	                  $PVLngURL2/data/$GUID.txt)
 
 	if echo "$1" | grep -qe '^20[012]'; then
 		### 200/201/202 ok
@@ -220,7 +223,7 @@ function PVLngPUT2 {
 ##############################################################################
 function clean_up {
 	### Clean up on program exit, accepts an exit status
-	rm -f "$TMPFILE" >/dev/null 2>&1
+	rm -f "$TMPFILE" 2>&1
 	exit $1
 }
 

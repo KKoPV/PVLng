@@ -18,7 +18,7 @@ abstract class Handler {
 	 *
 	 */
 	public static function formats() {
-	    return array( 'json', 'csv', 'tsv', 'xml' );
+	    return array( 'json', 'csv', 'tsv', 'xml', 'txt' );
 	}
 
 	/**
