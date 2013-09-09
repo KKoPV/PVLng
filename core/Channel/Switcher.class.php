@@ -21,15 +21,14 @@ class Switcher extends \Channel {
 
 		$this->before_write($request);
 
-		// Get last state and ...
+		// Get last value and ...
 		$last = $this->getLastReading();
 
 		// ... save only on changes
-		if ($this->numeric AND (float) $last  != (float) $this->value OR
-		    /* string */       (string) $last != (string) $this->value) {
+		if ($this->numeric  AND (float)  $last != (float)  $this->value OR
+		    !$this->numeric AND (string) $last != (string) $this->value) {
 			return parent::write($request, $timestamp);
 		}
 		return 0;
 	}
-
 }

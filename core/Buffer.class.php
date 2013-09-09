@@ -35,12 +35,15 @@ class Buffer {
 	 *
 	 */
 	public function write( $row, $id ) {
-	    if ($row != '') {
-			$encoded = $id . self::SEP1
-			         . implode(self::SEP2, array_keys($row)) . self::SEP1
-			         . implode(self::SEP2, array_values($row));
-	    	return fwrite($this->fh, $encoded . PHP_EOL);
+		if ($row != '') {
+			$encoded = $id                                      // Id
+			         . self::SEP1
+			         . implode(self::SEP2, array_keys($row))    // Keys
+			         . self::SEP1
+			         . implode(self::SEP2, array_values($row)); // Values
+			return fwrite($this->fh, self::MARK . $encoded . PHP_EOL);
 		}
+
 		return FALSE;
 	}
 
@@ -48,22 +51,32 @@ class Buffer {
 	 *
 	 */
 	public function read( &$row, &$id, $rewind=FALSE ) {
-	    if ($rewind) $this->rewind();
-	    $row = trim(fgets($this->fh));
+		if ($rewind) $this->rewind();
+
+		$row = trim(fgets($this->fh));
 		$id = '';
+
 		if ($row != '') {
+			if (strpos($row, self::MARK) !== 0) {
+				throw new \Exception('No valid buffer ressource');
+			}
+
+			$row = substr($row, strlen(self::MARK));
+
 			list($id, $keys, $values) = explode(self::SEP1, $row);
+
 			$row = array_combine(explode(self::SEP2, $keys),
 			                     explode(self::SEP2, $values));
 		}
-	    return ($row != '');
+
+		return ($row != '');
 	}
 
 	/**
 	 *
 	 */
 	public function swrite( $data ) {
-	    return !empty($data)
+		return !empty($data)
 		     ? fwrite($this->fh, serialize($data) . PHP_EOL)
 		     : TRUE;
 	}
@@ -72,10 +85,10 @@ class Buffer {
 	 *
 	 */
 	public function sread( &$row, $rewind=FALSE ) {
-	    if ($rewind) $this->rewind();
-	    $row = trim(fgets($this->fh));
+		if ($rewind) $this->rewind();
+		$row = trim(fgets($this->fh));
 		if ($row != '') $row = unserialize($row);
-	    return ($row != '');
+		return ($row != '');
 	}
 
 	/**
@@ -100,6 +113,7 @@ class Buffer {
 	/**
 	 * Separators for encoding/decoding row data
 	 */
+	const MARK = '#BUFFER#';
 	const SEP1 = "\x00";
 	const SEP2 = "\x01";
 

@@ -25,7 +25,9 @@ class Webbox extends \Channel {
 		// find valid child channels
 		$channels = array();
 		foreach ($this->getChilds() as $child) {
-			if ($child->write AND $child->channel != '') $channels[$child->channel] = $child;
+			if ($child->write AND $child->channel != '') {
+				$channels[$child->channel] = $child;
+			}
 		}
 
 		$ok = 0;
@@ -34,8 +36,7 @@ class Webbox extends \Channel {
 		foreach ($request['result']['devices'][0]['channels'] as $channel) {
 			// Look for a suitable child channel
 			$name = $channel['meta'];
-			if (isset($channels[$name]) AND
-					(!$channels[$name]->numeric OR $channel['value'] != '')) {
+			if (isset($channels[$name])) {
 				try {                              // Simulate $request['data']
 					$ok += $channels[$name]->write(array('data'=>$channel['value']), $timestamp);
 				} catch (\Exception $e) {

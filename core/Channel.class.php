@@ -94,56 +94,58 @@ class Channel {
 	 */
 	public function write( $request, $timestamp=NULL ) {
 
-		$this->performance->action = 'write';
-
 		$this->before_write($request);
 
 		if (is_null($this->value) OR !is_scalar($this->value))
 			throw new \Exception('Missing data value', 400);
 
 		if ($this->numeric) {
-			// make numeric
+			// Make numeric
 			$this->value = +$this->value;
 
-			if ($this->meter OR $this->threshold > 0) {
-				if ($last = $this->getLastReading()) {
-					if ($this->meter) {
-						// ... check that new value can't be lower than before
-						if ($this->value < $last) $this->value = $last;
-					} elseif ($this->threshold > 0) {
-						// ... check that new value is inside the threshold range
-						if (abs($this->value-$last) > $this->threshold) {
-							// Throw away invalid value
-							return;
-						}
-					}
-				}
-			}
-
-			// ... check that new value is inside the valid range
+			// Check that new value is inside the valid range
 			if ((!is_null($this->valid_from) AND $this->value < $this->valid_from) OR
 			    (!is_null($this->valid_to)   AND $this->value > $this->valid_to)) {
 
-				$msg = sprintf('Value %s is outside of valid range: %f <= value <= %f',
+				$msg = sprintf('Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
 				               $this->value, $this->valid_from, $this->valid_to);
 
 				$cfg = new \PVLng\Config('LogInvalid');
+
 				if ($cfg->value != 0) {
 					$log = new \PVLng\Log;
 					$log->scope = $this->name;
-					$log->data = $msg;
+					$log->data  = $msg;
 					$log->insert();
 				}
 
 				throw new \Exception($msg, 200);
 			}
+
+			$last = $this->getLastReading();
+
+			// Check that new reading value is inside the threshold range
+			if ($this->threshold > 0 AND abs($this->value-$last) > $this->threshold) {
+				// Throw away invalid reading value
+				return 0;
+			}
+
+			// Check that new meter reading value can't be lower than before
+			if ($this->meter AND $last AND $this->value < $last) {
+				$this->value = $last;
+			}
 		}
+
+		// Write performance only for "real" savings if the program flow
+		// can to here and not returned earlier
+		$this->performance->action = 'write';
 
 		// Default behavior
 		$reading = $this->numeric ? new \PVLng\ReadingNum : new \PVLng\ReadingStr;
-		$reading->id = $this->entity;
+
+		$reading->id        = $this->entity;
 		$reading->timestamp = $timestamp;
-		$reading->data = $this->value;
+		$reading->data      = $this->value;
 
 		$rc = $reading->insert();
 
@@ -351,13 +353,16 @@ class Channel {
 	 *
 	 */
 	public function __destruct() {
-		$time = microtime(TRUE) - $this->time;
+		// Check for real action to log
+		if ($this->performance->action == '') return;
+
+		$time = (microtime(TRUE) - $this->time) * 1000;
 
 		$this->performance->entity = $this->entity;
-		$this->performance->time_used = $time;
+		$this->performance->time = $time;
 		$this->performance->insert();
 
-		Header(sprintf('X-Query-Time:%d ms', $time * 1000));
+		Header(sprintf('X-Query-Time: %d ms', $time));
 	}
 
 	/**

@@ -52,7 +52,7 @@ class Ratio extends \Channel {
 				$child1->read($row1, $id1);
 				$child2->read($row2, $id2);
 
-			} elseif ($id1 < $id2) {
+			} elseif ($id1 AND $id1 < $id2 OR $id2 == '') {
 
 				// read only row 1
 				$child1->read($row1, $id1);
