@@ -132,7 +132,7 @@ function updateChart() {
 	if (view == '') return;
 
 	var loading = view.length;
-	chart.showLoading(loading);
+	chart.showLoading(' -' + loading + ' - ');
 
 	$('#table-cons tbody tr').remove();
 
@@ -230,7 +230,8 @@ function updateChart() {
 			url,
 			{
 			    attributes: true,
-			    mode:       'fullshort',
+			    full:       true,
+				short:      true,
 			    period:     (channel.type != 'scatter') ? Period : '',
 				_ts:        (new Date).getTime() /* force reload */
 			},
@@ -331,7 +332,7 @@ function updateChart() {
 		).always(function() {
 			// Force redraw
 			chart.hideLoading();
-			chart.showLoading(--loading);
+			chart.showLoading('- ' + (--loading) + ' -');
 
 			/* check real count of elements in series array! */
 			var completed = series.filter(function(a){ return a !== undefined }).length;

@@ -344,7 +344,7 @@ function updateChart() {
 			url,
 			{
 			    attributes: true,
-			    mode:       'full',
+			    full:       true,
 				start:	    $('#fromdate').attr('value'),
 				end:        $('#todate').attr('value') + '+1day',
 				period:     (channel.type != 'scatter') ? period_count + period : '',

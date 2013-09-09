@@ -42,16 +42,12 @@ class Rest {
 
 			// ---------------
 			case self::GET:
-				$this->request = $this->cleanInputs($_GET);
-				break;
-
-			// ---------------
-			case self::POST:
-				$this->request = $this->cleanInputs($_POST);
+				$this->request = $_GET;
 				break;
 
 			// ---------------
 			case self::PUT:
+			case self::POST:
 			case self::DELETE:
 			    $request = file_get_contents('php://input');
 			    // Try to interpret as raw JSON
@@ -60,15 +56,15 @@ class Rest {
                     // assume parameter=value data
     				parse_str($request, $this->request);
                 }
-
-                // Deep clean
-				$this->request = $this->cleanInputs($this->request);
 				break;
 
 			// ---------------
 			default:
 				$this->response(406, 'Only PUT, GET, POST and DELETE are supported.');
 		}
+
+		// Deep clean
+		$this->request = $this->cleanInputs($this->request);
 
 		if (isset($this->request['data'])) {
 			$data = json_decode($this->request['data'], $this->ForceDataArray);

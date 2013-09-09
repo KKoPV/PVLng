@@ -62,7 +62,7 @@ class JSON extends View {
 				echo json_encode($row);
 			}
 			echo ']';
-		} else {
+		} elseif ($this->content != '') {
 			echo json_encode($this->content);
 		}
 

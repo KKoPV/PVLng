@@ -38,9 +38,9 @@ class XML extends View {
 		Header('Content-Type: application/xml; charset=UTF-8');
 
 		Array2XML::Init('1.0', 'UTF-8',
-										($this->config->get('View.Verbose') OR $this->Plain));
+		                ($this->config->get('View.Verbose') OR $this->Plain));
 
-		$node = $this->config->get('View.XML.Node', 'readout');
+		$node = $this->config->get('View.XML.Node', 'reading');
 
 		if ($this->content instanceof \Buffer) {
 			$this->content = $this->content->ressource();
@@ -49,17 +49,19 @@ class XML extends View {
 		if (is_resource($this->content)) {
 			echo '<?xml version="1.0" encoding="UTF-8" ?'.'>' . PHP_EOL;
 			echo '<data>' . PHP_EOL;
+
 			rewind($this->content);
-			$first = TRUE;
+			$attr = (array_key_exists('attributes', $_REQUEST) AND $_REQUEST['attributes']);
+
 			while ($row = fgets($this->content)) {
 				$row = unserialize($row);
-				$xml = '	<' . ($first?'attributes':$node) . '>' . PHP_EOL;
+				$xml = '	<' . ($attr?'attributes':$node) . '>' . PHP_EOL;
 				foreach ($row as $key=>$value) {
 					$xml .= '		<' . $key . '>' . $value . '</' . $key . '>' . PHP_EOL;
 				}
-				$xml .= '	</' . ($first?'attributes':$node) . '>' . PHP_EOL;
+				$xml .= '	</' . ($attr?'attributes':$node) . '>' . PHP_EOL;
 				echo $xml;
-				$first = FALSE;
+				$attr = FALSE;
 			}
 			echo '</data>' . PHP_EOL;
 		} else {

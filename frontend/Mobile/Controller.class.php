@@ -28,6 +28,7 @@ class Mobile_Controller extends Controller {
 
 			$data = json_decode($row->data);
 			unset($data->c, $data->p);
+
 			$new_data = array();
 			foreach ($data as $id=>$presentation) {
 				// Get entity attributes
