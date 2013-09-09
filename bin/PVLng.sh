@@ -145,7 +145,7 @@ function save_log {
                 --header "X-PVLng-key: $PVLngAPIkey" \
                 --header "Content-Type: application/json" \
                 --data "{\"scope\":\"$scope\",\"message\":\"$message\"}" \
-                $PVLngHost/api/r2/log
+                $PVLngHost/api/r2/log >/dev/null
 }
 
 ##############################################################################
@@ -216,11 +216,11 @@ function PVLngPUT2 {
 	if echo "$1" | grep -qe '^20[012]'; then
 		### 200/201/202 ok
 		log 1 "HTTP code : $1"
-		test -f $TMPFILE && log 2 $(<$TMPFILE)
+		test -f $TMPFILE && log 2 @$TMPFILE
 	else
 		### errors
 		log -1 "HTTP code : $1"
-		test -f $TMPFILE && log -1 $(<$TMPFILE)
+		test -f $TMPFILE && log -1 @$TMPFILE
 		save_log "$GUID" "raw: $raw"
 		save_log "$GUID" @$TMPFILE
 	fi

@@ -80,8 +80,6 @@ while test $i -lt $PATTERN_N; do
 			continue
 		fi
 
-set -x
-
 		if test -z "$TEST"; then
 			$(dirname $0)/twitter.php \
 			  --consumer_key=$CONSUMER_KEY \

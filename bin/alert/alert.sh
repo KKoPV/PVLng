@@ -112,13 +112,13 @@ while test $i -lt $GUID_N; do
 
 		eval GUID="\$GUID_${i}_${j}"
 
-		name="$($curl "$PVLngURL2/attributes/$GUID/name.txt") ($($curl "$PVLngURL2/attributes/$GUID/description.txt"))"
+		name="$($curl "$PVLngURL2/attributes/$GUID.txt?attribute=name") ($($curl "$PVLngURL2/attributes/$GUID.txt?attribute=description"))"
 		eval name_$j="\$name"
 
-		### Extract 2nd value == data from last row, if exists
 		data=$($curl "$PVLngURL2/data/$GUID.tsv?period=last")
 		log 2 "Data   : $data"
 
+		### Extract 2nd value == data
 		value=$(echo "$data" | cut -f2)
 		log 2 "Result : $name - $value"
 
@@ -144,9 +144,13 @@ while test $i -lt $GUID_N; do
 	CONDITION=$(replace_vars "$CONDITION")
 	log 1 "Condition: $CONDITION"
 
-	if test "$numeric"; then
+	echo "$CONDITION" | grep -qe "[<>]"
+
+	if test $? -eq 0; then
+		### Numeric condition
 		result=$(echo "scale=4; $CONDITION" | bc -l)
 	else
+	    ### String condition
 		test $CONDITION
 		test $? -eq 0 && result=1 || result=0
 	fi

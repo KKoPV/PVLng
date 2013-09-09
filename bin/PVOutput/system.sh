@@ -89,7 +89,7 @@ while test $i -lt $vMax; do
 		### empty temp. file
 		echo -n >$TMPFILE
 
-		url="$PVLngURL2/data/$GUID.tsv?period=${INTERVAL}minutes"
+		url="$PVLngURL2/data/$GUID.tsv?period=${INTERVAL}minute"
 
 		value=$($curl $url | tail -n1 | cut -f2)
 
@@ -148,7 +148,8 @@ if cat $TMPFILE | grep -q '200:'; then
 	log 1 "Ok"
 else
 	### log error
-	save_log "PVOutput / $SYSTEMID" "Update plant failed: $(cat $TMPFILE)"
+	save_log "PVOutput" "$SYSTEMID - Update failed: $(cat $TMPFILE)"
+	save_log "PVOutput" "$SYSTEMID - Data: $DATA"
 fi
 
 set +x

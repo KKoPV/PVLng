@@ -91,6 +91,8 @@ if ($rc) {
   if ($rc) {
     echo 'Twitter update failed.', PHP_EOL;
     echo $conn->http_header['status'], PHP_EOL;
+    print_r($conn);
+    print_r($args);
   }
 }
 
