@@ -26,7 +26,7 @@ class Status extends Handler {
 	 */
 	public static function help() {
 	    return array(
-			'[GET] /api/r2/status' => array(
+			'GET /api/r2/status' => array(
 				'description' => 'System status',
 			),
 		);
@@ -73,12 +73,12 @@ class Status extends Handler {
 		                   implode("\n", $res), $args, PREG_SET_ORDER)) {
             foreach ($args as $arg) {
                 $result['memory'][$arg[1]] = array(
-					'total'    => +$arg[2],
-					'total_mb' => $arg[2]/1024,
-					'used'     => +$arg[3],
-					'used_mb'  => $arg[3]/1024,
-					'free'     => +$arg[4],
-					'free_mb'  => $arg[4]/1024
+					'total_mb' => +$arg[2],
+					'total_gb' => $arg[2]/1024,
+					'used_mb'  => +$arg[3],
+					'used_gb'  => $arg[3]/1024,
+					'free_mb'  => +$arg[4],
+					'free_gb'  => $arg[4]/1024
 				);
             }
 		}

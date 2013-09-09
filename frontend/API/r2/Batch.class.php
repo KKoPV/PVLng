@@ -19,7 +19,7 @@ class Batch extends Handler {
 	 */
 	public static function help() {
 	    return array(
-			'[PUT] /api/r2/batch/:guid' => array(
+			'PUT /api/r2/batch/:guid' => array(
 				'description' => 'Batch load of reading values',
 				'payload'     => array(
 					'<timestamp>,<value>;...'   => 'Semicolon separated timestamp and value data sets',

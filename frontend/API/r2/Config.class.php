@@ -19,22 +19,22 @@ class Config extends Handler {
 	 */
 	public static function help() {
 	    return array(
-			'[PUT] /api/r2/config' => array(
+			'PUT /api/r2/config' => array(
 				'description' => 'Store new configuration value',
 				'payload'     => array(
 					'{"<key>":"<value>"}',
 				),
 			),
-			'[GET] /api/r2/config/:key' => array(
+			'GET /api/r2/config/:key' => array(
 				'description' => 'Read a configuration value',
 			),
-			'[POST] /api/r2/config' => array(
+			'POST /api/r2/config' => array(
 				'description' => 'Update a configuration value',
 				'payload'     => array(
 					'{"<key>":"<value>"}',
 				),
 			),
-			'[DELETE] /api/r2/config/:key' => array(
+			'DELETE /api/r2/config/:key' => array(
 				'description' => 'Delete a configuration value',
 			),
 		);

@@ -26,7 +26,7 @@ class Help extends Handler {
 	 */
 	public static function help() {
 	    return array(
-			'[GET] /api/r2/help' => array(
+			'GET /api/r2/help' => array(
 				'description' => 'This help, only JSON or XML supported',
 			),
 		);
@@ -41,7 +41,6 @@ class Help extends Handler {
 		foreach (glob(__DIR__ . DS . '*.class.php') as $file) {
 			require_once $file;
 			preg_match('~'.DS.'([^'.DS.']+).class.php~', $file, $args);
-			if ($args[1] == 'Handler') continue;
 			$class = __NAMESPACE__ . '\\' . $args[1];
 			$help = array_merge($help, $class::help());
 		}

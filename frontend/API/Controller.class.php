@@ -124,7 +124,8 @@ class API_Controller extends Controller {
 					break;
 			}
 
-			Header('X-Version: PVLng ' . PVLNG_VERSION . ' API r1');
+			Header('X-Version: ' . PVLNG_VERSION);
+			Header('X-API-Version: r1');
 
 		} catch (Exception $exception) {
 			$this->ErrorResponse($exception);
@@ -138,24 +139,23 @@ class API_Controller extends Controller {
 
 		$ts = microtime(TRUE);
 
-		// Remove api/r2 and pad right
+		// Remove api/r2
 		$PathInfo = array_slice($this->Rest->PathInfo(), 2);
-
 		$r2Class = 'API\r2\\' . ucwords(array_shift($PathInfo));
 
 		$request = array_merge($this->Rest->Request(), $this->request(), $PathInfo);
+		$format = $request['format'];
+		$ViewClass = 'yMVC\View\\'.strtoupper($format);
 
 		try {
 
-			$format = $request['format'];
-
-			$ViewClass = 'yMVC\View\\'.strtoupper($format);
-
-			if (!class_exists($ViewClass)) {
-				$h = $ViewClass;
-				$ViewClass = 'yMVC\View\TXT';
+			if (class_exists($ViewClass)) {
+				$this->view = new $ViewClass;
+			} else {
+			    // Fall back to txt for error message
+				$this->view = new yMVC\View\TXT;
 				throw new Exception(
-					'Unsupported request format, missing view class: '.$h,
+					'Unsupported request format, missing view class: '.$ViewClass,
 					400
 				);
 			}
@@ -187,11 +187,12 @@ class API_Controller extends Controller {
 			Header('HTTP/1.1 '.$code);
 		}
 
-		$this->view = new $ViewClass;
 		$this->view->content = $content;
 
-		Header('X-Version: PVLng ' . PVLNG_VERSION . ' API r2');
-		Header(sprintf('X-Query-Time:%d ms', (microtime(TRUE) - $ts) * 1000));
+		Header(sprintf('X-Query-Time: %d ms', (microtime(TRUE) - $ts) * 1000));
+
+		Header('X-Version: ' . PVLNG_VERSION);
+		Header('X-API-Version: r2');
 	}
 
 	/**
@@ -222,7 +223,6 @@ class API_Controller extends Controller {
 	protected function ErrorResponse( Exception $exception ) {
 		$code = $exception->getCode() ?: 500;
 		$msg  = $exception->getMessage();
-#		$msg  = $this->Rest->StatusMessage($code) . ( $msg ? ' - ' . $msg : '' );
 		$this->Rest->response($code, $msg);
 	}
 

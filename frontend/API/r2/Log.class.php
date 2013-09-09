@@ -19,25 +19,25 @@ class Log extends Handler {
 	 */
 	public static function help() {
 	    return array(
-			'[PUT] /api/r2/log' => array(
+			'PUT /api/r2/log' => array(
 				'description' => 'Store new log entry, scope defaults to \'API r2\'',
 				'payload'     => array(
 					'{"scope":"...", "message":"..."}',
 				),
 			),
-			'[GET] /api/r2/log/:key' => array(
+			'GET /api/r2/log/:key' => array(
 				'description' => 'Read a log entry',
 			),
-			'[POST] /api/r2/log' => array(
+			'POST /api/r2/log' => array(
 				'description' => 'Update a log entry',
 				'payload'     => array(
 					'{"scope":"...", "message":"..."}',
 				),
 			),
-			'[DELETE] /api/r2/log/:key' => array(
+			'DELETE /api/r2/log/:key' => array(
 				'description' => 'Delete a log entry',
 			),
-			'[DELETE] /api/r2/log/' => array(
+			'DELETE /api/r2/log/' => array(
 				'description' => 'Delete all log entries of scope or all if no scope submitted',
 				'payload'     => array(
 					'{"scope":"..."}',

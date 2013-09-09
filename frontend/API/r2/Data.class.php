@@ -19,35 +19,49 @@ class Data extends Handler {
 	 */
 	public static function help() {
 	    return array(
-			'[PUT] /api/r2/data/:guid' => array(
+			'PUT /api/r2/data/:guid' => array(
 				'description' => 'Save a reading value',
 				'payload'     => array(
 					'{"<data>":"<value>"}',
 				),
 			),
-			'[GET] /api/r2/data/:guid' => array(
+			'GET /api/r2/data/:guid' => array(
 				'description' => 'Read reading values',
 				'parameters'  => array(
 					'start' => array(
 						'description' => 'Start timestamp for readout, default today 00:00',
-						'value'       => array( 'YYYY-mm-dd HH:ii:ss', '<seconds since 1970>', 'relative from now' ),
+						'value'       => array(
+							'YYYY-mm-dd HH:ii:ss',
+							'<seconds since 1970>',
+							'<relative from now> see http://php.net/manual/en/datetime.formats.relative.php'
+						),
 					),
 					'end' => array(
 						'description' => 'End timestamp for readout, default today midnight',
-						'value'       => array( 'YYYY-mm-dd HH:ii:ss', 'seconds since 1970', 'relative from now' ),
+						'value'       => array(
+							'YYYY-mm-dd HH:ii:ss',
+							'<seconds since 1970>',
+							'<relative from now> see http://php.net/manual/en/datetime.formats.relative.php'
+						),
 					),
 					'period' => array(
-					'description' => 'Aggregation period, default none',
-						'value'   => array( '[0-9.]+minutes', '[0-9.]+hours', '[0-9.]+days', '[0-9.]+weeks',
-						                    '[0-9.]+month', '[0-9.]+quarters', '[0-9.]+years', 'last' ),
-					),
-					'mode' => array(
-						'description' => 'Data mode',
-						'value'       => array( 'full', 'short', 'fullshort' ),
+						'description' => 'Aggregation period, default none',
+						'value'       => array( '[0-9.]+minutes', '[0-9.]+hours',
+						                        '[0-9.]+days',  '[0-9.]+weeks',
+						                        '[0-9.]+month', '[0-9.]+quarters',
+						                        '[0-9.]+years', 'last' ),
 					),
 					'attributes' => array(
 						'description' => 'Return channel attributes as 1st line',
-						'value'       => array( '1', 'true', 'yes' ),
+						'value'       => array( 1, 'true' ),
+					),
+					'full' => array(
+						'description' => 'Return all data, not only timestamp and value',
+						'value'       => array( 1, 'true' ),
+					),
+					'short' => array(
+						'description' => 'Return data as array, not object',
+						'value'       => array( 1, 'true' ),
 					),
 				),
 			),
@@ -81,8 +95,9 @@ class Data extends Handler {
 		    return $channel->GET($request);
 		}
 
-		$mode = array_key_exists('mode', $request) ? $request['mode'] : '';
-		$attr = array_key_exists('attributes', $request) ? $request['attributes'] : FALSE;
+		$attr  = array_key_exists('attributes', $request) ? $request['attributes'] : FALSE;
+		$full  = array_key_exists('full', $request) ? $request['full'] : FALSE;
+		$short = array_key_exists('short', $request) ? $request['short'] : FALSE;
 
 		$datafile = $channel->read($request);
 
@@ -91,7 +106,7 @@ class Data extends Handler {
 		if ($attr) {
 			$attributes = $channel->getAttributes();
 
-			if (strstr($mode, 'full')) {
+			if ($full) {
 				// Calculate consumption and costs
 				$datafile->rewind();
 				while ($datafile->read($row, $id)) {
@@ -105,50 +120,39 @@ class Data extends Handler {
 		$datafile->rewind();
 
 		// optimized flow...
-		switch ($mode) {
-			// -------------------
-			case 'full':
+		if ($full and $short) {
 
-				// do nothing with $row, passtrough
-				while ($datafile->read($row, $id)) {
-					$outfile->swrite($row);
-				}
-				break;
+			// passthrough all values with numeric based array
+			while ($datafile->read($row, $id)) {
+				$outfile->swrite(array_values($row));
+			}
 
-			// -------------------
-			case 'short':
+		} elseif ($full) {
 
-				// default mobile result: only timestamp and data
-				while ($datafile->read($row, $id)) {
-					$outfile->swrite(array(
-						/* 0 */ $row['timestamp'],
-						/* 1 */ $row['data']
-					));
+			// do nothing with $row, passtrough
+			while ($datafile->read($row, $id)) {
+				$outfile->swrite($row);
+			}
 
-				}
-				break;
+		} elseif ($short) {
 
-			// -------------------
-			case 'fullshort':
+			// default mobile result: only timestamp and data
+			while ($datafile->read($row, $id)) {
+				$outfile->swrite(array(
+					/* 0 */ $row['timestamp'],
+					/* 1 */ $row['data']
+				));
+			}
 
-				// passthrough all values
-				while ($datafile->read($row, $id)) {
-					$outfile->swrite(array_values($row));
-				}
-				break;
+		} else {
 
-			// -------------------
-			default:
-
-				// default result: only timestamp and data
-				while ($datafile->read($row, $id)) {
-					$outfile->swrite(array(
-						'timestamp' => $row['timestamp'],
-						'data'      => $row['data']
-					));
-				}
-				break;
-
+			// default result: only timestamp and data
+			while ($datafile->read($row, $id)) {
+				$outfile->swrite(array(
+					'timestamp' => $row['timestamp'],
+					'data'      => $row['data']
+				));
+			}
 		}
 		$datafile->close();
 

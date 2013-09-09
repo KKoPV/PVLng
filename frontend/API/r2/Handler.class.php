@@ -24,7 +24,9 @@ abstract class Handler {
 	/**
 	 *
 	 */
-	public static function help() {}
+	public static function help() {
+		return array();
+	}
 
 	/**
 	 *

@@ -19,10 +19,13 @@ class Attributes extends Handler {
 	 */
 	public static function help() {
 	    return array(
-			'[GET] /api/r2/attributes/:guid' => array(
+			'GET /api/r2/attributes/:guid' => array(
 				'description' => 'Read channel attributes',
 				'parameters'  => array(
-					'attribute' => 'Get only the requested attribute'
+					'attribute' =>  array(
+						'description' => 'Get only the requested attribute',
+						'value'       => array( '<attribute name>' ),
+					),
 				),
 			),
 		);
