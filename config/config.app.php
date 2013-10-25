@@ -12,17 +12,6 @@ return array(
 	// -----------------------------------------------------------------------
 	// INTERNAL SETTINGS, DO NOT TOUCH
 	// -----------------------------------------------------------------------
-	'Router' => array(
-		'Class'      => 'yMVC\Router',
-		'ErrorRoute' => 'index',
-	),
-
-	'Default' => array(
-		'Controller' => 'Controller',
-		'Model'      => 'Model',
-		'View'       => 'View',
-	),
-
 	/**
 	 * View settings
 	 */

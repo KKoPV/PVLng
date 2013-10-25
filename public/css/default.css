@@ -113,7 +113,15 @@ textarea {
 	background-color: white;
 }
 
-img.imgbar {
+img.imgbar,
+input.imgbar {
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+img.imgbar.wide,
+input.imgbar.wide {
+	margin-left: 4px;
 	margin-right: 4px;
 }
 
@@ -122,7 +130,7 @@ td.imgbar {
 }
 
 .s {
-	font-size: small;
+	font-size: smaller;
 }
 
 .b {

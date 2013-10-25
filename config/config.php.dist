@@ -57,6 +57,14 @@ return array(
 	),
 
 	/**
+	 * Preferd cache mode, auto detect best one if empty
+	 */
+	'Cache' => '',
+	#'Cache' => 'APC',
+	#'Cache' => 'MemCache',
+	#'Cache' => 'File',
+
+	/**
 	 * Default language, "en" or "de"
 	 *
 	 * Will be overwritten by browsers accept language settings if exists

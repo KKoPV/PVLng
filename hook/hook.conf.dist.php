@@ -1,35 +1,35 @@
 <?php
 /**
- * Hooks must be defined in directory public_hamt/hooks
+ * Hooks must be defined in directory public_html/hooks
  *
  * The system
- * - looks for a file <hook name>.php
+ * - looks for a file <hook name>.class.php
  * - require_once $file
- * - calls <hook>_<hook name>($entity, $value)
+ * - calls <hook name>( &$entity, $config )
  *
  * Example
  *
- * 'data_save_after' => array(
- *   'MyHook'
+ * 'data.save.after' => array(
+ *   'MyHook' => array(
+ *     config data ...
+ *   )
  * ),
  *
- * file: MyHook.php
- * function: data_save_after_MyHook($entity, value)
+ * file: MyHook.class.php
+ * function: data_save_after( &$entity, $config )
  *
  * So multiple hook functions can be defined in file
  *
  */
 return array(
 
-	// Hook function must return $value, also if unchanged!
-	'data_save_before' => array(
+	'data.save.before' => array(
 	),
 
-	'data_save_after' => array(
+	'data.save.after' => array(
 	),
 
-	// Hook function must return $value, also if unchanged!
-	'data_read_after' => array(
+	'data.read.after' => array(
 	),
 
 );

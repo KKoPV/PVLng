@@ -3,7 +3,7 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-RewriteRule ^(.*)$ index.php/$1 [QSA,L]
+RewriteRule ^(.*) index.php/$1 [QSA,L]
 
 # DISABLE ETAGS
 <filesMatch "\.(ico|pdf|flv|jpe?g?|png|gif|js|css|swf|txt|mp3|avi|mpe?g?|wmv)$">
