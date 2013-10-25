@@ -11,12 +11,12 @@
 /**
  *
  */
-namespace PVLng;
+namespace ORM;
 
 /**
  *
  */
-class Config extends \yMVC\ORMTable {
+class EntityType extends \slimMVC\ORMTable {
 
 	// -------------------------------------------------------------------------
 	// PROTECTED
@@ -25,6 +25,6 @@ class Config extends \yMVC\ORMTable {
 	/**
 	 *
 	 */
-	protected $table = 'pvlng_config';
+	protected $table = 'pvlng_type';
 
 }

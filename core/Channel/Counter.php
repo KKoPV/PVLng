@@ -25,10 +25,7 @@ class Counter extends \Channel {
 
 		$last = 0;
 
-		$buffer = parent::read($request);
-		$buffer->rewind();
-
-		while ($buffer->read($row, $id)) {
+		foreach (parent::read($request) as $id=>$row) {
 
 			// skip 1st row for plain data
 			if ($row['timediff'] OR $last) {
@@ -53,7 +50,6 @@ class Counter extends \Channel {
 
 			$last = $row['timestamp'];
 		}
-		$buffer->close();
 
 		return $this->after_read($result, $attributes);
 	}

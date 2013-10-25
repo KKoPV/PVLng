@@ -38,18 +38,18 @@ class InternalConsumption extends \Channel {
 		$childs = $this->getChilds();
 
 		$child1 = $childs[0]->read($request);
-		$child1->read($row1, $id1, TRUE);
-
 		$child2 = $childs[1]->read($request);
-		$child2->read($row2, $id2, TRUE);
+
+		$row1 = $child1->rewind()->current();
+		$row2 = $child2->rewind()->current();
 
 		$result = new \Buffer;
 
 		$last = 0;
 
-		while ($row1 != '' OR $row2 != '') {
+		while (!empty($row1) OR !empty($row2)) {
 
-			if ($id1 == $id2) {
+			if ($child1->key() == $child2->key()) {
 
 				// same timestamp, combine
 				if ($last) $row1['data'] = $last;
@@ -62,13 +62,14 @@ class InternalConsumption extends \Channel {
 				}
 				$last = $row1['data'];
 
-				$result->write($row1, $id1);
+				$result->write($row1, $child1->key());
 
 				// read both next rows
-				$child1->read($row1, $id1);
-				$child2->read($row2, $id2);
+				$row1 = $child1->next()->current();
+				$row2 = $child2->next()->current();
 
-			} elseif ($id2 == '' OR $id1 < $id2) {
+			} elseif ($child1->key() AND $child1->key() < $child2->key() OR
+			          $child2->key() == '') {
 
 				if ($last) {
 					$row1['data'] = $last;
@@ -79,15 +80,15 @@ class InternalConsumption extends \Channel {
 				$last = $row1['data'];
 
 				// missing row 2, save row 1 as is
-				$result->write($row1, $id1);
+				$result->write($row1, $child1->key());
 
 				// read only row 1
-				$child1->read($row1, $id1);
+				$row1 = $child1->next()->current();
 
-			} else /* $id1 > $id2 */ {
+			} else /* $child1->key() > $child2->key() */ {
 
 				// read only row 2
-				$child2->read($row2, $id2);
+				$row2 = $child2->next()->current();
 
 			}
 		}

@@ -11,12 +11,20 @@
 /**
  *
  */
-namespace PVLng;
+namespace ORM;
 
 /**
  *
  */
-class Entity extends \yMVC\ORMTable {
+class Entity extends \slimMVC\ORMTable {
+
+	/**
+	 *
+	 */
+	public function __construct ( $id=NULL ) {
+		parent::__construct();
+		$this->find('id', $id);
+	}
 
 	// -------------------------------------------------------------------------
 	// PROTECTED
@@ -25,6 +33,6 @@ class Entity extends \yMVC\ORMTable {
 	/**
 	 *
 	 */
-	protected $table = 'pvlng_channel';
+	protected $table = 'pvlng_channel_view';
 
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * An Accumulator sums channels with the same unit to retrieve them as one channel
+ *
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Accumulator extends \Channel {
+class Differentiator extends \Channel {
 
 	/**
 	 * Accept only childs of the same entity type
@@ -59,43 +59,40 @@ class Accumulator extends \Channel {
 		// combine all data for same timestamp
 		for ($i=1; $i<count($childs); $i++) {
 
-			$buffer->read($row1, $id1, TRUE);
-
 			$next = $childs[$i]->read($request);
-			$next->read($row2, $id2, TRUE);
+
+			$row1 = $buffer->rewind()->current();
+			$row2 = $next->rewind()->current();
 
 			$result = new \Buffer;
 
-			while ($row1 != '' OR $row2 != '') {
+			while (!empty($row1) OR !empty($row2)) {
 
-				if ($id1 == $id2) {
+				if ($buffer->key() == $next->key()) {
 
 					// same timestamp, combine
-					$row1['data']        += $row2['data'];
-					$row1['min']         += $row2['min'];
-					$row1['max']         += $row2['max'];
-					$row1['consumption'] += $row2['consumption'];
-					$result->write($row1, $id1);
+					$row1['data']        -= $row2['data'];
+					$row1['min']         -= $row2['min'];
+					$row1['max']         -= $row2['max'];
+					$row1['consumption'] -= $row2['consumption'];
+					$result->write($row1, $buffer->key());
 
 					// read both next rows
-					$buffer->read($row1, $id1);
-					$next->read($row2, $id2);
+					$row1 = $buffer->next()->current();
+					$row2 = $next->next()->current();
 
-				} elseif ($id1 AND $id1 < $id2 OR $id2 == '') {
+				} elseif ($buffer->key() AND $buffer->key() < $next->key() OR
+				          $next->key() == '') {
 
-					// missing row 2, save row 1 as is
-					$result->write($row1, $id1);
-
+					// missing row 2, skip
 					// read only row 1
-					$buffer->read($row1, $id1);
+					$row1 = $buffer->next()->current();
 
-				} else /* $id1 > $id2 */ {
+				} else /* $buffer->key() > $next->key() */ {
 
-					// missing row 1, save row 2 as is
-					$result->write($row2, $id2);
-
+					// missing row 1, skip
 					// read only row 2
-					$next->read($row2, $id2);
+					$row2 = $next->next()->current();
 
 				}
 			}

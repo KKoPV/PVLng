@@ -11,12 +11,12 @@
 /**
  *
  */
-namespace PVLng;
+namespace ORM;
 
 /**
  *
  */
-class Performance extends \yMVC\ORMTable {
+class View extends \slimMVC\ORMTable {
 
 	// -------------------------------------------------------------------------
 	// PROTECTED
@@ -25,6 +25,6 @@ class Performance extends \yMVC\ORMTable {
 	/**
 	 *
 	 */
-	protected $table = 'pvlng_performance';
+	protected $table = 'pvlng_view';
 
 }

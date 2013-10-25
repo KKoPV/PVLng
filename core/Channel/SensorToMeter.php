@@ -21,14 +21,11 @@ class SensorToMeter extends \Channel {
 
 		$this->before_read($request);
 
-		$buffer = $this->getChild(1)->read($request);
-		$buffer->rewind();
-
 		$result = new \Buffer;
 
 		$last = $consumption = $sum = 0;
 
-		while ($buffer->read($row, $id)) {
+		foreach ($this->getChild(1)->read($request) as $id=>$row) {
 
 			if ($last) {
 				$consumption = ($row['timestamp'] - $last) / 3600 * $row['data'];
@@ -41,7 +38,6 @@ class SensorToMeter extends \Channel {
 
 			$last = $row['timestamp'];
 		}
-		$buffer->close();
 
 		return $this->after_read($result, $attributes);
 	}

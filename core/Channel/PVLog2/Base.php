@@ -12,7 +12,7 @@ namespace Channel\PVLog2;
 /**
  * Load basic PV-Log class
  */
-require_once LIB_DIR . '/PVLog/PVLog.php';
+require_once LIB_DIR . DS . 'PVLog' . DS . 'PVLog.php';
 
 /**
  * Register PSR-1 autoloader
@@ -60,7 +60,7 @@ class Base extends Channel {
 		parent::__construct($guid);
 
 		$this->ts = microtime(TRUE);
-		$this->settings = include __DIR__ . DS . 'config.php';
+		$this->settings = include ROOT_DIR . DS . 'config' . DS . 'config.PVLog2.php';
 
 		$offset = $this->settings['offset'];
 		if ($this->settings['dst']) $offset++;
@@ -70,11 +70,11 @@ class Base extends Channel {
 	/**
 	 *
 	 */
-	protected function csv2data( $buffer ) {
-		$buffer->rewind();
+	protected function getChildData( $child, $request ) {
 		$data = array();
-		while ($buffer->read($row, $id)) {
-			$data[\PVLog\JSON2\Helper::localTimestamp($row['timestamp'])] = $row['data'];
+		foreach ($child->read($request) as $row) {
+		    $timestamp = \PVLog\JSON2\Helper::localTimestamp($row['timestamp']);
+			$data[$timestamp] = sprintf('%.'.$child->decimals.'f', $row['data']);
 		}
 		return $data;
 	}

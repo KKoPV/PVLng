@@ -1,5 +1,6 @@
 <?php
 /**
+ * An Accumulator sums channels with the same unit to retrieve them as one channel
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
@@ -11,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Average extends \Channel {
+class Accumulator extends \Channel {
 
 	/**
 	 * Accept only childs of the same entity type
@@ -60,41 +61,42 @@ class Average extends \Channel {
 
 			$next = $childs[$i]->read($request);
 
-			$buffer->read($row1, $id1, TRUE);
-			$next->read($row2, $id2, TRUE);
+			$row1 = $buffer->rewind()->current();
+			$row2 = $next->rewind()->current();
 
 			$result = new \Buffer;
 
-			while ($row1 != '' OR $row2 != '') {
+			while (!empty($row1) OR !empty($row2)) {
 
-				if ($id1 == $id2) {
+				if ($buffer->key() == $next->key()) {
 
 					// same timestamp, combine
-					$row1['data']        = ($row1['data']*$i        + $row2['data'])        / ($i+1);
-					$row1['min']         = ($row1['min']*$i         + $row2['min'])         / ($i+1);
-					$row1['max']         = ($row1['max']*$i         + $row2['max'])         / ($i+1);
-					$row1['consumption'] = ($row1['consumption']*$i + $row2['consumption']) / ($i+1);
-					$result->write($row1, $id1);
+					$row1['data']        += $row2['data'];
+					$row1['min']         += $row2['min'];
+					$row1['max']         += $row2['max'];
+					$row1['consumption'] += $row2['consumption'];
+					$result->write($row1, $buffer->key());
 
 					// read both next rows
-					$buffer->read($row1, $id1);
-					$next->read($row2, $id2);
+					$row1 = $buffer->next()->current();
+					$row2 = $next->next()->current();
 
-				} elseif ($id1 AND $id1 < $id2 OR $id2 == '') {
+				} elseif ($buffer->key() AND $buffer->key() < $next->key() OR
+				          $next->key() == '') {
 
 					// missing row 2, save row 1 as is
-					$result->write($row1, $id1);
+					$result->write($row1, $buffer->key());
 
 					// read only row 1
-					$buffer->read($row1, $id1);
+					$row1 = $buffer->next()->current();
 
-				} else /* $id1 > $id2 */ {
+				} else /* $buffer->key() > $next->key() */ {
 
 					// missing row 1, save row 2 as is
-					$result->write($row2, $id2);
+					$result->write($row2, $next->key());
 
 					// read only row 2
-					$next->read($row2, $id2);
+					$row2 = $next->next()->current();
 
 				}
 			}

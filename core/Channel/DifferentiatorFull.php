@@ -40,45 +40,46 @@ class DifferentiatorFull extends Differentiator {
 
 			$next = $childs[$i]->read($request);
 
-			$buffer->read($row1, $id1, TRUE);
-			$next->read($row2, $id2, TRUE);
+			$row1 = $buffer->rewind()->current();
+			$row2 = $next->rewind()->current();
 
 			$result = new \Buffer;
 
 			while ($row1 != '' OR $row2 != '') {
 
-				if ($id1 == $id2) {
+				if ($buffer->key() == $next->key()) {
 
 					// same timestamp, combine
 					$row1['data']        -= $row2['data'];
 					$row1['min']         -= $row2['min'];
 					$row1['max']         -= $row2['max'];
 					$row1['consumption'] -= $row2['consumption'];
-					$result->write($row1, $id1);
+					$result->write($row1, $buffer->key());
 
 					// read both next rows
-					$buffer->read($row1, $id1);
-					$next->read($row2, $id2);
+					$row1 = $buffer->next()->current();
+					$row2 = $next->next()->current();
 
-				} elseif ($id1 AND $id1 < $id2 OR $id2 == '') {
+				} elseif ($buffer->key() AND $buffer->key() < $next->key() OR
+				          $next->key() == '') {
 
 					// missing row 2, save row 1 as is
-					$result->write($row1, $id1);
+					$result->write($row1, $buffer->key());
 
 					// read only row 1
-					$buffer->read($row1, $id1);
+					$row1 = $buffer->next()->current();
 
-				} else /* $id1 > $id2 */ {
+				} else /* $buffer->key() > $next->key() */ {
 
 					// missing row 1
 					$row2['data']        = -$row2['data'];
 					$row2['min']         = -$row2['min'];
 					$row2['max']         = -$row2['max'];
 					$row2['consumption'] = -$row2['consumption'];
-					$result->write($row2, $id2);
+					$result->write($row2, $next->key());
 
 					// read only row 2
-					$next->read($row2, $id2);
+					$row2 = $next->next()->current();
 
 				}
 			}

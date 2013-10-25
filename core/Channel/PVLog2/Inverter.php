@@ -26,7 +26,7 @@ class Inverter extends Base {
 		}
 
 		// Analyse childs:
-		// - 1st with unit W           => data (Pac)
+		// - 1st with unit W           => actual (Pac)
 		// - 1st with unit Wh          => total
 		// - 2nd and more with unit W  => string[]->data (Pdc)
 		// - 1st with unit °C or F     => temperature
@@ -36,7 +36,7 @@ class Inverter extends Base {
 
 		foreach ($childs as $child) {
 
-			$data = $this->csv2data($child->read($request));
+			$data = $this->getChildData($child, $request);
 			if (empty($data)) continue;
 
 			$attr = $child->getAttributes();
@@ -46,12 +46,12 @@ class Inverter extends Base {
 				case 'W': // Pac or Pdc
 					if (!$bPac) {
 						// 1st child with unit W
-						$inverter->setData($data);
+						$inverter->setActual($data);
 						$bPac = TRUE;
 					} else {
 						// Additional child with unit W
 						$inverter->addString(
-							new \PVLog\JSON2\String(array('data'=>$data))
+							new \PVLog\JSON2\String(array('actual'=>$data))
 						);
 					}
 					break;
@@ -66,7 +66,7 @@ class Inverter extends Base {
 				// -------------------------------
 				case '°C': // Inverter temperature
 					$inverter->setTemperature(
-						new \PVLog\JSON2\Temperature(array('data'=>$data))
+						new \PVLog\JSON2\Temperature(array('actual'=>$data))
 					);
 					break;
 
@@ -75,12 +75,12 @@ class Inverter extends Base {
 					// Convert to °C
 					$data = \PVLog\JSON2\Helper::F2C($data);
 					$inverter->setTemperature(
-						new \PVLog\JSON2\Temperature(array('data'=>$data))
+						new \PVLog\JSON2\Temperature(array('actual'=>$data))
 					);
 					break;
 
 				// -------------------------------
-				default: // ignore all other childs
+				default: // silently ignore all other childs
 					break;
 			}
 		}

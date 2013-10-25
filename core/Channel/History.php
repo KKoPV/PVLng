@@ -27,8 +27,6 @@ class History extends \Channel {
 			          preg_match('~^[.\d]+~', $request['period'], $args)) {
 				$request['period'] = str_replace($args[0], $args[0]*$this->threshold, $request['period']);
 			}
-		} else {
-			$request['period'] = '4i';
 		}
 
 		$this->before_read($request);
@@ -50,11 +48,23 @@ class History extends \Channel {
 			$result = $this->overall($request);
 		}
 
-		// Skip validity handling of after_read!
-		$this->valid_from = NULL;
-		$this->valid_to = NULL;
+		// Smooth data
+		$buffer = new \Buffer;
+		$data = array();
+		$cnt = 3;
+        foreach ($result as $id=>$row) {
+			$data[] = $row['data'];
+			if (count($data) == $cnt) {
+			    $row['data'] = array_sum($data) / $cnt;
+			    array_shift($data);
+			}
+			$buffer->write($row, $id);
+        }
 
-		return $this->after_read($result, $attributes);
+		// Skip validity handling of after_read!
+		$this->valid_from = $this->valid_to = NULL;
+
+		return $this->after_read($buffer, $attributes);
 	}
 
 	// -----------------------------------------------------------------------
@@ -76,7 +86,7 @@ class History extends \Channel {
 		$_start = $start;
 		$_end = $start + ($this->end - $this->start);
 
-		$i = 1;
+		$i = 0;
 
 		while ($_end <= $end) {
 			$request['start'] = $_start;
@@ -84,12 +94,11 @@ class History extends \Channel {
 
 			// Skip actual requested period day
 			if ($_start != $this->start AND $_end != $this->end) {
-				$result = $this->combine($result, $this->child->read($request), $request, $i);
+				$result = $this->combine($result, $this->child->read($request), $request, $i++);
 			}
 
             $_start += $this->end - $this->start;
             $_end   += $this->end - $this->start;
-            $i++;
 		}
 
 		return $result;
@@ -142,51 +151,52 @@ class History extends \Channel {
 	protected function combine( \Buffer $buffer, \Buffer $next, $request, $i ) {
 
 		// Check for data to process
-		if (!$next->size()) return $buffer;
+		if (!count($next)) return $buffer;
 
-		$buffer->read($row1, $id1, TRUE);
-		$next->read($row2, $id2, TRUE);
+		$row1 = $buffer->rewind()->current();
+		$row2 = $next->rewind()->current();
 
 		$result = new \Buffer;
 
-		while ($row1 != '' OR $row2 != '') {
+		while (!empty($row1) OR !empty($row2)) {
 
-			// id1 is in correct format from previous run, build $id2
-			$id2 = $row2
-			     ? floor(($row2['timestamp'] - $request['start']) / 86400) . '|' .
-			       substr($row2['datetime'], -8)
-			     : '';
+			// id is in correct format from previous run, build id
+			$id = $row2
+			    ? floor(($row2['timestamp'] - $request['start']) / 86400) . '|' .
+			      substr($row2['datetime'], -8)
+			    : '';
 
-			if ($id1 == $id2) {
+			if (substr($buffer->key(), -8) == substr($id, -8)) {
 
 				// same timestamp, combine
-				$row1['data']        = ($row1['data']*$i        + $row2['data'])        / ($i+1);
-				$row1['min']         = ($row1['min']*$i         + $row2['min'])         / ($i+1);
-				$row1['max']         = ($row1['max']*$i         + $row2['max'])         / ($i+1);
-				$row1['consumption'] = ($row1['consumption']*$i + $row2['consumption']) / ($i+1);
+				$row1['data']        = ($row1['data']*($i-1)        + $row2['data'])        / $i;
+				$row1['min']         = ($row1['min']*($i-1)         + $row2['min'])         / $i;
+				$row1['max']         = ($row1['max']*($i-1)         + $row2['max'])         / $i;
+				$row1['consumption'] = ($row1['consumption']*($i-1) + $row2['consumption']) / $i;
+				$row1['count']      += $row2['count'];
 
 				// Save combined data
-				$result->write($row1, $id1);
+				$result->write($row1, $buffer->key());
 
 				// read both next rows
-				$buffer->read($row1, $id1);
-				$next->read($row2, $id2);
+				$row1 = $buffer->next()->current();
+				$row2 = $next->next()->current();
 
-			} elseif ( $id1 AND $id1 < $id2 OR $id2 == '') {
+			} elseif ( $buffer->key() AND $buffer->key() < $id OR $id == '') {
 
 				// missing row 2, save row 1 as is
-				$result->write($row1, $id1);
+				$result->write($row1, $buffer->key());
 
 				// read only row 1
-				$buffer->read($row1, $id1);
+				$row1 = $buffer->next()->current();
 
 			} else {
 
 				// missing row 1, save row 2 as is
-				$result->write($row2, $id2);
+				$result->write($row2, $id);
 
 				// read only row 2
-				$next->read($row2, $id2);
+				$row2 = $next->next()->current();
 
 			}
 		}
@@ -195,15 +205,12 @@ class History extends \Channel {
 
 		$buffer = new \Buffer;
 
-		$result->rewind();
-
 		// Recalc datetime & timestamp from row Ids
-		while ($result->read($row, $id)) {
+		foreach ($result as $id=>$row) {
 
-		    list($day_offset, $hms) = explode('|', $id);
+		    list($offset, $hms) = explode('|', $id);
 
-		    $row['datetime'] =
-				date('Y-m-d ', $this->start + $day_offset * 60*60*24) . $hms;
+		    $row['datetime']  = date('Y-m-d ', $this->start + $offset * 60*60*24) . $hms;
 		    $row['timestamp'] = strtotime($row['datetime']);
 			$buffer->write($row, $id);
 		}

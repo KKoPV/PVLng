@@ -11,12 +11,12 @@
 /**
  *
  */
-namespace PVLng;
+namespace ORM;
 
 /**
  *
  */
-class View extends \yMVC\ORMTable {
+class Tree extends \slimMVC\ORMTable {
 
 	// -------------------------------------------------------------------------
 	// PROTECTED
@@ -25,6 +25,6 @@ class View extends \yMVC\ORMTable {
 	/**
 	 *
 	 */
-	protected $table = 'pvlng_view';
+	protected $table = 'pvlng_tree_view';
 
 }

@@ -11,12 +11,12 @@
 /**
  *
  */
-namespace PVLng;
+namespace ORM;
 
 /**
  *
  */
-class ReadingStr extends \yMVC\ORMTable {
+class ReadingNum extends \slimMVC\ORMTable {
 
 	// -------------------------------------------------------------------------
 	// PROTECTED
@@ -25,6 +25,6 @@ class ReadingStr extends \yMVC\ORMTable {
 	/**
 	 *
 	 */
-	protected $table = 'pvlng_reading_str';
+	protected $table = 'pvlng_reading_num';
 
 }

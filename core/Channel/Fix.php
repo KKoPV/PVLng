@@ -27,7 +27,7 @@ class Fix extends \Channel {
 		// Buffer $this->db->TimeStep, at least 60 seconds
 		$TimeStep = max(60, $this->db->TimeStep);
 
- 		$result = new \Buffer;
+		$result = new \Buffer;
 
 		// Align start to full minutes
 		$ts = floor($this->start / $TimeStep) * $TimeStep;
