@@ -59,31 +59,31 @@ i=0
 
 while test $i -lt $ITEM_N; do
 
-  i=$((i + 1))
+	i=$((i + 1))
 
-  log 1 "--- $i ---"
+	log 1 "--- $i ---"
 
-  eval ITEM=\$ITEM_$i
-  log 1 "Item  : $ITEM"
+	eval ITEM=\$ITEM_$i
+	log 1 "Item	: $ITEM"
 
-  eval GUID=\$GUID_$i
-  log 1 "GUID  : $GUID"
+	eval GUID=\$GUID_$i
+	log 1 "GUID	: $GUID"
 
-  value=$(twitter_$ITEM $GUID)
-  log 1 "Value : $value"
+	value=$(twitter_$ITEM $GUID)
+	log 1 "Value : $value"
 
-  ### Exit if no value is found, e.g. no actual power outside daylight times
-  test "$value" && test "$value" != "0" || test "$FORCE" || exit
+	### Exit if no value is found, e.g. no actual power outside daylight times
+	test "$value" && test "$value" != "0" || test "$FORCE" || exit
 
-  eval FACTOR=\$FACTOR_$i
-  log 1 "Factor: $FACTOR"
+	eval FACTOR=\$FACTOR_$i
+	log 1 "Factor: $FACTOR"
 
-  if test "$FACTOR"; then
-    value=$(echo "scale=3; $value * $FACTOR" | bc -l)
-    log 1 "Value : $value"
-  fi
+	if test "$FACTOR"; then
+		value=$(echo "scale=3; $value * $FACTOR" | bc -l)
+		log 1 "Value : $value"
+	fi
 
-  PARAMS="$PARAMS $value"
+	PARAMS="$PARAMS $value"
 
 done
 
@@ -98,17 +98,16 @@ log 1 "Result   : $STATUS"
 log 1 "Length   : $(echo $STATUS | wc -c)"
 
 if test -z "$TEST"; then
-	test $VERBOSE -gt 0 && opts="$opts --debug"
 
-	$(dirname $0)/twitter.php $opts \
-	  --consumer_key=$CONSUMER_KEY \
-	  --consumer_secret=$CONSUMER_SECRET \
-	  --oauth_token=$OAUTH_TOKEN \
-	  --oauth_secret=$OAUTH_TOKEN_SECRET \
-	  --status="$STATUS" --location="$LAT_LON"
+	test $VERBOSE -gt 0 && opts="--debug"
+
+	$pwd/twitter.php $opts \
+		--consumer_key=$CONSUMER_KEY \
+		--consumer_secret=$CONSUMER_SECRET \
+		--oauth_token=$OAUTH_TOKEN \
+		--oauth_secret=$OAUTH_TOKEN_SECRET \
+		--status="$STATUS" --location="$LAT_LON"
 fi
-
-set +x
 
 exit $?
 

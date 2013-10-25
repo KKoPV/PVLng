@@ -1,0 +1,142 @@
+<!--
+/**
+ *
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2013 Knut Kohl
+ * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version     $Id: v1.0.0.2-19-gf67765b 2013-05-05 22:03:31 +0200 Knut Kohl $
+ */
+-->
+
+<!-- IF {EMBEDDED} -->
+	<!-- INCLUDE header.embedded.tpl -->
+<!-- ELSE -->
+	<!-- INCLUDE header.tpl -->
+<!-- ENDIF -->
+
+<form method="post" action="/dashboard">
+
+<div style="margin: 1em 0">
+
+	<!-- IF !{CHANNELCOUNT} -->
+
+	<div id="chart-placeholder">
+		Please select your channels to display.
+	</div>
+
+	<!-- ELSEIF {CHANNELCOUNT} == 1 -->
+		<!-- INCLUDE grid.01.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 2 -->
+		<!-- INCLUDE grid.02.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 3 -->
+		<!-- INCLUDE grid.03.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 4 -->
+		<!-- INCLUDE grid.04.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 5 -->
+		<!-- INCLUDE grid.05.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 6 -->
+		<!-- INCLUDE grid.06.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 7 -->
+		<!-- INCLUDE grid.07.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 8 -->
+		<!-- INCLUDE grid.08.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 9 -->
+		<!-- INCLUDE grid.09.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 10 -->
+		<!-- INCLUDE grid.10.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 11 -->
+		<!-- INCLUDE grid.11.tpl -->
+	<!-- ELSEIF {CHANNELCOUNT} == 12 -->
+		<!-- INCLUDE grid.12.tpl -->
+	<!-- ELSE -->
+		<!-- INCLUDE grid.12.tpl -->
+
+		<p>
+			Sorry, only up to 12 charts supported yet...
+		</p>
+		<p>
+			You are invited to improve the layout,
+			see <code>frontend/Dashboard/tpl/content.tpl</code> for details.
+		</p>
+
+	<!-- ENDIF -->
+
+	<div class="clear"></div>
+
+</div>
+
+<!-- IF {EMBEDDED} -->
+
+	<!-- BEGIN DATA --><!-- IF {CHECKED} -->
+	<input class="channel" type="checkbox" value="{ID}" checked="checked"
+	      data-guid="{GUID}" style="display:none"/>
+	<!-- ENDIF --><!-- END -->
+
+	<!-- INCLUDE footer.embedded.tpl -->
+
+<!-- ELSE -->
+
+<p>
+	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
+</p>
+
+<div id="wrapper">
+
+	<p>
+		<input type="submit" value="{{Save}}" />
+	</p>
+
+	<table id="tree" class="dataTable treeTable">
+		<thead>
+		<tr>
+			<th>
+				<img id="treetoggle" src="/images/ico/toggle.png"
+					 style="width:16px;height:16px"
+				     class="tip" onclick="ToggleTree()" alt="[+]"
+					 title="#tiptoggle" width="16" height="16" />
+				<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
+			</th>
+			<th style="width:99%;padding-left:0" class="l">
+				<span class="indenter" style="padding-left: 0px;"></span>
+				{{Channel}}
+			</th>
+		</tr>
+		</thead>
+
+		<tbody>
+
+		<!-- BEGIN DATA -->
+
+		<tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
+			<td>
+				<!-- IF {GRAPH} -->
+				<input class="channel iCheck" type="checkbox" name="v[]"
+				       value="{ID}" data-guid="{GUID}"
+				       <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
+				<!-- ENDIF -->
+			</td>
+			<td style="padding:0.4em 0">
+				<img style="vertical-align:middle;width:16px;height:16px"
+				     class="imgbar tip" src="/images/ico/{ICON}" alt=""
+				     title="{TYPE}" width="16" height="16"/>
+				<strong class="tip" title="{GUID}">{NAME}</strong>
+				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+			</td>
+		</tr>
+
+		<!-- END -->
+
+		</tbody>
+
+	</table>
+
+	<p>
+		<input type="submit" value="{{Save}}" />
+	</p>
+
+</div> <!-- wrapper -->
+
+<!-- ENDIF -->
+
+</form>

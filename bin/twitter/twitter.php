@@ -89,11 +89,12 @@ if ($rc) {
 
   $rc = ($conn->http_code == 200) ? 0 : 4;
   if ($rc) {
-    echo 'Twitter update failed.', PHP_EOL;
-    echo $conn->http_header['status'], PHP_EOL;
-    print_r($conn);
-    print_r($args);
+    echo 'Twitter update failed.', PHP_EOL,
+         $conn->http_header['status'], PHP_EOL;
+	print_r($res);
   }
 }
 
 if ($args->d) echo PHP_EOL, print_r($conn, TRUE), PHP_EOL;
+
+return $rc;

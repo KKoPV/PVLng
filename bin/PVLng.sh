@@ -32,7 +32,7 @@ function log {
 
 	shift
 
-	{	### Detect if $1 is a "@filename"
+	{	### Detect if now $1 is a "@filename"
 		if test "${1:0:1}" == '@'; then
 			echo $(date +"[%d-%b %H:%M:%S]") File: ${1:1}
 			cat ${1:1}
