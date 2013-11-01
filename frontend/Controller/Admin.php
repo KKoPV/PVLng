@@ -24,11 +24,15 @@ class Admin extends \Controller {
 		$user = $this->request->post('user');
 		$pass = $this->request->post('pass');
 
-		if ($this->config->get('Admin.User') == $user AND
-		    $hasher->CheckPassword($pass, $this->config->get('Admin.Password'))) {
+		$AdminUser = $this->config->get('Admin.User');
+		$AdminPass = $this->config->get('Admin.Password');
 
-			$this->User = $user;
-			\Session::set('user', $user);
+		// Ignore case of user name input
+		if (strtolower($AdminUser) == strtolower($user) AND
+		    $hasher->CheckPassword($pass, $AdminPass)) {
+
+			$this->User = $AdminUser;
+			\Session::set('user', $AdminUser);
 
 			if ($this->request->post('save')) {
 				setcookie(\Session::token(), 1, time()+60*60*24*7, '/');
