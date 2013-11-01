@@ -21,8 +21,8 @@ return array(
 		'ReuseCode'        => TRUE,
 
 		// Replace static images by base64 encoded inline code
-		// Only for images with max x/y of 16px
-		'InlineImages'     => 16,
+		// Only for images with max x/y of 8px
+		'InlineImages'     => 8,
 
 		// Don't compress HTML
 		'Verbose'          => FALSE,
