@@ -19,8 +19,8 @@
 		<!-- ENDIF -->
 	</td>
 	<td style="padding:0.4em 0">
-		<img style="vertical-align:middle;width:16px;height:16px"
-		     class="imgbar tip" src="/images/ico/{ICON}" alt=""
+		<img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
+		     class="tip" src="/images/ico/{ICON}" alt=""
 		     title="{TYPE}" width="16" height="16"/>
 		<strong class="tip" title="{GUID}">{NAME}</strong>
 		<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->

@@ -206,7 +206,7 @@
 			<!-- IF {__USER} -->
 				<!-- show all charts and mark public charts -->
 				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-					{NAME} <!-- IF {PUBLIC} -->({{public}})<!-- ENDIF -->
+					{NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
 				</option>
 			<!-- ELSEIF {PUBLIC} -->
 				<!-- show only public charts -->

@@ -123,15 +123,26 @@ class Index extends \Controller {
 			$node['parent'] = $parent[$node['level']-1];
 
 			if ($entity = $this->model->getEntity($node['entity'])) {
-				// remove id, is the same as $node[entity]
+
+				// remove id, is the same as $node['entity']
 				unset($entity->id);
 				$guid = $node['guid'] ?: $entity->guid;
 				$node = array_merge($node, (array) $entity);
 				$node['guid'] = $guid;
-				$id = $node['id'];
+
+				if ($node['model']) {
+					$e = \Channel::byId($node['id']);
+					$node['name']        = $e->name;
+					$node['description'] = $e->description;
+					$node['unit']        = $e->unit;
+					$node['icon']        = $e->icon;
+				}
+
+#				$id = $node['id'];
 				if (isset($this->Channels->$node['id'])) {
 					$node['checked'] = 'checked';
-					$node['presentation'] = $this->Channels->$id;
+#					$node['presentation'] = $this->Channels->$id;
+					$node['presentation'] = $this->Channels->$node['id'];
 				}
 			}
 

@@ -56,6 +56,7 @@ class Overview extends \Controller {
 			$node['parent'] = $parent[$node['level']-1];
 
 			if ($entity = $this->model->getEntity($node['entity'])) {
+
 				$node['type']         = $entity->type;
 				$node['name']         = $entity->name;
 				$node['unit']         = $entity->unit;
@@ -65,6 +66,15 @@ class Overview extends \Controller {
 				$node['read']         = $entity->read;
 				$node['write']        = $entity->write;
 				$node['icon']         = $entity->icon;
+
+				if ($entity->model) {
+					$e = \Channel::byId($node['id']);
+					$node['name']        = $e->name;
+					$node['description'] = $e->description;
+					$node['unit']        = $e->unit;
+					$node['icon']        = $e->icon;
+				}
+
 			}
 			$data[] = array_change_key_case($node, CASE_UPPER);
 		}

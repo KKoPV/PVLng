@@ -59,11 +59,11 @@
 			<img style="width:20px;height:12px" src="/images/en.png" alt="E" width="20" height="12" />
 		</a>
 		<!-- IF {USER} -->
-		<a class="tipbtn" title="Logout {USER}" href="/logout">
+		<a class="tipbtn" title="{{Logout}}" href="/logout">
 			<img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
 		</a>
 		<!-- ELSE -->
-		<a class="tipbtn" title="Login" href="/login">
+		<a class="tipbtn" title="{{Login}}" href="/login">
 			<img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
 		</a>
 		<!-- ENDIF -->

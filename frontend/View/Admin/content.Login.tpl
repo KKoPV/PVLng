@@ -41,7 +41,7 @@
 
 		<tr>
 			<td></td>
-			<td><input class="ui-button ui-widget ui-state-default ui-corner-all ui-priority-primary" type="submit" value="Login" /></td>
+			<td><input class="ui-button ui-widget ui-state-default ui-corner-all ui-priority-primary" type="submit" value="{{Login}}" /></td>
 		</tr>
 		</tbody>
 	</table>

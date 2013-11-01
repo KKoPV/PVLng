@@ -236,14 +236,15 @@ class Channel extends \Controller {
 		$this->view->Type = $type->id;
 		$this->view->TypeName = $type->name;
 		if ($type->unit) $this->view->TypeName .= ' (' . $type->unit . ')';
+		$this->view->Icon = $type->icon;
 
 		if (is_object($entity)) {
 			foreach ($this->fields as $key=>&$data) {
-				$h = 'model::'.$type->name.'_'.$key;
+				$h = 'model::'.$type->model.'_'.$key;
 				$name = \I18N::_($h);
 				if ($name != $h) $data['NAME'] = $name;
 
-				$h = 'model::'.$type->name.'_'.$key.'_Hint';
+				$h = 'model::'.$type->model.'_'.$key.'Hint';
 				$name = \I18N::_($h);
 				if ($name != $h) $data['HINT'] = $name;
 
