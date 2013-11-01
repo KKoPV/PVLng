@@ -5,14 +5,21 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-22-g7bc4608 2013-05-05 22:07:15 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 -->
+
+<!-- Use this image as spacer for not available moving actions of channels -->
+<!-- DEFINE MACRO SpacerImg -->
+<img src="/images/ico/16x16.png" class="imgbar" alt=""
+     style="width:16px;height:16px" width="16p" height="16" />
+<!-- END DEFINE -->
 
 <div>{MESSAGE}</div>
 
 <div class="alpha grid_3">
-	<input id="toggleGUID" type="checkbox" class="iCheckLine" /><label for="toggleGUID">{{ToggleGUIDs}}</label>
+	<input id="toggleGUID" type="checkbox" class="iCheckLine" />
+	<label for="toggleGUID">{{ToggleGUIDs}}</label>
 </div>
 
 <div class="clear"></div>
@@ -62,10 +69,7 @@
 				<img src="/images/ico/node_insert_next.png" class="imgbar" alt="add"
 				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
-			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt=""
-			     style="width:16px;height:16px" width="16p" height="16" />
-			<!-- ENDIF -->
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {CHILDS} == "0" -->
 			<form action="/overview/delete" method="post" class="delete-form">
@@ -94,10 +98,7 @@
 				<img src="/images/ico/navigation_090_frame.png" class="imgbar" alt="u"
 				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
-			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt=""
-			     style="width:16px;height:16px" width="16p" height="16" />
-			<!-- ENDIF -->
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {LEVEL} != "1" AND {LOWER} != "0" -->
 			<a href="/overview/moveright" title="{{MoveEntityDown}}" class="tip"
@@ -105,10 +106,7 @@
 				<img src="/images/ico/navigation_270_frame.png" class="imgbar" alt="d"
 				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
-			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt=""
-			     style="width:16px;height:16px" width="16p" height="16" />
-			<!-- ENDIF -->
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {LEVEL} > "2" -->
 			<form action="/overview/moveup" method="post">
@@ -116,10 +114,7 @@
 			<input type="image" src="/images/ico/navigation_180_frame.png" alt="h"
 			       class="imgbar tip" title="{{MoveEntityLeft}}" style="background-color:transparent" />
 			</form>
-			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt=""
-			     style="width:16px;height:16px" width="16p" height="16" />
-			<!-- ENDIF -->
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {UPPER} != "0" -->
 			<form action="/overview/movedown" method="post">
@@ -127,10 +122,7 @@
 			<input type="image" src="/images/ico/navigation_000_frame.png" alt="l"
 			       class="imgbar tip" title="{{MoveEntityRight}}" style="background-color:transparent" />
 			</form>
-			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt=""
-			     style="width:16px;height:16px" width="16p" height="16" />
-			<!-- ENDIF -->
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 		</td>
 	</tr>
 

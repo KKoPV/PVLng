@@ -200,9 +200,19 @@ class View extends \Slim\View {
 		if (strpos($html, '<!-- COMPILE OFF -->') === FALSE) {
 
 			// <!-- INCLUDE template.tpl -->
-			if (preg_match_all('~<!-- INCLUDE (.*?) -->~', $html, $incs, PREG_SET_ORDER)) {
-				foreach ($incs as $inc) {
+			if (preg_match_all('~<!-- INCLUDE (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
+				foreach ($args as $inc) {
 					$html = str_replace($inc[0], '<?php $this->display(\''.$inc[1].'\'); ?'.'>', $html);
+				}
+			}
+
+			// <!-- DEFINE MACRO name -->...<!-- END DEFINE -->
+			if (preg_match_all('~<!-- DEFINE MACRO (.+?) -->(.+?)<!-- END DEFINE -->~s', $html, $args, PREG_SET_ORDER)) {
+				foreach ($args as $macro) {
+					// Remove macro definition
+					$html = str_replace($macro[0], '', $html);
+					// Replace all macro uses
+					$html = str_replace('<!-- MACRO '.$macro[1].' -->', $macro[2], $html);
 				}
 			}
 
@@ -217,8 +227,8 @@ class View extends \Slim\View {
 			}
 
 			// <!-- (ELSE)?IF ... -->...<!-- ELSE -->...<!-- ENDIF -->
-			if (preg_match_all('~<!-- (ELSE)?IF (.*?) -->~', $html, $ifs, PREG_SET_ORDER)) {
-				foreach ($ifs as $if) {
+			if (preg_match_all('~<!-- (ELSE)?IF (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
+				foreach ($args as $if) {
 					if (preg_match_all('~'.$this->RegexVar.'~', $if[2], $matches, PREG_SET_ORDER)) {
 						foreach ($matches as $match) {
 							$if[2] = str_replace($match[0], '$this->__get(\''.$match[1].'\')', $if[2]);
@@ -265,8 +275,8 @@ class View extends \Slim\View {
 			}
 
 			// Loops
-			if (preg_match_all('~<!-- BEGIN (\w[\w\d_]*) -->~', $html, $matches, PREG_SET_ORDER)) {
-				foreach ($matches as $match) {
+			if (preg_match_all('~<!-- BEGIN (\w[\w\d_]*) -->~', $html, $args, PREG_SET_ORDER)) {
+				foreach ($args as $match) {
 					$id = rand(100, 999);
 					$html = str_replace($match[0], '<?php '
 					      . 'if ($_'.$id.' = $this->__get(\''.$match[1].'\')): '
