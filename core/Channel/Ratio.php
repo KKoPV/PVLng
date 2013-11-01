@@ -46,6 +46,9 @@ class Ratio extends \Channel {
 				              ? $row1['max'] / $row2['max']
 				              : 0;
 
+				// Remove consumption, may be we have a meter channel
+				$row1['consumption'] = 0;
+
 				$result->write($row1, $child1->key());
 
 				// read both next rows
