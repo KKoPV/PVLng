@@ -26,10 +26,7 @@ $(function() {
 		bFilter: false,
 		bSort: false,
 		bInfo: false,
-		bJQueryUI: true,
-		aoColumnDefs: [
-			{ "bVisible": false, "aTargets": [ 1 ] }
-		]
+		bJQueryUI: true
 	});
 
 	$('#tree').treetable({
@@ -76,19 +73,11 @@ $(function() {
 		}
 	});
 
-	$('#toggleGUID').click(function() {
-		var visible = $(this).is(':checked');
-		oTable.fnSetColumnVis( 1, visible);
-		if (visible) {
-			/* show after re-insert into table */
-			$('.td-guid').show();
-			$('.guid').click(function() {
-				/* select GUID, make ready for copy */
-				$(this).select();
-			}).mouseup(function(e) {
-				e.preventDefault();
-			});
-		}
+	$('.guid').click(function() {
+		/* select GUID, make ready for copy */
+		$(this).select();
+	}).mouseup(function(e) {
+		e.preventDefault();
 	});
 
 	$('.delete-form').submit(function(){

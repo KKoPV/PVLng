@@ -84,31 +84,30 @@ var
 		tooltip: {
 			useHTML: true,
 			formatter: function() {
-				var v,
-					s = '<table><tr>' +
-						'<td colspan="2" style="padding:0.3em 0;font-weight:bold">' +
-						Highcharts.dateFormat('%a. %Y-%m-%d %H:%M',this.x).replace(/ 00:00$/g, '') +
-						'</td></tr>';
+				var body = '<tr>' +
+					       '<td colspan="3" style="padding:0.3em 0;font-weight:bold;background-color:#DDD">' +
+					       Highcharts.dateFormat('%a. %Y-%m-%d %H:%M',this.x).replace(/ 00:00$/g, '') +
+					       '</td></tr>';
 
+				var value;
 				$.each(this.points, function(id, point) {
-					var c = 'color:' + point.series.color;
 					if (point.point.low != undefined && point.point.high != undefined) {
-						v = Highcharts.numberFormat(+point.point.low, point.series.options.decimals) + ' - ' +
-							Highcharts.numberFormat(+point.point.high, point.series.options.decimals);
+						value = Highcharts.numberFormat(+point.point.low, point.series.options.decimals) + ' - ' +
+						        Highcharts.numberFormat(+point.point.high, point.series.options.decimals);
 					} else if (point.y != undefined) {
-						v = Highcharts.numberFormat(+point.y, point.series.options.decimals);
+						value = Highcharts.numberFormat(+point.y, point.series.options.decimals);
 					} else {
 						return;
 					}
-					s += '<tr style="border-top:dotted lightgray 1px">' +
-						 '<td nowrap style="' + c + '">' +
-						 point.series.name+'</td>' +
-						 '<td style="padding-left:3em;text-align:right;' + c + '">' + v + '</td>' +
-						 '<td style="' + c + '"> ' +
-						 point.series.tooltipOptions.valueSuffix +
-						 '</td></tr>';
+					body += '<tr style="border-top:dotted lightgray 1px;color:' + point.series.color;
+					if (id & 1) body += ';background-color:#EEE';
+					body += '">' +
+					        '<td>' + point.series.name + '</td>' +
+					        '<td style="padding-left:1em;text-align:right;padding-right:.5em">' + value + '</td>' +
+					        '<td> ' + point.series.tooltipOptions.valueSuffix + '</td>' +
+							'</tr>';
 				});
-				return s + '</table>';
+				return '<table>' + body + '</table>';
 			},
 			borderColor: '#AAA',
 			borderWidth: 1,

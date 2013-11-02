@@ -17,13 +17,6 @@
 
 <div>{MESSAGE}</div>
 
-<div class="alpha grid_3">
-	<input id="toggleGUID" type="checkbox" class="iCheckLine" />
-	<label for="toggleGUID">{{ToggleGUIDs}}</label>
-</div>
-
-<div class="clear"></div>
-
 <br />
 
 <table id="tree" class="dataTable treeTable">
@@ -36,9 +29,9 @@
 			<div class="c">{{ChannelHierarchy}}</div>
 			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 		</th>
-		<th class="td-guid" style="display:none">GUID</th>
 		<th></th>
 		<th></th>
+		<th>GUID</th>
 	</tr>
 	</thead>
 
@@ -48,18 +41,13 @@
 
 	<tr data-tt-id="{ID}"
 	    <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
-		<td style="width:99%">
+		<td style="width:90%">
 			<img style="vertical-align:top;width:16px;height:16px;margin-right:8px"
 			     width="16" height="16" class="tip" title="{TYPE}"
 			     src="/images/ico/{ICON}" alt="" />
 			<strong>{NAME}</strong>
 			<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
 			<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
-		</td>
-
-		<td class="td-guid" style="white-space:nowrap;display:none">
-			<input style="background-color:transparent;border:0;width:24em;font-family:monospace"
-			       class="guid"  value="{GUID}" readonly="readonly" />
 		</td>
 
 		<td style="white-space:nowrap">
@@ -124,6 +112,11 @@
 			</form>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 		</td>
+
+		<td>
+			<input style="background-color:transparent;border:0;width:27em;font-family:monospace"
+			       class="guid" value="{GUID}" readonly="readonly" />
+		</td>
 	</tr>
 
 	<!-- END -->
@@ -139,8 +132,7 @@
 				     style="width:16px;height:16px" width="16p" height="16" />
 			</a>
 		</th>
-		<th class="td-guid" style="display:none"></th>
-		<th colspan="2"></th>
+		<th colspan="3"></th>
 	</tr>
 	<tfoot>
 </table>
