@@ -1,3 +1,7 @@
+
+@import "normalize.css";
+@import "960.10.fluid.css";
+
 #header,
 #content,
 #footer {
@@ -65,7 +69,6 @@ img.tip {
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 	height: 5.5em;
-	border-bottom: dotted 1px gray;
 }
 
 #title1 {

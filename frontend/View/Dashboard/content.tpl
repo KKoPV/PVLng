@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-19-gf67765b 2013-05-05 22:03:31 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 -->
 
@@ -17,14 +17,12 @@
 
 <form method="post" action="/dashboard">
 
-<div style="margin: 1em 0">
+<div style="width:940px;margin:1em auto">
 
 	<!-- IF !{CHANNELCOUNT} -->
-
 	<div id="chart-placeholder">
 		Please select your channels to display.
 	</div>
-
 	<!-- ELSEIF {CHANNELCOUNT} == 1 -->
 		<!-- INCLUDE grid.01.tpl -->
 	<!-- ELSEIF {CHANNELCOUNT} == 2 -->
@@ -51,15 +49,13 @@
 		<!-- INCLUDE grid.12.tpl -->
 	<!-- ELSE -->
 		<!-- INCLUDE grid.12.tpl -->
-
 		<p>
 			Sorry, only up to 12 charts supported yet...
 		</p>
 		<p>
 			You are invited to improve the layout,
-			see <code>frontend/Dashboard/tpl/content.tpl</code> for details.
+			see <code>frontend/View/Dashboard/content.tpl</code> for details.
 		</p>
-
 	<!-- ENDIF -->
 
 	<div class="clear"></div>

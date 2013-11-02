@@ -100,13 +100,9 @@
 <div id="wrapper" style="padding-top:1em">
 
 <!-- IF {USER} == "" -->
-
-	<!--
-	Show only channels in public charts and NOT all channel GUIDs
-	-->
+	<!-- Show only channels in public charts and NOT all channel GUIDs -->
 
 	<table id="tree" class="dataTable">
-
 		<thead>
 		<tr>
 			<th style="width:99%">{{Channel}}</th>
@@ -116,15 +112,12 @@
 		</thead>
 
 		<tbody>
-
 		<!-- BEGIN DATA -->
 		<!-- IF {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
 			<!-- INCLUDE content.rows.nouser.inc.tpl -->
 		<!-- ENDIF -->
 		<!-- END -->
-
 		</tbody>
-
 	</table>
 
 <!-- ELSE -->
@@ -154,11 +147,9 @@
 		</thead>
 
 		<tbody>
-
 		<!-- BEGIN DATA -->
 			<!-- INCLUDE content.rows.inc.tpl -->
 		<!-- END -->
-
 		</tbody>
 
 		<tfoot>

@@ -49,8 +49,7 @@
 <table id="table-stats">
 	<thead>
 	<tr>
-		<th></th>
-		<th class="l">{{Name}}</th>
+		<th class="l">{{ChannelName}}</th>
 		<th class="l">{{Description}}</th>
 		<th class="l">{{Serial}}</th>
 		<th class="l">{{Channel}}</th>
@@ -63,12 +62,15 @@
 	<!-- BEGIN STATS -->
 
 	<tr>
-		<td><img src="/images/ico/{ICON}" width="16" height="16" alt="" /></td>
-		<td>{NAME}</td>
+		<td>
+			<img src="/images/ico/{ICON}" style="width:16px;height:16px;margin-right:8px"
+			     width="16" height="16" alt="" />
+			{NAME}
+		</td>
 		<td>{DESCRIPTION}</td>
 		<td>{SERIAL}</td>
 		<td>{CHANNEL}</td>
-		<td class="r" style="padding-right:18px">{numf:READINGS}</td>
+		<td class="r">{numf:READINGS}</td>
 	</tr>
 
 	<!-- END -->
@@ -77,7 +79,7 @@
 
 	<tfoot>
 	<tr>
-		<th colspan="4"></th>
+		<th colspan="3"></th>
 		<th class="l">{{Total}}</th>
 		<th class="r">{numf:READINGS}</th>
 	</tr>

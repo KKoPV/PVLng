@@ -31,10 +31,9 @@ $(function() {
 		bLengthChange: false,
 		bFilter: false,
 		bInfo: false,
-		aaSorting: [[1, 'asc']],
+		aaSorting: [[0, 'asc']],
 		aoColumnDefs: [
-			{ bSortable: false, aTargets: [ 0 ] },
-			{ sType: 'numeric-' + (('{LANGUAGE}' == 'de') ? 'comma' : 'dot'), aTargets: [5] }
+			{ sType: 'numeric-' + (('{LANGUAGE}' == 'de') ? 'comma' : 'dot'), aTargets: [4] }
 		]
 	});
 

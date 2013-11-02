@@ -38,8 +38,7 @@
 
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 
-	<link rel="stylesheet" href="/css/normalize.css" />
-	<link rel="stylesheet" href="/css/960.10.css" />
+	<link rel="stylesheet" href="/css/default.css" />
 	<link rel="stylesheet" href="/css/jquery-ui.css" />
 
 	<link rel="stylesheet" href="/css/jquery.dataTables.css" />
@@ -53,7 +52,6 @@
 	<link rel="stylesheet" href="/css/iCheck/flat/orange.css" />
 	<link rel="stylesheet" href="/css/iCheck/line/orange.css" />
 
-	<link rel="stylesheet" href="/css/default.css" />
 
 	{HEAD}
 

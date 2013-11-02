@@ -9,8 +9,8 @@
  */
 -->
 
-<div id="header" class="grid_10">
-	<div class="alpha grid_2 s">
+<div id="header">
+	<div class="grid_2 s">
 		<a class="fl" href="/">
 			<img style="width:100;height:60px" src="/images/logo.png" width="100" height="60" />
 		</a>
@@ -25,51 +25,49 @@
 			<!-- ENDIF -->
 		</div>
 	</div>
-	<div class="grid_8 omega">
-		<div class="r">
-			<span id="title1">{TITLE}</span>
-		</div>
-		<h3 class="alpha grid_6 c">{SUBTITLE}</h3>
+	<div class="grid_8">
+		<div class="r"><span id="title1">{TITLE}</span></div>
+		<h3 class="grid_6 c">{SUBTITLE}</h3>
 		<!-- IF {USER} -->
-		<div class="grid_2 omega r"><br/ ><em>{USER}</em></div>
+		<div class="r"><br/ ><em>{USER}</em></div>
 		<!-- ENDIF -->
 	</div>
+	<div class="clear"></div>
 </div>
 
-<div class="clear"></div>
-
-<div class="grid_8">
-	<span class="toolbar">
-		<a class="tipbtn" title="{{ChartHint}}" href="/">{{Charts}}</a>
-		<!-- IF {USER} -->
-		<a class="tipbtn" title="{{DashboardHint}}" href="/dashboard">{{Dashboard}}</a>
-		<a class="tipbtn" title="{{OverviewHint}}" href="/overview">{{Overview}}</a>
-		<a class="tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
-		<a class="tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
-		<!-- ENDIF -->
-		<a class="tipbtn" title="{{PlantDescriptionHint}}" href="/description">{{Description}}</a>
-	</span>
+<div class="grid_10">
+	<div class="fl">
+		<span class="toolbar">
+			<a class="tipbtn" title="{{ChartHint}}" href="/">{{Charts}}</a>
+			<!-- IF {USER} -->
+			<a class="tipbtn" title="{{DashboardHint}}" href="/dashboard">{{Dashboard}}</a>
+			<a class="tipbtn" title="{{OverviewHint}}" href="/overview">{{Overview}}</a>
+			<a class="tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
+			<a class="tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
+			<!-- ENDIF -->
+			<a class="tipbtn" title="{{PlantDescriptionHint}}" href="/description">{{Description}}</a>
+		</span>
+	</div>
+	<div class="r">
+		<span class="toolbar">
+			<a class="tipbtn" title="Deutsch" href="?lang=de">
+				<img style="width:20px;height:12px" src="/images/de.png" alt="D" width="20" height="12" />
+			</a>
+			<a class="tipbtn" title="English" href="?lang=en">
+				<img style="width:20px;height:12px" src="/images/en.png" alt="E" width="20" height="12" />
+			</a>
+			<!-- IF {USER} -->
+			<a class="tipbtn" title="{{Logout}}" href="/logout">
+				<img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
+			</a>
+			<!-- ELSE -->
+			<a class="tipbtn" title="{{Login}}" href="/login">
+				<img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
+			</a>
+			<!-- ENDIF -->
+		</span>
+	</div>
 </div>
-<div class="grid_2 r">
-	<span class="toolbar">
-		<a class="tipbtn" title="Deutsch" href="?lang=de">
-			<img style="width:20px;height:12px" src="/images/de.png" alt="D" width="20" height="12" />
-		</a>
-		<a class="tipbtn" title="English" href="?lang=en">
-			<img style="width:20px;height:12px" src="/images/en.png" alt="E" width="20" height="12" />
-		</a>
-		<!-- IF {USER} -->
-		<a class="tipbtn" title="{{Logout}}" href="/logout">
-			<img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
-		</a>
-		<!-- ELSE -->
-		<a class="tipbtn" title="{{Login}}" href="/login">
-			<img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
-		</a>
-		<!-- ENDIF -->
-	</span>
-</div>
-
 <div class="clear"></div>
 <br />
 
