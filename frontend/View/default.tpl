@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-14-g2a8e482 2013-05-01 20:44:21 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 -->
 
@@ -19,8 +19,7 @@
 	<meta name="description" content="{PVLNG}" />
 	<meta name="author" content="Knut Kohl" />
 
-	<link rel="shortcut icon" href="/images/favicon.ico" />
-	<link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+	<!-- INCLUDE favicon.inc.tpl -->
 
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 

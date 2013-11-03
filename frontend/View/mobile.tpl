@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 -->
 <!doctype html>
@@ -18,16 +18,12 @@
 	<meta name="description" content="{PVLNG}" />
 	<meta name="author" content="Knut Kohl" />
 
-	<link rel="shortcut icon" href="/images/favicon.ico" />
-	<link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
-
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
-
 	<meta name="apple-mobile-web-app-title" content="PVLng">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<!-- INCLUDE favicon.inc.tpl -->
 
-	<link rel="apple-touch-icon" href="/images/touch-icon-iphone.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
 
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta http-equiv="Content-Script-Type" content="text/javascript">

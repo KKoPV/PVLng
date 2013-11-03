@@ -58,7 +58,7 @@ PAGE 1
 
 	<!-- Footer -->
 	<div data-role="footer" data-id="footer">
-		<h1>{PVLNG}</h1>
+		<h1>{TITLE}</h1>
 	</div>
 
 </div>
@@ -94,7 +94,7 @@ PAGE 2
 
 	<!-- Footer -->
 	<div data-role="footer" data-id="footer" data-position="fixed">
-		<h1>{PVLNG}</h1>
+		<h1>{TITLE}</h1>
 	</div>
 
 
