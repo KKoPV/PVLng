@@ -86,9 +86,7 @@
 </div>
 
 <div class="alpha grid_4">
-	<!-- IF {USER} -->
-		<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
-	<!-- ENDIF -->
+	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
 </div>
 
 <div class="grid_6 omega" style="text-align:right">
@@ -98,123 +96,18 @@
 <div class="clear"></div>
 
 <div id="wrapper" style="padding-top:1em">
-
-<!-- IF {USER} == "" -->
-	<!-- Show only channels in public charts and NOT all channel GUIDs -->
-
-	<table id="tree" class="dataTable">
-		<thead>
-		<tr>
-			<th style="width:99%">{{Channel}}</th>
-			<th>{{Amount}}</th>
-			<th>{{Unit}}</th>
-		</tr>
-		</thead>
-
-		<tbody>
-		<!-- BEGIN DATA -->
-		<!-- IF {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
-			<!-- INCLUDE content.rows.nouser.inc.tpl -->
-		<!-- ENDIF -->
-		<!-- END -->
-		</tbody>
-	</table>
-
-<!-- ELSE -->
-
-	<table id="tree" class="dataTable treeTable">
-		<thead>
-		<tr>
-			<th>
-				<img id="treetoggle" src="/images/ico/toggle.png"
-					 style="width:16px;height:16px"
-				     class="tip" onclick="ToggleTree()" alt="[+]"
-					 title="#tiptoggle" width="16" height="16" />
-				<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
-			</th>
-			<th style="width:99%;padding-left:0" class="l">
-				<span class="indenter" style="padding-left: 0px;"></span>
-				{{Channel}}
-			</th>
-			<th class="r">{{Amount}}</th>
-			<th class="l">{{Unit}}</th>
-			<th class="r">{{Earning}}&nbsp;/ {{Cost}}</th>
-			<th>
-				<img style="width:16px;height:16px" src="/images/ico/node_design.png"
-				     alt="" width="16" height="16" />
-			</th>
-		</tr>
-		</thead>
-
-		<tbody>
-		<!-- BEGIN DATA -->
-			<!-- INCLUDE content.rows.inc.tpl -->
-		<!-- END -->
-		</tbody>
-
-		<tfoot>
-			<tr>
-				<th colspan="2">&nbsp;</th>
-				<th colspan="2" class="l">{{Total}}</th>
-				<th id="costs" style="padding-right:10px" class="r"></th>
-				<th></th>
-			</tr>
-		<tfoot>
-	</table>
-
-<!-- ENDIF -->
-
-</div> <!-- wrapper -->
+	<!-- IF {USER} -->
+		<!-- INCLUDE datatable.inc.tpl -->
+	<!-- ELSE -->
+		<!-- INCLUDE datatable.nouser.inc.tpl -->
+	<!-- ENDIF -->
+</div>
 
 <!-- IF {USER} -->
-<h3>
-	{{Variants}}
-	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
-	     src="/images/ico/information_frame.png" width="16" height="16"
-	     title="{{MobileVariantHint}}" />
-</h3>
-<p>
+	<!-- INCLUDE variants.inc.tpl -->
 <!-- ELSE -->
-<p>
-	<span style="margin-right:1em">{{VariantsPublic}}:</span>
+	<!-- INCLUDE variants.nouser.inc.tpl -->
 <!-- ENDIF -->
-
-	<!-- IF {USER} -->
-	<input id="saveview" type="text" name="saveview" value="{VIEW}"/>
-	<input style="margin-left:.5em" id="public" type="checkbox" name="public" value="1"
-		<!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF -->
-	/>
-	<label for="public">{{public}}</label>
-	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
-	     src="/images/ico/information_frame.png" width="16" height="16"
-	     title="{{publicHint}}" />
-	<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
-	<!-- ENDIF -->
-
-	<select id="loaddeleteview" name="loaddeleteview">
-		<option value="">--- {{Select}} ---</option>
-		<!-- BEGIN VIEWS -->
-			<!-- IF {__USER} -->
-				<!-- show all charts and mark public charts -->
-				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-					{NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
-				</option>
-			<!-- ELSEIF {PUBLIC} -->
-				<!-- show only public charts -->
-				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-					{NAME}
-				</option>
-			<!-- ENDIF -->
-		<!-- END -->
-	</select>
-	<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
-	<!-- IF {USER} -->
-	<input type="submit" name="delete" value="{{Delete}}" style="margin-left:.5em" />
-	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">
-		PVLng | {VIEW}
-	<!-- ENDIF -->
-	</a>
-</p>
 
 </form>
 

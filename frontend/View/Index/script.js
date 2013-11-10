@@ -159,6 +159,10 @@ function ToggleTree( force ) {
 		$(el).parent().parent().parent().toggle(TreeExpanded || $(el).is(':checked'));
 	});
 
+	$('tr.no-graph').each(function(id, el) {
+		$(el).toggle(TreeExpanded);
+	});
+
 	if (TreeExpanded) {
 		$('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
 		$('#tiptoggle').html('{{CollapseAll}}');
@@ -166,7 +170,6 @@ function ToggleTree( force ) {
 		$('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
 		$('#tiptoggle').html('{{ExpandAll}}');
 	}
-
 }
 
 /**
