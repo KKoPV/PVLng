@@ -276,11 +276,15 @@ $app->map('/dashboard', $checkAuth, function() use ($app) {
 	$app->process('Dashboard');
 })->via('GET', 'POST');
 
-$app->get('/dashboard/embedded', $checkAuth, function() use ($app) {
+$app->get('/dashboard/embedded', function() use ($app) {
 	$app->process('Dashboard', 'IndexEmbedded');
 });
 
-$app->get('/ed', $checkAuth, function() use ($app) {
+$app->get('/ed', function() use ($app) {
+	$app->process('Dashboard', 'IndexEmbedded');
+});
+
+$app->get('/md', function() use ($app) {
 	$app->process('Dashboard', 'IndexEmbedded');
 });
 

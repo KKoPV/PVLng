@@ -49,9 +49,17 @@ class Controller extends slimMVC\Controller {
 			// Ok, we have a validated user session
 			$this->User = Session::get('user');
 		}
-		$this->view->User = $this->User;
 
+		$this->view->User = $this->User;
 		$this->view->Embedded = $this->app->request->get('embedded');
+	}
+
+	/**
+	 *
+	 */
+	public function after() {
+		/* For Logout */
+		$this->view->User = $this->User;
 	}
 
 	/**

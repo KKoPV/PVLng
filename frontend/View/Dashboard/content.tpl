@@ -17,7 +17,7 @@
 
 <form method="post" action="/dashboard">
 
-<div style="width:940px;margin:1em auto">
+<div style="max-width:940px;margin:1em auto">
 
 	<!-- IF !{CHANNELCOUNT} -->
 	<div id="chart-placeholder">
