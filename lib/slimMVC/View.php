@@ -321,7 +321,6 @@ class View extends \Slim\View {
 			$pre = array();
 			// mask <pre>, <code> and <tt> sequences
 			if (preg_match_all('~<(pre|code|tt).*?</\\1>~is', $html, $matches, PREG_SET_ORDER)) {
-				print_r($matches);
 				foreach ($matches as $match) {
 					$hash = md5($match[0]);
 					$pre[$hash] = $match[0];
