@@ -27,7 +27,7 @@
 	</div>
 	<div class="grid_8">
 		<div class="r"><span id="title1">{TITLE}</span></div>
-		<h3 class="grid_6 c">{SUBTITLE}</h3>
+		<h3 class="fl">{SUBTITLE}</h3>
 		<!-- IF {USER} -->
 		<div class="r"><br/ ><em>{USER}</em></div>
 		<!-- ENDIF -->

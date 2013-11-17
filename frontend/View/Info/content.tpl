@@ -9,6 +9,8 @@
  */
 -->
 
+<div class="grid_10">
+
 <h3>{{SystemInformation}}</h3>
 
 <table id="table-info">
@@ -86,3 +88,7 @@
 	</tfoot>
 
 </table>
+
+</div>
+
+<div class="clear"></div>

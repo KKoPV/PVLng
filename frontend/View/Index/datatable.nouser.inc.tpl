@@ -14,12 +14,12 @@
 <table id="tree" class="dataTable">
 	<thead>
 	<tr>
-		<th style="width:99%">{{Channel}}</th>
+		<th class="l" style="width:99%">{{Channel}}</th>
 		<th>
 			<img src="/images/ico/16x16.png" style="width:16px;height:16px" width="16" height="16" alt="" />
 		</th>
-		<th>{{Amount}}</th>
-		<th>{{Unit}}</th>
+		<th class="r">{{Amount}}</th>
+		<th class="l">{{Unit}}</th>
 	</tr>
 	</thead>
 

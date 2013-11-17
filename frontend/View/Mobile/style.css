@@ -1,19 +1,11 @@
 /**
  *
  *
- * @author			Knut Kohl <github@knutkohl.de>
- * @copyright	 2012-2013 Knut Kohl
- * @license		 GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version		 $Id$
+ * @author        Knut Kohl <github@knutkohl.de>
+ * @copyright     2012-2013 Knut Kohl
+ * @license       GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version       1.0.0
  */
-#chart-placeholder {
-	padding: 1em;
-	font-weight: bold;
-	text-align: center;
-	border: dashed gray 1px;
-	background-color: white;
-}
-
 .cost {
 	text-align: right !important;
 	font-style: italic;

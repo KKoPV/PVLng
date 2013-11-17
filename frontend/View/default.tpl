@@ -51,68 +51,64 @@
 	<link rel="stylesheet" href="/css/iCheck/flat/orange.css" />
 	<link rel="stylesheet" href="/css/iCheck/line/orange.css" />
 
-
 	{HEAD}
 
 	<style>{STYLES}</style>
+
+	<script src="http://code.jquery.com/jquery-2.0.0.js"></script>
+	<script>
+		window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>');
+	</script>
 
 </head>
 
 <body>
 
-<div id="container" class="container_10">
+	<div id="container" class="container_10">
 
-	<!-- IF !{EMBEDDED} -->
-		<!-- INCLUDE default.header.tpl -->
-	<!-- ENDIF -->
+		<!-- IF !{EMBEDDED} -->
+			<!-- INCLUDE default.header.tpl -->
+		<!-- ENDIF -->
 
-	<div id="content" role="main" class="grid_10">
-		{CONTENT}
+		<div id="content" role="main">
+			{CONTENT}
+		</div>
+
+		<div class="clear"></div>
+
+		<!-- IF !{EMBEDDED} -->
+			<!-- INCLUDE default.footer.tpl -->
+		<!-- ENDIF -->
+
 	</div>
 
-	<div class="clear"></div>
-
-	<!-- IF !{EMBEDDED} -->
-		<!-- INCLUDE default.footer.tpl -->
+	<script src="/js/jquery-ui.min.js" defer></script>
+	<!-- IF {LANGUAGE} != "en" -->
+	<script src="/js/jquery-ui-i18n.min.js"></script>
 	<!-- ENDIF -->
 
-</div>
+	<script src="/js/jquery.tipTip.js+jquery.dataTables.js" defer></script>
+	<script src="/js/jquery.pnotify.js+jquery.icheck.js" defer></script>
+	<script src="/js/hoverIntent.js+superfish.js+supersubs.js+sprintf.js+lscache.js" defer></script>
+	<script src="/js/dataTables.js+script.js"></script>
 
-<script src="http://code.jquery.com/jquery-2.0.0.js"></script>
-<script>
-	window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>');
-</script>
-<script src="/js/jquery-ui.min.js"></script>
-<script src="/js/jquery.tipTip.js"></script>
-<script src="/js/jquery.dataTables.js"></script>
-<script src="/js/dataTables.js"></script>
-<script src="/js/hoverIntent.js"></script>
-<script src="/js/superfish.js"></script>
-<script src="/js/supersubs.js"></script>
-<script src="/js/jquery.pnotify.js"></script>
-<script src="/js/jquery.icheck.js"></script>
-<script src="/js/sprintf.js"></script>
-<script src="/js/lscache.js"></script>
-<script src="/js/script.js"></script>
+	<script>
+		var PVLngAPI = 'http://{SERVERNAME}/api/r2/';
 
-<!-- IF {LANGUAGE} != "en" -->
-<script src="/js/jquery-ui-i18n.min.js"></script>
-<!-- ENDIF -->
+		/* Inititilize Pines Notify labels here */
+		var pnotify_defaults_labels_redisplay = '{{Redisplay}}';
+		var pnotify_defaults_labels_all = '{{All}}';
+		var pnotify_defaults_labels_last = '{{Last}}';
+		var pnotify_defaults_labels_stick = '{{Stick}}';
+		var pnotify_defaults_labels_close = '{{Close}}';
+	</script>
 
-<script>
+	{SCRIPTS}
 
-	var PVLngAPI = 'http://{SERVERNAME}/api/r2/';
-
-	/* Inititilize Pines Notify labels here */
-	$.pnotify.defaults.labels.redisplay = '{{Redisplay}}';
-	$.pnotify.defaults.labels.all = '{{All}}';
-	$.pnotify.defaults.labels.last = '{{Last}}';
-	$.pnotify.defaults.labels.stick = '{{Stick}}';
-	$.pnotify.defaults.labels.close = '{{Close}}';
-
-</script>
-
-{SCRIPTS}
+	<a href="#" class="back-to-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
+	   style="border-right:0" title="{{BackToTop}}">
+		<img src="/images/ico/arrow-stop-090.png">
+	</a>
 
 </body>
 </html>

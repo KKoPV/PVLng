@@ -67,9 +67,16 @@ abstract class I18N {
 	}
 
 	/**
-	 * Translate
+	 *
 	 */
-	public static function _( $str ) {
+	public static function _() {
+		return call_user_func_array('I18N::translate', func_get_args());
+	}
+
+	/**
+	 *
+	 */
+	public static function translate( $str ) {
 		$fargs = func_get_args();
 		$str = array_shift($fargs);
 
@@ -143,4 +150,11 @@ abstract class I18N {
 	 */
 	protected static $language = 'en';
 
+}
+
+/**
+ * Shortcut function
+ */
+function __() {
+	return call_user_func_array('I18N::translate', func_get_args());
 }

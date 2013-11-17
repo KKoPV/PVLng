@@ -12,10 +12,11 @@
 <!-- IF {EMBEDDED} -->
 	<!-- INCLUDE header.embedded.tpl -->
 <!-- ELSE -->
+
+	<div class="grid_10">
+
 	<!-- INCLUDE header.tpl -->
 <!-- ENDIF -->
-
-<form method="post" action="/dashboard">
 
 <div style="max-width:940px;margin:1em auto">
 
@@ -77,6 +78,8 @@
 	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
 </p>
 
+<form method="post" action="/dashboard">
+
 <div id="wrapper">
 
 	<p>
@@ -133,6 +136,10 @@
 
 </div> <!-- wrapper -->
 
-<!-- ENDIF -->
-
 </form>
+
+</div>
+
+<div class="clear"></div>
+
+<!-- ENDIF -->

@@ -129,8 +129,8 @@ var
 function changeDates( dir ) {
 	var from = Date.parse($('#from').datepicker('getDate')) + dir*24*60*60*1000;
 	var to = Date.parse($('#to').datepicker('getDate')) + dir*24*60*60*1000;
-	$("#from").datepicker( "option", "maxDate", 0 );
-	$("#to").datepicker( "option", "maxDate", 0 );
+	$('#from').datepicker( 'option', 'maxDate', 0 );
+	$('#to').datepicker( 'option', 'maxDate', 0 );
 	if (dir < 0) {
 		/* backwards */
 		$('#from').datepicker('setDate', new Date(from));
@@ -163,12 +163,25 @@ function ToggleTree( force ) {
 		$(el).toggle(TreeExpanded);
 	});
 
+	var css;
+
 	if (TreeExpanded) {
 		$('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
 		$('#tiptoggle').html('{{CollapseAll}}');
+
+		$('span.indenter').each(function(id, el) {
+			el = $(el);
+			/* Restore left indent */
+			el.css('padding-left', el.data('indent'));
+		});
 	} else {
 		$('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
 		$('#tiptoggle').html('{{ExpandAll}}');
+
+		$('span.indenter').each(function(id, el) {
+			/* Remove left indent */
+			$(el).css('padding-left', 0);
+		});
 	}
 }
 
@@ -603,6 +616,12 @@ $(function() {
 		}
 	});
 
+	/* Remember left padding of indenter */
+	$('span.indenter').each(function(id, el) {
+		el = $(el);
+		el.data('indent', el.css('padding-left'));
+	});
+
 	if ($('#loaddeleteview').val()) {
 		ToggleTree(false);
 		updateChart();
@@ -620,11 +639,21 @@ $(function() {
 
 	$('input').iCheck('update');
 
-	$('#btn-clear').button({
+	$('#btn-reset').button({
 		icons: {
-			primary: 'ui-icon-trash'
+			primary: 'ui-icon-calendar'
 		},
 		text: false
+	}).click(function(e) {
+		var d = new Date;
+		/* Reset max. date today */
+		$('#from').datepicker( 'option', 'maxDate', d );
+		$('#to').datepicker( 'option', 'maxDate', d );
+		/* Set max. date today */
+		$('#from').datepicker('setDate', d);
+		$('#to').datepicker('setDate', d);
+		updateChart();
+		return false;
 	});
 
 	$('#btn-refresh').button({
@@ -632,6 +661,9 @@ $(function() {
 			primary: 'ui-icon-refresh'
 		},
 		text: false
+	}).click(function(e) {
+		updateChart();
+		return false;
 	});
 
 	$('#btn-bookmark').button({
@@ -650,7 +682,12 @@ $(function() {
 		}).prop('href', el.data('url') + encodeURIComponent(this.value));
 	});
 
-	$('#togglewrapper').click(function() {
+	$('#togglewrapper').button({
+		icons: {
+			primary: 'ui-icon-carat-1-n'
+		},
+		text: false
+	}).click(function() {
 		var visible = ! $('#wrapper').is(':visible');
 			var link = $(this);
 
@@ -668,7 +705,7 @@ $(function() {
 		);
 
 		return false;
-	}).button({ icons: { primary: 'ui-icon-carat-1-n' }, text: false });
+	});
 
 });
 

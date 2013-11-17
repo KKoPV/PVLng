@@ -9,7 +9,7 @@
  */
 -->
 
-<div class="prefix_3" style="margin-top:3em;margin-bottom:7em">
+<div class="push_3 grid_3" style="margin-top:3em;margin-bottom:7em">
 
 	<p>{{WelcomeToAdministration}}</p>
 
@@ -51,3 +51,5 @@
 	</form>
 
 </div>
+
+<div class="clear"></div>

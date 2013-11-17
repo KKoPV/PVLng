@@ -9,6 +9,8 @@
  */
 -->
 
+<div class="grid_10">
+
 <h2>{{SelectEntityType}}</h2>
 
 <form action="/channel/add" method="post">
@@ -16,11 +18,11 @@
 <table id="dataTable" class="dataTable">
 	<thead>
 	<tr>
-		<th>?</th>
+		<th style="width:1%"></th>
 		<th>{{EntityType}}</th>
-		<th>{{Unit}}</th>
+		<th style="width:1%">{{Unit}}</th>
 		<th>{{Model}}</th>
-		<th></th>
+		<th style="width:1%"></th>
 		<th>{{DESCRIPTION}}</th>
 	</tr>
 	</thead>
@@ -71,3 +73,7 @@
 <p><input type="submit" value="{{Select}}" /></p>
 
 </form>
+
+</div>
+
+<div class="clear"></div>

@@ -31,8 +31,8 @@ class Channel extends \Controller {
 				'TYPE'     => 'text',
 				'DEFAULT'  => '',
 				'REQUIRED' => FALSE,
-				'NAME'     => \I18N::_('channel::'.$key),
-				'HINT'     => \I18N::_('channel::'.$key.'Hint'),
+				'NAME'     => __('channel::'.$key),
+				'HINT'     => __('channel::'.$key.'Hint'),
 			), array_change_key_case($field, CASE_UPPER));
 		}
 	}
@@ -53,7 +53,7 @@ class Channel extends \Controller {
 	 *
 	 */
 	public function Index_Action() {
-		$this->view->SubTitle = \I18N::_('Channels');
+		$this->view->SubTitle = __('Channels');
 	}
 
 	/**
@@ -81,10 +81,10 @@ class Channel extends \Controller {
 	 *
 	 */
 	public function Add_Action() {
-		$this->view->SubTitle = \I18N::_('CreateChannel');
+		$this->view->SubTitle = __('CreateChannel');
 
 		$q = new \DBQuery;
-		$q->select('pvlng_type')->whereNE('id', 0)->order('id');
+		$q->select('pvlng_type');
 
 		$this->view->EntityTypes = $this->rows2view($this->db->queryRows($q));
 
@@ -98,6 +98,31 @@ class Channel extends \Controller {
 
 			$this->app->foreward('Edit');
 		}
+	}
+
+	/**
+	 *
+	 */
+	public function AliasPOST_Action() {
+
+		$entity = new \ORM\Channel($this->request->post('id'));
+
+		$alias = new \ORM\Channel();
+		$alias->name = $entity->name;
+		$alias->description = $entity->description;
+		$alias->channel = $entity->guid;
+		$alias->type = 0;
+
+		$alias->insert();
+
+		if (!$alias->isError()) {
+			\Messages::Success(__('ChannelSaved'));
+		} else {
+			\Messages::Error($entity->Error());
+			\Messages::Info(print_r($entity->queries(), 1));
+		}
+
+		$this->app->redirect('/channel');
 	}
 
 	/**
@@ -117,7 +142,7 @@ class Channel extends \Controller {
 			/* check required fields */
 			foreach ($this->fields as $key=>$data) {
 				if ($data['REQUIRED'] AND $entity->$key == '') {
-					\Messages::Error(\I18N::_('channel::ParamIsRequired', $data['NAME']), TRUE);
+					\Messages::Error(__('channel::ParamIsRequired', $data['NAME']), TRUE);
 					$ok = FALSE;
 				}
 			}
@@ -127,7 +152,7 @@ class Channel extends \Controller {
 			    if ($entity->id) $entity->update(); else $entity->insert();
 
 				if (!$entity->isError()) {
-					\Messages::Success(\I18N::_('ChannelSaved'));
+					\Messages::Success(__('ChannelSaved'));
 				} else {
 					\Messages::Error($entity->Error());
 					\Messages::Info(print_r($entity->queries(), 1));
@@ -146,16 +171,17 @@ class Channel extends \Controller {
 	 *
 	 */
 	public function EditGET_Action() {
-		$id = $this->app->params->get('id');
-		$this->prepareFields(new \ORM\Channel($id));
-		$this->view->Id = $id;
+		if ($id = $this->app->params->get('id')) {
+			$this->prepareFields(new \ORM\Channel($id));
+			$this->view->Id = $id;
+		}
 	}
 
 	/**
 	 *
 	 */
 	public function Edit_Action() {
-		$this->view->SubTitle = \I18N::_('EditChannel');
+		$this->view->SubTitle = __('EditChannel');
 		$this->view->Fields = $this->fields;
 	}
 
@@ -163,7 +189,7 @@ class Channel extends \Controller {
 	 *
 	 */
 	public function DeletePOST_Action() {
-		$entity = new \ORM\Channel($this->request->get('id'));
+		$entity = new \ORM\Channel($this->request->post('id'));
 
 		if ($entity->id) {
 			// check for entity is assigned in channel tree
@@ -171,11 +197,12 @@ class Channel extends \Controller {
 			$tree->find('entity', $entity->id);
 
 			if ($tree->id) {
-				\Messages::Error(\I18N::_('ChannelStillInTree', $entity->name), TRUE);
+				\Messages::Error(__('ChannelStillInTree', $entity->name), TRUE);
 			} else {
+				$name = $entity->name;
 				$entity->delete();
 				if (!$entity->isError()) {
-					\Messages::Success(\I18N::_('ChannelDeleted'));
+					\Messages::Success(__('ChannelDeleted', $name));
 				} else {
 					\Messages::Error($entity->Error());
 					\Messages::Info(print_r($entity, 1));
@@ -241,11 +268,11 @@ class Channel extends \Controller {
 		if (is_object($entity)) {
 			foreach ($this->fields as $key=>&$data) {
 				$h = 'model::'.$type->model.'_'.$key;
-				$name = \I18N::_($h);
+				$name = __($h);
 				if ($name != $h) $data['NAME'] = $name;
 
 				$h = 'model::'.$type->model.'_'.$key.'Hint';
-				$name = \I18N::_($h);
+				$name = __($h);
 				if ($name != $h) $data['HINT'] = $name;
 
 				$data['VALUE'] = isset($entity->$key)

@@ -8,14 +8,19 @@
  * @revision    $Rev$
  */
 
-/* Inititilize Pines Notify */
-$.pnotify.defaults.styling = 'jqueryui';
-$.pnotify.defaults.delay = 5000;
-$.pnotify.defaults.history = false;
-$.pnotify.defaults.stack.spacing1 = 5;
-$.pnotify.defaults.stack.spacing2 = 15;
-
 $(function() {
+
+	/* Inititilize Pines Notify */
+	$.pnotify.defaults.styling = 'jqueryui';
+	$.pnotify.defaults.delay = 5000;
+	$.pnotify.defaults.history = false;
+	$.pnotify.defaults.stack.spacing1 = 5;
+	$.pnotify.defaults.stack.spacing2 = 15;
+	$.pnotify.defaults.labels.redisplay = pnotify_defaults_labels_redisplay;
+	$.pnotify.defaults.labels.all = pnotify_defaults_labels_all;
+	$.pnotify.defaults.labels.last = pnotify_defaults_labels_last;
+	$.pnotify.defaults.labels.stick = pnotify_defaults_labels_stick;
+	$.pnotify.defaults.labels.close = pnotify_defaults_labels_close;
 
 	/* Inititilize Tooltips */
 	$('.tip, .tipbtn').tipTip({
@@ -58,6 +63,22 @@ $(function() {
             radioClass: 'icheck_line-orange',
             insert: '<div class="icheck_line-icon"></div>' + label_text
         });
+    });
+
+	/* Back to top */
+	var fadeDuration = 500;
+    $(window).scroll(function() {
+        if ($(this).scrollTop()) {
+            $('.back-to-top').fadeIn(fadeDuration);
+        } else {
+            $('.back-to-top').fadeOut(fadeDuration);
+        }
+    });
+
+    $('.back-to-top').click(function(e) {
+        e.preventDefault();
+        jQuery('html, body').animate({scrollTop: 0}, fadeDuration);
+        return false;
     });
 
 });

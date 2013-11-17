@@ -15,6 +15,8 @@
      style="width:16px;height:16px" width="16p" height="16" />
 <!-- END DEFINE -->
 
+<div class="grid_10">
+
 <div>{MESSAGE}</div>
 
 <br />
@@ -172,4 +174,33 @@
 	{{ConfirmDeleteTreeItems}}
 </div>
 
-<!-- INCLUDE overview.move.tpl -->
+</div>
+
+<div class="clear"></div>
+
+<!-- Move channel dialog -->
+
+<div id="dialog-move" style="display:none" title="{{MoveChannel}}">
+	<form id="form-movechild" action="" method="post">
+	<input type="hidden" name="id" />
+	<p>
+	    {{MoveChannelHowMuchRows}}
+	</p>
+	<p>
+		<div style="float:left;width:25px">
+			<input type="radio" class="iCheck" id="countmax" name="countmax" value="0" checked="checked" />
+		</div>
+		<label for="countmax">
+			<input type="number" step="1" style="width:3em"class="numbersOnly" name="count" value="1" />
+			{{Positions}}
+		</label>
+	</p>
+	<p>
+		<div style="float:left;width:25px">
+			<input type="radio" class="iCheck" id="movecountmax" name="countmax" value="1" />
+		</div>
+		<label for="movecountmax">{{MoveChannelStartEnd}}</label>
+	</p>
+
+	</form>
+</div>

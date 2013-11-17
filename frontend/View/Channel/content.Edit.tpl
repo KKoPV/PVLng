@@ -9,6 +9,8 @@
  */
 -->
 
+<div class="grid_10">
+
 <p>
 	{{ChannelType}}: <img src="/images/ico/{ICON}" alt="" />&nbsp;<strong>{TYPENAME}</strong>
 </p>
@@ -89,3 +91,7 @@
 <p><input type="submit" value="{{Save}}" /></p>
 
 </form>
+
+</div>
+
+<div class="clear"></div>

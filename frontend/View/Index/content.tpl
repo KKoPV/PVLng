@@ -11,9 +11,10 @@
 
 <form method="post" action="/index">
 
-<div id="nav" style="margin-top:1em">
-	<input type="hidden" id="fromdate" name="fromdate" />
-	<input type="hidden" id="todate" name="todate" />
+<input type="hidden" id="fromdate" name="fromdate" />
+<input type="hidden" id="todate" name="todate" />
+
+<div id="nav" class="grid_10" style="margin-top:1em">
 
 	<table style="width:100%">
 	<tr>
@@ -34,18 +35,23 @@
 			<span class="ui-icon ui-icon-triangle-1-e tip"
 			      title="{{NextDay}}" onclick="changeDates(1)"></span>
 		</td>
+		<td>
+			<button id="btn-reset" style="margin-left:1em">{{Today}}</button>
+		</td>
 		<td style="width:99%;text-align:right">
 			<label for="periodcnt" style="margin-right:1em" >{{Aggregation}}:</label>
 			<input class="numbersOnly r" style="margin-right:.5em" type="text"
 			       id="periodcnt" name="periodcnt" value="1" size="2" />
 			{PERIODSELECT} &nbsp;
-			<button id="btn-refresh" onclick="updateChart(); return false">{{Refresh}}</button>
+			<button id="btn-refresh">{{Refresh}}</button>
 		</td>
 	</tr>
 	</table>
 </div>
 
-<div id="chart" style="margin-top: 1em">
+<div class="clear"></div>
+
+<div id="chart" class="grid_10" style="margin-top: 1em">
 	<div id="chart-placeholder">
 	<!-- IF {VIEW} -->
 		<p>
@@ -85,23 +91,27 @@
 	</div>
 </div>
 
-<div class="alpha grid_4">
+<div class="clear"></div>
+
+<div class="grid_4">
 	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
 </div>
 
-<div class="grid_6 omega" style="text-align:right">
+<div class="grid_6" style="text-align:right">
 	<input id="az" type="checkbox" />&nbsp;<label for="az">{{SetAxisMinZero}}</label>
 </div>
 
 <div class="clear"></div>
 
-<div id="wrapper" style="padding-top:1em">
+<div id="wrapper" class="grid_10" style="padding-top:1em">
 	<!-- IF {USER} -->
 		<!-- INCLUDE datatable.inc.tpl -->
 	<!-- ELSE -->
 		<!-- INCLUDE datatable.nouser.inc.tpl -->
 	<!-- ENDIF -->
 </div>
+
+<div class="clear"></div>
 
 <!-- IF {USER} -->
 	<!-- INCLUDE variants.inc.tpl -->

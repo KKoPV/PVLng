@@ -9,24 +9,16 @@
  */
 -->
 
-<h3>
+<h3 class="grid_10">
 	{{Variants}}
 	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
 	     src="/images/ico/information_frame.png" width="16" height="16"
 	     title="{{MobileVariantHint}}" />
 </h3>
 
-<p>
-	<input id="saveview" type="text" name="saveview" value="{VIEW}"/>
-	<input style="margin:0 .5em" id="public" type="checkbox" name="public" value="1"
-		<!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF -->
-	/>
-	<label for="public">{{public}}</label>
-	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
-	     src="/images/ico/information_frame.png" width="16" height="16"
-	     title="{{publicHint}}" />
-	<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
+<div class="clear"></div>
 
+<div class="grid_4">
 	<select id="loaddeleteview" name="loaddeleteview">
 		<option value="">--- {{Select}} ---</option>
 		<!-- BEGIN VIEWS -->
@@ -37,9 +29,25 @@
 		<!-- END -->
 	</select>
 	<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
-
 	<input type="submit" name="delete" value="{{Delete}}" style="margin-left:.5em" />
+</div>
+
+<div class="grid_4">
+	<input id="saveview" type="text" name="saveview" value="{VIEW}"/>
+	<input style="margin:0 .5em" id="public" type="checkbox" name="public" value="1"
+		<!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF -->
+	/>
+	<label for="public">{{public}}</label>
+	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
+	     src="/images/ico/information_frame.png" width="16" height="16"
+	     title="{{publicHint}}" />
+	<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
+</div>
+
+<div class="grid_2">
 	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">
 		PVLng | {VIEW}
 	</a>
-</p>
+</div>
+
+<div class="clear"></div>

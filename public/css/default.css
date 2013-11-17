@@ -14,7 +14,14 @@
 
 hr {
 	height: 0;
-	border-top: solid gray 1px;
+	border: 0;
+	border-top: dotted gray 1px;
+}
+
+div.hr {
+	margin-top: .5em;
+	margin-bottom: .5em;
+	border-top: dotted 1px gray;
 }
 
 a {
@@ -31,6 +38,20 @@ a:hover, a:active {
 
 .toolbar a {
 	color: black;
+}
+
+/* Back to top link
+--------------------------------------------------------------------------- */
+.back-to-top {
+    position: fixed;
+    bottom: 1.5em;
+    right: 0;
+    padding: 1em;
+    display: none;
+}
+
+.back-to-top:hover {
+    background-color: rgba(135, 135, 135, 0.50);
 }
 
 /* Tooltips
@@ -50,14 +71,14 @@ img.tip {
 #tiptip_content {
 	font-size: 90%;
 	text-shadow: none;
-	padding: 0.5em 1em;
+	padding: .5em 1em;
 }
 
 /* Chart-Tooltips
 --------------------------------------------------------------------------- */
 .chart-tooltips {
 	width: auto !important;
-	padding: 0.3em !important;
+	padding: .3em !important;
 	font-family: Verdana, Arial, sans-serif !important;
 	font-size: 85% !important;
 	background-color: rgb(255,255,200) !important;
@@ -66,8 +87,8 @@ img.tip {
 /* Header
 --------------------------------------------------------------------------- */
 #header {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+	margin-top: .5em;
+	margin-bottom: .5em;
 	height: 5.5em;
 }
 
@@ -75,16 +96,13 @@ img.tip {
 	font-size: 130%;
 	font-weight: bold;
 	font-style: italic;
-	text-shadow: #AAA 0.1em 0.1em 0.1em;
+	text-shadow: #AAA .1em .1em .1em;
 	color: black;
 }
 
 /* Footer
 --------------------------------------------------------------------------- */
 #footer {
-	margin-top: 1em;
-	border-top: dotted 1px gray;
-	padding-top: 0.5em;
 }
 
 #powered {
@@ -92,7 +110,7 @@ img.tip {
 }
 
 #powered a {
-	margin-left: 0.3em;
+	margin-left: .3em;
 }
 
 /* Other
@@ -112,7 +130,7 @@ input[type=text],
 input[type=password],
 select,
 textarea {
-	padding: 0.3em 0.2em;
+	padding: .3em .2em;
 	background-color: white;
 }
 

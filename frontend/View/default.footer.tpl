@@ -9,9 +9,13 @@
  */
 -->
 
-<div id="footer" class="grid_10 s" style="height:5em">
+<div class="grid_10 hr"></div>
+<div class="clear"></div>
 
-	<div class="alpha grid_4 s">
+<div id="footer" style="height:5em">
+
+
+	<div class="grid_4 s">
 		Version {VERSION} / {VERSIONDATE}
 		<br />
 		&copy; 2012-{YEAR} by
@@ -21,7 +25,7 @@
 		</a>
 	</div>
 
-	<div id="powered" class="grid_6 r omega">
+	<div id="powered" class="grid_6 s r">
 
 		<a href="http://php.net" target="_blank">
 			<img style="width:80px;height:15px" class="tip"

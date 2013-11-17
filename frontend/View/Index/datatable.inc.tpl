@@ -18,7 +18,7 @@
 			     class="tip"onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
 			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 		</th>
-		<th style="width:90%" class="l">
+		<th style="width:70%" class="l">
 			<span class="indenter" style="padding-left: 0px;"></span>
 			{{Channel}}
 		</th>

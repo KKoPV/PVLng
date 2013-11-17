@@ -206,18 +206,17 @@ $version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
 define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
+if (isset($_COOKIE[Session::token()])) {
+	// Ok, remembered user
+	Session::set('user', $app->config->get('Admin.User'));
+}
+
 // ---------------------------------------------------------------------------
 // Authenticate user if required
 // ---------------------------------------------------------------------------
 $checkAuth = function( Slim\Route $route ) use ($app) {
-	$admin = $app->config->get('Admin.User');
-
-	if (Session::get('user') === $admin) {         // 1st check valid logged in user
-		// Ok, validated user session
-	} elseif (isset($_COOKIE[Session::token()])) { // 2nd check for saved session
-		// Ok, remembered user
-		Session::set('user', $admin);
-	} else {                                       // Redirect to login!
+	// Check valid logged in user
+	if (Session::get('user') !== $app->config->get('Admin.User')) {
 		Session::set('returnto', $route->getPattern());
 		$app->redirect('/login');
 	}
@@ -315,6 +314,10 @@ $app->map('/channel/add(/:clone)', $checkAuth, function( $clone=0 ) use ($app) {
 $app->get('/channel/edit/:id', $checkAuth, function( $id ) use ($app) {
 	$app->params->set('id', $id);
 	$app->process('Channel', 'Edit');
+});
+
+$app->post('/channel/alias', $checkAuth, function() use ($app) {
+	$app->process('Channel', 'Alias');
 });
 
 $app->post('/channel/edit', $checkAuth, function() use ($app) {

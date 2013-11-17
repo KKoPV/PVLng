@@ -82,7 +82,7 @@ class Admin extends \Controller {
 
 		$hasher = new \PasswordHash();
 		$this->view->AdminUser = $this->request->post('u');
-		$this->view->AdminPass = $hasher->HashPassword($this->request('p1'));
+		$this->view->AdminPass = $hasher->HashPassword($this->request->post('p1'));
 	}
 
 	/**

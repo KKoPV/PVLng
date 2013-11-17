@@ -12,6 +12,13 @@ class DBQuery {
 	/**
 	 *
 	 */
+	public static function forge( $table=NULL, $fields=array() ) {
+		return new DBQuery($table, $fields);
+	}
+
+	/**
+	 *
+	 */
 	public function __construct( $table=NULL, $fields=array() ) {
 		return $this->select($table, $fields);
 	}

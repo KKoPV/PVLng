@@ -9,7 +9,7 @@
  */
 -->
 
-<p>
+<div class="grid_10" style="margin-top:.5em;margin-bottom:.5em">
 	<span style="margin-right:1em">{{VariantsPublic}}:</span>
 
 	<select id="loaddeleteview" name="loaddeleteview">
@@ -23,4 +23,6 @@
 	</select>
 	<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
 	</a>
-</p>
+</div>
+
+<div class="clear"></div>

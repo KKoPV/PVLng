@@ -49,7 +49,7 @@ class View extends \Slim\View {
 
 		$this->Helper = new ViewHelper;
 		$this->Helper->numf = function( $number, $decimals=0 ) {
-			return number_format($number, $decimals, \I18N::_('DSEP'), \I18N::_('TSEP'));
+			return number_format($number, $decimals, \I18N::translate('DSEP'), \I18N::translate('TSEP'));
 		};
 	}
 
@@ -222,7 +222,7 @@ class View extends \Slim\View {
 			// Translations
 			if (preg_match_all('~\{\{([^}]+?)\}\}~', $html, $args, PREG_SET_ORDER)) {
 				foreach ($args as $data) {
-					$html = str_replace($data[0], $this->e('I18N::_(\''.$data[1].'\')'), $html);
+					$html = str_replace($data[0], $this->e('I18N::translate(\''.$data[1].'\')'), $html);
 				}
 			}
 
@@ -320,11 +320,13 @@ class View extends \Slim\View {
 		if (!$this->app->config->get('View.Verbose')) {
 			$pre = array();
 			// mask <pre>, <code> and <tt> sequences
-			if (preg_match_all('~<(pre|code|tt).*?</\\1>~is', $html, $matches)) {
+			if (preg_match_all('~<(pre|code|tt).*?</\\1>~is', $html, $matches, PREG_SET_ORDER)) {
+				print_r($matches);
 				foreach ($matches as $match) {
-					$pre[md5($match[0])] = $match[0];
+					$hash = md5($match[0]);
+					$pre[$hash] = $match[0];
+					$html = str_replace($match[0], $hash, $html);
 				}
-				$html = str_replace($pre, array_keys($pre), $html);
 			}
 
 			// Remove HTML comments
@@ -340,7 +342,7 @@ class View extends \Slim\View {
 			$html = preg_replace('~\s*\?'.'><\?php\s*~', ' ', $html);
 
 			// Restore <pre>...</pre> sections
-			$html = str_replace(array_keys($pre), $pre, $html);
+			$html = str_replace(array_keys($pre), array_values($pre), $html);
 		}
 
 		if ($xy = $this->app->config->get('View.InlineImages') AND

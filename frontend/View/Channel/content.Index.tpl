@@ -9,6 +9,8 @@
  */
 -->
 
+<div class="grid_10">
+
 <div>{MESSAGE}</div>
 
 <p>
@@ -65,6 +67,15 @@
 			<a href="/channel/add/{ID}" class="tip" title="{{CloneEntity}}">
 				<img src="/images/ico/node_select_child.png" class="imgbar wide" alt="c" width="16" height="16" />
 			</a>
+			<!-- IF {CHILDS} -->
+			<form action="/channel/alias" method="post">
+			<input type="hidden" name="id" value="{ID}" />
+			<input type="image" src="/images/ico/arrow-split.png" alt="a"
+			       style="background-color:transparent" class="imgbar wide tip nb" title="{{AliasEntity}}" />
+			</form>
+			<!-- ELSE -->
+			<img src="/images/ico/16x16.png" class="imgbar wide" alt="" width="16" height="16" />
+			<!-- ENDIF -->
 			<form id="df{ID}" action="/channel/delete" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
 			<input type="image" src="/images/ico/node_delete.png" alt="-"
@@ -89,3 +100,7 @@
 		{{ConfirmDeleteEntity}}
 	</p>
 </div>
+
+</div>
+
+<div class="clear"></div>
