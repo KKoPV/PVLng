@@ -109,9 +109,9 @@ class History extends \Channel {
 	 */
 	protected function overall( $request ) {
 
-		$q = new \DBQuery('pvlng_reading_num');
-		$q->get($q->YEAR($q->MIN($q->FROM_UNIXTIME('timestamp'))))
-		  ->whereEQ('id', $this->child->entity);
+		$q = \DBQuery::forge('pvlng_reading_num')
+		     ->get($q->YEAR($q->MIN($q->FROM_UNIXTIME('timestamp'))))
+		     ->whereEQ('id', $this->child->entity);
 
 		// Start year
 		$year = $this->db->QueryOne($q);

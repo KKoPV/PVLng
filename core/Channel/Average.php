@@ -42,21 +42,22 @@ class Average extends \Channel {
 		$this->before_read($request);
 
 		$childs = $this->getChilds();
+		$childCnt = count($childs);
 
 		// no childs, return empty file
-		if (count($childs) == 0) {
+		if ($childCnt == 0) {
 			return $this->after_read(new \Buffer, $attributes);
 		}
 
 		$buffer = $childs[0]->read($request);
 
 		// only one child, return as is
-		if (count($childs) == 1) {
+		if ($childCnt == 1) {
 			return $this->after_read($buffer, $attributes);
 		}
 
 		// combine all data for same timestamp
-		for ($i=1; $i<count($childs); $i++) {
+		for ($i=1; $i<$childCnt; $i++) {
 
 			$next = $childs[$i]->read($request);
 
@@ -67,32 +68,35 @@ class Average extends \Channel {
 
 			while (!empty($row1) OR !empty($row2)) {
 
-				if ($buffer->key() == $next->key()) {
+				$key1 = $buffer->key();
+				$key2 = $next->key();
+
+				if ($key1 == $key2) {
 
 					// same timestamp, combine
 					$row1['data']        = ($row1['data']*$i        + $row2['data'])        / ($i+1);
 					$row1['min']         = ($row1['min']*$i         + $row2['min'])         / ($i+1);
 					$row1['max']         = ($row1['max']*$i         + $row2['max'])         / ($i+1);
 					$row1['consumption'] = ($row1['consumption']*$i + $row2['consumption']) / ($i+1);
-					$result->write($row1, $id1);
+
+					$result->write($row1, $key1);
 
 					// read both next rows
 					$row1 = $buffer->next()->current();
 					$row2 = $next->next()->current();
 
-				} elseif ($buffer->key() AND $buffer->key() < $next->key() OR
-				          $next->key() == '') {
+				} elseif ($key1 AND $key1 < $key2 OR !$key2) {
 
 					// missing row 2, save row 1 as is
-					$result->write($row1, $id1);
+					$result->write($row1, $key1);
 
 					// read only row 1
 					$row1 = $buffer->next()->current();
 
-				} else /* $buffer->key() > $next->key() */ {
+				} else /* $key1 > $key2 OR !$key2 */ {
 
 					// missing row 1, save row 2 as is
-					$result->write($row2, $id2);
+					$result->write($row2, $key2);
 
 					// read only row 2
 					$row2 = $next->next()->current();

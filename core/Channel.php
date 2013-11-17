@@ -168,7 +168,7 @@ abstract class Channel {
 
 		$this->before_read($request);
 
-		$q = new DBQuery($this->table[$this->numeric]);
+		$q = DBQuery::forge($this->table[$this->numeric]);
 
 		$buffer = new Buffer;
 
@@ -343,35 +343,23 @@ abstract class Channel {
 	/**
 	 * Grouping
 	 */
-// 	const LAST    = -1;
-// 	const NO      =  0;
-// 	const MINUTE  =  1;
-// 	const HOUR    =  2;
-// 	const DAY     =  3;
-// 	const WEEK    =  4;
-// 	const MONTH   =  5;
-// 	const QUARTER =  6;
-// 	const YEAR    =  7;
-// 	const ALL     =  8;
-
 	const NO      =  0;
-	const MINUTE  =  1;
-	const HOUR    =  2;
-	const DAY     =  3;
-	const WEEK    =  4;
-	const MONTH   =  5;
-	const QUARTER =  6;
-	const YEAR    =  7;
-	const LAST    = 10;
-	const ALL     = 20;
+	const MINUTE  = 10;
+	const HOUR    = 20;
+	const DAY     = 30;
+	const WEEK    = 40;
+	const MONTH   = 50;
+	const QUARTER = 60;
+	const YEAR    = 70;
+	const LAST    = 80;
+	const ALL     = 90;
 
 	/**
 	 * Grouping SQLs
 	 */
 	protected $GroupBy = array(
 		self::NO      => '',
-		self::MINUTE  => '(CAST(`timestamp` AS SIGNED) - UNIX_TIMESTAMP()) DIV (60 * %d)',
-		self::MINUTE  => '(UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
+		self::MINUTE  => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
 		self::HOUR    => '`timestamp` DIV (3600 * %f)',
 		self::DAY     => '`timestamp` DIV (86400 * %d)',
 		self::WEEK    => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
@@ -380,6 +368,7 @@ abstract class Channel {
 		self::YEAR    => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
 		self::LAST    => '',
 		self::ALL     => '`timestamp`',
+		self::ALL     => '',
 	);
 
 	/**
@@ -403,16 +392,16 @@ abstract class Channel {
 	 *
 	 */
 	public function __destruct() {
+		$time = (microtime(TRUE) - $this->time) * 1000;
+
+		Header(sprintf('X-Query-Time: %d ms', $time));
+
 		// Check for real action to log
 		if ($this->performance->action == '') return;
-
-		$time = (microtime(TRUE) - $this->time) * 1000;
 
 		$this->performance->entity = $this->entity;
 		$this->performance->time = $time;
 		$this->performance->insert();
-
-		Header(sprintf('X-Query-Time: %d ms', $time));
 	}
 
 	/**
@@ -440,11 +429,11 @@ abstract class Channel {
 	 *
 	 */
 	protected function getLastReading() {
-		$q = new DBQuery($this->table[$this->numeric]);
-		$q->get('data')
-		  ->whereEQ('id', $this->entity)
-		  ->orderDescending('timestamp')
-		  ->limit(1);
+		$q = DBQuery::forge($this->table[$this->numeric])
+		     ->get('data')
+		     ->whereEQ('id', $this->entity)
+		     ->orderDescending('timestamp')
+		     ->limit(1);
 
 		return $this->db->queryOne($q);
 	}
@@ -545,12 +534,6 @@ abstract class Channel {
 				$row['max']         *= $this->resolution;
 				$row['consumption'] *= $this->resolution;
 			}
-			if ($this->numeric) {
-				$row['data']        = round($row['data'], $this->decimals);
-				$row['min']         = round($row['min'], $this->decimals);
-				$row['max']         = round($row['max'], $this->decimals);
-				$row['consumption'] = round($row['consumption'], $this->decimals);
-			}
 
 			// Skip invalid rows
 			if ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
@@ -599,7 +582,9 @@ abstract class Channel {
 			case 3: // Full mobile
 
 				foreach ($datafile as $row) {
-					$buffer->write(array_values($row));
+					$row = array_values($row);
+					$row = array_map(function($n){ return round($n, $this->decimals); }, $row);
+					$buffer->write($row);
 				}
 				break;
 
@@ -609,8 +594,8 @@ abstract class Channel {
 				foreach ($datafile as $row) {
 					// default mobile result: only timestamp and data
 					$buffer->write(array(
-						/* 0 */ $row['timestamp'],
-						/* 1 */ $row['data']
+						/* 0 */ round($row['timestamp'], $this->decimals),
+						/* 1 */ round($row['data'], $this->decimals)
 					));
 
 				}
@@ -621,6 +606,7 @@ abstract class Channel {
 
 				// do nothing with $row
 				foreach ($datafile as $row) {
+					$row = array_map(function($n){ return round($n, $this->decimals); }, $row);
 					$buffer->write($row);
 				}
 				break;
@@ -631,8 +617,8 @@ abstract class Channel {
 				foreach ($datafile as $row) {
 					// default result: only timestamp and data
 					$buffer->write(array(
-						'timestamp' => $row['timestamp'],
-						'data'      => $row['data']
+						'timestamp' => round($row['timestamp'], $this->decimals),
+						'data'      => round($row['data'], $this->decimals)
 					));
 				}
 				break;

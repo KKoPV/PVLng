@@ -51,12 +51,13 @@ class SensorToMeter extends \Channel {
 	 */
 	protected function __construct( $guid ) {
 		parent::__construct($guid);
+
 		$this->meter = TRUE;
-		try {
+
+		if ($this->resolution != 0) {
 			$this->resolution = 1 / $this->resolution;
-		} catch (\Exception $e) {
-		    // Division by zero...
-		    $this->resolution = 1;
+		} else {
+			$this->resolution = 1;
 		}
 	}
 

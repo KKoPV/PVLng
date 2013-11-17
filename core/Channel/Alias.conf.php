@@ -17,6 +17,9 @@ return array(
 	'serial' => array(
 		'visible' => FALSE,
 	),
+	'channel' => array(
+		'required' => TRUE,
+	),
 	'decimals' => array(
 		'visible' => FALSE,
 	),

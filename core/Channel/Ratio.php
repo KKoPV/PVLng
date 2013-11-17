@@ -32,7 +32,10 @@ class Ratio extends \Channel {
 
 		while (!empty($row1) OR !empty($row2)) {
 
-			if ($child1->key() == $child2->key()) {
+			$key1 = $child1->key();
+			$key2 = $child2->key();
+
+			if ($key1 == $key2) {
 
 				$row1['data'] = $row2['data'] != 0
 				              ? $row1['data'] / $row2['data']
@@ -49,19 +52,18 @@ class Ratio extends \Channel {
 				// Remove consumption, may be we have a meter channel
 				$row1['consumption'] = 0;
 
-				$result->write($row1, $child1->key());
+				$result->write($row1, $key1);
 
 				// read both next rows
 				$row1 = $child1->next()->current();
 				$row2 = $child2->next()->current();
 
-			} elseif ($child1->key() AND $child1->key() < $child2->key() OR
-			          $child2->key() == '') {
+			} elseif ($key1 AND $key1 < $key2 OR !$key2) {
 
 				// read only row 1
 				$row1 = $child1->next()->current();
 
-			} else /* $child1->key() > $child2->key() */ {
+			} else /* $key1 > $key2 */ {
 
 				// read only row 2
 				$row2 = $child2->next()->current();
