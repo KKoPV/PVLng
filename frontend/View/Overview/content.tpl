@@ -11,8 +11,7 @@
 
 <!-- Use this image as spacer for not available moving actions of channels -->
 <!-- DEFINE MACRO SpacerImg -->
-<img src="/images/ico/16x16.png" class="imgbar" alt=""
-     style="width:16px;height:16px" width="16p" height="16" />
+<img src="/images/pix.gif" class="imgbar" width="16p" height="16" alt="" />
 <!-- END DEFINE -->
 
 <div class="grid_10">
@@ -26,11 +25,12 @@
 	<tr>
 		<th style="text-align:left !important">
 			<img src="/images/ico/toggle.png" id="treetoggle" class="fl tip"
-			     style="width:16px;height:16px" width="16p" height="16"
+			     width="16p" height="16"
 			     onclick="return ToggleTree()" tip="#tiptoggle" alt="[+]" />
 			<div class="c">{{ChannelHierarchy}}</div>
 			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 		</th>
+		<th></th>
 		<th></th>
 		<th></th>
 		<th>GUID</th>
@@ -44,7 +44,7 @@
 	<tr data-tt-id="{ID}"
 	    <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
 		<td style="width:90%">
-			<img style="vertical-align:top;width:16px;height:16px;margin-right:8px"
+			<img style="vertical-align:top;margin-right:8px"
 			     width="16" height="16" class="tip" title="{TYPE}"
 			     src="/images/ico/{ICON}" alt="" />
 			<strong>{NAME}</strong>
@@ -56,61 +56,76 @@
 			<!-- IF {ACCEPTCHILDS} -->
 			<a href="#" onclick="addChild({ID}); return false" class="tip"
 			   title="{{AssignEntity}}">
-				<img src="/images/ico/node_insert_next.png" class="imgbar" alt="add"
-				     style="width:16px;height:16px" width="16p" height="16" />
+				<img src="/images/ico/node_insert_next.png" class="imgbar"
+				     width="16p" height="16" alt="add" />
 			</a>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {CHILDS} == "0" -->
 			<form action="/overview/delete" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
-			<input type="image" src="/images/ico/node_delete_next.png" alt="-"
-			       class="imgbar tip nb" title="{{DeleteEntity}}" style="background-color:transparent" />
+			<input type="image" src="/images/ico/node_delete_next.png"
+			       class="imgbar tip nb" title="{{DeleteEntity}}"
+			       style="background-color:transparent" alt="-" />
 			</form>
 			<!-- ELSE -->
 			<form action="/overview/deletebranch" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
-			<input type="image" src="/images/ico/node_delete.png" alt="-!"
-			       class="imgbar tip nb" title="{{DeleteBranch}}" style="background-color:transparent" />
+			<input type="image" src="/images/ico/node_delete.png"
+			       class="imgbar tip nb" title="{{DeleteBranch}}"
+			       style="background-color:transparent" alt="-!" />
 			</form>
 			<!-- ENDIF -->
+		</td>
 
+		<td style="white-space:nowrap">
 			<a href="/channel/edit/{ENTITY}?returnto=overview" class="tip" title="{{EditEntity}}">
-				<img src="/images/ico/node_design.png" class="imgbar" alt="edit"
-				     style="width:16px;height:16px" width="16p" height="16" />
+				<img src="/images/ico/node_design.png" class="imgbar"
+				     width="16p" height="16" alt="edit" />
 			</a>
+
+			<!-- IF {CHILDS} -->
+			<form action="/channel/alias" method="post">
+			<input type="hidden" name="id" value="{ENTITY}" />
+			<input type="image" src="/images/ico/arrow-split.png"
+			       style="background-color:transparent" class="imgbar wide tip nb"
+			       title="{{AliasEntity}}" alt="a" />
+			</form>
+			<!-- ENDIF -->
 		</td>
 
 		<td style="white-space:nowrap">
 			<!-- IF {LEVEL} != "1" AND {UPPER} != "0" -->
 			<a href="/overview/moveleft" title="{{MoveEntityUp}}" class="tip"
 			   onclick="return moveChild({ID}, 'moveleft')">
-				<img src="/images/ico/navigation_090_frame.png" class="imgbar" alt="u"
-				     style="width:16px;height:16px" width="16p" height="16" />
+				<img src="/images/ico/navigation_090_frame.png" class="imgbar"
+				     width="16p" height="16" alt="u" />
 			</a>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {LEVEL} != "1" AND {LOWER} != "0" -->
 			<a href="/overview/moveright" title="{{MoveEntityDown}}" class="tip"
 			   onclick="return moveChild({ID}, 'moveright')">
-				<img src="/images/ico/navigation_270_frame.png" class="imgbar" alt="d"
-				     style="width:16px;height:16px" width="16p" height="16" />
+				<img src="/images/ico/navigation_270_frame.png" class="imgbar"
+				     width="16p" height="16" alt="d" />
 			</a>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {LEVEL} > "2" -->
 			<form action="/overview/moveup" method="post">
 			<input type="hidden" name="id" value="{ID}" />
-			<input type="image" src="/images/ico/navigation_180_frame.png" alt="h"
-			       class="imgbar tip" title="{{MoveEntityLeft}}" style="background-color:transparent" />
+			<input type="image" src="/images/ico/navigation_180_frame.png"
+			       class="imgbar tip" style="background-color:transparent"
+			       title="{{MoveEntityLeft}}" alt="h" />
 			</form>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
 			<!-- IF {UPPER} != "0" -->
 			<form action="/overview/movedown" method="post">
 			<input type="hidden" name="id" value="{ID}" />
-			<input type="image" src="/images/ico/navigation_000_frame.png" alt="l"
-			       class="imgbar tip" title="{{MoveEntityRight}}" style="background-color:transparent" />
+			<input type="image" src="/images/ico/navigation_000_frame.png"
+			       class="imgbar tip" style="background-color:transparent"
+			       title="{{MoveEntityRight}}" alt="l" />
 			</form>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 		</td>
@@ -127,14 +142,12 @@
 
 	<tfoot>
 	<tr>
-		<th style="padding-top:8px;padding-bottom:8px;text-align:left">
+		<th colspan="5" style="padding-top:8px;padding-bottom:8px;text-align:left">
 			<span class="indenter" style="padding-left: 0px;"></span>
 			<a href="#" title="{{AddChannel}}" class="tip" onclick="addChild(1); return false">
-				<img src="/images/ico/plus_circle_frame.png" alt="add"
-				     style="width:16px;height:16px" width="16p" height="16" />
+				<img src="/images/ico/plus_circle_frame.png" width="16p" height="16" alt="add" />
 			</a>
 		</th>
-		<th colspan="3"></th>
 	</tr>
 	<tfoot>
 </table>
@@ -142,6 +155,12 @@
 <p>
 	<a class="button" href="/channel/add">{{CreateChannel}}</a>
 </p>
+
+</div>
+
+<div class="clear"></div>
+
+<!-- Dialogs -->
 
 <div id="dialog-addchild" style="display:none" title="{{AddChild}}">
 	<form id="form-addchild" action="/overview/addchild" method="post">
@@ -163,22 +182,10 @@
 		</div>
 		<input type="hidden" id="parent" name="parent" />
 	</form>
-	<img src="/images/ico/plus_circle_frame.png" alt="[new select]"
-	     style="width:16px;height:16px" width="16p" height="16"
+	<img src="/images/ico/plus_circle_frame.png" width="16p" height="16"
 		 onclick="$('#form-addchild').append($('#child').clone().removeAttr('id')); return false"
-		 class="tip" title="{{AddAnotherChild}}" />
+		 class="tip" title="{{AddAnotherChild}}" alt="[new select]" />
 </div>
-
-<div id="dialog-confirm" style="display:none" title="{{DeleteEntity}}">
-	<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
-	{{ConfirmDeleteTreeItems}}
-</div>
-
-</div>
-
-<div class="clear"></div>
-
-<!-- Move channel dialog -->
 
 <div id="dialog-move" style="display:none" title="{{MoveChannel}}">
 	<form id="form-movechild" action="" method="post">
@@ -203,4 +210,9 @@
 	</p>
 
 	</form>
+</div>
+
+<div id="dialog-confirm" style="display:none" title="{{DeleteEntity}}">
+	<span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
+	{{ConfirmDeleteTreeItems}}
 </div>

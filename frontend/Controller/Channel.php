@@ -83,8 +83,7 @@ class Channel extends \Controller {
 	public function Add_Action() {
 		$this->view->SubTitle = __('CreateChannel');
 
-		$q = new \DBQuery;
-		$q->select('pvlng_type');
+		$q = \DBQuery::forge('pvlng_type')->whereGT('id', 0);
 
 		$this->view->EntityTypes = $this->rows2view($this->db->queryRows($q));
 
@@ -105,24 +104,27 @@ class Channel extends \Controller {
 	 */
 	public function AliasPOST_Action() {
 
-		$entity = new \ORM\Channel($this->request->post('id'));
+		$entity = new \ORM\Tree;
+		$entity->find('entity', $this->request->post('id'));
 
-		$alias = new \ORM\Channel();
-		$alias->name = $entity->name;
-		$alias->description = $entity->description;
-		$alias->channel = $entity->guid;
-		$alias->type = 0;
+		if ($entity->id) {
+			$alias = new \ORM\Channel();
+			$alias->name = $entity->name;
+			$alias->description = $entity->description;
+			$alias->channel = $entity->guid;
+			$alias->type = 0;
 
-		$alias->insert();
+			$alias->insert();
 
-		if (!$alias->isError()) {
-			\Messages::Success(__('ChannelSaved'));
-		} else {
-			\Messages::Error($entity->Error());
-			\Messages::Info(print_r($entity->queries(), 1));
+			if (!$alias->isError()) {
+				\Messages::Success(__('ChannelSaved'));
+			} else {
+				\Messages::Error($entity->Error());
+				\Messages::Info(print_r($entity->queries(), 1));
+			}
 		}
 
-		$this->app->redirect('/channel');
+		$this->app->redirect('/overview');
 	}
 
 	/**
@@ -138,6 +140,13 @@ class Channel extends \Controller {
 			foreach ($channel as $key=>$value) $entity->set($key, $value);
 
 			$this->prepareFields($entity);
+
+			$type = new \ORM\EntityType($entity->type);
+
+			if ($type->model) {
+				$model = '\Channel\\' . $type->model;
+				$model::afterEdit($entity);
+			}
 
 			/* check required fields */
 			foreach ($this->fields as $key=>$data) {

@@ -49,8 +49,7 @@
 			     style="width:16px;height:16px" width="16p" height="16"
 			     title="{{writableChannel}}" />
 			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar" alt=""
-			     style="width:16px;height:16px" width="16p" height="16" />
+			<img src="/images/pix.gif" class="imgbar" width="16p" height="16" alt="" />
 			<!-- ENDIF -->
 			<!-- IF {READ} -->
 			<img src="/images/ico/read.png" class="imgbar tip" alt="r"
@@ -74,7 +73,7 @@
 			       style="background-color:transparent" class="imgbar wide tip nb" title="{{AliasEntity}}" />
 			</form>
 			<!-- ELSE -->
-			<img src="/images/ico/16x16.png" class="imgbar wide" alt="" width="16" height="16" />
+			<img src="/images/pix.gif" class="imgbar wide" width="16" height="16" alt="" />
 			<!-- ENDIF -->
 			<form id="df{ID}" action="/channel/delete" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
