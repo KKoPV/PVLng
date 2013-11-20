@@ -40,6 +40,11 @@ abstract class Channel {
 	}
 
 	/**
+	 * Called just before the channel is saved to database
+	 */
+	public static function afterEdit( \ORM\Channel &$channel ) {}
+
+	/**
 	 *
 	 */
 	public function addChild( $guid ) {
@@ -237,8 +242,7 @@ abstract class Channel {
 				}
 			}
 
-			$q->whereEQ('id', $this->entity)
-			  ->order('timestamp');
+			$q->whereEQ('id', $this->entity)->order('timestamp');
 
 			if ($res = $this->db->query($q)) {
 
@@ -262,11 +266,11 @@ abstract class Channel {
 						}
 
 						// calc consumption from previous max value
-						if ($last == 0) {
-							$row['consumption'] = $row['max'] - $row['min'];
-						} else {
+#						if ($last == 0) {
+#							$row['consumption'] = $row['max'] - $row['min'];
+#						} else {
 							$row['consumption'] = $row['max'] - $last;
-						}
+#						}
 						$last = $row['max'];
 					}
 					// remove grouping value
@@ -528,6 +532,7 @@ abstract class Channel {
 				$consumption += $row['consumption'];
 				$last = $row['data'];
 			}
+
 			if ($this->numeric AND $this->resolution != 1) {
 				$row['data']        *= $this->resolution;
 				$row['min']         *= $this->resolution;
@@ -535,11 +540,23 @@ abstract class Channel {
 				$row['consumption'] *= $this->resolution;
 			}
 
-			// Skip invalid rows
-			if ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
-			    (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to)) {
+			if ($this->numeric) {
+				// Skip invalid (numeric) rows
+				if ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
+				    (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to)) {
 
-				$this->value = +$row['data'];
+					// Apply offset
+					#$row['data'] += $this->offset;
+
+					$this->value = $row['data'];
+					Hook::process('data.read.after', $this);
+					$row['data'] = $this->value;
+
+					$datafile->write($row, $id);
+					$lastrow = $row;
+				}
+			} else {
+				$this->value = $row['data'];
 				Hook::process('data.read.after', $this);
 				$row['data'] = $this->value;
 
@@ -563,7 +580,7 @@ abstract class Channel {
 		$buffer = new Buffer;
 
 		$attr = $this->getAttributes();
-		$attr['consumption'] = round($consumption * $this->resolution, $this->decimals);
+		$attr['consumption'] = $consumption * $this->resolution;
 		$dec = slimMVC\Config::getInstance()->get('Currency.Decimals');
 		$attr['costs'] = round($attr['consumption'] * $this->cost, $dec);
 
@@ -582,9 +599,7 @@ abstract class Channel {
 			case 3: // Full mobile
 
 				foreach ($datafile as $row) {
-					$row = array_values($row);
-					$row = array_map(function($n){ return round($n, $this->decimals); }, $row);
-					$buffer->write($row);
+					$buffer->write(array_values($row));
 				}
 				break;
 
@@ -594,8 +609,8 @@ abstract class Channel {
 				foreach ($datafile as $row) {
 					// default mobile result: only timestamp and data
 					$buffer->write(array(
-						/* 0 */ round($row['timestamp'], $this->decimals),
-						/* 1 */ round($row['data'], $this->decimals)
+						/* 0 */ $row['timestamp'],
+						/* 1 */ $row['data']
 					));
 
 				}
@@ -606,7 +621,6 @@ abstract class Channel {
 
 				// do nothing with $row
 				foreach ($datafile as $row) {
-					$row = array_map(function($n){ return round($n, $this->decimals); }, $row);
 					$buffer->write($row);
 				}
 				break;
@@ -617,8 +631,8 @@ abstract class Channel {
 				foreach ($datafile as $row) {
 					// default result: only timestamp and data
 					$buffer->write(array(
-						'timestamp' => round($row['timestamp'], $this->decimals),
-						'data'      => round($row['data'], $this->decimals)
+						'timestamp' => $row['timestamp'],
+						'data'      => $row['data']
 					));
 				}
 				break;
