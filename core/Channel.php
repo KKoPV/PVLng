@@ -62,41 +62,45 @@ abstract class Channel {
 	/**
 	 *
 	 */
-	public function getAttributes( $attribute='' ) {
-		$attr = array(
-	        'guid'        => $this->guid,
-	        'name'        => $this->name,
-	        'serial'      => $this->serial,
-	        'channel'     => $this->channel,
-	        'description' => $this->description,
-	        'type'        => $this->type,
-	        'unit'        => $this->unit,
-	        'decimals'    => $this->decimals,
-	        'numeric'     => $this->numeric,
-	        'meter'       => $this->meter,
-	        'resolution'  => $this->resolution,
-	        'threshold'   => $this->threshold,
-	        'valid_from'  => $this->valid_from,
-	        'valid_to'    => $this->valid_to,
-	        'cost'        => $this->cost,
-	        'childs'      => $this->childs,
-	        'read'        => $this->read,
-	        'write'       => $this->write,
-	        'graph'       => $this->graph,
-	        'icon'        => $this->icon,
-	        'comment'     => $this->comment,
-	        'start'       => $this->start,
-	        'end'         => $this->end,
-			'consumption' => 0,
-			'costs'       => 0
-		);
+	public function __get( $attribute ) {
+		throw new Exception('Unknown attribute: '.$attribute, 400);
+	}
 
-		return ($attribute == '' OR $attribute == '*')
-		     ? $attr
-		     : ( isset($attr[$attribute])
-		       ? array($attribute => $attr[$attribute])
-		       : ''
-		     );
+	/**
+	 *
+	 */
+	public function getAttributes( $attribute=NULL ) {
+
+		return $attribute != ''
+			// Here WITHOUT check, will be handled by __get()
+			? array($attribute => $this->$attribute)
+			: array(
+		        'guid'        => $this->guid,
+		        'name'        => $this->name,
+		        'serial'      => $this->serial,
+		        'channel'     => $this->channel,
+		        'description' => $this->description,
+		        'type'        => $this->type,
+		        'unit'        => $this->unit,
+		        'decimals'    => $this->decimals,
+		        'numeric'     => $this->numeric,
+		        'meter'       => $this->meter,
+		        'resolution'  => $this->resolution,
+		        'threshold'   => $this->threshold,
+		        'valid_from'  => $this->valid_from,
+		        'valid_to'    => $this->valid_to,
+		        'cost'        => $this->cost,
+		        'childs'      => $this->childs,
+		        'read'        => $this->read,
+		        'write'       => $this->write,
+		        'graph'       => $this->graph,
+		        'icon'        => $this->icon,
+		        'comment'     => $this->comment,
+		        'start'       => $this->start,
+		        'end'         => $this->end,
+				'consumption' => 0,
+				'costs'       => 0
+			);
 	}
 
 	/**

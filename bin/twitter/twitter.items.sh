@@ -6,36 +6,33 @@
 ##############################################################################
 
 ##############################################################################
-### Actual power
+### Actual/last value
 ##############################################################################
-function twitter_power {
-	url="$PVLngURL2/data/$1.tsv?period=last"
-	value=$($curl $url | cut -f2)
+function twitter_last {
+	value=$(PVLngGET2 "data/$1.tsv?period=last" | cut -f2)
 	log 1 "$url => $value"
 	echo $value
 }
 
 ##############################################################################
-### Average power over the last $1 minutes (e.g. 60 for last hour)
+### Average value over the last $1 minutes (e.g. 60 for last hour)
 ### $1 - Start time
 ### $2 - Period for aggregation
 ### $3 - GUID
 ### Example params: 00:00 24hours
 ### Start at today midnight and aggregate 24 hours > 1 row as result
 ##############################################################################
-function twitter_power_avg {
-	url="$PVLngURL2/data/$3.tsv?start=$1&period=$2"
-	value=$($curl $url | cut -f2)
+function twitter_average {
+	value=$(PVLngGET2 "data/$3.tsv?start=$1&period=$2" | cut -f2)
 	log 1 "$url => $value"
 	echo $value
 }
 
 ##############################################################################
-### Max. power of today
+### Max. value of today
 ##############################################################################
-function twitter_power_max {
-	url="$PVLngURL2/data/$1.tsv"
-	$curl $url >$TMPFILE
+function twitter_maximum {
+	PVLngGET2 "data/$1.tsv" >$TMPFILE
 
 	max=0
 	while read line; do
@@ -51,8 +48,7 @@ function twitter_power_max {
 ### Production today in kWh
 ##############################################################################
 function twitter_today {
-	url="$PVLngURL2/data/$1.tsv?period=last"
-	value=$($curl $url | cut -f2)
+	value=$(PVLngGET2 "data/$1.tsv?period=last" | cut -f2)
 	log 1 "$url => $value"
 	echo $value
 }
@@ -61,8 +57,7 @@ function twitter_today {
 ### Overall production in MWh
 ##############################################################################
 function twitter_overall {
-	url="$PVLngURL2/data/$1.tsv?start=0&period=99y"
-	value=$($curl $url | cut -f2)
+	value=$(PVLngGET2 "data/$1.tsv?start=0&period=99y" | cut -f2)
 	log 1 "$url => $value"
 	echo $value
 }
@@ -71,8 +66,7 @@ function twitter_overall {
 ### Today working hours in hours :-)
 ##############################################################################
 function twitter_today_working_hours {
-	url="$PVLngURL2/data/$1.tsv"
-	$curl $url >$TMPFILE
+	PVLngGET2 "data/$1.tsv" >$TMPFILE
 
 	### get first line, get 1st value
 	min=$(cat $TMPFILE | head -n1 | cut -f1)

@@ -153,6 +153,17 @@ function save_log {
 ### $1 = GUID
 ### $2 = date
 ##############################################################################
+function PVLngGET2 {
+	url="$PVLngHost/api/r2/$1"
+	log 2 "URL : $url"
+	$(curl_cmd) --header "X-PVLng-key: $PVLngAPIkey" $url
+}
+
+##############################################################################
+### Save data to PVLng
+### $1 = GUID
+### $2 = date
+##############################################################################
 function PVLngPUT1 {
 
 	log 2 "GUID	 : $1"
@@ -162,11 +173,9 @@ function PVLngPUT1 {
 
 	test "${2:0:1}" != "@" && data="data=\"$2\"" || data="data$2"
 
-	cmd=$(curl_cmd)
-
-	rc=$($cmd --header "X-PVLng-key: $PVLngAPIkey" --request PUT \
-						--write-out %{http_code} --output $TMPFILE \
-						--data-urlencode $data $PVLngURL1/$1)
+	rc=$($(curl_cmd) --header "X-PVLng-key: $PVLngAPIkey" --request PUT \
+	                 --write-out %{http_code} --output $TMPFILE \
+	                 --data-urlencode $data $PVLngHost/api/r1/$1)
 
 	if echo "$rc" | grep -qe '^20[012]'; then
 		### 200/201/202 ok
@@ -211,7 +220,7 @@ function PVLngPUT2 {
 	                  --write-out %{http_code} \
 	                  --output $TMPFILE \
 	                  --data-binary $data \
-	                  $PVLngURL2/data/$GUID.txt)
+	                  $PVLngHost/api/r2/data/$GUID.txt)
 
 	if echo "$1" | grep -qe '^20[012]'; then
 		### 200/201/202 ok

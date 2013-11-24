@@ -53,7 +53,7 @@ while test $i -lt $GUID_N; do
 	test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 	log 1 "GUID    : $GUID"
 
-	DEVICE=$($(curl_cmd) "$PVLngURL2/attributes/$GUID/channel.txt")
+	DEVICE=$(PVLngGET2 $GUID/channel.txt)
 	test "$DEVICE" || error_exit "Device is required (DEVICE_$i)"
 	log 1 "Device  : $DEVICE"
 

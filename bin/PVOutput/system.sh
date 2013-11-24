@@ -89,9 +89,7 @@ while test $i -lt $vMax; do
 		### empty temp. file
 		echo -n >$TMPFILE
 
-		url="$PVLngURL2/data/$GUID.tsv?period=${INTERVAL}minute"
-
-		value=$($curl $url | tail -n1 | cut -f2)
+		value=$(PVLngGET2 data/$GUID.tsv?period=${INTERVAL}minute | tail -n1 | cut -f2)
 
 		### unset only zero values for v1 .. v4
 		if test $i -le 4; then

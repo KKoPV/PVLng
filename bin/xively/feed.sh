@@ -71,13 +71,9 @@ while test $i -lt $GUID_N; do
 	log 2 "Channel  : $CHANNEL"
 	test "$CHANNEL" || error_exit "Xively channel name is required (CHANNEL_$i)"
 
-	### read value
-	url="$PVLngURL2/data/$GUID.tsv?start=-${INTERVAL}minutes&period=${INTERVAL}minutes"
-	log 2 "URL      : $url"
-
-	### get last row
-	row=$($curl $url | tail -n1)
-	log 2 "$row"
+	### read value, get last row
+	row=$(PVLngGET2 data/$GUID.tsv?start=-${INTERVAL}minutes&period=${INTERVAL}minutes | tail -n1)
+	log 2 "Data:    : $row"
 
 	### Just after 0:00 no data for today yet
 	test "$row" || continue

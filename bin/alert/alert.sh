@@ -112,12 +112,12 @@ while test $i -lt $GUID_N; do
 
 		eval GUID="\$GUID_${i}_${j}"
 
-		name="$($curl $PVLngURL2/attributes/$GUID/name.txt)"
-		desc="$($curl $PVLngURL2/attributes/$GUID/description.txt)"
+		name="$(PVLngGET2 $GUID/name.txt)"
+		desc="$(PVLngGET2 $GUID/description.txt)"
 		test "$desc" && name="$name ($desc)"
 		eval name_$j="\$name"
 
-		data=$($curl "$PVLngURL2/data/$GUID.tsv?period=last")
+		data=$(PVLngGET2 data/$GUID.tsv?period=last)
 		log 2 "Data   : $data"
 
 		### Extract 2nd value == data

@@ -41,14 +41,14 @@ ITEM_N           5
 ##############################################################################
 ### Items
 ##############################################################################
-ITEM_1           "power"
+ITEM_1           "last"
 GUID_1           ""
 FACTOR_1         1
 # GUID delivers watt hours * 0.001 = kilo watt hours
 #FACTOR_1         0.001
 
 ### Start at today midnight and aggregate 24 hours > 1 row as result
-ITEM_2           "power_avg 00:00 24hours"
+ITEM_2           "average 00:00 24hours"
 GUID_2           ""
 PARAM_2          ""
 

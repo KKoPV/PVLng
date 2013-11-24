@@ -5,7 +5,7 @@
  * @author       Knut Kohl <github@knutkohl.de>
  * @copyright    2012-2013 Knut Kohl
  * @license      GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version      $Id$
+ * @version      1.0.0
  */
 
 /**
@@ -34,7 +34,8 @@ Loader::register(
 
 $config = slimMVC\Config::getInstance()
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.app.php')
-        ->load(ROOT_DIR . DS . 'config' . DS . 'config.php');
+        ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
+        ->load('config.php');
 
 if ($config->get('develop')) {
 	ini_set('display_startup_errors', 1);
@@ -56,18 +57,16 @@ require 'View.php';
 $app = new Slim\Slim(array(
     'mode'      => 'production',
     'log.level' => Slim\Log::ALERT,
+	'debug'     => FALSE,
     'view'      => new View
 ));
 
-$app->db = slimMVC\MySQLi::getInstance();
-
-if ($config->get('DEV')) {
-	ini_set('display_startup_errors', 1);
-	ini_set('display_errors', 1);
-	error_reporting(-1);
+if ($config->get('develop')) {
 	$app->config('mode', 'development');
 	$app->config('log.level', Slim\Log::INFO);
 }
+
+$app->db = slimMVC\MySQLi::getInstance();
 
 $app->cache = Cache::factory(
 	array(
@@ -97,6 +96,18 @@ NestedSet::Init(array (
 	)
 ));
 
+function stopAPI( $message, $code=400 ) {
+	$app = Slim\Slim::getInstance();
+	$app->status($code);
+	$app->response()->header('X-Status-Reason', $message);
+	$app->render(array( 'status'=>'error', 'message'=>$message ));
+	$app->stop();
+}
+
+$app->error(function($e) {
+	stopAPI($e->getMessage(), $e->getCode());
+});
+
 /**
  * Some defines
  */
@@ -109,29 +120,10 @@ $app->response->headers->set('X-Version', PVLNG_VERSION);
 $app->response->headers->set('X-API-Version', 'r2');
 
 /**
- * Check for API-Key header
- */
-$verifyAPIKey = function() {
-	$app = Slim\Slim::getInstance();
-
-	if (($headerKey = $app->request->headers->get('X-PVLng-Key')) == '') {
-		$app->status(400);
-		$result = array('status' => 'error', 'message' => 'Missing API key.');
-		echo $app->render($result);
-		$app->stop();
-	}
-
-	if ($headerKey != $app->db->queryOne('SELECT getAPIKey()')) {
-		$app->status(400);
-		$result = array('status' => 'error', 'message' => 'You need a valid API key.');
-		echo $app->render($result);
-		$app->stop();
-	}
-};
-
-/**
  * Detect requested content type by file extension, correct PATH_INFO value
  * without extension and set Response conntent header
+ *
+ * Analyse X-PVLng-Key header
  */
 $app->hook('slim.before', function() use ($app) {
 	$PathInfo = $app->environment['PATH_INFO'];
@@ -157,7 +149,42 @@ $app->hook('slim.before', function() use ($app) {
 	}
 	// Set the response header, used also by View to build proper response body
 	$app->contentType($type);
+
+	// Analyse X-PVLng-Key header
+	$APIKey = $app->request->headers->get('X-PVLng-Key');
+
+	if ($APIKey == '') {
+		// Not given
+        $app->APIKeyValid = 0;
+	} elseif ($APIKey == $app->db->queryOne('SELECT getAPIKey()')) {
+		// Key is valid
+        $app->APIKeyValid = 1;
+	} else {
+		// Key is invalid
+		stopAPI('Invalid API key given.');
+	}
 });
+
+/**
+ *
+ */
+$APIkeyRequired = function() {
+	Slim\Slim::getInstance()->APIKeyValid || stopAPI('Access only with valid API key!');
+};
+
+/**
+ *
+ */
+$accessibleChannel = function(Slim\Route $route) {
+	$app = Slim\Slim::getInstance();
+	if ($app->APIKeyValid == 0) {
+		// No API key given, check channel is public
+		$channel = Channel::byGUID($route->getParam('guid'));
+		if (!$channel->public) {
+			stopAPI('Access to private channel \''.$channel->name.'\' only with valid API key!');
+		}
+	}
+};
 
 /**
  *
@@ -174,7 +201,7 @@ Slim\Route::setDefaultConditions(array(
 // ---------------------------------------------------------------------------
 $app->notFound(function() use ($app) {
 	// Catch also /
-	$app->redirect('help');
+	$app->redirect($app->request()->getRootUri() . '/help');
 });
 
 $app->any('/help', function() use ($app) {
@@ -199,28 +226,24 @@ $app->any('/help', function() use ($app) {
 // ---------------------------------------------------------------------------
 // Attributes
 // ---------------------------------------------------------------------------
-$app->get('/attributes/:guid(/:attribute)', function($guid, $attribute='') use ($app) {
+$app->get('/:guid', $accessibleChannel, function($guid) use ($app) {
+	$app->render(Channel::byGUID($guid)->getAttributes());
+})->name('Fetch channel attributes');
+
+$app->get('/:guid/:attribute', $accessibleChannel, function($guid, $attribute='') use ($app) {
+	$app->render(Channel::byGUID($guid)->$attribute);
+})->name('Fetch single channel attribute');
+
+$app->get('/attributes/:guid(/:attribute)', $accessibleChannel, function($guid, $attribute='') use ($app) {
 	$app->render(Channel::byGUID($guid)->getAttributes($attribute));
-})->name('Fetch all channel attributes or  specific channel attribute');
+})->name('Fetch all channel attributes or specific channel attribute');
 
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-$app->put('/data/:guid', $verifyAPIKey, function($guid) use ($app) {
-	try {
-		$request = json_decode($app->request->getBody(), TRUE);
-		if (Channel::byGUID($guid)->write($request)) {
-			$app->halt(201);
-		}
-	} catch (Exception $e) {
-		$app->status($e->getCode());
-		$app->response()->header('X-Status-Reason', $e->getMessage());
-		$result = array(
-			'status'  => 'error',
-			'message' => $e->getMessage()
-		);
-		$app->render($result);
-	}
+$app->put('/data/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
+	$request = json_decode($app->request->getBody(), TRUE);
+	Channel::byGUID($guid)->write($request) && $app->halt(201);
 })->name('put data');
 
 $app->container->help['put data'] = array(
@@ -228,89 +251,74 @@ $app->container->help['put data'] = array(
 	'payload'     => '{"<data>":"<value>"}',
 );
 
-$app->get('/data/:guid(/:p1(/:p2))', function($guid, $p1='', $p2='') use ($app) {
+$app->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='', $p2='') use ($app) {
+
 	$request = $app->request->get();
 	$request['p1'] = $p1;
 	$request['p2'] = $p2;
 
-	try {
-		$channel = Channel::byGUID($guid);
-		if (!$channel->read) {
-			throw new \Exception(
-				'Can\'t read data from '.$channel->name.', '.
-				'instance of '.get_class($channel), 400
-			);
-		}
-	} catch (Exception $e) {
-		$app->status($e->getCode());
-		$app->response()->header('X-Status-Reason', $e->getMessage());
-		$result = array(
-			'status'  => 'error',
-			'message' => $e->getMessage()
-		);
-		$app->render($result);
-		$app->stop();
-	}
+	$channel = Channel::byGUID($guid);
 
 	// Special models can provide an own GET functionality
 	// e.g. for special return formats like PVLog or Sonnenertrag
 	if (method_exists($channel, 'GET')) {
 		$app->render($channel->GET($request));
-	} else {
-
-		$buffer = $channel->read($request);
-		$result = new Buffer;
-
-		if ($app->request->get('attributes')) {
-			$attr = $channel->getAttributes();
-
-			if ($app->request->get('full')) {
-				// Calculate overall consumption and costs
-				foreach($buffer as $row) {
-					$attr['consumption'] += $row['consumption'];
-				}
-				$attr['consumption'] = round($attr['consumption'], $attr['decimals']);
-				$attr['costs'] = round(
-					$attr['consumption'] * $attr['cost'],
-					\slimMVC\Config::getInstance()->Currency_Decimals
-				);
-
-			}
-			$result->write($attr);
-		}
-
-		// optimized flow...
-		if ($app->request->get('full') and $app->request->get('short')) {
-			// passthrough all values as numeric based array
-			foreach ($buffer as $row) {
-				$result->write(array_values($row));
-			}
-		} elseif ($app->request->get('full')) {
-			// do nothing, use as is
-			$result->append($buffer);
-		} elseif ($app->request->get('short')) {
-			// default mobile result: only timestamp and data
-			foreach ($buffer as $row) {
-				$result->write(array(
-					/* 0 */ $row['timestamp'],
-					/* 1 */ $row['data']
-				));
-			}
-		} else {
-			// default result: only timestamp and data
-			foreach ($buffer as $row) {
-				$result->write(array(
-					'timestamp' => $row['timestamp'],
-					'data'      => $row['data']
-				));
-			}
-		}
-
-		$app->response->headers->set('X-Data-Rows', count($result));
-		$app->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
-
-		$app->render($result);
+		return;
 	}
+
+	$buffer = $channel->read($request);
+	$result = new Buffer;
+
+	if ($app->request->get('attributes')) {
+		$attr = $channel->getAttributes();
+
+		if ($app->request->get('full')) {
+			// Calculate overall consumption and costs
+			foreach($buffer as $row) {
+				$attr['consumption'] += $row['consumption'];
+			}
+			$attr['consumption'] = round($attr['consumption'], $attr['decimals']);
+			$attr['costs'] = round(
+				$attr['consumption'] * $attr['cost'],
+				\slimMVC\Config::getInstance()->Currency_Decimals
+			);
+
+		}
+		$result->write($attr);
+	}
+
+	// optimized flow...
+	if ($app->request->get('full') and $app->request->get('short')) {
+		// passthrough all values as numeric based array
+		foreach ($buffer as $row) {
+			$result->write(array_values($row));
+		}
+	} elseif ($app->request->get('full')) {
+		// do nothing, use as is
+		$result->append($buffer);
+	} elseif ($app->request->get('short')) {
+		// default mobile result: only timestamp and data
+		foreach ($buffer as $row) {
+			$result->write(array(
+				/* 0 */ $row['timestamp'],
+				/* 1 */ $row['data']
+			));
+		}
+	} else {
+		// default result: only timestamp and data
+		foreach ($buffer as $row) {
+			$result->write(array(
+				'timestamp' => $row['timestamp'],
+				'data'      => $row['data']
+			));
+		}
+	}
+
+	$app->response->headers->set('X-Data-Rows', count($result));
+	$app->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+
+	$app->render($result);
+
 })->name('get data');
 
 /**
@@ -360,16 +368,15 @@ $app->container->help['get data'] = array(
 // ---------------------------------------------------------------------------
 // Batch
 // ---------------------------------------------------------------------------
-$app->put('/batch/:guid', $verifyAPIKey, function($guid) use ($app) {
+$app->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
 
-	$db = slimMVC\MySQLi::getInstance();
+    $channel = Channel::byGUID($guid);
+
+	// Diasble AutoCommit in case of errors
+	$app->db->autocommit(FALSE);
+	$count = 0;
 
 	try {
-	    $channel = Channel::byGUID($guid);
-		$count = 0;
-		// Diasble AutoCommit in case of errors
-		$db->autocommit(FALSE);
-
 		foreach (explode(';',  $app->request->getBody()) as $dataset) {
 			if ($dataset == '') continue;
 			$data = explode(',', $dataset);
@@ -394,7 +401,7 @@ $app->put('/batch/:guid', $verifyAPIKey, function($guid) use ($app) {
 			$count += $channel->write(array('data'=>$data), $timestamp);
 		}
 		// All fine, commit changes
-		$db->commit();
+		$app->db->commit();
 
 		if ($count) $app->status(201);
 
@@ -403,19 +410,13 @@ $app->put('/batch/:guid', $verifyAPIKey, function($guid) use ($app) {
 			'message' => $count . ' row(s) inserted'
 		);
 
+		$app->render($result);
+
 	} catch (Exception $e) {
 	    // Rollback all correct data
-		$db->rollback();
-		$app->status($e->getCode());
-		$msg = $e->getMessage() . '; No data saved!';
-		$app->response->header('X-Status-Reason', $msg);
-		$result = array(
-			'status'  => 'error',
-			'message' => $msg
-		);
+		$app->db->rollback();
+		stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
 	}
-
-	$app->render($result);
 
 })->name('put batch data');
 
@@ -430,7 +431,7 @@ $app->container->help['put batch data'] = array(
 // ---------------------------------------------------------------------------
 // Log
 // ---------------------------------------------------------------------------
-$checkLogId = function(\Slim\Route $route) {
+$checkLogId = function(Slim\Route $route) {
 
 	$app = Slim\Slim::getInstance();
 	$id = $route->getParam('id');
@@ -438,32 +439,20 @@ $checkLogId = function(\Slim\Route $route) {
 	if ($id == 'all') return;
 
 	if ($id == '') {
-		$app->status(400);
-		$result = array(
-			'status'  => 'error',
-			'message' => 'Missing log entry Id'
-		);
-		$app->render($result);
-		$app->stop();
+		stopAPI('Missing log entry Id');
 	}
 
 	$log = new ORM\Log($id);
 
 	if ($log->id == '') {
-		$app->status(404);
-		$result = array(
-			'status'  => 'error',
-			'message' => 'No log entry found for Id: '.$id
-		);
-		$app->render($result);
-		$app->stop();
+		stopAPI('No log entry found for Id: '.$id, 404);
 	}
 };
 
 /**
  *
  */
-$app->put('/log', $verifyAPIKey, function() use ($app) {
+$app->put('/log', $APIkeyRequired, function() use ($app) {
 
 	$request = json_decode($app->request->getBody(), TRUE);
 
@@ -496,7 +485,7 @@ $app->container->help['put log'] = array(
 /**
  *
  */
-$app->get('/log/:id', $checkLogId, function($id) use ($app) {
+$app->get('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
 
 	$log = new ORM\Log($id);
 
@@ -515,7 +504,7 @@ $app->get('/log/:id', $checkLogId, function($id) use ($app) {
 
 })->name('Read a log entry');
 
-$app->get('/log/all(/:page(/:count))', function($page=1, $count=50) use ($app) {
+$app->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count=50) use ($app) {
 
 	if ($page < 1) $page = 1;
 	if ($count < 1) $count = 1;
@@ -526,8 +515,7 @@ $app->get('/log/all(/:page(/:count))', function($page=1, $count=50) use ($app) {
 	);
 
 	// Read all entries
-	$q = new DBQuery('pvlng_log');
-	$q->order('id')->limit($count, ($page-1)*$count);
+	$q = DBQuery::forge('pvlng_log')->order('id')->limit($count, ($page-1)*$count);
 
 	if ($res = $app->db->query($q)) {
 		while ($log = $res->fetch_object()) {
@@ -545,7 +533,7 @@ $app->get('/log/all(/:page(/:count))', function($page=1, $count=50) use ($app) {
 
 })->name('Read all log entries, paginated for :page, :count entries');
 
-$app->post('/log/:id', $verifyAPIKey, $checkLogId, function($id) use ($app) {
+$app->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
 
 	$request = json_decode($app->request->getBody(), TRUE);
 
@@ -578,7 +566,7 @@ $app->container->help['post log'] = array(
 	'payload'     => '{"scope":"...", "message":"..."}',
 );
 
-$app->delete('/log/:id', $verifyAPIKey, $checkLogId, function($id) use ($app) {
+$app->delete('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
 	$log = new ORM\Log($id);
 	$app->status($log->delete() ? 204 : 400);
 })->name('Delete a log entry');
@@ -659,6 +647,12 @@ $app->get('/status', function() use ($app) {
     $app->render($result);
 
 })->name('System status');
+
+/**
+ *
+ */
+$custom_routes = 'custom' . DS . 'routes.php';
+if (file_exists($custom_routes)) include $custom_routes;
 
 /**
  * Let's go

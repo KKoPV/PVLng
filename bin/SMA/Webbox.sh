@@ -60,7 +60,7 @@ while test $i -lt $GUID_N; do
 	test "$GUID" || error_exit "Equipment GUID is required (GUID_$i)"
 
 	### request serial
-	SERIAL=$($curl "$PVLngURL2/attributes/$GUID/serial.txt")
+	SERIAL=$(PVLngGET2 $GUID/serial.txt)
 	test "$SERIAL" || error_exit "No serial number found for GUID: $GUID"
 
 	### Build RPC request, catch all channels from equipment
