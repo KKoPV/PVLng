@@ -15,7 +15,7 @@
 		<th>
 			<img id="treetoggle" src="/images/ico/toggle.png"
 				 style="width:16px;height:16px" width="16" height="16"
-			     class="tip"onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
+			     class="tip" onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
 			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 		</th>
 		<th style="width:70%" class="l">
@@ -41,9 +41,9 @@
 			<td>
 				<!-- IF {GRAPH} -->
 				<input id="c{ID}" class="channel iCheck" type="checkbox" name="v[{ID}]"
-				       data-id="{ID}" data-guid="{GUID}" data-unit="{UNIT}"
+				       data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}"
 				       value='{PRESENTATION}'
-							 <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
+				       <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
 				<!-- ENDIF -->
 			</td>
 			<td style="padding:0.4em 0">
@@ -52,6 +52,12 @@
 				     title="{TYPE}" width="16" height="16"/>
 				<strong class="tip" title="{GUID}">{NAME}</strong>
 				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+				<!-- IF !{PUBLIC} -->
+					<img src="/images/ico/lock.png" class="tip"
+						 style="margin-left:8px;width:16px;height:16px"
+						 width="16" height="16" title="{{PrivateChannel}}"
+						 alt="[private]"/>
+				<!-- ENDIF -->
 			</td>
 			<td>
 				<img id="s{ID}" src="/images/spinner.gif" width="16" height="16"

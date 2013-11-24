@@ -41,8 +41,8 @@ class Channel extends \Controller {
 	 *
 	 */
 	public function afterPost() {
-	    if (!$this->ignore_returnto) {
-		    // Handle returnto (Edit from Overview) ...
+		if (!$this->ignore_returnto) {
+			// Handle returnto (Edit from Overview) ...
 			parent::afterPOST();
 			// ... or redirect to channels list
 			$this->app->redirect('/channel');

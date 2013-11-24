@@ -33,12 +33,14 @@
 			      ,`c`.`resolution`
 			      ,`c`.`cost`
 			      ,`c`.`numeric`
+			      ,`c`.`offset`
 			      ,`c`.`unit`
 			      ,`c`.`decimals`
 			      ,`c`.`meter`
 			      ,`c`.`threshold`
 			      ,`c`.`valid_from`
 			      ,`c`.`valid_to`
+			      ,`c`.`public`
 			      ,`t`.`name` AS `type`
 			      ,`t`.`model`
 			      ,`t`.`childs`
@@ -63,12 +65,14 @@
 			      ,`c`.`resolution`
 			      ,`c`.`cost`
 			      ,`c`.`numeric`
+			      ,`c`.`offset`
 			      ,`c`.`unit`
 			      ,`c`.`decimals`
 			      ,`c`.`meter`
 			      ,`c`.`threshold`
 			      ,`c`.`valid_from`
 			      ,`c`.`valid_to`
+			      ,`c`.`public`
 			      ,`t`.`name` AS `type`
 			      ,`t`.`model`
 			      ,`t`.`childs`

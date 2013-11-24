@@ -50,6 +50,12 @@
 			<strong>{NAME}</strong>
 			<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
 			<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+			<!-- IF !{PUBLIC} -->
+				<img src="/images/ico/lock.png" class="tip"
+					 style="margin-left:8px;width:16px;height:16px"
+					 width="16" height="16" title="{{PrivateChannel}}"
+					 alt="[private]"/>
+			<!-- ENDIF -->
 		</td>
 
 		<td style="white-space:nowrap">
@@ -79,7 +85,7 @@
 		</td>
 
 		<td style="white-space:nowrap">
-			<a href="/channel/edit/{ENTITY}?returnto=overview" class="tip" title="{{EditEntity}}">
+			<a href="/channel/edit/{ENTITY}?returnto=/overview" class="tip" title="{{EditEntity}}">
 				<img src="/images/ico/node_design.png" class="imgbar"
 				     width="16p" height="16" alt="edit" />
 			</a>

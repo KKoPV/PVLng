@@ -144,6 +144,8 @@ function updateChart() {
 
 	/* find active channels, map and sort axis */
 	$(view).each(function(id, view) {
+		/* Ignore private channels */
+		if (!view.public) return;
 		channel = new presentation(view.presentation);
 		channel.id = view.id;
 		channel.guid = view.guid;

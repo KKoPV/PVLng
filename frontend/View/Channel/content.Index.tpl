@@ -41,7 +41,15 @@
 				<img src="/images/ico/{ICON}" alt="{TYPE}" title="" width="16" height="16" />
 			</a>
 		</td>
-		<td class="b">{NAME}</td>
+		<td class="b">
+			{NAME}
+			<!-- IF !{PUBLIC} -->
+				<img src="/images/ico/lock.png" class="tip"
+					 style="margin-left:8px;width:16px;height:16px"
+					 width="16" height="16" title="{{PrivateChannel}}"
+					 alt="[private]"/>
+			<!-- ENDIF -->
+		</td>
 		<td>{TYPE}</td>
 		<td class="imgbar">
 			<!-- IF {WRITE} -->

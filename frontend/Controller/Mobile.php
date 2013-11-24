@@ -22,8 +22,7 @@ class Mobile extends \Controller {
 		$this->Layout = 'mobile';
 
 		// Get views
-		$q = new \DBQuery('pvlng_view');
-		$q->order('name');
+		$q = \DBQuery::forge('pvlng_view')->order('name');
 		$views = array();
 		$view = new \ORM\Tree;
 
@@ -39,9 +38,10 @@ class Mobile extends \Controller {
 				// Get entity attributes
 				$view->find('id', $id);
 				$new_data[] = array(
-					'id'           => $view->id,
+					'id'           => +$view->id,
 					'guid'         => $view->guid,
 					'unit'         => $view->unit,
+					'public'       => +$view->public,
 					'presentation' => addslashes($presentation)
 				);
 			}

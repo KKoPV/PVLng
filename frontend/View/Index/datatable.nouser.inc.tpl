@@ -25,22 +25,22 @@
 
 	<tbody>
 	<!-- BEGIN DATA -->
-	<!-- IF {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
+	<!-- IF {PUBLIC} AND {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
 		<tr>
 			<td>
 				<input id="c{ID}" style="display:none" class="channel"
 				       type="checkbox" checked="checked"
-				       data-id="{ID}" data-guid="{GUID}" data-unit="{UNIT}"
+				       data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}"
 				       value='{PRESENTATION}' />
-				<img style="vertical-align:middle;width:16px;height:16px"
-				     class="imgbar tip" src="/images/ico/{ICON}" alt=""
+				<img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
+				     class="tip" src="/images/ico/{ICON}" alt=""
 				     title="{TYPE}" width="16" height="16" />
 				<strong class="tip" title="{GUID}">{NAME}</strong>
 				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
 			</td>
 			<td>
 				<img id="s{ID}" src="/images/spinner.gif"
-				     style="float:right;display:none;width:16px;height:16px"
+				     style="float:right;width:16px;height:16px;display:none"
 				     width="16" height="16" />
 			</td>
 			<td id="cons{ID}" class="consumption r"></td>

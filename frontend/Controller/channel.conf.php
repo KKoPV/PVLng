@@ -43,14 +43,16 @@ return array(
 
 	'meter' => array(
 		'type'     => 'radio',
-		'required' => TRUE,
 		'default'  => 0
 	),
 
 	'numeric' => array(
 		'type'     => 'radio',
-		'required' => TRUE,
 		'default'  => 1
+	),
+
+	'offset' => array(
+		'default'  => 0
 	),
 
 	'cost' => array(
@@ -63,6 +65,11 @@ return array(
 	),
 
 	'valid_to' => array(
+	),
+
+	'public' => array(
+		'type'     => 'radio',
+		'default'  => 1
 	),
 
 	'comment' => array(

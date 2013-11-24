@@ -65,6 +65,7 @@ class Overview extends \Controller {
 				$node['acceptchilds'] = $entity->childs;
 				$node['read']         = $entity->read;
 				$node['write']        = $entity->write;
+				$node['public']       = $entity->public;
 				$node['icon']         = $entity->icon;
 
 				if ($entity->model) {

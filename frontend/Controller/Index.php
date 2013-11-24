@@ -43,6 +43,7 @@ class Index extends \Controller {
 			);
 
 		$this->view->Date = date('m/d/Y', $this->date);
+		$this->view->APIkey = $this->model->getAPIkey();
 	}
 
 	/**
@@ -135,6 +136,7 @@ class Index extends \Controller {
 					$node['name']        = $e->name;
 					$node['description'] = $e->description;
 					$node['unit']        = $e->unit;
+					$node['public']      = $e->public;
 					$node['icon']        = $e->icon;
 				}
 

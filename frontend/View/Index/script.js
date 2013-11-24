@@ -248,6 +248,7 @@ function updateChart() {
 	$('input.channel:checked').each(function(id, el) {
 		channel = new presentation($(el).val());
 		channel.id = $(el).data('id');
+		channel.name = $('<div/>').html($(el).data('name')).text()
 		channel.guid = $(el).data('guid');
 		channel.unit = $(el).data('unit');
 		/* remember channel */
@@ -384,10 +385,10 @@ function updateChart() {
 				t = (attr.description) ? ' (' + attr.description + ')' : '';
 
 				var serie = { /* HTML decode channel name */
+					name:     $('<div/>').html(attr.name + t).text(),
 				    id:       channel.id,
 				    decimals: attr.decimals,
 					unit:     attr.unit,
-					name:     $("<div/>").html(attr.name + t).text(),
 					color:    channel.color,
 					type:     channel.type,
 					yAxis:    channel.axis,
@@ -443,16 +444,28 @@ function updateChart() {
 
 				series[id] = serie;
 
-				$('#s'+channel.id).hide();
-
-				if ('{CHART_NOTIFYLOAD}') $.pnotify({
+				if ('{INDEX_NOTIFYLOAD}') $.pnotify({
 					type: 'success',
 					text: attr.name + ' loaded'
 				});
 			}
-		).fail(function(data, status) {
-		    _log('FAIL', data, status);
+		).fail(function(jqxhr, textStatus, error) {
+		    _log('FAIL', textStatus + ', ' + error);
+
+			$.pnotify({
+				type: jqxhr.responseJSON.status,
+				text: jqxhr.responseJSON.message,
+				hide: false,
+				sticker: false
+			});
+
+			/* Set pseudo channel */
+			series[id] = {};
+
 		}).always(function(data, status) {
+
+			$('#s'+channel.id).hide();
+
 			/* Force redraw */
 			chart.hideLoading();
 			chart.showLoading('- ' + (--loading) + ' -');
@@ -462,45 +475,53 @@ function updateChart() {
 			_log(completed+' series completed');
 
 			/* check if all getJSON() calls finished */
-			if (completed == channels.length) {
-				$.pnotify({
-					type: 'success',
-					text: completed + ' channels loaded ' +
-					      '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
-				});
-				$('#costs').html(costs ? Highcharts.numberFormat(costs, {CURRENCYDECIMALS}) : '');
-				var t = $('#from').val();
-				var s = $('#to').val();
-				if (t != s) t += ' - ' + s;
-				chart.setTitle({ text: $('#loaddeleteview').val() }, { text: t });
+			if (completed != channels.length) return;
 
-				_log('Apply series');
+			$.pnotify({
+				type: 'success',
+				text: completed + ' channels loaded ' +
+				      '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
+			});
+			$('#costs').html(costs ? Highcharts.numberFormat(costs, {CURRENCYDECIMALS}) : '');
+			var t = $('#from').val();
+			var s = $('#to').val();
+			if (t != s) t += ' - ' + s;
+			chart.setTitle({ text: $('#loaddeleteview').val() }, { text: t });
 
-				if (changed) {
-					/* remove all existing series */
-					while (chart.series.length) {
-						chart.series[0].remove();
-					}
-					/* add new series */
-					$.each(series, function(i, serie) {
+			_log('Apply series');
+
+			if (changed) {
+				/* remove all existing series */
+				while (chart.series.length) {
+					chart.series[0].remove();
+				}
+				/* add new series */
+				$.each(series, function(i, serie) {
+					if (serie.id) {
+						/* Valid channel with id */
 						chart.addSeries(serie, false);
-					});
-				} else {
-					/* replace series data */
-					$.each(series, function(i, serie) {
-						chart.series[i].setData(serie.data, false);
-					});
-				}
-
-				chart.hideLoading();
-				chart.redraw();
-				setExtremes();
-				/* setTimeout(setExtremes, channels.length*100); */
-
-				if (RefreshTimeout > 0) {
-					timeout = setTimeout(updateChart, RefreshTimeout*1000);
-				}
+					}
+				});
+			} else {
+				/* replace series data */
+				var sid = 0;
+				$.each(series, function(i, serie) {
+					if (serie.id) {
+						/* Valid channel with id */
+						chart.series[sid++].setData(serie.data, false);
+					}
+				});
 			}
+
+			chart.hideLoading();
+			chart.redraw();
+			setExtremes();
+			/* setTimeout(setExtremes, channels.length*100); */
+
+			if (RefreshTimeout > 0) {
+				timeout = setTimeout(updateChart, RefreshTimeout*1000);
+			}
+
 		});
 	});
 }
@@ -621,6 +642,14 @@ $(function() {
 		el = $(el);
 		el.data('indent', el.css('padding-left'));
 	});
+
+	<!-- IF {USER} -->
+	$.ajaxSetup({
+		beforeSend: function setHeader(xhr) {
+			xhr.setRequestHeader('X-PVLng-Key', '{APIKEY}');
+		}
+	});
+	<!-- ENDIF -->
 
 	if ($('#loaddeleteview').val()) {
 		ToggleTree(false);
