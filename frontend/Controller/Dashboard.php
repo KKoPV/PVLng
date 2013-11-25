@@ -21,7 +21,7 @@ class Dashboard extends \Controller {
 		parent::__construct();
 
 		$this->Tree = \NestedSet::getInstance();
-		$this->channels = array();
+		$this->Channels = array();
 	}
 
 	/**
