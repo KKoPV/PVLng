@@ -5,170 +5,10 @@
 -- @version     $Id$
 -- --------------------------------------------------------------------------
 
--- PVLng 1.0.0
-
--- Preparation
-
 SET NAMES utf8;
 SET foreign_key_checks = 0;
+SET time_zone = '+01:00';
 SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
-
--- Tables
-
-DROP TABLE IF EXISTS `pvlng_type`;
-CREATE TABLE `pvlng_type` (
-  `id` int(10) unsigned NOT NULL COMMENT 'Unique Id',
-  `name` varchar(60) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `model` varchar(30) NOT NULL,
-  `unit` varchar(10) NOT NULL,
-  `childs` tinyint(1) NOT NULL,
-  `read` tinyint(1) unsigned NOT NULL,
-  `write` tinyint(1) unsigned NOT NULL,
-  `graph` tinyint(1) unsigned NOT NULL,
-  `icon` varchar(30) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Channel types';
-
-DROP TABLE IF EXISTS `pvlng_channel`;
-CREATE TABLE `pvlng_channel` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Id',
-  `guid` varchar(39) DEFAULT NULL COMMENT 'Unique GUID',
-  `name` varchar(255) NOT NULL COMMENT 'Unique identifier',
-  `description` varchar(255) NOT NULL COMMENT 'Longer description',
-  `serial` varchar(30) NOT NULL,
-  `channel` varchar(30) NOT NULL,
-  `type` int(10) unsigned NOT NULL COMMENT 'pvlng_type -> id',
-  `resolution` double NOT NULL DEFAULT '1',
-  `unit` varchar(10) NOT NULL,
-  `meter` tinyint(1) unsigned NOT NULL,
-  `numeric` tinyint(1) unsigned NOT NULL DEFAULT '1',
-  `cost` double NOT NULL COMMENT 'per unit or unit * h',
-  `threshold` double unsigned NOT NULL,
-  `valid_from` double DEFAULT NULL COMMENT 'numeric min. acceptable value',
-  `valid_to` double DEFAULT NULL COMMENT 'numeric max. acceptable value',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `Name-Description` (`name`,`description`),
-  UNIQUE KEY `GUID` (`guid`),
-  KEY `type` (`type`),
-  CONSTRAINT `pvlng_channel_ibfk_2` FOREIGN KEY (`type`) REFERENCES `pvlng_type` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='The channels defined';
-
-DROP TABLE IF EXISTS `pvlng_tree`;
-CREATE TABLE `pvlng_tree` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `lft` int(10) unsigned NOT NULL,
-  `rgt` int(10) unsigned NOT NULL,
-  `moved` tinyint(1) unsigned NOT NULL,
-  `entity` int(10) unsigned NOT NULL,
-  `guid` varchar(39) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `lft` (`lft`),
-  KEY `rgt` (`rgt`),
-  KEY `entity` (`entity`),
-  CONSTRAINT `pvlng_tree_ibfk_2` FOREIGN KEY (`entity`) REFERENCES `pvlng_channel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Structured channels';
-
-DROP TABLE IF EXISTS `pvlng_view`;
-CREATE TABLE `pvlng_view` (
-  `name` varchar(50) NOT NULL COMMENT 'Variant name',
-  `data` text NOT NULL COMMENT 'Serialized channel data',
-  PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='View variants';
-
-DROP TABLE IF EXISTS `pvlng_config`;
-CREATE TABLE `pvlng_config` (
-  `key` varchar(50) NOT NULL,
-  `value` varchar(1000) NOT NULL,
-  `comment` varchar(255) NOT NULL,
-  `type` enum('str','num','bool') NOT NULL DEFAULT 'str',
-  PRIMARY KEY (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Key-Value-Store';
-
-DROP TABLE IF EXISTS `pvlng_log`;
-CREATE TABLE `pvlng_log` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `timestamp` datetime NOT NULL,
-  `scope` varchar(30) NOT NULL,
-  `data` text,
-  PRIMARY KEY (`id`),
-  KEY `timestamp` (`timestamp`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Logging messages';
-
-DROP TABLE IF EXISTS `pvlng_reading_num`;
-CREATE TABLE `pvlng_reading_num` (
-  `id` int(10) unsigned NOT NULL COMMENT 'pvlng_channel -> id',
-  `timestamp` int(10) unsigned NOT NULL,
-  `data` decimal(13,4) NOT NULL,
-  PRIMARY KEY (`id`,`timestamp`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Numeric readings'
-/*!50100 PARTITION BY LINEAR KEY (id) PARTITIONS 10 */;
-
-DROP TABLE IF EXISTS `pvlng_reading_str`;
-CREATE TABLE `pvlng_reading_str` (
-  `id` int(10) unsigned NOT NULL COMMENT 'pvlng_channel -> id',
-  `timestamp` int(10) unsigned NOT NULL,
-  `data` varchar(50) NOT NULL,
-  PRIMARY KEY (`id`,`timestamp`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Alphanumeric readings';
-
-DROP TABLE IF EXISTS `pvlng_babelkit`;
-CREATE TABLE `pvlng_babelkit` (
-  `code_set` varchar(16) NOT NULL,
-  `code_lang` varchar(5) NOT NULL,
-  `code_code` varchar(32) NOT NULL,
-  `code_desc` text NOT NULL,
-  `code_order` smallint(6) NOT NULL DEFAULT '0',
-  `code_flag` char(1) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`code_set`,`code_lang`,`code_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='I18N';
-
--- Triggers
-
-DELIMITER ;;
-
-CREATE TRIGGER `pvlng_channel_bi` BEFORE INSERT ON `pvlng_channel` FOR EACH ROW
-BEGIN
-  -- set guid only for entities which can't have childs
-  SELECT `childs` INTO @CHILDS FROM `pvlng_type`
-   WHERE `id` = new.`type` LIMIT 1;
-  if @CHILDS = 0 THEN SET new.`guid` = GUID(); END IF;
-END;;
-
-CREATE TRIGGER `pvlng_channel_ad` AFTER DELETE ON `pvlng_channel` FOR EACH ROW
-BEGIN
-  -- Remove ALL readings for deleted channel
-  DELETE FROM `pvlng_reading_num` WHERE `id` = old.`id`;
-  DELETE FROM `pvlng_reading_str` WHERE `id` = old.`id`;
-END;;
-
-CREATE TRIGGER `pvlng_tree_bi` BEFORE INSERT ON `pvlng_tree` FOR EACH ROW
-BEGIN
-  -- set guid only for entities which can have childs
-  SELECT `t`.`childs` INTO @CHILDS FROM `pvlng_channel` `e`
-    JOIN `pvlng_type` `t` ON `e`.`type` = `t`.`id`
-   WHERE `e`.`id` = new.`entity`;
-  if @CHILDS <> 0 THEN SET new.`guid` = GUID(); END IF;
-END;;
-
-CREATE TRIGGER `pvlng_log_bi` BEFORE INSERT ON `pvlng_log` FOR EACH ROW
-SET new.`timestamp` = NOW();;
-
-CREATE TRIGGER `pvlng_reading_num_bi` BEFORE INSERT ON `pvlng_reading_num` FOR EACH ROW
-CALL getTimestamp(new.`timestamp`);;
-
-CREATE TRIGGER `pvlng_reading_str_bi` BEFORE INSERT ON `pvlng_reading_str` FOR EACH ROW
-CALL getTimestamp(new.`timestamp`);;
-
-DELIMITER ;
-
--- Views
-
-DROP VIEW IF EXISTS `pvlng_tree_view`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `pvlng_tree_view` AS select `tree`.`id` AS `id`,`tree`.`entity` AS `entity`,if((`t`.`childs` <> 0),`tree`.`guid`,`c`.`guid`) AS `guid`,`c`.`name` AS `name`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`description` AS `description`,`c`.`resolution` AS `resolution`,`c`.`cost` AS `cost`,`c`.`meter` AS `meter`,`c`.`numeric` AS `numeric`,`c`.`unit` AS `unit`,`c`.`threshold` AS `threshold`,`c`.`valid_from` AS `valid_from`,`c`.`valid_to` AS `valid_to`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`icon` AS `icon` from ((`pvlng_tree` `tree` join `pvlng_channel` `c` on((`tree`.`entity` = `c`.`id`))) join `pvlng_type` `t` on((`c`.`type` = `t`.`id`)));
-
--- Functions, procedures and events
 
 DELIMITER ;;
 
@@ -177,16 +17,15 @@ CREATE FUNCTION `getAPIkey`() RETURNS varchar(36) CHARSET utf8
 BEGIN
   SELECT `value` INTO @KEY FROM `pvlng_config` WHERE `key` = 'APIKey';
   IF @KEY IS NULL THEN
-	-- Generate if not exists
     SET @KEY = UUID();
     INSERT INTO `pvlng_config` (`key`, `value`, `comment`)
-	     VALUES ('APIKey', @KEY, 'API key for all PUT requests');
+         VALUES ('APIKey', @KEY, 'API key for all PUT/POST/DELETE requests');
   END IF;
   RETURN @KEY;
 END;;
 
 DROP FUNCTION IF EXISTS `GUID`;;
-CREATE FUNCTION `GUID`() RETURNS varchar(39) CHARSET utf8
+CREATE FUNCTION `GUID`() RETURNS char(39) CHARSET utf8
 BEGIN
     SET @GUID = LOWER(MD5(UUID()));
     return CONCAT( SUBSTRING(@GUID, 1,4), '-', SUBSTRING(@GUID, 5,4), '-',
@@ -195,87 +34,145 @@ BEGIN
                    SUBSTRING(@GUID,25,4), '-', SUBSTRING(@GUID,29,4) );
 END;;
 
+DROP PROCEDURE IF EXISTS `aggregatePerformance`;;
+CREATE PROCEDURE `aggregatePerformance`()
+BEGIN
+
+    -- Build average of hours over raw data
+    REPLACE INTO `pvlng_performance_avg`
+    SELECT 'hour'
+          ,`action`
+          ,YEAR(`timestamp`)
+          ,MONTH(`timestamp`)
+          ,DAY(`timestamp`)
+          ,HOUR(`timestamp`)
+          ,AVG(`time`)
+          ,COUNT(*)
+      FROM `pvlng_performance`
+     GROUP BY `action`
+             ,YEAR(`timestamp`)
+             ,DAYOFYEAR(`timestamp`)
+             ,HOUR(`timestamp`);
+
+    -- Delete raw data
+    TRUNCATE `pvlng_performance`;
+
+    -- Delete hourly data older 1 month
+    DELETE FROM `pvlng_performance_avg`
+     WHERE `aggregation` = "hour"
+       AND FROM_UNIXTIME(UNIX_TIMESTAMP(CONCAT(`year`,'-',`month`,'-',`day`))) <
+           NOW() - INTERVAL 1 MONTH;
+
+    -- Build average of days over hours data
+    REPLACE INTO `pvlng_performance_avg`
+    SELECT 'day'
+          ,`action`
+          ,`year`
+          ,`month`
+          ,`day`
+          ,0
+          ,AVG(`average`)
+          ,SUM(`count`)
+      FROM `pvlng_performance_avg`
+     WHERE `aggregation` = "hour"
+     GROUP BY `action`
+             ,`year`
+             ,`month`
+             ,`day`;
+
+    -- Delete daily data older 1 year
+    DELETE FROM `pvlng_performance_avg`
+     WHERE `aggregation` = "day"
+       AND FROM_UNIXTIME(UNIX_TIMESTAMP(CONCAT(`year`,'-',`month`,'-',`day`))) <
+           NOW() - INTERVAL 1 YEAR;
+
+    -- Build average of month over days data
+    REPLACE INTO `pvlng_performance_avg`
+    SELECT 'month'
+          ,`action`
+          ,`year`
+          ,`month`
+          ,0
+          ,0
+          ,AVG(`average`)
+          ,SUM(`count`)
+      FROM `pvlng_performance_avg`
+     WHERE `aggregation` = "day"
+     GROUP BY `action`
+             ,`year`
+             ,`month`;
+
+    -- Build average of years over months data
+    REPLACE INTO `pvlng_performance_avg`
+    SELECT 'year'
+          ,`action`
+          ,`year`
+          ,0
+          ,0
+          ,0
+          ,AVG(`average`)
+          ,SUM(`count`)
+      FROM `pvlng_performance_avg`
+     WHERE `aggregation` = "month"
+     GROUP BY `action`
+             ,`year`;
+
+    -- Build overall average over year data
+    REPLACE INTO `pvlng_performance_avg`
+    SELECT 'overall'
+          ,`action`
+          ,0
+          ,0
+          ,0
+          ,0
+          ,AVG(`average`)
+          ,SUM(`count`)
+      FROM `pvlng_performance_avg`
+     WHERE `aggregation` = "year"
+     GROUP BY `action`;
+
+END;;
+
 DROP PROCEDURE IF EXISTS `getTimestamp`;;
 CREATE PROCEDURE `getTimestamp`(INOUT `timestamp` int unsigned)
-IF `timestamp` = 0 THEN
-  -- round down to full minute
-  SET `timestamp` = UNIX_TIMESTAMP() DIV 60 * 60;
-END IF;;
+BEGIN
+  IF `timestamp` = 0 THEN
+    SET `timestamp` = UNIX_TIMESTAMP();
+  END IF;
+
+  SELECT `value` FROM `pvlng_config` WHERE `key` = "TimeStep" INTO @SECONDS;
+
+  SET `timestamp` = `timestamp` DIV @SECONDS * @SECONDS;
+END;;
+
+DROP EVENT IF EXISTS `aggregatePerformance`;;
+CREATE EVENT `aggregatePerformance` ON SCHEDULE EVERY 1 HOUR STARTS '2000-01-01 00:00:00' ON COMPLETION PRESERVE ENABLE DO CALL `aggregatePerformance`();;
 
 DELIMITER ;
 
--- Data
+CREATE TABLE `pvlng_babelkit` (
+  `code_set` varchar(16) NOT NULL,
+  `code_lang` varchar(5) NOT NULL,
+  `code_code` varchar(32) NOT NULL,
+  `code_desc` text NOT NULL,
+  `code_order` smallint(6) NOT NULL DEFAULT '0',
+  `code_flag` char(1) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
+  PRIMARY KEY (`code_set`,`code_lang`,`code_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='I18N';
 
-INSERT INTO `pvlng_type`
-(`id`, `name`, `description`, `model`, `unit`, `childs`, `read`, `write`, `graph`, `icon`)
-VALUES
-(0,	'DON\'T TOUCH',	'Dummy for tree root',	'',	'',	0,	0,	0,	0,	''),
-(1,	'Power plant',	'A power plant groups mostly inverters',	'',	'',	-1,	0,	0,	0,	'building.png'),
-(2,	'Inverter',	'A Inverter groups mostly energy and voltage channels',	'',	'',	-1,	0,	0,	0,	'exclamation_frame.png'),
-(3,	'Building',	'A building groups several other things',	'',	'',	-1,	0,	0,	0,	'home.png'),
-(4,	'Multi-Sensor',	'A Sensor with different channels',	'',	'',	-1,	0,	0,	0,	'wooden_box.png'),
-(5,	'Group',	'A Generic group',	'',	'',	-1,	0,	0,	0,	'folders_stack.png'),
-(10,	'Random',	'A random channel delivers data \"valid_from\" ... \"valid_to\" with variance +-\"threshold\"',	'Random',	'',	0,	1,	0,	1,	'ghost.png'),
-(15,	'Ratio calculator',	'A ratio calculator calc the ration between 2 child entities (groups or channels)',	'Ratio',	'%',	2,	1,	0,	1,	'edit_percent.png'),
-(16,	'Accumulator',	'An accumulator groups channels with same type',	'Accumulator',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
-(17,	'Differentiator',	'An differentiator groups channels with same type',	'Differentiator',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
-(18,	'Full Differentiator',	'An differentiator groups channels with same type',	'DifferentiatorFull',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
-(19,	'Sensor to meter',	'Transform sensor data to meter data',	'SensorToMeter',	'',	1,	1,	0,	1,	'calculator_scientific.png'),
-(20,	'Internal consumption',	'Calculates internal consumption using consumption and production',	'InternalConsumption',	'',	2,	1,	0,	1,	'calculator_scientific.png'),
-(40,	'SMA Sunny Webbox',	'Accept JSON from a SMA Sunny Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_webbox.png'),
-(41,	'SMA Inverter',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_inverter.png'),
-(42,	'SMA Sensorbox',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_sensorbox.png'),
-(45,	'PV-Log Plant',	'Readout plant data for PV-Log JSON import',	'PVLog\\Plant',	'',	-1,	1,	0,	0,	'pv_log_sum.png'),
-(46,	'PV-Log Inverter',	'Readout inverter data for PV-Log JSON import',	'PVLog\\Inverter',	'',	-1,	1,	0,	0,	'pv_log.png'),
-(50,	'Energy meter, absolute',	'A enegry meter counts production or consumption',	'Sensor',	'Wh',	0,	1,	1,	1,	'plug.png'),
-(51,	'Power sensor',	'A power sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'plug.png'),
-(52,	'Voltage sensor',	'A voltage sensor tracks actual voltage',	'Sensor',	'V',	0,	1,	1,	1,	'dashboard.png'),
-(53,	'Current sensor',	'An irradiation sensor tracks actual current',	'Sensor',	'A',	0,	1,	1,	1,	'lightning.png'),
-(54,	'Gas sensor',	'A gas sensor tracks actual consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'fire.png'),
-(55,	'Heat sensor',	'A heat sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'fire_big.png'),
-(56,	'Humidity sensor',	'A humidity sensor tracks actual humitiy',	'Sensor',	'%',	0,	1,	1,	1,	'weather_cloud.png'),
-(57,	'Luminosity sensor',	'A luminosity sensor tracks actual luminosity',	'Sensor',	'lm',	0,	1,	1,	1,	'light_bulb.png'),
-(58,	'Pressure sensor',	'A pressure sensor tracks actual pressure',	'Sensor',	'hPa',	0,	1,	1,	1,	'umbrella.png'),
-(59,	'Radiation sensor',	'A radiation sensor tracks actual radiation',	'Sensor',	'µSV/h',	0,	1,	1,	1,	'brightness.png'),
-(60,	'Temperature sensor',	'A temperature sensor tracks actual temperature',	'Sensor',	'°C',	0,	1,	1,	1,	'application_monitor.png'),
-(61,	'Valve sensor',	'A valve sensor tracks actual valve position',	'Sensor',	'°',	0,	1,	1,	1,	'wheel.png'),
-(62,	'Water sensor',	'A water sensor tracks actual water consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'water.png'),
-(63,	'Windspeed sensor',	'A windspeed sensor tracks actual windspeed',	'Sensor',	'm/s',	0,	1,	1,	1,	'paper_plane.png'),
-(64,	'Irradiation sensor',	'An irradiation sensor tracks actual irradiation',	'Sensor',	'W/m²',	0,	1,	1,	1,	'brightness.png'),
-(65,	'Time',	'Counts time based data, e.g working hours',	'Sensor',	'h',	0,	1,	1,	1,	'clock.png'),
-(80,	'Power sensor counter',	'A power sensor counter tracks actual consumption or production',	'Counter',	'W',	0,	1,	1,	1,	'plug.png'),
-(90,	'Switch',	'A switch tracks state changes',	'Switcher',	'',	0,	1,	1,	1,	'ui_check_boxes.png');
-
-INSERT INTO
-`pvlng_channel` (`id`, `name`, `description`, `serial`, `channel`, `type`, `resolution`, `unit`, `meter`, `numeric`, `cost`, `threshold`, `valid_from`, `valid_to`)
-VALUES
-(1,	'DON\'T TOUCH',	'Dummy for tree root',	'',	'',	0,	0,	'',	0,	0,	0,	0,	NULL,	NULL),
-(2,	'RANDOM Temperature sensor',	'15 ... 25, &plusmn;0.5',	'',	'',	10,	1,	'°C',	0,	1,	0,	0.5,	15,	25),
-(3,	'RANDOM Energy meter',	'0 ... &infin;, +0.05',	'',	'',	10,	1000,	'Wh',	1,	1,	0.0002,	0.05,	0,	10000000000);
--- Remove GUID created by trigger from dummy channel
-UPDATE `pvlng_channel` SET `guid` = NULL WHERE `id` = 1;
-
-INSERT INTO `pvlng_tree` (`id`, `lft`, `rgt`, `entity`)
-VALUES (1,	1,	6,	1), (2,	2,	3,	2), (3,	4,	5,	3);
-
--- Translations
-
-INSERT INTO
-`pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`, `code_order`, `code_flag`)
-VALUES
+INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`, `code_order`, `code_flag`) VALUES
 ('app',	'de',	'Actions',	'Aktionen',	0,	''),
 ('app',	'de',	'ActualState',	'Aktueller Datenstatus',	0,	''),
 ('app',	'de',	'Add',	'Hinzufügen',	0,	''),
+('app',	'de',	'AddAnotherChild',	'Einen weiteren Kanal hinzufügen',	0,	''),
+('app',	'de',	'AddChannel',	'Einen Kanal zur Hierarchie hinzufügen',	0,	''),
 ('app',	'de',	'AddChild',	'Sub-Kanal hinzufügen',	0,	''),
-('app',	'de',	'AddEntity',	'Kanal anlegen',	0,	''),
 ('app',	'de',	'AdminAndPasswordRequired',	'Benutzername und Passwort sind erforderlich!',	0,	''),
-('app',	'de',	'Aggregation',	'Zusammenfassung',	0,	''),
+('app',	'de',	'Aggregation',	'Aggregation',	0,	''),
+('app',	'de',	'AliasEntity',	'Alias-Kanal erstellen',	0,	''),
 ('app',	'de',	'All',	'Alle',	0,	''),
-('app',	'de',	'AllDataWillBeRemoved',	'Alle Daten werden gelöscht, alle Stamm- und [color=red]alle[/color] Betriebsdaten!',	0,	''),
+('app',	'de',	'AllDataWillBeRemoved',	'Alle Daten werden gelöscht, [color=red]alle[/color] Stamm- und [color=red]alle[/color] Betriebsdaten!',	0,	''),
 ('app',	'de',	'Amount',	'Summe',	0,	''),
-('app',	'de',	'APIBuilder',	'API Builder',	0,	''),
-('app',	'de',	'APIBuilderHint',	'Visual builder for readout requests',	0,	''),
-('app',	'de',	'APIGUID',	'API GUID',	0,	''),
 ('app',	'de',	'APIkeyRegenerated',	'Dein API key wurde neu generiert.',	0,	''),
 ('app',	'de',	'APIURL',	'API URL',	0,	''),
 ('app',	'de',	'AssignEntity',	'Sub-Kanal zuordnen',	0,	''),
@@ -283,6 +180,7 @@ VALUES
 ('app',	'de',	'Average',	'Durchschnitt',	0,	''),
 ('app',	'de',	'Axis',	'Achse',	0,	''),
 ('app',	'de',	'Back',	'Zurück',	0,	''),
+('app',	'de',	'BackToTop',	'Zurück nach oben',	0,	''),
 ('app',	'de',	'BasicDate',	'Basisdatum',	0,	''),
 ('app',	'de',	'Bookmark',	'Lesezeichen',	0,	''),
 ('app',	'de',	'Bytes',	'Bytes',	0,	''),
@@ -290,7 +188,9 @@ VALUES
 ('app',	'de',	'CanHaveChilds',	'Dieser Kanaltyp kann Sub-Kanäle haben',	0,	''),
 ('app',	'de',	'channel',	'Kanal',	0,	''),
 ('app',	'de',	'ChannelAttributes',	'Kanal-Attribute',	0,	''),
-('app',	'de',	'ChannelDeleted',	'Kanal \'%1\' gelöscht.',	0,	''),
+('app',	'de',	'ChannelDeleted',	'Der Kanal \'%s\' wurde gelöscht.',	0,	''),
+('app',	'de',	'ChannelHierarchy',	'Kanal-Hierarchie',	0,	''),
+('app',	'de',	'ChannelName',	'Kanalname',	0,	''),
 ('app',	'de',	'Channels',	'Kanäle',	0,	''),
 ('app',	'de',	'ChannelSaved',	'Die Kanaldaten wurden gesichert.',	0,	''),
 ('app',	'de',	'ChannelsHint',	'Übersicht über alle definierten Kanäle',	0,	''),
@@ -311,13 +211,15 @@ VALUES
 ('app',	'de',	'Color',	'Farbe',	0,	''),
 ('app',	'de',	'Commissioning',	'Inbetriebnahme',	0,	''),
 ('app',	'de',	'ConfirmDeleteEntity',	'Löscht den Kanal und alle existierenden Messwerte.\r\n\r\nBist Du sicher?',	0,	''),
-('app',	'de',	'ConfirmDeleteTreeItems',	'Löscht den Kanal und seine Sub-Kanäle aus dem Baum.\r\n\r\nBist Du sicher?',	0,	''),
+('app',	'de',	'ConfirmDeleteTreeItems',	'Löscht den Kanal (und eventuelle Sub-Kanäle) aus dem Baum.\r\n\r\nBist Du sicher?',	0,	''),
 ('app',	'de',	'Consumption',	'Verbrauch',	0,	''),
 ('app',	'de',	'Cost',	'Kosten',	0,	''),
 ('app',	'de',	'Create',	'Erstellen',	0,	''),
 ('app',	'de',	'CreateChannel',	'Neuen Kanal erstellen',	0,	''),
 ('app',	'de',	'DailyAverage',	'Tagesdurchschnitt',	0,	''),
 ('app',	'de',	'DailyValue',	'Tageswerte',	0,	''),
+('app',	'de',	'Dashboard',	'Dashboard',	0,	''),
+('app',	'de',	'DashboardHint',	'Schnellübersicht mit Gauges',	0,	''),
 ('app',	'de',	'dashStyle',	'Linienart',	0,	''),
 ('app',	'de',	'Data',	'Daten',	0,	''),
 ('app',	'de',	'DataArea',	'Datenbereich',	0,	''),
@@ -335,11 +237,13 @@ VALUES
 ('app',	'de',	'DeleteBranch',	'Teilbaum löschen',	0,	''),
 ('app',	'de',	'DeleteEntity',	'Kanal löschen',	0,	''),
 ('app',	'de',	'DeleteEntityChilds',	'Kanal und Kind-Kanäle löschen',	0,	''),
+('app',	'de',	'DeleteViewFailed',	'Löschen des Diagramms \'%s\' ist fehlgeschlagen.',	0,	''),
 ('app',	'de',	'Delta',	'Delta',	0,	''),
 ('app',	'de',	'Description',	'Beschreibung',	0,	''),
 ('app',	'de',	'DontForgetUpdateAPIKey',	'Vergiss nicht Deinen API-Key nach einer Neuerstellung in externen Scripten zu aktualisieren!',	0,	''),
 ('app',	'de',	'DragBookmark',	'Ziehe den Link zu Deinen Lesezeichen',	0,	''),
 ('app',	'de',	'DSEP',	',',	0,	''),
+('app',	'de',	'Earning',	'Ertrag',	0,	''),
 ('app',	'de',	'Edit',	'Bearbeiten',	0,	''),
 ('app',	'de',	'EditChannel',	'Kanal bearbeiten',	0,	''),
 ('app',	'de',	'EditEntity',	'Kanal bearbeiten',	0,	''),
@@ -349,7 +253,7 @@ VALUES
 ('app',	'de',	'Expand',	'Erweitern',	0,	''),
 ('app',	'de',	'ExpandAll',	'Alles erweitern',	0,	''),
 ('app',	'de',	'from',	'von',	0,	''),
-('app',	'de',	'GenerateAdminHash',	'Erzeuge Administrations-Authorisierung',	0,	''),
+('app',	'de',	'GenerateAdminHash',	'Erstelle Administrations-Authorisierung',	0,	''),
 ('app',	'de',	'IndexLength',	'Indexgröße',	0,	''),
 ('app',	'de',	'InfoHint',	'Hintergrundinformationen',	0,	''),
 ('app',	'de',	'Information',	'Informationen',	0,	''),
@@ -357,36 +261,45 @@ VALUES
 ('app',	'de',	'InstalledAdapters',	'Installierte Adapter',	0,	''),
 ('app',	'de',	'Inverter',	'Wechselrichter',	0,	''),
 ('app',	'de',	'Irradiation',	'Einstrahlung',	0,	''),
+('app',	'de',	'JustAMoment',	'Einen Moment bitte ...',	0,	''),
 ('app',	'de',	'Last',	'Letzte',	0,	''),
 ('app',	'de',	'LastTimestamp',	'Zeitpunkt der letzten\r\nDatenaufzeichnung',	0,	''),
 ('app',	'de',	'left',	'links',	0,	''),
 ('app',	'de',	'LineBold',	'Zeiche dickere Linie',	0,	''),
 ('app',	'de',	'LineWidth',	'Linienstärke',	0,	''),
 ('app',	'de',	'Load',	'Laden',	0,	''),
-('app',	'de',	'Loading',	'Laden ...',	0,	''),
 ('app',	'de',	'Log',	'Log',	0,	''),
 ('app',	'de',	'LogHint',	'Log-Einträge',	0,	''),
-('app',	'de',	'LogoutSuccessful',	'html:\"%s\" wurde erfolgreich abgemeldet.',	0,	''),
+('app',	'de',	'Login',	'Anmelden',	0,	''),
+('app',	'de',	'Logout',	'Abmelden',	0,	''),
+('app',	'de',	'LogoutSuccessful',	'[b]%s[/b] wurde erfolgreich abgemeldet.',	0,	''),
 ('app',	'de',	'Manufacturer',	'Hersteller',	0,	''),
 ('app',	'de',	'MarkExtremes',	'Markiere Extremwerte',	0,	''),
 ('app',	'de',	'max',	'max',	0,	''),
 ('app',	'de',	'Message',	'Nachricht',	0,	''),
 ('app',	'de',	'min',	'min',	0,	''),
 ('app',	'de',	'MissingAPIkey',	'API key ist erforderlich!',	0,	''),
-('app',	'de',	'MobileVariantHint',	'Wenn Du PVLng auf mobilen Geräten nutzen möchtest, definiere mindestens eine Variante [b]@mobile[/b] als Standard-Variante.\r\nNur Varianten beginnend mit [b]@[/b] sind mobil verfügbar.',	0,	''),
+('app',	'de',	'MobileVariantHint',	'Wenn Du PVLng auf mobilen Geräten nutzen möchtest, definiere mindestens ein Diagramm [b]@mobile[/b] als Standard-Diagramm.\r\nNur Diagramme beginnend mit einem [b]@[/b] sind mobil verfügbar.\r\n(Mobile Diagramme sind immer öffentlich!)',	0,	''),
 ('app',	'de',	'Model',	'Modell',	0,	''),
 ('app',	'de',	'Month',	'Monat',	0,	''),
 ('app',	'de',	'MonthlyAverage',	'Monatsdurchschnitt',	0,	''),
-('app',	'de',	'MoveEntityDown',	'Schiebe Kanal nach unten',	0,	''),
-('app',	'de',	'MoveEntityRight',	'Schiebe Kanal nach rechts',	0,	''),
-('app',	'de',	'MoveEntityUp',	'Schiebe Kanal nach oben',	0,	''),
+('app',	'de',	'MoveChannel',	'Kanal verschieben',	0,	''),
+('app',	'de',	'MoveChannelHowMuchRows',	'Um wie viele Positionen (auf gleicher Ebene) soll der Kanal verschoben werden?',	0,	''),
+('app',	'de',	'MoveChannelStartEnd',	'an den Anfang / das Ende',	0,	''),
+('app',	'de',	'MoveEntityDown',	'Verschiebe Kanal nach unten',	0,	''),
+('app',	'de',	'MoveEntityLeft',	'Verschiebe Kanal eine Ebene höher',	0,	''),
+('app',	'de',	'MoveEntityRight',	'Verschiebe Kanal eine Ebene tiefer',	0,	''),
+('app',	'de',	'MoveEntityUp',	'Verschiebe Kanal nach oben',	0,	''),
 ('app',	'de',	'Name',	'Name',	0,	''),
 ('app',	'de',	'NameRequired',	'Der Name ist erforderlich.',	0,	''),
 ('app',	'de',	'New',	'Neu',	0,	''),
 ('app',	'de',	'NextDay',	'Nächster Tag',	0,	''),
 ('app',	'de',	'No',	'Nein',	0,	''),
-('app',	'de',	'NoChannelsSelectedYet',	'Es wurden bisher keine Kanäle zur Anzeige ausgewählt.',	0,	''),
+('app',	'de',	'NoChannelsSelectedYet',	'Es wurden noch keine Kanäle oder ein Diagramm zur Anzeige ausgewählt.',	0,	''),
+('app',	'de',	'NoDataAvailable',	'Keine Daten verfügbar',	0,	''),
+('app',	'de',	'None',	'Keine',	0,	''),
 ('app',	'de',	'NotAuthorized',	'Nicht autorisiert! Es wurde ein falscher API key übermittelt.',	0,	''),
+('app',	'de',	'NoViewSelectedYet',	'Es wurde noch kein Diagramm zur Anzeige ausgewählt.',	0,	''),
 ('app',	'de',	'Ok',	'Ok',	0,	''),
 ('app',	'de',	'or',	'oder',	0,	''),
 ('app',	'de',	'Overview',	'Übersicht',	0,	''),
@@ -397,10 +310,14 @@ VALUES
 ('app',	'de',	'PasswordsNotEqual',	'Die Passworte sind nicht identisch.',	0,	''),
 ('app',	'de',	'PerformanceRatio',	'Wirkungsgrad',	0,	''),
 ('app',	'de',	'Period',	'Zeitraum',	0,	''),
+('app',	'de',	'PlantDescriptionHint',	'Beschreibung der Installation',	0,	''),
+('app',	'de',	'Positions',	'Position(en)',	0,	''),
 ('app',	'de',	'Power',	'Leistung',	0,	''),
 ('app',	'de',	'Presentation',	'Darstellung',	0,	''),
 ('app',	'de',	'PrevDay',	'Vorheriger Tag',	0,	''),
 ('app',	'de',	'Production',	'Produktion',	0,	''),
+('app',	'de',	'public',	'öffentlich',	0,	''),
+('app',	'de',	'publicHint',	'Öffentliche Diagramme sind von nicht eingeloggten Besuchern anzeigbar.',	0,	''),
 ('app',	'de',	'ReadableEntity',	'Lesbarer Kanal',	0,	''),
 ('app',	'de',	'Readings',	'Messwerte',	0,	''),
 ('app',	'de',	'RecordCount',	'Anzahl Datensätze',	0,	''),
@@ -415,6 +332,7 @@ VALUES
 ('app',	'de',	'Save',	'Sichern',	0,	''),
 ('app',	'de',	'Scope',	'Bereich',	0,	''),
 ('app',	'de',	'SeeAdapters',	'Siehe unten welche Adapter installiert sind.',	0,	''),
+('app',	'de',	'SeeAPIReference',	'Für mehr Informationen, siehe in die [url=http://pvlng.com/index.html?API.html]API-Referenz[/url].',	0,	''),
 ('app',	'de',	'Select',	'Auswählen',	0,	''),
 ('app',	'de',	'SelectEntity',	'Kanal auswählen',	0,	''),
 ('app',	'de',	'SelectEntityType',	'Auswahl Kanaltyp',	0,	''),
@@ -426,6 +344,8 @@ VALUES
 ('app',	'de',	'SerialStillExists',	'Die Serialnummer existiert bereits.',	0,	''),
 ('app',	'de',	'SeriesType',	'Datenreihendarstellung',	0,	''),
 ('app',	'de',	'SetAxisMinZero',	'Setze Y-Achsen-Minimum auf 0',	0,	''),
+('app',	'de',	'ShowConsumption',	'Periodenwerte',	0,	''),
+('app',	'de',	'ShowConsumptionHint',	'Zeigt für Meter-Kanäle die Daten pro Periode und nicht den Gesamtwert über die Zeit',	0,	''),
 ('app',	'de',	'Statistics',	'Statistik',	0,	''),
 ('app',	'de',	'StayLoggedIn',	'Angemeldet bleiben',	0,	''),
 ('app',	'de',	'Stick',	'Anheften',	0,	''),
@@ -440,6 +360,7 @@ VALUES
 ('app',	'de',	'to',	'bis',	0,	''),
 ('app',	'de',	'Today',	'Heute',	0,	''),
 ('app',	'de',	'ToggleChannels',	'Kanäle ein-/ausklappen',	0,	''),
+('app',	'de',	'toggleGUIDs',	'Kanal-GUIDs anzeigen',	0,	''),
 ('app',	'de',	'Total',	'Gesamt',	0,	''),
 ('app',	'de',	'TotalRows',	'Datensatzanzahl',	0,	''),
 ('app',	'de',	'TotalSize',	'Gesamtgröße',	0,	''),
@@ -447,30 +368,32 @@ VALUES
 ('app',	'de',	'Type',	'Typ',	0,	''),
 ('app',	'de',	'Unit',	'Einheit',	0,	''),
 ('app',	'de',	'UnknownUser',	'Unbekannter Benutzer oder falsches Passwort.',	0,	''),
-('app',	'de',	'UnknownView',	'Unbekannte Variante: \'%s\'',	0,	''),
+('app',	'de',	'UnknownView',	'Unbekanntes Diagramm: \'%s\'',	0,	''),
 ('app',	'de',	'Value',	'Wert',	0,	''),
-('app',	'de',	'Variant',	'Variante',	0,	''),
+('app',	'de',	'Variant',	'Diagramm',	0,	''),
+('app',	'de',	'Variants',	'Diagramme',	0,	''),
+('app',	'de',	'VariantsPublic',	'Öffentliche Diagramme',	0,	''),
+('app',	'de',	'ViewDeleted',	'Diagramm \'%s\' gelöscht.',	0,	''),
 ('app',	'de',	'Voltage',	'Spannung',	0,	''),
 ('app',	'de',	'WeeklyAverage',	'Wochendurchschnitt',	0,	''),
 ('app',	'de',	'Welcome',	'Wilkommen %s!',	0,	''),
-('app',	'de',	'WelcomeToAdministration',	'Willkommen in Deinem PVLng Administrationsbereich.\r\n\r\nAus Sicherheitsgründen musst Du Dich einloggen.',	0,	''),
+('app',	'de',	'WelcomeToAdministration',	'Willkommen in Deinem PVLng Administrationsbereich.',	0,	''),
 ('app',	'de',	'WritableEntity',	'Schreibbarer Kanal',	0,	''),
 ('app',	'de',	'YearlyAverage',	'Jahresdurchschnitt',	0,	''),
 ('app',	'de',	'Yes',	'Ja',	0,	''),
-('app',	'de',	'YourAPIcode',	'API-Schlüssel für den Daten-Update\r\n[i](Halte Deinen API-Schlüssel immer geheim)[/i]',	0,	''),
+('app',	'de',	'YourAPIcode',	'API-Schlüssel für den Daten-Update\r\n\r\n[i](Halte Deinen API-Schlüssel immer geheim)[/i]',	0,	''),
 ('app',	'en',	'Actions',	'Actions',	0,	''),
 ('app',	'en',	'ActualState',	'Actual data state',	0,	''),
 ('app',	'en',	'Add',	'Add',	0,	''),
+('app',	'en',	'AddAnotherChild',	'Add another channel',	0,	''),
+('app',	'en',	'AddChannel',	'Add a channel to the hierarchy',	0,	''),
 ('app',	'en',	'AddChild',	'Add child channel',	0,	''),
-('app',	'en',	'AddEntity',	'Add channel',	0,	''),
 ('app',	'en',	'AdminAndPasswordRequired',	'User name and password required!',	0,	''),
 ('app',	'en',	'Aggregation',	'Aggregation',	0,	''),
+('app',	'en',	'AliasEntity',	'Create alias channel',	0,	''),
 ('app',	'en',	'All',	'All',	0,	''),
 ('app',	'en',	'AllDataWillBeRemoved',	'All data will be removed, all master data and [color=red]all[/color] operating data!',	0,	''),
 ('app',	'en',	'Amount',	'Amount',	0,	''),
-('app',	'en',	'APIBuilder',	'API Builder',	0,	''),
-('app',	'en',	'APIBuilderHint',	'Visual builder for readout requests',	0,	''),
-('app',	'en',	'APIGUID',	'API GUID',	0,	''),
 ('app',	'en',	'APIkeyRegenerated',	'Your API key was regenerated.',	0,	''),
 ('app',	'en',	'APIURL',	'API URL',	0,	''),
 ('app',	'en',	'AssignEntity',	'Assign sub channel',	0,	''),
@@ -478,6 +401,7 @@ VALUES
 ('app',	'en',	'Average',	'Average',	0,	''),
 ('app',	'en',	'Axis',	'Axis',	0,	''),
 ('app',	'en',	'Back',	'Back',	0,	''),
+('app',	'en',	'BackToTop',	'Back to top',	0,	''),
 ('app',	'en',	'BasicDate',	'Basic date',	0,	''),
 ('app',	'en',	'Bookmark',	'Bookmark',	0,	''),
 ('app',	'en',	'Bytes',	'Bytes',	0,	''),
@@ -485,7 +409,9 @@ VALUES
 ('app',	'en',	'CanHaveChilds',	'This channel type can have childs',	0,	''),
 ('app',	'en',	'channel',	'Channel',	0,	''),
 ('app',	'en',	'ChannelAttributes',	'Channel attributes',	0,	''),
-('app',	'en',	'ChannelDeleted',	'Channel \'%1\' deleted.',	0,	''),
+('app',	'en',	'ChannelDeleted',	'Channel \'%s\' deleted.',	0,	''),
+('app',	'en',	'ChannelHierarchy',	'Channel hierarchy\r\n',	0,	''),
+('app',	'en',	'ChannelName',	'Channel name',	0,	''),
 ('app',	'en',	'Channels',	'Channels',	0,	''),
 ('app',	'en',	'ChannelSaved',	'Channel data saved.',	0,	''),
 ('app',	'en',	'ChannelsHint',	'Overview of all defined channels',	0,	''),
@@ -506,13 +432,15 @@ VALUES
 ('app',	'en',	'Color',	'Color',	0,	''),
 ('app',	'en',	'Commissioning',	'Commissioning',	0,	''),
 ('app',	'en',	'ConfirmDeleteEntity',	'Delete channel and all existing measuring data.\r\n\r\nAre you sure?',	0,	''),
-('app',	'en',	'ConfirmDeleteTreeItems',	'Delete channel and all sub channels from tree.\r\n\r\nAre you sure?',	0,	''),
+('app',	'en',	'ConfirmDeleteTreeItems',	'Delete channel (and may be all sub channels) from tree.\r\n\r\nAre you sure?',	0,	''),
 ('app',	'en',	'Consumption',	'Consumption',	0,	''),
 ('app',	'en',	'Cost',	'Cost',	0,	''),
 ('app',	'en',	'Create',	'Create',	0,	''),
 ('app',	'en',	'CreateChannel',	'Create new channel',	0,	''),
 ('app',	'en',	'DailyAverage',	'Daily average',	0,	''),
 ('app',	'en',	'DailyValue',	'Daily values',	0,	''),
+('app',	'en',	'Dashboard',	'Dashboard',	0,	''),
+('app',	'en',	'DashboardHint',	'Quick overview with gauges',	0,	''),
 ('app',	'en',	'dashStyle',	'Dash style',	0,	''),
 ('app',	'en',	'Data',	'Data',	0,	''),
 ('app',	'en',	'DataArea',	'Data area',	0,	''),
@@ -530,11 +458,13 @@ VALUES
 ('app',	'en',	'DeleteBranch',	'Delete branch',	0,	''),
 ('app',	'en',	'DeleteEntity',	'Delete channel',	0,	''),
 ('app',	'en',	'DeleteEntityChilds',	'Delete channel with sub channels',	0,	''),
+('app',	'en',	'DeleteViewFailed',	'Delete chart \'%s\' failed.',	0,	''),
 ('app',	'en',	'Delta',	'Delta',	0,	''),
 ('app',	'en',	'Description',	'Description',	0,	''),
 ('app',	'en',	'DontForgetUpdateAPIKey',	'Don\'t forget to update the API key in extranl scripts after recreation!',	0,	''),
 ('app',	'en',	'DragBookmark',	'Drag the link to your bookmarks',	0,	''),
 ('app',	'en',	'DSEP',	'.',	0,	''),
+('app',	'en',	'Earning',	'Earning',	0,	''),
 ('app',	'en',	'Edit',	'Edit',	0,	''),
 ('app',	'en',	'EditChannel',	'Edit channel',	0,	''),
 ('app',	'en',	'EditEntity',	'Edit channel',	0,	''),
@@ -544,7 +474,7 @@ VALUES
 ('app',	'en',	'Expand',	'Expand',	0,	''),
 ('app',	'en',	'ExpandAll',	'ExpandAll',	0,	''),
 ('app',	'en',	'from',	'from',	0,	''),
-('app',	'en',	'GenerateAdminHash',	'Generate admininistration authorization',	0,	''),
+('app',	'en',	'GenerateAdminHash',	'Create admininistration authorization',	0,	''),
 ('app',	'en',	'IndexLength',	'Index size',	0,	''),
 ('app',	'en',	'InfoHint',	'Background information',	0,	''),
 ('app',	'en',	'Information',	'Information',	0,	''),
@@ -552,36 +482,45 @@ VALUES
 ('app',	'en',	'InstalledAdapters',	'Installed adapters',	0,	''),
 ('app',	'en',	'Inverter',	'Inverter',	0,	''),
 ('app',	'en',	'Irradiation',	'Irradiation',	0,	''),
+('app',	'en',	'JustAMoment',	'Just a moment please ...',	0,	''),
 ('app',	'en',	'Last',	'Last',	0,	''),
 ('app',	'en',	'LastTimestamp',	'Time stamp of\r\nlast data recording',	0,	''),
 ('app',	'en',	'left',	'left',	0,	''),
 ('app',	'en',	'LineBold',	'Draw thicker line',	0,	''),
 ('app',	'en',	'LineWidth',	'Line width',	0,	''),
 ('app',	'en',	'Load',	'Load',	0,	''),
-('app',	'en',	'Loading',	'Loading ...',	0,	''),
 ('app',	'en',	'Log',	'Log',	0,	''),
 ('app',	'en',	'LogHint',	'Log entries',	0,	''),
-('app',	'en',	'LogoutSuccessful',	'html:\"%s\" logged out successful.',	0,	''),
+('app',	'en',	'Login',	'Login',	0,	''),
+('app',	'en',	'Logout',	'Logout',	0,	''),
+('app',	'en',	'LogoutSuccessful',	'[b]%s[/b] logged out successful.',	0,	''),
 ('app',	'en',	'Manufacturer',	'Manufacturer',	0,	''),
 ('app',	'en',	'MarkExtremes',	'Mark extremes',	0,	''),
 ('app',	'en',	'max',	'max',	0,	''),
 ('app',	'en',	'Message',	'Message',	0,	''),
 ('app',	'en',	'min',	'min',	0,	''),
 ('app',	'en',	'MissingAPIkey',	'Missing API key!',	0,	''),
-('app',	'en',	'MobileVariantHint',	'If you plan to use PVLng on mobile devices, define at least a variant [b]@mobile[/b] as default variant.\r\nOnly variants starting with [b]@[/b] will be available mobile.',	0,	''),
+('app',	'en',	'MobileVariantHint',	'If you plan to use PVLng on mobile devices, define at least a chart [b]@mobile[/b] as default chart.\r\nOnly charts starting with a [b]@[/b] will be available mobile.\r\n(Mobile charts are public by default!) ',	0,	''),
 ('app',	'en',	'Model',	'Model',	0,	''),
 ('app',	'en',	'Month',	'Month',	0,	''),
 ('app',	'en',	'MonthlyAverage',	'Monthly average',	0,	''),
+('app',	'en',	'MoveChannel',	'Move channel',	0,	''),
+('app',	'en',	'MoveChannelHowMuchRows',	'Move how many positions (on same level)?',	0,	''),
+('app',	'en',	'MoveChannelStartEnd',	'to the start / the end',	0,	''),
 ('app',	'en',	'MoveEntityDown',	'Move channel down',	0,	''),
-('app',	'en',	'MoveEntityRight',	'Move channel right',	0,	''),
+('app',	'en',	'MoveEntityLeft',	'Move channel one level up',	0,	''),
+('app',	'en',	'MoveEntityRight',	'Move channel one level down',	0,	''),
 ('app',	'en',	'MoveEntityUp',	'Move channel up',	0,	''),
 ('app',	'en',	'Name',	'Name',	0,	''),
 ('app',	'en',	'NameRequired',	'The name is required.',	0,	''),
 ('app',	'en',	'New',	'New',	0,	''),
 ('app',	'en',	'NextDay',	'Next day',	0,	''),
 ('app',	'en',	'No',	'No',	0,	''),
-('app',	'en',	'NoChannelsSelectedYet',	'There are yet no channels selected to view.',	0,	''),
+('app',	'en',	'NoChannelsSelectedYet',	'There are no channels or a chart selected yet to view.',	0,	''),
+('app',	'en',	'NoDataAvailable',	'No data available',	0,	''),
+('app',	'en',	'None',	'None',	0,	''),
 ('app',	'en',	'NotAuthorized',	'Not authorized! A wrong API key was submitted.',	0,	''),
+('app',	'en',	'NoViewSelectedYet',	'There is no chart selected yet to view.',	0,	''),
 ('app',	'en',	'Ok',	'Ok',	0,	''),
 ('app',	'en',	'or',	'or',	0,	''),
 ('app',	'en',	'Overview',	'Overview',	0,	''),
@@ -592,10 +531,14 @@ VALUES
 ('app',	'en',	'PasswordsNotEqual',	'The passwords are not equal.',	0,	''),
 ('app',	'en',	'PerformanceRatio',	'Performance ratio',	0,	''),
 ('app',	'en',	'Period',	'Period',	0,	''),
+('app',	'en',	'PlantDescriptionHint',	'Description of installation',	0,	''),
+('app',	'en',	'Positions',	'Position(s)',	0,	''),
 ('app',	'en',	'Power',	'Power',	0,	''),
 ('app',	'en',	'Presentation',	'Presentation',	0,	''),
 ('app',	'en',	'PrevDay',	'Previous day',	0,	''),
 ('app',	'en',	'Production',	'Production',	0,	''),
+('app',	'en',	'public',	'public',	0,	''),
+('app',	'en',	'publicHint',	'Public charts are accessible by not logged in visitors.',	0,	''),
 ('app',	'en',	'ReadableEntity',	'Readable channel',	0,	''),
 ('app',	'en',	'Readings',	'Readings',	0,	''),
 ('app',	'en',	'RecordCount',	'Record count',	0,	''),
@@ -610,17 +553,20 @@ VALUES
 ('app',	'en',	'Save',	'Save',	0,	''),
 ('app',	'en',	'Scope',	'Scope',	0,	''),
 ('app',	'en',	'SeeAdapters',	'See below which adapters are installed.',	0,	''),
+('app',	'en',	'SeeAPIReference',	'For more information take a look into the [url=http://pvlng.com/index.html?API.html]API reference[/url].',	0,	''),
 ('app',	'en',	'Select',	'Select',	0,	''),
 ('app',	'en',	'SelectEntity',	'Select channel',	0,	''),
 ('app',	'en',	'SelectEntityType',	'Select channel type',	0,	''),
 ('app',	'en',	'Selection',	'Selection',	0,	''),
-('app',	'en',	'SelectView',	'Select view',	0,	''),
+('app',	'en',	'SelectView',	'Select chart',	0,	''),
 ('app',	'en',	'Send',	'Send',	0,	''),
 ('app',	'en',	'Serial',	'Serial number',	0,	''),
 ('app',	'en',	'SerialRequired',	'Serial number is required',	0,	''),
 ('app',	'en',	'SerialStillExists',	'This serial number still exists.',	0,	''),
 ('app',	'en',	'SeriesType',	'Series display type',	0,	''),
 ('app',	'en',	'SetAxisMinZero',	'Set Y axis min. to 0',	0,	''),
+('app',	'en',	'ShowConsumption',	'Period values',	0,	''),
+('app',	'en',	'ShowConsumptionHint',	'Shows for meter channels the data per selected aggregation period and not the total over time',	0,	''),
 ('app',	'en',	'Statistics',	'Statistics',	0,	''),
 ('app',	'en',	'StayLoggedIn',	'Remember me',	0,	''),
 ('app',	'en',	'Stick',	'Stick',	0,	''),
@@ -635,6 +581,7 @@ VALUES
 ('app',	'en',	'to',	'to',	0,	''),
 ('app',	'en',	'Today',	'Today',	0,	''),
 ('app',	'en',	'ToggleChannels',	'Expand/collapse channels',	0,	''),
+('app',	'en',	'toggleGUIDs',	'Show channel GUIDs',	0,	''),
 ('app',	'en',	'Total',	'Total',	0,	''),
 ('app',	'en',	'TotalRows',	'Total rows',	0,	''),
 ('app',	'en',	'TotalSize',	'Total size',	0,	''),
@@ -642,21 +589,28 @@ VALUES
 ('app',	'en',	'Type',	'Type',	0,	''),
 ('app',	'en',	'Unit',	'Unit',	0,	''),
 ('app',	'en',	'UnknownUser',	'Unknown user or wrong password.',	0,	''),
-('app',	'en',	'UnknownView',	'Unknown view: \'%s\'',	0,	''),
+('app',	'en',	'UnknownView',	'Unknown chart: \'%s\'',	0,	''),
 ('app',	'en',	'Value',	'Value',	0,	''),
-('app',	'en',	'Variant',	'Variant',	0,	''),
+('app',	'en',	'Variant',	'Chart',	0,	''),
+('app',	'en',	'Variants',	'Charts',	0,	''),
+('app',	'en',	'VariantsPublic',	'Public charts',	0,	''),
+('app',	'en',	'ViewDeleted',	'Chart \'%s\' deleted.',	0,	''),
 ('app',	'en',	'Voltage',	'Voltage',	0,	''),
 ('app',	'en',	'WeeklyAverage',	'Weekly average',	0,	''),
 ('app',	'en',	'Welcome',	'Welcome %s!',	0,	''),
-('app',	'en',	'WelcomeToAdministration',	'Welcome in your PVLng administration.\r\n\r\nFor security reasons login is required.',	0,	''),
+('app',	'en',	'WelcomeToAdministration',	'Welcome in your PVLng administration area.',	0,	''),
 ('app',	'en',	'WritableEntity',	'Writable channel',	0,	''),
 ('app',	'en',	'YearlyAverage',	'Yearly average',	0,	''),
 ('app',	'en',	'Yes',	'Yes',	0,	''),
-('app',	'en',	'YourAPIcode',	'API key for updating your data\r\n[i](Always keep your API key secret)[/i]',	0,	''),
+('app',	'en',	'YourAPIcode',	'API key for updating your data\r\n\r\n[i](Always keep your API key secret)[/i]',	0,	''),
 ('channel',	'de',	'channel',	'Kanal',	0,	''),
 ('channel',	'de',	'channelHint',	'Kanalname bei Multi-Sensoren',	0,	''),
+('channel',	'de',	'comment',	'Kommentar',	0,	''),
+('channel',	'de',	'commentHint',	'interner Kommentar',	0,	''),
 ('channel',	'de',	'cost',	'Kosten',	0,	''),
 ('channel',	'de',	'costHint',	'Kosten pro Einheit, nur bei Meter-Kanälen',	0,	''),
+('channel',	'de',	'decimals',	'Dezimalstellen',	0,	''),
+('channel',	'de',	'decimalsHint',	'Für die Wert-Ausgabe',	0,	''),
 ('channel',	'de',	'description',	'Beschreibung',	0,	''),
 ('channel',	'de',	'descriptionHint',	'Langtext',	0,	''),
 ('channel',	'de',	'Help',	'Hinweis',	0,	''),
@@ -666,8 +620,12 @@ VALUES
 ('channel',	'de',	'nameHint',	'Eindeutiger Kanalname',	0,	''),
 ('channel',	'de',	'numeric',	'Numerische Werte',	0,	''),
 ('channel',	'de',	'numericHint',	'Der Kanal hat numerische oder Alphanumerische Daten?',	0,	''),
+('channel',	'de',	'offset',	'Offset',	0,	''),
+('channel',	'de',	'offsetHint',	'Mittels dieses Offsets werden die realen Messwerte während des Auslesens korrigiert.',	0,	''),
 ('channel',	'de',	'Param',	'Parameter',	0,	''),
 ('channel',	'de',	'ParamIsRequired',	'Parameter \'%s\' ist erforderlich!',	0,	''),
+('channel',	'de',	'public',	'Öffentlich',	0,	''),
+('channel',	'de',	'publicHint',	'Nicht-öffentliche Kanäle sind für nicht eingeloggte Besucher oder ohne API key nicht ansprechbar.',	0,	''),
 ('channel',	'de',	'resolution',	'Auflösung',	0,	''),
 ('channel',	'de',	'resolutionHint',	'Auflösung bei Datenextraktion',	0,	''),
 ('channel',	'de',	'Serial',	'Seriennummer',	0,	''),
@@ -677,14 +635,18 @@ VALUES
 ('channel',	'de',	'unit',	'Einheit',	0,	''),
 ('channel',	'de',	'unitHint',	'Einheit des Kanals',	0,	''),
 ('channel',	'de',	'valid_from',	'Unterer Grenzwert',	0,	''),
-('channel',	'de',	'valid_fromHint',	'Messwerte sind nur gültig, wenn sie größer oder gleich dieses Wertes sind.',	0,	''),
+('channel',	'de',	'valid_fromHint',	'Werte sind nur gültig, wenn sie größer oder gleich dieses Wertes sind.\r\nBeim Speichern werden ungültige Werte verworfen, beim Auslesen kleiner Werte auf den Grenzwert gesetzt.',	0,	''),
 ('channel',	'de',	'valid_to',	'Oberer Grenzwert',	0,	''),
-('channel',	'de',	'valid_toHint',	'Messwerte sind nur gültig, wenn sie kleiner oder gleich dieses Wertes sind.',	0,	''),
+('channel',	'de',	'valid_toHint',	'Werte sind nur gültig, wenn sie kleiner oder gleich dieses Wertes sind.\r\nBeim Speichern werden ungültige Werte verworfen, beim Auslesen größere Werte auf den Grenzwert gesetzt.',	0,	''),
 ('channel',	'de',	'Value',	'Parameterwert',	0,	''),
 ('channel',	'en',	'channel',	'Channel',	0,	''),
 ('channel',	'en',	'channelHint',	'Channel name for multi sensors',	0,	''),
+('channel',	'en',	'comment',	'Comment',	0,	''),
+('channel',	'en',	'commentHint',	'Internal comment',	0,	''),
 ('channel',	'en',	'cost',	'Cost',	0,	''),
 ('channel',	'en',	'costHint',	'Cost per unit, for meter channels only',	0,	''),
+('channel',	'en',	'decimals',	'Decimals',	0,	''),
+('channel',	'en',	'decimalsHint',	'Decimals for value output',	0,	''),
 ('channel',	'en',	'description',	'Description',	0,	''),
 ('channel',	'en',	'descriptionHint',	'Long description',	0,	''),
 ('channel',	'en',	'Help',	'Hint',	0,	''),
@@ -694,8 +656,12 @@ VALUES
 ('channel',	'en',	'nameHint',	'Unique channel name',	0,	''),
 ('channel',	'en',	'numeric',	'Numeric values',	0,	''),
 ('channel',	'en',	'numericHint',	'Channels have numeric or alphanumeric data?',	0,	''),
+('channel',	'en',	'offset',	'Offset',	0,	''),
+('channel',	'en',	'offsetHint',	'Apply this value during readout to the reading values to correct them.',	0,	''),
 ('channel',	'en',	'Param',	'Parameter',	0,	''),
 ('channel',	'en',	'ParamIsRequired',	'Parameter \'%s\' is required!',	0,	''),
+('channel',	'en',	'public',	'Public',	0,	''),
+('channel',	'en',	'publicHint',	'Non public channels are not accessible for not logged in visitors or without API key.',	0,	''),
 ('channel',	'en',	'resolution',	'Resolution',	0,	''),
 ('channel',	'en',	'resolutionHint',	'Resolution for data readout',	0,	''),
 ('channel',	'en',	'Serial',	'Serial number',	0,	''),
@@ -705,15 +671,16 @@ VALUES
 ('channel',	'en',	'unit',	'Unit',	0,	''),
 ('channel',	'en',	'unitHint',	'Channel unit',	0,	''),
 ('channel',	'en',	'valid_from',	'Valid from',	0,	''),
-('channel',	'en',	'valid_fromHint',	'Readings are only valid if they are greater or equal this value.',	0,	''),
+('channel',	'en',	'valid_fromHint',	'Readings are only valid if they are greater or equal this limit.\r\nOn saving are invalid values skipped, on reading lower values will be set to this limit.',	0,	''),
 ('channel',	'en',	'valid_to',	'Valid to',	0,	''),
-('channel',	'en',	'valid_toHint',	'Readings are only valid if they are lower or equal this value.',	0,	''),
+('channel',	'en',	'valid_toHint',	'Readings are only valid if they are lower or equal this limit.\r\nOn saving are invalid values skipped, on reading greater values will be set to this limit.',	0,	''),
 ('channel',	'en',	'Value',	'Parameter value',	0,	''),
 ('code_admin',	'en',	'app',	'multi=1',	0,	''),
 ('code_admin',	'en',	'channel',	'multi=1',	0,	''),
 ('code_admin',	'en',	'code_admin',	'param=1 slave=1',	0,	''),
 ('code_admin',	'en',	'EquiVars',	'slave=1',	0,	''),
 ('code_admin',	'en',	'inverter',	'multi=1',	0,	''),
+('code_admin',	'en',	'model',	'multi=1',	0,	''),
 ('code_admin',	'en',	'plant',	'multi=1',	0,	''),
 ('code_admin',	'en',	'sensor',	'multi=1',	0,	''),
 ('code_admin',	'en',	'var',	'multi=1',	0,	''),
@@ -731,6 +698,7 @@ VALUES
 ('code_set',	'de',	'day2',	'Tag (2)',	0,	''),
 ('code_set',	'de',	'day3',	'Tag (3)',	0,	''),
 ('code_set',	'de',	'locale',	'Lokalisierung',	0,	''),
+('code_set',	'de',	'model',	'Model',	0,	''),
 ('code_set',	'de',	'month',	'Monat',	0,	''),
 ('code_set',	'de',	'month3',	'Monat (3)',	0,	''),
 ('code_set',	'de',	'period',	'Periode',	0,	''),
@@ -744,6 +712,7 @@ VALUES
 ('code_set',	'en',	'day2',	'day (2)',	0,	''),
 ('code_set',	'en',	'day3',	'day (3)',	0,	''),
 ('code_set',	'en',	'locale',	'Locales',	0,	''),
+('code_set',	'en',	'model',	'Model',	102,	''),
 ('code_set',	'en',	'month',	'month',	0,	''),
 ('code_set',	'en',	'month3',	'month (3)',	0,	''),
 ('code_set',	'en',	'period',	'Period',	0,	''),
@@ -855,6 +824,16 @@ VALUES
 ('locale',	'en',	'TimeShort',	'H:i',	0,	''),
 ('locale',	'en',	'YearDefault',	'Y',	0,	''),
 ('locale',	'en',	'YearShort',	'y',	0,	''),
+('model',	'de',	'Alias_channel',	'GUID',	0,	''),
+('model',	'de',	'Alias_channelHint',	'GUID des Orignalkanals aus der Übersicht',	0,	''),
+('model',	'de',	'History_valid_from',	'Tage zurück',	0,	''),
+('model',	'de',	'History_valid_from_Hint',	'Um diese Tage werden die Daten rückwärts gelesen.',	0,	''),
+('model',	'de',	'History_valid_to',	'Tage vorwärts',	0,	''),
+('model',	'en',	'Alias_channel',	'GUID',	0,	''),
+('model',	'en',	'Alias_channelHint',	'GUID of original channel from overview',	0,	''),
+('model',	'en',	'History_valid_from',	'Days backwards',	0,	''),
+('model',	'en',	'History_valid_from_Hint',	'These are number of days to fetch backwards.',	0,	''),
+('model',	'en',	'History_valid_to',	'Days foreward',	0,	''),
 ('month',	'de',	'1',	'Januar',	0,	''),
 ('month',	'de',	'10',	'Oktober',	0,	''),
 ('month',	'de',	'11',	'November',	0,	''),
@@ -918,24 +897,276 @@ VALUES
 ('period',	'en',	'w',	'Week',	3,	''),
 ('period',	'en',	'y',	'Year',	6,	'');
 
--- 1.2.0
+CREATE TABLE `pvlng_channel` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Id',
+  `guid` varchar(39) DEFAULT NULL COMMENT 'Unique GUID',
+  `name` varchar(255) NOT NULL COMMENT 'Unique identifier',
+  `description` varchar(255) NOT NULL COMMENT 'Longer description',
+  `serial` varchar(30) NOT NULL,
+  `channel` varchar(254) NOT NULL,
+  `type` int(10) unsigned NOT NULL COMMENT 'pvlng_type -> id',
+  `resolution` double NOT NULL DEFAULT '1',
+  `unit` varchar(10) NOT NULL,
+  `decimals` tinyint(1) unsigned NOT NULL DEFAULT '2',
+  `meter` tinyint(1) unsigned NOT NULL,
+  `numeric` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `offset` double NOT NULL,
+  `cost` double NOT NULL COMMENT 'per unit or unit * h',
+  `threshold` double unsigned DEFAULT NULL,
+  `valid_from` double DEFAULT NULL COMMENT 'Numeric min. acceptable value',
+  `valid_to` double DEFAULT NULL COMMENT 'Numeric max. acceptable value',
+  `public` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT 'Public channels don''t need API key to read',
+  `comment` text NOT NULL COMMENT 'Internal comment',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `Name-Description-Type` (`name`,`description`,`type`),
+  UNIQUE KEY `GUID` (`guid`),
+  KEY `type` (`type`),
+  CONSTRAINT `pvlng_channel_ibfk_2` FOREIGN KEY (`type`) REFERENCES `pvlng_type` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='The channels defined';
 
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "de", "None", "Keine", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "de", "ShowConsumption", "Periodenwerte", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "de", "ShowConsumptionHint", "Zeigt für Meter-Kanäle die Daten pro Periode und nicht den Gesamtwert über die Zeit", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "en", "None", "None", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "en", "ShowConsumption", "Period values", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "en", "ShowConsumptionHint", "Shows for meter channels the data per selected aggregation period and not the total over time", "0", "");
 
--- 1.3.0
+DELIMITER ;;
 
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "de", "GoToVariants", "Geh zu Deinen Varianten", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "de", "LogoutSuccessful", "[b]%s[/b] wurde erfolgreich abgemeldet.", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "en", "GoToVariants", "Go to your Variants", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "en", "LogoutSuccessful", "[b]%s[/b] logged out successful.", "0", "");
-REPLACE INTO `pvlng_babelkit` VALUES ("app", "en", "Variants", "Variants", "0", "");
-REPLACE INTO `pvlng_type` VALUES ("47", "Sonnenertrag JSON", "Readout plant/inverter data for Sonnenertrag JSON import", "Sonnenertrag\\JSON", "Wh", "-1", "1", "0", "0", "sonnenertrag.png");
+CREATE TRIGGER `pvlng_channel_bi` BEFORE INSERT ON `pvlng_channel` FOR EACH ROW
+BEGIN
 
--- Show API key
+  SELECT `childs` INTO @CHILDS FROM `pvlng_type`
+   WHERE `id` = new.`type` LIMIT 1;
+  if @CHILDS = 0 THEN SET new.`guid` = GUID(); END IF;
+END;;
 
-SELECT `getAPIkey`() AS 'Your API key';
+CREATE TRIGGER `pvlng_channel_ad` AFTER DELETE ON `pvlng_channel` FOR EACH ROW
+BEGIN
+
+  DELETE FROM `pvlng_reading_num` WHERE `id` = old.`id`;
+  DELETE FROM `pvlng_reading_str` WHERE `id` = old.`id`;
+END;;
+
+DELIMITER ;
+
+CREATE TABLE `pvlng_channel_view` (`id` int(10) unsigned, `guid` varchar(39), `name` varchar(255), `serial` varchar(30), `channel` varchar(254), `description` varchar(255), `resolution` double, `cost` double, `numeric` tinyint(1) unsigned, `unit` varchar(10), `decimals` tinyint(1) unsigned, `meter` tinyint(1) unsigned, `threshold` double unsigned, `valid_from` double, `valid_to` double, `type_id` int(10) unsigned, `type` varchar(60), `model` varchar(30), `childs` tinyint(1), `read` tinyint(1) unsigned, `write` tinyint(1) unsigned, `graph` tinyint(1) unsigned, `icon` varchar(30));
+
+
+CREATE TABLE `pvlng_config` (
+  `key` varchar(50) NOT NULL,
+  `value` varchar(1000) NOT NULL,
+  `comment` varchar(255) NOT NULL,
+  `type` enum('str','num','bool') NOT NULL DEFAULT 'str',
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Key-Value-Store';
+
+
+CREATE TABLE `pvlng_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `timestamp` datetime NOT NULL,
+  `scope` varchar(40) NOT NULL,
+  `data` text,
+  PRIMARY KEY (`id`),
+  KEY `timestamp` (`timestamp`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Logging messages';
+
+
+DELIMITER ;;
+
+CREATE TRIGGER `pvlng_log_bi` BEFORE INSERT ON `pvlng_log` FOR EACH ROW
+SET new.`timestamp` = NOW();;
+
+DELIMITER ;
+
+CREATE TABLE `pvlng_performance` (
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `action` enum('read','write') NOT NULL,
+  `time` int(10) unsigned NOT NULL COMMENT 'ms'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Gather system performance';
+
+
+CREATE TABLE `pvlng_performance_avg` (
+  `aggregation` enum('hour','day','month','year','overall') NOT NULL,
+  `action` enum('read','write') NOT NULL,
+  `year` year(4) NOT NULL,
+  `month` smallint(2) unsigned NOT NULL,
+  `day` smallint(2) unsigned NOT NULL,
+  `hour` smallint(2) unsigned NOT NULL,
+  `average` int(10) unsigned NOT NULL COMMENT 'ms',
+  `count` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`aggregation`,`action`,`year`,`month`,`day`,`hour`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `pvlng_performance_view` (`aggregation` enum('hour','day','month','year','overall'), `action` enum('read','write'), `timestamp` bigint(10), `average` int(10) unsigned);
+
+
+CREATE TABLE `pvlng_reading_num` (
+  `id` int(10) unsigned NOT NULL COMMENT 'pvlng_channel -> id',
+  `timestamp` int(10) unsigned NOT NULL,
+  `data` decimal(13,4) NOT NULL,
+  PRIMARY KEY (`id`,`timestamp`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Numeric readings'
+/*!50100 PARTITION BY LINEAR KEY (id)
+PARTITIONS 10 */;
+
+
+DELIMITER ;;
+
+CREATE TRIGGER `pvlng_reading_num_bi` BEFORE INSERT ON `pvlng_reading_num` FOR EACH ROW
+CALL getTimestamp(new.`timestamp`);;
+
+DELIMITER ;
+
+CREATE TABLE `pvlng_reading_str` (
+  `id` int(10) unsigned NOT NULL COMMENT 'pvlng_channel -> id',
+  `timestamp` int(10) unsigned NOT NULL,
+  `data` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`,`timestamp`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Alphanumeric readings';
+
+
+DELIMITER ;;
+
+CREATE TRIGGER `pvlng_reading_str_bi` BEFORE INSERT ON `pvlng_reading_str` FOR EACH ROW
+CALL getTimestamp(new.`timestamp`);;
+
+DELIMITER ;
+
+CREATE TABLE `pvlng_statistics` (`database` varchar(64), `table` varchar(64), `data_length` bigint(21) unsigned, `index_length` bigint(21) unsigned, `length` bigint(22) unsigned, `data_free` bigint(21) unsigned);
+
+
+CREATE TABLE `pvlng_tree` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `lft` int(10) unsigned NOT NULL,
+  `rgt` int(10) unsigned NOT NULL,
+  `moved` tinyint(1) unsigned NOT NULL,
+  `entity` int(10) unsigned NOT NULL COMMENT 'pvlng_channel -> id',
+  `guid` varchar(39) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `lft` (`lft`),
+  KEY `rgt` (`rgt`),
+  KEY `entity` (`entity`),
+  CONSTRAINT `pvlng_tree_ibfk_2` FOREIGN KEY (`entity`) REFERENCES `pvlng_channel` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Structured channels';
+
+
+DELIMITER ;;
+
+CREATE TRIGGER `pvlng_tree_bi` BEFORE INSERT ON `pvlng_tree` FOR EACH ROW
+BEGIN
+
+  SELECT `t`.`childs`, `t`.`read`+`t`.`write`
+    INTO @CHILDS, @RW
+    FROM `pvlng_channel` `e`
+    JOIN `pvlng_type` `t` ON `e`.`type` = `t`.`id`
+   WHERE `e`.`id` = new.`entity`;
+
+   IF @CHILDS != 0 AND @RW > 0 THEN
+     SET new.`guid` = GUID();
+   END IF;
+
+END;;
+
+DELIMITER ;
+
+CREATE TABLE `pvlng_tree_view` (`id` int(10) unsigned, `entity` int(10) unsigned, `guid` varchar(39), `name` varchar(255), `serial` varchar(30), `channel` varchar(254), `description` varchar(255), `resolution` double, `cost` double, `meter` tinyint(1) unsigned, `numeric` tinyint(1) unsigned, `offset` double, `unit` varchar(10), `decimals` tinyint(1) unsigned, `threshold` double unsigned, `valid_from` double, `valid_to` double, `public` tinyint(1) unsigned, `comment` text, `type` varchar(60), `model` varchar(30), `childs` tinyint(1), `read` tinyint(1) unsigned, `write` tinyint(1) unsigned, `graph` tinyint(1) unsigned, `icon` varchar(30));
+
+
+CREATE TABLE `pvlng_type` (
+  `id` int(10) unsigned NOT NULL COMMENT 'Unique Id',
+  `name` varchar(60) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `model` varchar(30) NOT NULL,
+  `unit` varchar(10) NOT NULL,
+  `childs` tinyint(1) NOT NULL,
+  `read` tinyint(1) unsigned NOT NULL,
+  `write` tinyint(1) unsigned NOT NULL,
+  `graph` tinyint(1) unsigned NOT NULL,
+  `icon` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Channel types';
+
+INSERT INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `childs`, `read`, `write`, `graph`, `icon`) VALUES
+(0,	'Alias',	'Alias channel acts like the referenced channel',	'Alias',	'',	0,	1,	0,	1,	'arrow_180.png'),
+(1,	'Power plant',	'A power plant groups mostly inverters',	'',	'',	-1,	0,	0,	0,	'building.png'),
+(2,	'Inverter',	'A Inverter groups mostly energy, voltage and current channels',	'',	'',	-1,	0,	0,	0,	'exclamation_frame.png'),
+(3,	'Building',	'A building groups several other things',	'',	'',	-1,	0,	0,	0,	'home.png'),
+(4,	'Multi-Sensor',	'A sensor with multiple channels',	'',	'',	-1,	0,	0,	0,	'wooden_box.png'),
+(5,	'Group',	'A generic group',	'',	'',	-1,	0,	0,	0,	'folders_stack.png'),
+(10,	'Random',	'A random channel delivers data \"valid_from\" ... \"valid_to\" with variance +-\"threshold\"',	'Random',	'',	0,	1,	0,	1,	'ghost.png'),
+(11,	'Fixed value',	'Use this to display a horz. line',	'Fix',	'',	0,	1,	0,	1,	'chart_arrow.png'),
+(12,	'Estimate',	'Show the the daily estimate of production',	'Estimate',	'Wh',	0,	1,	0,	1,	'plug.png'),
+(15,	'Ratio calculator',	'A ratio calculator calc the ration between 2 child entities (groups or channels)',	'Ratio',	'%',	2,	1,	0,	1,	'edit_percent.png'),
+(16,	'Accumulator',	'An accumulator groups channels with same type',	'Accumulator',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
+(17,	'Differentiator',	'An differentiator groups channels with same type',	'Differentiator',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
+(18,	'Full Differentiator',	'An differentiator groups channels with same type',	'DifferentiatorFull',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
+(19,	'Sensor to meter',	'Transform data of a sensor to meter data',	'SensorToMeter',	'',	1,	1,	0,	1,	'calculator_scientific.png'),
+(20,	'Import / Export',	'Calculates imort or export by consumption and production',	'InternalConsumption',	'',	2,	1,	0,	1,	'calculator_scientific.png'),
+(21,	'Average',	'An average calculator of channels with the same type',	'Average',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
+(22,	'Calculator',	'Uses resolution to perform only a calculation',	'Calculator',	'',	1,	1,	0,	1,	'calculator_scientific.png'),
+(23,	'History',	'Uses historic data, last x days, same days last years for display',	'History',	'',	1,	1,	0,	1,	'calculator_scientific.png'),
+(30,	'Dashboard channel',	'A proxy channel for dashboard display',	'Dashboard',	'',	0,	1,	0,	1,	'dashboard.png'),
+(40,	'SMA Sunny Webbox',	'Accept JSON from a SMA Sunny Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_webbox.png'),
+(41,	'SMA Inverter',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_inverter.png'),
+(42,	'SMA Sensorbox',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_sensorbox.png'),
+(50,	'Energy meter, absolute',	'A enegry meter counts production or consumption',	'Meter',	'Wh',	0,	1,	1,	1,	'plug.png'),
+(51,	'Power sensor',	'A power sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'plug.png'),
+(52,	'Voltage sensor',	'A voltage sensor tracks actual voltage',	'Sensor',	'V',	0,	1,	1,	1,	'dashboard.png'),
+(53,	'Current sensor',	'An current sensor tracks actual current',	'Sensor',	'A',	0,	1,	1,	1,	'lightning.png'),
+(54,	'Gas sensor',	'A gas sensor tracks actual consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'fire.png'),
+(55,	'Heat sensor',	'A heat sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'fire_big.png'),
+(56,	'Humidity sensor',	'A humidity sensor tracks actual humitiy',	'Sensor',	'%',	0,	1,	1,	1,	'weather_cloud.png'),
+(57,	'Luminosity sensor',	'A luminosity sensor tracks actual luminosity',	'Sensor',	'lm',	0,	1,	1,	1,	'light_bulb.png'),
+(58,	'Pressure sensor',	'A pressure sensor tracks actual pressure',	'Sensor',	'hPa',	0,	1,	1,	1,	'umbrella.png'),
+(59,	'Radiation sensor',	'A radiation sensor tracks actual radiation',	'Sensor',	'µSV/h',	0,	1,	1,	1,	'brightness.png'),
+(60,	'Temperature sensor',	'A temperature sensor tracks actual temperature',	'Sensor',	'°C',	0,	1,	1,	1,	'application_monitor.png'),
+(61,	'Valve sensor',	'A valve sensor tracks actual valve position',	'Sensor',	'°',	0,	1,	1,	1,	'wheel.png'),
+(62,	'Water sensor',	'A water sensor tracks actual water consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'water.png'),
+(63,	'Windspeed sensor',	'A windspeed sensor tracks actual windspeed',	'Sensor',	'm/s',	0,	1,	1,	1,	'paper_plane.png'),
+(64,	'Irradiation sensor',	'An irradiation sensor tracks actual irradiation',	'Sensor',	'W/m²',	0,	1,	1,	1,	'brightness.png'),
+(65,	'Time',	'Counts time based data, e.g working hours',	'Meter',	'h',	0,	1,	1,	1,	'clock.png'),
+(66,	'Frequency sensor',	'A frequency sensor tracks actual frequencies',	'Sensor',	'Hz',	0,	1,	1,	1,	'dashboard.png'),
+(70,	'Gas meter',	'A gas maeter tracks consumption or production over time',	'Meter',	'm³',	0,	1,	1,	1,	'fire.png'),
+(71,	'Radiation meter',	'A radiation meter tracks radiation over time',	'Meter',	'µSV',	0,	1,	1,	1,	'brightness.png'),
+(72,	'Water meter',	'A water meter tracks water consumption or production over time',	'Meter',	'm³',	0,	1,	1,	1,	'water.png'),
+(90,	'Power sensor counter',	'A power sensor counter tracks actual consumption or production',	'Counter',	'W',	0,	1,	1,	1,	'plug.png'),
+(91,	'Switch',	'A switch tracks only state changes',	'Switcher',	'',	0,	1,	1,	1,	'ui_check_boxes.png'),
+(100,	'PV-Log Plant',	'Readout plant data for PV-Log JSON import',	'PVLog\\Plant',	'',	-1,	1,	0,	0,	'pv_log_sum.png'),
+(101,	'PV-Log Inverter',	'Readout inverter data for PV-Log JSON import',	'PVLog\\Inverter',	'',	-1,	1,	0,	0,	'pv_log.png'),
+(102,	'PV-Log Plant (r2)',	'Readout plant data for PV-Log JSON import',	'PVLog2\\Plant',	'',	-1,	1,	0,	0,	'pv_log_sum.png'),
+(103,	'PV-Log Inverter (r2)',	'Readout inverter data for PV-Log JSON import',	'PVLog2\\Inverter',	'',	-1,	0,	0,	0,	'pv_log.png'),
+(110,	'Sonnenertrag JSON',	'Readout plant/inverter data for Sonnenertrag JSON import',	'Sonnenertrag\\JSON',	'',	-1,	1,	0,	0,	'sonnenertrag.png');
+
+CREATE TABLE `pvlng_view` (
+  `name` varchar(50) NOT NULL COMMENT 'Variant name',
+  `data` text NOT NULL COMMENT 'Serialized channel data',
+  `public` tinyint(1) NOT NULL COMMENT 'Public view',
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='View variants';
+
+
+DROP TABLE IF EXISTS `pvlng_channel_view`;
+CREATE VIEW `pvlng_channel_view` AS select `c`.`id` AS `id`,`c`.`guid` AS `guid`,`c`.`name` AS `name`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`description` AS `description`,`c`.`resolution` AS `resolution`,`c`.`cost` AS `cost`,`c`.`numeric` AS `numeric`,`c`.`unit` AS `unit`,`c`.`decimals` AS `decimals`,`c`.`meter` AS `meter`,`c`.`threshold` AS `threshold`,`c`.`valid_from` AS `valid_from`,`c`.`valid_to` AS `valid_to`,`t`.`id` AS `type_id`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`graph` AS `graph`,`t`.`icon` AS `icon` from (`pvlng_channel` `c` join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) where (`c`.`id` <> 1) order by `t`.`name`,`c`.`name`,`c`.`channel`,`c`.`description`;
+
+DROP TABLE IF EXISTS `pvlng_performance_view`;
+CREATE VIEW `pvlng_performance_view` AS select `pvlng_performance_avg`.`aggregation` AS `aggregation`,`pvlng_performance_avg`.`action` AS `action`,unix_timestamp(concat(`pvlng_performance_avg`.`year`,'-',`pvlng_performance_avg`.`month`,'-',`pvlng_performance_avg`.`day`,' ',`pvlng_performance_avg`.`hour`)) AS `timestamp`,`pvlng_performance_avg`.`average` AS `average` from `pvlng_performance_avg` limit 50;
+
+DROP TABLE IF EXISTS `pvlng_statistics`;
+CREATE VIEW `pvlng_statistics` AS select `information_schema`.`TABLES`.`TABLE_SCHEMA` AS `database`,`information_schema`.`TABLES`.`TABLE_NAME` AS `table`,`information_schema`.`TABLES`.`DATA_LENGTH` AS `data_length`,`information_schema`.`TABLES`.`INDEX_LENGTH` AS `index_length`,(`information_schema`.`TABLES`.`DATA_LENGTH` + `information_schema`.`TABLES`.`INDEX_LENGTH`) AS `length`,`information_schema`.`TABLES`.`DATA_FREE` AS `data_free` from `information_schema`.`TABLES` where ((`information_schema`.`TABLES`.`TABLE_NAME` like 'pvlng_%') and (`information_schema`.`TABLES`.`ENGINE` is not null)) group by `information_schema`.`TABLES`.`TABLE_NAME`;
+
+DROP TABLE IF EXISTS `pvlng_tree_view`;
+CREATE VIEW `pvlng_tree_view` AS select `tree`.`id` AS `id`,`tree`.`entity` AS `entity`,if((`t`.`childs` <> 0),`tree`.`guid`,`c`.`guid`) AS `guid`,`c`.`name` AS `name`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`description` AS `description`,`c`.`resolution` AS `resolution`,`c`.`cost` AS `cost`,`c`.`meter` AS `meter`,`c`.`numeric` AS `numeric`,`c`.`offset` AS `offset`,`c`.`unit` AS `unit`,`c`.`decimals` AS `decimals`,`c`.`threshold` AS `threshold`,`c`.`valid_from` AS `valid_from`,`c`.`valid_to` AS `valid_to`,`c`.`public` AS `public`,`c`.`comment` AS `comment`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`graph` AS `graph`,`t`.`icon` AS `icon` from ((`pvlng_tree` `tree` join `pvlng_channel` `c` on((`tree`.`entity` = `c`.`id`))) join `pvlng_type` `t` on((`c`.`type` = `t`.`id`)));
+
+
+INSERT INTO `pvlng_channel` (`id`, `name`, `description`, `serial`, `channel`, `type`, `resolution`, `unit`, `decimals`, `meter`, `numeric`, `offset`, `cost`, `threshold`, `valid_from`, `valid_to`, `public`, `comment`) VALUES
+(1,	'DON\'T TOUCH',	'Dummy for tree root',	'',	'',	0,	0,	'',	2,	0,	0,	0,	0,	NULL,	NULL,	NULL,	1,	''),
+(2,	'RANDOM Temperature sensor',	'15 ... 25, &plusmn;0.5',	'',	'',	10,	1,	'°C',	2,	0,	1,	0,	0,	0.5,	15,	25,	1,	''),
+(3,	'RANDOM Energy meter',	'0 ... &infin;, +0.05',	'',	'',	10,	1000,	'Wh',	2,	1,	1,	0,	0.0002,	0.05,	0,	10000000000,	1,	'');
+
+INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`) VALUES
+('Currency',	'EUR',	'Costs currency',	'str'),
+('CurrencyDecimals',	'2',	'Costs currency decimals',	'num'),
+('LogInvalid',	'0',	'Log invalid values',	'str'),
+('TimeStep',	'60',	'Reading time step in seconds',	'num');
+
+INSERT INTO `pvlng_tree` (`id`, `lft`, `rgt`, `entity`) VALUES
+(1,  1,  6,  1), (2,  2,  3,  2), (3,  4,  5,  3);
+
+select `getAPIkey`();
