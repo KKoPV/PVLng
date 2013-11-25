@@ -78,8 +78,6 @@ return array(
 	 */
 	'Cookie' => array(
 		'Name'     => 'PVLng',
-		'Lifetime' => 0, // Session only, default
-#		'Lifetime' => 24*60*60 * 7, // 7 days (in seconds)
 	),
 
 );

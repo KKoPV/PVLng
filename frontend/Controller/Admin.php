@@ -17,6 +17,13 @@ class Admin extends \Controller {
 	/**
 	 *
 	 */
+	public static function RememberLogin() {
+		setcookie(\Session::token(), 1, time()+60*60*24*60, '/');
+	}
+
+	/**
+	 *
+	 */
 	public function LoginPOST_Action() {
 
 		$hasher = new \PasswordHash();
@@ -33,11 +40,9 @@ class Admin extends \Controller {
 
 			$this->User = $AdminUser;
 			\Session::set('user', $AdminUser);
+			\Messages::Success(__('Welcome', $this->User));
 
-			if ($this->request->post('save')) {
-				setcookie(\Session::token(), 1, time()+60*60*24*7, '/');
-			}
-			\Messages::Success(\I18N::_('Welcome', $this->User));
+			if ($this->request->post('save')) self::RememberLogin();
 
 			if ($r = \Session::get('returnto')) {
 				// Clear before redirect
@@ -48,7 +53,7 @@ class Admin extends \Controller {
 			}
 
 		} else {
-			\Messages::Error(\I18N::_('UnknownUser'));
+			\Messages::Error(__('UnknownUser'));
 		}
 	}
 
@@ -57,7 +62,7 @@ class Admin extends \Controller {
 	 */
 	public function Logout_Action() {
 		if ($this->User) {
-			$this->view->Message = \I18N::_('LogoutSuccessful', $this->User);
+			$this->view->Message = __('LogoutSuccessful', $this->User);
 		}
 		$this->User = '';
 		\Session::destroy();
@@ -76,7 +81,7 @@ class Admin extends \Controller {
 		}
 
 		if ($this->request->post('p1') != $this->request->post('p2')) {
-			\Messages::Error(\I18N::_('PasswordsNotEqual'), TRUE);
+			\Messages::Error(__('PasswordsNotEqual'), TRUE);
             return;
 		}
 
@@ -89,7 +94,29 @@ class Admin extends \Controller {
 	 *
 	 */
 	public function AdminPassword_Action() {
-		$this->view->SubTitle = \I18N::_('GenerateAdminHash');
+		$this->view->SubTitle = __('GenerateAdminHash');
+	}
+
+	/**
+	 *
+	 */
+	public function ConfigPOST_Action() {
+		foreach ($this->request->post('c') as $key=>$value) {
+			$q = \DBQuery::forge()->update('pvlng_config')
+			     ->set('value', $value)->whereEQ('key', $key)->limit(1);
+			$this->db->query($q);
+		}
+		\Messages::success(__('DataSaved'));
+	}
+
+	/**
+	 *
+	 */
+	public function Config_Action() {
+		$this->view->SubTitle = __('Configuration');
+
+		$q = \DBQuery::forge('pvlng_config')->whereNE('type');
+		$this->view->Data = $this->rows2view($this->db->queryRows($q));
 	}
 
 }
