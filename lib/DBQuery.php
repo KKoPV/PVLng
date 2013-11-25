@@ -121,7 +121,7 @@ class DBQuery {
 	public function where( $field, $cond='', $value='' ) {
 		if ($field != '') {
 			if ($cond) $cond = ' ' . $cond . ' ' . $this->quote($value);
-			$this->where[] = $field . $cond;
+			$this->where[] = '`'.$field.'`' . $cond;
 		}
 		return $this;
 	}

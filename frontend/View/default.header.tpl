@@ -15,21 +15,21 @@
 			<img style="width:100;height:60px" src="/images/logo.png" width="100" height="60" />
 		</a>
 		<div style="margin-left:120px">
-			{VERSION}
+			v{VERSION}
 			<!-- IF {VERSIONNEW} -->
-			<br /><br />
-			<a href="https://github.com/K-Ko/PVLng/wiki"
-			   style="font-weight:bold;color:red">
-				{VERSIONNEW}
-			</a>
+			<p style="font-weight:bold;color:red">
+				NEW:<br /><a href="https://github.com/K-Ko/PVLng/wiki/ChangeLog">v{VERSIONNEW}</a>
+			</p>
 			<!-- ENDIF -->
 		</div>
 	</div>
-	<div class="grid_8">
-		<div class="r"><span id="title1">{TITLE}</span></div>
-		<h3 class="fl">{SUBTITLE}</h3>
+	<div class="grid_4 c">
+		<h3>{SUBTITLE}</h3>
+	</div>
+	<div class="grid_4 r">
+		<span id="title1">{TITLE}</span>
 		<!-- IF {USER} -->
-		<div class="r"><br/ ><em>{USER}</em></div>
+		<p><em>{USER}</em></p>
 		<!-- ENDIF -->
 	</div>
 	<div class="clear"></div>

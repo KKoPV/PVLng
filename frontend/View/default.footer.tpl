@@ -19,7 +19,7 @@
 		Version {VERSION} / {VERSIONDATE}
 		<br />
 		&copy; 2012-{YEAR} by
-		<a href="http://pvlng.com/Author.html" class="tip" title="Knut Kohl PhotoVoltaics"
+		<a href="http://pvlng.com/index.html?Author.html" class="tip" title="Knut Kohl PhotoVoltaics"
 		   tip="<strong>K</strong>nut <strong>Ko</strong>hl <strong>P</strong>hoto<strong>V</strong>oltaics">
 			<strong>KKoPV</strong>
 		</a>

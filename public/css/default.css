@@ -94,11 +94,10 @@ img.tip {
 #header {
 	margin-top: .5em;
 	margin-bottom: .5em;
-	height: 5.5em;
 }
 
 #title1 {
-	font-size: 130%;
+	font-size: 125%;
 	font-weight: bold;
 	font-style: italic;
 	text-shadow: #AAA .1em .1em .1em;

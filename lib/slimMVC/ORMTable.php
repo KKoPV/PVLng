@@ -136,7 +136,7 @@ abstract class ORMTable {
 		foreach ($this->fields as $field=>$value) {
 			// Skip primary key(s) and not changed values
 			if (!in_array($field, $this->primary) AND
-			    (string) $value != (string) $this->oldfields[$field]) {
+			    (!in_array($field, $this->oldfields) OR (string) $value != (string) $this->oldfields[$field])) {
 				if ($value == '' AND $this->nullable[$field]) {
 					$set[] = sprintf('%s = NULL', $field);
 				} else {

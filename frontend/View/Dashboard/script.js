@@ -91,12 +91,29 @@ function ToggleTree( force ) {
 		$(el).parent().parent().parent().toggle(TreeExpanded || $(el).is(':checked'));
 	});
 
+	$('tr.no-graph').each(function(id, el) {
+		$(el).toggle(TreeExpanded);
+	});
+
+	var css;
+
 	if (TreeExpanded) {
 		$('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
 		$('#tiptoggle').html('{{CollapseAll}}')
+
+		$('span.indenter').each(function(id, el) {
+			el = $(el);
+			/* Restore left indent */
+			el.css('padding-left', el.data('indent'));
+		});
 	} else {
 		$('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
 		$('#tiptoggle').html('{{ExpandAll}}')
+
+		$('span.indenter').each(function(id, el) {
+			/* Remove left indent */
+			$(el).css('padding-left', 0);
+		});
 	}
 
 }
@@ -238,6 +255,14 @@ $(function() {
 
 	updateClock();
 
+	<!-- IF {USER} -->
+	$.ajaxSetup({
+		beforeSend: function setHeader(xhr) {
+			xhr.setRequestHeader('X-PVLng-Key', '{APIKEY}');
+		}
+	});
+	<!-- ENDIF -->
+
 	Highcharts.setOptions({
 		lang: {
 			thousandsSep: '{TSEP}',
@@ -260,6 +285,12 @@ $(function() {
 		initialState: 'expanded',
 		indent: 24,
 		column: 1
+	});
+
+	/* Remember left padding of indenter */
+	$('span.indenter').each(function(id, el) {
+		el = $(el);
+		el.data('indent', el.css('padding-left'));
 	});
 
 	$('input.iCheck').iCheck('update');
@@ -291,7 +322,10 @@ $(function() {
 		return false;
 	}).button({ icons: { primary: 'ui-icon-carat-1-n' }, text: false });
 
-	if ('{CHANNELCOUNT}' != 0) $('#togglewrapper').trigger('click');
+	if ('{CHANNELCOUNT}' != 0) {
+		ToggleTree(false);
+		$('#togglewrapper').trigger('click');
+	}
 });
 
 </script>

@@ -13,9 +13,10 @@
 	<!-- INCLUDE header.embedded.tpl -->
 <!-- ELSE -->
 
-	<div class="grid_10">
+<div class="grid_10">
 
-	<!-- INCLUDE header.tpl -->
+<!-- INCLUDE header.tpl -->
+
 <!-- ENDIF -->
 
 <div style="max-width:940px;margin:1em auto">
@@ -59,9 +60,9 @@
 		</p>
 	<!-- ENDIF -->
 
-	<div class="clear"></div>
-
 </div>
+
+<div class="clear"></div>
 
 <!-- IF {EMBEDDED} -->
 
@@ -74,6 +75,12 @@
 
 <!-- ELSE -->
 
+</div>
+
+<div class="clear"></div>
+
+<div class="push_2 grid_6">
+
 <p>
 	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
 </p>
@@ -81,10 +88,6 @@
 <form method="post" action="/dashboard">
 
 <div id="wrapper">
-
-	<p>
-		<input type="submit" value="{{Save}}" />
-	</p>
 
 	<table id="tree" class="dataTable treeTable">
 		<thead>
@@ -96,7 +99,7 @@
 					 title="#tiptoggle" width="16" height="16" />
 				<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 			</th>
-			<th style="width:99%;padding-left:0" class="l">
+			<th style="width:99%" class="l">
 				<span class="indenter" style="padding-left: 0px;"></span>
 				{{Channel}}
 			</th>
@@ -107,7 +110,8 @@
 
 		<!-- BEGIN DATA -->
 
-		<tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
+		<tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->
+		    <!-- IF !{GRAPH} -->class="no-graph"<!-- ENDIF -->>
 			<td>
 				<!-- IF {GRAPH} -->
 				<input class="channel iCheck" type="checkbox" name="v[]"
@@ -137,8 +141,6 @@
 </div> <!-- wrapper -->
 
 </form>
-
-</div>
 
 <div class="clear"></div>
 
