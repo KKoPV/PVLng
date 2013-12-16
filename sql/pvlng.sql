@@ -2,13 +2,11 @@
 -- @author      Knut Kohl <github@knutkohl.de>
 -- @copyright   2012-2013 Knut Kohl
 -- @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
--- @version     $Id$
+-- @version     1.4.0
 -- --------------------------------------------------------------------------
 
 SET NAMES utf8;
 SET foreign_key_checks = 0;
-SET time_zone = '+01:00';
-SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
 
 DELIMITER ;;
 
@@ -17,9 +15,10 @@ CREATE FUNCTION `getAPIkey`() RETURNS varchar(36) CHARSET utf8
 BEGIN
   SELECT `value` INTO @KEY FROM `pvlng_config` WHERE `key` = 'APIKey';
   IF @KEY IS NULL THEN
+
     SET @KEY = UUID();
     INSERT INTO `pvlng_config` (`key`, `value`, `comment`)
-         VALUES ('APIKey', @KEY, 'API key for all PUT/POST/DELETE requests');
+	     VALUES ('APIKey', @KEY, 'API key for all PUT/POST/DELETE requests');
   END IF;
   RETURN @KEY;
 END;;
@@ -140,7 +139,7 @@ BEGIN
     SET `timestamp` = UNIX_TIMESTAMP();
   END IF;
 
-  SELECT `value` FROM `pvlng_config` WHERE `key` = "TimeStep" INTO @SECONDS;
+  SELECT `value` INTO @SECONDS FROM `pvlng_config` WHERE `key` = "TimeStep";
 
   SET `timestamp` = `timestamp` DIV @SECONDS * @SECONDS;
 END;;
@@ -170,6 +169,8 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'de',	'AdminAndPasswordRequired',	'Benutzername und Passwort sind erforderlich!',	0,	''),
 ('app',	'de',	'Aggregation',	'Aggregation',	0,	''),
 ('app',	'de',	'AliasEntity',	'Alias-Kanal erstellen',	0,	''),
+('app',	'de',	'AliasesUpdated',	'Der Alias-Kanal wurden ebenfalls geändert.',	0,	''),
+('app',	'de',	'AliasStillExists',	'Es existiert bereits ein Alias-Kanal.',	0,	''),
 ('app',	'de',	'All',	'Alle',	0,	''),
 ('app',	'de',	'AllDataWillBeRemoved',	'Alle Daten werden gelöscht, [color=red]alle[/color] Stamm- und [color=red]alle[/color] Betriebsdaten!',	0,	''),
 ('app',	'de',	'Amount',	'Summe',	0,	''),
@@ -242,6 +243,7 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'de',	'Description',	'Beschreibung',	0,	''),
 ('app',	'de',	'DontForgetUpdateAPIKey',	'Vergiss nicht Deinen API-Key nach einer Neuerstellung in externen Scripten zu aktualisieren!',	0,	''),
 ('app',	'de',	'DragBookmark',	'Ziehe den Link zu Deinen Lesezeichen',	0,	''),
+('app',	'de',	'DragPermanent',	'Permanent Link mit Datum\r\nZiehe den Link zu Deinen Lesezeichen',	0,	''),
 ('app',	'de',	'DSEP',	',',	0,	''),
 ('app',	'de',	'Earning',	'Ertrag',	0,	''),
 ('app',	'de',	'Edit',	'Bearbeiten',	0,	''),
@@ -265,7 +267,8 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'de',	'Last',	'Letzte',	0,	''),
 ('app',	'de',	'LastTimestamp',	'Zeitpunkt der letzten\r\nDatenaufzeichnung',	0,	''),
 ('app',	'de',	'left',	'links',	0,	''),
-('app',	'de',	'LineBold',	'Zeiche dickere Linie',	0,	''),
+('app',	'de',	'LineBold',	'dick',	0,	''),
+('app',	'de',	'LineNormal',	'normal',	0,	''),
 ('app',	'de',	'LineWidth',	'Linienstärke',	0,	''),
 ('app',	'de',	'Load',	'Laden',	0,	''),
 ('app',	'de',	'Log',	'Log',	0,	''),
@@ -315,6 +318,7 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'de',	'Power',	'Leistung',	0,	''),
 ('app',	'de',	'Presentation',	'Darstellung',	0,	''),
 ('app',	'de',	'PrevDay',	'Vorheriger Tag',	0,	''),
+('app',	'de',	'PrivateChannel',	'Nicht-öffentlicher Kanal',	0,	''),
 ('app',	'de',	'Production',	'Produktion',	0,	''),
 ('app',	'de',	'public',	'öffentlich',	0,	''),
 ('app',	'de',	'publicHint',	'Öffentliche Diagramme sind von nicht eingeloggten Besuchern anzeigbar.',	0,	''),
@@ -356,6 +360,8 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'de',	'TemperatureDifference',	'Temperaturdifferenz',	0,	''),
 ('app',	'de',	'TemperatureModules',	'Modultemperatur',	0,	''),
 ('app',	'de',	'TemperatureOutside',	'Außentemperatur',	0,	''),
+('app',	'de',	'ThinLine',	'dünn',	0,	''),
+('app',	'de',	'Threshold',	'Grenzwert',	0,	''),
 ('app',	'de',	'Timestamp',	'Timestamp',	0,	''),
 ('app',	'de',	'to',	'bis',	0,	''),
 ('app',	'de',	'Today',	'Heute',	0,	''),
@@ -369,6 +375,7 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'de',	'Unit',	'Einheit',	0,	''),
 ('app',	'de',	'UnknownUser',	'Unbekannter Benutzer oder falsches Passwort.',	0,	''),
 ('app',	'de',	'UnknownView',	'Unbekanntes Diagramm: \'%s\'',	0,	''),
+('app',	'de',	'UseNegativeColor',	'Nutze andere Farbe für Werte unterhalb Grenzwert',	0,	''),
 ('app',	'de',	'Value',	'Wert',	0,	''),
 ('app',	'de',	'Variant',	'Diagramm',	0,	''),
 ('app',	'de',	'Variants',	'Diagramme',	0,	''),
@@ -391,6 +398,8 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'en',	'AdminAndPasswordRequired',	'User name and password required!',	0,	''),
 ('app',	'en',	'Aggregation',	'Aggregation',	0,	''),
 ('app',	'en',	'AliasEntity',	'Create alias channel',	0,	''),
+('app',	'en',	'AliasesUpdated',	'The alias channel was also updated.',	0,	''),
+('app',	'en',	'AliasStillExists',	'An alias channel still exists.',	0,	''),
 ('app',	'en',	'All',	'All',	0,	''),
 ('app',	'en',	'AllDataWillBeRemoved',	'All data will be removed, all master data and [color=red]all[/color] operating data!',	0,	''),
 ('app',	'en',	'Amount',	'Amount',	0,	''),
@@ -463,6 +472,7 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'en',	'Description',	'Description',	0,	''),
 ('app',	'en',	'DontForgetUpdateAPIKey',	'Don\'t forget to update the API key in extranl scripts after recreation!',	0,	''),
 ('app',	'en',	'DragBookmark',	'Drag the link to your bookmarks',	0,	''),
+('app',	'en',	'DragPermanent',	'Permanent link with dates\r\nDrag the link to your bookmarks',	0,	''),
 ('app',	'en',	'DSEP',	'.',	0,	''),
 ('app',	'en',	'Earning',	'Earning',	0,	''),
 ('app',	'en',	'Edit',	'Edit',	0,	''),
@@ -486,7 +496,8 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'en',	'Last',	'Last',	0,	''),
 ('app',	'en',	'LastTimestamp',	'Time stamp of\r\nlast data recording',	0,	''),
 ('app',	'en',	'left',	'left',	0,	''),
-('app',	'en',	'LineBold',	'Draw thicker line',	0,	''),
+('app',	'en',	'LineBold',	'thick',	0,	''),
+('app',	'en',	'LineNormal',	'normal',	0,	''),
 ('app',	'en',	'LineWidth',	'Line width',	0,	''),
 ('app',	'en',	'Load',	'Load',	0,	''),
 ('app',	'en',	'Log',	'Log',	0,	''),
@@ -536,6 +547,7 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'en',	'Power',	'Power',	0,	''),
 ('app',	'en',	'Presentation',	'Presentation',	0,	''),
 ('app',	'en',	'PrevDay',	'Previous day',	0,	''),
+('app',	'en',	'PrivateChannel',	'No public channel',	0,	''),
 ('app',	'en',	'Production',	'Production',	0,	''),
 ('app',	'en',	'public',	'public',	0,	''),
 ('app',	'en',	'publicHint',	'Public charts are accessible by not logged in visitors.',	0,	''),
@@ -577,6 +589,8 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'en',	'TemperatureDifference',	'Temperature difference',	0,	''),
 ('app',	'en',	'TemperatureModules',	'Temperature modules',	0,	''),
 ('app',	'en',	'TemperatureOutside',	'Temperature outside',	0,	''),
+('app',	'en',	'ThinLine',	'thin',	0,	''),
+('app',	'en',	'Threshold',	'Threshold',	0,	''),
 ('app',	'en',	'Timestamp',	'Timestamp',	0,	''),
 ('app',	'en',	'to',	'to',	0,	''),
 ('app',	'en',	'Today',	'Today',	0,	''),
@@ -590,6 +604,7 @@ INSERT INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`,
 ('app',	'en',	'Unit',	'Unit',	0,	''),
 ('app',	'en',	'UnknownUser',	'Unknown user or wrong password.',	0,	''),
 ('app',	'en',	'UnknownView',	'Unknown chart: \'%s\'',	0,	''),
+('app',	'en',	'UseNegativeColor',	'Use different color for values below threshold',	0,	''),
 ('app',	'en',	'Value',	'Value',	0,	''),
 ('app',	'en',	'Variant',	'Chart',	0,	''),
 ('app',	'en',	'Variants',	'Charts',	0,	''),
@@ -903,7 +918,7 @@ CREATE TABLE `pvlng_channel` (
   `name` varchar(255) NOT NULL COMMENT 'Unique identifier',
   `description` varchar(255) NOT NULL COMMENT 'Longer description',
   `serial` varchar(30) NOT NULL,
-  `channel` varchar(254) NOT NULL,
+  `channel` varchar(255) NOT NULL,
   `type` int(10) unsigned NOT NULL COMMENT 'pvlng_type -> id',
   `resolution` double NOT NULL DEFAULT '1',
   `unit` varchar(10) NOT NULL,
@@ -929,10 +944,18 @@ DELIMITER ;;
 
 CREATE TRIGGER `pvlng_channel_bi` BEFORE INSERT ON `pvlng_channel` FOR EACH ROW
 BEGIN
-
   SELECT `childs` INTO @CHILDS FROM `pvlng_type`
    WHERE `id` = new.`type` LIMIT 1;
-  if @CHILDS = 0 THEN SET new.`guid` = GUID(); END IF;
+  IF @CHILDS = 0 THEN SET new.`guid` = GUID(); END IF;
+END;;
+
+CREATE TRIGGER `pvlng_channel_bd` BEFORE DELETE ON `pvlng_channel` FOR EACH ROW
+BEGIN
+  SELECT COUNT(*) INTO @COUNT FROM `pvlng_tree` WHERE `entity` = old.`id`;
+
+  IF @COUNT > 0 THEN
+    SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = 'ChannelStillInTree';
+  END IF;
 END;;
 
 CREATE TRIGGER `pvlng_channel_ad` AFTER DELETE ON `pvlng_channel` FOR EACH ROW
@@ -944,16 +967,16 @@ END;;
 
 DELIMITER ;
 
-CREATE TABLE `pvlng_channel_view` (`id` int(10) unsigned, `guid` varchar(39), `name` varchar(255), `serial` varchar(30), `channel` varchar(254), `description` varchar(255), `resolution` double, `cost` double, `numeric` tinyint(1) unsigned, `unit` varchar(10), `decimals` tinyint(1) unsigned, `meter` tinyint(1) unsigned, `threshold` double unsigned, `valid_from` double, `valid_to` double, `type_id` int(10) unsigned, `type` varchar(60), `model` varchar(30), `childs` tinyint(1), `read` tinyint(1) unsigned, `write` tinyint(1) unsigned, `graph` tinyint(1) unsigned, `icon` varchar(30));
+CREATE TABLE `pvlng_channel_view` (`id` int(10) unsigned, `guid` varchar(39), `name` varchar(255), `serial` varchar(30), `channel` varchar(255), `description` varchar(255), `resolution` double, `cost` double, `numeric` tinyint(1) unsigned, `unit` varchar(10), `decimals` tinyint(1) unsigned, `meter` tinyint(1) unsigned, `threshold` double unsigned, `valid_from` double, `valid_to` double, `type_id` int(10) unsigned, `type` varchar(60), `model` varchar(30), `childs` tinyint(1), `read` tinyint(1) unsigned, `write` tinyint(1) unsigned, `graph` tinyint(1) unsigned, `icon` varchar(255));
 
 
 CREATE TABLE `pvlng_config` (
   `key` varchar(50) NOT NULL,
   `value` varchar(1000) NOT NULL,
   `comment` varchar(255) NOT NULL,
-  `type` enum('str','num','bool') NOT NULL DEFAULT 'str',
+  `type` enum('','str','num','bool') NOT NULL DEFAULT '',
   PRIMARY KEY (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Key-Value-Store';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Application settings';
 
 
 CREATE TABLE `pvlng_log` (
@@ -973,10 +996,19 @@ SET new.`timestamp` = NOW();;
 
 DELIMITER ;
 
+CREATE TABLE `pvlng_options` (
+  `key` varchar(50) NOT NULL,
+  `value` varchar(1000) NOT NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Key-Value-Store';
+
+
 CREATE TABLE `pvlng_performance` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `action` enum('read','write') NOT NULL,
-  `time` int(10) unsigned NOT NULL COMMENT 'ms'
+  `time` int(10) unsigned NOT NULL COMMENT 'ms',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Gather system performance';
 
 
@@ -1012,6 +1044,14 @@ CREATE TRIGGER `pvlng_reading_num_bi` BEFORE INSERT ON `pvlng_reading_num` FOR E
 CALL getTimestamp(new.`timestamp`);;
 
 DELIMITER ;
+
+CREATE TABLE `pvlng_reading_num_tmp` (
+  `id` int(10) unsigned NOT NULL,
+  `timestamp` int(10) unsigned NOT NULL,
+  `data` decimal(13,4) NOT NULL,
+  PRIMARY KEY (`id`,`timestamp`)
+) ENGINE=MEMORY DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `pvlng_reading_str` (
   `id` int(10) unsigned NOT NULL COMMENT 'pvlng_channel -> id',
@@ -1050,94 +1090,93 @@ DELIMITER ;;
 
 CREATE TRIGGER `pvlng_tree_bi` BEFORE INSERT ON `pvlng_tree` FOR EACH ROW
 BEGIN
-
   SELECT `t`.`childs`, `t`.`read`+`t`.`write`
     INTO @CHILDS, @RW
     FROM `pvlng_channel` `e`
     JOIN `pvlng_type` `t` ON `e`.`type` = `t`.`id`
    WHERE `e`.`id` = new.`entity`;
-
    IF @CHILDS != 0 AND @RW > 0 THEN
      SET new.`guid` = GUID();
    END IF;
-
 END;;
 
 DELIMITER ;
 
-CREATE TABLE `pvlng_tree_view` (`id` int(10) unsigned, `entity` int(10) unsigned, `guid` varchar(39), `name` varchar(255), `serial` varchar(30), `channel` varchar(254), `description` varchar(255), `resolution` double, `cost` double, `meter` tinyint(1) unsigned, `numeric` tinyint(1) unsigned, `offset` double, `unit` varchar(10), `decimals` tinyint(1) unsigned, `threshold` double unsigned, `valid_from` double, `valid_to` double, `public` tinyint(1) unsigned, `comment` text, `type` varchar(60), `model` varchar(30), `childs` tinyint(1), `read` tinyint(1) unsigned, `write` tinyint(1) unsigned, `graph` tinyint(1) unsigned, `icon` varchar(30));
+CREATE TABLE `pvlng_tree_view` (`id` int(10) unsigned, `entity` int(10) unsigned, `guid` varchar(39), `name` varchar(255), `serial` varchar(30), `channel` varchar(255), `description` varchar(255), `resolution` double, `cost` double, `meter` tinyint(1) unsigned, `numeric` tinyint(1) unsigned, `offset` double, `unit` varchar(10), `decimals` tinyint(1) unsigned, `threshold` double unsigned, `valid_from` double, `valid_to` double, `public` tinyint(1) unsigned, `comment` text, `type` varchar(60), `model` varchar(30), `childs` tinyint(1), `read` tinyint(1) unsigned, `write` tinyint(1) unsigned, `graph` tinyint(1) unsigned, `icon` varchar(255));
 
 
 CREATE TABLE `pvlng_type` (
   `id` int(10) unsigned NOT NULL COMMENT 'Unique Id',
   `name` varchar(60) NOT NULL,
   `description` varchar(255) NOT NULL,
-  `model` varchar(30) NOT NULL,
+  `model` varchar(30) NOT NULL DEFAULT 'NoModel',
   `unit` varchar(10) NOT NULL,
   `childs` tinyint(1) NOT NULL,
   `read` tinyint(1) unsigned NOT NULL,
   `write` tinyint(1) unsigned NOT NULL,
   `graph` tinyint(1) unsigned NOT NULL,
-  `icon` varchar(30) NOT NULL,
+  `icon` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Channel types';
 
 INSERT INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `childs`, `read`, `write`, `graph`, `icon`) VALUES
-(0,	'Alias',	'Alias channel acts like the referenced channel',	'Alias',	'',	0,	1,	0,	1,	'arrow_180.png'),
-(1,	'Power plant',	'A power plant groups mostly inverters',	'',	'',	-1,	0,	0,	0,	'building.png'),
-(2,	'Inverter',	'A Inverter groups mostly energy, voltage and current channels',	'',	'',	-1,	0,	0,	0,	'exclamation_frame.png'),
-(3,	'Building',	'A building groups several other things',	'',	'',	-1,	0,	0,	0,	'home.png'),
-(4,	'Multi-Sensor',	'A sensor with multiple channels',	'',	'',	-1,	0,	0,	0,	'wooden_box.png'),
-(5,	'Group',	'A generic group',	'',	'',	-1,	0,	0,	0,	'folders_stack.png'),
-(10,	'Random',	'A random channel delivers data \"valid_from\" ... \"valid_to\" with variance +-\"threshold\"',	'Random',	'',	0,	1,	0,	1,	'ghost.png'),
-(11,	'Fixed value',	'Use this to display a horz. line',	'Fix',	'',	0,	1,	0,	1,	'chart_arrow.png'),
-(12,	'Estimate',	'Show the the daily estimate of production',	'Estimate',	'Wh',	0,	1,	0,	1,	'plug.png'),
-(15,	'Ratio calculator',	'A ratio calculator calc the ration between 2 child entities (groups or channels)',	'Ratio',	'%',	2,	1,	0,	1,	'edit_percent.png'),
-(16,	'Accumulator',	'An accumulator groups channels with same type',	'Accumulator',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
-(17,	'Differentiator',	'An differentiator groups channels with same type',	'Differentiator',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
-(18,	'Full Differentiator',	'An differentiator groups channels with same type',	'DifferentiatorFull',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
-(19,	'Sensor to meter',	'Transform data of a sensor to meter data',	'SensorToMeter',	'',	1,	1,	0,	1,	'calculator_scientific.png'),
-(20,	'Import / Export',	'Calculates imort or export by consumption and production',	'InternalConsumption',	'',	2,	1,	0,	1,	'calculator_scientific.png'),
-(21,	'Average',	'An average calculator of channels with the same type',	'Average',	'',	-1,	1,	0,	1,	'calculator_scientific.png'),
-(22,	'Calculator',	'Uses resolution to perform only a calculation',	'Calculator',	'',	1,	1,	0,	1,	'calculator_scientific.png'),
-(23,	'History',	'Uses historic data, last x days, same days last years for display',	'History',	'',	1,	1,	0,	1,	'calculator_scientific.png'),
-(30,	'Dashboard channel',	'A proxy channel for dashboard display',	'Dashboard',	'',	0,	1,	0,	1,	'dashboard.png'),
-(40,	'SMA Sunny Webbox',	'Accept JSON from a SMA Sunny Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_webbox.png'),
-(41,	'SMA Inverter',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_inverter.png'),
-(42,	'SMA Sensorbox',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'sma_sensorbox.png'),
-(50,	'Energy meter, absolute',	'A enegry meter counts production or consumption',	'Meter',	'Wh',	0,	1,	1,	1,	'plug.png'),
-(51,	'Power sensor',	'A power sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'plug.png'),
-(52,	'Voltage sensor',	'A voltage sensor tracks actual voltage',	'Sensor',	'V',	0,	1,	1,	1,	'dashboard.png'),
-(53,	'Current sensor',	'An current sensor tracks actual current',	'Sensor',	'A',	0,	1,	1,	1,	'lightning.png'),
-(54,	'Gas sensor',	'A gas sensor tracks actual consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'fire.png'),
-(55,	'Heat sensor',	'A heat sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'fire_big.png'),
-(56,	'Humidity sensor',	'A humidity sensor tracks actual humitiy',	'Sensor',	'%',	0,	1,	1,	1,	'weather_cloud.png'),
-(57,	'Luminosity sensor',	'A luminosity sensor tracks actual luminosity',	'Sensor',	'lm',	0,	1,	1,	1,	'light_bulb.png'),
-(58,	'Pressure sensor',	'A pressure sensor tracks actual pressure',	'Sensor',	'hPa',	0,	1,	1,	1,	'umbrella.png'),
-(59,	'Radiation sensor',	'A radiation sensor tracks actual radiation',	'Sensor',	'µSV/h',	0,	1,	1,	1,	'brightness.png'),
-(60,	'Temperature sensor',	'A temperature sensor tracks actual temperature',	'Sensor',	'°C',	0,	1,	1,	1,	'application_monitor.png'),
-(61,	'Valve sensor',	'A valve sensor tracks actual valve position',	'Sensor',	'°',	0,	1,	1,	1,	'wheel.png'),
-(62,	'Water sensor',	'A water sensor tracks actual water consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'water.png'),
-(63,	'Windspeed sensor',	'A windspeed sensor tracks actual windspeed',	'Sensor',	'm/s',	0,	1,	1,	1,	'paper_plane.png'),
-(64,	'Irradiation sensor',	'An irradiation sensor tracks actual irradiation',	'Sensor',	'W/m²',	0,	1,	1,	1,	'brightness.png'),
-(65,	'Time',	'Counts time based data, e.g working hours',	'Meter',	'h',	0,	1,	1,	1,	'clock.png'),
-(66,	'Frequency sensor',	'A frequency sensor tracks actual frequencies',	'Sensor',	'Hz',	0,	1,	1,	1,	'dashboard.png'),
-(70,	'Gas meter',	'A gas maeter tracks consumption or production over time',	'Meter',	'm³',	0,	1,	1,	1,	'fire.png'),
-(71,	'Radiation meter',	'A radiation meter tracks radiation over time',	'Meter',	'µSV',	0,	1,	1,	1,	'brightness.png'),
-(72,	'Water meter',	'A water meter tracks water consumption or production over time',	'Meter',	'm³',	0,	1,	1,	1,	'water.png'),
-(90,	'Power sensor counter',	'A power sensor counter tracks actual consumption or production',	'Counter',	'W',	0,	1,	1,	1,	'plug.png'),
-(91,	'Switch',	'A switch tracks only state changes',	'Switcher',	'',	0,	1,	1,	1,	'ui_check_boxes.png'),
-(100,	'PV-Log Plant',	'Readout plant data for PV-Log JSON import',	'PVLog\\Plant',	'',	-1,	1,	0,	0,	'pv_log_sum.png'),
-(101,	'PV-Log Inverter',	'Readout inverter data for PV-Log JSON import',	'PVLog\\Inverter',	'',	-1,	1,	0,	0,	'pv_log.png'),
-(102,	'PV-Log Plant (r2)',	'Readout plant data for PV-Log JSON import',	'PVLog2\\Plant',	'',	-1,	1,	0,	0,	'pv_log_sum.png'),
-(103,	'PV-Log Inverter (r2)',	'Readout inverter data for PV-Log JSON import',	'PVLog2\\Inverter',	'',	-1,	0,	0,	0,	'pv_log.png'),
-(110,	'Sonnenertrag JSON',	'Readout plant/inverter data for Sonnenertrag JSON import',	'Sonnenertrag\\JSON',	'',	-1,	1,	0,	0,	'sonnenertrag.png');
+(0,	'Alias',	'Alias channel acts like the referenced channel',	'Alias',	'',	0,	0,	0,	1,	'/images/ico/arrow_180.png'),
+(1,	'Power plant',	'A power plant groups mostly inverters',	'NoModel',	'',	-1,	0,	0,	0,	'/images/ico/building.png'),
+(2,	'Inverter',	'A Inverter groups mostly energy, voltage and current channels',	'NoModel',	'',	-1,	0,	0,	0,	'/images/ico/exclamation_frame.png'),
+(3,	'Building',	'A building groups several other things',	'NoModel',	'',	-1,	0,	0,	0,	'/images/ico/home.png'),
+(4,	'Multi-Sensor',	'A sensor with multiple channels',	'NoModel',	'',	-1,	0,	0,	0,	'/images/ico/wooden_box.png'),
+(5,	'Group',	'A generic group',	'NoModel',	'',	-1,	0,	0,	0,	'/images/ico/folders_stack.png'),
+(10,	'Random',	'A random channel delivers data \"valid_from\" ... \"valid_to\" with variance +-\"threshold\"',	'Random',	'',	0,	1,	0,	1,	'/images/ico/ghost.png'),
+(11,	'Fixed value',	'Use this to display a horz. line',	'Fix',	'',	0,	1,	0,	1,	'/images/ico/chart_arrow.png'),
+(12,	'Estimate',	'Show the the daily estimate of production',	'Estimate',	'Wh',	0,	1,	0,	1,	'/images/ico/plug.png'),
+(15,	'Ratio calculator',	'A ratio calculator calc the ration between 2 child entities (groups or channels)',	'Ratio',	'%',	2,	1,	0,	1,	'/images/ico/edit_percent.png'),
+(16,	'Accumulator',	'An accumulator groups channels with same type',	'Accumulator',	'',	-1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(17,	'Differentiator',	'An differentiator groups channels with same type',	'Differentiator',	'',	-1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(18,	'Full Differentiator',	'An differentiator groups channels with same type',	'DifferentiatorFull',	'',	-1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(19,	'Sensor to meter',	'Transform data of a sensor to meter data',	'SensorToMeter',	'',	1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(20,	'Import / Export',	'Calculates imort or export by consumption and production',	'InternalConsumption',	'',	2,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(21,	'Average',	'An average calculator of channels with the same type',	'Average',	'',	-1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(22,	'Calculator',	'Uses resolution to perform only a calculation',	'Calculator',	'',	1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(23,	'History',	'Uses historic data, last x days, same days last years for display',	'History',	'',	1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(24,	'Baseline',	'Shows a baseline for sensors on lowest value',	'Baseline',	'',	1,	1,	0,	1,	'/images/ico/calculator_scientific.png'),
+(30,	'Dashboard channel',	'A proxy channel for dashboard display',	'Dashboard',	'',	0,	1,	0,	1,	'/images/ico/dashboard.png'),
+(40,	'SMA Sunny Webbox',	'Accept JSON from a SMA Sunny Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'/images/ico/sma_webbox.png'),
+(41,	'SMA Inverter',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'/images/ico/sma_inverter.png'),
+(42,	'SMA Sensorbox',	'Accept JSON from a SMA Webbox',	'SMA\\Webbox',	'',	-1,	0,	1,	0,	'/images/ico/sma_sensorbox.png'),
+(50,	'Energy meter, absolute',	'A enegry meter counts production or consumption',	'Meter',	'Wh',	0,	1,	1,	1,	'/images/ico/plug.png'),
+(51,	'Power sensor',	'A power sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'/images/ico/plug.png'),
+(52,	'Voltage sensor',	'A voltage sensor tracks actual voltage',	'Sensor',	'V',	0,	1,	1,	1,	'/images/ico/dashboard.png'),
+(53,	'Current sensor',	'An current sensor tracks actual current',	'Sensor',	'A',	0,	1,	1,	1,	'/images/ico/lightning.png'),
+(54,	'Gas sensor',	'A gas sensor tracks actual consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'/images/ico/fire.png'),
+(55,	'Heat sensor',	'A heat sensor tracks actual consumption or production',	'Sensor',	'W',	0,	1,	1,	1,	'/images/ico/fire_big.png'),
+(56,	'Humidity sensor',	'A humidity sensor tracks actual humitiy',	'Sensor',	'%',	0,	1,	1,	1,	'/images/ico/weather_cloud.png'),
+(57,	'Luminosity sensor',	'A luminosity sensor tracks actual luminosity',	'Sensor',	'lm',	0,	1,	1,	1,	'/images/ico/light_bulb.png'),
+(58,	'Pressure sensor',	'A pressure sensor tracks actual pressure',	'Sensor',	'hPa',	0,	1,	1,	1,	'/images/ico/umbrella.png'),
+(59,	'Radiation sensor',	'A radiation sensor tracks actual radiation',	'Sensor',	'µSV/h',	0,	1,	1,	1,	'/images/ico/brightness.png'),
+(60,	'Temperature sensor',	'A temperature sensor tracks actual temperature',	'Sensor',	'°C',	0,	1,	1,	1,	'/images/ico/application_monitor.png'),
+(61,	'Valve sensor',	'A valve sensor tracks actual valve position',	'Sensor',	'°',	0,	1,	1,	1,	'/images/ico/wheel.png'),
+(62,	'Water sensor',	'A water sensor tracks actual water consumption or production',	'Sensor',	'm³/h',	0,	1,	1,	1,	'/images/ico/water.png'),
+(63,	'Windspeed sensor',	'A windspeed sensor tracks actual windspeed',	'Sensor',	'm/s',	0,	1,	1,	1,	'/images/ico/paper_plane.png'),
+(64,	'Irradiation sensor',	'An irradiation sensor tracks actual irradiation',	'Sensor',	'W/m²',	0,	1,	1,	1,	'/images/ico/brightness.png'),
+(65,	'Time',	'Counts time based data, e.g working hours',	'Meter',	'h',	0,	1,	1,	1,	'/images/ico/clock.png'),
+(66,	'Frequency sensor',	'A frequency sensor tracks actual frequencies',	'Sensor',	'Hz',	0,	1,	1,	1,	'/images/ico/dashboard.png'),
+(70,	'Gas meter',	'A gas maeter tracks consumption or production over time',	'Meter',	'm³',	0,	1,	1,	1,	'/images/ico/fire.png'),
+(71,	'Radiation meter',	'A radiation meter tracks radiation over time',	'Meter',	'µSV',	0,	1,	1,	1,	'/images/ico/brightness.png'),
+(72,	'Water meter',	'A water meter tracks water consumption or production over time',	'Meter',	'm³',	0,	1,	1,	1,	'/images/ico/water.png'),
+(90,	'Power sensor counter',	'A power sensor counter tracks actual consumption or production',	'Counter',	'W',	0,	1,	1,	1,	'/images/ico/plug.png'),
+(91,	'Switch',	'A switch tracks only state changes',	'Switcher',	'',	0,	1,	1,	1,	'/images/ico/ui_check_boxes.png'),
+(100,	'PV-Log Plant',	'Readout plant data for PV-Log JSON import',	'PVLog\\Plant',	'',	-1,	1,	0,	0,	'/images/ico/pv_log_sum.png'),
+(101,	'PV-Log Inverter',	'Readout inverter data for PV-Log JSON import',	'PVLog\\Inverter',	'',	-1,	1,	0,	0,	'/images/ico/pv_log.png'),
+(102,	'PV-Log Plant (r2)',	'Readout plant data for PV-Log JSON import',	'PVLog2\\Plant',	'',	-1,	1,	0,	0,	'/images/ico/pv_log_sum.png'),
+(103,	'PV-Log Inverter (r2)',	'Readout inverter data for PV-Log JSON import',	'PVLog2\\Inverter',	'',	-1,	0,	0,	0,	'/images/ico/pv_log.png'),
+(110,	'Sonnenertrag JSON',	'Readout plant/inverter data for Sonnenertrag JSON import',	'Sonnenertrag\\JSON',	'',	-1,	1,	0,	0,	'/images/ico/sonnenertrag.png');
 
 CREATE TABLE `pvlng_view` (
   `name` varchar(50) NOT NULL COMMENT 'Variant name',
   `data` text NOT NULL COMMENT 'Serialized channel data',
   `public` tinyint(1) NOT NULL COMMENT 'Public view',
+  `slug` varchar(50) NOT NULL COMMENT 'URL-save slug',
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='View variants';
 
@@ -1155,18 +1194,18 @@ DROP TABLE IF EXISTS `pvlng_tree_view`;
 CREATE VIEW `pvlng_tree_view` AS select `tree`.`id` AS `id`,`tree`.`entity` AS `entity`,if((`t`.`childs` <> 0),`tree`.`guid`,`c`.`guid`) AS `guid`,`c`.`name` AS `name`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`description` AS `description`,`c`.`resolution` AS `resolution`,`c`.`cost` AS `cost`,`c`.`meter` AS `meter`,`c`.`numeric` AS `numeric`,`c`.`offset` AS `offset`,`c`.`unit` AS `unit`,`c`.`decimals` AS `decimals`,`c`.`threshold` AS `threshold`,`c`.`valid_from` AS `valid_from`,`c`.`valid_to` AS `valid_to`,`c`.`public` AS `public`,`c`.`comment` AS `comment`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`graph` AS `graph`,`t`.`icon` AS `icon` from ((`pvlng_tree` `tree` join `pvlng_channel` `c` on((`tree`.`entity` = `c`.`id`))) join `pvlng_type` `t` on((`c`.`type` = `t`.`id`)));
 
 
-INSERT INTO `pvlng_channel` (`id`, `name`, `description`, `serial`, `channel`, `type`, `resolution`, `unit`, `decimals`, `meter`, `numeric`, `offset`, `cost`, `threshold`, `valid_from`, `valid_to`, `public`, `comment`) VALUES
-(1,	'DON\'T TOUCH',	'Dummy for tree root',	'',	'',	0,	0,	'',	2,	0,	0,	0,	0,	NULL,	NULL,	NULL,	1,	''),
-(2,	'RANDOM Temperature sensor',	'15 ... 25, &plusmn;0.5',	'',	'',	10,	1,	'°C',	2,	0,	1,	0,	0,	0.5,	15,	25,	1,	''),
-(3,	'RANDOM Energy meter',	'0 ... &infin;, +0.05',	'',	'',	10,	1000,	'Wh',	2,	1,	1,	0,	0.0002,	0.05,	0,	10000000000,	1,	'');
+INSERT INTO `pvlng_channel` (`id`, `name`, `description`, `type`, `resolution`, `unit`, `decimals`, `meter`, `cost`, `threshold`, `valid_from`, `valid_to`) VALUES
+(1,	'DO NOT TOUCH',	'Dummy for tree root',	0,	0,	'',	2,	0,	0,	NULL,	NULL,	NULL),
+(2,	'RANDOM Temperature sensor',	'15 ... 25, &plusmn;0.5',	10,	1,	'°C',	1,	0,	0,	0.5,	15,	25),
+(3,	'RANDOM Energy meter',	'0 ... &infin;, +0.05',	10,	1000,	'Wh',	0,	1,	0.0002,	0.05,	0,	10000000000);
 
 INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`) VALUES
 ('Currency',	'EUR',	'Costs currency',	'str'),
-('CurrencyDecimals',	'2',	'Costs currency decimals',	'num'),
-('LogInvalid',	'0',	'Log invalid values',	'str'),
-('TimeStep',	'60',	'Reading time step in seconds',	'num');
+('CurrencyDecimals',	2,	'Costs currency decimals',	'num'),
+('LogInvalid',	0,	'Log invalid values',	'str'),
+('TimeStep',	60,	'Reading time step in seconds',	'num');
 
 INSERT INTO `pvlng_tree` (`id`, `lft`, `rgt`, `entity`) VALUES
 (1,  1,  6,  1), (2,  2,  3,  2), (3,  4,  5,  3);
 
-select `getAPIkey`();
+SELECT `getAPIkey`() AS `PVLng API key`;
