@@ -12,7 +12,7 @@
 <div class="grid_10">
 
 <p>
-	{{ChannelType}}: <img src="/images/ico/{ICON}" alt="" />&nbsp;<strong>{TYPENAME}</strong>
+	{{ChannelType}}: <img src="{ICON}" alt="" />&nbsp;<strong>{TYPENAME}</strong>
 </p>
 
 <form action="/channel/edit" method="post">

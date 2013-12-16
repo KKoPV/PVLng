@@ -18,36 +18,45 @@
 
 <div class="clear"></div>
 
-<div class="grid_4">
-	<select id="loaddeleteview" name="loaddeleteview">
-		<option value="">--- {{Select}} ---</option>
-		<!-- BEGIN VIEWS -->
-			<!-- show all charts and mark public charts -->
-			<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-				{NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
-			</option>
-		<!-- END -->
-	</select>
-	<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
-	<input type="submit" name="delete" value="{{Delete}}" style="margin-left:.5em" />
-</div>
 
-<div class="grid_4">
-	<input id="saveview" type="text" name="saveview" value="{VIEW}"/>
-	<input style="margin:0 .5em" id="public" type="checkbox" name="public" value="1"
-		<!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF -->
-	/>
-	<label for="public">{{public}}</label>
-	<img style="margin-left:.5em;width:16px;height:16px" class="tip"
-	     src="/images/ico/information_frame.png" width="16" height="16"
-	     title="{{publicHint}}" />
-	<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
-</div>
-
-<div class="grid_2">
-	<a id="btn-bookmark" class="fr tip" title="{{DragBookmark}}" data-url="/chart/">
-		PVLng | {VIEW}
-	</a>
+<div class="grid_10">
+	<table style="width:100%"><tr>
+	<td style="width:60%">
+		<select id="loaddeleteview" name="loaddeleteview">
+			<option value="">--- {{Select}} ---</option>
+			<!-- BEGIN VIEWS -->
+				<!-- show all charts and mark public charts -->
+				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+					{NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
+				</option>
+			<!-- END -->
+		</select>
+		<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
+		<input type="submit" id="delete-view" name="delete" value="{{Delete}}" style="margin-left:.5em" />
+	</td>
+	<td>
+		<input id="saveview" type="text" style="margin-left:3em"
+		       name="saveview" value="{VIEW}"/>
+	</td>
+	<td>
+		<input type="checkbox" class="iCheckLine" id="public" name="public" value="1"
+		       <!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF --> />
+		<label for="public">{{public}}</label>
+	</td>
+	<td style="width:30%">
+		<img src="/images/ico/information_frame.png" class="tip" title="{{publicHint}}"
+		     style="margin-left:.5em;width:16px;height:16px" width="16" height="16" />
+		<input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
+	</td>
+	<td class="r" style="white-space:nowrap">
+		<a id="btn-permanent" class="tip" title="{{DragPermanent}}" data-text="{VIEW} & | {TITLE}" data-url="/chart/{SLUG}">
+			{VIEW} | {TITLE}
+		</a>
+		<a href="/chart/{SLUG}" id="btn-bookmark" class="tip" style="margin-left:.5em" title="{{DragBookmark}}">
+			{VIEW} | {TITLE}
+		</a>
+	</td>
+	</tr></table>
 </div>
 
 <div class="clear"></div>

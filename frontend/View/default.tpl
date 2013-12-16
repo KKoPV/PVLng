@@ -15,7 +15,7 @@
 	<meta charset="utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-	<title>PVLng - {TITLE} | {SUBTITLE}</title>
+	<title>{SUBTITLE} | {TITLE}</title>
 	<meta name="description" content="{PVLNG}" />
 	<meta name="author" content="Knut Kohl" />
 
@@ -38,7 +38,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 
 	<link rel="stylesheet" href="/css/default.css" />
-	<link rel="stylesheet" href="/css/jquery-ui.css" />
+	<link rel="stylesheet" href="/css/jquery-ui.min.css" />
 
 	<link rel="stylesheet" href="/css/jquery.dataTables.css" />
 	<link rel="stylesheet" href="/css/jquery.dataTables_themeroller.css" />
@@ -47,18 +47,12 @@
 
 	<link rel="stylesheet" href="/css/jquery.pnotify.default.css" />
 
-	<link rel="stylesheet" href="/css/iCheck/minimal/orange.css" />
-	<link rel="stylesheet" href="/css/iCheck/flat/orange.css" />
-	<link rel="stylesheet" href="/css/iCheck/line/orange.css" />
+	<link rel="stylesheet" href="/css/iCheck/flat.css" />
+	<link rel="stylesheet" href="/css/iCheck/line.css" />
 
 	{HEAD}
 
 	<style>{STYLES}</style>
-
-	<script src="http://code.jquery.com/jquery-2.0.0.js"></script>
-	<script>
-		window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>');
-	</script>
 
 </head>
 
@@ -82,6 +76,11 @@
 
 	</div>
 
+	<script src="/js/trmix.js"></script>
+	<script src="//code.jquery.com/jquery-2.0.0.js"></script>
+	<script>
+		window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>');
+	</script>
 	<script src="/js/jquery-ui.min.js" defer></script>
 	<!-- IF {LANGUAGE} != "en" -->
 	<script src="/js/jquery-ui-i18n.min.js"></script>

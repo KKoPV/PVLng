@@ -19,7 +19,6 @@ class Index extends \Model {
 	 */
 	public function __construct() {
 		parent::__construct();
-
 		$this->db->load(dirname(__FILE__) . DS . 'Index.xml');
 	}
 
@@ -47,8 +46,17 @@ class Index extends \Model {
 	/**
 	 *
 	 */
-	public function saveView( $name, $data, $public ) {
-		return $this->db->query($this->db->SQL->SaveView, $name, json_encode($data), $public);
+	public function getViewBySlug( $slug ) {
+		$result = $this->db->queryRow($this->db->SQL->ViewBySlug, $slug);
+		if (isset($result->data)) $result->data = json_decode($result->data);
+		return $result;
+	}
+
+	/**
+	 *
+	 */
+	public function saveView( $name, $data, $public, $slug ) {
+		return $this->db->query($this->db->SQL->SaveView, $name, json_encode($data), $public, $slug);
 	}
 
 	/**

@@ -29,6 +29,7 @@ $(function() {
 			{ 'asSorting': false },
 			null,
 			null,
+			null,
 			{ 'asSorting': false },
 			null,
 			null,

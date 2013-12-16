@@ -22,10 +22,7 @@ class Alias extends \Channel {
 		$org = new \ORM\Tree;
 		$org->find('guid', $channel->channel);
 
-		if ($org->id != '') {
-			parent::__construct($org);
-			return;
-		}
+		if ($org->id) return parent::__construct($org);
 
 		throw new Exception('No channel found for GUID: '.$channel->channel, 400);
 	}

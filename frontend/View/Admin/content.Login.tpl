@@ -9,7 +9,7 @@
  */
 -->
 
-<div class="push_3 grid_3" style="margin-top:3em;margin-bottom:7em">
+<div class="push_3 grid_3" style="margin-top:5em;margin-bottom:5em">
 
 	<p>{{WelcomeToAdministration}}</p>
 
@@ -34,14 +34,17 @@
 		<tr>
 			<td></td>
 			<td>
-				<input id="save" type="checkbox" name="save" style="margin-right:0.5em" />
-				<label for="save">{{StayLoggedIn}}</label>
+				<div>
+					<input id="save" type="checkbox" name="save" class="iCheckLine" style="margin-right:0.5em" />
+					<label for="save">{{StayLoggedIn}}</label>
+				</div>
+
 			</td>
 		</tr>
 
 		<tr>
 			<td></td>
-			<td><input class="ui-button ui-widget ui-state-default ui-corner-all ui-priority-primary" type="submit" value="{{Login}}" /></td>
+			<td><input type="submit" value="{{Login}}" /></td>
 		</tr>
 		</tbody>
 	</table>

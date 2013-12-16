@@ -41,21 +41,25 @@
 
 	<!-- BEGIN DATA -->
 
-	<tr data-tt-id="{ID}"
+	<tr data-tt-id="{ID}" class="droppable"
 	    <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
 		<td style="width:90%">
-			<img style="vertical-align:top;margin-right:8px"
-			     width="16" height="16" class="tip" title="{TYPE}"
-			     src="/images/ico/{ICON}" alt="" />
-			<strong>{NAME}</strong>
-			<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
-			<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
-			<!-- IF !{PUBLIC} -->
-				<img src="/images/ico/lock.png" class="tip"
-					 style="margin-left:8px;width:16px;height:16px"
-					 width="16" height="16" title="{{PrivateChannel}}"
-					 alt="[private]"/>
-			<!-- ENDIF -->
+			<span class="<!-- IF {ACCEPTCHILDS} -->non-draggable<!-- ELSE -->draggable<!-- ENDIF -->"
+			      data-id="{ID}" data-entity="{ENTITY}">
+				<img style="vertical-align:top;margin-right:8px"
+				     width="16" height="16" class="tip" title="{TYPE}"
+				     src="{ICON}" alt="" />
+				<strong>{NAME}</strong>
+				<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
+				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+				<!-- IF !{PUBLIC} -->
+					<img src="/images/ico/lock.png" class="tip"
+						 style="margin-left:8px;width:16px;height:16px"
+						 width="16" height="16" title="{{PrivateChannel}}"
+						 alt="[private]"/>
+				<!-- ENDIF -->
+				<span></span>
+			</span>
 		</td>
 
 		<td style="white-space:nowrap">
@@ -100,23 +104,7 @@
 			<!-- ENDIF -->
 		</td>
 
-		<td style="white-space:nowrap">
-			<!-- IF {LEVEL} != "1" AND {UPPER} != "0" -->
-			<a href="/overview/moveleft" title="{{MoveEntityUp}}" class="tip"
-			   onclick="return moveChild({ID}, 'moveleft')">
-				<img src="/images/ico/navigation_090_frame.png" class="imgbar"
-				     width="16p" height="16" alt="u" />
-			</a>
-			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-
-			<!-- IF {LEVEL} != "1" AND {LOWER} != "0" -->
-			<a href="/overview/moveright" title="{{MoveEntityDown}}" class="tip"
-			   onclick="return moveChild({ID}, 'moveright')">
-				<img src="/images/ico/navigation_270_frame.png" class="imgbar"
-				     width="16p" height="16" alt="d" />
-			</a>
-			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-
+		<td style="width:1%;white-space:nowrap">
 			<!-- IF {LEVEL} > "2" -->
 			<form action="/overview/moveup" method="post">
 			<input type="hidden" name="id" value="{ID}" />
@@ -126,13 +114,20 @@
 			</form>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
-			<!-- IF {UPPER} != "0" -->
-			<form action="/overview/movedown" method="post">
-			<input type="hidden" name="id" value="{ID}" />
-			<input type="image" src="/images/ico/navigation_000_frame.png"
-			       class="imgbar tip" style="background-color:transparent"
-			       title="{{MoveEntityRight}}" alt="l" />
-			</form>
+			<!-- IF {LEVEL} != 1 AND {UPPER} != 0 -->
+			<a href="/overview/moveleft" title="{{MoveEntityUp}}" class="tip"
+			   onclick="return moveChild({ID}, 'moveleft')">
+				<img src="/images/ico/navigation_090_frame.png" class="imgbar"
+				     width="16p" height="16" alt="u" />
+			</a>
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+
+			<!-- IF {LEVEL} != 1 AND {LOWER} != 0 -->
+			<a href="/overview/moveright" title="{{MoveEntityDown}}" class="tip"
+			   onclick="return moveChild({ID}, 'moveright')">
+				<img src="/images/ico/navigation_270_frame.png" class="imgbar"
+				     width="16p" height="16" alt="d" />
+			</a>
 			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 		</td>
 
@@ -149,10 +144,33 @@
 	<tfoot>
 	<tr>
 		<th colspan="5" style="padding-top:8px;padding-bottom:8px;text-align:left">
-			<span class="indenter" style="padding-left: 0px;"></span>
-			<a href="#" title="{{AddChannel}}" class="tip" onclick="addChild(1); return false">
-				<img src="/images/ico/plus_circle_frame.png" width="16p" height="16" alt="add" />
-			</a>
+			<p>
+				<span class="indenter"></span>
+				<a href="#" title="{{AddOneToManyChannels}}" class="tip" onclick="addChild(1); return false">
+					<img src="/images/ico/plus_circle_frame.png" width="16" height="16" alt="add" />
+				</a>
+				<span id="drag-new-wrapper" style="margin-left:.5em;display:none">
+					<span id="drag-new" class="draggable">
+						<img src="/images/ico/hand.png" style="width:16px;height:16px" width="16" height="16" />
+						<span id="drag-text"></span>
+					</span>
+				</span>
+			</p>
+
+			<p>
+				<span class="indenter"></span>
+				<select id="add-child">
+					<option value="">--- {{Select}} ---</option>
+					<!-- BEGIN ENTITIES -->
+					<option value="{ID}">
+						{TYPE}: {NAME}
+						<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
+						<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+					</option>
+					<!-- END -->
+				</select>
+			</p>
+
 		</th>
 	</tr>
 	<tfoot>
@@ -176,14 +194,13 @@
 		</p>
 		<select id="child" name="child[]" style="width:100%;margin-bottom:0.5em">
 			<option value="">--- {{Select}} ---</option>
-		<!-- BEGIN ENTITIES -->
+			<!-- BEGIN ENTITIES -->
 			<option value="{ID}">
 				{TYPE}: {NAME}
-				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
-				<!-- IF {CHANNEL} -->  - {CHANNEL}<!-- ENDIF -->
 				<!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
+				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
 			</option>
-		<!-- END -->
+			<!-- END -->
 		</select>
 		</div>
 		<input type="hidden" id="parent" name="parent" />

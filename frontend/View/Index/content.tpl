@@ -14,7 +14,7 @@
 <input type="hidden" id="fromdate" name="fromdate" />
 <input type="hidden" id="todate" name="todate" />
 
-<div id="nav" class="grid_10" style="margin-top:1em">
+<div id="nav" class="grid_10" style="margin-top:1em<!-- IF {EMBEDDED} == "2" -->;display:none<!-- ENDIF -->">
 
 	<table style="width:100%">
 	<tr>
@@ -51,54 +51,51 @@
 
 <div class="clear"></div>
 
-<div id="chart" class="grid_10" style="margin-top: 1em">
-	<div id="chart-placeholder">
+<div id="chart" class="grid_10">
 	<!-- IF {VIEW} -->
-		<p>
-			<img style="width:48px;height47px" src="/images/loading.gif"
-			     alt="{{JustAMoment}}" width="48" height="47" />
-		</p>
+	<p style="height:528px;text-align:center">
+		<img src="/images/loading.gif" alt="{{JustAMoment}}"
+		     style="margin-top:250px;width:48px;height47px" width="48" height="47" />
+	</p>
 	<!-- ELSE -->
+	<p class="b">
 		<!-- IF {USER} -->
 			{{NoChannelsSelectedYet}}
 		<!-- ELSE -->
 			{{NoViewSelectedYet}}
 		<!-- ENDIF -->
-		<br /><br />
+	</p>
 
-		<span style="margin-right:1em">{{Variants}}:</span>
+	<label for="top-loadview" class="b" style="margin-right:1em">{{Variants}}:</label>
 
-		<select name="loadview" onChange="this.form.submit()">
-			<option value="">--- {{Select}} ---</option>
-			<!-- BEGIN VIEWS -->
-				<!-- IF {__USER} -->
-					<!-- show all charts and mark public charts -->
-					<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-						{NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
-					</option>
-				<!-- ELSEIF {PUBLIC} -->
-					<!-- show only public charts -->
-					<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-						{NAME}
-					</option>
-				<!-- ENDIF -->
-			<!-- END -->
-		</select>
-		<noscript>
-			<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
-		</noscript>
+	<select id="top-loadview" name="loadview" onChange="this.form.submit()">
+		<option value="">--- {{Select}} ---</option>
+		<!-- BEGIN VIEWS -->
+			<!-- IF {__USER} -->
+				<!-- show all charts and mark public charts -->
+				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+					{NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
+				</option>
+			<!-- ELSEIF {PUBLIC} -->
+				<!-- show only public charts -->
+				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+					{NAME}
+				</option>
+			<!-- ENDIF -->
+		<!-- END -->
+	</select>
+	<noscript>
+		<input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
+	</noscript>
 	<!-- ENDIF -->
-	</div>
 </div>
 
 <div class="clear"></div>
 
-<div class="grid_4">
-	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
-</div>
+<!-- IF {EMBEDDED} != "2" -->
 
-<div class="grid_6" style="text-align:right">
-	<input id="az" type="checkbox" />&nbsp;<label for="az">{{SetAxisMinZero}}</label>
+<div class="grid_10">
+	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
 </div>
 
 <div class="clear"></div>
@@ -117,6 +114,18 @@
 	<!-- INCLUDE variants.inc.tpl -->
 <!-- ELSE -->
 	<!-- INCLUDE variants.nouser.inc.tpl -->
+<!-- ENDIF -->
+
+<!-- ELSE -->
+	<!-- BEGIN DATA -->
+	<!-- IF {PUBLIC} AND {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
+		<input id="c{ID}" style="display:none" class="channel"
+		       type="checkbox" checked="checked"
+		       data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}"
+		       value='{PRESENTATION}' />
+	<!-- ENDIF -->
+	<!-- END -->
+	<input id="loaddeleteview" type="hidden" value="{VIEW}"/>
 <!-- ENDIF -->
 
 </form>

@@ -9,7 +9,7 @@
  */
 -->
 
-<div class="push_3 grid_3" style="margin-top:3em;margin-bottom:3em">
+<div class="grid_10" style="margin-top:3em;margin-bottom:3em">
 	{MESSAGE}
 </div>
 

@@ -4,7 +4,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 
 #nav {
@@ -19,15 +19,44 @@
 	vertical-align: middle;
 }
 
-#chart-placeholder {
-	padding: 1em;
+#chart {
+	margin-top: 1em;
 	margin-bottom: 1em;
-	font-weight: bold;
-	text-align: center;
-/*border: dashed gray 1px;*/
 }
 
 #d-table td {
 	padding: .5em .5em;
 	vertical-align: top;
+}
+
+#td-axis .fl {
+	margin-right: 3px;
+}
+
+#td-axis .fl.nm {
+	/* no margin */
+	margin-right: 0;
+}
+
+#chart-tooltip th {
+	padding-left: .5em;
+	background-color: #DDD;
+}
+
+#chart-tooltip tr.even {
+	background-color: #EEE;
+}
+
+#chart-tooltip td.name {
+	padding-left: .5em;
+}
+
+#chart-tooltip td.value {
+	padding-left: 1em;
+	padding-right: .5em;
+	text-align: right;
+}
+
+#chart-tooltip td.unit {
+	padding-right: .5em;
 }

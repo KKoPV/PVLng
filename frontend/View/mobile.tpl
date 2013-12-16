@@ -41,6 +41,7 @@
 
 	{CONTENT}
 
+	<script src="/js/trmix.js"></script>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 	<script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 	<script src="/js/jquery-ui.min.js"></script>

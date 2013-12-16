@@ -35,7 +35,7 @@
 		</td>
 		<td nowrap>
 			<img style="vertical-align:middle;margin-right:5px"
-			     src="/images/ico/{ICON}" width="16" height="16" alt="" />
+			     src="{ICON}" width="16" height="16" alt="" />
 			<strong>{NAME}</strong>
 		</td>
 		<td>{UNIT}</td>

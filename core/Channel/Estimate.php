@@ -12,71 +12,65 @@ namespace Channel;
 /**
  *
  */
-class Estimate extends \Channel {
+class Estimate extends InternalCalc {
 
 	/**
 	 *
 	 */
-	public function read( $request, $attributes=FALSE ) {
+	protected function __construct( \ORM\Tree $channel ) {
+		parent::__construct($channel);
+		// Fake as counter to get the sum of estiamtes for periods greater than day
+		$this->counter = TRUE;
+	}
 
-		$this->before_read($request);
+	/**
+	 *
+	 */
+	protected function before_read( $request ) {
 
-		// make sure, only until now :-)
-		$this->end = min($this->end, time());
+		parent::before_read($request);
 
-		// Buffer $this->db->TimeStep, at least 60 seconds
-		$TimeStep = max(60, $this->db->TimeStep);
+		$timestamp = max(strtotime(date('Y-m-d 12:00', $this->start)), $this->start);
+		$this->end = min(strtotime(date('Y-m-d 12:00', $this->end)), $this->end);
+		$TimeStep = max($this->db->TimeStep, 60);
 
-		// Search for estimate, 1st for exact day
-		$data  = explode("\n", $this->comment);
-		$dstart = date('m-d', $this->start);
-		$mstart = date('d', $this->start);
-		$dend   = date('m-d', $this->end);
-		$mend   = date('d', $this->end);
+		$data = explode("\n", $this->comment);
+		$estimates = array();
 		foreach ($data as $line) {
 			$line = explode(':', $line, 2);
-			if (trim($line[0]) == $dstart) $estimate[1] = $line[1];
-			elseif (trim($line[0]) == $mstart) $estimate[1] = $line[1];
-			if (trim($line[0]) == $dend) $estimate[2] = $line[1];
-			elseif (trim($line[0]) == $mend) $estimate[2] = $line[1];
+			if (isset($line[1])) $estimates[trim($line[0])] = $line[1];
 		}
 
-		$result = new \Buffer;
+		$values = array();
 
-		if (!isset($estimate)) return $result; // Return empty result
+		while ($timestamp <= $this->end) {
+			$day   = date('m-d', $timestamp);
+			$month = date('m', $timestamp);
 
-		// Calc sunrise & sunset
+			if (date('Ymd', $timestamp) == date('Ymd')) {
+				// Use now for todays view
+				$ts = strtotime(date('Y-m-d H:i'));
+			} else {
+				// Round between 15:30 and 21:00 during year in seconds
+				$ts = (15.5 + sin(date('z', $timestamp) * M_PI / 366) * 5.5) *60*60;
 
+				// Move into this day using date functions for server time offsets
+				$ts = strtotime(date('Y-m-d H:i', strtotime(date('Y-m-d', $timestamp)) + $ts));
+			}
 
-		// Align start to full minutes
-		$ts = floor($this->start / $TimeStep) * $TimeStep;
+			// Align to data time step
+			$ts = bcdiv($ts, $TimeStep) * $TimeStep;
 
-		$result->write(array(
-			'datetime'    => date('Y-m-d H:i:s', $ts),
-			'timestamp'   => $ts,
-			'data'        => +$estimate[1],
-			'min'         => +$estimate[1],
-			'max'         => +$estimate[1],
-			'count'       => 1,
-			'timediff'    => 0,
-			'consumption' => 0
-		), $this->start);
+			// Search for estimate, 1st for exact day, then for month
+			if (isset($estimates[$day])) {
+				$values[$ts] = $estimates[$day];
+			} elseif (isset($estimates[$month])) {
+				$values[$ts] = $estimates[$month];
+			}
+			$timestamp += 86400;
+		}
 
-		// Align end to full minutes
-		$ts = floor($this->end / $TimeStep) * $TimeStep;
-
-		$result->write(array(
-			'datetime'    => date('Y-m-d H:i:s', $ts),
-			'timestamp'   => $ts,
-			'data'        => +$estimate[2],
-			'min'         => +$estimate[2],
-			'max'         => +$estimate[2],
-			'count'       => 1,
-			'timediff'    => $this->end-$this->start,
-			'consumption' => 0
-		), $this->end);
-
-		return $this->after_read($result, $attributes);
+		$this->saveValues($values);
 	}
 
 }

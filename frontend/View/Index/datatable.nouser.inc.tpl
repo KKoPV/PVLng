@@ -14,12 +14,12 @@
 <table id="tree" class="dataTable">
 	<thead>
 	<tr>
-		<th class="l" style="width:99%">{{Channel}}</th>
-		<th>
+		<th class="l">{{Channel}}</th>
+		<th style="width:1%">
 			<img src="/images/ico/16x16.png" style="width:16px;height:16px" width="16" height="16" alt="" />
 		</th>
-		<th class="r">{{Amount}}</th>
-		<th class="l">{{Unit}}</th>
+		<th style="width:1%" class="r">{{Amount}}</th>
+		<th style="width:1%" class="l">{{Unit}}</th>
 	</tr>
 	</thead>
 
@@ -29,12 +29,10 @@
 		<tr>
 			<td>
 				<input id="c{ID}" style="display:none" class="channel"
-				       type="checkbox" checked="checked"
-				       data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}"
-				       value='{PRESENTATION}' />
+				       type="checkbox" checked="checked" value='{PRESENTATION}'
+				       data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
 				<img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-				     class="tip" src="/images/ico/{ICON}" alt=""
-				     title="{TYPE}" width="16" height="16" />
+				     src="{ICON}" width="16" height="16" alt="" class="tip" title="{TYPE}" />
 				<strong class="tip" title="{GUID}">{NAME}</strong>
 				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
 			</td>

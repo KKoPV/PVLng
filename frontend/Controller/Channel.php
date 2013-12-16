@@ -60,7 +60,8 @@ class Channel extends \Controller {
 	 *
 	 */
 	public function AddPOST_Action() {
-		if ($type = $this->request->post('type')) {
+		$type = $this->request->post('type');
+		if ($type != '') {
 			$this->prepareFields($type);
 			foreach ($this->fields as &$data) {
 				$data['VALUE'] = $data['DEFAULT'];
@@ -109,18 +110,24 @@ class Channel extends \Controller {
 
 		if ($entity->id) {
 			$alias = new \ORM\Channel();
-			$alias->name = $entity->name;
-			$alias->description = $entity->description;
-			$alias->channel = $entity->guid;
-			$alias->type = 0;
-
-			$alias->insert();
-
-			if (!$alias->isError()) {
-				\Messages::Success(__('ChannelSaved'));
+			if ($alias->find('channel', $entity->guid)->id) {
+				\Messages::Error(__('AliasStillExists'));
 			} else {
-				\Messages::Error($entity->Error());
-				\Messages::Info(print_r($entity->queries(), 1));
+				$alias = new \ORM\Channel;
+				$alias->name = $entity->name;
+				$alias->description = $entity->description;
+				$alias->channel = $entity->guid;
+				$alias->public = $entity->public;
+				$alias->unit = $entity->unit;
+				$alias->type = 0;
+				$alias->insert();
+
+				if (!$alias->isError()) {
+					\Messages::Success(__('ChannelSaved'));
+				} else {
+					\Messages::Error($entity->Error());
+					\Messages::Info(implode(";\n", $entity->queries()).';');
+				}
 			}
 		}
 
@@ -157,14 +164,35 @@ class Channel extends \Controller {
 			}
 
 			if ($ok) {
-			    // CAN'T simply replace because of the foreign key in the tree!
-			    if ($entity->id) $entity->update(); else $entity->insert();
+				$entity->throwException();
+				try {
+				    // CAN'T simply replace because of the foreign key in the tree!
+					$AliasCount = 0;
+				    if (!$entity->id) {
+						$entity->insert();
+					} else {
+						$entity->update();
 
-				if (!$entity->isError()) {
+						// Update possible channel aliases!
+						$tree = new \ORM\Tree;
+						$tree->find('entity', $entity->id);
+						if ($tree->find('entity', $entity->id)->id != '') {
+							foreach ($entity->findMany('channel', $tree->guid) as $alias) {
+								$AliasCount++;
+								$alias->name = $tree->name;
+								$alias->description = $tree->description;
+								$alias->public = $tree->public;
+								$alias->update();
+							}
+						}
+					}
 					\Messages::Success(__('ChannelSaved'));
-				} else {
-					\Messages::Error($entity->Error());
-					\Messages::Info(print_r($entity->queries(), 1));
+					if ($AliasCount != 0) {
+						\Messages::Success(__('AliasesUpdated'));
+					}
+				} catch (Exception $e) {
+					\Messages::Error('['.$e->getCode().'] '.$e->getMessage());
+					\Messages::Info(implode(";\n", $entity->queries()).';');
 					$ok = FALSE;
 				}
 			}
@@ -201,21 +229,13 @@ class Channel extends \Controller {
 		$entity = new \ORM\Channel($this->request->post('id'));
 
 		if ($entity->id) {
-			// check for entity is assigned in channel tree
-			$tree = new \ORM\Tree;
-			$tree->find('entity', $entity->id);
-
-			if ($tree->id) {
-				\Messages::Error(__('ChannelStillInTree', $entity->name), TRUE);
+			$name = $entity->name;
+			$entity->delete();
+			if (!$entity->isError()) {
+				\Messages::Success(__('ChannelDeleted', $name));
 			} else {
-				$name = $entity->name;
-				$entity->delete();
-				if (!$entity->isError()) {
-					\Messages::Success(__('ChannelDeleted', $name));
-				} else {
-					\Messages::Error($entity->Error());
-					\Messages::Info(print_r($entity, 1));
-				}
+				\Messages::Error(__($entity->Error(), $entity->name), TRUE);
+#				\Messages::Info(implode(";\n", $entity->queries()).';');
 			}
 		}
 
@@ -248,26 +268,16 @@ class Channel extends \Controller {
 			$type = new \ORM\EntityType($entity->type);
 		}
 
-		if (!$type->id) {
+		if ($type->id == '') {
 			\Messages::Error('Unknown entity');
 			$this->app->redirect('/channel');
 		}
 
+		// Apply model specific attribute settings
 		$conf = CORE_DIR . DS . 'Channel' . DS
-		      . str_replace('\\', DS, $type->model?:'NoModel') . '.conf.php';
+		      . str_replace('\\', DS, $type->model) . '.conf.php';
 
-		$attr = file_exists($conf) ? include $conf : array();
-
-		// check all fields
-		foreach ($this->fields as $key=>$data) {
-			if (isset($attr[$key])) {
-				// apply settings for this field
-				$this->fields[$key] = array_merge(
-					$this->fields[$key],
-					array_change_key_case($attr[$key], CASE_UPPER)
-				);
-			}
-		}
+		$this->applyFieldSettings($conf);
 
 		$this->view->Type = $type->id;
 		$this->view->TypeName = $type->name;
@@ -275,6 +285,14 @@ class Channel extends \Controller {
 		$this->view->Icon = $type->icon;
 
 		if (is_object($entity)) {
+
+			// Apply type specific attribute settings
+			$conf = __DIR__ . DS
+			      . ($entity->numeric ? 'channel.numeric' : 'channel.non-numeric')
+				  . '.conf.php';
+
+			$this->applyFieldSettings($conf);
+
 			foreach ($this->fields as $key=>&$data) {
 				$h = 'model::'.$type->model.'_'.$key;
 				$name = __($h);
@@ -291,4 +309,23 @@ class Channel extends \Controller {
 		}
 	}
 
+	/**
+	 *
+	 */
+	protected function applyFieldSettings( $conf ) {
+		if (!file_exists($conf)) return;
+
+		$attr = include $conf;
+
+		// check all fields
+		foreach ($this->fields as $key=>$data) {
+			if (isset($attr[$key])) {
+				// apply settings for this field
+				$this->fields[$key] = array_merge(
+					$this->fields[$key],
+					array_change_key_case($attr[$key], CASE_UPPER)
+				);
+			}
+		}
+	}
 }

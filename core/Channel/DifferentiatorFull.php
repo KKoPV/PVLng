@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-14-g2a8e482 2013-05-01 20:44:21 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 namespace Channel;
 
@@ -46,7 +46,7 @@ class DifferentiatorFull extends Differentiator {
 
 			$result = new \Buffer;
 
-			while ($row1 != '' OR $row2 != '') {
+			while (!empty($row1) OR !empty($row2)) {
 
 				$key1 = $buffer->key();
 				$key2 = $next->key();

@@ -8,6 +8,22 @@
  * @revision    $Rev$
  */
 
+/**
+ * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+ */
+jQuery.extend({
+	parseQueryString: function() {
+		var nvpair = {};
+		var qs = window.location.search.replace('?', '');
+		var pairs = qs.split('&');
+		$.each(pairs, function(i, v){
+			var pair = v.split('=');
+			nvpair[pair[0]] = pair[1];
+		});
+		return nvpair;
+	}
+});
+
 $(function() {
 
 	/* Inititilize Pines Notify */
@@ -49,8 +65,8 @@ $(function() {
 	});
 
     $('input.iCheck').iCheck({
-        checkboxClass: 'icheckbox_flat-orange',
-        radioClass: 'iradio_minimal-orange'
+        checkboxClass: 'icheckbox_flat',
+        radioClass: 'iradio_flat'
     });
 
     $('input.iCheckLine').each(function(){
@@ -59,8 +75,8 @@ $(function() {
         label_text = label.text();
         label.remove();
         self.iCheck({
-            checkboxClass: 'icheck_line-orange',
-            radioClass: 'icheck_line-orange',
+            checkboxClass: 'icheckbox_line',
+            radioClass: 'iradio_line',
             insert: '<div class="icheck_line-icon"></div>' + label_text
         });
     });
@@ -80,6 +96,8 @@ $(function() {
         jQuery('html, body').animate({scrollTop: 0}, fadeDuration);
         return false;
     });
+
+	$('#overlay').fadeOut();
 
 });
 

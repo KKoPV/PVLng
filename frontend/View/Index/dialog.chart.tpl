@@ -13,22 +13,22 @@
 	<table id="d-table">
 		<tbody>
 		<tr>
-			<td>
+			<td style="width:50%">
 				{{Axis}}
 			</td>
 			<td id="td-axis">
-				<input type="radio" name="d-axis" value="9" />
-				<input type="radio" name="d-axis" value="7" />
-				<input type="radio" name="d-axis" value="5" />
-				<input type="radio" name="d-axis" value="3" />
-				<input type="radio" name="d-axis" value="1" />
-				<img style="margin:0 0.5em 0.7em;vertical-align:top;width:35px;height:18px"
-				     src="/images/chart.png" width="35" height="18" />
-				<input type="radio" name="d-axis" value="2" />
-				<input type="radio" name="d-axis" value="4" />
-				<input type="radio" name="d-axis" value="6" />
-				<input type="radio" name="d-axis" value="8" />
-				<input type="radio" name="d-axis" value="10" />
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="9" /></div>
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="7" /></div>
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="5" /></div>
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="3" /></div>
+				<div class="fl nm"><input class="iCheck" type="radio" name="d-axis" value="1" /></div>
+				<img class="fl nm" src="/images/chart.png" width="35" height="20"
+				     style="margin-left:.5em;margin-right:.5em;vertical-align:top;width:35px;height:20px"/>
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="2" /></div>
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="4" /></div>
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="6" /></div>
+				<div class="fl"><input class="iCheck" type="radio" name="d-axis" value="8" /></div>
+				<div class="fl nm"><input class="iCheck" type="radio" name="d-axis" value="10" /></div>
 			</td>
 		</tr>
 		<tr>
@@ -88,8 +88,18 @@
 		<tr>
 			<td>{{LineWidth}}</td>
 			<td>
-				<input type="checkbox" id="d-bold" class="iCheckLine" />
-				<label for="d-bold">{{LineBold}}</label>
+				<div class="fl" style="margin-right:.5em">
+					<input type="radio" class="iCheckLine" id="d-width-1" name="d-width" value="1" />
+					<label for="d-width-1">{{ThinLine}}</label>
+				</div>
+				<div class="fl" style="margin-right:.5em">
+					<input type="radio" class="iCheckLine" id="d-width-2" name="d-width" value="2" />
+					<label for="d-width-2">{{LineNormal}}</label>
+				</div>
+				<div class="fl">
+					<input type="radio" class="iCheckLine" id="d-width-3" name="d-width" value="4" />
+					<label for="d-width-3">{{LineBold}}</label>
+				</div>
 			</td>
 		</tr>
 		<tr>
@@ -97,11 +107,11 @@
 				{{MarkExtremes}}
 			</td>
 			<td>
-				<div style="float:left;margin-right:2em">
+				<div class="fl" style="margin-right:.5em">
 					<input type="checkbox" id="d-min" class="iCheckLine" />
 					<label for="d-min">{{min}}</label>
 				</div>
-				<div style="float:left">
+				<div class="fl">
 					<input type="checkbox" id="d-max" class="iCheckLine" />
 					<label for="d-max">{{max}}</label>
 				</div>
@@ -109,10 +119,31 @@
 		</tr>
 		<tr>
 			<td>
-				<label for="d-color">{{Color}}</label>
+				{{Color}}
 			</td>
 			<td>
-				<input id="spectrum" type="color" id="d-color" />
+				<input id="d-color" type="color" class="spectrum" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label for="d-color-use-neg">{{UseNegativeColor}}</label>
+			</td>
+			<td>
+				<table>
+				<tr>
+					<!-- Align controls correct using a table ... -->
+					<td style="padding-left:0;vertical-align:middle">
+						<input type="checkbox" id="d-color-use-neg" class="iCheck" />
+					</td>
+					<td style="vertical-align:middle">
+						<input id="d-threshold" type="number" style="width:6em" class="tip" title="{{Threshold}}" />
+					</td>
+					<td style="vertical-align:middle">
+						<input id="d-color-neg" type="color" class="spectrum" />
+					</td>
+				</tr>
+				</table>
 			</td>
 		</tr>
 		</tbody>

@@ -21,7 +21,6 @@ class Index extends \Controller {
 		$this->Tree = \NestedSet::getInstance();
 		$this->channels = array();
 		$this->views = $this->model->getViews();
-		$this->date = time();
 	}
 
 	/**
@@ -42,7 +41,6 @@ class Index extends \Controller {
 				)
 			);
 
-		$this->view->Date = date('m/d/Y', $this->date);
 		$this->view->APIkey = $this->model->getAPIkey();
 	}
 
@@ -50,17 +48,14 @@ class Index extends \Controller {
 	 *
 	 */
 	public function IndexGET_Action() {
-#		if ($view = $this->app->params->get('view')) {
-		if ($view = $this->app->params['view']) {
-			if ($data = $this->model->getView($view)) {
-				$this->actView = $view;
-				$this->Channels = $data->data;
+		if ($slug = $this->app->params['view']) {
+			$view = new \ORM\View;
+			$view->findBySlug($slug);
+			if ($view->name) {
+				$this->loadView($view->name);
 			} else {
 				\Messages::Error(\I18N::_('UnknownView', $view));
 			}
-		}
-		if ($date = $this->app->params->get('date')) {
-			$this->date = strtotime($date);
 		}
 	}
 
@@ -71,32 +66,30 @@ class Index extends \Controller {
 
 		if ($view = $this->request->post('loadview')) {
 			// Load view from top select
-			$this->actView = $view;
-			$this->Channels = $this->model->getView($view)->data;
-
+			$this->loadView($view);
 		} elseif ($this->request->post('save') AND
 		          $view = $this->request->post('saveview')) {
 			// Allowed only for logged in user
 			if (!\Session::get('user')) return;
+
 		    // Save view
 			if ($channels = $this->request->post('v')) {
-				$this->actView = $view;
 				// Save ...
-				$this->model->saveView($view, $channels, $this->request->post('public'));
+				$this->model->saveView($view, $channels, $this->request->post('public'), $this->slug($view));
 				// ... and read back
-				$this->Channels = $this->model->getView($view)->data;
+				$this->loadView($view);
 			}
 
 		} elseif ($this->request->post('load') AND
 		          $view = $this->request->post('loaddeleteview')) {
 			// Load view
-			$this->actView = $view;
-			$this->Channels = $this->model->getView($view)->data;
+			$this->loadView($view);
 
 		} elseif ($this->request->post('delete') AND
 		          $view = $this->request->post('loaddeleteview')) {
 			// Allowed only for logged in user
 			if (!\Session::get('user')) return;
+
 			// Delete view
 			if ($this->model->deleteView($view)) {
 				\Messages::Success(\I18N::_('ViewDeleted', $view));
@@ -140,10 +133,8 @@ class Index extends \Controller {
 					$node['icon']        = $e->icon;
 				}
 
-#				$id = $node['id'];
 				if (isset($this->Channels->$node['id'])) {
 					$node['checked'] = 'checked';
-#					$node['presentation'] = $this->Channels->$id;
 					$node['presentation'] = $this->Channels->$node['id'];
 				}
 			}
@@ -164,6 +155,7 @@ class Index extends \Controller {
 			}
 		}
 		$this->view->View = $this->actView;
+		$this->view->Slug = $this->actSlug;
 		$this->view->Views = $views;
 		$this->view->NotifyLoad = $this->config->Controller_Chart_NotifyLoad;
 	}
@@ -190,6 +182,47 @@ class Index extends \Controller {
 	/**
 	 *
 	 */
-	protected $date;
+	protected $actSlug;
 
+	/**
+	 *
+	 */
+	protected function slug( $string ) {
+
+		$translate = array(
+			'Š' => 'S',  'š' => 's',  'Đ' => 'Dj', 'đ' => 'dj', 'Ž' => 'Z',
+			'ž' => 'z',  'Č' => 'C',  'č' => 'c',  'Ć' => 'C',  'ć' => 'c',
+			'À' => 'A',  'Á' => 'A',  'Â' => 'A',  'Ã' => 'A',  'Ä' => 'Ae',
+			'Å' => 'A',  'Æ' => 'A',  'Ç' => 'C',  'È' => 'E',  'É' => 'E',
+			'Ê' => 'E',  'Ë' => 'E',  'Ì' => 'I',  'Í' => 'I',  'Î' => 'I',
+			'Ï' => 'I',  'Ñ' => 'N',  'Ò' => 'O',  'Ó' => 'O',  'Ô' => 'O',
+			'Õ' => 'O',  'Ö' => 'Oe', 'Ø' => 'O',  'Ù' => 'U',  'Ú' => 'U',
+			'Û' => 'U',  'Ü' => 'Ue', 'Ý' => 'Y',  'Þ' => 'B',  'ß' => 'Ss',
+			'à' => 'a',  'á' => 'a',  'â' => 'a',  'ã' => 'a',  'ä' => 'ae',
+			'å' => 'a',  'æ' => 'a',  'ç' => 'c',  'è' => 'e',  'é' => 'e',
+			'ê' => 'e',  'ë' => 'e',  'ì' => 'i',  'í' => 'i',  'î' => 'i',
+			'ï' => 'i',  'ð' => 'o',  'ñ' => 'n',  'ò' => 'o',  'ó' => 'o',
+			'ô' => 'o',  'õ' => 'o',  'ö' => 'oe', 'ø' => 'o',  'ù' => 'u',
+			'ú' => 'u',  'û' => 'u',  'ü' => 'ue', 'ý' => 'y',  'ý' => 'y',
+			'þ' => 'b',  'ÿ' => 'y',  'Ŕ' => 'R',  'ŕ' => 'r'
+		);
+
+		// Remove multiple spaces
+		$string = preg_replace(array('~\s{2,}~', '~[\t\r\n]+~'), ' ', $string);
+		$string = strtr($string, $translate);
+		$string = preg_replace('~[^\w\d]~', '-', $string);
+		$string = preg_replace('~-{2,}~', '-', $string);
+
+		return strtolower(trim($string, '-'));
+	}
+
+	/**
+	 *
+	 */
+	protected function loadView( $view ) {
+		$view = new \ORM\View($view);
+		$this->Channels = json_decode($view->data);
+		$this->actView = $view->name;
+		$this->actSlug = $view->slug;
+	}
 }

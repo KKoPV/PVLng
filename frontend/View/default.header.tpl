@@ -17,8 +17,11 @@
 		<div style="margin-left:120px">
 			v{VERSION}
 			<!-- IF {VERSIONNEW} -->
-			<p style="font-weight:bold;color:red">
-				NEW:<br /><a href="https://github.com/K-Ko/PVLng/wiki/ChangeLog">v{VERSIONNEW}</a>
+			<p class="b">
+				<a href="https://github.com/K-Ko/PVLng/wiki/ChangeLog">v{VERSIONNEW}</a>
+				<a href="https://github.com/K-Ko/PVLng/tree/master">
+					<img src="/images/ico/share.png" style="width:16px;height:16px;margin-left:.25em" width="16" height="16" />
+				</a>
 			</p>
 			<!-- ENDIF -->
 		</div>
@@ -28,12 +31,16 @@
 	</div>
 	<div class="grid_4 r">
 		<span id="title1">{TITLE}</span>
-		<!-- IF {USER} -->
-		<p><em>{USER}</em></p>
-		<!-- ENDIF -->
+		<br /><br />
+		<!-- IF {USER} --><em>{USER}</em><!-- ELSE -->&nbsp;<!-- ENDIF -->
 	</div>
-	<div class="clear"></div>
 </div>
+
+<div class="clear"></div>
+
+<div class="grid_10 hr"></div>
+
+<div class="clear"></div>
 
 <div class="grid_10">
 	<div class="fl">
@@ -68,7 +75,9 @@
 		</span>
 	</div>
 </div>
+
 <div class="clear"></div>
+
 <br />
 
 <!-- IF {MESSAGES} -->

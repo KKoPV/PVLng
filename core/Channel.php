@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-27-gf2cf3da 2013-05-06 15:24:30 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 abstract class Channel {
 
@@ -17,7 +17,7 @@ abstract class Channel {
 		$channel->find('id', $id);
 
 		if ($channel->id != '') {
-			$model = trim('Channel\\' . $channel->model,'\\');
+			$model = rtrim('Channel\\' . $channel->model, '\\');
 			return new $model($channel);
 		}
 
@@ -32,7 +32,7 @@ abstract class Channel {
 		$channel->find('guid', $guid);
 
 		if ($channel->id != '') {
-			$model = trim('Channel\\' . $channel->model,'\\');
+			$model = rtrim('Channel\\' . $channel->model, '\\');
 			return new $model($channel);
 		}
 
@@ -74,33 +74,44 @@ abstract class Channel {
 		return $attribute != ''
 			// Here WITHOUT check, will be handled by __get()
 			? array($attribute => $this->$attribute)
-			: array(
-		        'guid'        => $this->guid,
-		        'name'        => $this->name,
-		        'serial'      => $this->serial,
-		        'channel'     => $this->channel,
-		        'description' => $this->description,
-		        'type'        => $this->type,
-		        'unit'        => $this->unit,
-		        'decimals'    => $this->decimals,
-		        'numeric'     => $this->numeric,
-		        'meter'       => $this->meter,
-		        'resolution'  => $this->resolution,
-		        'threshold'   => $this->threshold,
-		        'valid_from'  => $this->valid_from,
-		        'valid_to'    => $this->valid_to,
-		        'cost'        => $this->cost,
-		        'childs'      => $this->childs,
-		        'read'        => $this->read,
-		        'write'       => $this->write,
-		        'graph'       => $this->graph,
-		        'icon'        => $this->icon,
-		        'comment'     => $this->comment,
-		        'start'       => $this->start,
-		        'end'         => $this->end,
-				'consumption' => 0,
-				'costs'       => 0
+			: array_merge(
+				$this->getAttributesShort(),
+				array(
+			        'start'       => $this->start,
+			        'end'         => $this->end,
+					'consumption' => 0,
+					'costs'       => 0
+				)
 			);
+	}
+
+	/**
+	 *
+	 */
+	public function getAttributesShort() {
+		return array(
+	        'guid'        => $this->guid,
+	        'name'        => $this->name,
+	        'serial'      => $this->serial,
+	        'channel'     => $this->channel,
+	        'description' => $this->description,
+	        'type'        => $this->type,
+	        'unit'        => $this->unit,
+	        'decimals'    => $this->decimals,
+	        'numeric'     => $this->numeric,
+	        'meter'       => $this->meter,
+	        'resolution'  => $this->resolution,
+	        'threshold'   => $this->threshold,
+	        'valid_from'  => $this->valid_from,
+	        'valid_to'    => $this->valid_to,
+	        'cost'        => $this->cost,
+	        'childs'      => $this->childs,
+	        'read'        => $this->read,
+	        'write'       => $this->write,
+	        'graph'       => $this->graph,
+	        'icon'        => $this->icon,
+	        'comment'     => trim($this->comment)
+		);
 	}
 
 	/**
@@ -114,8 +125,8 @@ abstract class Channel {
 			throw new Exception('Missing data value', 400);
 
 		if ($this->numeric) {
-			// Make numeric
-			$this->value = +$this->value;
+			// Apply offset
+			$this->value += $this->offset;
 
 			// Check that new value is inside the valid range
 			if ((!is_null($this->valid_from) AND $this->value < $this->valid_from) OR
@@ -188,9 +199,9 @@ abstract class Channel {
 			  ->get('data')
 			  ->get('data', 'min')
 			  ->get('data', 'max')
-			  ->get(1, 'count', TRUE)
-			  ->get(0, 'timediff', TRUE)
-			  ->get(0, 'consumption', TRUE)
+			  ->get(1, 'count')
+			  ->get(0, 'timediff')
+			  ->get(0, 'consumption')
 			  ->whereEQ('id', $this->entity)
 			  ->orderDescending('timestamp')
 			  ->limit(1);
@@ -209,8 +220,8 @@ abstract class Channel {
 				  ->get('data')
 				  ->get('data', 'min')
 				  ->get('data', 'max')
-				  ->get('1', 'count', TRUE)
-				  ->get('0', 'timediff', TRUE)
+				  ->get(1, 'count')
+				  ->get(0, 'timediff')
 				  ->get('timestamp', 'g');
 
 			} else {
@@ -233,20 +244,31 @@ abstract class Channel {
 				$q->get($q->MIN('data'), 'min')
 				  ->get($q->MAX('data'), 'max')
 				  ->get($q->COUNT('id'), 'count')
-				  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff', TRUE)
-				  ->get($grouping, 'g') // Also as row id used!
-				  ->group($grouping);
+				  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
+				  ->get($grouping, 'g')
+				  ->group('g');
 			}
 
 			if ($this->period[1] != self::ALL) {
 			    // Time is only relevant for select <> period=all
-				$q->whereGE('timestamp', $this->start);
+                if (!$this->meter) {
+					$q->whereGE('timestamp', $this->start);
+				} else {
+					// Fetch also period before start for consumption calculation!
+					$q->whereGE('timestamp', $this->start-$this->TimestampMeterOffset[$this->period[1]]);
+				}
 				if ($this->end < time()) {
 					$q->whereLT('timestamp', $this->end);
 				}
 			}
 
 			$q->whereEQ('id', $this->entity)->order('timestamp');
+
+			if (array_key_exists('sql', $request) AND $request['sql']) {
+				$sql = $this->name;
+				if ($this->description) $sql .= ' (' . $this->description . ')';
+				Header('X-SQL-'.substr(md5($sql), 25).': '.$sql.': '.$q);
+			}
 
 			if ($res = $this->db->query($q)) {
 
@@ -270,11 +292,7 @@ abstract class Channel {
 						}
 
 						// calc consumption from previous max value
-#						if ($last == 0) {
-#							$row['consumption'] = $row['max'] - $row['min'];
-#						} else {
-							$row['consumption'] = $row['max'] - $last;
-#						}
+						$row['consumption'] = $row['max'] - $last;
 						$last = $row['max'];
 					}
 					// remove grouping value
@@ -284,13 +302,6 @@ abstract class Channel {
 					$buffer->write($row, $id);
 				}
 			}
-		}
-
-		if (array_key_exists('sql', $request) AND $request['sql']) {
-			$sql = $this->name;
-			if ($this->description) $sql .= ' (' . $this->description . ')';
-			$sql .= ': ' . str_replace("\n", ' ', $q);
-			Header('X-SQL-' . substr(md5($sql), 25) . ': ' . $sql);
 		}
 
 		return $this->after_read($buffer, $attributes);
@@ -375,8 +386,23 @@ abstract class Channel {
 		self::QUARTER => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
 		self::YEAR    => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
 		self::LAST    => '',
-		self::ALL     => '`timestamp`',
 		self::ALL     => '',
+	);
+
+	/**
+	 *
+	 */
+	protected $TimestampMeterOffset = array(
+		self::NO      =>        0,
+		self::MINUTE  =>       60,
+		self::HOUR    =>     3600,
+		self::DAY     =>    86400,
+		self::WEEK    =>   604800,
+		self::MONTH   =>  2678400,
+		self::QUARTER =>  7776000,
+		self::YEAR    => 31536000,
+		self::LAST    =>        0,
+		self::ALL     =>        0,
 	);
 
 	/**
@@ -492,7 +518,7 @@ abstract class Channel {
 			// normalize aggr. periods
 			if (preg_match('~^([.\d]*)(|l|last|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
 			               $request['period'], $args)) {
-				$this->period = array($args[1]?:1, '');
+				$this->period = array($args[1]?:1, self::NO);
 				switch (substr($args[2], 0, 2)) {
 					case 'i': case 'mi':  $this->period[1] = self::MINUTE;   break;
 					case 'h': case 'ho':  $this->period[1] = self::HOUR;     break;
@@ -548,9 +574,6 @@ abstract class Channel {
 				// Skip invalid (numeric) rows
 				if ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
 				    (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to)) {
-
-					// Apply offset
-					#$row['data'] += $this->offset;
 
 					$this->value = $row['data'];
 					Hook::process('data.read.after', $this);

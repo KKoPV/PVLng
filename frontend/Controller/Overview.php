@@ -95,7 +95,6 @@ class Overview extends \Controller {
 		$this->redirect();
 	}
 
-
 	/**
 	 * Delete an entity from the tree
 	 */
@@ -112,6 +111,48 @@ class Overview extends \Controller {
 	public function DeleteBranchPOST_Action() {
 		if ($id = $this->request->post('id')) {
 			$this->Tree->DeleteBranch($id);
+		}
+		$this->redirect();
+	}
+
+	/**
+	 * Move an entity to new parent
+	 */
+	public function DragDropPOST_Action() {
+		if ($id = $this->request->post('id')) {
+			// Remove from old position
+			$this->Tree->DeleteNode($id);
+		}
+
+		if ($target = $this->request->post('target') AND
+		    $entity = $this->request->post('entity')) {
+
+			if (\ORM::forge('Tree')->find('id', $target)->childs != 0) {
+				// Add as new child
+				$this->Tree->insertChildNode($entity, $target);
+			} else {
+				// Get full path to drop target
+				$path = $this->Tree->getPathFromRoot($target);
+
+				// Get parent of drop target > second to last of path
+				$target_new = array_slice($path, count($path)-2, 1);
+				$target_new = $target_new[0]['id'];
+
+				// Search position of drop target in existing childs
+				$childs = $this->Tree->getChilds($target_new);
+				foreach ($childs as $pos=>$child) {
+					if ($child['id'] == $target) break;
+				}
+
+				// 1st Add as new child
+				$new = $this->Tree->insertChildNode($entity, $target_new);
+
+				// 2nd Move to correct position
+				$count = count($childs) - $pos - 1;
+				while ($count--) {
+					if (!$this->Tree->moveLft($new)) break;
+				}
+			}
 		}
 		$this->redirect();
 	}

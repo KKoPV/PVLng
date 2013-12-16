@@ -22,9 +22,15 @@
 		]]>
 	</View>
 
+	<ViewBySlug>
+		<![CDATA[
+			SELECT * FROM `pvlng_view` WHERE `slug` = "{1}"
+		]]>
+	</ViewBySlug>
+
 	<SaveView>
 		<![CDATA[
-			REPLACE INTO `pvlng_view` VALUES( "{1}", "{2}", "{3}" )
+			REPLACE INTO `pvlng_view` VALUES( "{1}", "{2}", "{3}", "{4}" )
 		]]>
 	</SaveView>
 

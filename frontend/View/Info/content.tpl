@@ -65,7 +65,7 @@
 
 	<tr>
 		<td>
-			<img src="/images/ico/{ICON}" style="width:16px;height:16px;margin-right:8px"
+			<img src="{ICON}" style="width:16px;height:16px;margin-right:8px"
 			     width="16" height="16" alt="" />
 			{NAME}
 		</td>

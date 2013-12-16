@@ -320,9 +320,7 @@ function updateChart() {
 					};
 				} else if (channel.type != 'bar') {
 					serie.dashStyle = channel.style;
-					serie.lineWidth = channel.bold
-					                ? defaults.line.bold
-					                : defaults.line.normal;
+					serie.lineWidth = channel.width;
 				}
 
 				if (channel.type != 'areasplinerange' && (channel.min || channel.max)) {

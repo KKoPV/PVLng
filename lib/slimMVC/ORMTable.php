@@ -21,26 +21,35 @@ abstract class ORMTable {
 	 */
 	public function __construct ( $id=NULL ) {
 		$this->app = App::getInstance();
-		$this->app->db = $this->app->db;
 
-		$schemaKey = 'ORMtable.' . MySQLi::getDatabase() . '.' . $this->table;
-		if ($schema = $this->app->cache->get($schemaKey)) {
-			list($this->fields, $this->nullable, $this->primary, $this->autoinc) = $schema;
-		} else {
-			// Read table schema
-			$res = $this->app->db->query('SHOW COLUMNS FROM '.$this->table);
-			while ($row = $res->fetch_object()) {
-				$this->fields[$row->Field]   = '';
-				$this->nullable[$row->Field] = ($row->Null == 'YES');
-				if ($row->Key   == 'PRI') $this->primary[] = $row->Field;
-				if ($row->Extra == 'auto_increment') $this->autoinc = $row->Field;
+		if (empty($this->fields)) {
+			$schemaKey = 'ORMtable.' . MySQLi::getDatabase() . '.' . $this->table;
+			if ($schema = $this->app->cache->get($schemaKey)) {
+				list($this->fields, $this->nullable, $this->primary, $this->autoinc) = $schema;
+			} else {
+				// Read table schema
+				$res = $this->app->db->query('SHOW COLUMNS FROM '.$this->table);
+				while ($row = $res->fetch_object()) {
+					$this->fields[$row->Field]   = '';
+					$this->nullable[$row->Field] = ($row->Null == 'YES');
+					if ($row->Key   == 'PRI') $this->primary[] = $row->Field;
+					if ($row->Extra == 'auto_increment') $this->autoinc = $row->Field;
+				}
+	            $this->app->cache->set($schemaKey, array(
+					$this->fields, $this->nullable, $this->primary, $this->autoinc
+				));
 			}
-            $this->app->cache->set($schemaKey, array(
-				$this->fields, $this->nullable, $this->primary, $this->autoinc
-			));
 		}
 
 		if (isset($id)) $this->findPrimary($id);
+	}
+
+	/**
+	 *
+	 * @return void
+	 */
+	public function throwException( $throw=TRUE ) {
+		$this->throwException = (bool) $throw;
 	}
 
 	/**
@@ -136,11 +145,11 @@ abstract class ORMTable {
 		foreach ($this->fields as $field=>$value) {
 			// Skip primary key(s) and not changed values
 			if (!in_array($field, $this->primary) AND
-			    (!in_array($field, $this->oldfields) OR (string) $value != (string) $this->oldfields[$field])) {
+			    (!array_key_exists($field, $this->oldfields) OR (string) $value != (string) $this->oldfields[$field])) {
 				if ($value == '' AND $this->nullable[$field]) {
-					$set[] = sprintf('%s = NULL', $field);
+					$set[] = sprintf('`%s` = NULL', $field);
 				} else {
-					$set[] = sprintf('%s = "%s"', $field, $this->app->db->real_escape_string($value));
+					$set[] = sprintf('`%s` = "%s"', $field, $this->app->db->real_escape_string($value));
 				}
 			}
 		}
@@ -267,7 +276,7 @@ abstract class ORMTable {
 	/**
 	 *
 	 */
-	protected $db;
+	protected $throwException = FALSE;
 
 	/**
 	 *
@@ -393,8 +402,13 @@ abstract class ORMTable {
 	protected function _query( $sql ) {
 		$this->sql[] = $sql;
 		$res = $this->app->db->query($sql);
+
 		// You have an error in your SQL syntax; check the manual ...
 		if ($this->app->db->errno == 1149) die($this->app->db->error . ' : ' . $sql);
+
+		if ($this->throwException AND $this->app->db->errno) {
+			throw new Exception($this->app->db->error, $this->app->db->errno);
+		}
 
 		return $res;
 	}

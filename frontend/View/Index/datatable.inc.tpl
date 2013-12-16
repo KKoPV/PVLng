@@ -12,23 +12,23 @@
 <table id="tree" class="dataTable treeTable">
 	<thead>
 	<tr>
-		<th>
+		<th style="width:1%">
 			<img id="treetoggle" src="/images/ico/toggle.png"
 				 style="width:16px;height:16px" width="16" height="16"
 			     class="tip" onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
 			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
 		</th>
-		<th style="width:70%" class="l">
+		<th class="l">
 			<span class="indenter" style="padding-left: 0px;"></span>
 			{{Channel}}
 		</th>
-		<th>
+		<th style="width:1%">
 			<img src="/images/ico/16x16.png" style="width:16px;height:16px" width="16" height="16" alt="" />
 		</th>
-		<th class="r">{{Amount}}</th>
-		<th class="l">{{Unit}}</th>
+		<th style="width:1%" class="r">{{Amount}}</th>
+		<th style="width:1%" class="l">{{Unit}}</th>
 		<th class="r">{{Earning}}&nbsp;/ {{Cost}}</th>
-		<th>
+		<th style="width:1%">
 			<img src="/images/ico/node_design.png" style="width:16px;height:16px" width="16" height="16" alt="" />
 		</th>
 	</tr>
@@ -37,7 +37,7 @@
 	<tbody>
 		<!-- BEGIN DATA -->
 		<tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->
-		    <!-- IF !{GRAPH} -->class="no-graph"<!-- ENDIF -->>
+			<!-- IF !{GRAPH} -->class="no-graph"<!-- ENDIF -->>
 			<td>
 				<!-- IF {GRAPH} -->
 				<input id="c{ID}" class="channel iCheck" type="checkbox" name="v[{ID}]"
@@ -48,8 +48,7 @@
 			</td>
 			<td style="padding:0.4em 0">
 				<img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-				     class="tip" src="/images/ico/{ICON}" alt=""
-				     title="{TYPE}" width="16" height="16"/>
+				     src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" />
 				<strong class="tip" title="{GUID}">{NAME}</strong>
 				<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
 				<!-- IF !{PUBLIC} -->

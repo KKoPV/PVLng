@@ -12,38 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Random extends \Channel {
-
-	/**
-	 * Timestamp delta 5 minutes
-	 */
-	const DELTA = 5;
-
-	/**
-	 *
-	 */
-	protected $table = array(
-		'pvlng_reading_str_tmp', // numeric == 0
-		'pvlng_reading_num_tmp'  // numeric == 1
-	);
-
-	/**
-	 *
-	 */
-	protected $create = array(
-		'CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
-		   `id` int(10) unsigned NOT NULL,
-		   `timestamp` int(10) unsigned NOT NULL,
-		   `data` varchar(50) NOT NULL,
-		   PRIMARY KEY (`id`,`timestamp`)
-		 ) ENGINE=MEMORY',
-		'CREATE TABLE IF NOT EXISTS `pvlng_reading_num_tmp` (
-		   `id` int(10) unsigned NOT NULL,
-		   `timestamp` int(10) unsigned NOT NULL,
-		   `data` decimal(13,4) NOT NULL,
-		   PRIMARY KEY (`id`, `timestamp`)
-		 ) ENGINE=MEMORY'
-	);
+class Random extends InternalCalc {
 
 	/**
 	 *
@@ -56,8 +25,15 @@ class Random extends \Channel {
 		$this->end = min($this->end, time());
 
 		$timestamp = $this->start;
+		// max. change +- 5
+		$threshold = $this->threshold ?: 5;
+		// buffer once
+		$randMax = mt_getrandmax();
+
+		$TimeStep = max(60, $this->db->TimeStep);
 
 		if ($this->meter) {
+			$timestamp -= $this->TimestampMeterOffset[$this->period[1]];
 			$value = is_null($this->valid_from) ? 0 : $this->valid_from;
 			$minRand = 0;
 		} else {
@@ -66,39 +42,16 @@ class Random extends \Channel {
 					  (is_null($this->valid_to) ? 100 : $this->valid_to)) / 2;
 			$minRand = -1; // to get negative steps
 		}
-		// max. change +- 5
-		$threshold = $this->threshold ?: 5;
-		// buffer once
-		$randMax = mt_getrandmax();
+		$values = array($timestamp => $value);
 
-		$this->db->query($this->create[$this->numeric]);
-		$this->db->query('TRUNCATE `'.$this->table[$this->numeric].'`');
-
-		$values = array();
 		while ($timestamp <= $this->end) {
-			$values[] = '(' . $this->entity . ',' . $timestamp . ',' . $value . ')';
-
 			// calc next value;
-			$timestamp += self::DELTA * 60;
+			$timestamp += $TimeStep;
 			$value += mt_rand() / $randMax * $threshold * mt_rand($minRand, 1);
-			$value = $this->valid($value);
+			$values[$timestamp] = $value;
 		}
 
-		if (count($values)) {
-			$this->db->query('INSERT INTO `'.$this->table[$this->numeric].'`'
-			                .'VALUES '. implode(',', $values));
-		}
-
-	}
-
-	/**
-	 *
-	 */
-	protected function after_read( Buffer $buffer, $attributes ) {
-
-		$this->db->query('TRUNCATE `'.$this->table[$this->numeric].'`');
-
-		return parent::after_read($buffer, $attributes);
+		$this->saveValues($values);
 	}
 
 }

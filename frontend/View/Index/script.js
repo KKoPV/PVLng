@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-19-gf67765b 2013-05-05 22:03:31 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 
 /**
@@ -46,13 +46,13 @@ var
 	options = {
 		chart: {
 			renderTo: 'chart',
-			height: ChartHeight,
+			height: $.parseQueryString().ChartHeight || ChartHeight,
 			paddingRight: 15,
 			alignTicks: false,
 			zoomType: 'x',
 			events: {
 				selection: function(event) {
-					setTimeout(setExtremes, 1000);
+					setTimeout(setExtremes, 100);
 				}
 			}
 		},
@@ -62,12 +62,12 @@ var
 				marker: { enabled: false }
 			},
 			spline: {
-				marker: { enabled: false }
+				marker: { enabled: false },
 			},
 			areaspline: {
 				marker: { enabled: false },
 				shadow: false,
-				fillOpacity: 0.2
+				fillOpacity: 0.2,
 			},
 			areasplinerange: {
 				marker: { enabled: false },
@@ -84,12 +84,7 @@ var
 		tooltip: {
 			useHTML: true,
 			formatter: function() {
-				var body = '<tr>' +
-					       '<td colspan="3" style="padding:0.3em 0;font-weight:bold;background-color:#DDD">' +
-					       Highcharts.dateFormat('%a. %Y-%m-%d %H:%M',this.x).replace(/ 00:00$/g, '') +
-					       '</td></tr>';
-
-				var value;
+				var body = '', value;
 				$.each(this.points, function(id, point) {
 					if (point.point.low != undefined && point.point.high != undefined) {
 						value = Highcharts.numberFormat(+point.point.low, point.series.options.decimals) + ' - ' +
@@ -99,18 +94,19 @@ var
 					} else {
 						return;
 					}
-					body += '<tr style="border-top:dotted lightgray 1px;color:' + point.series.color;
-					if (id & 1) body += ';background-color:#EEE';
-					body += '">' +
-					        '<td>' + point.series.name + '</td>' +
-					        '<td style="padding-left:1em;text-align:right;padding-right:.5em">' + value + '</td>' +
-					        '<td> ' + point.series.tooltipOptions.valueSuffix + '</td>' +
+					body += '<tr style="color:' + point.series.color + '"';
+					if (id & 1) body += ' class="even"'; /* id starts by 0 */
+					body += '>' +
+					        '<td class="name">' + point.series.name + '</td>' +
+					        '<td class="value">' + value + '</td>' +
+					        '<td class="unit"> ' + point.series.tooltipOptions.valueSuffix + '</td>' +
 							'</tr>';
 				});
-				return '<table>' + body + '</table>';
+				return '<table id="chart-tooltip"><thead><tr><th colspan="3">' +
+				       Highcharts.dateFormat('%a. %Y-%m-%d %H:%M',this.x).replace(' 00:00', '') +
+				       '</th></tr></thead><tbody>' + body + '</tbody></table>';
 			},
-			borderColor: '#AAA',
-			borderWidth: 1,
+			borderWidth: 0,
 			shadow: true,
 			crosshairs: true,
 			shared: true
@@ -119,6 +115,29 @@ var
 			labelStyle: {
 				top: '40%',
 				fontSize: '200%'
+			}
+		},
+
+		exporting: {
+			buttons: {
+				contextButton: {
+					menuItems: [{
+						text: 'Export to PNG (small)',
+						onclick: function() {
+							this.exportChart({
+								width: 250
+							});
+						}
+					}, {
+						separator: true
+					}, {
+						text: 'Export to PNG (large)',
+						onclick: function() {
+							this.exportChart();
+						},
+						separator: false
+					}]
+				}
 			}
 		}
 	};
@@ -172,7 +191,7 @@ function ToggleTree( force ) {
 		$('span.indenter').each(function(id, el) {
 			el = $(el);
 			/* Restore left indent */
-			el.css('padding-left', el.data('indent'));
+			el.css('padding-left', el.data('indent')).css('width', '19px');
 		});
 	} else {
 		$('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
@@ -180,9 +199,20 @@ function ToggleTree( force ) {
 
 		$('span.indenter').each(function(id, el) {
 			/* Remove left indent */
-			$(el).css('padding-left', 0);
+			$(el).css('padding-left', 0).css('width', '8px');
 		});
 	}
+
+    $('#tree tbody tr:visible').each(function(id, el) {
+		el = $(el);
+		if (id & 1) {
+			/* Set to odd if needed */
+			if (el.hasClass('even')) el.removeClass('even').addClass('odd');
+		} else {
+			/* Set to even if needed */
+			if (el.hasClass('odd'))  el.removeClass('odd').addClass('even');
+		}
+	});
 }
 
 /**
@@ -196,17 +226,23 @@ function ChartDialog( id, name ) {
 	$('input[name="d-axis"][value="' + p.axis + '"]').prop('checked', true);
 	$('#d-type').val(p.type);
 	$('#d-cons').prop('checked', p.consumption);
-	$('#d-bold').prop('checked', p.bold);
+	$('input[name="d-width"][value="' + p.width + '"]').prop('checked', true);
 	$('#d-min').prop('checked', p.min);
 	$('#d-max').prop('checked', p.max);
 	$('#d-style').val(p.style);
 	$('#d-color').val(p.color);
-	$('#spectrum').spectrum('set', p.color);
+	$('#d-color').spectrum('set', p.color);
+	$('#d-color-use-neg').prop('checked', p.coloruseneg);
+	$('#d-color-neg').val(p.colorneg);
+	$('#d-color-neg').spectrum('set', p.colorneg);
+	$('#d-color-neg').spectrum($('#d-color-use-neg').is(':checked') ? 'enable' : 'disable');
+	$('#d-threshold').val(p.threshold);
+	$('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'));
+	$('input').iCheck('update');
 	/* set the id into the dialog for onClose to write data back */
 	$('#dialog-chart').data('id', id);
 	$('#dialog-chart').dialog('option', 'title', name);
 	$('#dialog-chart').dialog('open');
-	$('input').iCheck('update');
 }
 
 /**
@@ -232,6 +268,19 @@ var xAxisResolution = {
 function updateChart() {
 
 	clearTimeout(timeout);
+
+	<!-- IF {USER} -->
+	/* Provide permanent link only for logged in user */
+	var btn = $('#btn-permanent'), date = $('#from').val(), to = $('#to').val();
+	if (date != to) date += ' - ' + to;
+	var text = btn.data('text').replace('&', date);
+
+	btn.prop('href', btn.data('url') + encodeURI('?from='+$('#fromdate').val()+'&to='+$('#todate').val()))
+	   .prop('title', text).html(text);
+
+	/* Rebuild button after text and title changes */
+	btn.button({ icons: { primary: 'ui-icon-image' }, text: false });
+	<!-- ENDIF -->
 
 	var ts = (new Date).getTime(),
 	    channels_new = [], yAxisMap = [], yAxis = [],
@@ -294,6 +343,8 @@ function updateChart() {
 				title: { text: channel.unit },
 				lineColor: channel.color,
 				showEmpty: false,
+				minPadding: 0,
+				maxPadding: 0,
 				opposite: is_right
 			};
 			/* only 1st left axis shows grid lines */
@@ -302,6 +353,13 @@ function updateChart() {
 			}
 		}
 	});
+
+	if (yAxis.length > 1) {
+		$(yAxis).each(function(id) {
+			yAxis[id].startOnTick = false;
+			yAxis[id].endOnTick = false;
+		});
+	}
 
 	_log('Channels:', channels_new);
 	_log('yAxis:', yAxis);
@@ -362,8 +420,8 @@ function updateChart() {
 			{
 			    attributes: true,
 			    full:       true,
-				start:	    $('#fromdate').attr('value'),
-				end:        $('#todate').attr('value') + '+1day',
+				start:	    $('#fromdate').val(),
+				end:        $('#todate').val() + '+1day',
 				period:     (channel.type != 'scatter') ? period_count + period : '',
 				_ts:        (new Date).getTime()
 			},
@@ -385,15 +443,20 @@ function updateChart() {
 				t = (attr.description) ? ' (' + attr.description + ')' : '';
 
 				var serie = { /* HTML decode channel name */
-					name:     $('<div/>').html(attr.name + t).text(),
-				    id:       channel.id,
+					name: $('<div/>').html(attr.name + t).text(),
+				    id: channel.id,
 				    decimals: attr.decimals,
-					unit:     attr.unit,
-					color:    channel.color,
-					type:     channel.type,
-					yAxis:    channel.axis,
-					data:     []
+					unit: attr.unit,
+					color: channel.color,
+					type: channel.type,
+					yAxis: channel.axis,
+					data: []
 				};
+
+				if (channel.coloruseneg) {
+					serie.threshold = channel.threshold;
+					serie.negativeColor = channel.colorneg;
+				}
 
 				if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
 				if (attr.unit) serie.tooltip = { valueSuffix: attr.unit };
@@ -401,18 +464,21 @@ function updateChart() {
 				if (channel.type == 'scatter') {
 					serie.dataLabels = {
 						enabled: true,
-						align: 'left',
-						rotation: 270,
-						align: 'left',
-						x: 3,
-						y: -7,
-						formatter: function() { return this.point.name }
+						formatter: function() {
+							/* Switch for non-numeric / numeric channels */
+							return this.point.name ? this.point.name : this.point.y;
+						}
 					};
+					if (!attr.unit) {
+						/* mostly non-numeric channels */
+						serie.dataLabels.align = 'left';
+						serie.dataLabels.rotation = 270;
+						serie.dataLabels.x = 3;
+						serie.dataLabels.y = -7;
+					}
 				} else if (channel.type != 'bar') {
 					serie.dashStyle = channel.style;
-					serie.lineWidth = channel.bold
-					                ? defaults.line.bold
-					                : defaults.line.normal;
+					serie.lineWidth = channel.width;
 				}
 
 				$(data).each(function(id, row) {
@@ -515,6 +581,11 @@ function updateChart() {
 
 			chart.hideLoading();
 			chart.redraw();
+
+			/* Resize chart correct into parent container */
+			var c = $('#chart')[0];
+			chart.setSize(c.offsetWidth, c.offsetHeight, false);
+
 			setExtremes();
 			/* setTimeout(setExtremes, channels.length*100); */
 
@@ -548,7 +619,7 @@ $(function() {
 
 	$("#dialog-chart").dialog({
 		autoOpen: false,
-		width: 652, /* grid_7 */
+		width: 750,
 		modal: true,
 		buttons: {
 			'{{Ok}}': function() {
@@ -557,10 +628,13 @@ $(function() {
 				p.type = $('#d-type').val();
 				p.consumption = $('#d-cons').is(':checked');
 				p.style = $('#d-style').val();
-				p.bold = $('#d-bold').is(':checked');
+				p.width = +$('input[name="d-width"]:checked').val();
 				p.min = $('#d-min').is(':checked');
 				p.max = $('#d-max').is(':checked');
-				p.color = $('#spectrum').spectrum("get").toHexString();
+				p.color = $('#d-color').spectrum('get').toHexString();
+				p.coloruseneg = $('#d-color-use-neg').is(':checked');
+				p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
+				p.threshold = +$('#d-threshold').val().replace(',', '.');
 				$('#c'+$(this).data('id')).val(p.toString());
 				$(this).dialog('close');
 			},
@@ -570,7 +644,7 @@ $(function() {
 		}
 	});
 
-	$('#spectrum').spectrum({
+	$('.spectrum').spectrum({
 		showPalette: true,
 /*
 		showPaletteOnly: true,
@@ -584,15 +658,21 @@ $(function() {
 			['#A47D7C', '#B5CA92']
 		],
 		showInitial: true,
-		showInput: true,
+		showInput: false,
 		showButtons: false,
 		preferredFormat: 'hex',
 		hide: function(color) { color.toHexString(); }
 	});
 
-	if ('{LANGUAGE}' != 'en') {
-		$.datepicker.setDefaults($.datepicker.regional['{LANGUAGE}']);
-	}
+	$('#d-color-use-neg').on('ifToggled', function(e) {
+		var checked = $(this).is(':checked');
+		$('#d-threshold').prop('disabled', !checked);
+		$('#d-color-neg').spectrum(checked ? 'enable' : 'disable');
+	});
+
+	<!-- IF {LANGUAGE} != "en" -->
+	$.datepicker.setDefaults($.datepicker.regional['{LANGUAGE}']);
+	<!-- ENDIF -->
 
 	$("#from").datepicker({
 		altField: '#fromdate',
@@ -621,9 +701,14 @@ $(function() {
 		}
 	});
 
-	var d = new Date('{DATE}');
-	$("#from").datepicker('setDate', d);
-	$("#to").datepicker('setDate', d);
+	var ts = $.parseQueryString(), d = new Date();
+
+	if (ts.date) {
+		ts.from = ts.date;
+		ts.to = ts.date;
+	}
+	$("#from").datepicker('setDate', ts.from ? new Date(ts.from) : d);
+	$("#to").datepicker('setDate', ts.to ? new Date(ts.to) : d);
 
 	Highcharts.setOptions({
 		global: {
@@ -655,12 +740,6 @@ $(function() {
 		ToggleTree(false);
 		updateChart();
 	}
-
-	$('#az').prop('checked', lscache.get('zero'));
-	$('#az').click(function() {
-		lscache.set('zero', $(this).is(':checked'));
-		setExtremes();
-	});
 
 	$('#d-type').change(function() {
 		$('#d-style').prop('disabled', (this.value == 'bar' || this.value == 'scatter'));
@@ -695,13 +774,21 @@ $(function() {
 		return false;
 	});
 
+	$('#btn-permanent').button({
+		icons: {
+			primary: 'ui-icon-image'
+		},
+		text: false,
+		disabled: ('{VIEW}' == '')
+	});
+
 	$('#btn-bookmark').button({
 		icons: {
 			primary: 'ui-icon-bookmark'
 		},
 		text: false,
 		disabled: ('{VIEW}' == '')
-	}).prop('href', $('#btn-bookmark').data('url') + encodeURIComponent('{VIEW}'));
+	});
 
 	$('#loaddeleteview').change(function() {
 		var el = $('#btn-bookmark');
@@ -733,6 +820,12 @@ $(function() {
 			}
 		);
 
+		return false;
+	});
+
+	$('#delete-view').click(function() {
+		/* Replace text, make bold red and unbind this click handler */
+		$(this).val("{{Sure}}?").css('fontWeight','bold').css('color','red').unbind();
 		return false;
 	});
 

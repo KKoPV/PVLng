@@ -18,6 +18,13 @@ namespace ORM;
  */
 class View extends \slimMVC\ORMTable {
 
+	/**
+	 *
+	 */
+	public function findBySlug( $slug ) {
+		$this->find('slug', $slug);
+	}
+
 	// -------------------------------------------------------------------------
 	// PROTECTED
 	// -------------------------------------------------------------------------

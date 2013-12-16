@@ -23,6 +23,7 @@
 	<tr>
 		<th style="width:1%"></th>
 		<th class="l">{{Channel}}</th>
+		<th class="l">{{Unit}}</th>
 		<th class="l">{{Type}}</th>
 		<th></th>
 		<th class="l">{{Serial}}</th>
@@ -38,7 +39,7 @@
 	<tr>
 		<td class="c" style="padding:0.4em 0">
 			<a href="/channel/edit/{ID}" class="tip" title="{{EditEntity}}">
-				<img src="/images/ico/{ICON}" alt="{TYPE}" title="" width="16" height="16" />
+				<img src="{ICON}" alt="{TYPE}" title="" width="16" height="16" />
 			</a>
 		</td>
 		<td class="b">
@@ -50,19 +51,20 @@
 					 alt="[private]"/>
 			<!-- ENDIF -->
 		</td>
+		<td>{UNIT}</td>
 		<td>{TYPE}</td>
 		<td class="imgbar">
 			<!-- IF {WRITE} -->
 			<img src="/images/ico/write.png" class="imgbar tip" alt="w"
 			     style="width:16px;height:16px" width="16p" height="16"
-			     title="{{writableChannel}}" />
+			     title="{{WritableEntity}}" />
 			<!-- ELSE -->
 			<img src="/images/pix.gif" class="imgbar" width="16p" height="16" alt="" />
 			<!-- ENDIF -->
 			<!-- IF {READ} -->
 			<img src="/images/ico/read.png" class="imgbar tip" alt="r"
 			     style="width:16px;height:16px" width="16p" height="16"
-			     title="{{readableChannel}}" />
+			     title="{{ReadableEntity}}" />
 			<!-- ENDIF -->
 		</td>
 		<td>{SERIAL}</td>

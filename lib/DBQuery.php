@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 class DBQuery {
 
@@ -88,10 +88,14 @@ class DBQuery {
 	 *
 	 */
 	public function get( $field, $as='' ) {
-#		if ($field === 0 OR $field != '') {
-			if ($as != '') $as = ' AS `' . $as . '`';
-			$this->get[] = $field . $as;
-#		}
+		if (is_array($field)) {
+			foreach ($field as $f) $this->get($f);
+		} else {
+			if ($field == '0' OR $field != '') {
+				if ($as != '') $as = ' AS `' . $as . '`';
+				$this->get[] = $this->field($field) . $as;
+			}
+		}
 		return $this;
 	}
 
@@ -238,7 +242,7 @@ class DBQuery {
 	 *
 	 */
 	public function group( $field ) {
-		$this->group[] = $field;
+		$this->group[] = $this->field($field);
 		return $this;
 	}
 
@@ -255,7 +259,7 @@ class DBQuery {
 	 *
 	 */
 	public function order( $field ) {
-		$this->order[] = $field;
+		$this->order[] = $this->field($field);
 		return $this;
 	}
 
@@ -277,18 +281,16 @@ class DBQuery {
 	}
 
 	/**
-	 * Wrap SQL functions
+	 * Wrap raw SQL functions
 	 *
 	 * $this->MAX('field')      => MAX(`field`)
 	 * $this->ROUND('field', 4) => ROUND(`field`, 4)
 	 */
 	public function __call( $method, $params ) {
-		$result = $method . '(' . $params[0];
-		$count = count($params);
-		for ($i=1; $i<$count; $i++) {
-			$result .= ', ' . $this->quote($params[$i]);
-		}
-		return $result . ')';
+		return $method . '('
+		     . $this->field(array_shift($params))
+			 . (count($params) ? ','.implode(',', array_map(array($this, 'quote'), $params)) : '')
+		     . ')';
 	}
 
 	/**
@@ -443,7 +445,7 @@ class DBQuery {
 	 *
 	 */
 	protected function field( $field ) {
-		return preg_match('~^[[:alpha:]_][\w_]*$~', $field) ? '`' . $field . '`' : $field;
+		return preg_match('~^[[:alpha:]_]\w*$~', $field) ? '`' . $field . '`' : $field;
 	}
 
 	/**

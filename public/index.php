@@ -248,15 +248,13 @@ $app->map('/index', $checkAuth, function() use ($app) {
 	$app->process();
 })->via('GET', 'POST');
 
-$app->get('/index(/:view(/:date))', function( $view='', $date='' ) use ($app) {
+$app->get('/index(/:view)', function( $view='' ) use ($app) {
 	$app->params->set('view', $view);
-	$app->params->set('date', $date);
 	$app->process();
 });
 
-$app->get('/chart/:view(/:date)', function( $view, $date='' ) use ($app) {
+$app->get('/chart/:view', function( $view ) use ($app) {
 	$app->params->set('view', $view);
-	$app->params->set('date', $date);
 	$app->process();
 });
 
@@ -356,6 +354,13 @@ $app->any('/apcclear(/:mode)', $checkAuth, function( $mode='' ) use ($app) {
 		// Clear User data cache
 		echo 'Clear APC user cache   - ', (apc_clear_cache('user') ? 'Done' : 'ERROR');
 	}
+	exit;
+});
+
+$app->get('/clearcache', $checkAuth, function() use ($app) {
+    shell_exec('rm '.TEMP_DIR.DS.'*');
+	echo '<p>Cached templates cleared from <tt>'.TEMP_DIR.'</tt></p>';
+	echo '<p><a href="/">back</a></p>';
 	exit;
 });
 

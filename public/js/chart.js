@@ -6,12 +6,10 @@ var defaults = {
 	HintDecimals: 2,
 
 	line: {
-		/* normal line width */
-		normal: 2,
-		/* bold line width */
-		bold: 4,
 		/* line type */
 		type: 'spline',
+		/* line width */
+		width: 2,
 		/* line color */
 		color: '#404040'
 	}
@@ -26,10 +24,13 @@ function presentation( data ) {
 	this.type = defaults.line.type;
 	this.consumption = false;
 	this.style = 'Solid';
+	this.width = defaults.line.width;
 	this.color = defaults.line.color;
-	this.bold  = false;
-	this.min   = false;
-	this.max   = false;
+	this.coloruseneg = false;
+	this.colorneg = defaults.line.color;
+	this.threshold = 0;
+	this.min = false;
+	this.max = false;
 
 	try { $.extend(this, JSON.parse(data));	} catch(e) {}
 
@@ -42,20 +43,67 @@ function presentation( data ) {
  *
  */
 function setExtremes() {
-	$(chart.yAxis).each(function(id, axis) {
-		var extremes = axis.getExtremes();
-		if ($('#az').is(':checked')) {
-			if (extremes.dataMin >= 0) axis.setExtremes(0);
-		} else {
-			/* reset axis ... */
-			axis.setExtremes(null);
-			/* ... and re-read */
-			extremes = axis.getExtremes();
-			if (extremes.min < 0 && extremes.dataMin >= 0) {
-				axis.setExtremes(0);
+
+	var i, e, extremes=[], p, pos=[], min=100, max=-100;
+
+	for (i=0; i<chart.yAxis.length; i++) {
+
+		/* Reset extremes */
+		chart.yAxis[i].setExtremes(null, null);
+
+		/* Get extremes */
+		e = chart.yAxis[i].getExtremes();
+
+		/* Calc rel. position of 0 value; 0 - top, 1 - bottom*/
+		p = e.max / (e.max-e.min);
+
+		/* Remember min/max positions */
+		min = Math.min(min, p);
+		max = Math.max(max, p);
+
+		/* Remember extremes and positions */
+		extremes.push( { min: e.min, max: e.max, height: e.max-e.min } );
+		pos.push(p);
+	}
+
+	/* Average to align to */
+	var center = (max+min)/2;
+
+	for (i=0; i<chart.yAxis.length; i++) {
+
+		if (max <= 1) {
+			/* With neg. values */
+			if (pos[i] < center) {
+				/* Add offset on top */
+				extremes[i].max += (center-pos[i])*2 * extremes[i].height;
+			} else {
+				/* Add offset at bottom */
+				extremes[i].min -= (pos[i]-center)*2 * extremes[i].height;
 			}
+		} else if (min >= 1) {
+			/* Add offset at bottom */
+			extremes[i].min -= (pos[i]-min) * extremes[i].height;
+		} else {
+			/* ??? */
 		}
-	});
+
+		extremes[i].min = Math.round(extremes[i].min * 100) / 100;
+		extremes[i].max = Math.round(extremes[i].max * 100) / 100;
+
+		/* Add 5% min padding only for "real" neg. data */
+		if (extremes[i].min < -0.001) {
+			extremes[i].min -= (extremes[i].max-extremes[i].min) * 0.05;
+		}
+
+		/* Add 5% max padding only for "real" pos. data */
+		if (extremes[i].max > 0.001) {
+			extremes[i].max += (extremes[i].max-extremes[i].min) * 0.05;
+		}
+
+		chart.yAxis[i].setExtremes(extremes[i].min, extremes[i].max, false);
+	}
+
+	chart.redraw();
 }
 
 /**
@@ -93,7 +141,7 @@ function setMinMax( serie, channel ) {
 			dataLabels: {
 				enabled: true,
 				formatter: function() {
-					return Highcharts.numberFormat(+this.y, this.series.options.decimals)
+					return Highcharts.numberFormat(+this.y, serie.decimals)
 				},
 				color: serie.color,
 				style: { fontWeight: 'bold' },
@@ -124,7 +172,7 @@ function setMinMax( serie, channel ) {
 			dataLabels: {
 				enabled: true,
 				formatter: function() {
-					return Highcharts.numberFormat(+this.y, this.series.options.decimals)
+					return Highcharts.numberFormat(+this.y, serie.decimals)
 				},
 				color: serie.color,
 				style: { fontWeight: 'bold' },
