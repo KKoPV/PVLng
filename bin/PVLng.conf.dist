@@ -6,12 +6,13 @@
 ##############################################################################
 
 ##############################################################################
-### Host for HTTP API
+### Host for HTTP API and Socket Server
 ##############################################################################
 ### If your PVLng installation runs not exclusive on this server, change it
 ### to your settings, Port is optional if it is the default (80)
 ##############################################################################
-PVLngHost="http://localhost:80"
+PVLngDomain="localhost"
+PVLngHost="http://$PVLngDomain:80"
 
 ##############################################################################
 ### API key
@@ -23,3 +24,8 @@ PVLngAPIkey=""
 ### More at http://curl.haxx.se/docs/manpage.html
 ##############################################################################
 CurlOpts="--connect-timeout 10 --retry 3 --retry-max-time 60"
+
+##############################################################################
+### Port for Socket Server
+##############################################################################
+SocketServerPort=12121

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+php=$(which php)
+
+test -z "$php" && echo "Missing PHP cli binary!" && exit 1
+
+pwd=$(dirname $0)
+
+. $pwd/PVLng.conf
+
+set -- $(ps aux | grep -e '[ /]SocketServer.php')
+
+if test "$2"; then
+	echo "PVLng Socket Server is running ($2)"
+else
+	echo -n "Starting PVLng Socket Server ... "
+	$php $pwd/SocketServer.php -p $SocketServerPort $SocketServerParams >/tmp/SocketServer.log 2>&1 &
+	set -- $(ps aux | grep -e '[ /]SocketServer.php')
+	echo "done ($2)"
+fi

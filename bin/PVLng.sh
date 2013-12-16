@@ -149,9 +149,16 @@ function save_log {
 }
 
 ##############################################################################
-### Save data to PVLng
+### Get latest data from PVLng Socket Server
+### $1 = GUID or GUID,<attribute>
+##############################################################################
+function PVLngNC {
+	echo "$1" | netcat $PVLngDomain $SocketServerPort
+}
+
+##############################################################################
+### Get data from PVLng by API r2
 ### $1 = GUID
-### $2 = date
 ##############################################################################
 function PVLngGET2 {
 	url="$PVLngHost/api/r2/$1"

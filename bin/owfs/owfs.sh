@@ -66,6 +66,9 @@ while test $i -lt $GUID_N; do
 	SERIAL=$(PVLngGET2 $GUID/serial.txt)
 	CHANNEL=$(PVLngGET2 $GUID/channel.txt)
 
+# 	SERIAL=$(PVLngNC "$GUID,serial")
+# 	CHANNEL=$(PVLngNC "$GUID,channel")
+
 	### read value
 	cmd="$owread -s $SERVER ${CACHED}/${SERIAL}/${CHANNEL}"
 	log 2 $cmd 
