@@ -20,6 +20,9 @@ return array(
 	'numeric' => array(
 		'visible' => FALSE,
 	),
+	'offset' => array(
+		'visible' => FALSE,
+	),
 	'threshold' => array(
 		'visible' => FALSE,
 	)

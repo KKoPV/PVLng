@@ -1,1 +1,2 @@
-S0_*
+run/*
+!run/.githold

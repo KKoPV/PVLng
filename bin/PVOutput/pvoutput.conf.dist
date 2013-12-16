@@ -6,15 +6,8 @@
 ##############################################################################
 
 ##############################################################################
-### Add status URL
-### See http://pvoutput.org/help.html#api-addstatus
-### required
-##############################################################################
-APIURL      "http://pvoutput.org/service/r2/addstatus.jsp"
-
-##############################################################################
 ### You API key
-### See Settings > API Settings
+### http://pvoutput.org/account.jsp > API Settings
 ### Your API key is used to update your data automatically,
 ### always keep your API key secret. API Access must be enabled
 ### required

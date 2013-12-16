@@ -71,19 +71,19 @@ class Yield extends AbstractYield {
 		'version'				=> '1.0',
 		'filecontent'			=> 'Minutes',
 		'deleteDayBeforeImport'	=> 0,
-		'utc_offset'			=> 0,
+		'utc_offset'			=> NULL,
 		'plant'					=> NULL,
 	);
 
 	/**
 	 *
 	 */
-	public function __construct ($creator = 'www.pv-log.com', $type = 'Minutes', $deleteDayBeforeImport = 0, $utcOffset = 0) {
+	public function __construct ($creator = 'www.pv-log.com', $type = 'Minutes', $deleteDayBeforeImport = 0, $utcOffset = NULL) {
 		$this->data['creator'] = $creator;
 		$this->data['version'] = '1.0';
 		$this->data['filecontent'] = $type;
 		$this->data['deleteDayBeforeImport'] = (int)$deleteDayBeforeImport;
-		$this->data['utc_offset'] = (int)$utcOffset;
+		$this->data['utc_offset'] = $utcOffset;
 		$this->data['plant'] = new YieldPlant();
 	}
 
@@ -393,7 +393,7 @@ class YieldPlant extends AbstractYield {
 				// sum up current and daily watt hours for corresponding parent inverter values
 				$currentTotalWattHoursInverter += $string->getCurrentTotalWattHours();
 				$dailyWattHoursInverter += $string->getDailyWattHours();
-			
+
 				// inverter
 				$start = $string->getTimestampStart();
 				$end = $string->getTimestampEnd();
@@ -417,7 +417,7 @@ class YieldPlant extends AbstractYield {
 			if ($dailyWattHoursInverter > 0 && $this->data['inverter'][$idInverter]->getDailyWattHours() == 0) {
 				$dailyWattHours = $dailyWattHoursInverter;
 			}
-		
+
 			// set the calculated string value into the inverter if it has not a given value
 			if ($this->data['inverter'][$idInverter]->getCurrentTotalWattHours() == 0) {
 				$this->data['inverter'][$idInverter]->setCurrentTotalWattHours($currentTotalWattHoursInverter);

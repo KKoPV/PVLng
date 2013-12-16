@@ -68,8 +68,17 @@ if (!$cacheExists) {
   touch($cacheFile, $lastModified);
 }
 
-header('Content-Type: text/css; charset: UTF-8');
+header('Content-Type: text/css; charset=utf-8');
 header('Content-Length: ' . filesize($cacheFile));
 header(sprintf('Last-Modified: %s GMT', gmdate('D, d M Y H:i:s', $lastModified)));
+header('Expires: ' . date('D, d M Y H:i:s', time() + (60*60*24*365)) . ' GMT');
+header('Cache-Control: max-age='.(60*60*24*365).', s-maxage='.(60*60*24*365));
+
+// GZip compress content if applicable
+if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) AND
+    strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') AND
+    extension_loaded('zlib') ) {
+	ob_start('ob_gzhandler');
+}
 
 readfile($cacheFile);

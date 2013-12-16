@@ -3,17 +3,27 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-RewriteRule ^(.*)$ index.php/$1 [L,QSA]
+RewriteRule ^(.*) index.php/$1 [QSA,L]
 
 # DISABLE ETAGS
 <filesMatch "\.(ico|pdf|flv|jpe?g?|png|gif|js|css|swf|txt|mp3|avi|mpe?g?|wmv)$">
- FileETag none
+	FileETag none
 </filesMatch>
 
+<FilesMatch "\.(ico|jpg|jpeg|png|gif|js|css|swf|svg|pdf|flv|mp3)$">
+	ExpiresActive on
+	ExpiresDefault "access plus 12 month"
+	Header set Cache-Control "public"
+</FilesMatch>
+
+<FilesMatch "\.(css|js)$">
+	ExpiresActive on
+	ExpiresDefault "access plus 1 month"
+	Header set Cache-Control "public"
+</FilesMatch>
+
 # FILE COMPRESSION
-<ifModule mod_deflate.c>
- AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/x-javascript
- BrowserMatch ^Mozilla/4 gzip-only-text/html
- BrowserMatch ^Mozilla/4\.0[678] no-gzip
- BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
-</ifModule>
+AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/x-javascript
+BrowserMatch ^Mozilla/4 gzip-only-text/html
+BrowserMatch ^Mozilla/4\.0[678] no-gzip
+BrowserMatch \bMSIE !no-gzip !gzip-only-text/html

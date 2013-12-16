@@ -29,4 +29,3 @@ $msg[401] = 'Insert the Child Node was successful.';
 $msg[401] = 'Delete of the Node was successful.';
 $msg[403] = 'Moving of the Node was successful.';
 $msg[404] = 'Rename of the Node was successful.';
-?>

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ##############################################################################
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2013 Knut Kohl
@@ -12,27 +12,34 @@
 pwd=$(dirname $0)
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
-. $pwd/twitter.items
+. $pwd/../PVLng.sh
+
+test -f $pwd/.tokens || error_exit "Missing token file! Did you run setup.sh?"
+
+. $pwd/twitter.items.sh
+. $pwd/.pvlng
+. $pwd/.tokens
 
 while getopts "lftvxh" OPTION; do
-  case "$OPTION" in
-    l) printf '\nImplemented items:\n\n'
-       typeset -F | grep ' twitter_' | sed -e 's/.*twitter_/  - /'
-       printf "\nSee $pwd/twitter.items for details\n"
-       exit ;;
-    f) FORCE=y ;;
-    t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-    v) VERBOSE=$(expr $VERBOSE + 1) ;;
-    x) TRACE=y ;;
-    h) usage; exit ;;
-    ?) usage; exit 1 ;;
-  esac
+	case "$OPTION" in
+		l) printf '\nImplemented items:\n\n'
+		   typeset -F | grep ' twitter_' | sed -e 's/.*twitter_/  - /'
+		   printf "\nSee $pwd/twitter.items for details\n"
+		   exit ;;
+		f) FORCE=y ;;
+		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+		v) VERBOSE=$((VERBOSE + 1)) ;;
+		x) TRACE=y ;;
+		h) usage; exit ;;
+		?) usage; exit 1 ;;
+	esac
 done
 
 shift $((OPTIND-1))
 
 read_config "$1"
+
+test "$STATUS" || error_exit "Missing status!"
 
 ITEM_N=$(int "$ITEM_N")
 test $ITEM_N -gt 0  || error_exit "No items defined"
@@ -42,49 +49,41 @@ test $ITEM_N -gt 0  || error_exit "No items defined"
 ##############################################################################
 test "$TRACE" && set -x
 
-test "$OAUTH_TOKEN"        || error_exit "Missing OAuth token!"
-test "$OAUTH_TOKEN_SECRET" || error_exit "Missing OAuth secret!"
-test "$STATUS"             || error_exit "Missing status!"
-
-### App tokens
-CONSUMER_KEY="4Qs7FkTWVyJKfZKYSadAw"
-CONSUMER_SECRET="baUNgkJxIbSiPau7VXBq1I1h4byWDNHRuqq2vmGA"
-
 TWITTER_URL="https://api.twitter.com/1/statuses/update.json"
 
 curl="$(curl_cmd)"
 
 LC_NUMERIC=en_US
 
-ITEMS=0
+i=0
 
-while test $ITEMS -lt $ITEM_N; do
+while test $i -lt $ITEM_N; do
 
-  ITEMS=$(expr $ITEMS + 1)
-  log 1 "--- $ITEMS ---"
+	i=$((i + 1))
 
-  eval ITEM=\$ITEM_$ITEMS
-  log 1 "Item  : $ITEM"
+	log 1 "--- $i ---"
 
-  eval GUID=\$GUID_$ITEMS
-  log 1 "GUID  : $GUID"
+	eval ITEM=\$ITEM_$i
+	log 1 "Item	: $ITEM"
 
-  value=$(twitter_$ITEM $GUID)
-  value=$(int $value)
-  log 1 "Value : $value"
+	eval GUID=\$GUID_$i
+	log 1 "GUID	: $GUID"
 
-  ### Exit if no value is found, e.g. no actual power outside daylight times
-  test "$value" != "0" || test "$FORCE" || exit
+	value=$(twitter_$ITEM $GUID)
+	log 1 "Value : $value"
 
-  eval FACTOR=\$FACTOR_$ITEMS
-  log 1 "Factor: $FACTOR"
+	### Exit if no value is found, e.g. no actual power outside daylight times
+	test "$value" && test "$value" != "0" || test "$FORCE" || exit
 
-  if test "$FACTOR"; then
-    value=$(echo "scale=3; $value * $FACTOR" | bc -l)
-    log 1 "Value : $value"
-  fi
+	eval FACTOR=\$FACTOR_$i
+	log 1 "Factor: $FACTOR"
 
-  PARAMS="$PARAMS $value"
+	if test "$FACTOR"; then
+		value=$(echo "scale=3; $value * $FACTOR" | bc -l)
+		log 1 "Value : $value"
+	fi
+
+	PARAMS="$PARAMS $value"
 
 done
 
@@ -98,17 +97,17 @@ STATUS=$(printf "$STATUS" $PARAMS)
 log 1 "Result   : $STATUS"
 log 1 "Length   : $(echo $STATUS | wc -c)"
 
-test "$TEST" && exit
+if test -z "$TEST"; then
 
-$(dirname $0)/twitter.php \
-  --consumer_key=$CONSUMER_KEY \
-  --consumer_secret=$CONSUMER_SECRET \
-  --oauth_token=$OAUTH_TOKEN \
-  --oauth_secret=$OAUTH_TOKEN_SECRET \
-  --status="$STATUS" \
-  --lat=$LAT --long=$LONG
+	test $VERBOSE -gt 0 && opts="--debug"
 
-set +x
+	$pwd/twitter.php $opts \
+		--consumer_key=$CONSUMER_KEY \
+		--consumer_secret=$CONSUMER_SECRET \
+		--oauth_token=$OAUTH_TOKEN \
+		--oauth_secret=$OAUTH_TOKEN_SECRET \
+		--status="$STATUS" --location="$LAT_LON"
+fi
 
 exit $?
 
@@ -120,13 +119,12 @@ Post status to twitter
 Usage: $scriptname [options] config_file
 
 Options:
-
-    -l   List implemented items
-    -t   Test mode, don't post
-         Sets verbosity to info level
-    -v   Set verbosity level to info level
-    -vv  Set verbosity level to debug level
-    -h   Show this help
+	-l   List implemented items
+	-t   Test mode, don't post
+	     Sets verbosity to info level
+	-v   Set verbosity level to info level
+	-vv  Set verbosity level to debug level
+	-h   Show this help
 
 See $pwd/twitter.conf.dist for details.
 

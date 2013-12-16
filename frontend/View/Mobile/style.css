@@ -1,0 +1,32 @@
+/**
+ *
+ *
+ * @author        Knut Kohl <github@knutkohl.de>
+ * @copyright     2012-2013 Knut Kohl
+ * @license       GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version       1.0.0
+ */
+.cost {
+	text-align: right !important;
+	font-style: italic;
+}
+
+.costs {
+	border-top: solid white 1px;
+	font-weight: bold;
+	text-align: right !important;
+	font-style: italic;
+}
+
+.ui-table {
+	margin-top: 0.5em;
+}
+
+.ui-table-reflow tbody th {
+	margin-top: 0;
+}
+
+.ui-table-reflow tbody td {
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+}

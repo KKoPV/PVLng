@@ -1,0 +1,47 @@
+#############################################################################
+# Install script
+#
+# @author      Knut Kohl <github@knutkohl.de>
+# @copyright   2012-2013 Knut Kohl
+# @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+# @version     $Id$
+#############################################################################
+#! /bin/bash
+
+function e { echo; echo "$*"; echo; }
+
+e '- Clone PVLng Github repository ...'
+
+git clone https://github.com/K-Ko/PVLng.git .
+
+[ $? -eq 0 ] || exit 1
+
+e '- Setup MySQL database'
+
+read -p 'Server (required) [localhost] : ' dbhost <&1
+[ -z "$dbhost" ] && dbhost=localhost
+
+read -p 'Username (required) [root]    : ' dbuser <&1
+[ -z "$dbuser" ] && dbhost=root
+
+read -p 'Password                      : ' dbpass <&1
+
+while [ -z "$dbname" ]; do
+	read -p 'Database (required)           : ' dbname <&1
+done
+
+[ "$dbpass" ] && p="-p$dbpass"
+
+e '- Import SQL definitions ...'
+
+mysql -h $dbhost -u $dbuser $p $dbname <$PWD/sql/pvlng.sql
+
+e '- Prepare config/config.php and set database credentials ...'
+
+sed -e "s/<HOST>/$dbhost/g" -e "s/<USER>/$dbuser/g" \
+    -e "s/<PASSWORD>/$dbpass/g" -e "s/<DATABASE>/$dbname/g" \
+    $PWD/config/config.php.dist >$PWD/config/config.php
+
+e 'Finished!'
+
+set +x

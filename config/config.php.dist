@@ -22,10 +22,10 @@ return array(
 	 * 1. Change the database credentials for your needs
 	 */
 	'Database' => array(
-		'Host'     => 'localhost',
-		'Username' => 'root',
-		'Password' => '',
-		'Database' => ''
+		'Host'     => '<HOST>',
+		'Username' => '<USER>',
+		'Password' => '<PASSWORD>',
+		'Database' => '<DATABASE>'
 	),
 
 	/**
@@ -43,6 +43,28 @@ return array(
 	),
 
 	/**
+	 * You title
+	 */
+	'Title' => 'PhotoVoltaic Logger new generation',
+
+	/**
+	 * Currency settings
+	 */
+	'Currency' => array(
+		'ISO'      => 'EUR',
+		'Symbol'   => '€',
+		'Decimals' => 2
+	),
+
+	/**
+	 * Preferd cache mode, auto detect best one if empty
+	 */
+	'Cache' => '',
+	#'Cache' => 'APC',
+	#'Cache' => 'MemCache',
+	#'Cache' => 'File',
+
+	/**
 	 * Default language, "en" or "de"
 	 *
 	 * Will be overwritten by browsers accept language settings if exists
@@ -56,8 +78,6 @@ return array(
 	 */
 	'Cookie' => array(
 		'Name'     => 'PVLng',
-		'Lifetime' => 0, // Session only, default
-#		'Lifetime' => 24*60*60 * 7, // 7 days (in seconds)
 	),
 
 );

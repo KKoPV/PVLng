@@ -6,6 +6,12 @@
 ### @version     $Id$
 ##############################################################################
 
+### URL to get system info
+GetSystemURL=http://pvoutput.org/service/r2/getsystem.jsp
+
+### URL to add system status
+AddStatusURL=http://pvoutput.org/service/r2/addstatus.jsp
+
 ### How many parameters are supported
 vMax=12
 
@@ -13,90 +19,102 @@ vMax=12
 ### Init
 ##############################################################################
 pwd=$(dirname $0)
-SYSTEMID=
 
 . $pwd/../PVLng.conf
-. $pwd/../PVLng.functions
+. $pwd/../PVLng.sh
 
 while getopts "tvxh" OPTION; do
-  case "$OPTION" in
-    t) TEST=y; VERBOSE=$(expr $VERBOSE + 1) ;;
-    v) VERBOSE=$(expr $VERBOSE + 1) ;;
-    x) TRACE=y ;;
-    h) usage; exit ;;
-    ?) usage; exit 1 ;;
-  esac
+	case "$OPTION" in
+		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+		v) VERBOSE=$((VERBOSE + 1)) ;;
+		x) TRACE=y ;;
+		h) usage; exit ;;
+		?) usage; exit 1 ;;
+	esac
 done
 
-shift $((OPTIND-1))
-
 read_config $pwd/pvoutput.conf
-read_config "$1"
+
+shift $((OPTIND-1))
+CONFIG="$1"
+
+read_config "$CONFIG"
 
 ##############################################################################
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
 
-test "$APIURL"   || error_exit "pvoutput.org API URL is required, see pvoutput.conf.dist"
-test "$APIKEY"   || error_exit "pvoutput.org API key is required, see pvoutput.conf.dist"
+test "$APIKEY"	 || error_exit "pvoutput.org API key is required, see pvoutput.conf.dist"
 test "$SYSTEMID" || error_exit "pvoutput.org Plant Id is required"
-test "$INTERVAL" || error_exit "pvoutput.org System interval is required"
-INTERVAL=$(int "$INTERVAL")
-test $INTERVAL -gt 0 || error_exit "System interval must be greater 0"
 
 curl="$(curl_cmd)"
+
+### Get system status interval
+ifile=$(run_file PVOutput "$CONFIG" interval)
+
+if test -f "$ifile"; then
+	INTERVAL=$(<$ifile)
+else
+	log 1 "Fetch System infos..."
+	### Extract status interval from response, 16th value
+	### http://pvoutput.org/help.html#api-getsystem
+	INTERVAL=$($curl --header "X-Pvoutput-Apikey: $APIKEY" \
+                     --header "X-Pvoutput-SystemId: $SYSTEMID" \
+                     $GetSystemURL | cut -d';' -f1 | cut -d',' -f16)
+	### Store valid status interval or set to maximum status interval until next run
+	test $(int "$INTERVAL") -ne 0 && echo $INTERVAL >$ifile || INTERVAL=15
+fi
 
 DATA=
 i=0
 check=
 
 while test $i -lt $vMax; do
-  i=$(expr $i + 1)
 
-  eval GUID=\$GUID_$i
+	i=$((i + 1))
 
-  if test "$GUID"; then
-  
-    log 1 "$(printf 'GUID    %2d: %s' $i $GUID)"
+	log 1 "--- v$i ---"
 
-    eval FACTOR=\$FACTOR_$i
-    test "$FACTOR" || FACTOR=1
-    log 1 "$(printf 'FACTOR  %2d: %s' $i $FACTOR)"
+	eval GUID=\$GUID_$i
 
-    url="$PVLngURL1/$GUID.tsv?period=${INTERVAL}minutes"
-    log 2 "$url"
+	if test "$GUID"; then
+	
+		log 1 "$(printf 'GUID    %2d: %s' $i $GUID)"
 
-    ### empty temp. file
-    echo -n >$TMPFILE
+		eval FACTOR=\$FACTOR_$i
+		test "$FACTOR" || FACTOR=1
+		log 1 "$(printf 'FACTOR  %2d: %s' $i $FACTOR)"
 
-    ### skip attributes row, extract 2nd value == data from last row, if exists
-    value=$($curl $url | tail -n+2 | tail -n1 | cut -f2)
+		### empty temp. file
+		echo -n >$TMPFILE
 
-    ### unset only zero values for v1 .. v4
-    if test $i -le 4; then
-      test "$value" = "0" && value=
-    fi
+		value=$(PVLngGET2 data/$GUID.tsv?period=${INTERVAL}minute | tail -n1 | cut -f2)
 
-    if test "$value"; then
-      value=$(echo "scale=3; $value * $FACTOR" | bc -l)
-      DATA="$DATA -d v$i=$value"
-    fi
-    log 1 "$(printf 'VALUE   %2d: %s' $i $value)"
+		### unset only zero values for v1 .. v4
+		if test $i -le 4; then
+			test "$value" = "0" && value=
+		fi
 
-    check="$check$value"
-  fi
+		if test "$value"; then
+			value=$(echo "scale=3; $value * $FACTOR" | bc -l)
+			DATA="$DATA -d v$i=$value"
+		fi
+		log 1 "$(printf 'VALUE   %2d: %s' $i $value)"
 
-  ### Check if at least one of v1...v4 is set
-  if test $i -eq 4; then
-    if test "$check"; then
-      log 1 "OK        : At least one of v1 .. v4 is filled ..."
-    else
-      ### skip further processing
-      log 1 "SKIP      : All of v1 .. v4 are empty!"
-      exit
-    fi
-  fi
+		check="$check$value"
+	fi
+
+	### Check if at least one of v1...v4 is set
+	if test $i -eq 4; then
+		if test "$check"; then
+			log 1 "OK        : At least one of v1 .. v4 is filled ..."
+		else
+			### skip further processing
+			log 1 "SKIP      : All of v1 .. v4 are empty!"
+			exit
+		fi
+	fi
 
 done
 
@@ -111,25 +129,25 @@ test -z "$TEST" || exit
 ### Send
 $curl --header "X-Pvoutput-Apikey: $APIKEY" \
       --header "X-Pvoutput-SystemId: $SYSTEMID" \
-      --output $TMPFILE \
-      $DATA $APIURL
+      --output $TMPFILE $DATA $AddStatusURL
 rc=$?
 
 log 1 $(cat $TMPFILE)
 
 ### Check curl exit code
 if test $rc -ne 0; then
-  . $pwd/../curl-errors
-  save_log "PVOutput" "Curl error ($rc): ${curl_rc[$rc]}"
+	. $pwd/../curl-errors
+	save_log "PVOutput" "Curl error ($rc): ${curl_rc[$rc]}"
 fi
 
 ### Check result, ONLY 200 is ok
 if cat $TMPFILE | grep -q '200:'; then
-  ### Ok, state added
-  :
+	### Ok, state added
+	log 1 "Ok"
 else
-  ### log error
-  save_log "PVOutput / $SYSTEMID" "Update plant failed: $(cat $TMPFILE)"
+	### log error
+	save_log "PVOutput" "$SYSTEMID - Update failed: $(cat $TMPFILE)"
+	save_log "PVOutput" "$SYSTEMID - Data: $DATA"
 fi
 
 set +x
@@ -139,17 +157,16 @@ exit
 ##############################################################################
 # USAGE >>
 
-Fetch 1-wire sensor data
+Update PVOutput.org system
 
 Usage: $scriptname [options] config_file
 
 Options:
-
-    -t   Test mode, don't push to PVOutput
-         Sets verbosity to info level
-    -v   Set verbosity level to info level
-    -vv  Set verbosity level to debug level
-    -h   Show this help
+	-t   Test mode, don't push to PVOutput
+	     Sets verbosity to info level
+	-v   Set verbosity level to info level
+	-vv  Set verbosity level to debug level
+	-h   Show this help
 
 See system.conf.dist for reference.
 

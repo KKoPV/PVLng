@@ -24,6 +24,12 @@ return array(
 	'cost' => array(
 		'visible' => FALSE,
 	),
+	'channel' => array(
+		'visible' => FALSE,
+	),
+	'decimals' => array(
+		'visible' => FALSE,
+	),
 	'threshold' => array(
 		'visible' => FALSE,
 	),

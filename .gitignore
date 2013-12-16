@@ -1,3 +1,8 @@
-config/config.php
+apc.php
+memcache.php
+config.php
+run/*
 tmp/*
-!tmp/.githold
+custom/
+description.md
+!.githold

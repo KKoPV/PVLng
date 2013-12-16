@@ -1,170 +1,462 @@
-/*
-  iCheck v0.7, http://git.io/uhUPMA
-  ===================================
-  Powerful jQuery plugin for checkboxes and radio buttons customization
-
-  (c) 2013 by Damir Foy, http://damirfoy.com
-  Released under MIT License
-*/
+/*!
+ * iCheck v0.9.1, http://git.io/uhUPMA
+ * =================================
+ * Powerful jQuery plugin for checkboxes and radio buttons customization
+ *
+ * (c) 2013 Damir Foy, http://damirfoy.com
+ * MIT Licensed
+ */
 
 (function($) {
-  $.fn.iCheck = function(options) {
-    if (/^(check|uncheck|disable|enable|update|destroy)$/.test(options)) {
-      return this.each(function() {
-        /destroy/.test(options) ? destroy($(this), 'is.Destroyed') : change($(this), true, options);
+
+  // Cached vars
+  var _iCheck = 'iCheck',
+    _iCheckHelper = _iCheck + '-helper',
+    _checkbox = 'checkbox',
+    _radio = 'radio',
+    _checked = 'checked',
+    _unchecked = 'un' + _checked,
+    _disabled = 'disabled',
+    _determinate = 'determinate',
+    _indeterminate = 'in' + _determinate,
+    _update = 'update',
+    _type = 'type',
+    _click = 'click',
+    _touch = 'touchbegin.i touchend.i',
+    _add = 'addClass',
+    _remove = 'removeClass',
+    _callback = 'trigger',
+    _label = 'label',
+    _cursor = 'cursor',
+    _mobile = /ipad|iphone|ipod|android|blackberry|windows phone|opera mini|silk/i.test(navigator.userAgent);
+
+  // Plugin init
+  $.fn[_iCheck] = function(options, fire) {
+
+    // Walker
+    var handle = ':' + _checkbox + ', :' + _radio,
+      stack = $(),
+      walker = function(object) {
+        object.each(function() {
+          var self = $(this);
+
+          if (self.is(handle)) {
+            stack = stack.add(self);
+          } else {
+            stack = stack.add(self.find(handle));
+          };
+        });
+      };
+
+    // Check if we should operate with some method
+    if (/^(check|uncheck|toggle|indeterminate|determinate|disable|enable|update|destroy)$/i.test(options)) {
+
+      // Normalize method's name
+      options = options.toLowerCase();
+
+      // Find checkboxes and radio buttons
+      walker(this);
+
+      return stack.each(function() {
+        if (options == 'destroy') {
+          tidy(this, 'ifDestroyed');
+        } else {
+          operate($(this), true, options);
+        };
+
+        // Fire method's callback
+        if ($.isFunction(fire)) {
+          fire();
+        };
       });
+
+    // Customization
     } else if (typeof options == 'object' || !options) {
-      var ua = navigator.userAgent,
-        defaults = {
-          checkboxClass: 'icheckbox',
-          radioClass: 'iradio',
-          checkedClass: 'checked',
-          disabledClass: 'disabled',
-          hoverClass: 'hover',
-          focusClass: 'focus',
-          activeClass: 'active',
-          labelHover: true,
-          labelHoverClass: 'hover'
-        },
-        settings = $.extend({}, defaults, options),
-        handle = /^(checkbox|radio)$/.test(settings.handle) ? ':' + settings.handle : ':checkbox, :radio',
+
+      // Check if any options were passed
+      var settings = $.extend({
+          checkedClass: _checked,
+          disabledClass: _disabled,
+          indeterminateClass: _indeterminate,
+          labelHover: true
+        }, options),
+
+        selector = settings.handle,
+        hoverClass = settings.hoverClass || 'hover',
+        focusClass = settings.focusClass || 'focus',
+        activeClass = settings.activeClass || 'active',
+        labelHover = !!settings.labelHover,
+        labelHoverClass = settings.labelHoverClass || 'hover',
+
+        // Setup clickable area
         area = ('' + settings.increaseArea).replace('%', '') | 0;
 
-      area < -50 && (area = -50);
+      // Selector limit
+      if (selector == _checkbox || selector == _radio) {
+        handle = ':' + selector;
+      };
 
-      return this.each(function() {
-        var tree = $(this).is(handle) ? $(this) : $(this).find(handle);
+      // Clickable area limit
+      if (area < -50) {
+        area = -50;
+      };
 
-        tree.each(function() {
-          destroy($(this));
+      // Walk around the selector
+      walker(this);
 
-          var node = this,
-            id = node.id,
-            layer = {
-              position: 'absolute',
-              top: -area + '%',
-              left: -area + '%',
-              display: 'block',
-              width: 100 + (area * 2) + '%',
-              height: 100 + (area * 2) + '%',
-              margin: 0,
-              padding: 0,
-              background: '#fff',
-              border: 0,
-              opacity: 0
-            },
-            hide = /ipad|iphone|ipod|android|blackberry|windows phone|opera mini/i.test(ua) ? {position: 'absolute', visibility: 'hidden'} : area | 0 ? layer : {position: 'absolute', opacity: 0},
-            className = node.type == 'checkbox' ? settings.checkboxClass : settings.radioClass,
-            self = $(this).data('icheck', {style: $(this).attr('style'), options: settings}).css(hide),
-            label = $('label[for=' + id + ']'),
-            parent = self.wrap('<div class="' + className + '"/>').trigger('is.Created').parent().append(settings.insert),
-            helper = $('<ins/>').css(layer).appendTo(parent).click(function() {
-              self.click(), change(self, false, true);
-            }),
-            hover = settings.hoverClass,
-            labelHover = settings.labelHoverClass,
-            keyCache;
+      return stack.each(function() {
 
-          settings.cursor == true && helper.css('cursor', 'pointer');
-          settings.inheritClass == true && parent.addClass(node.className);
-          settings.inheritID == true && id && parent.attr('id', 'icheck-' + id);
-          parent.css('position') == 'static' && parent.css('position', 'relative');
-          change(self, true, 'update');
+        // If already customized
+        tidy(this);
 
-          id && label.length && label.bind('click.df mouseenter.df mouseleave.df touchbegin.df touchend.df', function(event) {
-            var type = event.type, item = $(this);
+        var self = $(this),
+          node = this,
+          id = node.id,
 
-            if (type == 'click')
-              event.preventDefault(), self.click(), change(self, false, true);
-            else if (settings.labelHover == true && !node.disabled)
-              /mouseenter|touchbegin/.test(type) ? (parent.addClass(hover), item.addClass(labelHover)) : (parent.removeClass(hover), item.removeClass(labelHover));
+          // Layer styles
+          offset = -area + '%',
+          size = 100 + (area * 2) + '%',
+          layer = {
+            position: 'absolute',
+            top: offset,
+            left: offset,
+            display: 'block',
+            width: size,
+            height: size,
+            margin: 0,
+            padding: 0,
+            background: '#fff',
+            border: 0,
+            opacity: 0
+          },
+
+          // Choose how to hide input
+          hide = _mobile ? {
+            position: 'absolute',
+            visibility: 'hidden'
+          } : area ? layer : {
+            position: 'absolute',
+            opacity: 0
+          },
+
+          // Get proper class
+          className = node[_type] == _checkbox ? settings.checkboxClass || 'i' + _checkbox : settings.radioClass || 'i' + _radio,
+
+          // Find assigned labels
+          label = $(_label + '[for="' + id + '"]').add(self.closest(_label)),
+
+          // Wrap input
+          parent = self.wrap('<div class="' + className + '"/>')[_callback]('ifCreated').parent().append(settings.insert),
+
+          // Layer addition
+          helper = $('<ins class="' + _iCheckHelper + '"/>').css(layer).appendTo(parent);
+
+        // Finalize customization
+        self.data(_iCheck, {o: settings, s: self.attr('style')}).css(hide);
+        !!settings.inheritClass && parent[_add](node.className);
+        !!settings.inheritID && id && parent.attr('id', _iCheck + '-' + id);
+        parent.css('position') == 'static' && parent.css('position', 'relative');
+        operate(self, true, _update);
+
+        // Label events
+        if (label.length) {
+          label.on(_click + '.i mouseenter.i mouseleave.i ' + _touch, function(event) {
+            var type = event[_type],
+              item = $(this);
+
+            // Do nothing if input is disabled
+            if (!node[_disabled]) {
+
+              // Click
+              if (type == _click) {
+                operate(self, false, true);
+
+              // Hover state
+              } else if (labelHover) {
+
+                // mouseleave|touchend
+                if (/ve|nd/.test(type)) {
+                  parent[_remove](hoverClass);
+                  item[_remove](labelHoverClass);
+                } else {
+                  parent[_add](hoverClass);
+                  item[_add](labelHoverClass);
+                };
+              };
+
+              if (_mobile) {
+                event.stopPropagation();
+              } else {
+                return false;
+              };
+            };
           });
+        };
 
-          self.bind('focus.df blur.df keyup.df keydown.df keypress.df', function(event) {
-            var type = event.type,
-              key = event.keyCode || event.charCode || event.which,
-              fallback = /MSIE [5-8]/.test(ua) ? type == 'keyup' && keyCache !== 'keypress' : type == 'keyup',
-              condition = type == 'keypress' && key == 32;
+        // Input events
+        self.on(_click + '.i focus.i blur.i keyup.i keydown.i keypress.i', function(event) {
+          var type = event[_type],
+            key = event.keyCode;
 
-            if (/focus|blur/.test(type))
-              type == 'focus' ? parent.addClass(settings.focusClass) : parent.removeClass(settings.focusClass);
-            else if (node.type == 'radio')
-              (fallback ? change(self, true, 'update', true) : condition && !node.checked && on(self, false, parent, 'checked', true), keyCache = type);
-            else if (node.type == 'checkbox' && condition)
-              node.checked ? off(self, false, parent, 'checked', true) : on(self, false, parent, 'checked', true);
-          });
+          // Click
+          if (type == _click) {
+            return false;
 
-          helper.bind('mousedown mouseup mouseout mouseenter mouseleave touchbegin touchend', function(event) {
-            var type = event.type, toggle = /mousedown|mouseup|mouseout/.test(type) ? settings.activeClass : hover;
+          // Keydown
+          } else if (type == 'keydown' && key == 32) {
+            if (!(node[_type] == _radio && node[_checked])) {
+              if (node[_checked]) {
+                off(self, _checked);
+              } else {
+                on(self, _checked);
+              };
+            };
 
-            if (node.disabled) return;
-            /mousedown|mouseenter|touchbegin/.test(type) ? parent.addClass(toggle) : parent.removeClass(toggle);
+            return false;
 
-            if (id && label.length && settings.labelHover == true && toggle == hover)
-              /mouseleave|touchend/.test(type) ? label.removeClass(labelHover) : label.addClass(labelHover);
-          });
+          // Keyup
+          } else if (type == 'keyup' && node[_type] == _radio) {
+            !node[_checked] && on(self, _checked);
+
+          // Focus/blur
+          } else if (/us|ur/.test(type)) {
+            parent[type == 'blur' ? _remove : _add](focusClass);
+          };
+        });
+
+        // Helper events
+        helper.on(_click + ' mousedown mouseup mouseover mouseout ' + _touch, function(event) {
+          var type = event[_type],
+
+            // mousedown|mouseup
+            toggle = /wn|up/.test(type) ? activeClass : hoverClass;
+
+          // Do nothing if input is disabled
+          if (!node[_disabled]) {
+
+            // Click
+            if (type == _click) {
+              operate(self, false, true);
+
+            // Active and hover states
+            } else {
+
+              // State is on
+              if (/wn|er|in/.test(type)) {
+
+                // mousedown|mouseover|touchbegin
+                parent[_add](toggle);
+
+              // State is off
+              } else {
+                parent[_remove](toggle + ' ' + activeClass);
+              };
+
+              // Label hover
+              if (label.length && labelHover && toggle == hoverClass) {
+
+                // mouseout|touchend
+                label[/ut|nd/.test(type) ? _remove : _add](labelHoverClass);
+              };
+            };
+
+            if (_mobile) {
+              event.stopPropagation();
+            } else {
+              return false;
+            };
+          };
         });
       });
-    } else return this;
+    } else {
+      return this;
+    };
   };
 
-  function change(input, direct, method, keyboard) {
+  // Do something with inputs
+  function operate(input, direct, method) {
+    var node = input[0];
+      state = /er/.test(method) ? _indeterminate : /bl/.test(method) ? _disabled : _checked,
+      active = method == _update ? {
+        checked: node[_checked],
+        disabled: node[_disabled],
+        indeterminate: input.attr(_indeterminate) == 'true' || input.attr(_determinate) == 'false'
+      } : node[state];
+
+    // Check, disable or indeterminate
+    if (/^(ch|di|in)/.test(method) && !active) {
+      on(input, state);
+
+    // Uncheck, enable or determinate
+    } else if (/^(un|en|de)/.test(method) && active) {
+      off(input, state);
+
+    // Update
+    } else if (method == _update) {
+
+      // Handle states
+      for (var state in active) {
+        if (active[state]) {
+          on(input, state, true);
+        } else {
+          off(input, state, true);
+        };
+      };
+
+    } else if (!direct || method == 'toggle') {
+
+      // Helper or label was clicked
+      if (!direct) {
+        input[_callback]('ifClicked');
+      };
+
+      // Toggle checked state
+      if (active) {
+        if (node[_type] !== _radio) {
+          off(input, state);
+        };
+      } else {
+        on(input, state);
+      };
+    };
+  };
+
+  // Add checked, disabled or indeterminate state
+  function on(input, state, keep) {
     var node = input[0],
       parent = input.parent(),
-      state = /disable|enable/.test(method) ? 'disabled' : 'checked',
-      active = method == 'update' ? {checked: node.checked, disabled: node.disabled} : node[state];
+      checked = state == _checked,
+      indeterminate = state == _indeterminate,
+      callback = indeterminate ? _determinate : checked ? _unchecked : 'enabled',
+      regular = option(node, callback + capitalize(node[_type])),
+      specific = option(node, state + capitalize(node[_type]));
 
-    if (/^check|disable/.test(method) && !active)
-      on(input, true, parent, state);
-    else if (/uncheck|enable/.test(method) && active)
-      off(input, true, parent, state);
-    else if (method == 'update')
-      for(var state in active) active[state] ? on(input, false, parent, state, keyboard) : off(input, false, parent, state, keyboard);
-    else if (!direct) {
-      method == true && !node.disabled && input.trigger('is.Clicked');
-      active ? on(input, true, parent, state) : off(input, true, parent, state);
-    }
-  }
+    // Prevent unnecessary actions
+    if (node[state] !== true) {
 
-  function on(input, toggle, parent, state, keyboard) {
-    toggle && (input[0][state] = true);
+      // Toggle assigned radio buttons
+      if (!keep && state == _checked && node[_type] == _radio && node.name) {
+        var form = input.closest('form'),
+          inputs = 'input[name="' + node.name + '"]';
 
-    if (parent.data(state) !== true) {
-      if (state == 'checked' && input[0].type == 'radio' && input[0].name) {
-        $('input[name="' + input[0].name + '"]').each(function() {
-          this !== input[0] && $(this).data('icheck') && off($(this), true, $(this).parent(), state);
+        inputs = form.length ? form.find(inputs) : $(inputs);
+
+        inputs.each(function() {
+          if (this !== node && $.data(this, _iCheck)) {
+            off($(this), state);
+          };
         });
-      }
+      };
 
-      (toggle || keyboard) && input.trigger('is.Changed');
-      toggle && input.trigger('is.' + state.replace('di', 'Di').replace('ch', 'Ch'));
-      parent.data(state, true).addClass(getOption(input, state));
-    }
-  }
+      // Indeterminate state
+      if (indeterminate) {
 
-  function off(input, toggle, parent, state, keyboard) {
-    var callback = state == 'disabled' ? 'Enabled' : 'Unchecked';
+        // Add indeterminate state
+        node[state] = true;
 
-    toggle && (input[0][state] = false);
+        // Remove checked state
+        if (node[_checked]) {
+          off(input, _checked, 'force');
+        };
 
-    if (parent.data(state) !== false) {
-      (toggle || keyboard) && input.trigger('is.Changed');
-      toggle && input.trigger('is.' + callback);
-      parent.data(state, false).removeClass(getOption(input, state));
-    }
-  }
+      // Checked or disabled state
+      } else {
 
-  function destroy(input, callback) {
-    if (input.data('icheck')) {
-      var id = input[0].id, label = $('label[for=' + id + ']');
+        // Add checked or disabled state
+        if (!keep) {
+          node[state] = true;
+        };
 
-      input.parent().html(input.attr('style', input.data('icheck').style || '').trigger(callback || ''));
-      input.removeData('icheck').unbind('.df').unwrap();
-      id && label.length && label.unbind('.df');
-    }
-  }
+        // Remove indeterminate state
+        if (checked && node[_indeterminate]) {
+          off(input, _indeterminate, false);
+        };
+      };
 
-  function getOption(input, state) {
-    if (input.data('icheck')) return input.data('icheck').options[state + 'Class'];
-  }
+      // Trigger callbacks
+      callbacks(input, checked, state, keep);
+    };
+
+    // Add proper cursor
+    if (node[_disabled] && !!option(node, _cursor, true)) {
+      parent.find('.' + _iCheckHelper).css(_cursor, 'default');
+    };
+
+    // Add state class
+    parent[_add](specific || option(node, state));
+
+    // Remove regular state class
+    parent[_remove](regular || option(node, callback) || '');
+  };
+
+  // Remove checked, disabled or indeterminate state
+  function off(input, state, keep) {
+    var node = input[0],
+      parent = input.parent(),
+      checked = state == _checked,
+      indeterminate = state == _indeterminate,
+      callback = indeterminate ? _determinate : checked ? _unchecked : 'enabled',
+      regular = option(node, callback + capitalize(node[_type])),
+      specific = option(node, state + capitalize(node[_type]));
+
+    // Prevent unnecessary actions
+    if (node[state] !== false) {
+
+      // Toggle state
+      if (indeterminate || !keep || keep == 'force') {
+        node[state] = false;
+      };
+
+      // Trigger callbacks
+      callbacks(input, checked, callback, keep);
+    };
+
+    // Add proper cursor
+    if (!node[_disabled] && !!option(node, _cursor, true)) {
+      parent.find('.' + _iCheckHelper).css(_cursor, 'pointer');
+    };
+
+    // Remove state class
+    parent[_remove](specific || option(node, state) || '');
+
+    // Add regular state class
+    parent[_add](regular || option(node, callback));
+  };
+
+  // Remove all traces
+  function tidy(node, callback) {
+    if ($.data(node, _iCheck)) {
+      var input = $(node);
+
+      // Remove everything except input
+      input.parent().html(input.attr('style', $.data(node, _iCheck).s || '')[_callback](callback || ''));
+
+      // Unbind events
+      input.off('.i').unwrap();
+      $(_label + '[for="' + node.id + '"]').add(input.closest(_label)).off('.i');
+    };
+  };
+
+  // Get some option
+  function option(node, state, regular) {
+    if ($.data(node, _iCheck)) {
+      return $.data(node, _iCheck).o[state + (regular ? '' : 'Class')];
+    };
+  };
+
+  // Capitalize some string
+  function capitalize(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  // Executable handlers
+  function callbacks(input, checked, callback, keep) {
+    if (!keep) {
+      if (checked) {
+        input[_callback]('ifToggled');
+      };
+
+      input[_callback]('ifChanged')[_callback]('if' + capitalize(callback));
+    };
+  };
 })(jQuery);
