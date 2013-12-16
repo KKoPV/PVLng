@@ -121,13 +121,7 @@ abstract class Channel {
 
 		$this->before_write($request);
 
-		if (is_null($this->value) OR !is_scalar($this->value))
-			throw new Exception('Missing data value', 400);
-
 		if ($this->numeric) {
-			// Apply offset
-			$this->value += $this->offset;
-
 			// Check that new value is inside the valid range
 			if ((!is_null($this->valid_from) AND $this->value < $this->valid_from) OR
 			    (!is_null($this->valid_to)   AND $this->value > $this->valid_to)) {
@@ -147,17 +141,17 @@ abstract class Channel {
 				throw new Exception($msg, 200);
 			}
 
-			$last = $this->getLastReading();
+			$lastReading = $this->getLastReading();
 
 			// Check that new reading value is inside the threshold range
-			if ($this->threshold > 0 AND abs($this->value-$last) > $this->threshold) {
+			if ($this->threshold > 0 AND abs($this->value-$lastReading) > $this->threshold) {
 				// Throw away invalid reading value
 				return 0;
 			}
 
 			// Check that new meter reading value can't be lower than before
-			if ($this->meter AND $last AND $this->value < $last) {
-				$this->value = $last;
+			if ($this->meter AND $lastReading AND $this->value < $lastReading) {
+				$this->value = $lastReading;
 			}
 		}
 
@@ -477,11 +471,42 @@ abstract class Channel {
 	 */
 	protected function before_write( $request ) {
 
-		if (!$this->write)
+		if (!$this->write) {
 			throw new \Exception('Can\'t write data to '.$this->name.', '
 			                    .'instance of '.get_class($this), 400);
+		}
 
-		$this->value = isset($request['data']) ? $request['data'] : NULL;
+		if (!isset($request['data']) OR !is_scalar($request['data'])) {
+			throw new Exception('Missing data value', 400);
+		}
+
+		$this->value = $request['data'];
+
+		if ($this->meter) {
+			// MUST be a numeric channel :-)
+			if ($this->value == 0) {
+				throw new Exception('Invalid meter reading: 0', 422);
+			}
+
+			$lastReading = $this->getLastReading();
+
+			if ($this->value + $this->offset < $lastReading) {
+				$this->offset = $lastReading;
+				// Update channel in database
+				$q = new DBQuery;
+				$q->update('pvlng_channel')
+				  ->set('offset', $this->offset)
+				  ->whereEQ('id', $this->entity)
+				  ->limit(1);
+				$this->db->query($q);
+			}
+		}
+
+		if ($this->numeric) {
+			// MUST also work for sensor channels
+			// Apply offset
+			$this->value += $this->offset;
+		}
 
 		Hook::process('data.save.before', $this);
 	}
