@@ -41,7 +41,7 @@ class Webbox extends \Channel {
 					$ok += $channels[$name]->write(array('data'=>$channel['value']), $timestamp);
 				} catch (\Exception $e) {
 					$code = $e->getCode();
-					if ($code != 200 AND $code != 201) throw $e;
+					if ($code != 200 AND $code != 201 AND $code != 422) throw $e;
 				}
 			}
 		}
