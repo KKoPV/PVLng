@@ -161,7 +161,7 @@ $app->hook('slim.before', function() use ($app) {
         $app->APIKeyValid = 1;
 	} else {
 		// Key is invalid
-		stopAPI('Invalid API key given.');
+		stopAPI('Invalid API key given.', 403);
 	}
 });
 
@@ -169,7 +169,7 @@ $app->hook('slim.before', function() use ($app) {
  *
  */
 $APIkeyRequired = function() {
-	Slim\Slim::getInstance()->APIKeyValid || stopAPI('Access only with valid API key!');
+	Slim\Slim::getInstance()->APIKeyValid || stopAPI('Access only with valid API key!', 403);
 };
 
 /**
@@ -181,7 +181,7 @@ $accessibleChannel = function(Slim\Route $route) {
 		// No API key given, check channel is public
 		$channel = Channel::byGUID($route->getParam('guid'));
 		if (!$channel->public) {
-			stopAPI('Access to private channel \''.$channel->name.'\' only with valid API key!');
+			stopAPI('Access to private channel \''.$channel->name.'\' only with valid API key!', 403);
 		}
 	}
 };
