@@ -67,7 +67,7 @@ class gMemCache {
     if ($this->isConnected()) return FALSE;
     $this->status = self::DISCONNECTED;
     if ($this->host == '' || $this->port == 0) return FALSE;
-    $this->socket = fsockopen($this->host, $this->port);
+    $this->socket = @fsockopen($this->host, $this->port);
     if ($this->socket !== FALSE) $this->status = self::CONNECTED;
     return $this->isConnected();
   }
