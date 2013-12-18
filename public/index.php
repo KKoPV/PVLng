@@ -22,7 +22,8 @@ clearstatcache();
 /**
  * Check mobile client
  */
-if (substr($_SERVER['PATH_INFO'],0,2) != '/m') {
+if (isset($_SERVER['HTTP_USER_AGENT']) AND isset($_SERVER['PATH_INFO']) AND
+    substr($_SERVER['PATH_INFO'],0,2) != '/m') {
 	$useragent = $_SERVER['HTTP_USER_AGENT'];
 	/**
 	 * http://detectmobilebrowsers.com/download/php
