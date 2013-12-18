@@ -1,3 +1,4 @@
+<!--
 /**
  *
  *
@@ -6,6 +7,10 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     $Id$
  */
+-->
+
+<script>
+
 /**
  *
  */
@@ -44,3 +49,5 @@ $(function() {
 	});
 
 });
+
+</script>
