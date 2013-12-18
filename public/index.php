@@ -22,7 +22,8 @@ clearstatcache();
 /**
  * Check mobile client
  */
-if (substr($_SERVER['PATH_INFO'],0,2) != '/m') {
+if (isset($_SERVER['HTTP_USER_AGENT']) AND isset($_SERVER['PATH_INFO']) AND
+    substr($_SERVER['PATH_INFO'],0,2) != '/m') {
 	$useragent = $_SERVER['HTTP_USER_AGENT'];
 	/**
 	 * http://detectmobilebrowsers.com/download/php
@@ -78,6 +79,12 @@ if ($config->get('develop')) {
 	ini_set('display_startup_errors', 1);
 	ini_set('display_errors', 1);
 	error_reporting(-1);
+}
+
+if ($config->get('Admin.User') == '' AND
+    isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO'] != '/adminpass') {
+	$protocol = (isset($_SERVER['HTTPS']) AND $_SERVER['HTTPS']) ? 'https' : 'http';
+	die(Header('Location: '.$protocol.'://'.$_SERVER['HTTP_HOST'].'/adminpass'));
 }
 
 Session::start($config->get('Cookie.Name', 'PVLng'));
@@ -244,7 +251,7 @@ $app->map('/', function() use ($app) {
 	$app->process();
 })->via('GET', 'POST');
 
-$app->map('/index', $checkAuth, function() use ($app) {
+$app->map('/index', function() use ($app) {
 	$app->process();
 })->via('GET', 'POST');
 
