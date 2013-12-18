@@ -81,6 +81,12 @@ if ($config->get('develop')) {
 	error_reporting(-1);
 }
 
+if ($config->get('Admin.User') == '' AND
+    isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO'] != '/adminpass') {
+	$protocol = (isset($_SERVER['HTTPS']) AND $_SERVER['HTTPS']) ? 'https' : 'http';
+	die(Header('Location: '.$protocol.'://'.$_SERVER['HTTP_HOST'].'/adminpass'));
+}
+
 Session::start($config->get('Cookie.Name', 'PVLng'));
 
 // ---------------------------------------------------------------------------
