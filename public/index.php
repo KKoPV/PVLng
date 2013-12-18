@@ -244,7 +244,7 @@ $app->map('/', function() use ($app) {
 	$app->process();
 })->via('GET', 'POST');
 
-$app->map('/index', $checkAuth, function() use ($app) {
+$app->map('/index', function() use ($app) {
 	$app->process();
 })->via('GET', 'POST');
 
