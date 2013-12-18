@@ -184,7 +184,7 @@ function updateCharts() {
 					    var options = $.extend({}, chartOptions, {
 							chart:    { renderTo: 'chart-'+chart_id, type: 'gauge' },
 							title:    { text: attr.name },
-							subtitle: { text: attr.description ? attr.description : ' ' },
+							subtitle: { text: attr.description ? $('<div/>').html(attr.description).text() : ' ' },
 							yAxis: {
 								min: attr.valid_from,
 								max: attr.valid_to,
