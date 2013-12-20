@@ -9,7 +9,6 @@
  */
 </script>
 
-<script src="/js/chosen.jquery.js"></script>
 <script src="/js/jquery.treetable.js"></script>
 
 <script>
