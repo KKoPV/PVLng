@@ -40,6 +40,13 @@ class Channel extends \Controller {
 	/**
 	 *
 	 */
+	public function after() {
+		$this->view->APIkey = $this->model->getAPIkey();
+	}
+
+	/**
+	 *
+	 */
 	public function afterPost() {
 		if (!$this->ignore_returnto) {
 			// Handle returnto (Edit from Overview) ...

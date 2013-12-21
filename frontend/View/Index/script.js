@@ -262,15 +262,19 @@ var xAxisResolution = {
 	y: 3600 * 24 * 360,
 };
 
+var updateCount = 0;
+
 /**
  *
  */
 function updateChart() {
 
+    updateCount++;
+
 	clearTimeout(timeout);
 
-	<!-- IF {USER} -->
-	/* Provide permanent link only for logged in user */
+	<!-- IF {USER} AND {EMBEDDED} != "2" -->
+	/* Provide permanent link only for logged in user and not embedded view level 2 */
 	var btn = $('#btn-permanent'), date = $('#from').val(), to = $('#to').val();
 	if (date != to) date += ' - ' + to;
 	var text = btn.data('text').replace('&', date);
@@ -367,9 +371,11 @@ function updateChart() {
 	/* check for changed channels */
 	var changed = false;
 
-	if (channels_new.length != channels.length) {
+	/* renew chart at least each hour to adjust axis ranges by Highcharts */
+	if (channels_new.length != channels.length || updateCount >= 3600/RefreshTimeout ) {
 		changed = true;
 		channels = channels_new;
+        updateCount = 0;
 	} else {
 		for (var i=0, l=channels_new.length; i<l; i++) {
 			if (JSON.stringify(channels_new[i]) != JSON.stringify(channels[i])) {
@@ -413,7 +419,7 @@ function updateChart() {
 		$('#s'+channel.id).show();
 
 		var t, url = PVLngAPI + 'data/' + channel.guid + '.json';
-		_log('Fetch: '+url);
+		_log('Fetch', url);
 
 		$.getJSON(
 			url,
@@ -428,8 +434,8 @@ function updateChart() {
 			function(data) {
 				/* pop out 1st row with attributes */
 				attr = data.shift();
-				_log('Attributes:', attr);
-				_log('Data: ', data);
+				_log('Attributes', attr);
+				_log('Data', data);
 
 				if (attr.consumption) {
 					$('#cons'+channel.id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
@@ -506,7 +512,7 @@ function updateChart() {
 					serie = setMinMax(serie, channel);
 				}
 
-				_log('Serie: ', serie);
+				_log('Serie', serie);
 
 				series[id] = serie;
 
@@ -582,12 +588,8 @@ function updateChart() {
 			chart.hideLoading();
 			chart.redraw();
 
-			/* Resize chart correct into parent container */
-			var c = $('#chart')[0];
-			chart.setSize(c.offsetWidth, c.offsetHeight, false);
-
+			resizeChart();
 			setExtremes();
-			/* setTimeout(setExtremes, channels.length*100); */
 
 			if (RefreshTimeout > 0) {
 				timeout = setTimeout(updateChart, RefreshTimeout*1000);
@@ -597,10 +599,26 @@ function updateChart() {
 	});
 }
 
+var resizeTimeout;
+
+/**
+ *
+ */
+function resizeChart() {
+	clearTimeout(resizeTimeout);
+	/* Resize chart correct into parent container */
+	var c = $('#chart')[0];
+	chart.setSize(c.offsetWidth, c.offsetHeight);
+}
+
 /**
  *
  */
 $(function() {
+
+	$(window).resize(function() {
+		resizeTimeout = setTimeout(resizeChart, 500);
+	});
 
 	$('#tree').DataTable({
 		bPaginate: false,

@@ -23,7 +23,7 @@ class Info extends \Controller {
 	 */
 	public function IndexPost_Action() {
 		if ($this->request->post('regenerate')) {
-// 			$this->model->resetAPIkey();
+			$this->model->resetAPIkey();
 			\Messages::Success(\I18N::_('APIkeyRegenerated'));
 		}
 		$this->app->redirect('info');

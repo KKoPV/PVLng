@@ -10,6 +10,34 @@
 
 $(function() {
 
+	$.ajaxSetup({
+		beforeSend: function setHeader(xhr) {
+			xhr.setRequestHeader('X-PVLng-Key', '{APIKEY}');
+		}
+	});
+
+	$('.last-reading').each(function(id, el){
+		$.getJSON(
+			PVLngAPI + 'data/' + $(el).data('guid') + '.json',
+			{
+				start:      0,
+				attributes: true,
+				period:     'last',
+				_ts:        (new Date).getTime()
+			},
+			function(data) {
+				var attr = data.shift(), value;
+				try {
+					/* Don't make checks, just try :-) */
+					value = data[0].data.toFixed(attr.decimals);
+				} catch (e) {
+					value = data[0].data;
+				}
+				$(el).html(value);
+			}
+		);
+	});
+
 	$('#table-info').DataTable({
 		bJQueryUI: true,
 		bPaginate: false,

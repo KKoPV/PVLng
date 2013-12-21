@@ -9,7 +9,6 @@
  */
 </script>
 
-<script src="/js/chosen.jquery.js"></script>
 <script src="/js/jquery.treetable.js"></script>
 
 <script>
@@ -19,6 +18,38 @@
  */
 $(function() {
 
+	$.ajaxSetup({
+		beforeSend: function setHeader(xhr) {
+			xhr.setRequestHeader('X-PVLng-Key', '{APIKEY}');
+		}
+	});
+
+	$('.last-reading').each(function(id, el){
+		var guid = $(el).data('guid');
+
+		if (guid) {
+			$.getJSON(
+				PVLngAPI + 'data/' + guid + '.json',
+				{
+					start:      0,
+					attributes: true,
+					period:     'last',
+					_ts:        (new Date).getTime()
+				},
+				function(data) {
+					var attr = data.shift(), value;
+					try {
+						/* Don't make checks, just try :-) */
+						value = data[0].data.toFixed(attr.decimals);
+					} catch (e) {
+						value = data[0].data;
+					}
+					$(el).html(value);
+				}
+			);
+		}
+	});
+
 	$('#entities').DataTable({
 		bFilter: false,
 		bInfo: false,
@@ -27,6 +58,7 @@ $(function() {
 		bJQueryUI: true,
 		aoColumns: [
 			{ 'asSorting': false },
+			null,
 			null,
 			null,
 			null,

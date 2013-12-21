@@ -56,6 +56,8 @@
 		<th class="l">{{Serial}}</th>
 		<th class="l">{{Channel}}</th>
 		<th class="r">{{Readings}}</th>
+		<th class="r">{{LastReading}}</th>
+		<th class="l">{{Unit}}</th>
 	</tr>
 	</thead>
 
@@ -73,6 +75,10 @@
 		<td>{SERIAL}</td>
 		<td>{CHANNEL}</td>
 		<td class="r">{numf:READINGS}</td>
+		<td class="r last-reading" data-guid="{GUID}">
+			<img src="/images/spinner.gif" style="width:16px;height:16px" width="16" height="16" alt="..." />
+		</td>
+		<td>{UNIT}</td>
 	</tr>
 
 	<!-- END -->
@@ -84,6 +90,7 @@
 		<th colspan="3"></th>
 		<th class="l">{{Total}}</th>
 		<th class="r">{numf:READINGS}</th>
+		<th colspan="2"></th>
 	</tr>
 	</tfoot>
 
