@@ -40,6 +40,10 @@ return array(
 		'visible' => FALSE,
 	),
 
+	'adjust' => array(
+		'visible' => FALSE,
+	),
+
 	'cost' => array(
 		'visible' => FALSE,
 	),
