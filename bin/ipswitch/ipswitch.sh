@@ -69,7 +69,7 @@ while test $i -lt $GUID_N; do
         value=$(echo $row | cut -d, -f $CHANNEL)
 	log 1 "Value    : $value"
 
-	if echo "$value" | egrep -v -q '^[0-9\.]+$'; then
+	if echo "$value" | egrep -v -q '^[0-9\.-]+$'; then
 		error_exit "$value not numeric"
 	fi
 
