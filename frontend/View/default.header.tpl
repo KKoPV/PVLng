@@ -12,15 +12,17 @@
 <div id="header">
 	<div class="grid_2 s">
 		<a class="fl" href="/">
-			<img style="width:100;height:60px" src="/images/logo.png" width="100" height="60" />
+			<img style="width:100px;height:60px" src="/images/logo.png" width="100" height="60" />
 		</a>
 		<div style="margin-left:120px">
 			v{VERSION}
 			<!-- IF {VERSIONNEW} -->
 			<p class="b">
-				<a href="https://github.com/K-Ko/PVLng/wiki/ChangeLog">v{VERSIONNEW}</a>
-				<a href="https://github.com/K-Ko/PVLng/tree/master">
-					<img src="/images/ico/share.png" style="width:16px;height:16px;margin-left:.25em" width="16" height="16" />
+				<a href="https://github.com/K-Ko/PVLng/releases/tag/v{VERSIONNEW}" class="tip" title="Changelog">
+					v{VERSIONNEW}
+				</a>
+				<a href="https://github.com/K-Ko/PVLng/tree/master" class="tip" title="Check me out on Github">
+					<img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.25em" width="16" height="16" />
 				</a>
 			</p>
 			<!-- ENDIF -->
