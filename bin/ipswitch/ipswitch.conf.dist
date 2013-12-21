@@ -1,0 +1,45 @@
+##############################################################################
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2013 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     $Id$
+##############################################################################
+
+##############################################################################
+### Global settings
+##############################################################################
+
+##############################################################################
+### IPswitch IP[:Port]
+### required
+##############################################################################
+#IPSWITCH        "10.10.10.10:80"
+
+##############################################################################
+### Count of following GUIDs
+##############################################################################
+GUID_N        0
+
+### copy section >>>
+
+##############################################################################
+### Channel GUID
+### required
+##############################################################################
+GUID_1        ""
+
+##############################################################################
+### Position of data in CVS String
+### required
+### For IPswitch-add-Eingänge the counter ic9 has CHANNEL number 10
+### For IPswitch.kWh.1 
+###   counter ic1/ic2/ic3 have CHANNEL numbers 17/18/19
+###   internal Temperature sensor has channel 10. Valid range: -25°C to  70°C
+###   external Temperature sensor has channel 11. Valid range: -40°C to 110°C
+###   external Temperature sensor sends -99.0 if not connected.
+###   10 bit DC Sensor 0V .. 10V has channel number 12
+###   Switches oC1/oC2/oE1/oE2 have channel numbers 13/14/15/16
+##############################################################################
+CHANNEL_1     0
+
+### <<< copy section
