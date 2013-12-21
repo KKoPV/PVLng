@@ -33,6 +33,8 @@ read_config "$1"
 ##############################################################################
 ### Check config data
 ##############################################################################
+test "$IPSWITCH" || error_exit "IP address of ipswitch is required"
+
 GUID_N=$(int "$GUID_N")
 test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
 
