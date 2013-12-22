@@ -99,7 +99,13 @@ $(function() {
         return false;
     });
 
-	$('#overlay').fadeOut();
+	shortcut.add('Shift+F1', function() { window.location = '/'; });
+	shortcut.add('Shift+F2', function() { window.location = '/dashboard'; });
+	shortcut.add('Shift+F3', function() { window.location = '/overview'; });
+	shortcut.add('Shift+F4', function() { window.location = '/channel'; });
+	shortcut.add('Shift+F5', function() { window.location = '/info'; });
+	shortcut.add('Shift+F6', function() { window.location = '/description'; });
+	shortcut.add('Alt+L',    function() { window.location = '/logout'; });
 
 });
 

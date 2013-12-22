@@ -20,7 +20,7 @@
 	<tr>
 		<td>
 			<span class="ui-icon ui-icon-triangle-1-w tip"
-			      title="{{PrevDay}}" onclick="changeDates(-1)"></span>
+			      title="{{PrevDay}} (Alt+P)" onclick="changeDates(-1)"></span>
 		</td>
 		<td>
 			<input class="c" type="text" id="from" name="from" size="10" />
@@ -33,7 +33,7 @@
 		</td>
 		<td>
 			<span class="ui-icon ui-icon-triangle-1-e tip"
-			      title="{{NextDay}}" onclick="changeDates(1)"></span>
+			      title="{{NextDay}} (Alt+N)" onclick="changeDates(1)"></span>
 		</td>
 		<td>
 			<button id="btn-reset" style="margin-left:1em">{{Today}}</button>
@@ -43,7 +43,7 @@
 			<input class="numbersOnly r" style="margin-right:.5em" type="text"
 			       id="periodcnt" name="periodcnt" value="1" size="2" />
 			{PERIODSELECT} &nbsp;
-			<button id="btn-refresh">{{Refresh}}</button>
+			<button id="btn-refresh" class="tip" title="{{ChartRefreshHint}}">{{Refresh}}</button>
 		</td>
 	</tr>
 	</table>
@@ -95,7 +95,7 @@
 <!-- IF {EMBEDDED} != "2" -->
 
 <div class="grid_10">
-	<a id="togglewrapper" href="#">{{ToggleChannels}}</a>
+	<a id="togglewrapper" href="#">{{ToggleChannels}} (F3)</a>
 </div>
 
 <div class="clear"></div>

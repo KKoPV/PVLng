@@ -14,7 +14,7 @@
 <div>{MESSAGE}</div>
 
 <p>
-	<a class="button" href="/channel/add">{{CreateChannel}}</a>
+	<a class="button tip" href="/channel/add" title="Alt+N">{{CreateChannel}}</a>
 </p>
 
 <table id="entities" class="dataTable">
@@ -111,7 +111,7 @@
 </table>
 
 <p>
-	<a class="button" href="/channel/add">{{CreateChannel}}</a>
+	<a class="button tip" href="/channel/add" title="Alt+N">{{CreateChannel}}</a>
 </p>
 
 <div id="dialog-confirm" style="display:none" title="{{DeleteEntity}}">

@@ -14,7 +14,6 @@
 
 <div id="footer" style="height:5em">
 
-
 	<div class="grid_4 s">
 		Version {VERSION} / {VERSIONDATE}
 		<a href="https://github.com/K-Ko/PVLng/releases/tag/v{VERSION}" class="tip" title="Changelog">

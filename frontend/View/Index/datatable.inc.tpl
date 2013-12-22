@@ -15,8 +15,7 @@
 		<th style="width:1%">
 			<img id="treetoggle" src="/images/ico/toggle.png"
 				 style="width:16px;height:16px" width="16" height="16"
-			     class="tip" onclick="ToggleTree()" alt="[+]" title="#tiptoggle" />
-			<div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
+			     class="tip" onclick="ToggleTree()" alt="[+]" title="{{CollapseAll}} (F4)" />
 		</th>
 		<th class="l">
 			<span class="indenter" style="padding-left: 0px;"></span>

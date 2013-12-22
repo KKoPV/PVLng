@@ -87,6 +87,8 @@ $(function() {
 			return false;
 	});
 
+	shortcut.add('Alt+N', function() { window.location = '/channel/add'; });
+
 });
 
 </script>

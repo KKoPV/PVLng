@@ -147,9 +147,13 @@ var
  */
 function changeDates( dir ) {
 	var from = Date.parse($('#from').datepicker('getDate')) + dir*24*60*60*1000;
+	if (from > (new Date).getTime()) {
+		$.pnotify({ type: 'info', text: "Can't go beyond today." });
+		return;
+	}
 	var to = Date.parse($('#to').datepicker('getDate')) + dir*24*60*60*1000;
-	$('#from').datepicker( 'option', 'maxDate', 0 );
-	$('#to').datepicker( 'option', 'maxDate', 0 );
+	$('#from').datepicker('option', 'maxDate', 0);
+	$('#to').datepicker('option', 'maxDate', 0);
 	if (dir < 0) {
 		/* backwards */
 		$('#from').datepicker('setDate', new Date(from));
@@ -267,7 +271,7 @@ var lastChanged = (new Date).getTime() / 1000 / 60;
 /**
  *
  */
-function updateChart() {
+function updateChart( forceUpdate ) {
 
 	clearTimeout(timeout);
 
@@ -370,7 +374,7 @@ function updateChart() {
 	var changed = false, now = (new Date).getTime() / 1000 / 60;
 
 	/* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
-	if (channels_new.length != channels.length || now - lastChanged > 30) {
+	if (forceUpdate || channels_new.length != channels.length || now - lastChanged > 30) {
 		changed = true;
 		channels = channels_new;
 		lastChanged = now;
@@ -520,11 +524,9 @@ function updateChart() {
 				});
 			}
 		).fail(function(jqxhr, textStatus, error) {
-		    _log('FAIL', textStatus + ', ' + error);
-
 			$.pnotify({
-				type: jqxhr.responseJSON.status,
-				text: jqxhr.responseJSON.message,
+				type: textStatus,
+				text: jqxhr.responseText,
 				hide: false,
 				sticker: false
 			});
@@ -586,8 +588,8 @@ function updateChart() {
 			chart.hideLoading();
 			chart.redraw();
 
-			resizeChart();
 			setExtremes();
+			resizeChart();
 
 			if (RefreshTimeout > 0) {
 				timeout = setTimeout(updateChart, RefreshTimeout*1000);
@@ -786,7 +788,7 @@ $(function() {
 		},
 		text: false
 	}).click(function(e) {
-		updateChart();
+		updateChart(e.shiftKey);
 		return false;
 	});
 
@@ -844,6 +846,13 @@ $(function() {
 		$(this).val("{{Sure}}?").css('fontWeight','bold').css('color','red').unbind();
 		return false;
 	});
+
+	shortcut.add('Alt+P', function() { changeDates(-1); });
+	shortcut.add('Alt+N', function() { changeDates(1); });
+	shortcut.add('F3',    function() { $('#togglewrapper').click(); });
+	shortcut.add('F4',    function() { ToggleTree(); });
+	shortcut.add('F6',    function() { updateChart(); });
+	shortcut.add('F7',    function() { updateChart(true); });
 
 });
 
