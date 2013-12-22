@@ -237,8 +237,8 @@ function PVLngPUT2 {
 		### errors
 		log -1 "HTTP code : $1"
 		test -f $TMPFILE && log -1 @$TMPFILE
-		save_log "$GUID" "raw: $raw"
-		save_log "$GUID" @$TMPFILE
+		save_log "$GUID" "HTTP code: $1 - raw: $raw"
+		test -f $TMPFILE && save_log "$GUID" @$TMPFILE
 	fi
 
 }
