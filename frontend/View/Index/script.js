@@ -262,14 +262,12 @@ var xAxisResolution = {
 	y: 3600 * 24 * 360,
 };
 
-var updateCount = 0;
+var lastChanged = (new Date).getTime() / 1000 / 60;
 
 /**
  *
  */
 function updateChart() {
-
-    updateCount++;
 
 	clearTimeout(timeout);
 
@@ -369,13 +367,13 @@ function updateChart() {
 	_log('yAxis:', yAxis);
 
 	/* check for changed channels */
-	var changed = false;
+	var changed = false, now = (new Date).getTime() / 1000 / 60;
 
-	/* renew chart at least each hour to adjust axis ranges by Highcharts */
-	if (channels_new.length != channels.length || updateCount >= 3600/RefreshTimeout ) {
+	/* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
+	if (channels_new.length != channels.length || now - lastChanged > 30) {
 		changed = true;
 		channels = channels_new;
-        updateCount = 0;
+		lastChanged = now;
 	} else {
 		for (var i=0, l=channels_new.length; i<l; i++) {
 			if (JSON.stringify(channels_new[i]) != JSON.stringify(channels[i])) {
