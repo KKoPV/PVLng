@@ -68,7 +68,7 @@ while test $i -lt $GUID_N; do
 	test "$CHANNEL" || error_exit "IPswitch channel name is required (CHANNEL_$i)"
 
 
-        value=$(echo $row | cut -d, -f $CHANNEL)
+        value=$(echo $row | cut -d, -f $CHANNEL | sed 's/ //g' )
 	log 1 "Value    : $value"
 
 	if echo "$value" | egrep -v -q '^[0-9\.-]+$'; then
