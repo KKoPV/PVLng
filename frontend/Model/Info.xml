@@ -12,7 +12,7 @@
 
 	<ReadingCounts>
 		<![CDATA[
-		SELECT c.`name`, c.`description`, c.`serial`, c.`channel`, t.`icon`, u.`readings`
+		SELECT c.`guid`, c.`name`, c.`description`, c.`serial`, c.`channel`, c.`unit`, t.`icon`, u.`readings`
 		  FROM (
 			SELECT `id`, COUNT(id) AS `readings` FROM `pvlng_reading_num` GROUP BY `id`
 			UNION

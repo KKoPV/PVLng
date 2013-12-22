@@ -89,7 +89,7 @@
 	<script src="/js/jquery.tipTip.js+jquery.dataTables.js" defer></script>
 	<script src="/js/jquery.pnotify.js+jquery.icheck.js" defer></script>
 	<script src="/js/hoverIntent.js+superfish.js+supersubs.js+sprintf.js+lscache.js" defer></script>
-	<script src="/js/dataTables.js+script.js"></script>
+	<script src="/js/dataTables.js+script.js+shortcut.js"></script>
 
 	<script>
 		var PVLngAPI = 'http://{SERVERNAME}/api/r2/';
@@ -106,7 +106,7 @@
 
 	<a href="#" class="back-to-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
 	   style="border-right:0" title="{{BackToTop}}">
-		<img src="/images/ico/arrow-stop-090.png">
+		<img src="/images/ico/arrow-stop-090.png" style="width:16px;height:16px" width="16" height="16" />
 	</a>
 
 </body>

@@ -55,6 +55,10 @@ return array(
 		'default'  => 0
 	),
 
+	'adjust' => array(
+		'type'     => 'radio',
+	),
+
 	'cost' => array(
 	),
 

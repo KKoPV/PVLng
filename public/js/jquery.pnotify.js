@@ -17,7 +17,7 @@
 		jwindow = $(window),
 		styling = {
 			jqueryui: {
-				container: "ui-widget ui-widget-content ui-corner-all",
+				container: "ui-widget-content ui-corner-all",
 				notice: "ui-state-highlight",
 				// (The actual jQUI notice icon looks terrible.)
 				notice_icon: "ui-icon ui-icon-info",

@@ -14,7 +14,7 @@
 <div>{MESSAGE}</div>
 
 <p>
-	<a class="button" href="/channel/add">{{CreateChannel}}</a>
+	<a class="button tip" href="/channel/add" title="Alt+N">{{CreateChannel}}</a>
 </p>
 
 <table id="entities" class="dataTable">
@@ -23,6 +23,7 @@
 	<tr>
 		<th style="width:1%"></th>
 		<th class="l">{{Channel}}</th>
+		<th class="r">{{LastReading}}</th>
 		<th class="l">{{Unit}}</th>
 		<th class="l">{{Type}}</th>
 		<th></th>
@@ -51,6 +52,16 @@
 					 alt="[private]"/>
 			<!-- ENDIF -->
 		</td>
+
+		<!-- IF {WRITE} AND {READ} -->
+		<!-- Load last reading for physical channels only -->
+		<td class="r last-reading" data-guid="{GUID}">
+			<img src="/images/spinner.gif" style="width:16px;height:16px" width="16" height="16" alt="..." />
+		</td>
+		<!-- ELSE -->
+		<td></td>
+		<!-- ENDIF -->
+
 		<td>{UNIT}</td>
 		<td>{TYPE}</td>
 		<td class="imgbar">
@@ -100,7 +111,7 @@
 </table>
 
 <p>
-	<a class="button" href="/channel/add">{{CreateChannel}}</a>
+	<a class="button tip" href="/channel/add" title="Alt+N">{{CreateChannel}}</a>
 </p>
 
 <div id="dialog-confirm" style="display:none" title="{{DeleteEntity}}">

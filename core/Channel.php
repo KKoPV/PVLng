@@ -90,27 +90,27 @@ abstract class Channel {
 	 */
 	public function getAttributesShort() {
 		return array(
-	        'guid'        => $this->guid,
-	        'name'        => $this->name,
-	        'serial'      => $this->serial,
-	        'channel'     => $this->channel,
-	        'description' => $this->description,
-	        'type'        => $this->type,
-	        'unit'        => $this->unit,
-	        'decimals'    => $this->decimals,
-	        'numeric'     => $this->numeric,
-	        'meter'       => $this->meter,
-	        'resolution'  => $this->resolution,
-	        'threshold'   => $this->threshold,
-	        'valid_from'  => $this->valid_from,
-	        'valid_to'    => $this->valid_to,
-	        'cost'        => $this->cost,
-	        'childs'      => $this->childs,
-	        'read'        => $this->read,
-	        'write'       => $this->write,
-	        'graph'       => $this->graph,
-	        'icon'        => $this->icon,
-	        'comment'     => trim($this->comment)
+			'guid'        => $this->guid,
+			'name'        => $this->name,
+			'serial'      => $this->serial,
+			'channel'     => $this->channel,
+			'description' => $this->description,
+			'type'        => $this->type,
+			'unit'        => $this->unit,
+			'decimals'    => $this->decimals,
+			'numeric'     => $this->numeric,
+			'meter'       => $this->meter,
+			'resolution'  => $this->resolution,
+			'threshold'   => $this->threshold,
+			'valid_from'  => $this->valid_from,
+			'valid_to'    => $this->valid_to,
+			'cost'        => $this->cost,
+			'childs'      => $this->childs,
+			'read'        => $this->read,
+			'write'       => $this->write,
+			'graph'       => $this->graph,
+			'icon'        => $this->icon,
+			'comment'     => trim($this->comment)
 		);
 	}
 
@@ -244,12 +244,14 @@ abstract class Channel {
 			}
 
 			if ($this->period[1] != self::ALL) {
-			    // Time is only relevant for select <> period=all
-                if (!$this->meter) {
-					$q->whereGE('timestamp', $this->start);
-				} else {
-					// Fetch also period before start for consumption calculation!
-					$q->whereGE('timestamp', $this->start-$this->TimestampMeterOffset[$this->period[1]]);
+				// Time is only relevant for select <> period=all
+				if ($this->start) {
+					if (!$this->meter) {
+						$q->whereGE('timestamp', $this->start);
+					} else {
+						// Fetch also period before start for consumption calculation!
+						$q->whereGE('timestamp', $this->start-$this->TimestampMeterOffset[$this->period[1]]);
+					}
 				}
 				if ($this->end < time()) {
 					$q->whereLT('timestamp', $this->end);
@@ -267,6 +269,7 @@ abstract class Channel {
 			if ($res = $this->db->query($q)) {
 
 				$offset = $last = 0;
+				$lastRow = NULL;
 
 				while ($row = $res->fetch_assoc()) {
 
@@ -293,9 +296,20 @@ abstract class Channel {
 					$id = $row['g'];
 					unset($row['g']);
 
-					$buffer->write($row, $id);
+					if ($this->period[1] != self::LAST) {
+						// Write only if NOT only last value was requested
+						$buffer->write($row, $id);
+					}
+
+					$lastRow = $row;
 				}
 			}
+
+			if ($this->period[1] == self::LAST AND $lastRow) {
+				// Write ONLY last row if only last value was requested
+				$buffer->write($lastRow);
+			}
+
 		}
 
 		return $this->after_read($buffer, $attributes);
@@ -482,27 +496,34 @@ abstract class Channel {
 
 		$this->value = $request['data'];
 
-		if ($this->meter) {
-			// MUST be a numeric channel :-)
-			if ($this->value == 0) {
-				throw new Exception('Invalid meter reading: 0', 422);
-			}
-
-			$lastReading = $this->getLastReading();
-
-			if ($this->value + $this->offset < $lastReading) {
-				$this->offset = $lastReading;
-				// Update channel in database
-				$q = new DBQuery;
-				$q->update('pvlng_channel')
-				  ->set('offset', $this->offset)
-				  ->whereEQ('id', $this->entity)
-				  ->limit(1);
-				$this->db->query($q);
-			}
-		}
-
 		if ($this->numeric) {
+
+			$this->value = +$this->value;
+
+			if ($this->meter) {
+				if ($this->value == 0) {
+					throw new Exception('Invalid meter reading: 0', 422);
+				}
+
+				$lastReading = $this->getLastReading();
+
+				if ($this->value + $this->offset < $lastReading AND $this->adjust) {
+
+					$t = new ORM\Log;
+					$t->scope = $this->name;
+					$t->data  = sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
+					                    $this->offset, $lastReading, $this->value);
+					$t->insert();
+
+					// Update channel in database
+					$t = new ORM\Channel($this->entity);
+					$t->offset = $lastReading;
+					$t->update();
+
+					$this->offset = $lastReading;
+				}
+			}
+
 			// MUST also work for sensor channels
 			// Apply offset
 			$this->value += $this->offset;

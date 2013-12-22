@@ -2,9 +2,7 @@
 @import "normalize.css";
 @import "960.10.fluid.css";
 
-#header,
-#content,
-#footer {
+body {
 	font-family: Verdana, Arial, sans-serif;
 }
 

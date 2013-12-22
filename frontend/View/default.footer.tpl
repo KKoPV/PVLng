@@ -14,9 +14,12 @@
 
 <div id="footer" style="height:5em">
 
-
 	<div class="grid_4 s">
 		Version {VERSION} / {VERSIONDATE}
+		<a href="https://github.com/K-Ko/PVLng/releases/tag/v{VERSION}" class="tip" title="Changelog">
+			<img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.25em" width="16" height="16" />
+		</a>
+
 		<br />
 		&copy; 2012-{YEAR} by
 		<a href="http://pvlng.com/index.html?Author.html" class="tip" title="Knut Kohl PhotoVoltaics"

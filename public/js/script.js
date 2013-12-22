@@ -8,6 +8,8 @@
  * @revision    $Rev$
  */
 
+console.time('Duration');
+
 /**
  * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
  */
@@ -97,25 +99,44 @@ $(function() {
         return false;
     });
 
-	$('#overlay').fadeOut();
+	shortcut.add('Shift+F1', function() { window.location = '/'; });
+	shortcut.add('Shift+F2', function() { window.location = '/dashboard'; });
+	shortcut.add('Shift+F3', function() { window.location = '/overview'; });
+	shortcut.add('Shift+F4', function() { window.location = '/channel'; });
+	shortcut.add('Shift+F5', function() { window.location = '/info'; });
+	shortcut.add('Shift+F6', function() { window.location = '/description'; });
+	shortcut.add('Alt+L',    function() { window.location = '/logout'; });
 
 });
 
-/**
- *
- */
-var verbose = true;
+var timer;
 
 /**
  *
  */
 function _log() {
-	if (!verbose) return;
-	var d = new Date;
-	console.log(d.toLocaleString()+'.'+d.getMilliseconds());
-	$(arguments).each(function(id, data) {
-		console.log(data);
-	});
+	console.timeEnd('Duration');
+	console.time('Duration');
+	if (arguments.length == 1) {
+		console.log(arguments[0]);
+	} else {
+		$(arguments).each(function(id, data) {
+			if (id == 0) {
+				console.group(data);
+			} else {
+				if (Object.prototype.toString.call(data) === '[object Array]') {
+					console.table(data);
+/*
+				} else if (typeof data == 'object') {
+					console.dir(data);
+*/
+				} else {
+					console.log(data);
+				}
+			}
+		});
+		console.groupEnd();
+	}
 }
 
 /**

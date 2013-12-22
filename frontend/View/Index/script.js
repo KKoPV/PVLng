@@ -147,9 +147,13 @@ var
  */
 function changeDates( dir ) {
 	var from = Date.parse($('#from').datepicker('getDate')) + dir*24*60*60*1000;
+	if (from > (new Date).getTime()) {
+		$.pnotify({ type: 'info', text: "Can't go beyond today." });
+		return;
+	}
 	var to = Date.parse($('#to').datepicker('getDate')) + dir*24*60*60*1000;
-	$('#from').datepicker( 'option', 'maxDate', 0 );
-	$('#to').datepicker( 'option', 'maxDate', 0 );
+	$('#from').datepicker('option', 'maxDate', 0);
+	$('#to').datepicker('option', 'maxDate', 0);
 	if (dir < 0) {
 		/* backwards */
 		$('#from').datepicker('setDate', new Date(from));
@@ -262,15 +266,17 @@ var xAxisResolution = {
 	y: 3600 * 24 * 360,
 };
 
+var lastChanged = (new Date).getTime() / 1000 / 60;
+
 /**
  *
  */
-function updateChart() {
+function updateChart( forceUpdate ) {
 
 	clearTimeout(timeout);
 
-	<!-- IF {USER} -->
-	/* Provide permanent link only for logged in user */
+	<!-- IF {USER} AND {EMBEDDED} != "2" -->
+	/* Provide permanent link only for logged in user and not embedded view level 2 */
 	var btn = $('#btn-permanent'), date = $('#from').val(), to = $('#to').val();
 	if (date != to) date += ' - ' + to;
 	var text = btn.data('text').replace('&', date);
@@ -365,11 +371,13 @@ function updateChart() {
 	_log('yAxis:', yAxis);
 
 	/* check for changed channels */
-	var changed = false;
+	var changed = false, now = (new Date).getTime() / 1000 / 60;
 
-	if (channels_new.length != channels.length) {
+	/* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
+	if (forceUpdate || channels_new.length != channels.length || now - lastChanged > 30) {
 		changed = true;
 		channels = channels_new;
+		lastChanged = now;
 	} else {
 		for (var i=0, l=channels_new.length; i<l; i++) {
 			if (JSON.stringify(channels_new[i]) != JSON.stringify(channels[i])) {
@@ -413,7 +421,7 @@ function updateChart() {
 		$('#s'+channel.id).show();
 
 		var t, url = PVLngAPI + 'data/' + channel.guid + '.json';
-		_log('Fetch: '+url);
+		_log('Fetch', url);
 
 		$.getJSON(
 			url,
@@ -428,8 +436,8 @@ function updateChart() {
 			function(data) {
 				/* pop out 1st row with attributes */
 				attr = data.shift();
-				_log('Attributes:', attr);
-				_log('Data: ', data);
+				_log('Attributes', attr);
+				_log('Data', data);
 
 				if (attr.consumption) {
 					$('#cons'+channel.id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
@@ -506,7 +514,7 @@ function updateChart() {
 					serie = setMinMax(serie, channel);
 				}
 
-				_log('Serie: ', serie);
+				_log('Serie', serie);
 
 				series[id] = serie;
 
@@ -516,11 +524,9 @@ function updateChart() {
 				});
 			}
 		).fail(function(jqxhr, textStatus, error) {
-		    _log('FAIL', textStatus + ', ' + error);
-
 			$.pnotify({
-				type: jqxhr.responseJSON.status,
-				text: jqxhr.responseJSON.message,
+				type: textStatus,
+				text: jqxhr.responseText,
 				hide: false,
 				sticker: false
 			});
@@ -582,12 +588,8 @@ function updateChart() {
 			chart.hideLoading();
 			chart.redraw();
 
-			/* Resize chart correct into parent container */
-			var c = $('#chart')[0];
-			chart.setSize(c.offsetWidth, c.offsetHeight, false);
-
 			setExtremes();
-			/* setTimeout(setExtremes, channels.length*100); */
+			resizeChart();
 
 			if (RefreshTimeout > 0) {
 				timeout = setTimeout(updateChart, RefreshTimeout*1000);
@@ -597,10 +599,26 @@ function updateChart() {
 	});
 }
 
+var resizeTimeout;
+
+/**
+ *
+ */
+function resizeChart() {
+	clearTimeout(resizeTimeout);
+	/* Resize chart correct into parent container */
+	var c = $('#chart')[0];
+	chart.setSize(c.offsetWidth, c.offsetHeight);
+}
+
 /**
  *
  */
 $(function() {
+
+	$(window).resize(function() {
+		resizeTimeout = setTimeout(resizeChart, 500);
+	});
 
 	$('#tree').DataTable({
 		bPaginate: false,
@@ -770,7 +788,7 @@ $(function() {
 		},
 		text: false
 	}).click(function(e) {
-		updateChart();
+		updateChart(e.shiftKey);
 		return false;
 	});
 
@@ -828,6 +846,13 @@ $(function() {
 		$(this).val("{{Sure}}?").css('fontWeight','bold').css('color','red').unbind();
 		return false;
 	});
+
+	shortcut.add('Alt+P', function() { changeDates(-1); });
+	shortcut.add('Alt+N', function() { changeDates(1); });
+	shortcut.add('F3',    function() { $('#togglewrapper').click(); });
+	shortcut.add('F4',    function() { ToggleTree(); });
+	shortcut.add('F6',    function() { updateChart(); });
+	shortcut.add('F7',    function() { updateChart(true); });
 
 });
 
