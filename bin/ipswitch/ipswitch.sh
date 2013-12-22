@@ -1,9 +1,9 @@
 #!/bin/sh
 ##############################################################################
-### @author      Knut Kohl <github@knutkohl.de>
-### @copyright   2012-2013 Knut Kohl
+### @author      Patrick Feisthammel <patrick.feisthammel@citrin.ch>
+### @copyright   2013 Patrick Feisthammel
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     $Id$
+### @version     1.0.0
 ##############################################################################
 
 ##############################################################################
@@ -27,36 +27,34 @@ while getopts "tvxh" OPTION; do
 done
 
 shift $((OPTIND-1))
+CONFIG="$1"
 
-read_config "$1"
+read_config "$CONFIG"
 
 ##############################################################################
 ### Check config data
 ##############################################################################
-test "$IPSWITCH" || error_exit "IP address of ipswitch is required"
+test "$IPSWITCH" || error_exit "IP address of IPswitch is required"
 
 GUID_N=$(int "$GUID_N")
-test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
+test $GUID_N -gt 0 || error_exit "No sections defined"
 
 ##############################################################################
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
 
-LC_NUMERIC=en_US
-
-curl=$(curl_cmd)
-
-### read value, extract data
-row=$(curl --silent --output - http://$IPSWITCH/csv.html | awk '/<body>/{print $0}' | sed 's/<body>//; s/<br>//;')
-log 2 "Data:    : $row"
+### read value, extract data, $(curl_cmd) respects verbose settings!
+row=$($(curl_cmd) http://$IPSWITCH/csv.html | awk '/<body>/{print $0}' | sed 's/<body>//; s/<br>//;')
+log 2 "Raw data : $row"
 
 i=0
+
 while test $i -lt $GUID_N; do
 
 	i=$((i + 1))
 
-	log 1 "--- $i ---"
+	log 1 "--- Section $i ---"
 
 	### required parameters
 	eval GUID=\$GUID_$i
@@ -67,19 +65,18 @@ while test $i -lt $GUID_N; do
 	log 2 "Channel  : $CHANNEL"
 	test "$CHANNEL" || error_exit "IPswitch channel name is required (CHANNEL_$i)"
 
-
-        value=$(echo $row | cut -d, -f $CHANNEL)
+	value=$(echo "$row" | cut -d, -f $CHANNEL)
 	log 1 "Value    : $value"
 
 	if echo "$value" | egrep -v -q '^[0-9\.-]+$'; then
-		error_exit "$value not numeric"
+		error_exit "$GUID: $value not numeric"
 	fi
 
-        if test "$TEST" ; then
-          log 1 "Test-Mode - not sending value=$value of channel=$CHANNEL to $GUID"
-        else 
-          PVLngPUT2 "$GUID" "$value" "$value"
-        fi        
+	if test "$TEST" ; then
+		log 1 "Test-Mode - not sending value=$value of channel=$CHANNEL to $GUID"
+	else
+		PVLngPUT2 $GUID $value
+	fi
 
 done
 
@@ -90,7 +87,7 @@ exit
 ##############################################################################
 # USAGE >>
 
-Push PVLng channel data to device channels on Xively.com
+Read IPswitch data and push to PVLng channel
 
 Usage: $scriptname [options] config_file
 
@@ -102,6 +99,6 @@ Options:
 	-vv Set verbosity level to debug level
 	-h  Show this help
 
-See $pwd/device.conf.dist for details.
+See $pwd/ipswitch.conf.dist for details.
 
 # << USAGE
