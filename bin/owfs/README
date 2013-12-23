@@ -1,0 +1,4 @@
+1-Wire channels must have maintained in PVLng in channel view the
+
+- serial  -- REAL serial as 28CA2307040000E0 - NOT 28.CA2307040000 !
+- channel -- the channel to read, e.g. temperture
