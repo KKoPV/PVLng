@@ -3,7 +3,7 @@
 ### @author      Patrick Feisthammel <patrick.feisthammel@citrin.ch>
 ### @copyright   2013 Patrick Feisthammel
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     1.0.0
+### @version     1.0.1
 ##############################################################################
 
 ##############################################################################
@@ -65,11 +65,11 @@ while test $i -lt $GUID_N; do
 	log 2 "Channel  : $CHANNEL"
 	test "$CHANNEL" || error_exit "IPswitch channel name is required (CHANNEL_$i)"
 
-	value=$(echo "$row" | cut -d, -f $CHANNEL)
+	value=$(echo $row | cut -d, -f $CHANNEL | sed 's/ //g' )
 	log 1 "Value    : $value"
 
 	if echo "$value" | egrep -v -q '^[0-9\.-]+$'; then
-		error_exit "$GUID: $value not numeric"
+		error_exit "$GUID: $value not numeric, extracted from $row"
 	fi
 
 	if test "$TEST" ; then
