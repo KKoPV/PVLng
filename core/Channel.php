@@ -511,6 +511,8 @@ abstract class Channel {
 
 		$this->value = $request['data'];
 
+		Hook::process('data.save.before', $this);
+
 		if ($this->numeric) {
 
 			$this->value = +$this->value;
@@ -543,8 +545,6 @@ abstract class Channel {
 			// Apply offset
 			$this->value += $this->offset;
 		}
-
-		Hook::process('data.save.before', $this);
 	}
 
 	/**
