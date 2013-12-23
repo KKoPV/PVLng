@@ -84,17 +84,23 @@ var
 		tooltip: {
 			useHTML: true,
 			formatter: function() {
-				var body = '', value;
+				var body = '';
 				$.each(this.points, function(id, point) {
 					if (point.point.low != undefined && point.point.high != undefined) {
-						value = Highcharts.numberFormat(+point.point.low, point.series.options.decimals) + ' - ' +
-						        Highcharts.numberFormat(+point.point.high, point.series.options.decimals);
+						var color = point.series.color;
+						var value = Highcharts.numberFormat(+point.point.low, point.series.options.decimals) + ' - ' +
+						            Highcharts.numberFormat(+point.point.high, point.series.options.decimals);
 					} else if (point.y != undefined) {
-						value = Highcharts.numberFormat(+point.y, point.series.options.decimals);
+						if (point.series.options.negativeColor && +point.y < point.series.options.threshold) {
+							var color = point.series.options.negativeColor;
+						} else {
+							var color = point.series.color;
+						}
+						var value = Highcharts.numberFormat(+point.y, point.series.options.decimals);
 					} else {
 						return;
 					}
-					body += '<tr style="color:' + point.series.color + '"';
+					body += '<tr style="color:' + color + '"';
 					if (id & 1) body += ' class="even"'; /* id starts by 0 */
 					body += '>' +
 					        '<td class="name">' + point.series.name + '</td>' +
