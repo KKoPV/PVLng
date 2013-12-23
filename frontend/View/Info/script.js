@@ -25,6 +25,7 @@ $(function() {
 			},
 			function(data) {
 				var attr = data.shift();
+				/* Test for numeric data */
 				if (data[0].data == +data[0].data) {
 					$(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
 				} else {

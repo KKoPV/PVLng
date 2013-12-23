@@ -31,11 +31,12 @@ $(function() {
 			$.getJSON(
 				PVLngAPI + 'data/' + guid + '.json',
 				{
-					attributes: true,
+					attributes: true, /* need decimals for formating */
 					period:     'readlast'
 				},
 				function(data) {
 					var attr = data.shift();
+					/* Test for numeric data */
 					if (data[0].data == +data[0].data) {
 						$(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
 					} else {

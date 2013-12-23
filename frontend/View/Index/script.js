@@ -269,7 +269,7 @@ var xAxisResolution = {
 	w: 3600 * 24 * 7,
 	m: 3600 * 24 * 30,
 	q: 3600 * 24 * 90,
-	y: 3600 * 24 * 360,
+	y: 3600 * 24 * 360
 };
 
 var lastChanged = (new Date).getTime() / 1000 / 60;
@@ -309,7 +309,7 @@ function updateChart( forceUpdate ) {
 	$('input.channel:checked').each(function(id, el) {
 		channel = new presentation($(el).val());
 		channel.id = $(el).data('id');
-		channel.name = $('<div/>').html($(el).data('name')).text()
+		channel.name = $('<div/>').html($(el).data('name')).text();
 		channel.guid = $(el).data('guid');
 		channel.unit = $(el).data('unit');
 		/* remember channel */
