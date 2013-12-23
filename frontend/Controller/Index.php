@@ -189,6 +189,8 @@ class Index extends \Controller {
 	 */
 	protected function slug( $string ) {
 
+		$mobile = substr($string, 0, 1) == '@' ? '@' : '';
+
 		$translate = array(
 			'Š' => 'S',  'š' => 's',  'Đ' => 'Dj', 'đ' => 'dj', 'Ž' => 'Z',
 			'ž' => 'z',  'Č' => 'C',  'č' => 'c',  'Ć' => 'C',  'ć' => 'c',
@@ -213,7 +215,7 @@ class Index extends \Controller {
 		$string = preg_replace('~[^\w\d]~', '-', $string);
 		$string = preg_replace('~-{2,}~', '-', $string);
 
-		return strtolower(trim($string, '-'));
+		return strtolower($mobile . trim($string, '-'));
 	}
 
 	/**
