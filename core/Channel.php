@@ -190,19 +190,29 @@ abstract class Channel {
 			// Simply read also last data set for sensor channels
 		    (!$this->meter AND $this->period[1] == self::LAST)) {
 
+			// Fetch last reading and set some data to 0 to get correct order
 			$q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
 			  ->get('timestamp')
 			  ->get('data')
-			  ->get('data', 'min')
-			  ->get('data', 'max')
-			  ->get(1, 'count')
+			  ->get(0, 'min')
+			  ->get(0, 'max')
+			  ->get(0, 'count')
 			  ->get(0, 'timediff')
 			  ->get($this->meter ? 'data' : 0, 'consumption')
 			  ->whereEQ('id', $this->entity)
 			  ->orderDescending('timestamp')
 			  ->limit(1);
+			$row = $this->db->queryRow($q);
 
-			$buffer->write((array) $this->db->queryRow($q));
+			// Reset query and read add. data
+			$q->select($this->table[$this->numeric])
+			  ->get($q->MIN('data'), 'min')
+			  ->get($q->MAX('data'), 'max')
+			  ->get($q->COUNT('id'), 'count')
+			  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
+			  ->whereEQ('id', $this->entity);
+
+			$buffer->write(array_merge((array) $row, (array) $this->db->queryRow($q)));
 
 		} else {
 
