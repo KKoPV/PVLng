@@ -20,7 +20,7 @@ $(function() {
 
 	$.ajaxSetup({
 		beforeSend: function setHeader(xhr) {
-			xhr.setRequestHeader('X-PVLng-Key', '{APIKEY}');
+			xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
 		}
 	});
 
@@ -31,20 +31,16 @@ $(function() {
 			$.getJSON(
 				PVLngAPI + 'data/' + guid + '.json',
 				{
-					start:      0,
 					attributes: true,
-					period:     'last',
-					_ts:        (new Date).getTime()
+					period:     'readlast'
 				},
 				function(data) {
-					var attr = data.shift(), value;
-					try {
-						/* Don't make checks, just try :-) */
-						value = data[0].data.toFixed(attr.decimals);
-					} catch (e) {
-						value = data[0].data;
+					var attr = data.shift();
+					if (data[0].data == +data[0].data) {
+						$(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
+					} else {
+						$(el).html(data[0].data);
 					}
-					$(el).html(value);
 				}
 			);
 		}
