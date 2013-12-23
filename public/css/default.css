@@ -52,7 +52,8 @@ a:hover, a:active {
     background-color: rgba(135, 135, 135, 0.50);
 }
 
-img {
+img,
+input[type=image] {
 	border: 0;
 	vertical-align: middle;
 }
