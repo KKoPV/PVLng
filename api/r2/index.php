@@ -35,7 +35,7 @@ Loader::register(
 $config = slimMVC\Config::getInstance()
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.app.php')
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
-        ->load('config.php');
+        ->load('config.php', false);
 
 if ($config->get('develop')) {
 	ini_set('display_startup_errors', 1);
