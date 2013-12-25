@@ -151,7 +151,9 @@
 				</a>
 				<span id="drag-new-wrapper" style="margin-left:.5em;display:none">
 					<span id="drag-new" class="draggable">
-						<img src="/images/ico/hand.png" style="width:16px;height:16px" width="16" height="16" />
+						<img src="/images/ico/hand.png"
+						     style="width:16px;height:16px;vertical-align:top;margin-right:8px"
+						     width="16" height="16" />
 						<span id="drag-text"></span>
 					</span>
 				</span>
