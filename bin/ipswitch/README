@@ -46,14 +46,14 @@ iC13  14             Usable for S0 counting
 iC14  15             Usable for S0 counting
 iC15  16             Usable for S0 counting
 iC16  17             Usable for S0 counting
-      18             S0 counting of ic9 used to calculate current Energy 
-      19             S0 counting of ic10 used to calculate current Energy 
-      20             S0 counting of ic11 used to calculate current Energy 
-      21             S0 counting of ic12 used to calculate current Energy 
-      22             S0 counting of ic13 used to calculate current Energy 
-      23             S0 counting of ic14 used to calculate current Energy 
-      24             S0 counting of ic15 used to calculate current Energy 
-      25             S0 counting of ic16 used to calculate current Energy 
+      19             S0 counting of ic9 used to calculate current Energy 
+      20             S0 counting of ic10 used to calculate current Energy 
+      21             S0 counting of ic11 used to calculate current Energy 
+      22             S0 counting of ic12 used to calculate current Energy 
+      23             S0 counting of ic13 used to calculate current Energy 
+      24             S0 counting of ic14 used to calculate current Energy 
+      25             S0 counting of ic15 used to calculate current Energy 
+      26             S0 counting of ic16 used to calculate current Energy 
 
 A sample CSV-Output can be found in csv-ipswitch-add-eingaenge.html
 
@@ -80,6 +80,8 @@ i10V  12             DC sensor 0V-10V (10 bit)
       20             S0 counting of ic1 used to calculate current Energy 
       21             S0 counting of ic2 used to calculate current Energy 
       22             S0 counting of ic3 used to calculate current Energy 
+
+A sample CSV-Output can be found in csv-ipswitch.kWh.html
 
 
 
