@@ -348,7 +348,7 @@ $app->container->help['get data'] = array(
 			'value'       => array( '[0-9.]+minutes', '[0-9.]+hours',
 			                        '[0-9.]+days',  '[0-9.]+weeks',
 			                        '[0-9.]+month', '[0-9.]+quarters',
-			                        '[0-9.]+years', 'last' ),
+			                        '[0-9.]+years', 'last', 'readlast', 'all' ),
 		),
 		'attributes' => array(
 			'description' => 'Return channel attributes as 1st line',

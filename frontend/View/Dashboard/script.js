@@ -99,7 +99,7 @@ function ToggleTree( force ) {
 
 	if (TreeExpanded) {
 		$('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
-		$('#tiptoggle').html('{{CollapseAll}}')
+		$('#tiptoggle').html('{{CollapseAll}}');
 
 		$('span.indenter').each(function(id, el) {
 			el = $(el);
@@ -108,7 +108,7 @@ function ToggleTree( force ) {
 		});
 	} else {
 		$('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
-		$('#tiptoggle').html('{{ExpandAll}}')
+		$('#tiptoggle').html('{{ExpandAll}}');
 
 		$('span.indenter').each(function(id, el) {
 			/* Remove left indent */

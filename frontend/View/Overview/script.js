@@ -42,11 +42,11 @@ function ToggleTree() {
 	if (TreeExpanded) {
 		$('#tree').treetable('collapseAll');
 		$('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
-		$('#tiptoggle').html('{{ExpandAll}}')
+		$('#tiptoggle').html('{{ExpandAll}}');
 	} else {
 		$('#tree').treetable('expandAll');
 		$('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
-		$('#tiptoggle').html('{{CollapseAll}}')
+		$('#tiptoggle').html('{{CollapseAll}}');
 	}
 	TreeExpanded = !TreeExpanded;
 	return false;
@@ -166,7 +166,7 @@ $(function() {
 	$('#add-child').change(function() {
 		var el = $(this).find('option:selected');
 		if (el && el.val()) {
-			$('#drag-new').data('entity', el.val())
+			$('#drag-new').data('entity', el.val());
 			$('#drag-text').text(el.text());
 			$('#drag-new-wrapper').show();
 		} else {
@@ -180,8 +180,8 @@ $(function() {
 		width: 650,
 		modal: true,
 		buttons: {
-			'{{Add}}'	 : function() { $('#form-addchild').submit(); },
-			'{{Cancel}}': function() { $(this).dialog('close'); return false; }
+			'{{Add}}'	 : function() { $('#form-addchild').submit() },
+			'{{Cancel}}': function() { $(this).dialog('close'); return false }
 		}
 	});
 
@@ -191,8 +191,8 @@ $(function() {
 		width: 480,
 		modal: true,
 		buttons: {
-			'{{Delete}}': function() { $(this).data('form').submit(); },
-			'{{Cancel}}': function() { $(this).dialog('close'); return false; }
+			'{{Delete}}': function() { $(this).data('form').submit() },
+			'{{Cancel}}': function() { $(this).dialog('close'); return false }
 		}
 	});
 
@@ -214,8 +214,8 @@ $(function() {
 		width: 480,
 		modal: true,
 		buttons: {
-			'{{Ok}}': function() { $('#form-movechild').submit(); },
-			'{{Cancel}}': function() { $(this).dialog('close'); return false; }
+			'{{Ok}}': function() { $('#form-movechild').submit() },
+			'{{Cancel}}': function() { $(this).dialog('close'); return false }
 		}
 	});
 

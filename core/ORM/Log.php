@@ -18,6 +18,13 @@ namespace ORM;
  */
 class Log extends \slimMVC\ORMTable {
 
+	public static function save( $scope, $data ) {
+		$log = new Log;
+		$log->scope = $scope;
+		$log->data = (string) $data;
+		$log->insert();
+	}
+
 	// -------------------------------------------------------------------------
 	// PROTECTED
 	// -------------------------------------------------------------------------

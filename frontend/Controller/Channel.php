@@ -174,28 +174,32 @@ class Channel extends \Controller {
 				$entity->throwException();
 				try {
 				    // CAN'T simply replace because of the foreign key in the tree!
-					$AliasCount = 0;
 				    if (!$entity->id) {
 						$entity->insert();
+						\Messages::Success(__('ChannelSaved'));
 					} else {
 						$entity->update();
+						\Messages::Success(__('ChannelSaved'));
 
-						// Update possible channel aliases!
+						// Update possible alias channel!
+						// Find channel itself in tree to get GUID
 						$tree = new \ORM\Tree;
 						$tree->find('entity', $entity->id);
-						if ($tree->find('entity', $entity->id)->id != '') {
-							foreach ($entity->findMany('channel', $tree->guid) as $alias) {
-								$AliasCount++;
-								$alias->name = $tree->name;
-								$alias->description = $tree->description;
-								$alias->public = $tree->public;
-								$alias->update();
+						// Alias channel
+						$alias = new \ORM\Channel;
+						// Any channel with this GUID and type 0 (Alias)?
+						if ($alias->find(array('channel', 'type'), array($tree->guid, 0))) {
+							$alias->name = $entity->name;
+							$alias->description = $entity->description;
+							$alias->public = $entity->public;
+							$alias->unit = $entity->unit;
+							$alias->update();
+							\Messages::Success(__('AliasesUpdated'));
+
+							if (\slimMVC\Config::getInstance()->get('Log.SQL')) {
+								\ORM\Log::save('Update Alias', implode(";\n", $alias->queries()).';');
 							}
 						}
-					}
-					\Messages::Success(__('ChannelSaved'));
-					if ($AliasCount != 0) {
-						\Messages::Success(__('AliasesUpdated'));
 					}
 				} catch (Exception $e) {
 					\Messages::Error('['.$e->getCode().'] '.$e->getMessage());

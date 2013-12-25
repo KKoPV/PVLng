@@ -87,12 +87,13 @@
 	<!-- ENDIF -->
 
 	<script src="/js/jquery.tipTip.js+jquery.dataTables.js" defer></script>
-	<script src="/js/jquery.pnotify.js+jquery.icheck.js" defer></script>
+	<script src="/js/jquery.pnotify.js+jquery.icheck.js+jquery.number.min.js" defer></script>
 	<script src="/js/hoverIntent.js+superfish.js+supersubs.js+sprintf.js+lscache.js" defer></script>
 	<script src="/js/dataTables.js+script.js+shortcut.js"></script>
 
 	<script>
-		var PVLngAPI = 'http://{SERVERNAME}/api/r2/';
+		var PVLngAPI    = 'http://{SERVERNAME}/api/r2/';
+		var PVLngAPIkey = '<!-- IF {USER} -->{APIKEY}<!-- ENDIF -->';
 
 		/* Inititilize Pines Notify labels here */
 		var pnotify_defaults_labels_redisplay = '{{Redisplay}}';
@@ -100,6 +101,9 @@
 		var pnotify_defaults_labels_last = '{{Last}}';
 		var pnotify_defaults_labels_stick = '{{Stick}}';
 		var pnotify_defaults_labels_close = '{{Close}}';
+
+		var DecimalSeparator = '{DSEP}';
+		var ThousandSeparator = '{TSEP}';
 	</script>
 
 	{SCRIPTS}

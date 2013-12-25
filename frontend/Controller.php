@@ -33,8 +33,6 @@ class Controller extends slimMVC\Controller {
 		$this->view = $this->app->view;
 		$this->Layout = 'default';
 
-		$this->config->load(APP_DIR . DS . 'config.php', FALSE);
-
 		$controller = str_replace('Controller\\', '', get_class($this));
 
 		$this->config->loadNamespace('Controller.'.$controller,

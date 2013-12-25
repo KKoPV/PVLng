@@ -131,12 +131,7 @@ abstract class Channel {
 
 				$cfg = new ORM\Config('LogInvalid');
 
-				if ($cfg->value != 0) {
-					$log = new ORM\Log;
-					$log->scope = $this->name;
-					$log->data  = $msg;
-					$log->insert();
-				}
+				if ($cfg->value != 0) ORM\Log::save($this->name, $msg);
 
 				throw new Exception($msg, 200);
 			}
@@ -178,6 +173,8 @@ abstract class Channel {
 	 */
 	public function read( $request, $attributes=FALSE ) {
 
+		$logSQL = slimMVC\Config::getInstance()->get('Log.SQL');
+
 		$this->performance->action = 'read';
 
 		$this->before_read($request);
@@ -186,21 +183,35 @@ abstract class Channel {
 
 		$buffer = new Buffer;
 
-		if (!$this->meter AND $this->period[1] == self::LAST) {
-			// Simply read last data set for sensor channels
+		if ($this->period[1] == self::READLAST OR
+			// Simply read also last data set for sensor channels
+		    (!$this->meter AND $this->period[1] == self::LAST)) {
+
+			// Fetch last reading and set some data to 0 to get correct order
 			$q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
 			  ->get('timestamp')
 			  ->get('data')
-			  ->get('data', 'min')
-			  ->get('data', 'max')
-			  ->get(1, 'count')
+			  ->get(0, 'min')
+			  ->get(0, 'max')
+			  ->get(0, 'count')
 			  ->get(0, 'timediff')
-			  ->get(0, 'consumption')
+			  ->get($this->meter ? 'data' : 0, 'consumption')
 			  ->whereEQ('id', $this->entity)
 			  ->orderDescending('timestamp')
 			  ->limit(1);
+			$row = $this->db->queryRow($q);
 
-			$buffer->write((array) $this->db->queryRow($q));
+			if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
+
+			// Reset query and read add. data
+			$q->select($this->table[$this->numeric])
+			  ->get($q->MIN('data'), 'min')
+			  ->get($q->MAX('data'), 'max')
+			  ->get($q->COUNT('id'), 'count')
+			  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
+			  ->whereEQ('id', $this->entity);
+
+			$buffer->write(array_merge((array) $row, (array) $this->db->queryRow($q)));
 
 		} else {
 
@@ -260,12 +271,6 @@ abstract class Channel {
 
 			$q->whereEQ('id', $this->entity)->order('timestamp');
 
-			if (array_key_exists('sql', $request) AND $request['sql']) {
-				$sql = $this->name;
-				if ($this->description) $sql .= ' (' . $this->description . ')';
-				Header('X-SQL-'.substr(md5($sql), 25).': '.$sql.': '.$q);
-			}
-
 			if ($res = $this->db->query($q)) {
 
 				$offset = $last = 0;
@@ -310,6 +315,14 @@ abstract class Channel {
 				$buffer->write($lastRow);
 			}
 
+		}
+
+		if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
+
+		if (array_key_exists('sql', $request) AND $request['sql']) {
+			$sql = $this->name;
+			if ($this->description) $sql .= ' (' . $this->description . ')';
+			Header('X-SQL-'.substr(md5($sql), 25).': '.$sql.': '.$q);
 		}
 
 		return $this->after_read($buffer, $attributes);
@@ -370,47 +383,50 @@ abstract class Channel {
 	/**
 	 * Grouping
 	 */
-	const NO      =  0;
-	const MINUTE  = 10;
-	const HOUR    = 20;
-	const DAY     = 30;
-	const WEEK    = 40;
-	const MONTH   = 50;
-	const QUARTER = 60;
-	const YEAR    = 70;
-	const LAST    = 80;
-	const ALL     = 90;
+	const NO       =  0;
+	const MINUTE   = 10;
+	const HOUR     = 20;
+	const DAY      = 30;
+	const WEEK     = 40;
+	const MONTH    = 50;
+	const QUARTER  = 60;
+	const YEAR     = 70;
+	const LAST     = 80;
+	const READLAST = 81;
+	const ALL      = 90;
 
 	/**
 	 * Grouping SQLs
 	 */
 	protected $GroupBy = array(
-		self::NO      => '',
-		self::MINUTE  => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
-		self::HOUR    => '`timestamp` DIV (3600 * %f)',
-		self::DAY     => '`timestamp` DIV (86400 * %d)',
-		self::WEEK    => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
-		self::MONTH   => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
-		self::QUARTER => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
-		self::YEAR    => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
-		self::LAST    => '',
-		self::ALL     => '',
+		self::NO       => '',
+		self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
+		self::HOUR     => '`timestamp` DIV (3600 * %f)',
+		self::DAY      => '`timestamp` DIV (86400 * %d)',
+		self::WEEK     => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
+		self::MONTH    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
+		self::QUARTER  => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
+		self::YEAR     => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
+		self::LAST     => '',
+		self::READLAST => '',
+		self::ALL      => '',
 	);
 
 	/**
 	 *
 	 */
 	protected $TimestampMeterOffset = array(
-		self::NO      =>        0,
-		self::MINUTE  =>       60,
-		self::HOUR    =>     3600,
-		self::DAY     =>    86400,
-		self::WEEK    =>   604800,
-		self::MONTH   =>  2678400,
-		self::QUARTER =>  7776000,
-		self::YEAR    => 31536000,
-		self::LAST    =>        0,
-		self::ALL     =>        0,
+		self::NO       =>        0,
+		self::MINUTE   =>       60,
+		self::HOUR     =>     3600,
+		self::DAY      =>    86400,
+		self::WEEK     =>   604800,
+		self::MONTH    =>  2678400,
+		self::QUARTER  =>  7776000,
+		self::YEAR     => 31536000,
+		self::LAST     =>        0,
+		self::READLAST =>        0,
+		self::ALL      =>        0,
 	);
 
 	/**
@@ -496,6 +512,8 @@ abstract class Channel {
 
 		$this->value = $request['data'];
 
+		Hook::process('data.save.before', $this);
+
 		if ($this->numeric) {
 
 			$this->value = +$this->value;
@@ -509,11 +527,11 @@ abstract class Channel {
 
 				if ($this->value + $this->offset < $lastReading AND $this->adjust) {
 
-					$t = new ORM\Log;
-					$t->scope = $this->name;
-					$t->data  = sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
-					                    $this->offset, $lastReading, $this->value);
-					$t->insert();
+					ORM\Log::save(
+						$this->name,
+						sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
+						        $this->offset, $lastReading, $this->value)
+					);
 
 					// Update channel in database
 					$t = new ORM\Channel($this->entity);
@@ -528,8 +546,6 @@ abstract class Channel {
 			// Apply offset
 			$this->value += $this->offset;
 		}
-
-		Hook::process('data.save.before', $this);
 	}
 
 	/**
@@ -562,7 +578,7 @@ abstract class Channel {
 
 		if (isset($request['period'])) {
 			// normalize aggr. periods
-			if (preg_match('~^([.\d]*)(|l|last|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
+			if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
 			               $request['period'], $args)) {
 				$this->period = array($args[1]?:1, self::NO);
 				switch (substr($args[2], 0, 2)) {
@@ -574,6 +590,7 @@ abstract class Channel {
 					case 'q': case 'qa':  $this->period[1] = self::QUARTER;  break;
 					case 'y': case 'ye':  $this->period[1] = self::YEAR;     break;
 					case 'l': case 'la':  $this->period[1] = self::LAST;     break;
+					case 'r': case 're':  $this->period[1] = self::READLAST; break;
 					case 'a': case 'al':  $this->period[1] = self::ALL;      break;
 				}
 			} else {
