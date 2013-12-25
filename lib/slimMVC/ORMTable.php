@@ -370,7 +370,9 @@ abstract class ORMTable {
 			if (!is_array($values)) $values = array($values);
 			foreach ($fields as $id=>$field) {
 				if (!isset($values[$id])) continue;
-				$where[] = $field.' = '
+				$where[] = is_numeric($values[$id])
+				         ? $field.' = '.$values[$id]
+						 : $field.' = '
 				         . '"' . $this->app->db->real_escape_string($values[$id]) .'"';
 			}
 		}
@@ -407,7 +409,7 @@ abstract class ORMTable {
 		if ($this->app->db->errno == 1149) die($this->app->db->error . ' : ' . $sql);
 
 		if ($this->throwException AND $this->app->db->errno) {
-			throw new Exception($this->app->db->error, $this->app->db->errno);
+			throw new \Exception($this->app->db->error, $this->app->db->errno);
 		}
 
 		return $res;
