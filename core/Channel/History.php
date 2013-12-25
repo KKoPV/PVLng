@@ -86,7 +86,7 @@ class History extends \Channel {
 		$_start = $start;
 		$_end = $start + ($this->end - $this->start);
 
-		$i = 0;
+		$i = 1;
 
 		while ($_end <= $end) {
 			$request['start'] = $_start;
@@ -108,25 +108,20 @@ class History extends \Channel {
 	 *
 	 */
 	protected function overall( $request ) {
-
-		$q = \DBQuery::forge('pvlng_reading_num')
-		     ->get($q->YEAR($q->MIN($q->FROM_UNIXTIME('timestamp'))))
-		     ->whereEQ('id', $this->child->entity);
-
 		// Start year
-		$year = $this->db->QueryOne($q);
-
-		$result = new \Buffer;
+		$year = date('Y') - 11;
 		$i = 1;
 
-		while ($year < date('Y')) {
+		$result = new \Buffer;
+
+		while ($year <= date('Y')) {
+
 		    // Recalc dates to fetch into year
 		    list($m, $d) = explode('|', date('m|d', $this->start));
 		    $start = mktime(0, 0, 0, $m, $d, $year);
 
 		    list($m, $d) = explode('|', date('m|d', $this->end));
 		    $end = mktime(0, 0, 0, $m, $d, $year);
-
 			$buffer = $this->DayRange(
 				$request,
 				$start + $this->valid_from * 60*60*24,
@@ -136,10 +131,8 @@ class History extends \Channel {
 			$request['start'] = $this->start;
 			$request['end']   = $this->end;
 
-			$result = $this->combine($result, $buffer, $request, $i);
-
+			$result = $this->combine($result, $buffer, $request, $i++);
 			$year++;
-			$i++;
 		}
 
 		return $result;
