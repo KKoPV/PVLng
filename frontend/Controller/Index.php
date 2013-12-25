@@ -64,8 +64,10 @@ class Index extends \Controller {
 	 */
 	public function IndexPOST_Action() {
 
-		if ($view = $this->request->post('loadview')) {
-			// Load view from top select
+		if ($view = $this->request->post('top-loadview') OR
+		    ($this->request->post('load') AND
+		     $view = $this->request->post('loaddeleteview'))) {
+			// Load view
 			$this->loadView($view);
 		} elseif ($this->request->post('save') AND
 		          $view = $this->request->post('saveview')) {
@@ -80,13 +82,9 @@ class Index extends \Controller {
 				$this->loadView($view);
 			}
 
-		} elseif ($this->request->post('load') AND
-		          $view = $this->request->post('loaddeleteview')) {
-			// Load view
-			$this->loadView($view);
-
 		} elseif ($this->request->post('delete') AND
 		          $view = $this->request->post('loaddeleteview')) {
+
 			// Allowed only for logged in user
 			if (!\Session::get('user')) return;
 
@@ -148,7 +146,8 @@ class Index extends \Controller {
 			$views[] = array(
 				'NAME'     => $row->name,
 				'PUBLIC'   => $row->public,
-				'SELECTED' => ($row->name == $this->actView)
+				'SELECTED' => ($row->name == $this->actView),
+				'SLUG'     => $row->slug
 			);
 			if ($row->name == $this->actView AND $row->public) {
 				$this->view->ViewPublic = TRUE;

@@ -68,12 +68,12 @@
 
 	<label for="top-loadview" class="b" style="margin-right:1em">{{Variants}}:</label>
 
-	<select id="top-loadview" name="loadview" onChange="this.form.submit()">
+	<select id="top-loadview" name="top-loadview" onChange="this.form.submit()">
 		<option value="">--- {{Select}} ---</option>
 		<!-- BEGIN VIEWS -->
 			<!-- IF {__USER} -->
 				<!-- show all charts and mark public charts -->
-				<option value="{SLUG}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+				<option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
 					{NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
 				</option>
 			<!-- ELSEIF {PUBLIC} -->
