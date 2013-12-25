@@ -18,6 +18,13 @@ namespace ORM;
  */
 class Log extends \slimMVC\ORMTable {
 
+	public static function save( $scope, $data ) {
+		if (!self::$save) self::$save = new Log;
+		self::$save->scope = $scope;
+		self::$save->data = (string) $data;
+		self::$save->insert();
+	}
+
 	// -------------------------------------------------------------------------
 	// PROTECTED
 	// -------------------------------------------------------------------------
@@ -26,5 +33,10 @@ class Log extends \slimMVC\ORMTable {
 	 *
 	 */
 	protected $table = 'pvlng_log';
+
+	/**
+	 *
+	 */
+	protected static $save;
 
 }
