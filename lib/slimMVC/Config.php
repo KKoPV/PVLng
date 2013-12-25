@@ -117,15 +117,17 @@ class Config extends \Slim\Helper\Set {
 	 */
 	protected function array_replace_deep($base, $replace) {
 		// Loop through array key/value pairs
-		foreach ($replace as $key=>$value) {
-			if (is_array($value)) {
-				// Value is an array
-				// Traverse the array; replace or add result to original array
-				$base[$key] = $this->array_replace_deep(isset($base[$key])?$base[$key]:array(), $value);
-			} else {
-				// Value is not an array
-				// Replace or add current value to original array
-				$base[$key] = $value;
+		if (is_array($replace)) {
+			foreach ($replace as $key=>$value) {
+				if (is_array($value)) {
+					// Value is an array
+					// Traverse the array; replace or add result to original array
+					$base[$key] = $this->array_replace_deep(isset($base[$key])?$base[$key]:array(), $value);
+				} else {
+					// Value is not an array
+					// Replace or add current value to original array
+					$base[$key] = $value;
+				}
 			}
 		}
 		// Return the joined array
