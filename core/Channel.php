@@ -131,12 +131,7 @@ abstract class Channel {
 
 				$cfg = new ORM\Config('LogInvalid');
 
-				if ($cfg->value != 0) {
-					$log = new ORM\Log;
-					$log->scope = $this->name;
-					$log->data  = $msg;
-					$log->insert();
-				}
+				if ($cfg->value != 0) ORM\Log::save($this->name, $msg);
 
 				throw new Exception($msg, 200);
 			}
@@ -178,6 +173,8 @@ abstract class Channel {
 	 */
 	public function read( $request, $attributes=FALSE ) {
 
+		$logSQL = slimMVC\Config::getInstance()->get('Log.SQL');
+
 		$this->performance->action = 'read';
 
 		$this->before_read($request);
@@ -203,6 +200,8 @@ abstract class Channel {
 			  ->orderDescending('timestamp')
 			  ->limit(1);
 			$row = $this->db->queryRow($q);
+
+			if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
 
 			// Reset query and read add. data
 			$q->select($this->table[$this->numeric])
@@ -317,6 +316,8 @@ abstract class Channel {
 			}
 
 		}
+
+		if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
 
 		if (array_key_exists('sql', $request) AND $request['sql']) {
 			$sql = $this->name;
@@ -526,11 +527,11 @@ abstract class Channel {
 
 				if ($this->value + $this->offset < $lastReading AND $this->adjust) {
 
-					$t = new ORM\Log;
-					$t->scope = $this->name;
-					$t->data  = sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
-					                    $this->offset, $lastReading, $this->value);
-					$t->insert();
+					ORM\Log::save(
+						$this->name,
+						sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
+						        $this->offset, $lastReading, $this->value)
+					);
 
 					// Update channel in database
 					$t = new ORM\Channel($this->entity);
