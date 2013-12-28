@@ -86,7 +86,7 @@
     <script src="/js/jquery-ui-i18n.min.js"></script>
     <!-- ENDIF -->
 
-    <script src="/js/jquery.tipTip.js+jquery.dataTables.js" defer></script>
+    <script src="/js/jquery.tipTip.js+jquery.dataTables.min.js" defer></script>
     <script src="/js/jquery.pnotify.js+jquery.icheck.js+jquery.number.min.js" defer></script>
     <script src="/js/hoverIntent.js+superfish.js+supersubs.js+sprintf.js+lscache.js" defer></script>
     <script src="/js/dataTables.js+script.js+shortcut.js"></script>
