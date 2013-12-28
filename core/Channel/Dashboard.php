@@ -21,20 +21,11 @@ namespace Channel;
 class Dashboard extends Calculator {
 
     /**
-     * Inherit name and description from wrapped channel
-     */
-    public static function afterEdit( \ORM\Channel &$channel ) {
-        $channel_for = \Channel::byGUID($channel->channel);
-        $channel->name = $channel_for->name;
-        $channel->description = $channel_for->description;
-    }
-
-    /**
      *
      */
     public function read( $request, $attributes=FALSE ) {
 
-        $channel = \Channel::byGUID($this->channel);
+        $channel = $this->getChild(1);
 
         // Get some properties from child
         $this->meter = $channel->meter;

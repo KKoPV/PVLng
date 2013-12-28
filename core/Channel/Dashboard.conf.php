@@ -21,23 +21,23 @@ return array(
      * - required             : (TRUE|FALSE), default FALSE
      * - default             : default value
      */
-    'name' => array(
-        'visible' => FALSE,
-    ),
-    'description' => array(
-        'visible' => FALSE,
-    ),
     'serial' => array(
         'visible' => FALSE,
     ),
     'channel' => array(
-        'required' => TRUE,
+        'visible' => FALSE,
     ),
     'numeric' => array(
         'visible' => FALSE,
     ),
     'meter' => array(
         /* Get the info from the child */
+        'visible' => FALSE,
+    ),
+    'offset' => array(
+        'visible' => FALSE,
+    ),
+    'adjust' => array(
         'visible' => FALSE,
     ),
     'threshold' => array(
