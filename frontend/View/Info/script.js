@@ -1,4 +1,4 @@
-<script>
+<!--
 /**
  *
  *
@@ -7,6 +7,9 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     $Id$
  */
+-->
+
+<script>
 
 $(function() {
 
@@ -36,12 +39,13 @@ $(function() {
 	});
 
 	$('#table-info').DataTable({
-		bJQueryUI: true,
-		bPaginate: false,
+		bSort: false,
 		bLengthChange: false,
 		bFilter: false,
-		bSort: false,
-		bInfo: false
+		bInfo: false,
+		bPaginate: false,
+		bJQueryUI: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
 	});
 
 	$('#regenerate').click(function() {
@@ -51,15 +55,13 @@ $(function() {
 	});
 
 	$('#table-stats').DataTable({
-		bJQueryUI: true,
-		bPaginate: false,
+		bSort: true,
 		bLengthChange: false,
 		bFilter: false,
 		bInfo: false,
-		aaSorting: [[0, 'asc']],
-		aoColumnDefs: [
-			{ sType: 'numeric-' + (('{LANGUAGE}' == 'de') ? 'comma' : 'dot'), aTargets: [4] }
-		]
+		bPaginate: false,
+		bJQueryUI: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
 	});
 
 });

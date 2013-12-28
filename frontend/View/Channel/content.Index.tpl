@@ -9,6 +9,11 @@
  */
 -->
 
+<!-- Use this image as spacer for not available actions of channels -->
+<!-- DEFINE MACRO SpacerImg -->
+<img src="/images/pix.gif" class="imgbar wide" style="width:16px;height:16px" width="16" height="16" alt="" />
+<!-- END DEFINE -->
+
 <div class="grid_10">
 
 <div>{MESSAGE}</div>
@@ -69,9 +74,7 @@
 			<img src="/images/ico/write.png" class="imgbar tip" alt="w"
 			     style="width:16px;height:16px" width="16p" height="16"
 			     title="{{WritableEntity}}" />
-			<!-- ELSE -->
-			<img src="/images/pix.gif" class="imgbar" width="16p" height="16" alt="" />
-			<!-- ENDIF -->
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 			<!-- IF {READ} -->
 			<img src="/images/ico/read.png" class="imgbar tip" alt="r"
 			     style="width:16px;height:16px" width="16p" height="16"
@@ -84,18 +87,11 @@
 			<a href="/channel/edit/{ID}" class="tip" title="{{EditEntity}}">
 				<img src="/images/ico/node_design.png" class="imgbar wide" alt="e" width="16" height="16" />
 			</a>
+			<!-- IF {TYPE_ID} != 0 -->
 			<a href="/channel/add/{ID}" class="tip" title="{{CloneEntity}}">
 				<img src="/images/ico/node_select_child.png" class="imgbar wide" alt="c" width="16" height="16" />
 			</a>
-			<!-- IF {CHILDS} -->
-			<form action="/channel/alias" method="post">
-			<input type="hidden" name="id" value="{ID}" />
-			<input type="image" src="/images/ico/arrow-split.png" alt="a"
-			       style="background-color:transparent" class="imgbar wide tip nb" title="{{AliasEntity}}" />
-			</form>
-			<!-- ELSE -->
-			<img src="/images/pix.gif" class="imgbar wide" width="16" height="16" alt="" />
-			<!-- ENDIF -->
+			<!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 			<form id="df{ID}" action="/channel/delete" method="post" class="delete-form">
 			<input type="hidden" name="id" value="{ID}" />
 			<input type="image" src="/images/ico/node_delete.png" alt="-"

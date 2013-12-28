@@ -11,7 +11,7 @@
 
 <!-- Use this image as spacer for not available moving actions of channels -->
 <!-- DEFINE MACRO SpacerImg -->
-<img src="/images/pix.gif" class="imgbar" width="16p" height="16" alt="" />
+<img src="/images/pix.gif" class="imgbar" style="width:16px;height:16px" width="16" height="16" alt="" />
 <!-- END DEFINE -->
 
 <div class="grid_10">
@@ -94,7 +94,7 @@
 				     width="16p" height="16" alt="edit" />
 			</a>
 
-			<!-- IF {CHILDS} -->
+			<!-- IF {ACCEPTCHILDS} AND {GUID} AND !{ALIAS} -->
 			<form action="/channel/alias" method="post">
 			<input type="hidden" name="id" value="{ENTITY}" />
 			<input type="image" src="/images/ico/arrow-split.png"
@@ -219,16 +219,16 @@
 	    {{MoveChannelHowMuchRows}}
 	</p>
 	<p>
-		<div style="float:left;width:25px">
+		<div style="float:left;padding-top:4px;width:35px">
 			<input type="radio" class="iCheck" id="countmax" name="countmax" value="0" checked="checked" />
 		</div>
 		<label for="countmax">
-			<input type="number" step="1" style="width:3em"class="numbersOnly" name="count" value="1" />
+			<input type="number" step="1" style="width:3em;margin-right:.5em" class="numbersOnly" name="count" value="1" />
 			{{Positions}}
 		</label>
 	</p>
 	<p>
-		<div style="float:left;width:25px">
+		<div style="float:left;padding-top:4px;width:35px">
 			<input type="radio" class="iCheck" id="movecountmax" name="countmax" value="1" />
 		</div>
 		<label for="movecountmax">{{MoveChannelStartEnd}}</label>

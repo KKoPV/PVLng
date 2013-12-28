@@ -213,7 +213,7 @@ function ToggleTree( force ) {
 		});
 	}
 
-    $('#tree tbody tr:visible').each(function(id, el) {
+	$('#tree tbody tr:visible').each(function(id, el) {
 		el = $(el);
 		if (id & 1) {
 			/* Set to odd if needed */
@@ -627,12 +627,13 @@ $(function() {
 	});
 
 	$('#tree').DataTable({
-		bPaginate: false,
+		bSort: false,
 		bLengthChange: false,
 		bFilter: false,
-		bSort: false,
 		bInfo: false,
-		bJQueryUI: true
+		bPaginate: false,
+		bJQueryUI: true,
+		oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
 	});
 
 	$('.treeTable').treetable({

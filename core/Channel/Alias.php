@@ -20,11 +20,11 @@ class Alias extends \Channel {
 	protected function __construct( \ORM\Tree $channel ) {
 
 		$org = new \ORM\Tree;
-		$org->find('guid', $channel->channel);
+		$org->find('id', $channel->alias_of);
 
 		if ($org->id) return parent::__construct($org);
 
-		throw new Exception('No channel found for GUID: '.$channel->channel, 400);
+		throw new \Exception('No aliased channel found', 400);
 	}
 
 	/**

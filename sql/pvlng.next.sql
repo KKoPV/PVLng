@@ -6,7 +6,69 @@ ALTER TABLE `pvlng_channel` ADD `adjust` tinyint(1) unsigned NOT NULL COMMENT 'a
 ALTER TABLE `pvlng_view` ADD UNIQUE `slug` (`slug`);
 
 CREATE OR REPLACE VIEW `pvlng_tree_view` AS
-select `tree`.`id` AS `id`,`tree`.`entity` AS `entity`,if((`t`.`childs` <> 0),`tree`.`guid`,`c`.`guid`) AS `guid`,`c`.`name` AS `name`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`description` AS `description`,`c`.`resolution` AS `resolution`,`c`.`cost` AS `cost`,`c`.`meter` AS `meter`,`c`.`numeric` AS `numeric`,`c`.`offset` AS `offset`,`c`.`adjust` AS `adjust`,`c`.`unit` AS `unit`,`c`.`decimals` AS `decimals`,`c`.`threshold` AS `threshold`,`c`.`valid_from` AS `valid_from`,`c`.`valid_to` AS `valid_to`,`c`.`public` AS `public`,`c`.`comment` AS `comment`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`graph` AS `graph`,`t`.`icon` AS `icon` from ((`pvlng_tree` `tree` join `pvlng_channel` `c` on((`tree`.`entity` = `c`.`id`))) join `pvlng_type` `t` on((`c`.`type` = `t`.`id`)));
+    select
+        `tree`.`id` AS `id`,
+        `tree`.`entity` AS `entity`,
+        if(`t`.`childs`,
+            `tree`.`guid`,
+            `c`.`guid`) AS `guid`,
+        if(`co`.`id`, `co`.`name`, `c`.`name`) AS `name`,
+        if(`co`.`id`,
+            `co`.`serial`,
+            `c`.`serial`) AS `serial`,
+        `c`.`channel` AS `channel`,
+        if(`co`.`id`,
+            `co`.`description`,
+            `c`.`description`) AS `description`,
+        if(`co`.`id`,
+            `co`.`resolution`,
+            `c`.`resolution`) AS `resolution`,
+        if(`co`.`id`, `co`.`cost`, `c`.`cost`) AS `cost`,
+        if(`co`.`id`, `co`.`meter`, `c`.`meter`) AS `meter`,
+        if(`co`.`id`,
+            `co`.`numeric`,
+            `c`.`numeric`) AS `numeric`,
+        if(`co`.`id`,
+            `co`.`offset`,
+            `c`.`offset`) AS `offset`,
+        if(`co`.`id`,
+            `co`.`adjust`,
+            `c`.`adjust`) AS `adjust`,
+        if(`co`.`id`, `co`.`unit`, `c`.`unit`) AS `unit`,
+        if(`co`.`id`,
+            `co`.`decimals`,
+            `c`.`decimals`) AS `decimals`,
+        if(`co`.`id`,
+            `co`.`threshold`,
+            `c`.`threshold`) AS `threshold`,
+        if(`co`.`id`,
+            `co`.`valid_from`,
+            `c`.`valid_from`) AS `valid_from`,
+        if(`co`.`id`,
+            `co`.`valid_to`,
+            `c`.`valid_to`) AS `valid_to`,
+        if(`co`.`id`,
+            `co`.`public`,
+            `c`.`public`) AS `public`,
+        `c`.`comment` AS `comment`,
+        `t`.`name` AS `type`,
+        `t`.`model` AS `model`,
+        `t`.`childs` AS `childs`,
+        `t`.`read` AS `read`,
+        `t`.`write` AS `write`,
+        `t`.`graph` AS `graph`,
+        `t`.`icon` AS `icon`,
+        `ca`.`id` AS `alias`,
+        `ta`.`id` AS `alias_of`
+    from
+        (((((`pvlng_tree` `tree`
+        join `pvlng_channel` `c` ON ((`tree`.`entity` = `c`.`id`)))
+        join `pvlng_type` `t` ON ((`c`.`type` = `t`.`id`)))
+        left join `pvlng_channel` `ca` ON (((if(`t`.`childs`, `tree`.`guid`, `c`.`guid`) = `ca`.`channel`)
+            and (`ca`.`type` = 0))))
+        left join `pvlng_tree` `ta` ON ((`c`.`channel` = `ta`.`guid`)))
+        left join `pvlng_channel` `co` ON (((`ta`.`entity` = `co`.`id`)
+            and (`c`.`type` = 0))));
 
 CREATE OR REPLACE VIEW `pvlng_channel_view` AS
 select `c`.`id` AS `id`,`c`.`guid` AS `guid`,`c`.`name` AS `name`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`description` AS `description`,`c`.`resolution` AS `resolution`,`c`.`cost` AS `cost`,`c`.`numeric` AS `numeric`,`c`.`offset` AS `offset`,`c`.`adjust` AS `adjust`,`c`.`unit` AS `unit`,`c`.`decimals` AS `decimals`,`c`.`meter` AS `meter`,`c`.`threshold` AS `threshold`,`c`.`valid_from` AS `valid_from`,`c`.`valid_to` AS `valid_to`,`t`.`id` AS `type_id`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`graph` AS `graph`,`t`.`icon` AS `icon` from (`pvlng_channel` `c` join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) where (`c`.`id` <> 1);

@@ -43,28 +43,31 @@
 			<label for="{FIELD}">{NAME}</label>
 			<!-- IF {REQUIRED} -->
 				<img style="width:16px;height:16px" width="16" height="16"
-				     src="/images/required.gif" alt="*" />
+					src="/images/required.gif" alt="*" />
 			<!-- ENDIF -->
 		</td>
 		<td style="white-space:nowrap">
 			<!-- IF {TYPE} == "radio" -->
-			    <div class="fl">
+				<div class="fl">
 					<input type="radio" id="y{FIELD}" name="c[{FIELD}]" value="1"
-					       class="iCheckLine" style="margin-right:.3em"
-					       <!-- IF {VALUE} == 1 -->checked="checked"<!-- ENDIF --> />
+						class="iCheckLine" style="margin-right:.3em"
+						<!-- IF {READONLY} --> readonly="readonly"<!-- ENDIF -->
+						<!-- IF {VALUE} == 1 --> checked="checked"<!-- ENDIF --> />
 					<label for="y{FIELD}">{{Yes}}</label>
 				</div>
-			    <div class="fl" style="margin-left:1em">
+				<div class="fl" style="margin-left:1em">
 					<input type="radio" id="n{FIELD}" name="c[{FIELD}]" value="0"
-					       class="iCheckLine" style="margin-right:.3em"
-					       <!-- IF {VALUE} == 0 -->checked="checked"<!-- ENDIF --> />
+						class="iCheckLine" style="margin-right:.3em"
+						<!-- IF {READONLY} --> readonly="readonly"<!-- ENDIF -->
+						<!-- IF {VALUE} == 0 --> checked="checked"<!-- ENDIF --> />
 					<label for="n{FIELD}">{{No}}</label>
 				</div>
 			<!-- ELSEIF {TYPE} == "textarea" -->
-				<textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%"
-				          rows="4">{VALUE}</textarea>
+				<textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="4"
+					<!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>{VALUE}</textarea>
 			<!-- ELSE -->
-				<input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="50" />
+				<input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="50"
+					<!-- IF {READONLY} -->class="ro" readonly="readonly"<!-- ENDIF --> />
 			<!-- ENDIF -->
 		</td>
 		<td>

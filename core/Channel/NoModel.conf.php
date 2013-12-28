@@ -35,6 +35,15 @@ return array(
 	'numeric' => array(
 		'visible' => FALSE,
 	),
+	'offset' => array(
+		'visible' => FALSE,
+	),
+	'adjust' => array(
+		'visible' => FALSE,
+	),
+	'public' => array(
+		'visible' => FALSE,
+	),
 	'cost' => array(
 		'visible' => FALSE,
 	),

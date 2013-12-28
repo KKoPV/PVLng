@@ -74,12 +74,13 @@ function rearrangeStripes() {
 $(function() {
 
 	oTable = $('#tree').DataTable({
-		bPaginate: false,
+		bSort: false,
 		bLengthChange: false,
 		bFilter: false,
-		bSort: false,
 		bInfo: false,
-		bJQueryUI: true
+		bPaginate: false,
+		bJQueryUI: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
 	}).disableSelection();
 
 	lscache.setBucket('Overview');
@@ -140,8 +141,6 @@ $(function() {
 	});
 
     $('.draggable').draggable({
-		containment: $('#tree'),
-		/* axis: 'y', */
 		distance: 5,
 		opacity: .9,
 		revert: true,
@@ -180,7 +179,7 @@ $(function() {
 		width: 650,
 		modal: true,
 		buttons: {
-			'{{Add}}'	 : function() { $('#form-addchild').submit() },
+			'{{Add}}': function() { $('#form-addchild').submit() },
 			'{{Cancel}}': function() { $(this).dialog('close'); return false }
 		}
 	});

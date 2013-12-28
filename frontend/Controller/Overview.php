@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-22-g7bc4608 2013-05-05 22:07:15 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 namespace Controller;
 
@@ -45,9 +45,12 @@ class Overview extends \Controller {
 		$this->view->SubTitle = \I18N::_('Overview');
 
 		$tree = $this->Tree->getFullTree();
+		// Skip root node
 		array_shift($tree);
 
 		$parent = array( 1 => 0 );
+
+		$entity = new \ORM\Tree;
 
 		$data = array();
 		foreach ($tree as $i=>$node) {
@@ -55,27 +58,18 @@ class Overview extends \Controller {
 			$parent[$node['level']] = $node['id'];
 			$node['parent'] = $parent[$node['level']-1];
 
-			if ($entity = $this->model->getEntity($node['entity'])) {
-
+			if ($entity->find('id', $node['id'])) {
 				$node['type']         = $entity->type;
 				$node['name']         = $entity->name;
 				$node['unit']         = $entity->unit;
 				$node['description']  = $entity->description;
-				$node['guid']         = $node['guid'] ?: $entity->guid;
+				$node['guid']         = $entity->guid;
 				$node['acceptchilds'] = $entity->childs;
 				$node['read']         = $entity->read;
 				$node['write']        = $entity->write;
 				$node['public']       = $entity->public;
 				$node['icon']         = $entity->icon;
-
-				if ($entity->model) {
-					$e = \Channel::byId($node['id']);
-					$node['name']        = $e->name;
-					$node['description'] = $e->description;
-					$node['unit']        = $e->unit;
-					$node['icon']        = $e->icon;
-				}
-
+				$node['alias']        = $entity->alias;
 			}
 			$data[] = array_change_key_case($node, CASE_UPPER);
 		}
@@ -100,7 +94,13 @@ class Overview extends \Controller {
 	 */
 	public function DeletePOST_Action() {
 		if ($id = $this->request->post('id')) {
-			$this->Tree->DeleteNode($id);
+			if ($this->AliasInTree($id)) {
+				\Messages::Error(__('AliasStillInTree'), TRUE);
+			} else {
+				// Alias channel if exists will be deleted by trigger,
+				// because it is only valid for a channel in tree!
+				$this->Tree->DeleteNode($id);
+			}
 		}
 		$this->redirect();
 	}
@@ -110,7 +110,13 @@ class Overview extends \Controller {
 	 */
 	public function DeleteBranchPOST_Action() {
 		if ($id = $this->request->post('id')) {
-			$this->Tree->DeleteBranch($id);
+			if ($this->AliasInTree($id)) {
+				\Messages::Error(__('AliasStillInTree'), TRUE);
+			} else {
+				// Alias channel if exists will be deleted by trigger,
+				// because it is only valid for a channel in tree!
+				$this->Tree->DeleteBranch($id);
+			}
 		}
 		$this->redirect();
 	}
@@ -162,8 +168,8 @@ class Overview extends \Controller {
 	 */
 	public function MoveLeftPOST_Action() {
 		if ($id = $this->request->post('id')) {
-			// Set an absurd high value, loop breaks anyway if can't move anymore...
-			$count = $this->request->post('countmax') ? 99999 : $this->request->post('count', 1);
+			// Set an off-wall high value, loop breaks anyway if can't move anymore...
+			$count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
 		    while ($count--) {
 				if (!$this->Tree->moveLft($id)) break;
 			}
@@ -176,8 +182,8 @@ class Overview extends \Controller {
 	 */
 	public function MoveRightPOST_Action() {
 		if ($id = $this->request->post('id')) {
-			// Set an absurd high value, loop breaks anyway if can't move anymore...
-			$count = $this->request->post('countmax') ? 99999 : $this->request->post('count', 1);
+			// Set an off-wall high value, loop breaks anyway if can't move anymore...
+			$count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
 		    while ($count--) {
 				if (!$this->Tree->moveRgt($id)) break;
 			}
@@ -221,4 +227,15 @@ class Overview extends \Controller {
 		Header('Location: /overview');
 		exit;
 	}
+
+	/**
+	 * Find out if channel to delete has an alias channel and
+	 * if the alias channel is still in tree
+	 */
+	protected function AliasInTree( $id ) {
+		$node = new \ORM\Tree;
+		return ($node->find('id', $id)->alias AND
+		        $node->find('entity', $node->alias)->id);
+	}
+
 }

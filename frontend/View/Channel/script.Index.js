@@ -48,11 +48,13 @@ $(function() {
 	});
 
 	$('#entities').DataTable({
+		bSort: true,
+		bLengthChange: false,
 		bFilter: false,
 		bInfo: false,
 		bPaginate: false,
-		bLengthChange: false,
 		bJQueryUI: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
 		aoColumns: [
 			{ 'asSorting': false },
 			null,
@@ -64,7 +66,7 @@ $(function() {
 			null,
 			{ 'asSorting': false }
 		],
-		aaSorting: [[ 1, "asc" ]]
+		aaSorting: [[ 1, 'asc' ]]
 	});
 
 	$("#dialog-confirm").dialog({

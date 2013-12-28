@@ -14,11 +14,13 @@
 $(function() {
 
 	$('#dataTable').DataTable({
-		bPaginate: false,
-		bFilter: false,
+		bSort: true,
 		bLengthChange: false,
+		bFilter: true,
 		bInfo: false,
+		bPaginate: false,
 		bJQueryUI: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
 		aoColumns: [
 			{ 'asSorting': false },
 			null,

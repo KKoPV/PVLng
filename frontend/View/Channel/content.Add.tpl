@@ -18,7 +18,9 @@
 <table id="dataTable" class="dataTable">
 	<thead>
 	<tr>
-		<th style="width:1%"></th>
+		<th style="width:1%">
+			<input type="radio" name="type" value="" class="iCheck" checked="checked" />
+		</th>
 		<th>{{EntityType}}</th>
 		<th style="width:1%">{{Unit}}</th>
 		<th>{{Model}}</th>
@@ -34,7 +36,7 @@
 			<input type="radio" name="type" value="{ID}" class="iCheck" />
 		</td>
 		<td nowrap>
-			<img style="vertical-align:middle;margin-right:5px"
+			<img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
 			     src="{ICON}" width="16" height="16" alt="" />
 			<strong>{NAME}</strong>
 		</td>
@@ -70,7 +72,7 @@
 	</tbody>
 </table>
 
-<p><input type="submit" value="{{Select}}" /></p>
+<p><input type="submit" value="{{proceed}} &raquo;" /></p>
 
 </form>
 

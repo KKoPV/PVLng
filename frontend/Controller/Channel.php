@@ -18,19 +18,19 @@ class Channel extends \Controller {
 	 *
 	 */
 	public function before() {
-		$this->view->Entities = $this->rows2view($this->model->getEntities());
-
-		$fields = include __DIR__ . DS . 'channel.conf.php';
+		$q = \DBQuery::forge('pvlng_channel_view');
+		$this->view->Entities = $this->rows2view($this->db->queryRows($q));
 
 		$this->fields = array();
 
-		foreach ($fields as $key=>$field) {
+		foreach (include __DIR__ . DS . 'channel.conf.php' as $key=>$field) {
 			$this->fields[$key] = array_merge(array(
 				'VISIBLE'  => TRUE,
 				'FIELD'    => $key,
 				'TYPE'     => 'text',
 				'DEFAULT'  => '',
 				'REQUIRED' => FALSE,
+				'READONLY' => FALSE,
 				'NAME'     => __('channel::'.$key),
 				'HINT'     => __('channel::'.$key.'Hint'),
 			), array_change_key_case($field, CASE_UPPER));
@@ -116,17 +116,20 @@ class Channel extends \Controller {
 		$entity->find('entity', $this->request->post('id'));
 
 		if ($entity->id) {
-			$alias = new \ORM\Channel();
-			if ($alias->find('channel', $entity->guid)->id) {
+			if ($entity->alias) {
 				\Messages::Error(__('AliasStillExists'));
 			} else {
 				$alias = new \ORM\Channel;
 				$alias->name = $entity->name;
 				$alias->description = $entity->description;
 				$alias->channel = $entity->guid;
-				$alias->public = $entity->public;
 				$alias->unit = $entity->unit;
+				$alias->private = $entity->private;
 				$alias->type = 0;
+				$alias->comment = 'Alias of ['.$entity->id.'] '.$entity->name;
+				if ($entity->description) {
+					$alias->comment .= ' ('.$entity->description.')';
+				}
 				$alias->insert();
 
 				if (!$alias->isError()) {
@@ -182,13 +185,12 @@ class Channel extends \Controller {
 						\Messages::Success(__('ChannelSaved'));
 
 						// Update possible alias channel!
-						// Find channel itself in tree to get GUID
 						$tree = new \ORM\Tree;
-						$tree->find('entity', $entity->id);
-						// Alias channel
-						$alias = new \ORM\Channel;
-						// Any channel with this GUID and type 0 (Alias)?
-						if ($alias->find(array('channel', 'type'), array($tree->guid, 0))) {
+
+						// Find channel itself in tree to get alias Id
+						if ($tree->find('entity', $entity->id)->alias) {
+							// Alias channel
+							$alias = new \ORM\Channel($tree->alias);
 							$alias->name = $entity->name;
 							$alias->description = $entity->description;
 							$alias->public = $entity->public;
@@ -197,6 +199,7 @@ class Channel extends \Controller {
 							\Messages::Success(__('AliasesUpdated'));
 
 							if (\slimMVC\Config::getInstance()->get('Log.SQL')) {
+								\ORM\Log::save('Update Alias', implode(";\n", $tree->queries()).';');
 								\ORM\Log::save('Update Alias', implode(";\n", $alias->queries()).';');
 							}
 						}
@@ -246,7 +249,6 @@ class Channel extends \Controller {
 				\Messages::Success(__('ChannelDeleted', $name));
 			} else {
 				\Messages::Error(__($entity->Error(), $entity->name), TRUE);
-#				\Messages::Info(implode(";\n", $entity->queries()).';');
 			}
 		}
 

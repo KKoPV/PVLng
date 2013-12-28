@@ -241,9 +241,16 @@ class DBQuery {
 	/**
 	 *
 	 */
-	public function group( $field ) {
+	public function groupBy( $field ) {
 		$this->group[] = $this->field($field);
 		return $this;
+	}
+
+	/**
+	 *
+	 */
+	public function group( $field ) {
+		return $this->groupBy($field);
 	}
 
 	/**

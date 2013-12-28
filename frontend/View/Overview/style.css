@@ -21,9 +21,9 @@
 }
 
 .droppable.odd {
-	border-left: 4px solid #E2E4FF;
-	border-top: 1px solid #E2E4FF;
-	border-bottom: 1px solid #E2E4FF;
+	border-left: 4px solid white;
+	border-top: 1px solid #EEE;
+	border-bottom: 1px solid #EEE;
 }
 
 .droppable.even {

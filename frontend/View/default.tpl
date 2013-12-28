@@ -104,6 +104,8 @@
 
 		var DecimalSeparator = '{DSEP}';
 		var ThousandSeparator = '{TSEP}';
+
+		var language = '{LANGUAGE}';
 	</script>
 
 	{SCRIPTS}

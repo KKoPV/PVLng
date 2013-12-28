@@ -18,7 +18,7 @@ return array(
 		'visible' => FALSE,
 	),
 	'channel' => array(
-		'required' => TRUE,
+		'readonly' => TRUE,
 	),
 	'decimals' => array(
 		'visible' => FALSE,
@@ -34,6 +34,15 @@ return array(
 		'visible'  => FALSE,
 	),
 	'meter' => array(
+		'visible' => FALSE,
+	),
+	'offset' => array(
+		'visible' => FALSE,
+	),
+	'adjust' => array(
+		'visible' => FALSE,
+	),
+	'public' => array(
 		'visible' => FALSE,
 	),
 	'threshold' => array(

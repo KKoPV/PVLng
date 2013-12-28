@@ -28,19 +28,20 @@
 			<code class="b">
 				http://{SERVERNAME}/api/r2/\{action\}/\{GUID\}
 			</code>
-			<p>{{SeeAPIReference}}</p>
+			<br /><br />
+			{{SeeAPIReference}}
 		</td>
 	</tr>
 	<tr>
 		<td style="vertical-align:top">{{YourAPIcode}}</td>
 		<td>
-			<code class="b">X-PVLng-Key: {APIKEY}</code>
 			<form method="post" style="float:right">
 				<input type="hidden" name="regenerate" value="1" />
 				<input id="regenerate" type="submit" value="{{Regenerate}}" />
 			</form>
-			<div class="clear"/></div>
-			<p>{{DontForgetUpdateAPIKey}}</p>
+			<code class="b">X-PVLng-Key: {APIKEY}</code>
+			<br /><br />
+			{{DontForgetUpdateAPIKey}}
 		</td>
 	</tr>
 	</tbody>
