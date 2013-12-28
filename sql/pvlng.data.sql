@@ -1,21 +1,14 @@
--- --------------------------------------------------------------------------
--- @author      Knut Kohl <github@knutkohl.de>
--- @copyright   2012-2013 Knut Kohl
--- @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
--- @version     1.0.0
--- --------------------------------------------------------------------------
-
---
--- Initial data
---
+-- ------------------------------------------------------
+-- Initial channel data and demo views
+-- ------------------------------------------------------
 
 INSERT INTO `pvlng_channel`
 (`id`, `name`, `description`, `type`, `resolution`, `unit`, `decimals`, `meter`, `cost`, `threshold`, `valid_from`, `valid_to`, `comment`) VALUES
 (1, 'DO NOT TOUCH', 'Dummy for tree root',    0, 0, '', 2, 0, 0, NULL, NULL, NULL, ''),
-(2, 'RANDOM Temperature sensor', '15 ... 25, &plusmn;0.5', 10, 1, '°C', 1, 0, 0, 0.5, 15, 25, ''),
+(2, 'RANDOM Temperature sensor', '15 ... 25, &plusmn;0.1', 10, 1, '°C', 1, 0, 0, 0.1, 15, 25, ''),
 (3, 'RANDOM Energy meter', '0 ... &infin;, +0.05',   10, 1000, 'Wh', 0, 1, 0.0002, 0.05, 0, 10000000000, ''),
 (4, 'Dashboard', 'Dashboard group', 5, 1, '', 2, 0, 0, NULL, NULL, NULL, ''),
-(5, 'Temperature sensor', 'RANDOM Temperature sensor for Dashboard', 30, 1, '°C', 1, 0, 0, NULL, 0, 30, '> 10 : #BFB\n10 > 20 : #FFB\n20 > : #FBB');
+(5, 'Temperature sensor', 'RANDOM Temperature sensor for Dashboard', 30, 1, '°C', 1, 0, 0, NULL, 0, 40, '> 10 : #BFB\n10 > 20 : #FFB\n20 > : #FBB');
 
 INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`) VALUES
 ('Currency', 'EUR', 'Costs currency', 'str'),
@@ -31,5 +24,9 @@ INSERT INTO `pvlng_view` (`name`, `data`, `public`, `slug`) VALUES
 
 INSERT INTO `pvlng_config` (`key`, `value`) VALUES
 ('dashboard', '[5]');
+
+-- ------------------------------------------------------
+-- Generate and show API key
+-- ------------------------------------------------------
 
 SELECT `getAPIkey`() AS `PVLng API key`;
