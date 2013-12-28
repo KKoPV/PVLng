@@ -9,11 +9,11 @@
  */
 return array(
 
-	/**
-	 * Possible keys:
-	 * - type     : (text|radio|textarea), default text
-	 * - default  : a default value
-	 * - required : (TRUE|FALSE), default FALSE
-	 */
+    /**
+     * Possible keys:
+     * - type     : (text|radio|textarea), default text
+     * - default  : a default value
+     * - required : (TRUE|FALSE), default FALSE
+     */
 
 );

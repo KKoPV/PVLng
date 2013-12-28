@@ -3,7 +3,7 @@
 @import "960.10.fluid.css";
 
 body {
-	font-family: Verdana, Arial, sans-serif;
+    font-family: Verdana, Arial, sans-serif;
 }
 
 #content {
@@ -11,23 +11,23 @@ body {
 }
 
 hr {
-	height: 0;
-	border: 0;
-	border-top: dotted gray 1px;
+    height: 0;
+    border: 0;
+    border-top: dotted gray 1px;
 }
 
 div.hr {
-	margin-top: .5em;
-	margin-bottom: .5em;
-	border-top: dotted 1px gray;
+    margin-top: .5em;
+    margin-bottom: .5em;
+    border-top: dotted 1px gray;
 }
 
 a {
-	text-decoration: none;
+    text-decoration: none;
 }
 
 a:link, a:visited, a:focus, a:hover, a:active {
-	color: rgb(204, 102, 17);
+    color: rgb(204, 102, 17);
 }
 
 a:hover, a:active {
@@ -35,7 +35,7 @@ a:hover, a:active {
 }
 
 .toolbar a {
-	color: black;
+    color: black;
 }
 
 /* Back to top link
@@ -54,53 +54,53 @@ a:hover, a:active {
 
 img,
 input[type=image] {
-	border: 0;
-	vertical-align: middle;
+    border: 0;
+    vertical-align: middle;
 }
 
 /* Tooltips
 --------------------------------------------------------------------------- */
 .tip {
-	cursor: help;
+    cursor: help;
 }
 
 .tipid {
-	display: none;
+    display: none;
 }
 
 img.tip {
-	border: 0;
+    border: 0;
 }
 
 #tiptip_content {
-	font-size: 90%;
-	text-shadow: none;
-	padding: .5em 1em;
+    font-size: 90%;
+    text-shadow: none;
+    padding: .5em 1em;
 }
 
 /* Chart-Tooltips
 --------------------------------------------------------------------------- */
 .chart-tooltips {
-	width: auto !important;
-	padding: .3em !important;
-	font-family: Verdana, Arial, sans-serif !important;
-	font-size: 85% !important;
-	background-color: rgb(255,255,200) !important;
+    width: auto !important;
+    padding: .3em !important;
+    font-family: Verdana, Arial, sans-serif !important;
+    font-size: 85% !important;
+    background-color: rgb(255,255,200) !important;
 }
 
 /* Header
 --------------------------------------------------------------------------- */
 #header {
-	margin-top: .5em;
-	margin-bottom: .5em;
+    margin-top: .5em;
+    margin-bottom: .5em;
 }
 
 #title1 {
-	font-size: 125%;
-	font-weight: bold;
-	font-style: italic;
-	text-shadow: #AAA .1em .1em .1em;
-	color: black;
+    font-size: 125%;
+    font-weight: bold;
+    font-style: italic;
+    text-shadow: #AAA .1em .1em .1em;
+    color: black;
 }
 
 /* Footer
@@ -109,110 +109,110 @@ img.tip {
 }
 
 #powered {
-	margin-top: 1em;
+    margin-top: 1em;
 }
 
 #powered a {
-	margin-left: .3em;
+    margin-left: .3em;
 }
 
 /* Other
 --------------------------------------------------------------------------- */
 .ui-textfield {
-	font: inherit;
-	color: inherit;
-	text-align: inherit;
-	outline: none;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+    outline: none;
 }
 
 .ui-button-text {
-	color: black;
+    color: black;
 }
 
 input[type=text],
 input[type=password],
 select,
 textarea {
-	padding: .3em .2em;
-	background-color: white;
+    padding: .3em .2em;
+    background-color: white;
 }
 
 img.imgbar,
 input.imgbar {
-	margin-left: 2px;
-	margin-right: 2px;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 img.imgbar.wide,
 input.imgbar.wide {
-	margin-left: 4px;
-	margin-right: 4px;
+    margin-left: 4px;
+    margin-right: 4px;
 }
 
 td.imgbar {
-	white-space: nowrap;
+    white-space: nowrap;
 }
 
 .s {
-	font-size: smaller;
+    font-size: smaller;
 }
 
 .b {
-	font-weight: bold;
+    font-weight: bold;
 }
 
 .i {
-	font-style: italic;
+    font-style: italic;
 }
 
 .l {
-	text-align: left;
+    text-align: left;
 }
 
 .c {
-	text-align: center;
+    text-align: center;
 }
 
 .r {
-	text-align: right;
+    text-align: right;
 }
 
 .fl {
-	float: left;
+    float: left;
 }
 
 .fr {
-	float: right;
+    float: right;
 }
 
 form {
-	display: inline;
+    display: inline;
 }
 
 .p10, .ten-cols {
-	width: 10%;
+    width: 10%;
 }
 
 .p14, .seven-cols {
-	width: 14%;
+    width: 14%;
 }
 
 .p12_5, .eight-cols {
-	width: 12.5%;
+    width: 12.5%;
 }
 
 .p20, .five-cols {
-	width: 20%;
+    width: 20%;
 }
 
 .p25, .four-cols {
-	width: 25%;
+    width: 25%;
 }
 
 .p33, .three-cols {
-	width: 33%;
+    width: 33%;
 }
 
 .p50, .two-cols {
-	width: 50%;
+    width: 50%;
 }

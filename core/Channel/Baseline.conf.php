@@ -9,37 +9,37 @@
  */
 return array(
 
-	/**
-	 * Possible keys:
-	 * - visible			 : (TRUE|FALSE), default TRUE
-	 * - required			 : (TRUE|FALSE), default FALSE
-	 * - default			 : default value
-	 */
-	'serial' => array(
-		'visible' => FALSE,
-	),
-	'channel' => array(
-		'visible' => FALSE,
-	),
-	'numeric' => array(
-		'default' => TRUE,
-		'visible' => FALSE,
-	),
-	'meter' => array(
-		'default' => FALSE,
-		'visible' => FALSE,
-	),
-	'threshold' => array(
-		'visible' => FALSE,
-	),
-	'cost' => array(
-		'visible' => FALSE,
-	),
-	'valid_from' => array(
-		'visible' => FALSE,
-	),
-	'valid_to' => array(
-		'visible' => FALSE,
-	)
+    /**
+     * Possible keys:
+     * - visible             : (TRUE|FALSE), default TRUE
+     * - required             : (TRUE|FALSE), default FALSE
+     * - default             : default value
+     */
+    'serial' => array(
+        'visible' => FALSE,
+    ),
+    'channel' => array(
+        'visible' => FALSE,
+    ),
+    'numeric' => array(
+        'default' => TRUE,
+        'visible' => FALSE,
+    ),
+    'meter' => array(
+        'default' => FALSE,
+        'visible' => FALSE,
+    ),
+    'threshold' => array(
+        'visible' => FALSE,
+    ),
+    'cost' => array(
+        'visible' => FALSE,
+    ),
+    'valid_from' => array(
+        'visible' => FALSE,
+    ),
+    'valid_to' => array(
+        'visible' => FALSE,
+    )
 
 );

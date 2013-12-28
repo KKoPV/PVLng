@@ -15,36 +15,36 @@
  */
 abstract class Hook {
 
-	/**
-	 *
-	 */
-	public static function process( $hook, &$channel ) {
-	    if (!self::$hooks) {
-			$file = ROOT_DIR . DS . 'hook' . DS . 'hook.conf.php';
-			self::$hooks = file_exists($file) ? include $file : array();
-		}
+    /**
+     *
+     */
+    public static function process( $hook, &$channel ) {
+        if (!self::$hooks) {
+            $file = ROOT_DIR . DS . 'hook' . DS . 'hook.conf.php';
+            self::$hooks = file_exists($file) ? include $file : array();
+        }
 
-		if (!isset(self::$hooks[$hook])) return;
+        if (!isset(self::$hooks[$hook])) return;
 
         foreach (self::$hooks[$hook] as $name=>$config) {
             if (isset($config[$channel->guid])) {
-				require_once ROOT_DIR . DS . 'hook' . DS . $name . '.php';
-				$class = '\Hook\\'.$name;
-	            $hook = str_replace('.', '_', $hook);
-	            $class::$hook($channel, $config[$channel->guid]);
-			}
+                require_once ROOT_DIR . DS . 'hook' . DS . $name . '.php';
+                $class = '\Hook\\'.$name;
+                $hook = str_replace('.', '_', $hook);
+                $class::$hook($channel, $config[$channel->guid]);
+            }
         }
 
         return $channel->value;
-	}
+    }
 
-	// -----------------------------------------------------------------------
-	// PROTECTED
-	// -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
 
-	/**
-	 *
-	 */
-	protected static $hooks;
+    /**
+     *
+     */
+    protected static $hooks;
 
 }

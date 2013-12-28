@@ -6,7 +6,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 
 /**
@@ -91,7 +91,7 @@ if ($rc) {
   if ($rc) {
     echo 'Twitter update failed.', PHP_EOL,
          $conn->http_header['status'], PHP_EOL;
-	print_r($res);
+    print_r($res);
   }
 }
 

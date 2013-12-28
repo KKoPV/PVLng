@@ -1,37 +1,37 @@
 .draggable,
 .non-draggable {
-	padding: 4px;
-	border: 1px solid transparent;
+    padding: 4px;
+    border: 1px solid transparent;
 }
 
 .draggable {
-	cursor: move;
-	border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
+    cursor: move;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
 }
 
 .draggable:hover {
-	border: 1px dashed black;
+    border: 1px dashed black;
 }
 
 #drag-new,
 .draggable.ui-state-hover {
-	border: 1px solid black;
+    border: 1px solid black;
 }
 
 .droppable.odd {
-	border-left: 4px solid white;
-	border-top: 1px solid #EEE;
-	border-bottom: 1px solid #EEE;
+    border-left: 4px solid white;
+    border-top: 1px solid #EEE;
+    border-bottom: 1px solid #EEE;
 }
 
 .droppable.even {
-	border-left: 4px solid white;
-	border-top: 1px solid white;
-	border-bottom: 1px solid white;
+    border-left: 4px solid white;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
 }
 
 .droppable.ui-state-active {
-	border-left: 4px solid green;
+    border-left: 4px solid green;
 }

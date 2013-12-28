@@ -23,36 +23,36 @@
  */
 return array(
 
-	'data.save.before' => array(
-	),
+    'data.save.before' => array(
+    ),
 
-	'data.save.after' => array(
+    'data.save.after' => array(
 
 /*
-		'XivelyStatus' => array(
+        'XivelyStatus' => array(
 
-		    // Repeat for all PVLng channels as needed >>>
+            // Repeat for all PVLng channels as needed >>>
 
-			// PVLng channel GUID as key
-			'...' => array(
-				// API end point
-				'https://api.xively.com/v2/feeds/...',
-				// Your API key
-				'...',
-				// Xively channel name
-				'...',
-				// Format, optional, mostly for temperature channels
-				// '%.1f'
-			),
+            // PVLng channel GUID as key
+            '...' => array(
+                // API end point
+                'https://api.xively.com/v2/feeds/...',
+                // Your API key
+                '...',
+                // Xively channel name
+                '...',
+                // Format, optional, mostly for temperature channels
+                // '%.1f'
+            ),
 
-		    // <<< Repeat for all channels as needed
+            // <<< Repeat for all channels as needed
 
-		),
+        ),
 */
 
-	),
+    ),
 
-	'data.read.after' => array(
-	),
+    'data.read.after' => array(
+    ),
 
 );

@@ -9,47 +9,47 @@
  */
 return array(
 
-	/**
-	 * Possible keys:
-	 * - type     : (text|radio|textarea), default text
-	 * - default  : a default value
-	 * - required : (TRUE|FALSE), default FALSE
-	 */
+    /**
+     * Possible keys:
+     * - type     : (text|radio|textarea), default text
+     * - default  : a default value
+     * - required : (TRUE|FALSE), default FALSE
+     */
 
-	'resolution' => array(
-		'visible' => FALSE,
-	),
+    'resolution' => array(
+        'visible' => FALSE,
+    ),
 
-	'decimals' => array(
-		'visible' => FALSE,
-	),
+    'decimals' => array(
+        'visible' => FALSE,
+    ),
 
-	'meter' => array(
-		'visible' => FALSE,
-	),
+    'meter' => array(
+        'visible' => FALSE,
+    ),
 
-	'numeric' => array(
-		'visible' => FALSE,
-	),
+    'numeric' => array(
+        'visible' => FALSE,
+    ),
 
-	'offset' => array(
-		'visible' => FALSE,
-	),
+    'offset' => array(
+        'visible' => FALSE,
+    ),
 
-	'cost' => array(
-		'visible' => FALSE,
-	),
+    'cost' => array(
+        'visible' => FALSE,
+    ),
 
-	'threshold' => array(
-		'visible' => FALSE,
-	),
+    'threshold' => array(
+        'visible' => FALSE,
+    ),
 
-	'valid_from' => array(
-		'visible' => FALSE,
-	),
+    'valid_from' => array(
+        'visible' => FALSE,
+    ),
 
-	'valid_to' => array(
-		'visible' => FALSE,
-	),
+    'valid_to' => array(
+        'visible' => FALSE,
+    ),
 
 );

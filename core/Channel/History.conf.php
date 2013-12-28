@@ -5,29 +5,29 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 return array(
 
-	/**
-	 * Possible keys:
-	 * - visible			 : (TRUE|FALSE), default TRUE
-	 * - default			 : default value
-	 */
-	'channel' => array(
-		'visible' => FALSE,
-	),
-	'meter' => array(
-		'visible' => FALSE,
-	),
-	'numeric' => array(
-		'visible' => FALSE,
-	),
-	'threshold' => array(
-		'visible' => FALSE,
-	),
-	'valid_from' => array(
-		'required' => TRUE,
-	)
+    /**
+     * Possible keys:
+     * - visible             : (TRUE|FALSE), default TRUE
+     * - default             : default value
+     */
+    'channel' => array(
+        'visible' => FALSE,
+    ),
+    'meter' => array(
+        'visible' => FALSE,
+    ),
+    'numeric' => array(
+        'visible' => FALSE,
+    ),
+    'threshold' => array(
+        'visible' => FALSE,
+    ),
+    'valid_from' => array(
+        'required' => TRUE,
+    )
 
 );

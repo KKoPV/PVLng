@@ -11,18 +11,18 @@
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-	<meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
 
-	<link rel="stylesheet" href="/css/default.css" />
+    <link rel="stylesheet" href="/css/default.css" />
 
-	<title>PVLng initial setup</title>
-	<style>
-		body { width: 60%; margin: 1em auto; }
-		tt { font-size: 130%; font-weight: bold; }
-	</style>
+    <title>PVLng initial setup</title>
+    <style>
+        body { width: 60%; margin: 1em auto; }
+        tt { font-size: 130%; font-weight: bold; }
+    </style>
 </head>
 <body>
 
@@ -36,14 +36,14 @@ error_reporting(0);
 $configFile = '../../config/config.php';
 
 if (file_exists($configFile)) {
-	$config = include $configFile;
-	$db = new MySQLi($config['Database']['Host'], $config['Database']['Username'],
-	                 $config['Database']['Password'], $config['Database']['Database']);
-	if (!$db->connect_error AND $config['Admin']['User']) {
-		echo '<p>Your PVLng installation is successful configured!</p>';
-		echo '<p>Please start <a href="/">here</a>.</p>';
-		exit;
-	}
+    $config = include $configFile;
+    $db = new MySQLi($config['Database']['Host'], $config['Database']['Username'],
+                     $config['Database']['Password'], $config['Database']['Database']);
+    if (!$db->connect_error AND $config['Admin']['User']) {
+        echo '<p>Your PVLng installation is successful configured!</p>';
+        echo '<p>Please start <a href="/">here</a>.</p>';
+        exit;
+    }
 }
 
 $ok = TRUE;
@@ -52,23 +52,23 @@ $ok = TRUE;
  *
  */
 function checkExtension( $ext, $name ) {
-	global $ok;
-	echo '<li>'.$name.': ';
-	if (extension_loaded($ext)) {
-		echo '<strong style="color:green">ok</strong>';
-	} else {
-		echo '<strong style="color:red">failed</strong> - please install extension <strong>'.$ext.'</strong>';
-		$ok = FALSE;
-	}
-	echo '</li>';
+    global $ok;
+    echo '<li>'.$name.': ';
+    if (extension_loaded($ext)) {
+        echo '<strong style="color:green">ok</strong>';
+    } else {
+        echo '<strong style="color:red">failed</strong> - please install extension <strong>'.$ext.'</strong>';
+        $ok = FALSE;
+    }
+    echo '</li>';
 }
 
 /**
  *
  */
 function checkOk() {
-	global $ok;
-	if (!$ok) die('<p><a href="?">Reload page</a></p>');
+    global $ok;
+    if (!$ok) die('<p><a href="?">Reload page</a></p>');
 }
 
 ?>
@@ -93,16 +93,16 @@ checkExtension('session', 'Session Support');
 <h3>2. Check configuration</h3>
 
 <p>
-	<tt><strong>config/config.php</strong></tt>:
+    <tt><strong>config/config.php</strong></tt>:
 
 <?php
 
 if (file_exists($configFile)) {
-	echo '<strong style="color:green"> exists</strong>';
+    echo '<strong style="color:green"> exists</strong>';
 } else {
-	echo '<strong style="color:red"> missing</strong>';
-	echo '</p><p>Copy <tt>config/config.php.dist</tt> to <tt>config/config.php</tt>';
-	$ok = FALSE;
+    echo '<strong style="color:red"> missing</strong>';
+    echo '</p><p>Copy <tt>config/config.php.dist</tt> to <tt>config/config.php</tt>';
+    $ok = FALSE;
 }
 ?>
 </p>
@@ -112,17 +112,17 @@ if (file_exists($configFile)) {
 <h3>3. Check database settings</h3>
 
 <p>
-	Connect to database:
+    Connect to database:
 
 <?php
 
 if (!$db->connect_error) {
-	echo '<strong style="color:green"> ok</strong>';
+    echo '<strong style="color:green"> ok</strong>';
 } else {
-	echo '<strong style="color:red"> Error (', $db->connect_errno, ') ', $db->connect_error, '</strong>';
-	echo '</p><p>';
-	echo 'Please check your database settings in <tt>config/config.php</tt> section <tt>"Database"</tt>.';
-	$ok = FALSE;
+    echo '<strong style="color:red"> Error (', $db->connect_errno, ') ', $db->connect_error, '</strong>';
+    echo '</p><p>';
+    echo 'Please check your database settings in <tt>config/config.php</tt> section <tt>"Database"</tt>.';
+    $ok = FALSE;
 }
 ?>
 </p>
@@ -132,7 +132,7 @@ if (!$db->connect_error) {
 <h3>Finished</h3>
 
 <p>
-	Please proceed to <a href="/adminpass">definition of your administration user</a>.
+    Please proceed to <a href="/adminpass">definition of your administration user</a>.
 </p>
 
 </body>

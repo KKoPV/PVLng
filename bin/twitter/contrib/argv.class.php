@@ -264,11 +264,11 @@ class argv {
       $help[] = $h . array_shift($helptext);
       foreach ($helptext as $line) {
         // add additional lines
-      	$help[] = str_repeat(' ', $indent) . $line;
+          $help[] = str_repeat(' ', $indent) . $line;
       } ;
       // vaild values
       if (!empty($data['valid'])) {
-      	$help[] = str_repeat(' ', $indent)
+          $help[] = str_repeat(' ', $indent)
                 . $this->HelpValid . ': ' . implode(', ',$data['valid']);
       }
       // required value?

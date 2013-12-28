@@ -78,7 +78,7 @@ header('Cache-Control: max-age='.(60*60*24*365).', s-maxage='.(60*60*24*365));
 if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) AND
     strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') AND
     extension_loaded('zlib') ) {
-	ob_start('ob_gzhandler');
+    ob_start('ob_gzhandler');
 }
 
 readfile($cacheFile);

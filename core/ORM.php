@@ -9,12 +9,12 @@
  */
 class ORM {
 
-	/**
-	 *
-	 */
-	public static function forge( $class ) {
-		$class = 'ORM\\' . $class;
-		return new $class;
-	}
+    /**
+     *
+     */
+    public static function forge( $class ) {
+        $class = 'ORM\\' . $class;
+        return new $class;
+    }
 
 }

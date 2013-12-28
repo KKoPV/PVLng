@@ -8,55 +8,55 @@
  */
 
 #nav {
-	text-align: center;
+    text-align: center;
 }
 
 #nav table {
-	margin: 0 auto;
+    margin: 0 auto;
 }
 
 #nav table td {
-	vertical-align: middle;
+    vertical-align: middle;
 }
 
 #chart {
-	margin-top: 1em;
-	margin-bottom: 1em;
+    margin-top: 1em;
+    margin-bottom: 1em;
 }
 
 #d-table td {
-	padding: .5em .5em;
-	vertical-align: top;
+    padding: .5em .5em;
+    vertical-align: top;
 }
 
 #td-axis .fl {
-	margin-right: 3px;
+    margin-right: 3px;
 }
 
 #td-axis .fl.nm {
-	/* no margin */
-	margin-right: 0;
+    /* no margin */
+    margin-right: 0;
 }
 
 #chart-tooltip th {
-	padding-left: .5em;
-	background-color: #DDD;
+    padding-left: .5em;
+    background-color: #DDD;
 }
 
 #chart-tooltip tr.even {
-	background-color: #EEE;
+    background-color: #EEE;
 }
 
 #chart-tooltip td.name {
-	padding-left: .5em;
+    padding-left: .5em;
 }
 
 #chart-tooltip td.value {
-	padding-left: 1em;
-	padding-right: .5em;
-	text-align: right;
+    padding-left: 1em;
+    padding-right: .5em;
+    text-align: right;
 }
 
 #chart-tooltip td.unit {
-	padding-right: .5em;
+    padding-right: .5em;
 }

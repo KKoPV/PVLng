@@ -9,75 +9,75 @@
  */
 return array(
 
-	/**
-	 * Possible keys:
-	 * - type     : (text|radio|textarea), default text
-	 * - default  : a default value
-	 * - required : (TRUE|FALSE), default FALSE
-	 */
+    /**
+     * Possible keys:
+     * - type     : (text|radio|textarea), default text
+     * - default  : a default value
+     * - required : (TRUE|FALSE), default FALSE
+     */
 
-	'name' => array(
-		'required' => TRUE,
-	),
+    'name' => array(
+        'required' => TRUE,
+    ),
 
-	'description' => array(
-	),
+    'description' => array(
+    ),
 
-	'serial' => array(
-	),
+    'serial' => array(
+    ),
 
-	'channel' => array(
-	),
+    'channel' => array(
+    ),
 
-	'resolution' => array(
-		'required' => TRUE,
-		'default'  => 1
-	),
+    'resolution' => array(
+        'required' => TRUE,
+        'default'  => 1
+    ),
 
-	'unit' => array(
-	),
+    'unit' => array(
+    ),
 
-	'decimals' => array(
-		'default'  => 2
-	),
+    'decimals' => array(
+        'default'  => 2
+    ),
 
-	'meter' => array(
-		'type'     => 'radio',
-		'default'  => 0
-	),
+    'meter' => array(
+        'type'     => 'radio',
+        'default'  => 0
+    ),
 
-	'numeric' => array(
-		'type'     => 'radio',
-		'default'  => 1
-	),
+    'numeric' => array(
+        'type'     => 'radio',
+        'default'  => 1
+    ),
 
-	'offset' => array(
-		'default'  => 0
-	),
+    'offset' => array(
+        'default'  => 0
+    ),
 
-	'adjust' => array(
-		'type'     => 'radio',
-	),
+    'adjust' => array(
+        'type'     => 'radio',
+    ),
 
-	'cost' => array(
-	),
+    'cost' => array(
+    ),
 
-	'threshold' => array(
-	),
+    'threshold' => array(
+    ),
 
-	'valid_from' => array(
-	),
+    'valid_from' => array(
+    ),
 
-	'valid_to' => array(
-	),
+    'valid_to' => array(
+    ),
 
-	'public' => array(
-		'type'     => 'radio',
-		'default'  => 1
-	),
+    'public' => array(
+        'type'     => 'radio',
+        'default'  => 1
+    ),
 
-	'comment' => array(
-		'type'     => 'textarea',
-	),
+    'comment' => array(
+        'type'     => 'textarea',
+    ),
 
 );

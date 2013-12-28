@@ -15,42 +15,42 @@
  */
 return array(
 
-	/**
-	 * Possible keys:
-	 * - visible			 : (TRUE|FALSE), default TRUE
-	 * - required			 : (TRUE|FALSE), default FALSE
-	 * - default			 : default value
-	 */
-	'name' => array(
-		'visible' => FALSE,
-	),
-	'description' => array(
-		'visible' => FALSE,
-	),
-	'serial' => array(
-		'visible' => FALSE,
-	),
-	'channel' => array(
-		'required' => TRUE,
-	),
-	'numeric' => array(
-		'visible' => FALSE,
-	),
-	'meter' => array(
-		/* Get the info from the child */
-		'visible' => FALSE,
-	),
-	'threshold' => array(
-		'visible' => FALSE,
-	),
-	'cost' => array(
-		'visible' => FALSE,
-	),
-	'valid_from' => array(
-		'required' => TRUE,
-	),
-	'valid_to' => array(
-		'required' => TRUE,
-	)
+    /**
+     * Possible keys:
+     * - visible             : (TRUE|FALSE), default TRUE
+     * - required             : (TRUE|FALSE), default FALSE
+     * - default             : default value
+     */
+    'name' => array(
+        'visible' => FALSE,
+    ),
+    'description' => array(
+        'visible' => FALSE,
+    ),
+    'serial' => array(
+        'visible' => FALSE,
+    ),
+    'channel' => array(
+        'required' => TRUE,
+    ),
+    'numeric' => array(
+        'visible' => FALSE,
+    ),
+    'meter' => array(
+        /* Get the info from the child */
+        'visible' => FALSE,
+    ),
+    'threshold' => array(
+        'visible' => FALSE,
+    ),
+    'cost' => array(
+        'visible' => FALSE,
+    ),
+    'valid_from' => array(
+        'required' => TRUE,
+    ),
+    'valid_to' => array(
+        'required' => TRUE,
+    )
 
 );
