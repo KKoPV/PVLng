@@ -178,7 +178,14 @@ BabelKitMySQLi::setParams(array(
 BabelKitMySQLi::setDB($app->db);
 BabelKitMySQLi::setCache($app->cache);
 
-I18N::setBabelKit(BabelKitMySQLi::getInstance());
+try {
+    I18N::setBabelKit(BabelKitMySQLi::getInstance());
+} catch (Exception $e) {
+    die('<p>Missing translations!</p><p>Did you loaded '
+       .'<tt><strong>sql/pvlng.sql</strong></tt> '
+       .'into your database?!</p>');
+}
+
 I18N::setLanguage(LANGUAGE);
 I18N::setCodeSet('app');
 I18N::setAddMissing($config->get('I18N.Add'));
