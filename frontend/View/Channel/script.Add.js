@@ -13,7 +13,7 @@
  */
 $(function() {
 
-    $('#dataTable').DataTable({
+    $('#typeTable').DataTable({
         bSort: true,
         bLengthChange: false,
         bFilter: true,
@@ -30,6 +30,16 @@ $(function() {
             { 'asSorting': false }
         ],
         aaSorting: [[ 1, "asc" ]]
+    });
+
+    $('#tplTable').DataTable({
+        bSort: false,
+        bLengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        bPaginate: false,
+        bJQueryUI: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
     });
 
 });

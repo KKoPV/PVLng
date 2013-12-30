@@ -70,8 +70,11 @@ class Channel extends \Controller {
      *
      */
     public function AddPOST_Action() {
-        $type = $this->request->post('type');
-        if ($type != '') {
+
+        if (($type = $this->request->post('type')) == '') return;
+
+        if (is_numeric($type)) {
+            // Type Id
             $this->prepareFields($type);
             foreach ($this->fields as &$data) {
                 $data['VALUE'] = $data['DEFAULT'];
@@ -85,6 +88,59 @@ class Channel extends \Controller {
 
             $this->ignore_returnto = TRUE;
             $this->app->foreward('Edit');
+        } else {
+            // Get from template
+            $channels = include $type;
+            $channels = $channels['channels'];
+
+            // 1st save channels
+            $oChannel = new \ORM\Channel;
+            $oChannel->throwException();
+
+            try {
+
+                foreach ($channels as $id=>$channel) {
+                    $oChannel->reset();
+                    foreach ($channel as $key=>$value) {
+                        $oChannel->set($key, $value);
+                    }
+                    $oChannel->insert();
+                    $channels[$id]['id'] = $oChannel->id;
+                }
+                \Messages::Success(__('ChannelsSaved', count($channels)));
+
+            } catch (\Exception $e) {
+                \Messages::Error($e->getMessage());
+
+                // Rollback, mostly by double index entries
+                $oChannel->reset();
+                foreach ($channels as $id=>$channel) {
+                    if (isset($channels[$id]['id'])) {
+                        $oChannel->id = $channels[$id]['id'];
+                        $oChannel->delete();
+                    }
+                }
+
+                $this->app->redirect('/channel');
+            }
+
+            if (!isset($channels[0])) {
+                $this->app->redirect('/channel');
+            } else {
+                // Build hierarchy
+                $tree = \NestedSet::getInstance();
+
+                foreach ($channels as $id=>$channel) {
+                    if ($id == 0) {
+                        $root = $tree->insertChildNode($channel['id'], 1);
+                    } else {
+                        $tree->insertChildNode($channel['id'], $root);
+                    }
+                }
+                \Messages::Success(__('HierarchyCreated', count($channels)));
+
+                $this->app->redirect('/overview');
+            }
         }
     }
 
@@ -111,6 +167,18 @@ class Channel extends \Controller {
             }
 
             $this->app->foreward('Edit');
+        } else {
+            // Search for equipment templates
+            $templates = array();
+            foreach (glob(CORE_DIR . DS . 'Channel' . DS . 'Templates' . DS . '*.php') as $file) {
+                $template = include $file;
+                $templates[] = array(
+                    'FILE'         => $file,
+                    'NAME'         => $template['name'],
+                    'DESCRIPTION'  => $template['description']
+                );
+            }
+            $this->view->Templates = $templates;
         }
     }
 

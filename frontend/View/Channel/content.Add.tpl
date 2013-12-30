@@ -20,7 +20,7 @@
 
 <form action="/channel/add" method="post">
 
-<table id="dataTable" class="dataTable">
+<table id="typeTable" class="dataTable">
     <thead>
     <tr>
         <th style="width:1%">
@@ -30,7 +30,7 @@
         <th style="white-space:nowrap">{{ExampleUnit}}</th>
         <th style="white-space:nowrap">{{Childs}}</th>
         <th style="width:1%"></th>
-        <th>{{DESCRIPTION}}</th>
+        <th>{{Description}}</th>
     </tr>
     </thead>
     <tbody>
@@ -40,7 +40,7 @@
         <td>
             <input type="radio" name="type" value="{ID}" class="iCheck" />
         </td>
-        <td nowrap>
+        <td style="white-space:nowrap">
             <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
                  src="{ICON}" width="16" height="16" alt="" />
             <strong>{NAME}</strong>
@@ -78,6 +78,36 @@
 
     </tbody>
 </table>
+
+<h3>{{SelectEntityTemplate}}</h3>
+
+<table id="tplTable" class="dataTable">
+    <thead>
+    <tr>
+        <th style="width:1%"></th>
+        <th>{{Name}}</th>
+        <th>{{Description}}</th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <!-- BEGIN TEMPLATES -->
+    <tr>
+        <td>
+            <input type="radio" name="type" value="{FILE}" class="iCheck" />
+        </td>
+        <td style="white-space:nowrap">
+            <strong>{NAME}</strong>
+        </td>
+        <td>
+            <small>{DESCRIPTION}</small>
+        </td>
+    </tr>
+    <!-- END -->
+
+    </tbody>
+</table>
+
 
 <p><input type="submit" value="{{proceed}} &raquo;" /></p>
 
