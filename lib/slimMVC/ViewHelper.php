@@ -21,7 +21,7 @@ class ViewHelper {
     /**
      *
      */
-    public function callable($method) {
+    public function is_callable($method) {
         return isset($this->closures[$method]);
     }
 

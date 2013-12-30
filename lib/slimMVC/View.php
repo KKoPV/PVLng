@@ -266,7 +266,7 @@ class View extends \Slim\View {
                         }
                     }
 
-                    if ($this->Helper->callable($func)) $func = '$this->Helper->'.$func;
+                    if ($this->Helper->is_callable($func)) $func = '$this->Helper->'.$func;
 
                     $html = str_replace($match[0],
                                         $this->e($func.'('.substr($args, 1).')'),
