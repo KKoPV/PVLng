@@ -53,14 +53,14 @@ $ok = TRUE;
  */
 function checkExtension( $ext, $name ) {
     global $ok;
-    echo '<li>'.$name.': ';
+    echo '<p><div style="float:left;width:12em">'.$name.':</div> ';
     if (extension_loaded($ext)) {
         echo '<strong style="color:green">ok</strong>';
     } else {
         echo '<strong style="color:red">failed</strong> - please install extension <strong>'.$ext.'</strong>';
         $ok = FALSE;
     }
-    echo '</li>';
+    echo '</p>';
 }
 
 /**
@@ -68,48 +68,57 @@ function checkExtension( $ext, $name ) {
  */
 function checkOk() {
     global $ok;
-    if (!$ok) die('<p><a href="?">Reload page</a></p>');
+    if (!$ok) die('<form><input type="submit" value="Reload" /></form>');
 }
 
 ?>
 
 <h3>1. Check required extensions</h3>
 
-<ul>
 <?php
+
 checkExtension('bcmath', 'BCMath support');
 checkExtension('curl', 'cURL support');
 checkExtension('json', 'JSON support');
 checkExtension('mbstring', 'Multibyte Support');
 checkExtension('mysqli', 'MySQLi support');
-checkExtension('curl', 'cURL support');
 checkExtension('pcre', 'PCRE Support');
 checkExtension('session', 'Session Support');
-?>
-</ul>
 
-<?php checkOk(); ?>
+checkOk();
+
+?>
 
 <h3>2. Check configuration</h3>
 
 <p>
-    <tt><strong>config/config.php</strong></tt>:
+    Configuration file <tt><strong>config/config.php</strong></tt>:
 
 <?php
 
 if (file_exists($configFile)) {
     echo '<strong style="color:green"> exists</strong>';
 } else {
-    echo '<strong style="color:red"> missing</strong>';
-    echo '</p><p>Copy <tt>config/config.php.dist</tt> to <tt>config/config.php</tt>';
-    $ok = FALSE;
+    echo '<strong style="color:red"> missing</strong></p>';
+    echo '<p>Try to create from <tt>config/config.php.dist</tt> ...';
+    copy($configFile.'.dist', $configFile);
+    if (file_exists($configFile)) {
+        echo '<strong style="color:green"> done</strong>';
+        $config = include $configFile;
+        $db = new MySQLi($config['Database']['Host'], $config['Database']['Username'],
+                         $config['Database']['Password'], $config['Database']['Database']);
+    } else {
+        echo '<strong style="color:red"> failed</strong></p>';
+        echo '<p>Copy <tt>config/config.php.dist</tt> to <tt>config/config.php</tt>';
+        $ok = FALSE;
+    }
 }
 ?>
 </p>
 
 <?php checkOk(); ?>
 
-<h3>3. Check database settings</h3>
+<h3>3. Check database</h3>
 
 <p>
     Connect to database:
@@ -119,11 +128,35 @@ if (file_exists($configFile)) {
 if (!$db->connect_error) {
     echo '<strong style="color:green"> ok</strong>';
 } else {
-    echo '<strong style="color:red"> Error (', $db->connect_errno, ') ', $db->connect_error, '</strong>';
+    echo '<strong style="color:red"> failed</strong>';
     echo '</p><p>';
     echo 'Please check your database settings in <tt>config/config.php</tt> section <tt>"Database"</tt>.';
     $ok = FALSE;
 }
+
+if ($ok):
+
+?>
+</p>
+
+<p>
+    Check database content:
+
+<?php
+
+    $db->query('SELECT count(0) FROM `pvlng_babelkit`');
+
+    if (!$db->error) {
+        echo '<strong style="color:green"> ok</strong>';
+    } else {
+        echo '<strong style="color:red"> failed</strong>';
+        echo '</p><p>';
+        echo 'Did you loaded the SQL data from <tt><strong>sql/pvlng.sql</strong></tt>?!';
+        $ok = FALSE;
+    }
+
+endif;
+
 ?>
 </p>
 
@@ -132,7 +165,7 @@ if (!$db->connect_error) {
 <h3>Finished</h3>
 
 <p>
-    Please proceed to <a href="/adminpass">definition of your administration user</a>.
+    <form action="/adminpass"><input type="submit" value="Definition of your administration user" /></form>
 </p>
 
 </body>
