@@ -264,6 +264,14 @@ abstract class ORMTable {
         return $this->app->db->error;
     }
 
+    /**
+     *
+     */
+    public function reset() {
+        foreach ($this->fields as &$value) $value = NULL;
+        return $this;
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
@@ -312,14 +320,6 @@ abstract class ORMTable {
      *
      */
     protected $autoinc;
-
-    /**
-     *
-     */
-    protected function reset() {
-        foreach ($this->fields as &$value) $value = NULL;
-        return $this;
-    }
 
     /**
      *
@@ -409,7 +409,7 @@ abstract class ORMTable {
         if ($this->app->db->errno == 1149) die($this->app->db->error . ' : ' . $sql);
 
         if ($this->throwException AND $this->app->db->errno) {
-            throw new \Exception($this->app->db->error, $this->app->db->errno);
+            throw new \Exception('Database error: '.$this->app->db->error, $this->app->db->errno);
         }
 
         return $res;

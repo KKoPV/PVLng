@@ -43,7 +43,9 @@ $(function() {
                         $(el).html(data[0].data);
                     }
                 }
-            );
+            ).error(function() {
+                $(el).html('?');
+            });
         }
     });
 
