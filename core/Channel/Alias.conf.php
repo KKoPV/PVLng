@@ -11,51 +11,17 @@ return array(
 
     /**
      * Possible keys:
-     * - visible             : (TRUE|FALSE), default TRUE
-     * - default             : default value
+     * - type     : (text|textarea|numeric|integer|radio), default text
+     *              radio results in (0|1)
+     * - visible  : (TRUE|FALSE), default TRUE
+     * - required : (TRUE|FALSE), default FALSE
+     * - readonly : (TRUE|FALSE), default FALSE
+     * - default  : Default value, works also for not visible attributes
      */
-    'serial' => array(
-        'visible' => FALSE,
-    ),
+
     'channel' => array(
+        'visible'  => TRUE,
         'readonly' => TRUE,
     ),
-    'decimals' => array(
-        'visible' => FALSE,
-    ),
-    'unit' => array(
-        'visible' => FALSE,
-    ),
-    'numeric' => array(
-        'visible' => FALSE,
-    ),
-    'resolution' => array(
-        'required' => FALSE,
-        'visible'  => FALSE,
-    ),
-    'meter' => array(
-        'visible' => FALSE,
-    ),
-    'offset' => array(
-        'visible' => FALSE,
-    ),
-    'adjust' => array(
-        'visible' => FALSE,
-    ),
-    'public' => array(
-        'visible' => FALSE,
-    ),
-    'threshold' => array(
-        'visible' => FALSE,
-    ),
-    'cost' => array(
-        'visible' => FALSE,
-    ),
-    'valid_from' => array(
-        'visible' => FALSE,
-    ),
-    'valid_to' => array(
-        'visible' => FALSE,
-    )
 
 );

@@ -11,23 +11,21 @@ return array(
 
     /**
      * Possible keys:
-     * - visible             : (TRUE|FALSE), default TRUE
-     * - default             : default value
+     * - type     : (text|textarea|numeric|integer|radio), default text
+     *              radio results in (0|1)
+     * - visible  : (TRUE|FALSE), default TRUE
+     * - required : (TRUE|FALSE), default FALSE
+     * - readonly : (TRUE|FALSE), default FALSE
+     * - default  : Default value, works also for not visible attributes
      */
-    'channel' => array(
-        'visible' => FALSE,
-    ),
-    'meter' => array(
-        'visible' => FALSE,
-    ),
-    'numeric' => array(
-        'visible' => FALSE,
-    ),
-    'threshold' => array(
-        'visible' => FALSE,
-    ),
+
     'valid_from' => array(
+        'required' => TRUE
+    ),
+
+    'valid_to' => array(
         'required' => TRUE,
+        'default'  => 0
     )
 
 );

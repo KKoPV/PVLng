@@ -1,7 +1,5 @@
 <?php
 /**
- *
- *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
@@ -9,32 +7,28 @@
  */
 return array(
 
-    'channel' => array(
-        'visible' => FALSE,
-    ),
-    'serial' => array(
-        'visible' => FALSE,
-    ),
+    /**
+     * Possible keys:
+     * - type     : (text|textarea|numeric|integer|radio), default text
+     *              radio results in (0|1)
+     * - visible  : (TRUE|FALSE), default TRUE
+     * - required : (TRUE|FALSE), default FALSE
+     * - readonly : (TRUE|FALSE), default FALSE
+     * - default  : Default value, works also for not visible attributes
+     */
+
     'resolution' => array(
         'visible' => FALSE,
     ),
     'unit' => array(
         'visible' => FALSE,
     ),
-    'meter' => array(
-        'visible' => FALSE,
-    ),
-    'numeric' => array(
-        'visible' => FALSE,
-    ),
-    'cost' => array(
-        'visible' => FALSE,
-    ),
     'decimals' => array(
         'visible' => FALSE,
     ),
-    'threshold' => array(
+    'public' => array(
         'visible' => FALSE,
+        'default' => 1
     ),
     'valid_from' => array(
         'visible' => FALSE,

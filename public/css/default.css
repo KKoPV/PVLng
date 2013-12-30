@@ -130,6 +130,8 @@ img.tip {
 }
 
 input[type=text],
+input[type=number],
+input[type=text],
 input[type=password],
 select,
 textarea {

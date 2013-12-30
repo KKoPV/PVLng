@@ -15,6 +15,14 @@ namespace Controller;
 class Channel extends \Controller {
 
     /**
+     * Model types
+     */
+    const UNDEFINED = 0;
+    const NUMERIC   = 1;
+    const SENSOR    = 2;
+    const METER     = 3;
+
+    /**
      *
      */
     public function before() {
@@ -23,16 +31,11 @@ class Channel extends \Controller {
 
         $this->fields = array();
 
-        foreach (include __DIR__ . DS . 'channel.conf.php' as $key=>$field) {
+        foreach (include __DIR__ . DS . 'Channel' . DS . 'default.php' as $key=>$field) {
             $this->fields[$key] = array_merge(array(
-                'VISIBLE'  => TRUE,
-                'FIELD'    => $key,
-                'TYPE'     => 'text',
-                'DEFAULT'  => '',
-                'REQUIRED' => FALSE,
-                'READONLY' => FALSE,
-                'NAME'     => __('channel::'.$key),
-                'HINT'     => __('channel::'.$key.'Hint'),
+                'FIELD' => $key,
+                'NAME'  => __('channel::'.$key),
+                'HINT'  => __('channel::'.$key.'Hint'),
             ), array_change_key_case($field, CASE_UPPER));
         }
     }
@@ -93,14 +96,18 @@ class Channel extends \Controller {
 
         $q = \DBQuery::forge('pvlng_type')->whereGT('id', 0);
 
-        $this->view->EntityTypes = $this->rows2view($this->db->queryRows($q));
+        $types = array();
+        foreach ($this->db->queryRows($q) as $type) {
+            $type->description = __($type->description);
+            $types[] = array_change_key_case((array) $type, CASE_UPPER);
+        }
+        $this->view->EntityTypes = $types;
 
         if ($clone = $this->app->params->get('clone')) {
             $entity = new \ORM\Channel($clone);
             if ($entity->id) {
                 unset($entity->id, $entity->guid);
                 $this->prepareFields($entity);
-                $this->view->Type = $entity->type;
             }
 
             $this->app->foreward('Edit');
@@ -167,7 +174,7 @@ class Channel extends \Controller {
 
             /* check required fields */
             foreach ($this->fields as $key=>$data) {
-                if ($data['REQUIRED'] AND $entity->$key == '') {
+                if ($data['VISIBLE'] AND $data['REQUIRED'] AND $entity->$key == '') {
                     \Messages::Error(__('channel::ParamIsRequired', $data['NAME']), TRUE);
                     $ok = FALSE;
                 }
@@ -275,9 +282,13 @@ class Channel extends \Controller {
      */
     protected function prepareFields( $entity=NULL ) {
 
-        if (!is_object($entity)) {
+        $addMode = !is_object($entity);
+
+        if ($addMode) {
+            // Got channel type number to create new channel
             $type = new \ORM\EntityType($entity);
         } else {
+            // Got real channel object to edit
             $type = new \ORM\EntityType($entity->type);
         }
 
@@ -286,49 +297,79 @@ class Channel extends \Controller {
             $this->app->redirect('/channel');
         }
 
-        // Apply model specific attribute settings
-        $conf = CORE_DIR . DS . 'Channel' . DS
-              . str_replace('\\', DS, $type->model) . '.conf.php';
+        if ($addMode) {
+            // Get prefered type settings from Model
+            $model = 'Channel\\' . $type->model;
+            if ($model::TYPE != self::UNDEFINED) {
+                $this->applyFieldSettings('numeric');
+                if ($model::TYPE == self::SENSOR) {
+                    $this->applyFieldSettings('sensor');
+                } elseif ($model::TYPE == self::METER) {
+                    $this->applyFieldSettings('meter');
+                }
+            }
+        } else {
+            // Get type settings from entity
+            $this->applyFieldSettings($entity->numeric ? 'numeric' : 'non-numeric');
+            if ($entity->numeric) {
+                $this->applyFieldSettings($entity->meter ? 'meter' : 'sensor');
+            }
+        }
 
-        $this->applyFieldSettings($conf);
+        if ($type->write AND $type->read) {
+            // No specials for writable AND readable channels
+        } elseif ($type->write) {
+            // Write only
+           $this->applyFieldSettings('write');
+        } elseif ($type->read) {
+            // Read only
+           $this->applyFieldSettings('read');
+        } else {
+            // A grouping channel, not write, not read
+           $this->applyFieldSettings('group');
+        }
+
+        // Last apply model specific settings
+        $this->applyFieldSettings(str_replace('\\', DS, $type->model));
+
+        foreach ($this->fields as $key=>&$data) {
+            $h = 'model::'.$type->model.'_'.$key;
+            $name = __($h);
+            if ($name != $h) $data['NAME'] = $name;
+
+            $h = 'model::'.$type->model.'_'.$key.'Hint';
+            $name = __($h);
+            if ($name != $h) $data['HINT'] = $name;
+
+            $data['VALUE'] = isset($entity->$key)
+                           ? htmlspecialchars($entity->$key)
+                           : htmlspecialchars($data['DEFAULT']);
+        }
 
         $this->view->Type = $type->id;
         $this->view->TypeName = $type->name;
         if ($type->unit) $this->view->TypeName .= ' (' . $type->unit . ')';
         $this->view->Icon = $type->icon;
 
-        if (is_object($entity)) {
-
-            // Apply type specific attribute settings
-            $conf = __DIR__ . DS
-                  . ($entity->numeric ? 'channel.numeric' : 'channel.non-numeric')
-                  . '.conf.php';
-
-            $this->applyFieldSettings($conf);
-
-            foreach ($this->fields as $key=>&$data) {
-                $h = 'model::'.$type->model.'_'.$key;
-                $name = __($h);
-                if ($name != $h) $data['NAME'] = $name;
-
-                $h = 'model::'.$type->model.'_'.$key.'Hint';
-                $name = __($h);
-                if ($name != $h) $data['HINT'] = $name;
-
-                $data['VALUE'] = isset($entity->$key)
-                               ? htmlspecialchars($entity->$key)
-                               : htmlspecialchars($data['DEFAULT']);
-            }
-        }
+        $h = $type->description.'Help';
+        $help = __($h);
+        // Check if a help text exists
+        $this->view->TypeHelp = $help != $h ? $help : '';
     }
 
     /**
      *
      */
     protected function applyFieldSettings( $conf ) {
-        if (!file_exists($conf)) return;
+        // 1st try general config
+        $config = __DIR__ . DS . 'Channel' . DS . $conf . '.php';
+        if (!file_exists($config)) {
+            // 2nd try model specific config
+            $config = CORE_DIR . DS . 'Channel' . DS . $conf . '.conf.php';
+            if (!file_exists($config)) return;
+        }
 
-        $attr = include $conf;
+        $attr = include $config;
 
         // check all fields
         foreach ($this->fields as $key=>$data) {

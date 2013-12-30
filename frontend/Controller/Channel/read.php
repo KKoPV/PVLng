@@ -1,5 +1,7 @@
 <?php
 /**
+ *
+ *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
@@ -17,11 +19,24 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
-    'valid_from' => array(
-        'visible' => FALSE,
+    'serial' => array(
+        'visible'  => FALSE
     ),
-    'valid_to' => array(
-        'visible' => FALSE,
-    )
+
+    'channel' => array(
+        'visible'  => FALSE
+    ),
+
+    'offset' => array(
+        'visible'  => FALSE
+    ),
+
+    'adjust' => array(
+        'visible'  => FALSE
+    ),
+
+    'threshold' => array(
+        'visible'  => FALSE
+    ),
 
 );

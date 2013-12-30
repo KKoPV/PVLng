@@ -15,6 +15,15 @@ namespace Channel;
 abstract class InternalCalc extends \Channel {
 
     /**
+     * Channel type
+     * 0 - undefined, concrete channel decides
+     * 1 - numeric, concrete channel decides if sensor or meter
+     * 2 - sensor, numeric
+     * 3 - meter, numeric
+     */
+    const TYPE = 1;
+
+    /**
      *
      */
     protected function __construct( \ORM\Tree $channel ) {

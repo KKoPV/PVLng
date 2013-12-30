@@ -50,7 +50,7 @@ $(function() {
 
     $('button, a.button, input[type="submit"]').button();
     $('.toolbar').buttonset();
-    $('input[type=text], input[type=password], select, textarea').addClass('ui-corner-all');
+    $('input[type=text], input[type=number], input[type=password], select, textarea').addClass('ui-corner-all');
 
     $(messages).each(function(id, msg) {
         if (msg.type == 'error') {

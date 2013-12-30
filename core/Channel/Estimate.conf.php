@@ -18,10 +18,13 @@ return array(
      */
 
     'valid_from' => array(
-        'visible' => FALSE,
+        'visible'  => FALSE,
     ),
     'valid_to' => array(
-        'visible' => FALSE,
+        'visible'  => FALSE,
+    ),
+    'comment' => array(
+        'type'     => 'textextra'
     )
 
 );

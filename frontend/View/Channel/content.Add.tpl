@@ -9,6 +9,11 @@
  */
 -->
 
+<!-- Use this image as spacer for not available actions of channels -->
+<!-- DEFINE MACRO SpacerImg -->
+<img src="/images/pix.gif" class="imgbar wide" style="width:16px;height:16px" width="16" height="16" alt="" />
+<!-- END DEFINE -->
+
 <div class="grid_10">
 
 <h2>{{SelectEntityType}}</h2>
@@ -22,8 +27,8 @@
             <input type="radio" name="type" value="" class="iCheck" checked="checked" />
         </th>
         <th>{{EntityType}}</th>
-        <th style="width:1%">{{Unit}}</th>
-        <th>{{Model}}</th>
+        <th style="white-space:nowrap">{{ExampleUnit}}</th>
+        <th style="white-space:nowrap">{{Childs}}</th>
         <th style="width:1%"></th>
         <th>{{DESCRIPTION}}</th>
     </tr>
@@ -41,24 +46,26 @@
             <strong>{NAME}</strong>
         </td>
         <td>{UNIT}</td>
-        <td>{MODEL}</td>
-        <td nowrap>
+        <td class="c">
+            <!-- IF {CHILDS} == 0 -->
+                {{no}}
+            <!-- ELSEIF {CHILDS} == -1 -->
+                {{unlimited}}
+            <!-- ELSE -->
+                {CHILDS}
+            <!-- ENDIF -->
+        </td>
+        <td style="white-space:nowrap">
             <!-- IF {CHILDS} -->
             <img src="/images/ico/node_select_child.png" class="imgbar tip"
                  style="width:16px;height:16px" width="16p" height="16"
-                 alt="c" title="{{CanHaveChilds}}" />
-            <!-- ELSE -->
-            <img src="/images/ico/16x16.png" class="imgbar" alt=""
-                 style="width:16px;height:16px" width="16p" height="16" />
-            <!-- ENDIF -->
+                 alt="c" title="{{MustHaveChilds}}" />
+            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
             <!-- IF {WRITE} -->
             <img src="/images/ico/write.png" class="imgbar tip"
                  style="width:16px;height:16px" width="16p" height="16"
                  alt="w" title="{{WritableEntity}}" />
-            <!-- ELSE -->
-            <img src="/images/ico/16x16.png" class="imgbar" alt=""
-                 style="width:16px;height:16px" width="16p" height="16" />
-            <!-- ENDIF -->
+            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
             <!-- IF {READ} -->
             <img src="/images/ico/read.png" class="tip"
                  style="width:16px;height:16px" width="16p" height="16"

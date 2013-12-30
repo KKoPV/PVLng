@@ -9,35 +9,33 @@
  */
 return array(
 
+    'channel' => array(
+        'visible' => FALSE
+    ),
     'resolution' => array(
-        'visible' => FALSE,
+        'visible' => FALSE
     ),
     'unit' => array(
-        'visible' => FALSE,
-    ),
-    'meter' => array(
-        'visible' => FALSE,
-    ),
-    'numeric' => array(
-        'visible' => FALSE,
-    ),
-    'cost' => array(
-        'visible' => FALSE,
-    ),
-    'channel' => array(
-        'visible' => FALSE,
+        'visible' => FALSE
     ),
     'decimals' => array(
+        'visible' => FALSE
+    ),
+    'offset' => array(
+        'visible' => FALSE
+    ),
+    'public' => array(
         'visible' => FALSE,
+        'default' => 0
     ),
     'threshold' => array(
-        'visible' => FALSE,
+        'visible' => FALSE
     ),
     'valid_from' => array(
-        'visible' => FALSE,
+        'visible' => FALSE
     ),
     'valid_to' => array(
-        'visible' => FALSE,
+        'visible' => FALSE
     )
 
 );

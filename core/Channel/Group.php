@@ -7,4 +7,9 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
-return array();
+namespace Channel;
+
+/**
+ *
+ */
+class Group extends \Channel {}

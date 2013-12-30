@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Ratio extends \Channel {
+class Ratio extends Sensor {
 
     /**
      *

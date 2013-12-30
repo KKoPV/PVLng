@@ -11,9 +11,12 @@ return array(
 
     /**
      * Possible keys:
-     * - type     : (text|radio|textarea), default text
-     * - default  : a default value
+     * - type     : (text|textarea|numeric|integer|radio), default text
+     *              radio results in (0|1)
+     * - visible  : (TRUE|FALSE), default TRUE
      * - required : (TRUE|FALSE), default FALSE
+     * - readonly : (TRUE|FALSE), default FALSE
+     * - default  : Default value, works also for not visible attributes
      */
 
 );

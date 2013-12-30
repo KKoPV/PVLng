@@ -15,6 +15,14 @@
     {{ChannelType}}: <img src="{ICON}" alt="" />&nbsp;<strong>{TYPENAME}</strong>
 </p>
 
+<!-- IF {TYPEHELP} -->
+<p>
+    <strong><img src="/images/ico/exclamation-circle.png"
+        style="width:16px;height:16px;margin-right:8px" width="16" height="16" alt="!"/></strong>
+    <em>{TYPEHELP}</em>
+</p>
+<!-- ENDIF -->
+
 <form action="/channel/edit" method="post">
 
 <input type="hidden" name="c[id]" value="{ID}" />
@@ -47,7 +55,17 @@
             <!-- ENDIF -->
         </td>
         <td style="white-space:nowrap">
-            <!-- IF {TYPE} == "radio" -->
+            <!-- IF {TYPE} == "numeric" -->
+                <input type="number" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10" step="0.000000000000001"
+                       <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
+                       <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
+                />
+            <!-- ELSEIF {TYPE} == "integer" -->
+                <input type="number" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10" step="1"
+                       <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
+                       <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
+                />
+            <!-- ELSEIF {TYPE} == "radio" -->
                 <div class="fl">
                     <input type="radio" id="y{FIELD}" name="c[{FIELD}]" value="1"
                         class="iCheckLine" style="margin-right:.3em"
@@ -63,11 +81,25 @@
                     <label for="n{FIELD}">{{No}}</label>
                 </div>
             <!-- ELSEIF {TYPE} == "textarea" -->
-                <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="4"
-                    <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>{VALUE}</textarea>
+                <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="5"
+                          <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
+                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>
+                    {VALUE}
+                </textarea>
+            <!-- ELSEIF {TYPE} == "textextra" -->
+                <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="15"
+                          <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
+                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>
+                    {VALUE}
+                </textarea>
+            <!-- ELSEIF {TYPE} == "textsmall" -->
+                <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10"
+                       <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
+                       <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
             <!-- ELSE -->
                 <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="50"
-                    <!-- IF {READONLY} -->class="ro" readonly="readonly"<!-- ENDIF --> />
+                       <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
+                       <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
             <!-- ENDIF -->
         </td>
         <td>

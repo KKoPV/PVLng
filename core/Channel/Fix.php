@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Fix extends \Channel {
+class Fix extends Sensor {
 
     /**
      *

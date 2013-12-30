@@ -15,6 +15,15 @@ namespace Channel;
 class Differentiator extends \Channel {
 
     /**
+     * Channel type
+     * 0 - undefined, concrete channel decides
+     * 1 - numeric, concrete channel decides if sensor or meter
+     * 2 - sensor, numeric
+     * 3 - meter, numeric
+     */
+    const TYPE = 1;
+
+    /**
      * Accept only childs of the same entity type
      */
     public function addChild( $guid ) {

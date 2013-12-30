@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class SensorToMeter extends \Channel {
+class SensorToMeter extends Meter {
 
     /**
      *

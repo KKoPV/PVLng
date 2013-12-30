@@ -10,6 +10,15 @@
 abstract class Channel {
 
     /**
+     * Channel type
+     * 0 - undefined, concrete channel decides
+     * 1 - numeric, concrete channel decides if sensor or meter
+     * 2 - sensor, numeric
+     * 3 - meter, numeric
+     */
+    const TYPE = 0;
+
+    /**
      * Helper function to build an instance
      */
     public static function byId( $id ) {

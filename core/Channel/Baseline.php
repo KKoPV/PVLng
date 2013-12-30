@@ -15,7 +15,7 @@ namespace Channel;
 /**
  *
  */
-class Baseline extends \Channel {
+class Baseline extends Sensor {
 
     /**
      *

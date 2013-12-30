@@ -25,7 +25,7 @@ $(function() {
             { 'asSorting': false },
             null,
             null,
-            null,
+            { 'asSorting': false },
             { 'asSorting': false },
             { 'asSorting': false }
         ],
