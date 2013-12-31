@@ -52,8 +52,16 @@ abstract class InternalCalc extends \Channel {
     protected function saveValues( $values ) {
         $cnt = 0;
         $this->data->id = $this->entity;
-        foreach ($values as $this->data->timestamp=>$this->data->data) {
-            $cnt += $this->data->insert();
+        if ($values instanceof \Buffer) {
+            foreach ($values as $row) {
+                $this->data->timestamp = $row['timestamp'];
+                $this->data->data      = $row['data'];
+                $cnt += $this->data->insert();
+            }
+        } else {
+            foreach ($values as $this->data->timestamp=>$this->data->data) {
+                $cnt += $this->data->insert();
+            }
         }
         return $cnt;
     }
