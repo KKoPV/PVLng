@@ -397,7 +397,7 @@ class DBQuery {
     protected function SelectSQL() {
         return 'SELECT '
              . $this->_get()
-             . "\n".'  FROM `' . $this->table . '`'
+             . "\n".'  FROM ' . $this->field($this->table)
              . $this->_join()
              . $this->_where()
              . $this->_group()
