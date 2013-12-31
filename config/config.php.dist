@@ -43,7 +43,7 @@ return array(
     ),
 
     /**
-     * You title
+     * Your personal title :-)
      */
     'Title' => 'PhotoVoltaic Logger new generation',
 
@@ -60,10 +60,10 @@ return array(
      * Preferd cache mode, auto detect best one if empty
      */
     'Cache' => '',      // Auto detect
-    #'Cache' => 'APC',
-    #'Cache' => 'MemCache',
-    #'Cache' => 'File',
-    #'Cache' => 'Mock', // Disable caching complete
+//    'Cache' => 'APC',
+//    'Cache' => 'MemCache',
+//    'Cache' => 'File',
+//    'Cache' => 'Mock', // Disable caching complete
 
     /**
      * Default language, 'en' or 'de', Translators are welcome :-)
@@ -78,7 +78,25 @@ return array(
      * Login cookie settings for private installation
      */
     'Cookie' => array(
-        'Name'     => 'PVLng',
+        'Name' => 'PVLng',
     ),
+
+    /**
+     * Model flags
+     */
+    'Model' => array(
+
+        /**
+         * How to calculate the average of data in History channels
+         *
+         * 0 - linear (default)
+         * 1 - harmonic
+         * 2 - geometric
+         */
+//         'History' => array(
+//             'Average' => 0
+//         ),
+
+     ),
 
 );

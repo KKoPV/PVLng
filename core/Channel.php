@@ -244,8 +244,6 @@ abstract class Channel {
 
             } else {
                 // with period
-                $grouping = sprintf($this->GroupBy[$this->period[1]], $this->period[0]);
-
                 $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
                   ->get($q->MIN('timestamp'), 'timestamp');
 
@@ -263,7 +261,7 @@ abstract class Channel {
                   ->get($q->MAX('data'), 'max')
                   ->get($q->COUNT('id'), 'count')
                   ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
-                  ->get($grouping, 'g')
+                  ->get($this->periodGrouping(), 'g')
                   ->group('g');
             }
 
@@ -339,6 +337,22 @@ abstract class Channel {
         }
 
         return $this->after_read($buffer, $attributes);
+    }
+
+    /**
+     *
+     */
+    public function __destruct() {
+        $time = (microtime(TRUE) - $this->time) * 1000;
+
+        Header(sprintf('X-Query-Time: %d ms', $time));
+
+        // Check for real action to log
+        if ($this->performance->action == '') return;
+
+        $this->performance->entity = $this->entity;
+        $this->performance->time = $time;
+        $this->performance->insert();
     }
 
     // -------------------------------------------------------------------------
@@ -462,17 +476,21 @@ abstract class Channel {
     /**
      *
      */
-    public function __destruct() {
-        $time = (microtime(TRUE) - $this->time) * 1000;
-
-        Header(sprintf('X-Query-Time: %d ms', $time));
-
-        // Check for real action to log
-        if ($this->performance->action == '') return;
-
-        $this->performance->entity = $this->entity;
-        $this->performance->time = $time;
-        $this->performance->insert();
+    protected function periodGrouping() {
+        static $GroupBy = array(
+            self::NO       => '`timestamp`',
+            self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
+            self::HOUR     => '`timestamp` DIV (3600 * %f)',
+            self::DAY      => '`timestamp` DIV (86400 * %d)',
+            self::WEEK     => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
+            self::MONTH    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
+            self::QUARTER  => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
+            self::YEAR     => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
+            self::LAST     => '`timestamp`',
+            self::READLAST => '`timestamp`',
+            self::ALL      => '`timestamp`',
+        );
+        return sprintf($GroupBy[$this->period[1]], $this->period[0]);
     }
 
     /**

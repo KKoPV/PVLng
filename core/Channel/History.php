@@ -12,31 +12,12 @@ namespace Channel;
 /**
  *
  */
-class History extends \Channel {
-
-    /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = NUMERIC_CHANNEL;
+class History extends InternalCalc {
 
     /**
      *
      */
     public function read( $request, $attributes=FALSE ) {
-
-        if (isset($request['period'])) {
-            if (preg_match('~^([.\d]+)(i|min|minutes?)$~', $request['period'], $args)) {
-                if ($this->threshold) $args[1] *= $this->threshold;
-                $request['period'] = ($args[1]/60).'h';
-            } elseif ($this->threshold AND
-                      preg_match('~^[.\d]+~', $request['period'], $args)) {
-                $request['period'] = str_replace($args[0], $args[0]*$this->threshold, $request['period']);
-            }
-        }
 
         $this->before_read($request);
 
@@ -47,33 +28,100 @@ class History extends \Channel {
         // Inherit properties from child
         $this->meter = $this->child->meter;
 
-        if (!$this->valid_to) {
-            $result = $this->DayRange(
-                $request,
-                $this->start + $this->valid_from * 60*60*24,
-                $this->end
-            );
+        // Fetch all data, compress later
+        unset($request['period']);
+
+        if ($this->valid_to == 0) {
+            // Last x days, move request start backwards
+            $request['start'] = $this->start + $this->valid_from * 60*60*24;
+            // Save data into temp. table
+            $this->saveValues($this->child->read($request));
         } else {
-            $result = $this->overall($request);
+            // Find earliest data
+            $q = new \DBQuery('pvlng_reading_num');
+            $q->get($q->FROM_UNIXTIME($q->MIN('timestamp'), '%Y'));
+
+            for ($i=$this->db->queryOne($q)-date('Y'); $i<=0; $i++) {
+                $request['start'] = strtotime(date('Y-m-d ', $this->start + $this->valid_from * 60*60*24).$i.'years');
+                $request['end']   = strtotime(date('Y-m-d ', $this->end + $this->valid_to * 60*60*24).$i.'years');
+                // Save data into temp. table
+                $this->saveValues($this->child->read($request));
+            }
         }
 
-        // Smooth data
-        $buffer = new \Buffer;
-        $data = array();
-        $cnt = 3;
-        foreach ($result as $id=>$row) {
-            $data[] = $row['data'];
-            if (count($data) == $cnt) {
-                $row['data'] = array_sum($data) / $cnt;
-                array_shift($data);
+        if ($this->period[1] == self::NO) {
+            // Smooth result at least 5 times time step
+            $this->period = array(5 * $this->db->TimeStep/60, self::MINUTE);
+        } elseif ($this->threshold AND $this->period[1] == self::MINUTE) {
+            // Smooth result by cut period by "threshold", only for minutes
+            $this->period[0] *= $this->threshold;
+        }
+
+        $q = new \DBQuery('pvlng_reading_num_tmp');
+        $q->get($q->FROM_UNIXTIME('timestamp', '%H'), 'hour')
+          ->get($q->FROM_UNIXTIME('timestamp', '%i'), 'minute');
+
+        if ($this->meter) {
+            $q->get($q->MAX('data'), 'data');
+        } elseif ($this->counter) {
+            $q->get($q->SUM('data'), 'data');
+        } else {
+
+            switch (\slimMVC\Config::getInstance()->get('Model.History.Average')) {
+                default:
+                    // Linear average
+                    $q->get($q->AVG('data'), 'data');
+                    break;
+                case 1:
+                    // harm. avg.: count(val) / sum(1/val) as hmean
+                    $q->get($q->COUNT('data').'/'.$q->SUM('1/`data`'), 'data');
+                    break;
+                case 2:
+                    // geom. avg.: exp(avg(ln(val)))
+                    $q->get($q->EXP($q->AVG($q->LN('data'))), 'data');
+                    break;
             }
-            $buffer->write($row, $id);
+        }
+
+        $q->get($q->MIN('data'), 'min')
+          ->get($q->MAX('data'), 'max')
+          ->get($q->COUNT(0), 'count')
+          ->get($this->periodGrouping(), 'g')
+          ->whereEQ('id', $this->entity)
+          ->groupBy('g');
+        $inner = $q->SQL();
+        $q->select("\n(\n".$inner."\n) t")
+          ->groupBy('hour')
+          ->groupBy('minute');
+
+#echo $q;
+
+        $result = new \Buffer;
+
+        $day   = date('d', ($this->start+$this->end)/2);
+        $month = date('m', ($this->start+$this->end)/2);
+        $year  = date('Y', ($this->start+$this->end)/2);
+
+        if ($res = $this->db->query($q)) {
+            while ($row = $res->fetch_object()) {
+                $ts = mktime($row->hour, $row->minute, 0, $month, $day, $year);
+                $result->write(array(
+                    'datetime'    => date('Y-m-d H:i:s', $ts),
+                    'timestamp'   => $ts,
+                    'data'        => +$row->data,
+                    'min'         => +$row->min,
+                    'max'         => +$row->max,
+                    'count'       => +$row->count,
+                    'timediff'    => 0,
+                    'consumption' => 0
+                ), $row->g);
+            }
         }
 
         // Skip validity handling of after_read!
         $this->valid_from = $this->valid_to = NULL;
 
-        return $this->after_read($buffer, $attributes);
+        return $this->after_read($result, $attributes);
     }
 
     // -----------------------------------------------------------------------
@@ -84,140 +132,5 @@ class History extends \Channel {
      *
      */
     protected $child;
-
-    /**
-     *
-     */
-    protected function DayRange( $request, $start, $end ) {
-
-        $result = new \Buffer;
-
-        $_start = $start;
-        $_end = $start + ($this->end - $this->start);
-
-        $i = 1;
-
-        while ($_end <= $end) {
-            $request['start'] = $_start;
-            $request['end']   = $_end;
-
-            // Skip actual requested period day
-            if ($_start != $this->start AND $_end != $this->end) {
-                $result = $this->combine($result, $this->child->read($request), $request, $i++);
-            }
-
-            $_start += $this->end - $this->start;
-            $_end   += $this->end - $this->start;
-        }
-
-        return $result;
-    }
-
-    /**
-     *
-     */
-    protected function overall( $request ) {
-        // Start year
-        $year = date('Y') - 11;
-        $i = 1;
-
-        $result = new \Buffer;
-
-        while ($year <= date('Y')) {
-
-            // Recalc dates to fetch into year
-            list($m, $d) = explode('|', date('m|d', $this->start));
-            $start = mktime(0, 0, 0, $m, $d, $year);
-
-            list($m, $d) = explode('|', date('m|d', $this->end));
-            $end = mktime(0, 0, 0, $m, $d, $year);
-            $buffer = $this->DayRange(
-                $request,
-                $start + $this->valid_from * 60*60*24,
-                $end + $this->valid_to * 60*60*24
-            );
-
-            $request['start'] = $this->start;
-            $request['end']   = $this->end;
-
-            $result = $this->combine($result, $buffer, $request, $i++);
-            $year++;
-        }
-
-        return $result;
-    }
-
-    /**
-     *
-     */
-    protected function combine( \Buffer $buffer, \Buffer $next, $request, $i ) {
-
-        // Check for data to process
-        if (!count($next)) return $buffer;
-
-        $row1 = $buffer->rewind()->current();
-        $row2 = $next->rewind()->current();
-
-        $result = new \Buffer;
-
-        while (!empty($row1) OR !empty($row2)) {
-
-            // id is in correct format from previous run, build id
-            $id = $row2
-                ? floor(($row2['timestamp'] - $request['start']) / 86400) . '|' .
-                  substr($row2['datetime'], -8)
-                : '';
-
-            if (substr($buffer->key(), -8) == substr($id, -8)) {
-
-                // same timestamp, combine
-                $row1['data']        = ($row1['data']*($i-1)        + $row2['data'])        / $i;
-                $row1['min']         = ($row1['min']*($i-1)         + $row2['min'])         / $i;
-                $row1['max']         = ($row1['max']*($i-1)         + $row2['max'])         / $i;
-                $row1['consumption'] = ($row1['consumption']*($i-1) + $row2['consumption']) / $i;
-                $row1['count']      += $row2['count'];
-
-                // Save combined data
-                $result->write($row1, $buffer->key());
-
-                // read both next rows
-                $row1 = $buffer->next()->current();
-                $row2 = $next->next()->current();
-
-            } elseif ( $buffer->key() AND $buffer->key() < $id OR $id == '') {
-
-                // missing row 2, save row 1 as is
-                $result->write($row1, $buffer->key());
-
-                // read only row 1
-                $row1 = $buffer->next()->current();
-
-            } else {
-
-                // missing row 1, save row 2 as is
-                $result->write($row2, $id);
-
-                // read only row 2
-                $row2 = $next->next()->current();
-
-            }
-        }
-        $buffer->close();
-        $next->close();
-
-        $buffer = new \Buffer;
-
-        // Recalc datetime & timestamp from row Ids
-        foreach ($result as $id=>$row) {
-
-            list($offset, $hms) = explode('|', $id);
-
-            $row['datetime']  = date('Y-m-d ', $this->start + $offset * 60*60*24) . $hms;
-            $row['timestamp'] = strtotime($row['datetime']);
-            $buffer->write($row, $id);
-        }
-
-        return $buffer;
-    }
 
 }

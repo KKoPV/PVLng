@@ -19,10 +19,12 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
+    'threshold' => array(
+        'visible' => TRUE
+    ),
     'valid_from' => array(
         'required' => TRUE
     ),
-
     'valid_to' => array(
         'required' => TRUE,
         'default'  => 0
