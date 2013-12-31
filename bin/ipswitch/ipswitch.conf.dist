@@ -2,7 +2,7 @@
 ### @author      Patrick Feisthammel <patrick.feisthammel@citrin.ch>
 ### @copyright   2013 Patrick Feisthammel
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     1.0.0
+### @version     1.1.0
 ##############################################################################
 
 ##############################################################################
@@ -14,6 +14,14 @@
 ### required
 ##############################################################################
 #IPSWITCH        "10.10.10.10:80"
+
+##############################################################################
+### CVSFILENAME
+### optional
+### If you define a [path]filename here, the values will not only be pushed
+### to the server but also written to [path]filename20131231.csv
+##############################################################################
+#CVSFILENAME     "ipswitch.log."
 
 ##############################################################################
 ### Per sensor settings

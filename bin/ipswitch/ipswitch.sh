@@ -3,7 +3,7 @@
 ### @author      Patrick Feisthammel <patrick.feisthammel@citrin.ch>
 ### @copyright   2013 Patrick Feisthammel
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     1.0.1
+### @version     1.1.0
 ##############################################################################
 
 ##############################################################################
@@ -16,11 +16,12 @@ pwd=$(dirname $0)
 
 CACHED=false
 
-while getopts "tvxh" OPTION; do
+while getopts "tvxnh" OPTION; do
 	case "$OPTION" in
 		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
 		v) VERBOSE=$((VERBOSE + 1)) ;;
 		x) TRACE=y ;;
+                n) NOPUSH=y ;;
 		h) usage; exit ;;
 		?) usage; exit 1 ;;
 	esac
@@ -49,7 +50,8 @@ row=$($(curl_cmd) http://$IPSWITCH/csv.html | awk '/<body>/{print $0}' | sed 's/
 log 2 "Raw data : $row"
 
 i=0
-
+valuelist=""
+guidlist=""
 while test $i -lt $GUID_N; do
 
 	i=$((i + 1))
@@ -75,10 +77,28 @@ while test $i -lt $GUID_N; do
 	if test "$TEST" ; then
 		log 1 "Test-Mode - not sending value=$value of channel=$CHANNEL to $GUID"
 	else
-		PVLngPUT2 $GUID $value
+                if test "$NOPUSH" = "y" ; then
+                        log 1 "Not pushing to server - value=$value, channel=$CHANNEL, GUID=$GUID"
+                else
+		        PVLngPUT2 $GUID $value
+                fi
 	fi
-
+        valuelist="$valuelist,\"$value\""
+        guidlist="$guidlist,$GUID"
 done
+
+if test ! -z "$CSVFILENAME" ; then
+        file="$CSVFILENAME$(date +%Y%m%d).csv"
+        line="\"$(date +%s)\"$valuelist"
+        if test "$TEST" ; then
+                log 1 "Test-Mode - not writing to $file: $line"
+        else
+                if test ! -e $file ; then 
+                        echo "#v1:time$guidlist" >>$file;
+		fi
+		echo $line >>$file || error_exit "Could not write to $file: $line"
+        fi
+fi
 
 set +x
 
@@ -97,6 +117,7 @@ Options:
 	    Sets verbosity to info level
 	-v  Set verbosity level to info level
 	-vv Set verbosity level to debug level
+        -n  Do not push the values to the server
 	-h  Show this help
 
 See $pwd/ipswitch.conf.dist for details.
