@@ -11,12 +11,12 @@ abstract class Channel {
 
     /**
      * Channel type
-     * 0 - undefined, concrete channel decides
-     * 1 - numeric, concrete channel decides if sensor or meter
-     * 2 - sensor, numeric
-     * 3 - meter, numeric
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
      */
-    const TYPE = 0;
+    const TYPE = UNDEFINED_CHANNEL;
 
     /**
      * Helper function to build an instance
@@ -25,8 +25,13 @@ abstract class Channel {
         $channel = new ORM\Tree;
         $channel->find('id', $id);
 
-        if ($channel->id != '') {
-            $model = rtrim('Channel\\' . $channel->model, '\\');
+        if ($channel->alias_of) {
+            // Is an alias channel, switch direct to the original channel
+            return self::byId($channel->alias_of);
+        }
+
+        if ($channel->model) {
+            $model = $channel->ModelClass();
             return new $model($channel);
         }
 
@@ -40,18 +45,17 @@ abstract class Channel {
         $channel = new ORM\Tree;
         $channel->find('guid', $guid);
 
-        if ($channel->id != '') {
-            $model = rtrim('Channel\\' . $channel->model, '\\');
+        if ($channel->alias_of) {
+            // Is an alias channel, switch direct to the original channel
+            return self::byId($channel->alias_of);
+        } elseif ($channel->model) {
+            // Channel is in tree
+            $model = $channel->ModelClass();
             return new $model($channel);
         }
 
         throw new Exception('No channel found for GUID: '.$guid, 400);
     }
-
-    /**
-     * Called just before the channel is saved to database
-     */
-    public static function afterEdit( \ORM\Channel &$channel ) {}
 
     /**
      *
@@ -752,3 +756,11 @@ abstract class Channel {
     private $_childs;
 
 }
+
+/**
+ *
+ */
+define('UNDEFINED_CHANNEL', 0);
+define('NUMERIC_CHANNEL',   1);
+define('SENSOR_CHANNEL',    2);
+define('METER_CHANNEL',     3);

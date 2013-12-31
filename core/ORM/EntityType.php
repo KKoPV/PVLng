@@ -18,6 +18,13 @@ namespace ORM;
  */
 class EntityType extends \slimMVC\ORMTable {
 
+    /**
+     *
+     */
+    public function ModelClass() {
+        return $this->model ? 'Channel\\'.$this->model : NULL;
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------

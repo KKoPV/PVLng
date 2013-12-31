@@ -30,7 +30,7 @@ class Dashboard extends Calculator {
         // Get some properties from child
         $this->meter = $channel->meter;
 
-        // Set some proerties of child
+        // Set some properties of child
         // If valid range is smaller than dashbord should display,
         // extend to at least dashboard range
         // e.g. performance ratio for graphs 95 .. 100, but dashboard 50 .. 100

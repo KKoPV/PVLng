@@ -35,8 +35,9 @@ $(function() {
                     $(el).html(data[0].data);
                 }
             }
-        ).error(function() {
+        ).fail(function(jqxhr) {
             $(el).html('?');
+            console.log(jqxhr.responseText);
         });
     });
 

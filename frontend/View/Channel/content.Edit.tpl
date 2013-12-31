@@ -27,18 +27,18 @@
 
 <input type="hidden" name="c[id]" value="{ID}" />
 <input type="hidden" name="c[type]" value="{TYPE}" />
-<!-- BEGIN FIELDS -->
-<!-- IF ! {VISIBLE} -->
+<!-- BEGIN FIELDS --><!-- IF !{VISIBLE} AND {VALUE} != "" -->
+<!-- Store also invisible fields, because they can have
+     non-default values from model in add mode. -->
 <input type="hidden" name="c[{FIELD}]" value="{VALUE}" />
-<!-- ENDIF -->
-<!-- END -->
+<!-- ENDIF --><!-- END -->
 
 <table id="dataTable" class="dataTable">
     <thead>
     <tr>
         <th style="width:20%">{{channel::Param}}</th>
-        <th>{{channel::Value}}</th>
-        <th>{{channel::Help}}</th>
+        <th style="width:40%">{{channel::Value}}</th>
+        <th style="width:40%">{{channel::Help}}</th>
     </tr>
     </thead>
 

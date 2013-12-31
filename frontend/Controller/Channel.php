@@ -15,14 +15,6 @@ namespace Controller;
 class Channel extends \Controller {
 
     /**
-     * Model types
-     */
-    const UNDEFINED = 0;
-    const NUMERIC   = 1;
-    const SENSOR    = 2;
-    const METER     = 3;
-
-    /**
      *
      */
     public function before() {
@@ -233,13 +225,6 @@ class Channel extends \Controller {
 
             $this->prepareFields($entity);
 
-            $type = new \ORM\EntityType($entity->type);
-
-            if ($type->model) {
-                $model = '\Channel\\' . $type->model;
-                $model::afterEdit($entity);
-            }
-
             /* check required fields */
             foreach ($this->fields as $key=>$data) {
                 if ($data['VISIBLE'] AND $data['REQUIRED'] AND $entity->$key == '') {
@@ -367,12 +352,12 @@ class Channel extends \Controller {
 
         if ($addMode) {
             // Get prefered type settings from Model
-            $model = 'Channel\\' . $type->model;
-            if ($model::TYPE != self::UNDEFINED) {
+            $model = $type->ModelClass();
+            if ($model::TYPE != UNDEFINED_CHANNEL) {
                 $this->applyFieldSettings('numeric');
-                if ($model::TYPE == self::SENSOR) {
+                if ($model::TYPE == SENSOR_CHANNEL) {
                     $this->applyFieldSettings('sensor');
-                } elseif ($model::TYPE == self::METER) {
+                } elseif ($model::TYPE == METER_CHANNEL) {
                     $this->applyFieldSettings('meter');
                 }
             }
