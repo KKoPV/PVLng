@@ -9,7 +9,7 @@
  */
 -->
 
-<form method="post" action="/index">
+<form method="post" action="/">
 
 <input type="hidden" id="fromdate" name="fromdate" />
 <input type="hidden" id="todate" name="todate" />
