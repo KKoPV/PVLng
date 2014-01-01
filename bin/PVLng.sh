@@ -317,6 +317,47 @@ function PVLngPUT2Batch {
 }
 
 ##############################################################################
+### Save data to PVLng using CSV file
+### $1 = GUID
+### $2 = CSV file - @file_name
+###      <timestamp>;<value>   : "Semicolon separated timestamp and value data rows",
+###      <date time>;<value>   : "Semicolon separated date time and value data rows"
+###      <date>;<time>;<value> : "Semicolon separated date, time and value data rows"
+##############################################################################
+function PVLngPUT2CSV {
+
+    local GUID="$1"
+    local data="$2"
+
+    log 2 "GUID     : $GUID"
+    log 2 "Data file: $data"
+
+    ### Clear temp. file before
+    rm $TMPFILE >/dev/null 2>&1
+
+    set $($(curl_cmd) --request PUT \
+                      --header "X-PVLng-key: $PVLngAPIkey" \
+                      --header "Content-Type: text/plain" \
+                      --write-out %{http_code} \
+                      --output $TMPFILE \
+                      --data-binary $data \
+                      $PVLngHost/api/r2/csv/$GUID.txt)
+
+    if echo "$1" | grep -qe '^20[012]'; then
+        ### 200/201/202 ok
+        log 1 "HTTP code : $1"
+        test -f $TMPFILE && log 2 @$TMPFILE
+    else
+        ### errors
+        log -1 "HTTP code : $1"
+        test -f $TMPFILE && log -1 @$TMPFILE
+        save_log "$GUID" "HTTP code: $1 - raw: $raw"
+        test -f $TMPFILE && save_log "$GUID" @$TMPFILE
+    fi
+
+}
+
+##############################################################################
 ### trap function to clean up
 ##############################################################################
 function clean_up {
