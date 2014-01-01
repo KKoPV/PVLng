@@ -16,12 +16,12 @@
 #IPSWITCH        "10.10.10.10:80"
 
 ##############################################################################
-### CVSFILENAME
+### CSVFILENAME
 ### optional
 ### If you define a [path]filename here, the values will not only be pushed
 ### to the server but also written to [path]filename20131231.csv
 ##############################################################################
-#CVSFILENAME     "ipswitch.log."
+#CSVFILENAME     "ipswitch.log."
 
 ##############################################################################
 ### Per sensor settings
