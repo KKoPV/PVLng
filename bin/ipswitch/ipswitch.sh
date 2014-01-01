@@ -117,7 +117,7 @@ Options:
 	    Sets verbosity to info level
 	-v  Set verbosity level to info level
 	-vv Set verbosity level to debug level
-        -n  Do not push the values to the server
+        -n  Do not push the values to the server. Usefull if you only want to write to CSVFILENAME
 	-h  Show this help
 
 See $pwd/ipswitch.conf.dist for details.
