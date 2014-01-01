@@ -17,10 +17,10 @@ pwd=$(dirname $0)
 S0=$(which S0)
 test "$S0" || error_exit 'Missing "S0" binary!'
 
-while getopts "sltvxh" OPTION; do
+while getopts "astvxh" OPTION; do
     case "$OPTION" in
-        s) STOP=y ;;
-        l) SAVEDATA=y ;;
+        a) STOP=y ;;
+        s) SAVEDATA=y ;;
         t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
         v) VERBOSE=$((VERBOSE + 1)) ;;
         x) TRACE=y ;;
@@ -171,11 +171,11 @@ Read S0 impulses
 Usage: $scriptname [options] config_file
 
 Options:
-    -s    Stop listening, kill all running S0 processes
-    -l  Save data also into log file
+    -a    Abort listening, kill all running S0 processes
+    -s    Save data also into log file
     -t    Test mode
     -v    Make processing verbose
-    -vv    Make processing more verbose
+    -vv   Make processing more verbose
     -h    Show this help
 
 # << USAGE

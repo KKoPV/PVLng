@@ -15,9 +15,9 @@ WEBBOX="192.168.0.168:80"
 . $pwd/../PVLng.conf
 . $pwd/../PVLng.sh
 
-while getopts "ltvxh" OPTION; do
+while getopts "stvxh" OPTION; do
     case "$OPTION" in
-        l) SAVEDATA=y ;;
+        s) SAVEDATA=y ;;
         t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
         v) VERBOSE=$((VERBOSE + 1)) ;;
         x) TRACE=y ;;
@@ -106,7 +106,7 @@ Read Inverter or Sensorbox data from SMA Webbox
 Usage: $scriptname [options] config_file
 
 Options:
-    -l  Save data also into log file
+    -s  Save data also into log file
     -t  Test mode, read only from Webbox and show the results, don't save to PVLng
         Sets verbosity to info level
     -v  Set verbosity level to info level
