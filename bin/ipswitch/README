@@ -21,6 +21,9 @@ The entries of IPSwitch are numbered iC1, iC2, iC3 etc.
 
 The conversation rate for impules to Wh has to be set on the IPSwitches.
 
+You can optionally log the values into a CSV file and submit them later 
+to the PVlng using submitcsv.sh 
+
 
 IPswitch-16E
 ============
