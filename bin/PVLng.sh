@@ -34,10 +34,12 @@ function log {
 
     {    ### Detect if now $1 is a "@filename"
         if test "${1:0:1}" == '@'; then
-            echo $(date +"[%d-%b %H:%M:%S]") File: ${1:1}
+#            echo $(date +"[%d-%b %H:%M:%S]") File: ${1:1}
+            echo $(date +"[%H:%M:%S]") File: ${1:1}
             cat ${1:1}
         else
-            echo -e $(date +"[%d-%b %H:%M:%S]") "$*"
+#            echo -e $(date +"[%d-%b %H:%M:%S]") "$*"
+            echo -e $(date +"[%H:%M:%S]") "$*"
         fi
     } >&2
 }

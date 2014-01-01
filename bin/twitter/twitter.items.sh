@@ -2,11 +2,17 @@
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2013 Knut Kohl
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     $Id$
+### @version     1.1.0
+###
+### 1.1.0
+### Adjust functions, make more variable
+###
+### 1.0.0
+### Initial creation
 ##############################################################################
 
 ##############################################################################
-### Actual/last value
+twitter_last_help='Actual/last value'
 ##############################################################################
 function twitter_last {
 	value=$(PVLngGET2 "data/$1.tsv?period=last" | cut -f2)
@@ -15,11 +21,11 @@ function twitter_last {
 }
 
 ##############################################################################
-### Average value over the last $1 minutes (e.g. 60 for last hour)
+twitter_average_help='Average value since $1'
 ### $1 - Start time
 ### $2 - Period for aggregation
 ### $3 - GUID
-### Example params: 00:00 24hours
+### Example params: midnight 24hours
 ### Start at today midnight and aggregate 24 hours > 1 row as result
 ##############################################################################
 function twitter_average {
@@ -29,11 +35,17 @@ function twitter_average {
 }
 
 ##############################################################################
-### Max. value of today
+twitter_maximum_help='Maximum value since $1'
+### $1 - Start time
+### $2 - GUID
+### Example params: midnight | first%20day%20of%20this%20month
+### Start at today midnight  | 1st of this month
 ##############################################################################
 function twitter_maximum {
-	PVLngGET2 "data/$1.tsv" >$TMPFILE
+    ### Get all data rows
+	PVLngGET2 "data/$2.tsv?start=$1" >$TMPFILE
 
+    ### Loop all rows and find max. value
 	max=0
 	while read line; do
 		value=$(echo "$line" | cut -f2)
@@ -45,16 +57,20 @@ function twitter_maximum {
 }
 
 ##############################################################################
-### Production today in kWh
+twitter_production_help='Production in kWh since $1'
+### $1 - Start time
+### $2 - GUID
+### Example params: midnight | first%20day%20of%20this%20month
+### Start at today midnight  | 1st of this month
 ##############################################################################
-function twitter_today {
-	value=$(PVLngGET2 "data/$1.tsv?period=last" | cut -f2)
+function twitter_production {
+	value=$(PVLngGET2 "data/$2.tsv?start=$1&period=last" | cut -f2)
 	log 1 "$url => $value"
 	echo $value
 }
 
 ##############################################################################
-### Overall production in MWh
+twitter_overall_help='Overall production in MWh'
 ##############################################################################
 function twitter_overall {
 	value=$(PVLngGET2 "data/$1.tsv?start=0&period=99y" | cut -f2)
@@ -63,9 +79,10 @@ function twitter_overall {
 }
 
 ##############################################################################
-### Today working hours in hours :-)
+twitter_today_working_hours_help='Today working hours in hours :-)'
 ##############################################################################
 function twitter_today_working_hours {
+    ### Get all data rows
 	PVLngGET2 "data/$1.tsv" >$TMPFILE
 
 	### get first line, get 1st value

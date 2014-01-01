@@ -20,19 +20,28 @@ test -f $pwd/.tokens || error_exit "Missing token file! Did you run setup.sh?"
 . $pwd/.pvlng
 . $pwd/.tokens
 
+##############################################################################
+function listItems {
+    printf '\nImplemented items:\n\n'
+    typeset -F | grep ' twitter_' | sed -e 's/.*twitter_//'| \
+    while read line; do
+        eval help="\$twitter_${line}_help"
+        printf '    - %-25s - %s\n' "$line" "$help"
+    done
+    printf "\nSee $pwd/twitter.items.sh for more details\n"
+}
+
+##############################################################################
 while getopts "lftvxh" OPTION; do
-	case "$OPTION" in
-		l) printf '\nImplemented items:\n\n'
-		   typeset -F | grep ' twitter_' | sed -e 's/.*twitter_/  - /'
-		   printf "\nSee $pwd/twitter.items for details\n"
-		   exit ;;
-		f) FORCE=y ;;
-		t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
-		v) VERBOSE=$((VERBOSE + 1)) ;;
-		x) TRACE=y ;;
-		h) usage; exit ;;
-		?) usage; exit 1 ;;
-	esac
+    case "$OPTION" in
+        l) listItems; exit ;;
+        f) FORCE=y ;;
+        t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+        v) VERBOSE=$((VERBOSE + 1)) ;;
+        x) TRACE=y ;;
+        h) usage; exit ;;
+        ?) usage; exit 1 ;;
+    esac
 done
 
 shift $((OPTIND-1))
@@ -59,31 +68,31 @@ i=0
 
 while test $i -lt $ITEM_N; do
 
-	i=$((i + 1))
+    i=$((i + 1))
 
-	log 1 "--- $i ---"
+    log 1 "--- $i ---"
 
-	eval ITEM=\$ITEM_$i
-	log 1 "Item	: $ITEM"
+    eval ITEM=\$ITEM_$i
+    log 1 "Item    : $ITEM"
 
-	eval GUID=\$GUID_$i
-	log 1 "GUID	: $GUID"
+    eval GUID=\$GUID_$i
+    log 1 "GUID    : $GUID"
 
-	value=$(twitter_$ITEM $GUID)
-	log 1 "Value : $value"
+    value=$(twitter_$ITEM $GUID)
+    log 1 "Value : $value"
 
-	### Exit if no value is found, e.g. no actual power outside daylight times
-	test "$value" && test "$value" != "0" || test "$FORCE" || exit
+    ### Exit if no value is found, e.g. no actual power outside daylight times
+    test "$value" && test "$value" != "0" || test "$FORCE" || exit
 
-	eval FACTOR=\$FACTOR_$i
-	log 1 "Factor: $FACTOR"
+    eval FACTOR=\$FACTOR_$i
+    log 1 "Factor: $FACTOR"
 
-	if test "$FACTOR"; then
-		value=$(echo "scale=3; $value * $FACTOR" | bc -l)
-		log 1 "Value : $value"
-	fi
+    if test "$FACTOR"; then
+        value=$(echo "scale=3; $value * $FACTOR" | bc -l)
+        log 1 "Value : $value"
+    fi
 
-	PARAMS="$PARAMS $value"
+    PARAMS="$PARAMS $value"
 
 done
 
@@ -99,14 +108,14 @@ log 1 "Length   : $(echo $STATUS | wc -c)"
 
 if test -z "$TEST"; then
 
-	test $VERBOSE -gt 0 && opts="--debug"
+    test $VERBOSE -gt 0 && opts="--debug"
 
-	$pwd/twitter.php $opts \
-		--consumer_key=$CONSUMER_KEY \
-		--consumer_secret=$CONSUMER_SECRET \
-		--oauth_token=$OAUTH_TOKEN \
-		--oauth_secret=$OAUTH_TOKEN_SECRET \
-		--status="$STATUS" --location="$LAT_LON"
+    $pwd/twitter.php $opts \
+        --consumer_key=$CONSUMER_KEY \
+        --consumer_secret=$CONSUMER_SECRET \
+        --oauth_token=$OAUTH_TOKEN \
+        --oauth_secret=$OAUTH_TOKEN_SECRET \
+        --status="$STATUS" --location="$LAT_LON"
 fi
 
 exit $?
@@ -119,12 +128,12 @@ Post status to twitter
 Usage: $scriptname [options] config_file
 
 Options:
-	-l   List implemented items
-	-t   Test mode, don't post
-	     Sets verbosity to info level
-	-v   Set verbosity level to info level
-	-vv  Set verbosity level to debug level
-	-h   Show this help
+    -l   List implemented items
+    -t   Test mode, don't post
+         Sets verbosity to info level
+    -v   Set verbosity level to info level
+    -vv  Set verbosity level to debug level
+    -h   Show this help
 
 See $pwd/twitter.conf.dist for details.
 
