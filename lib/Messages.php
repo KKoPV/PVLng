@@ -167,6 +167,7 @@ abstract class Messages {
     public static function getRaw( $clear=TRUE ) {
         $msgs = array();
         foreach ((array) Session::get(self::$SessionVar) as $msg) {
+            if (is_array($msg[0])) $msg[0] = implode("\n", $msg[0]);
             $msgs[] = array(
                 'type'    => $msg[1],
                 'message' => $msg[2] ? $msg[0] : htmlspecialchars($msg[0], ENT_QUOTES)

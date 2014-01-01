@@ -16,12 +16,12 @@ abstract class InternalCalc extends \Channel {
 
     /**
      * Channel type
-     * 0 - undefined, concrete channel decides
-     * 1 - numeric, concrete channel decides if sensor or meter
-     * 2 - sensor, numeric
-     * 3 - meter, numeric
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
      */
-    const TYPE = 1;
+    const TYPE = NUMERIC_CHANNEL;
 
     /**
      *
@@ -52,8 +52,16 @@ abstract class InternalCalc extends \Channel {
     protected function saveValues( $values ) {
         $cnt = 0;
         $this->data->id = $this->entity;
-        foreach ($values as $this->data->timestamp=>$this->data->data) {
-            $cnt += $this->data->insert();
+        if ($values instanceof \Buffer) {
+            foreach ($values as $row) {
+                $this->data->timestamp = $row['timestamp'];
+                $this->data->data      = $row['data'];
+                $cnt += $this->data->insert();
+            }
+        } else {
+            foreach ($values as $this->data->timestamp=>$this->data->data) {
+                $cnt += $this->data->insert();
+            }
         }
         return $cnt;
     }

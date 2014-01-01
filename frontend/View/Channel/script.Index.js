@@ -18,37 +18,6 @@
  */
 $(function() {
 
-    $.ajaxSetup({
-        beforeSend: function setHeader(xhr) {
-            xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
-        }
-    });
-
-    $('.last-reading').each(function(id, el){
-        var guid = $(el).data('guid');
-
-        if (guid) {
-            $.getJSON(
-                PVLngAPI + 'data/' + guid + '.json',
-                {
-                    attributes: true, /* need decimals for formating */
-                    period:     'readlast'
-                },
-                function(data) {
-                    var attr = data.shift();
-                    /* Test for numeric data */
-                    if (data[0].data == +data[0].data) {
-                        $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
-                    } else {
-                        $(el).html(data[0].data);
-                    }
-                }
-            ).error(function() {
-                $(el).html('?');
-            });
-        }
-    });
-
     $('#entities').DataTable({
         bSort: true,
         bLengthChange: false,
@@ -59,7 +28,6 @@ $(function() {
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
         aoColumns: [
             { 'asSorting': false },
-            null,
             null,
             null,
             null,

@@ -16,11 +16,11 @@ class Meter extends \Channel {
 
     /**
      * Channel type
-     * 0 - undefined, concrete channel decides
-     * 1 - numeric, concrete channel decides if sensor or meter
-     * 2 - sensor, numeric
-     * 3 - meter, numeric
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
      */
-    const TYPE = 2;
+    const TYPE = METER_CHANNEL;
 
 }

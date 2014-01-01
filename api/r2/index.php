@@ -208,15 +208,13 @@ $app->any('/help', function() use ($app) {
     $content = array();
 
     foreach ($app->router()->getNamedRoutes() as $route) {
-        $name = $route->getName();
+        $name    = $route->getName();
         $pattern = implode('|', $route->getHttpMethods()) . ' '
                  . $app->request()->getRootUri() . $route->getPattern();
         $help = array( 'description' => $route->getName() );
-        if (isset($app->container->help[$name])) {
-            $content[$pattern] = array_merge($help, $app->container->help[$name]);
-        } else {
-            $content[$pattern] = $help;
-        }
+        $content[$pattern] = isset($route->help)
+                           ? array_merge($help, $route->help)
+                           : $help;
     }
 
     $app->response->headers->set('Content-Type', 'application/json');
@@ -243,10 +241,16 @@ $app->get('/attributes/:guid(/:attribute)', $accessibleChannel, function($guid, 
 // ---------------------------------------------------------------------------
 $app->put('/data/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
     $request = json_decode($app->request->getBody(), TRUE);
-    Channel::byGUID($guid)->write($request) && $app->halt(201);
-})->name('put data');
-
-$app->container->help['put data'] = array(
+    // Check request for 'timestamp' attribute, take as is if numeric,
+    // otherwise try to convert datetime to timestamp
+    $timestamp = isset($request['timestamp'])
+               ? ( is_numeric($request['timestamp'])
+                 ? $request['timestamp']
+                 : strtotime($request['timestamp'])
+                 )
+               : NULL;
+    Channel::byGUID($guid)->write($request, $timestamp) && $app->halt(201);
+})->name('put data')->help = array(
     'description' => 'Save a reading value',
     'payload'     => '{"<data>":"<value>"}',
 );
@@ -319,12 +323,7 @@ $app->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
 
     $app->render($result);
 
-})->name('get data');
-
-/**
- *
- */
-$app->container->help['get data'] = array(
+})->name('get data')->help = array(
     'description' => 'Read reading values',
     'parameters'  => array(
         'start' => array(
@@ -366,6 +365,72 @@ $app->container->help['get data'] = array(
 );
 
 // ---------------------------------------------------------------------------
+// File
+// ---------------------------------------------------------------------------
+$app->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
+
+    $channel = Channel::byGUID($guid);
+
+    // Diasble AutoCommit in case of errors
+    $app->db->autocommit(FALSE);
+    $count = 0;
+
+    try {
+        foreach (explode(PHP_EOL, $app->request->getBody()) as $send=>$dataset) {
+            if ($dataset == '') continue;
+
+            $data = explode(';', $dataset);
+            switch (count($data)) {
+                case 2:
+                    // timestamp/datetime and data
+                    $timestamp = $data[0];
+                    if (!is_numeric($timestamp)) {
+                        $timestamp = strtotime($timestamp);
+                    }
+                    $data = $data[1];
+                    break;
+                case 3:
+                    // date, time and data
+                    $timestamp = strtotime($data[0] . ' ' . $data[1]);
+                    if ($timestamp === FALSE) {
+                        throw new Exception('Invalid timestamp in data: '.$dataset, 400);
+                    }
+                    $data = $data[2];
+                    break;
+                default:
+                    throw new Exception('Invalid batch data: '.$dataset, 400);
+            } // switch
+
+            $count += $channel->write(array('data'=>$data), $timestamp);
+        }
+        // All fine, commit changes
+        $app->db->commit();
+
+        if ($count) $app->status(201);
+
+        $result = array(
+            'status'  => 'succes',
+            'message' => ($send+1) . ' row(s) sended, ' . $count . ' row(s) inserted'
+        );
+
+        $app->render($result);
+
+    } catch (Exception $e) {
+        // Rollback all correct data
+        $app->db->rollback();
+        stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
+    }
+
+})->name('put data from file')->help = array(
+    'description' => 'Save multiple reading values',
+    'payload'     => array(
+        '<timestamp>;<value>'   => 'Semicolon separated timestamp and value data rows',
+        '<date time>;<value>'   => 'Semicolon separated date time and value data rows',
+        '<date>;<time>;<value>' => 'Semicolon separated date, time and value data rows',
+    ),
+);
+
+// ---------------------------------------------------------------------------
 // Batch
 // ---------------------------------------------------------------------------
 $app->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
@@ -377,13 +442,17 @@ $app->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) u
     $count = 0;
 
     try {
-        foreach (explode(';',  $app->request->getBody()) as $dataset) {
+        foreach (explode(';', $app->request->getBody()) as $dataset) {
             if ($dataset == '') continue;
+
             $data = explode(',', $dataset);
             switch (count($data)) {
                 case 2:
                     // timestamp and data
                     $timestamp = $data[0];
+                    if (!is_numeric($timestamp)) {
+                        $timestamp = strtotime($timestamp);
+                    }
                     $data = $data[1];
                     break;
                 case 3:
@@ -418,12 +487,11 @@ $app->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) u
         stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
     }
 
-})->name('put batch data');
-
-$app->container->help['put batch data'] = array(
+})->name('put batch data')->help = array(
     'description' => 'Save multiple reading values',
     'payload'     => array(
         '<timestamp>,<value>;...'   => 'Semicolon separated timestamp and value data sets',
+        '<date time>,<value>;...'   => 'Semicolon separated date time and value data sets',
         '<date>,<time>,<value>;...' => 'Semicolon separated date, time and value data sets',
     ),
 );
@@ -472,12 +540,7 @@ $app->put('/log', $APIkeyRequired, function() use ($app) {
     $app->render($result);
     $app->stop();
 
-})->name('put log');
-
-/**
- *
- */
-$app->container->help['put log'] = array(
+})->name('put log')->help = array(
     'description' => 'Store new log entry, scope defaults to \'API r2\'',
     'payload'     => '{"scope":"...", "message":"..."}',
 );
@@ -559,9 +622,7 @@ $app->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
         $app->halt(400);
     }
 
-})->name('post log');
-
-$app->container->help['post log'] = array(
+})->name('post log')->help = array(
     'description' => 'Update a log entry',
     'payload'     => '{"scope":"...", "message":"..."}',
 );

@@ -1,0 +1,65 @@
+##############################################################################
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2013 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     1.0.0
+##############################################################################
+
+##############################################################################
+###
+### To see it live, please take look at https://twitter.com/KKoPV
+###
+##############################################################################
+### cron tab
+### # State every hour
+### 0 * * * *  .../public_html/bin/twitter/twitter.sh .../public_html/bin/twitter/hourly.conf
+##############################################################################
+
+##############################################################################
+### Status
+### required
+##############################################################################
+STATUS  "Ø Stunde: %.0f W • Heute: %.1f kWh (%.2f kWh/kWp) • Gesamt: %.2f MWh (%.2f MWh/kWp) • powered by http://PVLng.com"
+#STATUS "Actual power: %.0f W • Ø hour: %.0f W • Today: %.1f kWh (%.2f kWh/kWp) • Overall: %.2f MWh • http://kk.my-pv.info"
+#STATUS "Power today: Ø %.0f W / max. %.0f W • Working: %.1f h • Production: %.1f kWh (%.2f kWh/kWp) • Overall: %.3f MWh (%.3f MWh/kWp)"
+
+##############################################################################
+### Loaction, latitude,longitude
+### 2 decimals: 1.2345,1.2345, optional
+##############################################################################
+LAT_LON          ""
+
+##############################################################################
+### How many items are used in status, in correct order!
+##############################################################################
+ITEM_N           5
+
+##############################################################################
+### Items
+##############################################################################
+### Pac channel of inverter or an accumulator of many Pac
+### last 60 minutes
+ITEM_1           "average -60minutes"
+GUID_1           ""
+
+### E-Total channel of inverter or an accumulator of many E-Total
+ITEM_2           "production -60minutes"
+GUID_2           ""
+FACTOR_2         "1 / 1000"
+
+### E-Total channel of inverter or an accumulator of many E-Total
+ITEM_3           "production -60minutes"
+GUID_3           ""
+###              relative values in kWh / installed power in kWp = kWh/kWp
+FACTOR_3         "1 / 1000 / <your installed power here>"
+
+### E-Total channel of inverter or an accumulator of any E-Total
+ITEM_4           "overall"
+GUID_4           ""
+FACTOR_4         "1 / 1000 / 1000" # into MWh
+
+### E-Total channel of inverter or an accumulator of any E-Total
+ITEM_5           "overall"
+GUID_5           ""
+###              relative values in MWh / installed power in kWp = MWh/kWp
+FACTOR_5         "1 / 1000 / 1000 / <your installed power here>"

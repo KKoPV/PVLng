@@ -16,14 +16,7 @@ namespace ORM;
 /**
  *
  */
-class Tree extends \slimMVC\ORMTable {
-
-    /**
-     *
-     */
-    public function ModelClass() {
-        return $this->model ? 'Channel\\'.$this->model : NULL;
-    }
+class ChannelView extends \slimMVC\ORMTable {
 
     // -------------------------------------------------------------------------
     // PROTECTED
@@ -32,6 +25,6 @@ class Tree extends \slimMVC\ORMTable {
     /**
      *
      */
-    protected $table = 'pvlng_tree_view';
+    protected $table = 'pvlng_channel_view';
 
 }

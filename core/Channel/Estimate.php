@@ -47,16 +47,10 @@ class Estimate extends InternalCalc {
             $day   = date('m-d', $timestamp);
             $month = date('m', $timestamp);
 
-            if (date('Ymd', $timestamp) == date('Ymd')) {
-                // Use now for todays view
-                $ts = strtotime(date('Y-m-d H:i'));
-            } else {
-                // Round between 15:30 and 21:00 during year in seconds
-                $ts = (15.5 + sin(date('z', $timestamp) * M_PI / 366) * 5.5) *60*60;
-
-                // Move into this day using date functions for server time offsets
-                $ts = strtotime(date('Y-m-d H:i', strtotime(date('Y-m-d', $timestamp)) + $ts));
-            }
+            // Round between 16:00 and 21:00 during year in seconds
+            $ts = (16 + sin(date('z', $timestamp) * M_PI / 366) * 5) *60*60;
+            // Move into this day using date functions for server time offsets
+            $ts = strtotime(date('Y-m-d H:i', strtotime(date('Y-m-d', $timestamp)) + $ts));
 
             // Align to data time step
             $ts = bcdiv($ts, $TimeStep) * $TimeStep;

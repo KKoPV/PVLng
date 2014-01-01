@@ -11,12 +11,12 @@ abstract class Channel {
 
     /**
      * Channel type
-     * 0 - undefined, concrete channel decides
-     * 1 - numeric, concrete channel decides if sensor or meter
-     * 2 - sensor, numeric
-     * 3 - meter, numeric
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
      */
-    const TYPE = 0;
+    const TYPE = UNDEFINED_CHANNEL;
 
     /**
      * Helper function to build an instance
@@ -25,8 +25,13 @@ abstract class Channel {
         $channel = new ORM\Tree;
         $channel->find('id', $id);
 
-        if ($channel->id != '') {
-            $model = rtrim('Channel\\' . $channel->model, '\\');
+        if ($channel->alias_of) {
+            // Is an alias channel, switch direct to the original channel
+            return self::byId($channel->alias_of);
+        }
+
+        if ($channel->model) {
+            $model = $channel->ModelClass();
             return new $model($channel);
         }
 
@@ -40,18 +45,17 @@ abstract class Channel {
         $channel = new ORM\Tree;
         $channel->find('guid', $guid);
 
-        if ($channel->id != '') {
-            $model = rtrim('Channel\\' . $channel->model, '\\');
+        if ($channel->alias_of) {
+            // Is an alias channel, switch direct to the original channel
+            return self::byId($channel->alias_of);
+        } elseif ($channel->model) {
+            // Channel is in tree
+            $model = $channel->ModelClass();
             return new $model($channel);
         }
 
         throw new Exception('No channel found for GUID: '.$guid, 400);
     }
-
-    /**
-     * Called just before the channel is saved to database
-     */
-    public static function afterEdit( \ORM\Channel &$channel ) {}
 
     /**
      *
@@ -240,8 +244,6 @@ abstract class Channel {
 
             } else {
                 // with period
-                $grouping = sprintf($this->GroupBy[$this->period[1]], $this->period[0]);
-
                 $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
                   ->get($q->MIN('timestamp'), 'timestamp');
 
@@ -259,7 +261,7 @@ abstract class Channel {
                   ->get($q->MAX('data'), 'max')
                   ->get($q->COUNT('id'), 'count')
                   ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
-                  ->get($grouping, 'g')
+                  ->get($this->periodGrouping(), 'g')
                   ->group('g');
             }
 
@@ -335,6 +337,22 @@ abstract class Channel {
         }
 
         return $this->after_read($buffer, $attributes);
+    }
+
+    /**
+     *
+     */
+    public function __destruct() {
+        $time = (microtime(TRUE) - $this->time) * 1000;
+
+        Header(sprintf('X-Query-Time: %d ms', $time));
+
+        // Check for real action to log
+        if ($this->performance->action == '') return;
+
+        $this->performance->entity = $this->entity;
+        $this->performance->time = $time;
+        $this->performance->insert();
     }
 
     // -------------------------------------------------------------------------
@@ -458,17 +476,21 @@ abstract class Channel {
     /**
      *
      */
-    public function __destruct() {
-        $time = (microtime(TRUE) - $this->time) * 1000;
-
-        Header(sprintf('X-Query-Time: %d ms', $time));
-
-        // Check for real action to log
-        if ($this->performance->action == '') return;
-
-        $this->performance->entity = $this->entity;
-        $this->performance->time = $time;
-        $this->performance->insert();
+    protected function periodGrouping() {
+        static $GroupBy = array(
+            self::NO       => '`timestamp`',
+            self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
+            self::HOUR     => '`timestamp` DIV (3600 * %f)',
+            self::DAY      => '`timestamp` DIV (86400 * %d)',
+            self::WEEK     => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
+            self::MONTH    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
+            self::QUARTER  => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
+            self::YEAR     => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
+            self::LAST     => '`timestamp`',
+            self::READLAST => '`timestamp`',
+            self::ALL      => '`timestamp`',
+        );
+        return sprintf($GroupBy[$this->period[1]], $this->period[0]);
     }
 
     /**
@@ -752,3 +774,11 @@ abstract class Channel {
     private $_childs;
 
 }
+
+/**
+ *
+ */
+define('UNDEFINED_CHANNEL', 0);
+define('NUMERIC_CHANNEL',   1);
+define('SENSOR_CHANNEL',    2);
+define('METER_CHANNEL',     3);
