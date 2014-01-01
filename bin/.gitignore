@@ -1,2 +1,4 @@
 *.conf
 test-all.sh
+data/*
+!data/.githold

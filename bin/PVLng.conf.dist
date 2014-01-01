@@ -26,6 +26,13 @@ PVLngAPIkey=""
 CurlOpts="--connect-timeout 10 --retry 3 --retry-max-time 60"
 
 ##############################################################################
+### Global setting for log data
+### default: .../public_html/bin/data
+### Can also adjusted in later config files
+##############################################################################
+SaveDataDir=
+
+##############################################################################
 ### Port for Socket Server
 ##############################################################################
 SocketServerPort=12121

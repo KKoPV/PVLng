@@ -24,6 +24,12 @@ TEST=
 VERBOSE=0
 TRACE=
 
+### Automatic logging of all data pushed to PVLng API,
+### flag -l required
+SAVEDATA=
+### default directory can be overwriten in any other config file
+test "$SaveDataDir" || SaveDataDir=$(readlink -f $(dirname ${BASH_SOURCE[0]}))/data
+
 ##############################################################################
 ### show message depending of verbosity level on stderr
 ##############################################################################
@@ -32,13 +38,11 @@ function log {
 
     shift
 
-    {    ### Detect if now $1 is a "@filename"
+    {   ### Detect if now $1 is a "@filename"
         if test "${1:0:1}" == '@'; then
-#            echo $(date +"[%d-%b %H:%M:%S]") File: ${1:1}
             echo $(date +"[%H:%M:%S]") File: ${1:1}
             cat ${1:1}
         else
-#            echo -e $(date +"[%d-%b %H:%M:%S]") "$*"
             echo -e $(date +"[%H:%M:%S]") "$*"
         fi
     } >&2
@@ -209,13 +213,19 @@ function PVLngPUT2 {
     local GUID="$1"
     local raw="$2"
     local data="$2"
+    local dataraw=
+    local datafile=
 
     log 2 "GUID     : $GUID"
     log 2 "Data     : $data"
 
     if test "${data:0:1}" != "@"; then
         ### No file
+        dataraw="$data"
         data="{\"data\":\"$(JSON_quote "$data")\"}"
+    else
+        ### File
+        datafile="${data:1}"
     fi
 
     log 2 "Send     : $data"
@@ -235,6 +245,26 @@ function PVLngPUT2 {
         ### 200/201/202 ok
         log 1 "HTTP code : $1"
         test -f $TMPFILE && log 2 @$TMPFILE
+
+        ### Log sended data
+        if test "$SAVEDATA"; then
+            ### Each GUID get its own directory
+            test -d $SaveDataDir/$GUID || mkdir -p $SaveDataDir/$GUID
+
+            if test "$dataraw"; then
+                file=$SaveDataDir/$GUID/$(date +"%Y-%m-%d").csv
+                log 2 "Save $dataraw to $file"
+                echo $(date +"%Y-%m-%d %H:%M")";$dataraw" >>$file
+            elif test "$datafile"; then
+                ### Because of multiple files each day, so each day get its own directory
+                dir=$SaveDataDir/$GUID/$(date +"%Y-%m-%d")
+                test -d $dir || mkdir -p $dir
+                file=$dir/$(date +"%H:%M:%S")
+                log 2 "Save data from $datafile"
+                log 2 "  to $file"
+                mv "$datafile" $file
+            fi
+        fi
     else
         ### errors
         log -1 "HTTP code : $1"
