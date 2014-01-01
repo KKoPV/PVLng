@@ -15,23 +15,22 @@
 twitter_last_help='Actual/last value'
 ##############################################################################
 function twitter_last {
-	value=$(PVLngGET2 "data/$1.tsv?period=last" | cut -f2)
-	log 1 "$url => $value"
-	echo $value
+    value=$(PVLngGET2 "data/$1.tsv?period=last" | cut -f2)
+    log 1 "$url => $value"
+    echo $value
 }
 
 ##############################################################################
 twitter_average_help='Average value since $1'
 ### $1 - Start time
-### $2 - Period for aggregation
-### $3 - GUID
+### $2 - GUID
 ### Example params: midnight 24hours
 ### Start at today midnight and aggregate 24 hours > 1 row as result
 ##############################################################################
 function twitter_average {
-	value=$(PVLngGET2 "data/$3.tsv?start=$1&period=$2" | cut -f2)
-	log 1 "$url => $value"
-	echo $value
+    value=$(PVLngGET2 "data/$2.tsv?start=$1&period=99y" | cut -f2)
+    log 1 "$url => $value"
+    echo $value
 }
 
 ##############################################################################
@@ -43,17 +42,17 @@ twitter_maximum_help='Maximum value since $1'
 ##############################################################################
 function twitter_maximum {
     ### Get all data rows
-	PVLngGET2 "data/$2.tsv?start=$1" >$TMPFILE
+    PVLngGET2 "data/$2.tsv?start=$1" >$TMPFILE
 
     ### Loop all rows and find max. value
-	max=0
-	while read line; do
-		value=$(echo "$line" | cut -f2)
-		test $value -gt $max && max=$value
-	done <$TMPFILE
+    max=0
+    while read line; do
+        value=$(echo "$line" | cut -f2)
+        test $value -gt $max && max=$value
+    done <$TMPFILE
 
-	log 1 "$url => $max"
-	echo $max
+    log 1 "$url => $max"
+    echo $max
 }
 
 ##############################################################################
@@ -64,18 +63,18 @@ twitter_production_help='Production in kWh since $1'
 ### Start at today midnight  | 1st of this month
 ##############################################################################
 function twitter_production {
-	value=$(PVLngGET2 "data/$2.tsv?start=$1&period=last" | cut -f2)
-	log 1 "$url => $value"
-	echo $value
+    value=$(PVLngGET2 "data/$2.tsv?start=$1&period=last" | cut -f2)
+    log 1 "$url => $value"
+    echo $value
 }
 
 ##############################################################################
 twitter_overall_help='Overall production in MWh'
 ##############################################################################
 function twitter_overall {
-	value=$(PVLngGET2 "data/$1.tsv?start=0&period=99y" | cut -f2)
-	log 1 "$url => $value"
-	echo $value
+    value=$(PVLngGET2 "data/$1.tsv?start=0&period=99y" | cut -f2)
+    log 1 "$url => $value"
+    echo $value
 }
 
 ##############################################################################
@@ -83,14 +82,14 @@ twitter_today_working_hours_help='Today working hours in hours :-)'
 ##############################################################################
 function twitter_today_working_hours {
     ### Get all data rows
-	PVLngGET2 "data/$1.tsv" >$TMPFILE
+    PVLngGET2 "data/$1.tsv" >$TMPFILE
 
-	### get first line, get 1st value
-	min=$(cat $TMPFILE | head -n1 | cut -f1)
-	### get last line, get 1st value
-	max=$(cat $TMPFILE | tail -n1 | cut -f1)
-	log 1 "$url => $min - $max"
+    ### get first line, get 1st value
+    min=$(cat $TMPFILE | head -n1 | cut -f1)
+    ### get last line, get 1st value
+    max=$(cat $TMPFILE | tail -n1 | cut -f1)
+    log 1 "$url => $min - $max"
 
-	### to hours
-	echo "scale=3; ($max - $min) / 3600" | bc -l
+    ### to hours
+    echo "scale=3; ($max - $min) / 3600" | bc -l
 }
