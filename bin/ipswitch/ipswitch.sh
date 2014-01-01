@@ -83,13 +83,13 @@ while test $i -lt $GUID_N; do
 		        PVLngPUT2 $GUID $value
                 fi
 	fi
-        valuelist="$valuelist,\"$value\""
+        valuelist="$valuelist,$value"
         guidlist="$guidlist,$GUID"
 done
 
 if test ! -z "$CSVFILENAME" ; then
         file="$CSVFILENAME$(date +%Y%m%d).csv"
-        line="\"$(date +%s)\"$valuelist"
+        line="$(date +%s)$valuelist"
         if test "$TEST" ; then
                 log 1 "Test-Mode - not writing to $file: $line"
         else
