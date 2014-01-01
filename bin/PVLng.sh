@@ -216,8 +216,8 @@ function PVLngPUT2 {
     local dataraw=
     local datafile=
 
-    log 2 "GUID     : $GUID"
-    log 2 "Data     : $data"
+    log 2 "GUID      : $GUID"
+    log 2 "Data      : $data"
 
     if test "${data:0:1}" != "@"; then
         ### No file
@@ -278,18 +278,18 @@ function PVLngPUT2 {
 ##############################################################################
 ### Save data to PVLng using batch
 ### $1 = GUID
-### $2 = payload
-###        "<timestamp>,<value>;...": "Semicolon separated timestamp and value data sets",
-###        "<date>,<time>,<value>;...": "Semicolon separated date, time and value data sets"
-###      of @file_name with raw data
+### $2 = file - @file_name
+###      <timestamp>,<value>;...   : Semicolon separated timestamp and value data sets
+###      <date time>,<value>;...   : Semicolon separated date time and value data sets
+###      <date>,<time>,<value>;... : Semicolon separated date, time and value data sets
 ##############################################################################
 function PVLngPUT2Batch {
 
     local GUID="$1"
     local data="$2"
 
-    log 2 "GUID     : $GUID"
-    log 2 "Data     : $data"
+    log 2 "GUID      : $GUID"
+    log 2 "Data file : $data"
 
     ### Clear temp. file before
     rm $TMPFILE >/dev/null 2>&1
@@ -320,17 +320,17 @@ function PVLngPUT2Batch {
 ### Save data to PVLng using CSV file
 ### $1 = GUID
 ### $2 = CSV file - @file_name
-###      <timestamp>;<value>   : "Semicolon separated timestamp and value data rows",
-###      <date time>;<value>   : "Semicolon separated date time and value data rows"
-###      <date>;<time>;<value> : "Semicolon separated date, time and value data rows"
+###      <timestamp>;<value>   : Semicolon separated timestamp and value data rows
+###      <date time>;<value>   : Semicolon separated date time and value data rows
+###      <date>;<time>;<value> : Semicolon separated date, time and value data rows
 ##############################################################################
 function PVLngPUT2CSV {
 
     local GUID="$1"
     local data="$2"
 
-    log 2 "GUID     : $GUID"
-    log 2 "Data file: $data"
+    log 2 "GUID      : $GUID"
+    log 2 "Data file : $data"
 
     ### Clear temp. file before
     rm $TMPFILE >/dev/null 2>&1

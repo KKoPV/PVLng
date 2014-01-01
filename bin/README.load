@@ -1,0 +1,11 @@
+--------------------
+- load_csv_file.sh -
+--------------------
+
+Load any CSV file via API, need GUID as command line parameter, see help
+
+-------------------
+- load_csv_log.sh -
+-------------------
+
+Load before saved log data files (via -s), get GUID from file name, see help
