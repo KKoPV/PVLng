@@ -20,9 +20,9 @@ test "$owread" || error_exit "Missing owread binary!"
 
 CACHED=false
 
-while getopts "ltvxh" OPTION; do
+while getopts "stvxh" OPTION; do
     case "$OPTION" in
-        l) SAVEDATA=y ;;
+        s) SAVEDATA=y ;;
         t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
         v) VERBOSE=$((VERBOSE + 1)) ;;
         x) TRACE=y ;;
@@ -94,7 +94,7 @@ Usage: $scriptname [options]
 
 Options:
 
-    -l  Save data also into log file
+    -s  Save data also into log file
     -t  Test mode, don't save to PVLng
         Sets verbosity to info level
     -v  Set verbosity level to info level
