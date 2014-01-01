@@ -823,7 +823,7 @@ $(function() {
         }).prop('href', el.data('url') + encodeURIComponent(this.value));
     });
 
-    $('#togglewrapper').button({
+    $('#togglewrapper').html('&nbsp;').button({
         icons: {
             primary: 'ui-icon-carat-1-n'
         },

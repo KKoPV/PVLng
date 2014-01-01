@@ -95,7 +95,7 @@
 <!-- IF {EMBEDDED} != "2" -->
 
 <div class="grid_10">
-    <a id="togglewrapper" href="#">{{ToggleChannels}} (F3)</a>
+    <a id="togglewrapper" href="#" class="tip" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</a>
 </div>
 
 <div class="clear"></div>
