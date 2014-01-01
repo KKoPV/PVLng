@@ -9,10 +9,12 @@
  */
 -->
 
+<!-- IF {VIEW} -->
+
 <div class="grid_10" style="margin-top:.5em;margin-bottom:.5em">
     <span style="margin-right:1em">{{VariantsPublic}}:</span>
 
-    <select id="loaddeleteview" name="loaddeleteview" onChange="this.form.submit()">
+    <select id="loaddeleteview" name="loaddeleteview" onChange="if (this.value) this.form.submit()">
         <option value="">--- {{Select}} ---</option>
         <!-- BEGIN VIEWS --><!-- IF {PUBLIC} -->
             <!-- show only public charts -->
@@ -28,3 +30,5 @@
 </div>
 
 <div class="clear"></div>
+
+<!-- ENDIF -->
