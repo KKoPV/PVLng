@@ -84,6 +84,9 @@ while test $i -lt $ITEM_N; do
     ### Exit if no value is found, e.g. no actual power outside daylight times
     test "$value" && test "$value" != "0" || test "$FORCE" || exit
 
+    ### In case of force set to zero to work properly
+    test -z "$value" && value=0
+
     eval FACTOR=\$FACTOR_$i
     log 1 "Factor: $FACTOR"
 

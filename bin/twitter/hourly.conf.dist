@@ -43,12 +43,12 @@ ITEM_1           "average -60minutes"
 GUID_1           ""
 
 ### E-Total channel of inverter or an accumulator of many E-Total
-ITEM_2           "production -60minutes"
+ITEM_2           "production midnight"
 GUID_2           ""
 FACTOR_2         "1 / 1000"
 
 ### E-Total channel of inverter or an accumulator of many E-Total
-ITEM_3           "production -60minutes"
+ITEM_3           "production midnight"
 GUID_3           ""
 ###              relative values in kWh / installed power in kWp = kWh/kWp
 FACTOR_3         "1 / 1000 / <your installed power here>"
