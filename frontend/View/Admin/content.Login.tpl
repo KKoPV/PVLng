@@ -34,7 +34,9 @@
         <tr>
             <td></td>
             <td>
-                <input id="save" type="checkbox" name="save" class="iCheckLine" style="margin-right:0.5em" />
+                <div class="fl" style="margin-right:0.5em">
+                    <input id="save" type="checkbox" name="save" class="iCheck" />
+                </div>
                 <label for="save">{{StayLoggedIn}}</label>
             </td>
         </tr>

@@ -53,40 +53,36 @@
 
 <div id="chart" class="grid_10">
     <!-- IF {VIEW} -->
-    <p style="height:528px;text-align:center">
-        <img src="/images/loading.gif" alt="{{JustAMoment}}"
-             style="margin-top:250px;width:48px;height47px" width="48" height="47" />
-    </p>
-    <!-- ELSE -->
-    <p class="b">
-        <!-- IF {USER} -->
+        <p style="height:528px;text-align:center">
+            <img src="/images/loading.gif" alt="{{JustAMoment}}"
+                 style="margin-top:250px;width:48px;height47px" width="48" height="47" />
+        </p>
+    <!-- ELSEIF {USER} -->
+        <p class="b">
             {{NoChannelsSelectedYet}}
-        <!-- ELSE -->
-            {{NoViewSelectedYet}}
-        <!-- ENDIF -->
-    </p>
+        </p>
 
-    <label for="top-loadview" class="b" style="margin-right:1em">{{Variants}}:</label>
+        <label for="top-loadview" class="b" style="margin-right:1em">{{Variants}}:</label>
 
-    <select id="top-loadview" name="top-loadview" onChange="this.form.submit()">
-        <option value="">--- {{Select}} ---</option>
-        <!-- BEGIN VIEWS -->
-            <!-- IF {__USER} -->
-                <!-- show all charts and mark public charts -->
-                <option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-                    {NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
-                </option>
-            <!-- ELSEIF {PUBLIC} -->
-                <!-- show only public charts -->
-                <option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-                    {NAME}
-                </option>
-            <!-- ENDIF -->
-        <!-- END -->
-    </select>
-    <noscript>
-        <input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
-    </noscript>
+        <select id="top-loadview" name="top-loadview" onChange="this.form.submit()">
+            <option value="">--- {{Select}} ---</option>
+            <!-- BEGIN VIEWS -->
+                <!-- IF {__USER} -->
+                    <!-- show all charts and mark public charts -->
+                    <option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+                        {NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
+                    </option>
+                <!-- ELSEIF {PUBLIC} -->
+                    <!-- show only public charts -->
+                    <option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
+                        {NAME}
+                    </option>
+                <!-- ENDIF -->
+            <!-- END -->
+        </select>
+        <noscript>
+            <input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
+        </noscript>
     <!-- ENDIF -->
 </div>
 
@@ -94,29 +90,14 @@
 
 <!-- IF {EMBEDDED} != "2" -->
 
-<div class="grid_10">
-    <a id="togglewrapper" href="#" class="tip" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</a>
-</div>
-
-<div class="clear"></div>
-
-<div id="wrapper" class="grid_10" style="padding-top:1em">
     <!-- IF {USER} -->
-        <!-- INCLUDE datatable.inc.tpl -->
+        <!-- INCLUDE content.private.inc.tpl -->
     <!-- ELSE -->
-        <!-- INCLUDE datatable.nouser.inc.tpl -->
+        <!-- INCLUDE content.public.inc.tpl -->
     <!-- ENDIF -->
-</div>
-
-<div class="clear"></div>
-
-<!-- IF {USER} -->
-    <!-- INCLUDE variants.inc.tpl -->
-<!-- ELSE -->
-    <!-- INCLUDE variants.nouser.inc.tpl -->
-<!-- ENDIF -->
 
 <!-- ELSE -->
+
     <!-- BEGIN DATA -->
     <!-- IF {PUBLIC} AND {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
         <input id="c{ID}" style="display:none" class="channel"
@@ -126,6 +107,7 @@
     <!-- ENDIF -->
     <!-- END -->
     <input id="loaddeleteview" type="hidden" value="{VIEW}"/>
+
 <!-- ENDIF -->
 
 </form>
