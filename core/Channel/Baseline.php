@@ -15,50 +15,50 @@ namespace Channel;
 /**
  *
  */
-class Baseline extends \Channel {
+class Baseline extends Sensor {
 
-	/**
-	 *
-	 */
-	public function read( $request, $attributes=FALSE ) {
+    /**
+     *
+     */
+    public function read( $request, $attributes=FALSE ) {
 
-		$baseline = $ts_min = $ts_max = NAN;
+        $baseline = $ts_min = $ts_max = NAN;
 
-		foreach ($this->getChild(1)->read($request) as $row) {
-			$baseline = min($baseline, $row['data']);
-			$ts_min = min($ts_min, $row['timestamp']);
-			$ts_max = max($row['timestamp'], $ts_max);
-		}
+        foreach ($this->getChild(1)->read($request) as $row) {
+            $baseline = min($baseline, $row['data']);
+            $ts_min = min($ts_min, $row['timestamp']);
+            $ts_max = max($row['timestamp'], $ts_max);
+        }
 
-		$result = new \Buffer;
+        $result = new \Buffer;
 
-		if ($baseline != NAN) {
+        if ($baseline != NAN) {
 
-			$result->write(array(
-				'datetime'    => date('Y-m-d H:i:s', $ts_min),
-				'timestamp'   => $ts_min,
-				'data'        => $baseline,
-				'min'         => $baseline,
-				'max'         => $baseline,
-				'count'       => 1,
-				'timediff'    => 0,
-				'consumption' => 0
-			), $this->start);
+            $result->write(array(
+                'datetime'    => date('Y-m-d H:i:s', $ts_min),
+                'timestamp'   => $ts_min,
+                'data'        => $baseline,
+                'min'         => $baseline,
+                'max'         => $baseline,
+                'count'       => 1,
+                'timediff'    => 0,
+                'consumption' => 0
+            ), $this->start);
 
-			$result->write(array(
-				'datetime'    => date('Y-m-d H:i:s', $ts_max),
-				'timestamp'   => $ts_max,
-				'data'        => $baseline,
-				'min'         => $baseline,
-				'max'         => $baseline,
-				'count'       => 1,
-				'timediff'    => 0,
-				'consumption' => 0
-			), $this->end);
+            $result->write(array(
+                'datetime'    => date('Y-m-d H:i:s', $ts_max),
+                'timestamp'   => $ts_max,
+                'data'        => $baseline,
+                'min'         => $baseline,
+                'max'         => $baseline,
+                'count'       => 1,
+                'timediff'    => 0,
+                'consumption' => 0
+            ), $this->end);
 
-		}
+        }
 
-		return $this->after_read($result, $attributes);
-	}
+        return $this->after_read($result, $attributes);
+    }
 
 }

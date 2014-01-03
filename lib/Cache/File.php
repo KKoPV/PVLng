@@ -21,110 +21,110 @@ namespace Cache;
  */
 class File extends AbstractFile {
 
-	// -------------------------------------------------------------------------
-	// PUBLIC
-	// -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // PUBLIC
+    // -------------------------------------------------------------------------
 
-	/**
-	 * Cache availability
-	 *
-	 * @return bool
-	 */
-	public function isAvailable() {
-		if (parent::isAvailable()) {
-			$this->filename = $this->FileName(NULL);
-			// Load cached data
-			if ($data = $this->ReadFile($this->filename)) {
+    /**
+     * Cache availability
+     *
+     * @return bool
+     */
+    public function isAvailable() {
+        if (parent::isAvailable()) {
+            $this->filename = $this->FileName(NULL);
+            // Load cached data
+            if ($data = $this->ReadFile($this->filename)) {
                 $this->data = $this->unserialize($data);
-			}
-			return TRUE;
-		}
-		return FALSE;
-	}
+            }
+            return TRUE;
+        }
+        return FALSE;
+    }
 
-	/**
-	 * Write raw data in cache
-	 *
-	 * @param string $key Unique cache Id
-	 * @param string $data
-	 * @return bool
-	 */
-	public function write( $key, $data ) {
-		$this->data[$key] = $data;
-		$this->modified = TRUE;
-	} // function write()
+    /**
+     * Write raw data in cache
+     *
+     * @param string $key Unique cache Id
+     * @param string $data
+     * @return bool
+     */
+    public function write( $key, $data ) {
+        $this->data[$key] = $data;
+        $this->modified = TRUE;
+    } // function write()
 
-	/**
-	 * Retrieve raw data from cache
-	 *
-	 * @param string $key Unique cache Id
-	 * @return string
-	 */
-	public function fetch( $key, $expire=0 ) {
-		return isset($this->data[$key]) ? $this->data[$key] : NULL;
-	} // function fetch()
+    /**
+     * Retrieve raw data from cache
+     *
+     * @param string $key Unique cache Id
+     * @return string
+     */
+    public function fetch( $key, $expire=0 ) {
+        return isset($this->data[$key]) ? $this->data[$key] : NULL;
+    } // function fetch()
 
-	/**
-	 * Delete data from cache
-	 *
-	 * @param string $key Unique cache Id
-	 * @return bool
-	 */
-	public function delete($key) {
-		if (isset($this->data[$key])) {
-			unset($this->data[$key]);
-			$this->modified = TRUE;
-		}
-	} // function delete()
+    /**
+     * Delete data from cache
+     *
+     * @param string $key Unique cache Id
+     * @return bool
+     */
+    public function delete($key) {
+        if (isset($this->data[$key])) {
+            unset($this->data[$key]);
+            $this->modified = TRUE;
+        }
+    } // function delete()
 
-	/**
-	 * Clear cache
-	 *
-	 * @return bool
-	 */
-	public function flush() {
-		parent::flush();
-		return $this->RemoveFile($this->filename);
-	} // function flush()
+    /**
+     * Clear cache
+     *
+     * @return bool
+     */
+    public function flush() {
+        parent::flush();
+        return $this->RemoveFile($this->filename);
+    } // function flush()
 
-	/**
-	 * Class destructor
-	 *
-	 * Save changes to file if modified
-	 */
-	public function __destruct() {
-		// Save only if data was modified
-		if ($this->modified) {
-			$this->WriteFile($this->filename, $this->serialize($this->data));
-		}
-	} // function __destruct()
+    /**
+     * Class destructor
+     *
+     * Save changes to file if modified
+     */
+    public function __destruct() {
+        // Save only if data was modified
+        if ($this->modified) {
+            $this->WriteFile($this->filename, $this->serialize($this->data));
+        }
+    } // function __destruct()
 
-	/**
-	 *
-	 */
-	public function info() {
-		$info = parent::info();
-		$info['FileName'] = $this->filename;
-		$info['Count'] = count($this->data);
-		return $info;
-	}
+    /**
+     *
+     */
+    public function info() {
+        $info = parent::info();
+        $info['FileName'] = $this->filename;
+        $info['Count'] = count($this->data);
+        return $info;
+    }
 
-	// -------------------------------------------------------------------------
-	// PROTECTED
-	// -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // PROTECTED
+    // -------------------------------------------------------------------------
 
-	/**
-	 * File name
-	 *
-	 * @var string $filename
-	 */
-	protected $filename;
+    /**
+     * File name
+     *
+     * @var string $filename
+     */
+    protected $filename;
 
-	/**
-	 * Save whole cache file only if at least one id was changed/deleted
-	 *
-	 * @var bool $modified
-	 */
-	protected $modified = FALSE;
+    /**
+     * Save whole cache file only if at least one id was changed/deleted
+     *
+     * @var bool $modified
+     */
+    protected $modified = FALSE;
 
 }

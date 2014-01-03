@@ -1,9 +1,9 @@
 /*
-	Variable Grid System.
-	Learn more ~ http://www.spry-soft.com/grids/
-	Based on 960 Grid System - http://960.gs/
+    Variable Grid System.
+    Learn more ~ http://www.spry-soft.com/grids/
+    Based on 960 Grid System - http://960.gs/
 
-	Licensed under GPL and MIT.
+    Licensed under GPL and MIT.
 */
 
 /*
@@ -21,9 +21,9 @@ body {
 /* Containers
 ----------------------------------------------------------------------------------------------------*/
 .container_10 {
-	margin-left: auto;
-	margin-right: auto;
-	width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 960px;
 }
 
 /* Grid >> Global
@@ -40,11 +40,11 @@ body {
 .grid_8,
 .grid_9,
 .grid_10 {
-	display:inline;
-	float: left;
-	position: relative;
-	margin-left: 10px;
-	margin-right: 10px;
+    display:inline;
+    float: left;
+    position: relative;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 
@@ -59,7 +59,7 @@ body {
 .push_8, .pull_8,
 .push_9, .pull_9,
 .push_10, .pull_10 {
-	position:relative;
+    position:relative;
 }
 
 
@@ -67,11 +67,11 @@ body {
 ----------------------------------------------------------------------------------------------------*/
 
 .alpha {
-	margin-left: 0;
+    margin-left: 0;
 }
 
 .omega {
-	margin-right: 0;
+    margin-right: 0;
 }
 
 /* Grid >> 10 Columns
@@ -79,43 +79,43 @@ body {
 
 
 .container_10 .grid_1 {
-	width:76px;
+    width:76px;
 }
 
 .container_10 .grid_2 {
-	width:172px;
+    width:172px;
 }
 
 .container_10 .grid_3 {
-	width:268px;
+    width:268px;
 }
 
 .container_10 .grid_4 {
-	width:364px;
+    width:364px;
 }
 
 .container_10 .grid_5 {
-	width:460px;
+    width:460px;
 }
 
 .container_10 .grid_6 {
-	width:556px;
+    width:556px;
 }
 
 .container_10 .grid_7 {
-	width:652px;
+    width:652px;
 }
 
 .container_10 .grid_8 {
-	width:748px;
+    width:748px;
 }
 
 .container_10 .grid_9 {
-	width:844px;
+    width:844px;
 }
 
 .container_10 .grid_10 {
-	width:940px;
+    width:940px;
 }
 
 
@@ -126,39 +126,39 @@ body {
 
 
 .container_10 .prefix_1 {
-	padding-left:96px;
+    padding-left:96px;
 }
 
 .container_10 .prefix_2 {
-	padding-left:192px;
+    padding-left:192px;
 }
 
 .container_10 .prefix_3 {
-	padding-left:288px;
+    padding-left:288px;
 }
 
 .container_10 .prefix_4 {
-	padding-left:384px;
+    padding-left:384px;
 }
 
 .container_10 .prefix_5 {
-	padding-left:480px;
+    padding-left:480px;
 }
 
 .container_10 .prefix_6 {
-	padding-left:576px;
+    padding-left:576px;
 }
 
 .container_10 .prefix_7 {
-	padding-left:672px;
+    padding-left:672px;
 }
 
 .container_10 .prefix_8 {
-	padding-left:768px;
+    padding-left:768px;
 }
 
 .container_10 .prefix_9 {
-	padding-left:864px;
+    padding-left:864px;
 }
 
 
@@ -168,39 +168,39 @@ body {
 
 
 .container_10 .suffix_1 {
-	padding-right:96px;
+    padding-right:96px;
 }
 
 .container_10 .suffix_2 {
-	padding-right:192px;
+    padding-right:192px;
 }
 
 .container_10 .suffix_3 {
-	padding-right:288px;
+    padding-right:288px;
 }
 
 .container_10 .suffix_4 {
-	padding-right:384px;
+    padding-right:384px;
 }
 
 .container_10 .suffix_5 {
-	padding-right:480px;
+    padding-right:480px;
 }
 
 .container_10 .suffix_6 {
-	padding-right:576px;
+    padding-right:576px;
 }
 
 .container_10 .suffix_7 {
-	padding-right:672px;
+    padding-right:672px;
 }
 
 .container_10 .suffix_8 {
-	padding-right:768px;
+    padding-right:768px;
 }
 
 .container_10 .suffix_9 {
-	padding-right:864px;
+    padding-right:864px;
 }
 
 
@@ -210,39 +210,39 @@ body {
 
 
 .container_10 .push_1 {
-	left:96px;
+    left:96px;
 }
 
 .container_10 .push_2 {
-	left:192px;
+    left:192px;
 }
 
 .container_10 .push_3 {
-	left:288px;
+    left:288px;
 }
 
 .container_10 .push_4 {
-	left:384px;
+    left:384px;
 }
 
 .container_10 .push_5 {
-	left:480px;
+    left:480px;
 }
 
 .container_10 .push_6 {
-	left:576px;
+    left:576px;
 }
 
 .container_10 .push_7 {
-	left:672px;
+    left:672px;
 }
 
 .container_10 .push_8 {
-	left:768px;
+    left:768px;
 }
 
 .container_10 .push_9 {
-	left:864px;
+    left:864px;
 }
 
 
@@ -252,39 +252,39 @@ body {
 
 
 .container_10 .pull_1 {
-	left:-96px;
+    left:-96px;
 }
 
 .container_10 .pull_2 {
-	left:-192px;
+    left:-192px;
 }
 
 .container_10 .pull_3 {
-	left:-288px;
+    left:-288px;
 }
 
 .container_10 .pull_4 {
-	left:-384px;
+    left:-384px;
 }
 
 .container_10 .pull_5 {
-	left:-480px;
+    left:-480px;
 }
 
 .container_10 .pull_6 {
-	left:-576px;
+    left:-576px;
 }
 
 .container_10 .pull_7 {
-	left:-672px;
+    left:-672px;
 }
 
 .container_10 .pull_8 {
-	left:-768px;
+    left:-768px;
 }
 
 .container_10 .pull_9 {
-	left:-864px;
+    left:-864px;
 }
 
 

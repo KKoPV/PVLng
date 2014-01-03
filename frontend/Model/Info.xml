@@ -12,11 +12,11 @@
 
 	<ReadingCounts>
 		<![CDATA[
-		SELECT c.`name`, c.`description`, c.`serial`, c.`channel`, t.`icon`, u.`readings`
+		SELECT c.`guid`, c.`name`, c.`description`, c.`serial`, c.`channel`, c.`unit`, t.`icon`, FROM_UNIXTIME(u.`timestamp`), u.`readings`
 		  FROM (
-			SELECT `id`, COUNT(id) AS `readings` FROM `pvlng_reading_num` GROUP BY `id`
+			SELECT `id`, MAX(`timestamp`) as `timestamp`, COUNT(id) AS `readings` FROM `pvlng_reading_num` GROUP BY `id`
 			UNION
-			SELECT `id`, COUNT(id) AS `readings` FROM `pvlng_reading_str` GROUP BY `id`
+			SELECT `id`, MAX(`timestamp`), COUNT(id) FROM `pvlng_reading_str` GROUP BY `id`
 		  ) AS u
 		  JOIN `pvlng_channel` AS c USING(`id`)
 		  JOIN `pvlng_type` AS t ON c.`type`= t.`id`

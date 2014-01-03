@@ -3,7 +3,7 @@
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2013 Knut Kohl
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     $Id$
+### @version     1.0.0
 ##############################################################################
 
 ##############################################################################
@@ -20,18 +20,19 @@ test "$owread" || error_exit "Missing owread binary!"
 
 CACHED=false
 
-while getopts "tvxh" OPTION; do
-	case "$OPTION" in
-    	t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
-    	v) VERBOSE=$((VERBOSE + 1)) ;;
-		x) TRACE=y ;;
-		h) usage; exit ;;
-		?) usage; exit 1 ;;
-	esac
+while getopts "stvxh" OPTION; do
+    case "$OPTION" in
+        s) SAVEDATA=y ;;
+        t) TEST=y; VERBOSE=$((VERBOSE + 1)) ;;
+        v) VERBOSE=$((VERBOSE + 1)) ;;
+        x) TRACE=y ;;
+        h) usage; exit ;;
+        ?) usage; exit 1 ;;
+    esac
 done
 
 if test "$TEST" && test -z "$(which owread)"; then
-	error_exit "Missing owread binary from OWFS. Is OWFS is properly installed?"
+    error_exit "Missing owread binary from OWFS. Is OWFS is properly installed?"
 fi
 
 shift $((OPTIND-1))
@@ -56,27 +57,27 @@ i=0
 
 while test $i -lt $GUID_N; do
 
-	i=$(expr $i + 1)
+    i=$(expr $i + 1)
 
-	log 1 "--- GUID $i ---"
+    log 1 "--- GUID $i ---"
 
-	eval GUID=\$GUID_$i
-	test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
+    eval GUID=\$GUID_$i
+    test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 
-	SERIAL=$(PVLngGET2 $GUID/serial.txt)
-	CHANNEL=$(PVLngGET2 $GUID/channel.txt)
+    SERIAL=$(PVLngGET2 $GUID/serial.txt)
+    CHANNEL=$(PVLngGET2 $GUID/channel.txt)
 
-# 	SERIAL=$(PVLngNC "$GUID,serial")
-# 	CHANNEL=$(PVLngNC "$GUID,channel")
+#     SERIAL=$(PVLngNC "$GUID,serial")
+#     CHANNEL=$(PVLngNC "$GUID,channel")
 
-	### read value
-	cmd="$owread -s $SERVER ${CACHED}/${SERIAL}/${CHANNEL}"
-	log 2 $cmd 
-	value=$($cmd)
-	log 1 "Value        = $value"
+    ### read value
+    cmd="$owread -s $SERVER ${CACHED}/${SERIAL}/${CHANNEL}"
+    log 2 $cmd
+    value=$($cmd)
+    log 1 "Value        = $value"
 
-	### Save data
-	test "$TEST" || PVLngPUT2 $GUID $value
+    ### Save data
+    test "$TEST" || PVLngPUT2 $GUID $value
 
 done
 
@@ -93,11 +94,12 @@ Usage: $scriptname [options]
 
 Options:
 
-	-t  Test mode, don't save to PVLng
-	    Sets verbosity to info level
-	-v  Set verbosity level to info level
-	-vv Set verbosity level to debug level
-	-h  Show this help
+    -s  Save data also into log file
+    -t  Test mode, don't save to PVLng
+        Sets verbosity to info level
+    -v  Set verbosity level to info level
+    -vv Set verbosity level to debug level
+    -h  Show this help
 
 Requires a configuation file $pwd/owfs.conf
 

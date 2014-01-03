@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id: v1.0.0.2-23-g2e4cde1 2013-05-05 22:15:44 +0200 Knut Kohl $
+ * @version     1.0.0
  */
 namespace Controller;
 
@@ -14,318 +14,425 @@ namespace Controller;
  */
 class Channel extends \Controller {
 
-	/**
-	 *
-	 */
-	public function before() {
-		$this->view->Entities = $this->rows2view($this->model->getEntities());
+    /**
+     *
+     */
+    public function before() {
+        $q = \DBQuery::forge('pvlng_channel_view');
+        $this->view->Entities = $this->rows2view($this->db->queryRows($q));
 
-		$fields = include __DIR__ . DS . 'channel.conf.php';
+        $this->fields = array();
 
-		$this->fields = array();
+        foreach (include __DIR__ . DS . 'Channel' . DS . 'default.php' as $key=>$field) {
+            $this->fields[$key] = array_merge(array(
+                'FIELD' => $key,
+                'NAME'  => __('channel::'.$key),
+                'HINT'  => __('channel::'.$key.'Hint'),
+            ), array_change_key_case($field, CASE_UPPER));
+        }
+    }
 
-		foreach ($fields as $key=>$field) {
-			$this->fields[$key] = array_merge(array(
-				'VISIBLE'  => TRUE,
-				'FIELD'    => $key,
-				'TYPE'     => 'text',
-				'DEFAULT'  => '',
-				'REQUIRED' => FALSE,
-				'NAME'     => __('channel::'.$key),
-				'HINT'     => __('channel::'.$key.'Hint'),
-			), array_change_key_case($field, CASE_UPPER));
-		}
-	}
+    /**
+     *
+     */
+    public function after() {
+        $this->view->APIkey = $this->model->getAPIkey();
+    }
 
-	/**
-	 *
-	 */
-	public function afterPost() {
-		if (!$this->ignore_returnto) {
-			// Handle returnto (Edit from Overview) ...
-			parent::afterPOST();
-			// ... or redirect to channels list
-			$this->app->redirect('/channel');
-		}
-	}
+    /**
+     *
+     */
+    public function afterPost() {
+        if (!$this->ignore_returnto) {
+            // Handle returnto (Edit from Overview) ...
+            parent::afterPOST();
+            // ... or redirect to channels list
+            $this->app->redirect('/channel');
+        }
+    }
 
-	/**
-	 *
-	 */
-	public function Index_Action() {
-		$this->view->SubTitle = __('Channels');
-	}
+    /**
+     *
+     */
+    public function Index_Action() {
+        $this->view->SubTitle = __('Channels');
+    }
 
-	/**
-	 *
-	 */
-	public function AddPOST_Action() {
-		$type = $this->request->post('type');
-		if ($type != '') {
-			$this->prepareFields($type);
-			foreach ($this->fields as &$data) {
-				$data['VALUE'] = $data['DEFAULT'];
-			}
+    /**
+     *
+     */
+    public function AddPOST_Action() {
 
-			$this->view->Type = $type;
+        if (($type = $this->request->post('type')) == '') return;
 
-			// Preset channel unit
-			$type = new \ORM\EntityType($type);
-			$this->fields['unit']['VALUE'] = $type->unit;
+        if (is_numeric($type)) {
+            // Type Id
+            $this->prepareFields($type);
+            foreach ($this->fields as &$data) {
+                $data['VALUE'] = $data['DEFAULT'];
+            }
 
-			$this->ignore_returnto = TRUE;
-			$this->app->foreward('Edit');
-		}
-	}
+            $this->view->Type = $type;
 
-	/**
-	 *
-	 */
-	public function Add_Action() {
-		$this->view->SubTitle = __('CreateChannel');
+            // Preset channel unit
+            $type = new \ORM\EntityType($type);
+            $this->fields['unit']['VALUE'] = $type->unit;
 
-		$q = \DBQuery::forge('pvlng_type')->whereGT('id', 0);
+            $this->ignore_returnto = TRUE;
+            $this->app->foreward('Edit');
+        } else {
+            // Get from template
+            $channels = include $type;
+            $channels = $channels['channels'];
 
-		$this->view->EntityTypes = $this->rows2view($this->db->queryRows($q));
+            // 1st save channels
+            $oChannel = new \ORM\Channel;
+            $oChannel->throwException();
 
-		if ($clone = $this->app->params->get('clone')) {
-			$entity = new \ORM\Channel($clone);
-			if ($entity->id) {
-				unset($entity->id, $entity->guid);
-				$this->prepareFields($entity);
-				$this->view->Type = $entity->type;
-			}
+            try {
 
-			$this->app->foreward('Edit');
-		}
-	}
+                foreach ($channels as $id=>$channel) {
+                    $oChannel->reset();
+                    foreach ($channel as $key=>$value) {
+                        $oChannel->set($key, $value);
+                    }
+                    $oChannel->insert();
+                    $channels[$id]['id'] = $oChannel->id;
+                }
+                \Messages::Success(__('ChannelsSaved', count($channels)));
 
-	/**
-	 *
-	 */
-	public function AliasPOST_Action() {
+            } catch (\Exception $e) {
+                \Messages::Error($e->getMessage());
 
-		$entity = new \ORM\Tree;
-		$entity->find('entity', $this->request->post('id'));
+                // Rollback, mostly by double index entries
+                $oChannel->reset();
+                foreach ($channels as $id=>$channel) {
+                    if (isset($channels[$id]['id'])) {
+                        $oChannel->id = $channels[$id]['id'];
+                        $oChannel->delete();
+                    }
+                }
 
-		if ($entity->id) {
-			$alias = new \ORM\Channel();
-			if ($alias->find('channel', $entity->guid)->id) {
-				\Messages::Error(__('AliasStillExists'));
-			} else {
-				$alias = new \ORM\Channel;
-				$alias->name = $entity->name;
-				$alias->description = $entity->description;
-				$alias->channel = $entity->guid;
-				$alias->public = $entity->public;
-				$alias->unit = $entity->unit;
-				$alias->type = 0;
-				$alias->insert();
+                $this->app->redirect('/channel');
+            }
 
-				if (!$alias->isError()) {
-					\Messages::Success(__('ChannelSaved'));
-				} else {
-					\Messages::Error($entity->Error());
-					\Messages::Info(implode(";\n", $entity->queries()).';');
-				}
-			}
-		}
+            if (!isset($channels[0])) {
+                $this->app->redirect('/channel');
+            } else {
+                // Build hierarchy
+                $tree = \NestedSet::getInstance();
 
-		$this->app->redirect('/overview');
-	}
+                foreach ($channels as $id=>$channel) {
+                    if ($id == 0) {
+                        $root = $tree->insertChildNode($channel['id'], 1);
+                    } else {
+                        $tree->insertChildNode($channel['id'], $root);
+                    }
+                }
+                \Messages::Success(__('HierarchyCreated', count($channels)));
 
-	/**
-	 *
-	 */
-	public function EditPOST_Action() {
-		if ($channel = $this->request->post('c')) {
-			$ok = TRUE;
+                $this->app->redirect('/overview');
+            }
+        }
+    }
 
-			$entity = new \ORM\Channel($channel['id']);
+    /**
+     *
+     */
+    public function Add_Action() {
+        $this->view->SubTitle = __('CreateChannel');
 
-			// set values
-			foreach ($channel as $key=>$value) $entity->set($key, $value);
+        $q = \DBQuery::forge('pvlng_type')->whereGT('id', 0);
 
-			$this->prepareFields($entity);
+        $types = array();
+        foreach ($this->db->queryRows($q) as $type) {
+            $type->description = __($type->description);
+            $types[] = array_change_key_case((array) $type, CASE_UPPER);
+        }
+        $this->view->EntityTypes = $types;
 
-			$type = new \ORM\EntityType($entity->type);
+        if ($clone = $this->app->params->get('clone')) {
+            $entity = new \ORM\Channel($clone);
+            if ($entity->id) {
+                unset($entity->id, $entity->guid);
+                $this->prepareFields($entity);
+            }
 
-			if ($type->model) {
-				$model = '\Channel\\' . $type->model;
-				$model::afterEdit($entity);
-			}
+            $this->app->foreward('Edit');
+        } else {
+            // Search for equipment templates
+            $templates = array();
+            foreach (glob(CORE_DIR . DS . 'Channel' . DS . 'Templates' . DS . '*.php') as $file) {
+                $template = include $file;
+                $templates[] = array(
+                    'FILE'         => $file,
+                    'NAME'         => $template['name'],
+                    'DESCRIPTION'  => $template['description']
+                );
+            }
+            $this->view->Templates = $templates;
+        }
+    }
 
-			/* check required fields */
-			foreach ($this->fields as $key=>$data) {
-				if ($data['REQUIRED'] AND $entity->$key == '') {
-					\Messages::Error(__('channel::ParamIsRequired', $data['NAME']), TRUE);
-					$ok = FALSE;
-				}
-			}
+    /**
+     *
+     */
+    public function AliasPOST_Action() {
 
-			if ($ok) {
-				$entity->throwException();
-				try {
-				    // CAN'T simply replace because of the foreign key in the tree!
-					$AliasCount = 0;
-				    if (!$entity->id) {
-						$entity->insert();
-					} else {
-						$entity->update();
+        $entity = new \ORM\Tree;
+        $entity->find('entity', $this->request->post('id'));
 
-						// Update possible channel aliases!
-						$tree = new \ORM\Tree;
-						$tree->find('entity', $entity->id);
-						if ($tree->find('entity', $entity->id)->id != '') {
-							foreach ($entity->findMany('channel', $tree->guid) as $alias) {
-								$AliasCount++;
-								$alias->name = $tree->name;
-								$alias->description = $tree->description;
-								$alias->public = $tree->public;
-								$alias->update();
-							}
-						}
-					}
-					\Messages::Success(__('ChannelSaved'));
-					if ($AliasCount != 0) {
-						\Messages::Success(__('AliasesUpdated'));
-					}
-				} catch (Exception $e) {
-					\Messages::Error('['.$e->getCode().'] '.$e->getMessage());
-					\Messages::Info(implode(";\n", $entity->queries()).';');
-					$ok = FALSE;
-				}
-			}
+        if ($entity->id) {
+            if ($entity->alias) {
+                \Messages::Error(__('AliasStillExists'));
+            } else {
+                $alias = new \ORM\Channel;
+                $alias->name = $entity->name;
+                $alias->description = $entity->description;
+                $alias->channel = $entity->guid;
+                $alias->unit = $entity->unit;
+                $alias->private = $entity->private;
+                $alias->type = 0;
+                $alias->comment = 'Alias of ['.$entity->id.'] '.$entity->name;
+                if ($entity->description) {
+                    $alias->comment .= ' ('.$entity->description.')';
+                }
+                $alias->insert();
 
-			$this->ignore_returnto = !$ok;
+                if (!$alias->isError()) {
+                    \Messages::Success(__('ChannelSaved'));
+                } else {
+                    \Messages::Error($entity->Error());
+                    \Messages::Info(implode(";\n", $entity->queries()).';');
+                }
+            }
+        }
 
-			$this->view->Id = $entity->id;
-			$this->view->Type = $entity->type;
-		}
-	}
+        $this->app->redirect('/overview');
+    }
 
-	/**
-	 *
-	 */
-	public function EditGET_Action() {
-		if ($id = $this->app->params->get('id')) {
-			$this->prepareFields(new \ORM\Channel($id));
-			$this->view->Id = $id;
-		}
-	}
+    /**
+     *
+     */
+    public function EditPOST_Action() {
+        if ($channel = $this->request->post('c')) {
+            $ok = TRUE;
 
-	/**
-	 *
-	 */
-	public function Edit_Action() {
-		$this->view->SubTitle = __('EditChannel');
-		$this->view->Fields = $this->fields;
-	}
+            $entity = new \ORM\Channel($channel['id']);
 
-	/**
-	 *
-	 */
-	public function DeletePOST_Action() {
-		$entity = new \ORM\Channel($this->request->post('id'));
+            // set values
+            foreach ($channel as $key=>$value) $entity->set($key, $value);
 
-		if ($entity->id) {
-			$name = $entity->name;
-			$entity->delete();
-			if (!$entity->isError()) {
-				\Messages::Success(__('ChannelDeleted', $name));
-			} else {
-				\Messages::Error(__($entity->Error(), $entity->name), TRUE);
-#				\Messages::Info(implode(";\n", $entity->queries()).';');
-			}
-		}
+            $this->prepareFields($entity);
 
-		$this->app->redirect('/channel');
-	}
+            /* check required fields */
+            foreach ($this->fields as $key=>$data) {
+                if ($data['VISIBLE'] AND $data['REQUIRED'] AND $entity->$key == '') {
+                    \Messages::Error(__('channel::ParamIsRequired', $data['NAME']), TRUE);
+                    $ok = FALSE;
+                }
+            }
 
-	// -------------------------------------------------------------------------
-	// PROTECTED
-	// -------------------------------------------------------------------------
+            if ($ok) {
+                $entity->throwException();
+                try {
+                    // CAN'T simply replace because of the foreign key in the tree!
+                    if (!$entity->id) {
+                        $entity->insert();
+                        \Messages::Success(__('ChannelSaved'));
+                    } else {
+                        $entity->update();
+                        \Messages::Success(__('ChannelSaved'));
 
-	/**
-	 *
-	 */
-	protected $fields = array();
+                        // Update possible alias channel!
+                        $tree = new \ORM\Tree;
 
-	/**
-	 *
-	 */
-	protected $ignore_returnto;
+                        // Find channel itself in tree to get alias Id
+                        if ($tree->find('entity', $entity->id)->alias) {
+                            // Alias channel
+                            $alias = new \ORM\Channel($tree->alias);
+                            $alias->name = $entity->name;
+                            $alias->description = $entity->description;
+                            $alias->public = $entity->public;
+                            $alias->unit = $entity->unit;
+                            $alias->update();
+                            \Messages::Success(__('AliasesUpdated'));
 
-	/**
-	 *
-	 * @param $entity integer|object Type Id or Channel object
-	 */
-	protected function prepareFields( $entity=NULL ) {
+                            if (\slimMVC\Config::getInstance()->get('Log.SQL')) {
+                                \ORM\Log::save('Update Alias', implode(";\n", $tree->queries()).';');
+                                \ORM\Log::save('Update Alias', implode(";\n", $alias->queries()).';');
+                            }
+                        }
+                    }
+                } catch (Exception $e) {
+                    \Messages::Error('['.$e->getCode().'] '.$e->getMessage());
+                    \Messages::Info(implode(";\n", $entity->queries()).';');
+                    $ok = FALSE;
+                }
+            }
 
-		if (!is_object($entity)) {
-			$type = new \ORM\EntityType($entity);
-		} else {
-			$type = new \ORM\EntityType($entity->type);
-		}
+            $this->ignore_returnto = !$ok;
 
-		if ($type->id == '') {
-			\Messages::Error('Unknown entity');
-			$this->app->redirect('/channel');
-		}
+            $this->view->Id = $entity->id;
+            $this->view->Type = $entity->type;
+        }
+    }
 
-		// Apply model specific attribute settings
-		$conf = CORE_DIR . DS . 'Channel' . DS
-		      . str_replace('\\', DS, $type->model) . '.conf.php';
+    /**
+     *
+     */
+    public function EditGET_Action() {
+        if ($id = $this->app->params->get('id')) {
+            $this->prepareFields(new \ORM\Channel($id));
+            $this->view->Id = $id;
+        }
+    }
 
-		$this->applyFieldSettings($conf);
+    /**
+     *
+     */
+    public function Edit_Action() {
+        $this->view->SubTitle = __('EditChannel');
+        $this->view->Fields = $this->fields;
+    }
 
-		$this->view->Type = $type->id;
-		$this->view->TypeName = $type->name;
-		if ($type->unit) $this->view->TypeName .= ' (' . $type->unit . ')';
-		$this->view->Icon = $type->icon;
+    /**
+     *
+     */
+    public function DeletePOST_Action() {
+        $entity = new \ORM\Channel($this->request->post('id'));
 
-		if (is_object($entity)) {
+        if ($entity->id) {
+            $name = $entity->name;
+            $entity->delete();
+            if (!$entity->isError()) {
+                \Messages::Success(__('ChannelDeleted', $name));
+            } else {
+                \Messages::Error(__($entity->Error(), $entity->name), TRUE);
+            }
+        }
 
-			// Apply type specific attribute settings
-			$conf = __DIR__ . DS
-			      . ($entity->numeric ? 'channel.numeric' : 'channel.non-numeric')
-				  . '.conf.php';
+        $this->app->redirect('/channel');
+    }
 
-			$this->applyFieldSettings($conf);
+    // -------------------------------------------------------------------------
+    // PROTECTED
+    // -------------------------------------------------------------------------
 
-			foreach ($this->fields as $key=>&$data) {
-				$h = 'model::'.$type->model.'_'.$key;
-				$name = __($h);
-				if ($name != $h) $data['NAME'] = $name;
+    /**
+     *
+     */
+    protected $fields = array();
 
-				$h = 'model::'.$type->model.'_'.$key.'Hint';
-				$name = __($h);
-				if ($name != $h) $data['HINT'] = $name;
+    /**
+     *
+     */
+    protected $ignore_returnto;
 
-				$data['VALUE'] = isset($entity->$key)
-				               ? htmlspecialchars($entity->$key)
-				               : htmlspecialchars($data['DEFAULT']);
-			}
-		}
-	}
+    /**
+     *
+     * @param $entity integer|object Type Id or Channel object
+     */
+    protected function prepareFields( $entity=NULL ) {
 
-	/**
-	 *
-	 */
-	protected function applyFieldSettings( $conf ) {
-		if (!file_exists($conf)) return;
+        $addMode = !is_object($entity);
 
-		$attr = include $conf;
+        if ($addMode) {
+            // Got channel type number to create new channel
+            $type = new \ORM\EntityType($entity);
+        } else {
+            // Got real channel object to edit
+            $type = new \ORM\EntityType($entity->type);
+        }
 
-		// check all fields
-		foreach ($this->fields as $key=>$data) {
-			if (isset($attr[$key])) {
-				// apply settings for this field
-				$this->fields[$key] = array_merge(
-					$this->fields[$key],
-					array_change_key_case($attr[$key], CASE_UPPER)
-				);
-			}
-		}
-	}
+        if ($type->id == '') {
+            \Messages::Error('Unknown entity');
+            $this->app->redirect('/channel');
+        }
+
+        if ($addMode) {
+            // Get prefered type settings from Model
+            $model = $type->ModelClass();
+            if ($model::TYPE != UNDEFINED_CHANNEL) {
+                $this->applyFieldSettings('numeric');
+                if ($model::TYPE == SENSOR_CHANNEL) {
+                    $this->applyFieldSettings('sensor');
+                } elseif ($model::TYPE == METER_CHANNEL) {
+                    $this->applyFieldSettings('meter');
+                }
+            }
+        } else {
+            // Get type settings from entity
+            $this->applyFieldSettings($entity->numeric ? 'numeric' : 'non-numeric');
+            if ($entity->numeric) {
+                $this->applyFieldSettings($entity->meter ? 'meter' : 'sensor');
+            }
+        }
+
+        if ($type->write AND $type->read) {
+            // No specials for writable AND readable channels
+        } elseif ($type->write) {
+            // Write only
+           $this->applyFieldSettings('write');
+        } elseif ($type->read) {
+            // Read only
+           $this->applyFieldSettings('read');
+        } else {
+            // A grouping channel, not write, not read
+           $this->applyFieldSettings('group');
+        }
+
+        // Last apply model specific settings
+        $this->applyFieldSettings(str_replace('\\', DS, $type->model));
+
+        foreach ($this->fields as $key=>&$data) {
+            $h = 'model::'.$type->model.'_'.$key;
+            $name = __($h);
+            if ($name != $h) $data['NAME'] = $name;
+
+            $h = 'model::'.$type->model.'_'.$key.'Hint';
+            $name = __($h);
+            if ($name != $h) $data['HINT'] = $name;
+
+            $data['VALUE'] = isset($entity->$key)
+                           ? htmlspecialchars($entity->$key)
+                           : htmlspecialchars($data['DEFAULT']);
+        }
+
+        $this->view->Type = $type->id;
+        $this->view->TypeName = $type->name;
+        if ($type->unit) $this->view->TypeName .= ' (' . $type->unit . ')';
+        $this->view->Icon = $type->icon;
+
+        $h = $type->description.'Help';
+        $help = __($h);
+        // Check if a help text exists
+        $this->view->TypeHelp = $help != $h ? $help : '';
+    }
+
+    /**
+     *
+     */
+    protected function applyFieldSettings( $conf ) {
+        // 1st try general config
+        $config = __DIR__ . DS . 'Channel' . DS . $conf . '.php';
+        if (!file_exists($config)) {
+            // 2nd try model specific config
+            $config = CORE_DIR . DS . 'Channel' . DS . $conf . '.conf.php';
+            if (!file_exists($config)) return;
+        }
+
+        $attr = include $config;
+
+        // check all fields
+        foreach ($this->fields as $key=>$data) {
+            if (isset($attr[$key])) {
+                // apply settings for this field
+                $this->fields[$key] = array_merge(
+                    $this->fields[$key],
+                    array_change_key_case($attr[$key], CASE_UPPER)
+                );
+            }
+        }
+    }
 }

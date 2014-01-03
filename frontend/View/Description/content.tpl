@@ -10,7 +10,7 @@
 -->
 
 <div class="grid_10">
-	{CONTENT}
+    {CONTENT}
 </div>
 
 <div class="clear"></div>

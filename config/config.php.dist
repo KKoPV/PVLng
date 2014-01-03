@@ -14,70 +14,89 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 return array(
 
-	/**
-	 * 1. Change the database credentials for your needs
-	 */
-	'Database' => array(
-		'Host'     => '<HOST>',
-		'Username' => '<USER>',
-		'Password' => '<PASSWORD>',
-		'Database' => '<DATABASE>'
-	),
+    /**
+     * 1. Change the database credentials for your needs
+     */
+    'Database' => array(
+        'Host'     => '<HOST>',
+        'Username' => '<USER>',
+        'Password' => '<PASSWORD>',
+        'Database' => '<DATABASE>'
+    ),
 
-	/**
-	 * 2. Protect your installation.
-	 *
-	 * Call
-	 *
-	 * 	  http://your.domain.here/adminpass
-	 *
-	 * to setup your administrator account
-	 */
-	'Admin' => array(
-		'User'     => '',
-		'Password' => ''
-	),
+    /**
+     * 2. Protect your installation.
+     *
+     * Call
+     *
+     *       http://your.domain.here/adminpass
+     *
+     * to setup your administrator account
+     */
+    'Admin' => array(
+        'User'     => '',
+        'Password' => ''
+    ),
 
-	/**
-	 * You title
-	 */
-	'Title' => 'PhotoVoltaic Logger new generation',
+    /**
+     * Your personal title :-)
+     */
+    'Title' => 'PhotoVoltaic Logger new generation',
 
-	/**
-	 * Currency settings
-	 */
-	'Currency' => array(
-		'ISO'      => 'EUR',
-		'Symbol'   => '€',
-		'Decimals' => 2
-	),
+    /**
+     * Currency settings
+     */
+    'Currency' => array(
+        'ISO'      => 'EUR',
+        'Symbol'   => '€',
+        'Decimals' => 2
+    ),
 
-	/**
-	 * Preferd cache mode, auto detect best one if empty
-	 */
-	'Cache' => '',
-	#'Cache' => 'APC',
-	#'Cache' => 'MemCache',
-	#'Cache' => 'File',
+    /**
+     * Preferd cache mode, auto detect best one if empty
+     */
+    'Cache' => '',      // Auto detect
+//    'Cache' => 'APC',
+//    'Cache' => 'MemCache',
+//    'Cache' => 'File',
+//    'Cache' => 'Mock', // Disable caching complete
 
-	/**
-	 * Default language, "en" or "de"
-	 *
-	 * Will be overwritten by browsers accept language settings if exists
-	 */
-	'Language' => 'en',
+    /**
+     * Default language, 'en' or 'de', Translators are welcome :-)
+     *
+     * Will be overwritten by browsers accept language settings if exists
+     */
+    'Language' => 'en',
 
-	/**
-	 * Defaults, no need to change
-	 *
-	 * Login cookie settings for private installation
-	 */
-	'Cookie' => array(
-		'Name'     => 'PVLng',
-	),
+    /**
+     * Defaults, no need to change
+     *
+     * Login cookie settings for private installation
+     */
+    'Cookie' => array(
+        'Name' => 'PVLng',
+    ),
+
+    /**
+     * Model flags
+     */
+    'Model' => array(
+
+        /**
+         * How to calculate the average of data in History channels
+         *
+         * 0 - linear (default)
+         * 1 - harmonic
+         * 2 - geometric
+         */
+//         'History' => array(
+//             'Average' => 0
+//         ),
+
+     ),
 
 );

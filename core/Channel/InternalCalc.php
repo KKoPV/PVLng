@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 namespace Channel;
 
@@ -14,48 +14,65 @@ namespace Channel;
  */
 abstract class InternalCalc extends \Channel {
 
-	/**
-	 *
-	 */
-	protected function __construct( \ORM\Tree $channel ) {
-		parent::__construct($channel);
-		$this->data = $this->numeric ? new \ORM\ReadingNumMemory :  new \ORM\ReadingStrMemory;
-		/* Clean up */
-		$this->data->deleteById($this->entity);
-	}
+    /**
+     * Channel type
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
+     */
+    const TYPE = NUMERIC_CHANNEL;
 
-	/**
-	 * Readings table object
-	 */
-	protected $data;
+    /**
+     *
+     */
+    protected function __construct( \ORM\Tree $channel ) {
+        parent::__construct($channel);
+        $this->data = $this->numeric ? new \ORM\ReadingNumMemory :  new \ORM\ReadingStrMemory;
+        /* Clean up */
+        $this->data->deleteById($this->entity);
+    }
 
-	/**
-	 * Overwrite default channel tables
-	 */
-	protected $table = array(
-		'pvlng_reading_str_tmp', // numeric == 0
-		'pvlng_reading_num_tmp'  // numeric == 1
-	);
+    /**
+     * Readings table object
+     */
+    protected $data;
 
-	/**
-	 *
-	 */
-	protected function saveValues( $values ) {
-		$cnt = 0;
-		$this->data->id = $this->entity;
-		foreach ($values as $this->data->timestamp=>$this->data->data) {
-			$cnt += $this->data->insert();
-		}
-		return $cnt;
-	}
+    /**
+     * Overwrite default channel tables
+     */
+    protected $table = array(
+        'pvlng_reading_str_tmp', // numeric == 0
+        'pvlng_reading_num_tmp'  // numeric == 1
+    );
 
-	/**
-	 *
-	 */
-	protected function after_read( \Buffer $buffer, $attributes ) {
-		/* Clean up */
-		$this->data->deleteById($this->entity);
-		return parent::after_read($buffer, $attributes);
-	}
+    /**
+     *
+     */
+    protected function saveValues( $values ) {
+        $cnt = 0;
+        $this->data->id = $this->entity;
+        if ($values instanceof \Buffer) {
+            foreach ($values as $row) {
+                $this->data->timestamp = $row['timestamp'];
+                $this->data->data      = $row['data'];
+                $cnt += $this->data->insert();
+            }
+        } else {
+            foreach ($values as $this->data->timestamp=>$this->data->data) {
+                $cnt += $this->data->insert();
+            }
+        }
+        return $cnt;
+    }
+
+    /**
+     *
+     */
+    protected function after_read( \Buffer $buffer, $attributes ) {
+        /* Clean up */
+        $this->data->deleteById($this->entity);
+        return parent::after_read($buffer, $attributes);
+    }
 
 }

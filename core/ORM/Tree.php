@@ -5,7 +5,7 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     $Id$
+ * @version     1.0.0
  */
 
 /**
@@ -18,13 +18,20 @@ namespace ORM;
  */
 class Tree extends \slimMVC\ORMTable {
 
-	// -------------------------------------------------------------------------
-	// PROTECTED
-	// -------------------------------------------------------------------------
+    /**
+     *
+     */
+    public function ModelClass() {
+        return $this->model ? 'Channel\\'.$this->model : NULL;
+    }
 
-	/**
-	 *
-	 */
-	protected $table = 'pvlng_tree_view';
+    // -------------------------------------------------------------------------
+    // PROTECTED
+    // -------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected $table = 'pvlng_tree_view';
 
 }

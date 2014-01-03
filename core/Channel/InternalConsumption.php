@@ -14,87 +14,96 @@ namespace Channel;
  */
 class InternalConsumption extends \Channel {
 
-	/**
-	 * Accept only childs of the same entity type
-	 */
-	public function addChild( $guid ) {
-		// Check if the new child is a meter
-		$new = self::byGUID($guid);
-		if ($new->meter) {
-			// ok, add new child
-			return parent::addChild($guid);
-		}
+    /**
+     * Channel type
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
+     */
+    const TYPE = NUMERIC_CHANNEL;
 
-		throw new Exception('"'.$this->name.'" accepts only meters as sub channels!', 400);
-	}
+    /**
+     * Accept only childs of the same entity type
+     */
+    public function addChild( $guid ) {
+        // Check if the new child is a meter
+        $new = self::byGUID($guid);
+        if ($new->meter) {
+            // ok, add new child
+            return parent::addChild($guid);
+        }
 
-	/**
-	 *
-	 */
-	public function read( $request, $attributes=FALSE ) {
+        throw new Exception('"'.$this->name.'" accepts only meters as sub channels!', 400);
+    }
 
-		$this->before_read($request);
+    /**
+     *
+     */
+    public function read( $request, $attributes=FALSE ) {
 
-		$childs = $this->getChilds();
+        $this->before_read($request);
 
-		$child1 = $childs[0]->read($request);
-		$child2 = $childs[1]->read($request);
+        $childs = $this->getChilds();
 
-		$row2 = $child2->rewind()->current();
-		$FirstKey2 = $child2->key();
+        $child1 = $childs[0]->read($request);
+        $child2 = $childs[1]->read($request);
 
-		$result = new \Buffer;
+        $row2 = $child2->rewind()->current();
+        $FirstKey2 = $child2->key();
 
-		$last = 0;
+        $result = new \Buffer;
 
-		foreach ($child1 as $key1=>$row1) {
+        $last = 0;
 
-			$key2 = $child2->key();
+        foreach ($child1 as $key1=>$row1) {
 
-			if (!$key2) {
-				$last = $row1['data'] = $last + $row1['consumption'];
-				$result->write($row1, $key1);
-				continue;
-			}
+            $key2 = $child2->key();
 
-			if ($key1 == $key2) {
+            if (!$key2) {
+                $last = $row1['data'] = $last + $row1['consumption'];
+                $result->write($row1, $key1);
+                continue;
+            }
 
-				// same timestamp, combine
-				if ($row1['consumption'] > $row2['consumption']) {
-					$row1['consumption'] -= $row2['consumption'];
-					$last = $row1['data'] = $last + $row1['consumption'];
-				} else {
-					$row1['data'] = $last;
-					$row1['consumption'] = 0;
-				}
+            if ($key1 == $key2) {
 
-				$result->write($row1, $key1);
+                // same timestamp, combine
+                if ($row1['consumption'] > $row2['consumption']) {
+                    $row1['consumption'] -= $row2['consumption'];
+                    $last = $row1['data'] = $last + $row1['consumption'];
+                } else {
+                    $row1['data'] = $last;
+                    $row1['consumption'] = 0;
+                }
 
-				$row2 = $child2->next()->current();
+                $result->write($row1, $key1);
 
-			} elseif ($key1 < $key2) {
+                $row2 = $child2->next()->current();
 
-				if ($key2 == $FirstKey2) {
-					// Remember $last ONLY for timestamps before 2nd channel
-					// starts and NOT for data holes
-					$last = $row1['data'];
+            } elseif ($key1 < $key2) {
 
-					$result->write($row1, $key1);
-				}
+                if ($key2 == $FirstKey2) {
+                    // Remember $last ONLY for timestamps before 2nd channel
+                    // starts and NOT for data holes
+                    $last = $row1['data'];
 
-			} else { // $key1 > $key2
+                    $result->write($row1, $key1);
+                }
 
-				$last = $row1['data'];
+            } else { // $key1 > $key2
 
-				$result->write($row1, $key1);
+                $last = $row1['data'];
 
-				$row2 = $child2->next()->current();
-			}
-		}
-		$child1->close();
-		$child2->close();
+                $result->write($row1, $key1);
 
-		return $this->after_read($result, $attributes);
-	}
+                $row2 = $child2->next()->current();
+            }
+        }
+        $child1->close();
+        $child2->close();
+
+        return $this->after_read($result, $attributes);
+    }
 
 }

@@ -13,14 +13,14 @@
  */
 $(function() {
 
-	$('#dataTable').DataTable({
-		bPaginate: false,
-		bLengthChange: false,
-		bFilter: false,
-		bSort: false,
-		bInfo: false,
-		bJQueryUI: true
-	});
+    $('#dataTable').DataTable({
+        bPaginate: false,
+        bLengthChange: false,
+        bFilter: false,
+        bSort: false,
+        bInfo: false,
+        bJQueryUI: true
+    });
 
 });
 

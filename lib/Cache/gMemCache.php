@@ -21,7 +21,7 @@
  * @author     Cesar D. Rodas (saddor@cesarodas.com)
  * @author     Knut Kohl <knutkohl@users.sourceforge.net>
  * @license    GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version    $Id: v2.4.1-64-gee8a889 2011-02-03 23:16:23 +0100 $
+ * @version    1.0.0
  */
 
 /* *************************************************************************
@@ -92,7 +92,7 @@ class gMemCache {
 
     $lines = explode(self::EOL,$buf,2);
 
-	if ($lines[0] == 'END') return;
+    if ($lines[0] == 'END') return;
 
     $parts = explode(' ',$lines[0]);
 
@@ -188,13 +188,13 @@ class gMemCache {
     while ($c = fread($this->socket,32))  {
       $buf .= $c;
     }
-	$info = array();
+    $info = array();
     foreach (explode(self::EOL, $buf) as $value) {
-		$value = explode(' ', $value, 3);
-		if ($value[0] == 'STAT') $info[$value[1]] = $value[2];
-    	
+        $value = explode(' ', $value, 3);
+        if ($value[0] == 'STAT') $info[$value[1]] = $value[2];
+
     }
-	return $info;
+    return $info;
   }
 
   /*

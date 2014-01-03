@@ -21,119 +21,119 @@ namespace Cache;
  */
 class MemCache extends \Cache {
 
-	/**
-	 * Default server
-	 */
-	const HOST = 'localhost';
+    /**
+     * Default server
+     */
+    const HOST = 'localhost';
 
-	/**
-	 * Default port
-	 */
-	const PORT = 11211;
+    /**
+     * Default port
+     */
+    const PORT = 11211;
 
-	// -------------------------------------------------------------------------
-	// PUBLIC
-	// -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // PUBLIC
+    // -------------------------------------------------------------------------
 
-	/**
-	 * The following additional settings are supported:
-	 * - @c host : MemCache host:port (optional)
-	 *
-	 * @copydoc Cache::__construct()
-	 */
-	public function __construct( $settings=array() ) {
-		parent::__construct($settings);
+    /**
+     * The following additional settings are supported:
+     * - @c host : MemCache host:port (optional)
+     *
+     * @copydoc Cache::__construct()
+     */
+    public function __construct( $settings=array() ) {
+        parent::__construct($settings);
 
-		$host = isset($this->settings['MemCache']) ? $this->settings['MemCache'] : self::HOST;
+        $host = isset($this->settings['MemCache']) ? $this->settings['MemCache'] : self::HOST;
 
-		if (strstr($host, ':')) {
-			list($this->host, $this->port) = explode(':', $host, 2);
-		} else {
+        if (strstr($host, ':')) {
+            list($this->host, $this->port) = explode(':', $host, 2);
+        } else {
             $this->host = $host;
-			$this->port = self::PORT;
-		}
+            $this->port = self::PORT;
+        }
 
-		if (extension_loaded('memcache')) {
-			$this->memcache = new \MemCache;
-		} else {
-			// use gMemCache
-			require_once dirname(__FILE__).'/gMemCache.php';
-			$this->memcache = new \gMemCache;
-		}
-	}
+        if (extension_loaded('memcache')) {
+            $this->memcache = new \MemCache;
+        } else {
+            // use gMemCache
+            require_once dirname(__FILE__).'/gMemCache.php';
+            $this->memcache = new \gMemCache;
+        }
+    }
 
-	/**
-	 * @name Implemented abstract functions
-	 * @{
-	 */
-	public function isAvailable() {
-		return $this->memcache->connect($this->host, $this->port);
-	}
+    /**
+     * @name Implemented abstract functions
+     * @{
+     */
+    public function isAvailable() {
+        return $this->memcache->connect($this->host, $this->port);
+    }
 
-	public function write( $key, $data ) {
-		return $this->memcache->set($this->key($key), $data);
-	}
+    public function write( $key, $data ) {
+        return $this->memcache->set($this->key($key), $data);
+    }
 
-	public function fetch( $key ) {
-		return $this->memcache->get($this->key($key));
-	}
+    public function fetch( $key ) {
+        return $this->memcache->get($this->key($key));
+    }
 
-	public function delete( $key ) {
-		return $this->memcache->delete($this->key($key));
-	}
+    public function delete( $key ) {
+        return $this->memcache->delete($this->key($key));
+    }
 
-	public function flush() {
-		return $this->memcache->flush();
-	}
+    public function flush() {
+        return $this->memcache->flush();
+    }
 
-	public function info() {
-		return array_merge(parrent::info(), $this->memcache->getStats());
-	}
+    public function info() {
+        return array_merge(parrent::info(), $this->memcache->getStats());
+    }
 
-	/**
-	 * @name Overloaded functions
-	 * Use MemCache own functions
-	 * @{
-	 */
-	public function inc( $key, $step=1 ) {
-		return $this->memcache->increment($this->key($key), $step);
-	} // function inc()
+    /**
+     * @name Overloaded functions
+     * Use MemCache own functions
+     * @{
+     */
+    public function inc( $key, $step=1 ) {
+        return $this->memcache->increment($this->key($key), $step);
+    } // function inc()
 
-	public function dec( $key, $step=1 ) {
-		return $this->memcache->decrement($this->key($key), $step);
-	} // function dec()
-	/** @} */
+    public function dec( $key, $step=1 ) {
+        return $this->memcache->decrement($this->key($key), $step);
+    } // function dec()
+    /** @} */
 
-	/**
-	 * Close connection
-	 */
-	public function __destruct(){
-		$this->memcache->close();
-	}
+    /**
+     * Close connection
+     */
+    public function __destruct(){
+        $this->memcache->close();
+    }
 
-	// -------------------------------------------------------------------------
-	// PROTECTED
-	// -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // PROTECTED
+    // -------------------------------------------------------------------------
 
-	/**
-	 * MemCache instance
-	 *
-	 * @var string $host
-	 */
-	protected $host;
+    /**
+     * MemCache instance
+     *
+     * @var string $host
+     */
+    protected $host;
 
-	/**
-	 * MemCache instance
-	 *
-	 * @var int $port
-	 */
-	protected $port;
+    /**
+     * MemCache instance
+     *
+     * @var int $port
+     */
+    protected $port;
 
-	/**
-	 * MemCache instance
-	 *
-	 * @var MemCache $memcache
-	 */
-	protected $memcache;
+    /**
+     * MemCache instance
+     *
+     * @var MemCache $memcache
+     */
+    protected $memcache;
 
 }

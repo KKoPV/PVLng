@@ -12,4 +12,15 @@ namespace Channel;
 /**
  *
  */
-class Meter extends \Channel {}
+class Meter extends \Channel {
+
+    /**
+     * Channel type
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
+     */
+    const TYPE = METER_CHANNEL;
+
+}

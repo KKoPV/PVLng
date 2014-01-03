@@ -232,11 +232,11 @@ class Slim
     }
     
     public function __isset($name){
-    	return isset($this->container[$name]);
+        return isset($this->container[$name]);
     }
   
     public function __unset($name){
-    	unset($this->container[$name]);
+        unset($this->container[$name]);
     }
 
     /**
@@ -1247,8 +1247,8 @@ class Slim
 
         //Apply final outer middleware layers
         if($this->config('debug')){
-        	//Apply pretty exceptions only in debug to avoid accidental information leakage in production
-        	$this->add(new \Slim\Middleware\PrettyExceptions());
+            //Apply pretty exceptions only in debug to avoid accidental information leakage in production
+            $this->add(new \Slim\Middleware\PrettyExceptions());
         }
 
         //Invoke middleware and application stack

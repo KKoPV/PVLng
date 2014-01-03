@@ -2,7 +2,7 @@
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2013 Knut Kohl
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     $Id$
+### @version     1.0.0
 ##############################################################################
 
 ##############################################################################
@@ -37,22 +37,22 @@ GUID_2        ""
 ### kilo watt => watt == 1000
 #FACTOR_2      1000
 
-### v3	- Energy Consumption, watt hours
+### v3    - Energy Consumption, watt hours
 GUID_3        ""
 ### kilo watt hours => watt hours == 1000
 #FACTOR_3      1000
 
-### v4	- Power Consumption, watts
+### v4    - Power Consumption, watts
 ### Consumption
 GUID_4        ""
 ### kilo watt => watt == 1000
 #FACTOR_4      1000
 
-### v5	- Temperature
+### v5    - Temperature
 ### Inverter temperature, celsius
 GUID_5        ""
 
-### v6	- Voltage, volts
+### v6    - Voltage, volts
 GUID_6        ""
 
 ##############################################################################
@@ -60,23 +60,23 @@ GUID_6        ""
 ### http://pvoutput.org/help.html#donations
 ##############################################################################
 
-### v7	- Extended Value 1
+### v7    - Extended Value 1
 ### Irradiation
 GUID_7        ""
 
-### v8	- Extended Value 2
+### v8    - Extended Value 2
 ### Module temperature
 GUID_8        ""
 
-### v9	- Extended Value 3
+### v9    - Extended Value 3
 ### Outside temperature
 GUID_9        ""
 
-### v10	- Extended Value 4
+### v10    - Extended Value 4
 GUID_10       ""
 
-### v11	- Extended Value 5
+### v11    - Extended Value 5
 GUID_11       ""
 
-### v12	- Extended Value 6
+### v12    - Extended Value 6
 GUID_12       ""
