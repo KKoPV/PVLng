@@ -1,0 +1,80 @@
+
+ v2.0.0
+========
+
+FIXED
+
+ - Fix hourly template for Twitter ~Knut Kohl <github@knutkohl.de>
+ - Fix Index page top variant select to point to / and not /index (don't work with new .htaccess) ~Knut Kohl <github@knutkohl.de>
+ - Fix #8 Incorrect update of alias channel during update of normal channel ~Knut Kohl <github@knutkohl.de>
+ - Fix #7 loading views for logged in and not logged in users ~Knut Kohl <github@knutkohl.de>
+ - Fix slug generation for mobile views ~Knut Kohl <github@knutkohl.de>
+ - Fix some missing semicolon for work with compressed JavaScript code ~Knut Kohl <github@knutkohl.de>
+ - Fix reading of last data saved ~Knut Kohl <github@knutkohl.de>
+ - Fix text color in chart-over hint for negative values ~Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust layout for charts view depending on logged in or not ~Knut Kohl <github@knutkohl.de>
+ - Change -l flag for saving data to more logic -s ~Knut Kohl <github@knutkohl.de>
+ - Adjust Twitter Average item, need only start and set period automatic ~Knut Kohl <github@knutkohl.de>
+ - Adjust position in timeline of estimate value ~Knut Kohl <github@knutkohl.de>
+ - Adjust Alias handling, switch direct on creation to aliased channel ~Knut Kohl <github@knutkohl.de>
+ - Adjust method callable() name for PHP 5.5 ~Knut Kohl <github@knutkohl.de>
+ - Adjust Dashboard channel handling ~Knut Kohl <github@knutkohl.de>
+ - Adjust Alias handling and DataTable internationalization ~Knut Kohl <github@knutkohl.de>
+ - Adjust data.save.before hook, call for the raw reading value to handle e.g.
+   translation from strings to numeric values ~Knut Kohl <github@knutkohl.de>
+ - Adjust error logging into database ~Knut Kohl <github@knutkohl.de>
+ - Adjust redirection for not properly configured installations ~Knut Kohl <github@knutkohl.de>
+ - Adjust browser console debugging ~Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Add scripts to load CSV data from shell prompt ~Knut Kohl <github@knutkohl.de>
+ - Add PVLngPUT2CSV function to binaries ~Knut Kohl <github@knutkohl.de>
+ - Add /api/r2/csv/:guid PUT route to load directly CSV files, see /api/r2/help for details ~Knut Kohl <github@knutkohl.de>
+ - Add automatic logging of to API sended data ~Knut Kohl <github@knutkohl.de>
+ - Add example configuration files for Twitter update ~Knut Kohl <github@knutkohl.de>
+ - Add Buffer handling as source of data ~Knut Kohl <github@knutkohl.de>
+ - Add possibility to log values into a local file ~Patrick Feisthammel <patrick.feisthammel@citrin.ch>
+ - Add equipment/channel creation from templates ~Knut Kohl <github@knutkohl.de>
+ - Add check for initial loaded SQL ~Knut Kohl <github@knutkohl.de>
+ - Added Batch-Update function ~Patrick Feisthammel <patrick.feisthammel@citrin.ch>
+ - Add shortcut save() function for logging ~Knut Kohl <github@knutkohl.de>
+ - Add SQL log for debugging ~Knut Kohl <github@knutkohl.de>
+ - Add number formating library ~Knut Kohl <github@knutkohl.de>
+ - Add keyboard shortcuts and hints for them to several actions ~Knut Kohl <github@knutkohl.de>
+ - Add initial setup script ~Knut Kohl <github@knutkohl.de>
+ - Add octocat image for CHANGELOG link ~Knut Kohl <github@knutkohl.de>
+ - Add last readings in Info and Channel views ~Knut Kohl <github@knutkohl.de>
+ - Add auto adjust of meter channels ~Knut Kohl <github@knutkohl.de>
+
+OTHER
+
+ - Merge pull request #13 from pafei/develop ~Knut Kohl <github@knutkohl.de>
+ - Make Twitter items more variable to allow also weekly and monthly state updates, add items help ~Knut Kohl <github@knutkohl.de>
+ - New logic for Historic channels, work with memory table inside ~Knut Kohl <github@knutkohl.de>
+ - Make in DBQuery SELECT FROM ... flexible to work with pre-build sub selects ~Knut Kohl <github@knutkohl.de>
+ - Merge pull request #12 from pafei/develop ~Knut Kohl <github@knutkohl.de>
+ - Redirect /index after login to / on Apache ~Knut Kohl <github@knutkohl.de>
+ - Update initial SQL script ~Knut Kohl <github@knutkohl.de>
+ - Update setup script with more checks ~Knut Kohl <github@knutkohl.de>
+ - Merge pull request #11 from pafei/develop ~Knut Kohl <github@knutkohl.de>
+ - Merge pull request #10 from pafei/develop ~Knut Kohl <github@knutkohl.de>
+ - Updated adminer to version 3.7.1 ~Patrick Feisthammel <patrick.feisthammel@citrin.ch>
+ - Update database initialization script ~Knut Kohl <github@knutkohl.de>
+ - Some finetuning in layout and initial demo data ~Knut Kohl <github@knutkohl.de>
+ - Use minified datatable JS ~Knut Kohl <github@knutkohl.de>
+ - Make more PSR-2 standard conform, use 4 spaces for indenting, not tabs ~Knut Kohl <github@knutkohl.de>
+ - Merge pull request #9 from pafei/develop ~Knut Kohl <github@knutkohl.de>
+ - Reduce php error messages in error_log. ~Knut Kohl <github@knutkohl.de>
+ - reduce php error 'config.php not found' in api calls ~Patrick Feisthammel <patrick.feisthammel@citrin.ch>
+ - Make overall history working with not direct channels ~Knut Kohl <github@knutkohl.de>
+ - Merge pull request #6 from pafei/develop ~Knut Kohl <github@knutkohl.de>
+ - Corrected channel numbers in README ~Patrick Feisthammel <patrick.feisthammel@citrin.ch>
+ - Describe the required settings for a 1-Wire channel ~Knut Kohl <github@knutkohl.de>
+ - Merge pull request #5 from pafei/develop ~Knut Kohl <github@knutkohl.de>
+ - Don't use frontend/config.php anymore, put all settings into config/config.php ~Knut Kohl <github@knutkohl.de>
+ - Auto update chart dimensions at least each 30 minutes ~Knut Kohl <github@knutkohl.de>
+ - Merge pull request #4 from pafei/develop ~Knut Kohl <github@knutkohl.de>
