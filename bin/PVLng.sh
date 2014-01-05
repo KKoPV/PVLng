@@ -8,8 +8,8 @@
 PVLngURL1="$PVLngHost/api/r1"
 PVLngURL2="$PVLngHost/api/r2"
 
-CURL="$(which curl)"
-test -z "$CURL" && echo "Missing curl executable!" && exit 1
+test "$CURL" || CURL="$(which curl 2>/dev/null)"
+test -z "$CURL" && echo "Can not find curl executable, please install and/or define in PVLng.conf!" && exit 1
 
 CURL="$CURL $CURLCONNECT"
 
