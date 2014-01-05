@@ -17,14 +17,30 @@ class Widget extends \Controller {
     /**
      *
      */
-    public function Index_Action() {
-        // Switch layout
-        $this->Layout = 'content';
+    public function before() {
+        parent::before();
 
         $this->app->ContentType('text/javascript');
 
+        // Switch layout
+        $this->Layout = 'widget';
+
         // Compress in any case!
         $this->config->set('View.Verbose', FALSE);
+    }
+
+    /**
+     *
+     */
+    public function Inc_Action() {
+        // Aplly content direct
+        $this->view->Content = $this->view->render('inc.js');
+    }
+
+    /**
+     *
+     */
+    public function Chart_Action() {
 
         $data = array();
         $time1 = $time2 = time();
@@ -38,7 +54,10 @@ class Widget extends \Controller {
 
             $channel = \Channel::byGUID($guid);
 
-            foreach ($channel->read(array('period'=>'10i')) as $row) {
+            $period = $this->intParam('period', 0);
+            if ($period != 0) $period .= 'i';
+
+            foreach ($channel->read(array('period'=>$period)) as $row) {
                 $data[] = array( $row['timestamp']*1000, +$row['data'] );
                 $time1  = min($row['timestamp'], $time1);
                 $max    = max($row['data'], $max);
@@ -52,24 +71,16 @@ class Widget extends \Controller {
             $this->view->Height  = $this->intParam('height', 200);
             $this->view->Color   = $this->strParam('color', '#2F7ED8');
             $this->view->Labels  = $this->boolParam('labels', TRUE);
-            $this->view->Type    = $this->boolParam('area', FALSE) ? 'areaspline' : 'spline';
+            $this->view->Area    = $this->boolParam('area', FALSE);
             $this->view->Time1   = date('H:i', $time1);
             $this->view->Time2   = date('H:i', $time2);
             $this->view->Data    = json_encode($data);
             $this->view->Max     = round($max, $channel->decimals);
             // Aplly content direct
-            $this->view->Content = $this->view->render('chart.tpl');
+            $this->view->Content = $this->view->render('chart.js');
 
         } catch (\Exception $e) {
-            $this->view->Error = $e->getMessage();
-
-            // Switch off compression for help text ...
-            $this->config->set('View.Verbose', TRUE);
-
-            $this->view->Content = "/*\n\n".$this->view->render('help.tpl')."\n\n*/";
-
-            // ... and re-enable
-            $this->config->set('View.Verbose', FALSE);
+            $this->view->Content = $e->getMessage();
         }
     }
 }
