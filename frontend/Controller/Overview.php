@@ -35,6 +35,7 @@ class Overview extends \Controller {
         }
 
         $this->view->Entities = $this->rows2view($this->model->getEntities());
+        parent::after();
     }
 
     /**

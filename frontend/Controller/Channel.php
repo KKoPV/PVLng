@@ -18,6 +18,8 @@ class Channel extends \Controller {
      *
      */
     public function before() {
+        parent::before();
+
         $q = \DBQuery::forge('pvlng_channel_view');
         $this->view->Entities = $this->rows2view($this->db->queryRows($q));
 
@@ -30,13 +32,6 @@ class Channel extends \Controller {
                 'HINT'  => __('channel::'.$key.'Hint'),
             ), array_change_key_case($field, CASE_UPPER));
         }
-    }
-
-    /**
-     *
-     */
-    public function after() {
-        $this->view->APIkey = $this->model->getAPIkey();
     }
 
     /**
@@ -221,7 +216,7 @@ class Channel extends \Controller {
             $entity = new \ORM\Channel($channel['id']);
 
             // set values
-            foreach ($channel as $key=>$value) $entity->set($key, $value);
+            foreach ($channel as $key=>$value) $entity->set($key, trim($value));
 
             $this->prepareFields($entity);
 

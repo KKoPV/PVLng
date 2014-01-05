@@ -25,6 +25,18 @@ abstract class Controller {
         $this->app = App::getInstance();
     }
 
+    /**
+     *
+     */
+    public function before() {
+    }
+
+    /**
+     *
+     */
+    public function after() {
+    }
+
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
