@@ -207,6 +207,8 @@ if (isset($_COOKIE[Session::token()])) {
     Controller\Admin::RememberLogin();
 }
 
+$app->showStats = TRUE;
+
 // ---------------------------------------------------------------------------
 // Authenticate user if required
 // ---------------------------------------------------------------------------
@@ -350,7 +352,16 @@ $app->get('/m', function() use ($app) {
 // ---------------------------------------------------------------------------
 // Other
 // ---------------------------------------------------------------------------
+$app->get('/widget.js', function() use ($app) {
+    $app->showStats = FALSE;
+    $app->process('Widget');
+});
+
+/**
+ *
+ */
 $app->any('/apcclear(/:mode)', $checkAuth, function( $mode='' ) use ($app) {
+    $app->showStats = FALSE;
     $app->ContentType('text/plain');
     if (!extension_loaded('apc') OR !ini_get('apc.enabled')) {
         echo 'Alternative PHP Cache (APC) extension not loaded and/or enabled';
@@ -362,14 +373,16 @@ $app->any('/apcclear(/:mode)', $checkAuth, function( $mode='' ) use ($app) {
         // Clear User data cache
         echo 'Clear APC user cache   - ', (apc_clear_cache('user') ? 'Done' : 'ERROR');
     }
-    exit;
 });
 
+/**
+ *
+ */
 $app->get('/clearcache', $checkAuth, function() use ($app) {
+    $app->showStats = FALSE;
     shell_exec('rm '.TEMP_DIR.DS.'*');
     echo '<p>Cached templates cleared from <tt>'.TEMP_DIR.'</tt></p>';
     echo '<p><a href="/">back</a></p>';
-    exit;
 });
 
 /**
@@ -377,11 +390,13 @@ $app->get('/clearcache', $checkAuth, function() use ($app) {
  */
 $app->run();
 
-/**
- * Some statistics
- */
-printf(PHP_EOL.PHP_EOL
-      .'<!-- %.3fs, Q: %d (%.3fs), M (max.): %.1f (%.1f) kByte -->',
-       (microtime(TRUE)-$_SERVER['REQUEST_TIME']),
-       slimMVC\MySQLi::$QueryCount, slimMVC\MySQLi::$QueryTime/1000,
-       memory_get_usage(TRUE)/1024, memory_get_peak_usage(TRUE)/1024);
+if ($app->showStats) {
+    /**
+     * Some statistics
+     */
+    printf(PHP_EOL.PHP_EOL
+          .'<!-- %.3fs, Q: %d (%.3fs), M (max.): %.1f (%.1f) kByte -->',
+           (microtime(TRUE)-$_SERVER['REQUEST_TIME']),
+           slimMVC\MySQLi::$QueryCount, slimMVC\MySQLi::$QueryTime/1000,
+           memory_get_usage(TRUE)/1024, memory_get_peak_usage(TRUE)/1024);
+}
