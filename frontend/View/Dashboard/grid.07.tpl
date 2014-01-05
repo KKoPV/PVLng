@@ -13,11 +13,11 @@
 <!--  |_|_|_|  -->
 <!-- |_|_|_|_| -->
 <!--           -->
-<div id="chart-1" class="chart push-0_5"><img src="/images/loading.gif" /></div>
-<div id="chart-2" class="chart"><img src="/images/loading.gif" /></div>
-<div id="chart-3" class="chart"><img src="/images/loading.gif" /></div>
+<div id="chart-1" class="chart push-0_5"></div>
+<div id="chart-2" class="chart"></div>
+<div id="chart-3" class="chart"></div>
 <div class="clear"></div>
-<div id="chart-4" class="chart"><img src="/images/loading.gif" /></div>
-<div id="chart-5" class="chart"><img src="/images/loading.gif" /></div>
-<div id="chart-6" class="chart"><img src="/images/loading.gif" /></div>
-<div id="chart-7" class="chart"><img src="/images/loading.gif" /></div>
+<div id="chart-4" class="chart"></div>
+<div id="chart-5" class="chart"></div>
+<div id="chart-6" class="chart"></div>
+<div id="chart-7" class="chart"></div>
