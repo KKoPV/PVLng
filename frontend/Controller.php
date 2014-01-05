@@ -55,6 +55,19 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
+    public function before() {
+        $controller = str_replace('Controller\\', '', get_class($this));
+        $this->view->BaseDir = array(
+            APP_DIR . DS . 'View' . DS . $controller . DS . 'custom',
+            APP_DIR . DS . 'View' . DS . $controller,
+            APP_DIR . DS . 'View' . DS . 'custom',
+            APP_DIR . DS . 'View'
+        );
+    }
+
+    /**
+     *
+     */
     public function after() {
         /* For Logout */
         $this->view->User = $this->User;
@@ -98,14 +111,6 @@ class Controller extends slimMVC\Controller {
         $this->view->Title = $this->config['Title'];
 
         $controller = str_replace('Controller\\', '', get_class($this));
-
-        $this->view->BaseDir = array(
-            APP_DIR . DS . 'View' . DS . $controller . DS . 'custom',
-            APP_DIR . DS . 'View' . DS . $controller,
-            APP_DIR . DS . 'View' . DS . 'custom',
-            APP_DIR . DS . 'View'
-        );
-
 
         $messages = array();
         foreach (Messages::getRaw() as $message) {
