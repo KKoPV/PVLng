@@ -72,34 +72,4 @@ class Widget extends \Controller {
             $this->config->set('View.Verbose', FALSE);
         }
     }
-
-    // -----------------------------------------------------------------------
-    // PROTECTED
-    // -----------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected function strParam( $name, $default ) {
-        $value = $this->app->request->get($name);
-        return !is_null($value) ? $value : $default;
-    }
-
-    /**
-     *
-     */
-    protected function intParam( $name, $default ) {
-        $value = $this->app->request->get($name);
-        return $value != '' ? (int) $value : (int) $default;
-    }
-
-    /**
-     *
-     */
-    protected function boolParam( $name, $default ) {
-        $value = strtolower(trim($this->app->request->get($name)));
-        return $value != ''
-             ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
-             : $default;
-    }
 }
