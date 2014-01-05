@@ -27,13 +27,6 @@ class Dashboard extends \Controller {
     /**
      *
      */
-    public function after() {
-        $this->view->APIkey = $this->model->getAPIkey();
-    }
-
-    /**
-     *
-     */
     public function IndexEmbedded_Action() {
         $this->view->Embedded = TRUE;
         $this->app->foreward('Index');

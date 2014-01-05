@@ -12,5 +12,5 @@
 <!--  _ _  -->
 <!-- |_|_| -->
 <!--       -->
-<div id="chart-1" class="chart push-0_5"><img src="/images/loading.gif" /></div>
-<div id="chart-2" class="chart push-0_5"><img src="/images/loading.gif" /></div>
+<div id="chart-1" class="chart push-0_5"></div>
+<div id="chart-2" class="chart push-0_5"></div>

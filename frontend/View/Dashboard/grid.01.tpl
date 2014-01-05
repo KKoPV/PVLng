@@ -12,4 +12,4 @@
 <!--     _    -->
 <!--    |_|   -->
 <!-- centered -->
-<div id="chart-1" class="chart push-1_5"><img src="/images/loading.gif" /></div>
+<div id="chart-1" class="chart push-1_5"></div>

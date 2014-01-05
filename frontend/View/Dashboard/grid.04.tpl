@@ -12,7 +12,7 @@
 <!--  _ _ _ _  -->
 <!-- |_|_|_|_| -->
 <!--           -->
-<div id="chart-1"  class="chart"><img src="/images/loading.gif" /></div>
-<div id="chart-2"  class="chart"><img src="/images/loading.gif" /></div>
-<div id="chart-3"  class="chart"><img src="/images/loading.gif" /></div>
-<div id="chart-4"  class="chart"><img src="/images/loading.gif" /></div>
+<div id="chart-1"  class="chart"></div>
+<div id="chart-2"  class="chart"></div>
+<div id="chart-3"  class="chart"></div>
+<div id="chart-4"  class="chart"></div>

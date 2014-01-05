@@ -18,6 +18,7 @@ class Index extends \Controller {
      *
      */
     public function before() {
+        parent::before();
         $this->Tree = \NestedSet::getInstance();
         $this->channels = array();
         $this->views = $this->model->getViews();
@@ -41,7 +42,7 @@ class Index extends \Controller {
                 )
             );
 
-        $this->view->APIkey = $this->model->getAPIkey();
+        parent::after();
     }
 
     /**

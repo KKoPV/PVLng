@@ -53,10 +53,9 @@ class App extends \Slim\Slim {
 
         $reqMethod = strtoupper($this->request->getMethod());
 
-        $method = 'before' . $reqMethod;
-        if (method_exists($controller, $method)) $controller->$method();
+        $controller->before();
 
-        $method = 'before';
+        $method = 'before' . $reqMethod;
         if (method_exists($controller, $method)) $controller->$method();
 
         $this->action = $action;
@@ -77,8 +76,7 @@ class App extends \Slim\Slim {
         $method = 'after' . $reqMethod;
         if (method_exists($controller, $method)) $controller->$method();
 
-        $method = 'after';
-        if (method_exists($controller, $method)) $controller->$method();
+        $controller->after();
 
         $controller->finalize($action);
     }

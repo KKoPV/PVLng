@@ -83,15 +83,13 @@
             <!-- ELSEIF {TYPE} == "textarea" -->
                 <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="5"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
-                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>
-                    {VALUE}
-                </textarea>
+                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
+                >{VALUE}</textarea>
             <!-- ELSEIF {TYPE} == "textextra" -->
                 <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="15"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
-                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>
-                    {VALUE}
-                </textarea>
+                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
+                >{VALUE}</textarea>
             <!-- ELSEIF {TYPE} == "textsmall" -->
                 <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10"
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
