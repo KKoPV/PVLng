@@ -200,7 +200,7 @@ abstract class Channel {
             // Simply read also last data set for sensor channels
             (!$this->meter AND $this->period[1] == self::LAST)) {
 
-            // Fetch last reading and set some data to 0 to get correct order
+            // Fetch last reading and set some data to 0 to get correct field order
             $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
               ->get('timestamp')
               ->get('data')
@@ -222,15 +222,14 @@ abstract class Channel {
               ->get($q->MAX('data'), 'max')
               ->get($q->COUNT('id'), 'count')
               ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
-              ->whereEQ('id', $this->entity);
+              ->whereEQ('id', $this->entity)
+              ->limit(1);
 
             $buffer->write(array_merge((array) $row, (array) $this->db->queryRow($q)));
 
         } else {
 
-            if ($this->period[1] == self::NO OR
-                $this->period[1] == self::LAST OR
-                $this->period[1] == self::ALL) {
+            if ($this->period[1] == self::LAST OR $this->period[1] == self::ALL) {
                 // Default behavior
 
                 $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
@@ -243,19 +242,25 @@ abstract class Channel {
                   ->get('timestamp', 'g');
 
             } else {
-                // with period
-                $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
-                  ->get($q->MIN('timestamp'), 'timestamp');
+                // With period, also for self::NO with period "1minute"
+                // Round timestamps to full minute
+                $q->get($q->FROM_UNIXTIME($q->MIN('(`timestamp` DIV 60)*60')), 'datetime')
+                  ->get($q->MIN('(`timestamp` DIV 60)*60'), 'timestamp');
 
-                if (!$this->numeric) {
-                    $q->get('data');
-                } elseif ($this->meter) {
-                    $q->get($q->MAX('data'), 'data');
-                } elseif ($this->counter) {
-                    $q->get($q->SUM('data'), 'data');
-                } else {
-                    $q->get($q->AVG('data'), 'data');
-                }
+			    switch (TRUE) {
+                    case !$this->numeric:
+                        // Raw data for non-numeric channels
+                        $q->get('data');  break;
+                    case $this->meter:
+                        // Max. value for meters
+                        $q->get($q->MAX('data'), 'data');  break;
+                    case $this->counter:
+                        // Summarize counter ticks
+                        $q->get($q->SUM('data'), 'data');  break;
+                    default:
+                        // Average value of sensors/proxies
+                        $q->get($q->AVG('data'), 'data');
+                } // switch
 
                 $q->get($q->MIN('data'), 'min')
                   ->get($q->MAX('data'), 'max')
@@ -266,7 +271,7 @@ abstract class Channel {
             }
 
             if ($this->period[1] != self::ALL) {
-                // Time is only relevant for select <> period=all
+                // Time is only relevant for period != ALL
                 if ($this->start) {
                     if (!$this->meter) {
                         $q->whereGE('timestamp', $this->start);
@@ -333,7 +338,7 @@ abstract class Channel {
         if (array_key_exists('sql', $request) AND $request['sql']) {
             $sql = $this->name;
             if ($this->description) $sql .= ' (' . $this->description . ')';
-            Header('X-SQL-'.substr(md5($sql), 25).': '.$sql.': '.$q);
+            Header('X-SQL-'.substr(md5($sql), 8).': '.$sql.': '.$q);
         }
 
         return $this->after_read($buffer, $attributes);
@@ -423,23 +428,6 @@ abstract class Channel {
     const ALL      = 90;
 
     /**
-     * Grouping SQLs
-     */
-    protected $GroupBy = array(
-        self::NO       => '',
-        self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
-        self::HOUR     => '`timestamp` DIV (3600 * %f)',
-        self::DAY      => '`timestamp` DIV (86400 * %d)',
-        self::WEEK     => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
-        self::MONTH    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
-        self::QUARTER  => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
-        self::YEAR     => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
-        self::LAST     => '',
-        self::READLAST => '',
-        self::ALL      => '',
-    );
-
-    /**
      *
      */
     protected $TimestampMeterOffset = array(
@@ -478,7 +466,7 @@ abstract class Channel {
      */
     protected function periodGrouping() {
         static $GroupBy = array(
-            self::NO       => '`timestamp`',
+            self::NO       => '`timestamp` DIV 60',
             self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
             self::HOUR     => '`timestamp` DIV (3600 * %f)',
             self::DAY      => '`timestamp` DIV (86400 * %d)',
@@ -518,13 +506,13 @@ abstract class Channel {
      *
      */
     protected function getLastReading() {
-        $q = DBQuery::forge($this->table[$this->numeric])
-             ->get('data')
-             ->whereEQ('id', $this->entity)
-             ->orderDescending('timestamp')
-             ->limit(1);
-
-        return $this->db->queryOne($q);
+        return $this->db->queryOne(
+            DBQuery::forge($this->table[$this->numeric])
+            ->get('data')
+            ->whereEQ('id', $this->entity)
+            ->orderDescending('timestamp')
+            ->limit(1)
+        );
     }
 
     /**
@@ -556,7 +544,8 @@ abstract class Channel {
 
                 $lastReading = $this->getLastReading();
 
-                if ($this->value + $this->offset < $lastReading AND $this->adjust) {
+                if ($this->meter AND $this->value + $this->offset < $lastReading AND $this->adjust) {
+                    // Auto-adjust channel offset
 
                     ORM\Log::save(
                         $this->name,
