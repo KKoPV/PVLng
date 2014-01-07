@@ -480,7 +480,9 @@ function updateChart( forceUpdate ) {
                         enabled: true,
                         formatter: function() {
                             /* Switch for non-numeric / numeric channels */
-                            return this.point.name ? this.point.name : this.point.y;
+                            return this.point.name
+                                 ? this.point.name
+                                 : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
                         }
                     };
                     if (!attr.unit) {
