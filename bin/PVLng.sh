@@ -254,7 +254,7 @@ function PVLngPUT2 {
             if test "$dataraw"; then
                 file=$SaveDataDir/$GUID/$(date +"%Y-%m-%d").csv
                 log 2 "Save $dataraw to $file"
-                echo $(date +"%Y-%m-%d %H:%M")";$dataraw" >>$file
+                echo $(date +"%Y-%m-%d %H:%M:%S")";$dataraw" >>$file
             elif test "$datafile"; then
                 ### Because of multiple files each day, so each day get its own directory
                 dir=$SaveDataDir/$GUID/$(date +"%Y-%m-%d")
