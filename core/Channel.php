@@ -242,10 +242,9 @@ abstract class Channel {
                   ->get('timestamp', 'g');
 
             } else {
-                // With period, also for self::NO with period "1minute"
-                // Round timestamps to full minute
-                $q->get($q->FROM_UNIXTIME($q->MIN('(`timestamp` DIV 60)*60')), 'datetime')
-                  ->get($q->MIN('(`timestamp` DIV 60)*60'), 'timestamp');
+
+                $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
+                  ->get($q->MIN('timestamp'), 'timestamp');
 
 			    switch (TRUE) {
                     case !$this->numeric:
@@ -395,7 +394,7 @@ abstract class Channel {
     /**
      *
      */
-    protected $period = array( 1, 0 );
+    protected $period = array( 0, self::NO );
 
     /**
      *
@@ -415,33 +414,35 @@ abstract class Channel {
     /**
      * Grouping
      */
-    const NO       =  0;
-    const MINUTE   = 10;
-    const HOUR     = 20;
-    const DAY      = 30;
-    const WEEK     = 40;
-    const MONTH    = 50;
-    const QUARTER  = 60;
-    const YEAR     = 70;
-    const LAST     = 80;
-    const READLAST = 81;
-    const ALL      = 90;
+    const NO            =  0;
+    const NO_WITHCHILDS =  1; // Required for grouping by at least 1 minute
+    const MINUTE        = 10;
+    const HOUR          = 20;
+    const DAY           = 30;
+    const WEEK          = 40;
+    const MONTH         = 50;
+    const QUARTER       = 60;
+    const YEAR          = 70;
+    const LAST          = 80;
+    const READLAST      = 81;
+    const ALL           = 90;
 
     /**
      *
      */
     protected $TimestampMeterOffset = array(
-        self::NO       =>        0,
-        self::MINUTE   =>       60,
-        self::HOUR     =>     3600,
-        self::DAY      =>    86400,
-        self::WEEK     =>   604800,
-        self::MONTH    =>  2678400,
-        self::QUARTER  =>  7776000,
-        self::YEAR     => 31536000,
-        self::LAST     =>        0,
-        self::READLAST =>        0,
-        self::ALL      =>        0,
+        self::NO            =>        0,
+        self::NO_WITHCHILDS =>        0,
+        self::MINUTE        =>       60,
+        self::HOUR          =>     3600,
+        self::DAY           =>    86400,
+        self::WEEK          =>   604800,
+        self::MONTH         =>  2678400,
+        self::QUARTER       =>  7776000,
+        self::YEAR          => 31536000,
+        self::LAST          =>        0,
+        self::READLAST      =>        0,
+        self::ALL           =>        0,
     );
 
     /**
@@ -466,17 +467,18 @@ abstract class Channel {
      */
     protected function periodGrouping() {
         static $GroupBy = array(
-            self::NO       => '`timestamp` DIV 60',
-            self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
-            self::HOUR     => '`timestamp` DIV (3600 * %f)',
-            self::DAY      => '`timestamp` DIV (86400 * %d)',
-            self::WEEK     => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
-            self::MONTH    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
-            self::QUARTER  => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
-            self::YEAR     => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
-            self::LAST     => '`timestamp`',
-            self::READLAST => '`timestamp`',
-            self::ALL      => '`timestamp`',
+            self::NO            => '`timestamp`',
+            self::NO_WITHCHILDS => '`timestamp` DIV 60',
+            self::MINUTE        => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
+            self::HOUR          => '`timestamp` DIV (3600 * %f)',
+            self::DAY           => '`timestamp` DIV (86400 * %d)',
+            self::WEEK          => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
+            self::MONTH         => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
+            self::QUARTER       => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
+            self::YEAR          => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
+            self::LAST          => '`timestamp`',
+            self::READLAST      => '`timestamp`',
+            self::ALL           => '`timestamp`',
         );
         return sprintf($GroupBy[$this->period[1]], $this->period[0]);
     }
@@ -616,6 +618,11 @@ abstract class Channel {
             } else {
                 throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
             }
+        }
+
+        if ($this->period[1] == self::NO AND $this->childs >= 0) {
+            // For calculated channels set period to at least 1 minute
+            $this->period[1] = self::NO_WITHCHILDS;
         }
 
         $this->full   = (array_key_exists('full', $request) OR

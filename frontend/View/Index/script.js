@@ -261,15 +261,16 @@ function ChartDialog( id, name ) {
 var channels = [];
 
 /**
- * Scale timestamps down to full hour, day, week, month, quarter or year
+ * Scale timestamps down to full minute, hour, day, week, month, quarter or year
  */
 var xAxisResolution = {
-    h: 3600,
-    d: 3600 * 24,
-    w: 3600 * 24 * 7,
-    m: 3600 * 24 * 30,
-    q: 3600 * 24 * 90,
-    y: 3600 * 24 * 360
+    i: 60,
+    h: 60 * 60,
+    d: 60 * 60 * 24,
+    w: 60 * 60 * 24 * 7,
+    m: 60 * 60 * 24 * 30,
+    q: 60 * 60 * 24 * 90,
+    y: 60 * 60 * 24 * 360
 };
 
 var lastChanged = (new Date).getTime() / 1000 / 60;
@@ -298,7 +299,8 @@ function updateChart( forceUpdate ) {
         channels_new = [], yAxisMap = [], yAxis = [],
         channel, channel_clone, buffer = [],
         period_count = +$('#periodcnt').val(),
-        period = $('#period').val();
+        period = $('#period').val(),
+        res;
 
     /* reset consumption and costs data */
     $('.minmax, .consumption, .costs, #costs').each(function(id, el) {
@@ -393,17 +395,13 @@ function updateChart( forceUpdate ) {
         }
     }
 
-    var res = xAxisResolution[period];
-
-    if (period_count < 1) {
-        switch(period) {
-            case 'h':  res = null;  break;
-            case 'd':  res = xAxisResolution['h'];  break;
-            case 'w':  res = xAxisResolution['d'];  break;
-            case 'm':  res = xAxisResolution['w'];  break;
-            case 'q':  res = xAxisResolution['m'];  break;
-            case 'y':  res = xAxisResolution['q'];  break;
-        }
+    switch(period) {
+        case 'd':  res = xAxisResolution['h'];  break;
+        case 'w':  res = xAxisResolution['d'];  break;
+        case 'm':  res = xAxisResolution['w'];  break;
+        case 'q':  res = xAxisResolution['m'];  break;
+        case 'y':  res = xAxisResolution['q'];  break;
+        default:   res = xAxisResolution['i'];
     }
 
     if (changed) {
@@ -434,7 +432,7 @@ function updateChart( forceUpdate ) {
             {
                 attributes: true,
                 full:       true,
-                start:        $('#fromdate').val(),
+                start:      $('#fromdate').val(),
                 end:        $('#todate').val() + '+1day',
                 period:     (channel.type != 'scatter') ? period_count + period : '',
                 _ts:        (new Date).getTime()
@@ -498,9 +496,7 @@ function updateChart( forceUpdate ) {
                 }
 
                 $(data).each(function(id, row) {
-                    var ts = res
-                           ? Math.round(row.timestamp / res) * res * 1000
-                           : row.timestamp * 1000;
+                    var ts = Math.round(row.timestamp / res) * res * 1000;
                     if ($.isNumeric(row.data)) {
                         if (channel.type == 'areasplinerange') {
                             serie.data.push([ts, row.min, row.max]);

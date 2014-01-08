@@ -178,6 +178,8 @@ function updateChart() {
                 title: false /* { text: channel.unit } */,
                 lineColor:channel.color,
                 showEmpty: false,
+                minPadding: 0,
+                maxPadding: 0,
                 opposite: is_right
             };
             /* only 1st left axis shows grid lines */
@@ -257,14 +259,15 @@ function updateChart() {
                     tr, td;
 
                 $(data).each(function(id, row) {
+                    var ts = Math.round(row[1] / 60) * 60 * 1000;
                     if ($.isNumeric(row[2])) {
                         if (channel.type == 'areasplinerange') {
-                            serie.data.push([row[1]*1000, row[3], row[4]]);
+                            serie.data.push([ ts, row[3], row[4] ]);
                         } else {
-                            serie.data.push([row[1]*1000, row[2]]);
+                            serie.data.push([ ts, row[2] ]);
                         }
                     } else {
-                        serie.data.push({ x: row[1]*1000, y: 0, name: row[2] });
+                        serie.data.push({ x: ts, y: 0, name: row[2] });
                     }
                 });
 
@@ -379,7 +382,7 @@ function updateChart() {
 
                 chart.redraw();
                 chart.hideLoading();
-                setTimeout(setExtremes, channels.length*100);
+                if (yAxis.length > 1) setTimeout(setExtremes, channels.length*100);
                 lock = false;
             }
         });
