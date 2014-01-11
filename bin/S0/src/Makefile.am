@@ -1,2 +1,0 @@
-bin_PROGRAMS = S0
-S0_SOURCES = S0.c
