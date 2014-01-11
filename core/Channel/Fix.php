@@ -22,19 +22,13 @@ class Fix extends Sensor {
         $this->before_read($request);
 
         // make sure, only until now :-)
-        $this->end = min($this->end, time());
-
-        // Buffer $this->db->TimeStep, at least 60 seconds
-        $TimeStep = max(60, $this->db->TimeStep);
+        $this->end = floor(min($this->end, time()) / 60) * 60;
 
         $result = new \Buffer;
 
-        // Align start to full minutes
-        $ts = floor($this->start / $TimeStep) * $TimeStep;
-
         $result->write(array(
-            'datetime'    => date('Y-m-d H:i:s', $ts),
-            'timestamp'   => $ts,
+            'datetime'    => date('Y-m-d H:i', $this->start),
+            'timestamp'   => $this->start,
             'data'        => 1,
             'min'         => 1,
             'max'         => 1,
@@ -43,12 +37,9 @@ class Fix extends Sensor {
             'consumption' => 0
         ), $this->start);
 
-        // Align end to full minutes
-        $ts = floor($this->end / $TimeStep) * $TimeStep;
-
         $result->write(array(
-            'datetime'    => date('Y-m-d H:i:s', $ts),
-            'timestamp'   => $ts,
+            'datetime'    => date('Y-m-d H:i', $this->end),
+            'timestamp'   => $this->end,
             'data'        => 1,
             'min'         => 1,
             'max'         => 1,

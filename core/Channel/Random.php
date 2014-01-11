@@ -30,8 +30,6 @@ class Random extends InternalCalc {
         // buffer once
         $randMax = mt_getrandmax();
 
-        $TimeStep = max(60, $this->db->TimeStep);
-
         if ($this->meter) {
             $timestamp -= $this->TimestampMeterOffset[$this->period[1]];
             $value = is_null($this->valid_from) ? 0 : $this->valid_from;
@@ -46,7 +44,7 @@ class Random extends InternalCalc {
 
         while ($timestamp <= $this->end) {
             // calc next value;
-            $timestamp += $TimeStep;
+            $timestamp += 60;
             $value += mt_rand() / $randMax * $threshold * mt_rand($minRand, 1);
             $values[$timestamp] = $value;
         }

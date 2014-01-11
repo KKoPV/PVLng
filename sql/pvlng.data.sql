@@ -13,8 +13,7 @@ INSERT INTO `pvlng_channel`
 INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`) VALUES
 ('Currency', 'EUR', 'Costs currency', 'str'),
 ('CurrencyDecimals', 2, 'Costs currency decimals', 'num'),
-('LogInvalid', 0, 'Log invalid values', 'str'),
-('TimeStep', 60, 'Reading time step in seconds', 'num');
+('LogInvalid', 0, 'Log invalid values', 'str');
 
 INSERT INTO `pvlng_tree` (`id`, `lft`, `rgt`, `entity`) VALUES
 (1, 1, 12, 1), (2, 2, 3, 2), (3, 4, 5, 3), (4, 6, 11, 4), (5, 7, 10, 5), (6, 8, 9, 2);

@@ -32,7 +32,6 @@ class Estimate extends InternalCalc {
 
         $timestamp = max(strtotime(date('Y-m-d 12:00', $this->start)), $this->start);
         $this->end = min(strtotime(date('Y-m-d 12:00', $this->end)), $this->end);
-        $TimeStep = max($this->db->TimeStep, 60);
 
         $data = explode("\n", $this->comment);
         $estimates = array();
@@ -60,9 +59,6 @@ class Estimate extends InternalCalc {
             $ts = (16 + sin(date('z', $timestamp) * M_PI / 366) * 5) *60*60;
             // Move into this day using date functions for server time offsets
             $ts = strtotime(date('Y-m-d H:i', strtotime(date('Y-m-d', $timestamp)) + $ts));
-
-            // Align to data time step
-            $ts = bcdiv($ts, $TimeStep) * $TimeStep;
 
             // Search for estimate, 1st for exact day, then for month
             if (isset($estimates[$day])) {
