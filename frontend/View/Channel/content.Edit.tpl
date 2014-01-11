@@ -107,6 +107,30 @@
     <!-- ENDIF -->
 
     <!-- END -->
+
+    <!-- IF !{ID} -->
+    <!-- New channel, ask for auto add to hierarchy -->
+    <tr>
+        <td>
+            {{Overview}}
+        </td>
+        <td>
+            <select name="add2tree">
+                <option value="0">--- {{Select}} ---</option>
+                <option value="1">> {{TopLevel}}</option>
+                <option disabled="disabled">> {{AsChild}}:</option>
+                <!-- BEGIN ADDTREE -->
+                <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
+                <!-- END -->
+            </select>
+
+        </td>
+        <td>
+            {{Channel2Overview}}
+        </td>
+    </tr>
+    <!-- ENDIF -->
+
     </tbody>
 
     <tfoot>
