@@ -31,32 +31,28 @@ return array(
 
     'channels' => array(
 
-        /**
-         * 0       - grouping channel, optional
-         * 1 ... n - Real measuring channels
-         *
-         * Only required attributes must be filled
-         */
-        0 => array(
+        // Grouping channel
+        array(
             'type'        => 4, // Multi-Sensor
             'name'        => 'Weather station',
         ),
 
-        1 => array(
+        // Real channels
+        array(
             'type'        => 60, // Temperature sensor
             'name'        => 'Temperature outside',
             'unit'        => '°C',
             'decimals'    => 1,
         ),
 
-        2 => array(
+        array(
             'type'        => 60, // Temperature sensor
             'name'        => 'Soil temperature',
             'unit'        => '°C',
             'decimals'    => 1,
         ),
 
-        3 => array(
+        array(
             'type'        => 56, // Humidity sensor
             'name'        => 'Humidity outside',
             'unit'        => '%',
@@ -65,14 +61,14 @@ return array(
             'valid_to'    => 100,
         ),
 
-        4 => array(
+        array(
             'type'        => 63, // Windspeed sensor
             'name'        => 'Wind speed',
             'unit'        => 'm/s',
             'decimals'    => 1,
         ),
 
-        5 => array(
+        array(
             'type'        => 67, // Winddirection sensor
             'name'        => 'Wind direction',
             'unit'        => '°',
@@ -81,14 +77,14 @@ return array(
             'valid_to'    => 360,
         ),
 
-        6 => array(
+        array(
             'type'        => 68, // Rainfall sensor
             'name'        => 'Rainfall',
             'unit'        => 'mm/h',
             'decimals'    => 0,
         ),
 
-        7 => array(
+        array(
             'type'        => 73, // Rainfall meter
             'name'        => 'Rainfall absolute',
             'unit'        => 'mm',
@@ -96,21 +92,21 @@ return array(
             'meter'       => 1,
         ),
 
-        8 => array(
+        array(
             'type'        => 58, // Pressure sensor
             'name'        => 'Air pressure',
             'unit'        => 'hPa',
             'decimals'    => 1,
         ),
 
-        9 => array(
+        array(
             'type'        => 60, // Temperature sensor
             'name'        => 'Temperature inside',
             'unit'        => '°C',
             'decimals'    => 1,
         ),
 
-        10 => array(
+        array(
             'type'        => 56, // Humidity sensor
             'name'        => 'Humidity inside',
             'unit'        => '%',

@@ -6,6 +6,8 @@ ALTER TABLE `pvlng_tree` DROP INDEX `lft`;
 ALTER TABLE `pvlng_tree` ADD INDEX `lft_rgt` (`lft`, `rgt`);
 ALTER TABLE `pvlng_tree` ADD INDEX `guid` (`guid`);
 
+ALTER TABLE `pvlng_channel` DROP INDEX `Name-Description-Type`;
+
 DROP PROCEDURE `getTimestamp`;
 
 DELIMITER ;;

@@ -92,6 +92,7 @@ class Channel extends \Controller {
                         $oChannel->set($key, $value);
                     }
                     $oChannel->insert();
+                    // Remember id for hierarchy build
                     $channels[$id]['id'] = $oChannel->id;
                 }
                 \Messages::Success(__('ChannelsSaved', count($channels)));
@@ -99,7 +100,7 @@ class Channel extends \Controller {
             } catch (\Exception $e) {
                 \Messages::Error($e->getMessage());
 
-                // Rollback, mostly by double index entries
+                // Rollback in case of error
                 $oChannel->reset();
                 foreach ($channels as $id=>$channel) {
                     if (isset($channels[$id]['id'])) {
@@ -111,23 +112,19 @@ class Channel extends \Controller {
                 $this->app->redirect('/channel');
             }
 
-            if (!isset($channels[0])) {
-                $this->app->redirect('/channel');
-            } else {
-                // Build hierarchy
-                $tree = \NestedSet::getInstance();
+            // Build hierarchy
+            $tree = \NestedSet::getInstance();
 
-                foreach ($channels as $id=>$channel) {
-                    if ($id == 0) {
-                        $root = $tree->insertChildNode($channel['id'], 1);
-                    } else {
-                        $tree->insertChildNode($channel['id'], $root);
-                    }
+            foreach ($channels as $id=>$channel) {
+                if ($id == 0) {
+                    $groupId = $tree->insertChildNode($channel['id'], 1);
+                } else {
+                    $tree->insertChildNode($channel['id'], $groupId);
                 }
-                \Messages::Success(__('HierarchyCreated', count($channels)));
-
-                $this->app->redirect('/overview');
             }
+            \Messages::Success(__('HierarchyCreated', count($channels)));
+
+            $this->app->redirect('/overview');
         }
     }
 
