@@ -235,6 +235,11 @@ class Channel extends \Controller {
                     if (!$entity->id) {
                         $entity->insert();
                         \Messages::Success(__('ChannelSaved'));
+
+                        if ($addTo = $this->request->post('add2tree')) {
+                            \NestedSet::getInstance()->insertChildNode($entity->id, $addTo);
+                            \Messages::Success(__('HierarchyCreated', 1));
+                        }
                     } else {
                         $entity->update();
                         \Messages::Success(__('ChannelSaved'));
@@ -259,7 +264,7 @@ class Channel extends \Controller {
                             }
                         }
                     }
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     \Messages::Error('['.$e->getCode().'] '.$e->getMessage());
                     \Messages::Info(implode(";\n", $entity->queries()).';');
                     $ok = FALSE;
@@ -289,6 +294,16 @@ class Channel extends \Controller {
     public function Edit_Action() {
         $this->view->SubTitle = __('EditChannel');
         $this->view->Fields = $this->fields;
+
+        if (!$this->view->Id) {
+            $q = new \DBQuery('pvlng_tree_view');
+            $q->get('id')
+              ->get('REPEAT("- ", `level`-2)', 'indent')
+              ->get('name')
+              ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
+              ->whereNE('childs', 0);
+            $this->view->AddTree = $this->rows2view($this->db->queryRows($q));
+        }
     }
 
     /**

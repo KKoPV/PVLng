@@ -192,6 +192,11 @@ abstract class Channel {
 
         $this->before_read($request);
 
+        if (!$attributes AND $this->period[1] == self::NO AND $this->childs == 0) {
+            // For calculated channels set period to at least 1 minute
+            $this->period[1] = self::NO_WITHCHILDS;
+        }
+
         $q = DBQuery::forge($this->table[$this->numeric]);
 
         $buffer = new Buffer;
@@ -456,8 +461,8 @@ abstract class Channel {
             $this->$key = $value;
         }
 
-        $this->start = strtotime('00:00');
-        $this->end   = strtotime('24:00');
+//         $this->start = strtotime('00:00');
+//         $this->end   = strtotime('24:00');
 
         $this->performance = new ORM\Performance;
     }
@@ -469,7 +474,7 @@ abstract class Channel {
         static $GroupBy = array(
             self::NO            => '`timestamp`',
             self::NO_WITHCHILDS => '`timestamp` DIV 60',
-            self::MINUTE        => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
+            self::MINUTE        => '-((UNIX_TIMESTAMP() - `timestamp`) DIV 60) DIV %d',
             self::HOUR          => '`timestamp` DIV (3600 * %f)',
             self::DAY           => '`timestamp` DIV (86400 * %d)',
             self::WEEK          => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
@@ -578,27 +583,35 @@ abstract class Channel {
             throw new \Exception('Can\'t read data from '.$this->name.', '
                                 .'instance of '.get_class($this), 400);
 
-        if ($this->childs >= 0 AND
-            count($this->getChilds()) != $this->childs)
+        if ($this->childs >= 0 AND count($this->getChilds()) != $this->childs)
             throw new \Exception($this->name.' must have '.$this->childs.' child(s)', 400);
 
-        if (isset($request['start'])) {
-            $this->start = is_numeric($request['start'])
-                         ? $request['start']
-                         : strtotime($request['start']);
-            if ($this->start === FALSE)
-                throw new \Exception('No valid start timestamp: '.$this->start, 400);
-        }
+        $request = array_merge(
+            array(
+                'start'  => '00:00',
+                'end'    => '24:00',
+                'period' => '',
+                'full'   => FALSE,
+                'mobile' => FALSE
+            ),
+            $request
+        );
 
-        if (isset($request['end'])) {
-            $this->end = is_numeric($request['end'])
-                       ? $request['end']
-                       : strtotime($request['end']);
-            if ($this->end === FALSE)
-                throw new \Exception('No valid end timestamp: '.$this->end, 400);
-        }
+        $this->start = is_numeric($request['start'])
+                     ? $request['start']
+                     : strtotime($request['start']);
 
-        if (isset($request['period'])) {
+        if ($this->start === FALSE)
+            throw new \Exception('No valid start timestamp: '.$this->start, 400);
+
+        $this->end = is_numeric($request['end'])
+                   ? $request['end']
+                   : strtotime($request['end']);
+
+        if ($this->end === FALSE)
+            throw new \Exception('No valid end timestamp: '.$this->end, 400);
+
+        if ($request['period'] != '') {
             // normalize aggr. periods
             if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
                            $request['period'], $args)) {
@@ -620,15 +633,13 @@ abstract class Channel {
             }
         }
 
-        if ($this->period[1] == self::NO AND $this->childs >= 0) {
+        if ($this->period[1] == self::NO AND $this->childs == 0) {
             // For calculated channels set period to at least 1 minute
             $this->period[1] = self::NO_WITHCHILDS;
         }
 
-        $this->full   = (array_key_exists('full', $request) OR
-                         array_search('full', $request) !== FALSE);
-        $this->mobile = (array_key_exists('mobile', $request) OR
-                         array_search('short', $request) !== FALSE);
+        $this->full   = (bool) $request['full'];
+        $this->mobile = (bool) $request['mobile'];
     }
 
     /**
