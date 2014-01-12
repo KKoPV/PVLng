@@ -46,7 +46,7 @@ class Average extends \Channel {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -55,14 +55,14 @@ class Average extends \Channel {
 
         // no childs, return empty file
         if ($childCnt == 0) {
-            return $this->after_read(new \Buffer, $attributes);
+            return $this->after_read(new \Buffer);
         }
 
         $buffer = $childs[0]->read($request);
 
         // only one child, return as is
         if ($childCnt == 1) {
-            return $this->after_read($buffer, $attributes);
+            return $this->after_read($buffer);
         }
 
         // combine all data for same timestamp
@@ -94,7 +94,7 @@ class Average extends \Channel {
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
 
-                } elseif ($key1 AND $key1 < $key2 OR !$key2) {
+                } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                     // missing row 2, save row 1 as is
                     $result->write($row1, $key1);
@@ -102,7 +102,7 @@ class Average extends \Channel {
                     // read only row 1
                     $row1 = $buffer->next()->current();
 
-                } else /* $key1 > $key2 OR !$key2 */ {
+                } else /* $key1 > $key2 */ {
 
                     // missing row 1, save row 2 as is
                     $result->write($row2, $key2);
@@ -118,7 +118,7 @@ class Average extends \Channel {
             $buffer = $result;
         }
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
 
 }

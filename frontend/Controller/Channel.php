@@ -156,10 +156,12 @@ class Channel extends \Controller {
             $templates = array();
             foreach (glob(CORE_DIR . DS . 'Channel' . DS . 'Templates' . DS . '*.php') as $file) {
                 $template = include $file;
+                $type = new \ORM\EntityType($template['channels'][0]['type']);
                 $templates[] = array(
                     'FILE'         => $file,
-                    'NAME'         => $template['name'],
-                    'DESCRIPTION'  => $template['description']
+                    'NAME'         => $template['name'] . ' (Type: ' . $type->name . ')',
+                    'DESCRIPTION'  => $template['description'],
+                    'ICON'         => $type->icon
                 );
             }
             $this->view->Templates = $templates;

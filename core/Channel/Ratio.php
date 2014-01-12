@@ -17,7 +17,7 @@ class Ratio extends Sensor {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
         $this->before_read($request);
 
         $childs = $this->getChilds();
@@ -58,7 +58,7 @@ class Ratio extends Sensor {
                 $row1 = $child1->next()->current();
                 $row2 = $child2->next()->current();
 
-            } elseif ($key1 AND $key1 < $key2 OR !$key2) {
+            } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                 // read only row 1
                 $row1 = $child1->next()->current();
@@ -73,7 +73,7 @@ class Ratio extends Sensor {
         $child1->close();
         $child2->close();
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
 
 }

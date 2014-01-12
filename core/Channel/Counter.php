@@ -27,7 +27,7 @@ class Counter extends Sensor {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -60,7 +60,7 @@ class Counter extends Sensor {
         // Switch resolution
         $this->resolution = 1 / $this->resolution;
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
 
     // -------------------------------------------------------------------------

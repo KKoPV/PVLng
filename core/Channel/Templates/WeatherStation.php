@@ -13,7 +13,7 @@ return array(
     'name' => 'Weather station',
 
     'description' => '
-        Weather station (as Multi-Sensor) with pre-configured child sensors:
+        Weather station with pre-configured sensors:
         <ul>
             <li>Temperature outside (°C)</li>
             <li>Soil temperature (°C)</li>
@@ -26,7 +26,6 @@ return array(
             <li>Temperatue inside (°C)</li>
             <li>Humidity inside (%)</li>
         </ul>
-        Adjust e.g. units, decimals and public settings afterwards.
     ',
 
     'channels' => array(

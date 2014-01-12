@@ -69,10 +69,10 @@ abstract class InternalCalc extends \Channel {
     /**
      *
      */
-    protected function after_read( \Buffer $buffer, $attributes ) {
+    protected function after_read( \Buffer $buffer ) {
         /* Clean up */
         $this->data->deleteById($this->entity);
-        return parent::after_read($buffer, $attributes);
+        return parent::after_read($buffer);
     }
 
 }

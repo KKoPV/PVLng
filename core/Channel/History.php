@@ -17,13 +17,13 @@ class History extends InternalCalc {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
         $this->child = $this->getChild(1);
 
-        if (!$this->child) return $this->after_read(new \Buffer, $attributes);
+        if (!$this->child) return $this->after_read(new \Buffer);
 
         // Inherit properties from child
         $this->meter = $this->child->meter;
@@ -121,7 +121,7 @@ class History extends InternalCalc {
         // Skip validity handling of after_read!
         $this->valid_from = $this->valid_to = NULL;
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
 
     // -----------------------------------------------------------------------

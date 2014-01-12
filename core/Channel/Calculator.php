@@ -26,7 +26,7 @@ class Calculator extends \Channel {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -36,7 +36,7 @@ class Calculator extends \Channel {
         $this->meter = $child->meter;
 
         // Simply pass-through
-        return $this->after_read($child->read($request), $attributes);
+        return $this->after_read($child->read($request));
     }
 
 }

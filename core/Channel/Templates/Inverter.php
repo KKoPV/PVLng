@@ -10,7 +10,7 @@
  */
 return array(
 
-    'name' => 'Inverter',
+    'name' => 'Solar Inverter',
 
     'description' => '
         Solar inverter with up to 3 strings:
@@ -25,7 +25,6 @@ return array(
             <li>Temperature (°C)</li>
             <li>Mains frequency (Hz)</li>
         </ul>
-        Adjust e.g. units, decimals and public settings afterwards.
     ',
 
     'channels' => array(
