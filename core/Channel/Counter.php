@@ -17,7 +17,17 @@ class Counter extends Sensor {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    protected function before_write( $request ) {
+        // Used as ticker/marker
+        if (!isset($request['data'])) $request['data'] = 1;
+
+        parent::before_write($request);
+    }
+
+    /**
+     *
+     */
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -36,14 +46,10 @@ class Counter extends Sensor {
                     $row['timediff'] = $row['timestamp'] - $last;
                 }
 
-                // remove resolution, will be applied in after_read
-                $factor = 3600 / $row['timediff'] / $this->resolution /
-                          $this->resolution / $this->resolution;
-
-                $row['data']        *= $factor;
-                $row['min']         *= $factor;
-                $row['max']         *= $factor;
-                $row['consumption'] *= $factor;
+                $row['data']        *= 3600 / $row['timediff'];
+                $row['min']         *= 3600 / $row['timediff'];
+                $row['max']         *= 3600 / $row['timediff'];
+                $row['consumption'] *= 3600 / $row['timediff'];
 
                 $result->write($row, $id);
             }
@@ -51,7 +57,10 @@ class Counter extends Sensor {
             $last = $row['timestamp'];
         }
 
-        return $this->after_read($result, $attributes);
+        // Switch resolution
+        $this->resolution = 1 / $this->resolution;
+
+        return $this->after_read($result);
     }
 
     // -------------------------------------------------------------------------

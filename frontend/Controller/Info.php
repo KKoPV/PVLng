@@ -41,10 +41,11 @@ class Info extends \Controller {
         $this->view->set('Stats', $this->rows2view($rows));
 
         $readings = 0;
-        foreach ($rows as $row) {
+        foreach ($rows as $id=>$row) {
             $readings += $row->readings;
         }
         $this->view->set('readings', $readings);
+        $this->view->ChannelCount = $id+1;
     }
 
 }

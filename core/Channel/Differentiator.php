@@ -47,7 +47,7 @@ class Differentiator extends \Channel {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -56,14 +56,14 @@ class Differentiator extends \Channel {
 
         // no childs, return empty file
         if ($childCnt == 0) {
-            return $this->after_read(new \Buffer, $attributes);
+            return $this->after_read(new \Buffer);
         }
 
         $buffer = $childs[0]->read($request);
 
         // only one child, return as is
         if ($childCnt == 1) {
-            return $this->after_read($buffer, $attributes);
+            return $this->after_read($buffer);
         }
 
         // combine all data for same timestamp
@@ -95,13 +95,13 @@ class Differentiator extends \Channel {
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
 
-                } elseif ($key1 AND $key1 < $key2 OR !$key2) {
+                } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                     // missing row 2, skip
                     // read only row 1
                     $row1 = $buffer->next()->current();
 
-                } else /* $key1 > $key2 OR !$key2 */ {
+                } else /* $key1 > $key2 */ {
 
                     // missing row 1, skip
                     // read only row 2
@@ -115,7 +115,7 @@ class Differentiator extends \Channel {
             $buffer = $result;
         }
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
 
 }

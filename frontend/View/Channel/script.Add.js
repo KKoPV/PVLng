@@ -33,13 +33,19 @@ $(function() {
     });
 
     $('#tplTable').DataTable({
-        bSort: false,
+        bSort: true,
         bLengthChange: false,
         bFilter: false,
         bInfo: false,
         bPaginate: false,
         bJQueryUI: true,
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
+        aoColumns: [
+            { 'asSorting': false },
+            null,
+            { 'asSorting': false }
+        ],
+        aaSorting: [[ 1, "asc" ]]
     });
 
 });

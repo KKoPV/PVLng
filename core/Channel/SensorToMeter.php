@@ -17,7 +17,7 @@ class SensorToMeter extends Meter {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -39,7 +39,7 @@ class SensorToMeter extends Meter {
             $last = $row['timestamp'];
         }
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
 
     // -------------------------------------------------------------------------

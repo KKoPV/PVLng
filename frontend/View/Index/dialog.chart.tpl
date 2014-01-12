@@ -46,21 +46,7 @@
                 </select>
             </td>
         </tr>
-        <tr>
-            <td>
-                <label for="d-cons">{{Presentation}}</label>
-            </td>
-            <td>
-                <div class="fl">
-                    <input type="checkbox" id="d-cons" class="iCheckLine tip" />
-                    <label for="d-cons">{{ShowConsumption}}</label>
-                </div>
-                <img style="margin-left:.5em;width:16px;height:16px" class="tip"
-                     src="/images/ico/information_frame.png" width="16" height="16"
-                     title="{{ShowConsumptionHint}}" />
-            </td>
-        </tr>
-        <tr>
+        <tr class="line-style">
             <td>
                 <label for="d-style">{{dashStyle}}</label>
             </td>
@@ -85,7 +71,7 @@
                 </select>
             </td>
         </tr>
-        <tr>
+        <tr class="line-style">
             <td>{{LineWidth}}</td>
             <td>
                 <div class="fl" style="margin-right:.5em">
@@ -102,7 +88,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="line-style">
             <td>
                 {{MarkExtremes}}
             </td>
@@ -115,6 +101,20 @@
                     <input type="checkbox" id="d-max" class="iCheckLine" />
                     <label for="d-max">{{max}}</label>
                 </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="d-cons">{{Presentation}}</label>
+            </td>
+            <td>
+                <div class="fl">
+                    <input type="checkbox" id="d-cons" class="iCheckLine tip" />
+                    <label for="d-cons">{{ShowConsumption}}</label>
+                </div>
+                <img style="margin-left:.5em;width:16px;height:16px" class="tip"
+                     src="/images/ico/information_frame.png" width="16" height="16"
+                     title="{{ShowConsumptionHint}}" />
             </td>
         </tr>
         <tr>

@@ -23,7 +23,7 @@ class Dashboard extends Calculator {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $channel = $this->getChild(1);
 
@@ -42,7 +42,7 @@ class Dashboard extends Calculator {
         }
 
         // Simply pass-through
-        return $this->after_read($channel->read($request), $attributes);
+        return $this->after_read($channel->read($request));
     }
 
 }

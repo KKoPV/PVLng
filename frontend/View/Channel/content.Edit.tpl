@@ -83,15 +83,13 @@
             <!-- ELSEIF {TYPE} == "textarea" -->
                 <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="5"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
-                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>
-                    {VALUE}
-                </textarea>
+                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
+                >{VALUE}</textarea>
             <!-- ELSEIF {TYPE} == "textextra" -->
                 <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="15"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
-                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>
-                    {VALUE}
-                </textarea>
+                          <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
+                >{VALUE}</textarea>
             <!-- ELSEIF {TYPE} == "textsmall" -->
                 <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10"
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
@@ -109,6 +107,30 @@
     <!-- ENDIF -->
 
     <!-- END -->
+
+    <!-- IF !{ID} -->
+    <!-- New channel, ask for auto add to hierarchy -->
+    <tr>
+        <td>
+            {{Overview}}
+        </td>
+        <td>
+            <select name="add2tree">
+                <option value="0">--- {{Select}} ---</option>
+                <option value="1">> {{TopLevel}}</option>
+                <option disabled="disabled">> {{AsChild}}:</option>
+                <!-- BEGIN ADDTREE -->
+                <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
+                <!-- END -->
+            </select>
+
+        </td>
+        <td>
+            {{Channel2Overview}}
+        </td>
+    </tr>
+    <!-- ENDIF -->
+
     </tbody>
 
     <tfoot>

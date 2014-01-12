@@ -40,7 +40,7 @@ class InternalConsumption extends \Channel {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -81,7 +81,7 @@ class InternalConsumption extends \Channel {
 
                 $row2 = $child2->next()->current();
 
-            } elseif ($key1 < $key2) {
+            } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                 if ($key2 == $FirstKey2) {
                     // Remember $last ONLY for timestamps before 2nd channel
@@ -91,7 +91,7 @@ class InternalConsumption extends \Channel {
                     $result->write($row1, $key1);
                 }
 
-            } else { // $key1 > $key2
+            } else /* $key1 > $key2 */ {
 
                 $last = $row1['data'];
 
@@ -103,7 +103,7 @@ class InternalConsumption extends \Channel {
         $child1->close();
         $child2->close();
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
 
 }

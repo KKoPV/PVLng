@@ -6,13 +6,16 @@
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
+ *
+ * 1.0.0
+ * - initial creation
  */
 namespace Channel;
 
 /**
  *
  */
-class Fix extends InternalCalc {
+class Topline extends InternalCalc {
 
     /**
      * Channel type
@@ -26,16 +29,23 @@ class Fix extends InternalCalc {
     /**
      *
      */
-    protected function before_read( $request ) {
+    public function before_read( $request ) {
 
         parent::before_read($request);
 
-        // make sure, only until now :-)
-        $this->end = min($this->end, time());
+        $max = -PHP_INT_MAX;
+        $ts_min = FALSE;
 
-        $this->saveValues(array(
-            $this->start => 1,
-            $this->end   => 1
-        ));
+        foreach ($this->getChild(1)->read($request) as $row) {
+            if ($ts_min === FALSE) $ts_min = $row['timestamp'];
+            $max = max($max, $row['data']);
+        }
+
+        if ($ts_min !== FALSE) {
+            $this->saveValues(array(
+                $ts_min           => $max,
+                $row['timestamp'] => $max
+            ));
+        }
     }
 }

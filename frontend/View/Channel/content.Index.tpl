@@ -28,11 +28,11 @@
     <tr>
         <th style="width:1%"></th>
         <th class="l">{{Channel}}</th>
+        <th class="l">{{Description}}</th>
         <th class="l">{{Unit}}</th>
         <th class="l">{{Type}}</th>
         <th></th>
         <th class="l">{{Serial}}</th>
-        <th class="l">{{Description}}</th>
         <th style="width:1%"></th>
     </tr>
     </thead>
@@ -56,6 +56,7 @@
                      alt="[private]"/>
             <!-- ENDIF -->
         </td>
+        <td>{DESCRIPTION}</td>
         <td>{UNIT}</td>
         <td>{TYPE}</td>
         <td class="imgbar">
@@ -71,7 +72,6 @@
             <!-- ENDIF -->
         </td>
         <td>{SERIAL}</td>
-        <td>{DESCRIPTION}</td>
         <td style="white-space:nowrap">
             <a href="/channel/edit/{ID}" class="tip" title="{{EditEntity}}">
                 <img src="/images/ico/node_design.png" class="imgbar wide" alt="e" width="16" height="16" />

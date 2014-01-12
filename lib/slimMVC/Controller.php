@@ -25,6 +25,18 @@ abstract class Controller {
         $this->app = App::getInstance();
     }
 
+    /**
+     *
+     */
+    public function before() {
+    }
+
+    /**
+     *
+     */
+    public function after() {
+    }
+
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
@@ -34,4 +46,29 @@ abstract class Controller {
      */
     protected $app;
 
+    /**
+     *
+     */
+    protected function strParam( $name, $default ) {
+        $value = trim($this->app->request->params($name));
+        return !is_null($value) ? $value : $default;
+    }
+
+    /**
+     *
+     */
+    protected function intParam( $name, $default ) {
+        $value = trim($this->app->request->params($name));
+        return $value != '' ? (int) $value : (int) $default;
+    }
+
+    /**
+     *
+     */
+    protected function boolParam( $name, $default ) {
+        $value = strtolower(trim($this->app->request->params($name)));
+        return $value != ''
+             ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
+             : $default;
+    }
 }

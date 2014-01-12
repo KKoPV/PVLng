@@ -14,8 +14,8 @@ pwd=$(dirname $0)
 . $pwd/../PVLng.conf
 . $pwd/../PVLng.sh
 
-S0=$(which S0)
-test "$S0" || error_exit 'Missing "S0" binary!'
+S0=$pwd/bin/S0
+test -x "$S0" || error_exit 'Missing "'$S0'" binary, please compile first!'
 
 while getopts "astvxh" OPTION; do
     case "$OPTION" in
@@ -148,11 +148,13 @@ while test $i -lt $GUID_N; do
         ##########################################################################
         ### mostly 1st run, start s0
         ##########################################################################
+        cmd="$S0 -d $DEVICE -r $RESOLUTION -l $LOG"
         if test "$TEST"; then
-            log 1 "TEST: $S0 -d $DEVICE -r $RESOLUTION -l $LOG"
+            log 1 "TEST: $cmd"
         else
+            log 1 "Start listener: $cmd"
             ### Start read of device in watt mode!
-            $S0 -d $DEVICE -r $RESOLUTION -l $LOG
+            $($cmd)
         fi
 
     fi

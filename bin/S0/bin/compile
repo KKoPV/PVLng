@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -x
+
+gcc $(dirname $0)/S0.c -o $(dirname $0)/S0 && strip $(dirname $0)/S0

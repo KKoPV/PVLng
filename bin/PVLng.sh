@@ -8,8 +8,8 @@
 PVLngURL1="$PVLngHost/api/r1"
 PVLngURL2="$PVLngHost/api/r2"
 
-CURL="$(which curl)"
-test -z "$CURL" && echo "Missing curl executable!" && exit 1
+test "$CURL" || CURL="$(which curl 2>/dev/null)"
+test -z "$CURL" && echo "Can not find curl executable, please install and/or define in PVLng.conf!" && exit 1
 
 CURL="$CURL $CURLCONNECT"
 
@@ -254,7 +254,7 @@ function PVLngPUT2 {
             if test "$dataraw"; then
                 file=$SaveDataDir/$GUID/$(date +"%Y-%m-%d").csv
                 log 2 "Save $dataraw to $file"
-                echo $(date +"%Y-%m-%d %H:%M")";$dataraw" >>$file
+                echo $(date +"%Y-%m-%d %H:%M:%S")";$dataraw" >>$file
             elif test "$datafile"; then
                 ### Because of multiple files each day, so each day get its own directory
                 dir=$SaveDataDir/$GUID/$(date +"%Y-%m-%d")

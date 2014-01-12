@@ -55,23 +55,9 @@ function ToggleTree() {
 /**
  *
  */
-function rearrangeStripes() {
-    $('#tree tbody tr:visible').each(function(id, el) {
-        el = $(el);
-        if (id & 1) {
-            /* Set to odd if needed */
-            if (el.hasClass('even')) el.removeClass('even').addClass('odd');
-        } else {
-            /* Set to even if needed */
-            if (el.hasClass('odd'))  el.removeClass('odd').addClass('even');
-        }
-    });
-}
-
-/**
- *
- */
 $(function() {
+
+    lscache.setBucket('Overview');
 
     oTable = $('#tree').DataTable({
         bSort: false,
@@ -80,51 +66,53 @@ $(function() {
         bInfo: false,
         bPaginate: false,
         bJQueryUI: true,
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
-    }).disableSelection();
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
 
-    lscache.setBucket('Overview');
+        fnInitComplete: function() {
 
-    $('#tree').treetable({
-        initialState: 'expanded',
-        indent: 24,
-        expandable: true,
-        stringExpand: '{{Expand}}',
-        stringCollapse: '{{Collapse}}',
-        hiddenNodes: (lscache.get('HiddenNodes') || []),
+            /* Init treetable AFTER databale is ready */
+            $('#tree').treetable({
+                initialState: 'expanded',
+                indent: 24,
+                expandable: true,
+                stringExpand: '{{Expand}}',
+                stringCollapse: '{{Collapse}}',
+                hiddenNodes: (lscache.get('HiddenNodes') || []),
 
-        /* Helper functions for local storage handling */
-        isCollapsed: function(id) {
-            return (this.hiddenNodes.indexOf(id) != -1);
-        },
-        markCollapsed: function(id, collapsed) {
-            if (collapsed) {
-                this.hiddenNodes.push(id);
-            } else {
-                idx = this.hiddenNodes.indexOf(id);
-                if (idx != -1) this.hiddenNodes.splice(idx);
-            }
-            lscache.set('HiddenNodes', this.hiddenNodes);
-        },
+                /* Helper functions for local storage handling */
+                isCollapsed: function(id) {
+                    return (this.hiddenNodes.indexOf(id) != -1);
+                },
+                markCollapsed: function(id, collapsed) {
+                    if (collapsed) {
+                        this.hiddenNodes.push(id);
+                    } else {
+                        idx = this.hiddenNodes.indexOf(id);
+                        if (idx != -1) this.hiddenNodes.splice(idx);
+                    }
+                    lscache.set('HiddenNodes', this.hiddenNodes);
+                },
 
-        onNodeInitialized: function() {
-            /* check if the node is marked as collapsed */
-            if (this.settings.isCollapsed(this.id)) this.collapse();
-        },
-        onInitialized: function() {
-            rearrangeStripes();
-            /* set callbacks here AFTER stripes are initialized */
-            this.settings.onNodeCollapse = function() {
-                /* mark node as collapsed */
-                this.settings.markCollapsed(this.id, true);
-                rearrangeStripes();
-            };
-            this.settings.onNodeExpand = function() {
-                this.settings.markCollapsed(this.id, false);
-                setTimeout(function() { rearrangeStripes() }, 1);
-            };
+                onNodeInitialized: function() {
+                    /* check if the node is marked as collapsed */
+                    if (this.settings.isCollapsed(this.id)) this.collapse();
+                },
+                onInitialized: function() {
+                    /* set callbacks here AFTER stripes are initialized */
+                    this.settings.onNodeCollapse = function() {
+                        /* mark node as collapsed */
+                        this.settings.markCollapsed(this.id, true);
+                        setTimeout(function() { zebra('#tree') }, 1);
+                    };
+                    this.settings.onNodeExpand = function() {
+                        this.settings.markCollapsed(this.id, false);
+                        setTimeout(function() { zebra('#tree') }, 1);
+                    };
+                    zebra('#tree');
+                }
+            });
         }
-    });
+    }).disableSelection();
 
     $('.droppable').droppable({
         accept: '.draggable',

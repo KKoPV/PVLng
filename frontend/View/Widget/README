@@ -1,0 +1,19 @@
+Usage
+-----
+
+    1st include common function definitions once per page (inside body tag, NOT in head tag):
+        <script src="http://your.domain.here/widget.inc.js"></script>
+
+    2nd include widget script for each chart
+        <script src="http://your.domain.here/widget.js?guid=<channel GUID>[&period=0][&with=320][&height=200][&color=#2F7ED8][&area=false][&lables=true]"></script>
+
+Parameters
+----------
+
+    guid   - Channel GUID (required)
+    period - Smooth data by average over <period> minutes, default: 0 (optional)
+    width  - chart width, default: 320px (optional)
+    height - chart height, default: 200px (optional)
+    color  - Line color, default: #2F7ED8 (optional)
+    area   - Show as area spline, default: false (optional)
+    labels - Labels and grid lines for Y axis, default true (optional)

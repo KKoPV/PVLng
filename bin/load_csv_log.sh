@@ -33,7 +33,10 @@ test "$TRACE" && set -x
 
 while test "$1"; do
 
-    GUID=$(echo "$1" | awk '{ match($1, "([a-z0-9]{4}-){7}[a-z0-9]{4}", a) } END { print a[0] }')
+    ### Ubuntu/Debian don't have the same awk as openSUSE, so the GUID match
+    ### didn't work for me. Because of that I changed awk to sed.
+    ### https://github.com/K-Ko/PVLng/pull/18
+    GUID=$(echo "$1" | sed -n 's/.*\(\([a-z0-9]\{4\}-\)\{7\}[a-z0-9]\{4\}\).*/\1/p')
     test "$GUID" || error_exit "No sensor GUID in filename detected"
 
     test "$TEST" || PVLngPUT2CSV $GUID "@$1"

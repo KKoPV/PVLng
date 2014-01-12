@@ -26,7 +26,7 @@ class DifferentiatorFull extends Differentiator {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $this->before_read($request);
 
@@ -35,14 +35,14 @@ class DifferentiatorFull extends Differentiator {
 
         // no childs, return empty file
         if ($childCnt == 0) {
-            return $this->after_read(new \Buffer, $attributes);
+            return $this->after_read(new \Buffer);
         }
 
         $buffer = $childs[0]->read($request);
 
         // only one child, return as is
         if ($childCnt == 1) {
-            return $this->after_read($buffer, $attributes);
+            return $this->after_read($buffer);
         }
 
         // combine all data for same timestamp
@@ -74,7 +74,7 @@ class DifferentiatorFull extends Differentiator {
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
 
-                } elseif ($key1 AND $key1 < $key2 OR !$key2) {
+                } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                     // missing row 2, save row 1 as is
                     $result->write($row1, $key1);
@@ -96,6 +96,7 @@ class DifferentiatorFull extends Differentiator {
                     $row2 = $next->next()->current();
 
                 }
+
             }
             $next->close();
 
@@ -103,7 +104,6 @@ class DifferentiatorFull extends Differentiator {
             $buffer = $result;
         }
 
-        return $this->after_read($result, $attributes);
+        return $this->after_read($result);
     }
-
 }

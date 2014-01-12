@@ -18,6 +18,8 @@ class Channel extends \Controller {
      *
      */
     public function before() {
+        parent::before();
+
         $q = \DBQuery::forge('pvlng_channel_view');
         $this->view->Entities = $this->rows2view($this->db->queryRows($q));
 
@@ -30,13 +32,6 @@ class Channel extends \Controller {
                 'HINT'  => __('channel::'.$key.'Hint'),
             ), array_change_key_case($field, CASE_UPPER));
         }
-    }
-
-    /**
-     *
-     */
-    public function after() {
-        $this->view->APIkey = $this->model->getAPIkey();
     }
 
     /**
@@ -97,6 +92,7 @@ class Channel extends \Controller {
                         $oChannel->set($key, $value);
                     }
                     $oChannel->insert();
+                    // Remember id for hierarchy build
                     $channels[$id]['id'] = $oChannel->id;
                 }
                 \Messages::Success(__('ChannelsSaved', count($channels)));
@@ -104,7 +100,7 @@ class Channel extends \Controller {
             } catch (\Exception $e) {
                 \Messages::Error($e->getMessage());
 
-                // Rollback, mostly by double index entries
+                // Rollback in case of error
                 $oChannel->reset();
                 foreach ($channels as $id=>$channel) {
                     if (isset($channels[$id]['id'])) {
@@ -116,23 +112,19 @@ class Channel extends \Controller {
                 $this->app->redirect('/channel');
             }
 
-            if (!isset($channels[0])) {
-                $this->app->redirect('/channel');
-            } else {
-                // Build hierarchy
-                $tree = \NestedSet::getInstance();
+            // Build hierarchy
+            $tree = \NestedSet::getInstance();
 
-                foreach ($channels as $id=>$channel) {
-                    if ($id == 0) {
-                        $root = $tree->insertChildNode($channel['id'], 1);
-                    } else {
-                        $tree->insertChildNode($channel['id'], $root);
-                    }
+            foreach ($channels as $id=>$channel) {
+                if ($id == 0) {
+                    $groupId = $tree->insertChildNode($channel['id'], 1);
+                } else {
+                    $tree->insertChildNode($channel['id'], $groupId);
                 }
-                \Messages::Success(__('HierarchyCreated', count($channels)));
-
-                $this->app->redirect('/overview');
             }
+            \Messages::Success(__('HierarchyCreated', count($channels)));
+
+            $this->app->redirect('/overview');
         }
     }
 
@@ -164,10 +156,12 @@ class Channel extends \Controller {
             $templates = array();
             foreach (glob(CORE_DIR . DS . 'Channel' . DS . 'Templates' . DS . '*.php') as $file) {
                 $template = include $file;
+                $type = new \ORM\EntityType($template['channels'][0]['type']);
                 $templates[] = array(
                     'FILE'         => $file,
-                    'NAME'         => $template['name'],
-                    'DESCRIPTION'  => $template['description']
+                    'NAME'         => $template['name'] . ' (Type: ' . $type->name . ')',
+                    'DESCRIPTION'  => $template['description'],
+                    'ICON'         => $type->icon
                 );
             }
             $this->view->Templates = $templates;
@@ -221,7 +215,7 @@ class Channel extends \Controller {
             $entity = new \ORM\Channel($channel['id']);
 
             // set values
-            foreach ($channel as $key=>$value) $entity->set($key, $value);
+            foreach ($channel as $key=>$value) $entity->set($key, trim($value));
 
             $this->prepareFields($entity);
 
@@ -240,6 +234,11 @@ class Channel extends \Controller {
                     if (!$entity->id) {
                         $entity->insert();
                         \Messages::Success(__('ChannelSaved'));
+
+                        if ($addTo = $this->request->post('add2tree')) {
+                            \NestedSet::getInstance()->insertChildNode($entity->id, $addTo);
+                            \Messages::Success(__('HierarchyCreated', 1));
+                        }
                     } else {
                         $entity->update();
                         \Messages::Success(__('ChannelSaved'));
@@ -264,7 +263,7 @@ class Channel extends \Controller {
                             }
                         }
                     }
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     \Messages::Error('['.$e->getCode().'] '.$e->getMessage());
                     \Messages::Info(implode(";\n", $entity->queries()).';');
                     $ok = FALSE;
@@ -294,6 +293,16 @@ class Channel extends \Controller {
     public function Edit_Action() {
         $this->view->SubTitle = __('EditChannel');
         $this->view->Fields = $this->fields;
+
+        if (!$this->view->Id) {
+            $q = new \DBQuery('pvlng_tree_view');
+            $q->get('id')
+              ->get('REPEAT("- ", `level`-2)', 'indent')
+              ->get('name')
+              ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
+              ->whereNE('childs', 0);
+            $this->view->AddTree = $this->rows2view($this->db->queryRows($q));
+        }
     }
 
     /**

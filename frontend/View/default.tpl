@@ -81,7 +81,7 @@
     <script>
         window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>');
     </script>
-    <script src="/js/jquery-ui.min.js" defer></script>
+    <script src="/js/jquery-ui.min.js"></script>
     <!-- IF {LANGUAGE} != "en" -->
     <script src="/js/jquery-ui-i18n.min.js"></script>
     <!-- ENDIF -->

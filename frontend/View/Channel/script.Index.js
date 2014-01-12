@@ -31,8 +31,8 @@ $(function() {
             null,
             null,
             null,
-            { 'asSorting': false },
             null,
+            { 'asSorting': false },
             null,
             { 'asSorting': false }
         ],

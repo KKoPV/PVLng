@@ -19,6 +19,11 @@ abstract class Channel {
     const TYPE = UNDEFINED_CHANNEL;
 
     /**
+     * Mark that a channel is used as sub channel for readout
+     */
+    public $isChild = FALSE;
+
+    /**
      * Helper function to build an instance
      */
     public static function byId( $id ) {
@@ -184,13 +189,18 @@ abstract class Channel {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read( $request ) {
 
         $logSQL = slimMVC\Config::getInstance()->get('Log.SQL');
 
         $this->performance->action = 'read';
 
         $this->before_read($request);
+
+        if ($this->isChild AND $this->period[1] == self::NO) {
+            // For channels used as childs set period to at least 1 minute
+            $this->period[1] = self::ASCHILD;
+        }
 
         $q = DBQuery::forge($this->table[$this->numeric]);
 
@@ -200,7 +210,7 @@ abstract class Channel {
             // Simply read also last data set for sensor channels
             (!$this->meter AND $this->period[1] == self::LAST)) {
 
-            // Fetch last reading and set some data to 0 to get correct order
+            // Fetch last reading and set some data to 0 to get correct field order
             $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
               ->get('timestamp')
               ->get('data')
@@ -222,16 +232,14 @@ abstract class Channel {
               ->get($q->MAX('data'), 'max')
               ->get($q->COUNT('id'), 'count')
               ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
-              ->whereEQ('id', $this->entity);
+              ->whereEQ('id', $this->entity)
+              ->limit(1);
 
             $buffer->write(array_merge((array) $row, (array) $this->db->queryRow($q)));
 
         } else {
 
-            if ($this->period[1] == self::NO OR
-                $this->period[1] == self::LAST OR
-                $this->period[1] == self::ALL) {
-                // Default behavior
+            if ($this->period[1] == self::LAST OR $this->period[1] == self::ALL) {
 
                 $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
                   ->get('timestamp')
@@ -243,19 +251,24 @@ abstract class Channel {
                   ->get('timestamp', 'g');
 
             } else {
-                // with period
+
                 $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
                   ->get($q->MIN('timestamp'), 'timestamp');
 
-                if (!$this->numeric) {
-                    $q->get('data');
-                } elseif ($this->meter) {
-                    $q->get($q->MAX('data'), 'data');
-                } elseif ($this->counter) {
-                    $q->get($q->SUM('data'), 'data');
-                } else {
-                    $q->get($q->AVG('data'), 'data');
-                }
+			    switch (TRUE) {
+                    case !$this->numeric:
+                        // Raw data for non-numeric channels
+                        $q->get('data');  break;
+                    case $this->meter:
+                        // Max. value for meters
+                        $q->get($q->MAX('data'), 'data');  break;
+                    case $this->counter:
+                        // Summarize counter ticks
+                        $q->get($q->SUM('data'), 'data');  break;
+                    default:
+                        // Average value of sensors/proxies
+                        $q->get($q->AVG('data'), 'data');
+                } // switch
 
                 $q->get($q->MIN('data'), 'min')
                   ->get($q->MAX('data'), 'max')
@@ -266,7 +279,7 @@ abstract class Channel {
             }
 
             if ($this->period[1] != self::ALL) {
-                // Time is only relevant for select <> period=all
+                // Time is only relevant for period != ALL
                 if ($this->start) {
                     if (!$this->meter) {
                         $q->whereGE('timestamp', $this->start);
@@ -308,11 +321,12 @@ abstract class Channel {
                         $row['consumption'] = $row['max'] - $last;
                         $last = $row['max'];
                     }
-                    // remove grouping value
-                    $id = $row['g'];
-                    unset($row['g']);
 
                     if ($this->period[1] != self::LAST) {
+                        // remove grouping value
+                        $id = $row['g'];
+                        unset($row['g']);
+
                         // Write only if NOT only last value was requested
                         $buffer->write($row, $id);
                     }
@@ -323,6 +337,7 @@ abstract class Channel {
 
             if ($this->period[1] == self::LAST AND $lastRow) {
                 // Write ONLY last row if only last value was requested
+                unset($lastRow['g']);
                 $buffer->write($lastRow);
             }
 
@@ -333,10 +348,10 @@ abstract class Channel {
         if (array_key_exists('sql', $request) AND $request['sql']) {
             $sql = $this->name;
             if ($this->description) $sql .= ' (' . $this->description . ')';
-            Header('X-SQL-'.substr(md5($sql), 25).': '.$sql.': '.$q);
+            Header('X-SQL-'.substr(md5($sql), 8).': '.$sql.': '.$q);
         }
 
-        return $this->after_read($buffer, $attributes);
+        return $this->after_read($buffer);
     }
 
     /**
@@ -390,17 +405,7 @@ abstract class Channel {
     /**
      *
      */
-    protected $period = array( 1, 0 );
-
-    /**
-     *
-     */
-    protected $full;
-
-    /**
-     *
-     */
-    protected $mobile;
+    protected $period = array( 0, self::NO );
 
     /**
      *
@@ -410,50 +415,35 @@ abstract class Channel {
     /**
      * Grouping
      */
-    const NO       =  0;
-    const MINUTE   = 10;
-    const HOUR     = 20;
-    const DAY      = 30;
-    const WEEK     = 40;
-    const MONTH    = 50;
-    const QUARTER  = 60;
-    const YEAR     = 70;
-    const LAST     = 80;
-    const READLAST = 81;
-    const ALL      = 90;
-
-    /**
-     * Grouping SQLs
-     */
-    protected $GroupBy = array(
-        self::NO       => '',
-        self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
-        self::HOUR     => '`timestamp` DIV (3600 * %f)',
-        self::DAY      => '`timestamp` DIV (86400 * %d)',
-        self::WEEK     => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
-        self::MONTH    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
-        self::QUARTER  => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
-        self::YEAR     => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
-        self::LAST     => '',
-        self::READLAST => '',
-        self::ALL      => '',
-    );
+    const NO        =  0;
+    const ASCHILD   =  1; // Required for grouping by at least 1 minute
+    const MINUTE    = 10;
+    const HOUR      = 20;
+    const DAY       = 30;
+    const WEEK      = 40;
+    const MONTH     = 50;
+    const QUARTER   = 60;
+    const YEAR      = 70;
+    const LAST      = 80;
+    const READLAST  = 81;
+    const ALL       = 90;
 
     /**
      *
      */
     protected $TimestampMeterOffset = array(
-        self::NO       =>        0,
-        self::MINUTE   =>       60,
-        self::HOUR     =>     3600,
-        self::DAY      =>    86400,
-        self::WEEK     =>   604800,
-        self::MONTH    =>  2678400,
-        self::QUARTER  =>  7776000,
-        self::YEAR     => 31536000,
-        self::LAST     =>        0,
-        self::READLAST =>        0,
-        self::ALL      =>        0,
+        self::NO        =>        0,
+        self::ASCHILD   =>        0,
+        self::MINUTE    =>       60,
+        self::HOUR      =>     3600,
+        self::DAY       =>    86400,
+        self::WEEK      =>   604800,
+        self::MONTH     =>  2678400,
+        self::QUARTER   =>  7776000,
+        self::YEAR      => 31536000,
+        self::LAST      =>        0,
+        self::READLAST  =>        0,
+        self::ALL       =>        0,
     );
 
     /**
@@ -467,9 +457,6 @@ abstract class Channel {
             $this->$key = $value;
         }
 
-        $this->start = strtotime('00:00');
-        $this->end   = strtotime('24:00');
-
         $this->performance = new ORM\Performance;
     }
 
@@ -478,17 +465,18 @@ abstract class Channel {
      */
     protected function periodGrouping() {
         static $GroupBy = array(
-            self::NO       => '`timestamp`',
-            self::MINUTE   => 'UNIX_TIMESTAMP() - (UNIX_TIMESTAMP() - `timestamp`) DIV (60 * %d)',
-            self::HOUR     => '`timestamp` DIV (3600 * %f)',
-            self::DAY      => '`timestamp` DIV (86400 * %d)',
-            self::WEEK     => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
-            self::MONTH    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
-            self::QUARTER  => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
-            self::YEAR     => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
-            self::LAST     => '`timestamp`',
-            self::READLAST => '`timestamp`',
-            self::ALL      => '`timestamp`',
+            self::NO        => '`timestamp`',
+            self::ASCHILD   => '`timestamp` DIV 60',
+            self::MINUTE    => '-((UNIX_TIMESTAMP() - `timestamp`) DIV 60) DIV %d',
+            self::HOUR      => '`timestamp` DIV (3600 * %f)',
+            self::DAY       => '`timestamp` DIV (86400 * %d)',
+            self::WEEK      => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
+            self::MONTH     => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
+            self::QUARTER   => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
+            self::YEAR      => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
+            self::LAST      => '`timestamp`',
+            self::READLAST  => '`timestamp`',
+            self::ALL       => '`timestamp`',
         );
         return sprintf($GroupBy[$this->period[1]], $this->period[0]);
     }
@@ -500,7 +488,9 @@ abstract class Channel {
         if (is_null($this->_childs)) {
             $this->_childs = array();
             foreach (NestedSet::getInstance()->getChilds($this->id) as $child) {
-                $this->_childs[] = self::byID($child['id']);
+                $child = self::byID($child['id']);
+                $child->isChild = TRUE;
+                $this->_childs[] = $child;
             }
         }
         return $this->_childs;
@@ -511,20 +501,20 @@ abstract class Channel {
      */
     protected function getChild( $id ) {
         $this->getChilds();
-        return isset($this->_childs[$id-1]) ? $this->_childs[$id-1] : FALSE;
+        return ($_=&$this->_childs[$id-1]) ?: FALSE;
     }
 
     /**
      *
      */
     protected function getLastReading() {
-        $q = DBQuery::forge($this->table[$this->numeric])
-             ->get('data')
-             ->whereEQ('id', $this->entity)
-             ->orderDescending('timestamp')
-             ->limit(1);
-
-        return $this->db->queryOne($q);
+        return $this->db->queryOne(
+            DBQuery::forge($this->table[$this->numeric])
+            ->get('data')
+            ->whereEQ('id', $this->entity)
+            ->orderDescending('timestamp')
+            ->limit(1)
+        );
     }
 
     /**
@@ -556,7 +546,8 @@ abstract class Channel {
 
                 $lastReading = $this->getLastReading();
 
-                if ($this->value + $this->offset < $lastReading AND $this->adjust) {
+                if ($this->meter AND $this->value + $this->offset < $lastReading AND $this->adjust) {
+                    // Auto-adjust channel offset
 
                     ORM\Log::save(
                         $this->name,
@@ -587,27 +578,33 @@ abstract class Channel {
             throw new \Exception('Can\'t read data from '.$this->name.', '
                                 .'instance of '.get_class($this), 400);
 
-        if ($this->childs >= 0 AND
-            count($this->getChilds()) != $this->childs)
+        if ($this->childs >= 0 AND count($this->getChilds()) != $this->childs)
             throw new \Exception($this->name.' must have '.$this->childs.' child(s)', 400);
 
-        if (isset($request['start'])) {
-            $this->start = is_numeric($request['start'])
-                         ? $request['start']
-                         : strtotime($request['start']);
-            if ($this->start === FALSE)
-                throw new \Exception('No valid start timestamp: '.$this->start, 400);
-        }
+        $request = array_merge(
+            array(
+                'start'  => '00:00',
+                'end'    => '24:00',
+                'period' => ''
+            ),
+            $request
+        );
 
-        if (isset($request['end'])) {
-            $this->end = is_numeric($request['end'])
-                       ? $request['end']
-                       : strtotime($request['end']);
-            if ($this->end === FALSE)
-                throw new \Exception('No valid end timestamp: '.$this->end, 400);
-        }
+        $this->start = is_numeric($request['start'])
+                     ? $request['start']
+                     : strtotime($request['start']);
 
-        if (isset($request['period'])) {
+        if ($this->start === FALSE)
+            throw new \Exception('No valid start timestamp: '.$this->start, 400);
+
+        $this->end = is_numeric($request['end'])
+                   ? $request['end']
+                   : strtotime($request['end']);
+
+        if ($this->end === FALSE)
+            throw new \Exception('No valid end timestamp: '.$this->end, 400);
+
+        if ($request['period'] != '') {
             // normalize aggr. periods
             if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
                            $request['period'], $args)) {
@@ -628,17 +625,12 @@ abstract class Channel {
                 throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
             }
         }
-
-        $this->full   = (array_key_exists('full', $request) OR
-                         array_search('full', $request) !== FALSE);
-        $this->mobile = (array_key_exists('mobile', $request) OR
-                         array_search('short', $request) !== FALSE);
     }
 
     /**
      *
      */
-    protected function after_read( Buffer $buffer, $attributes ) {
+    protected function after_read( Buffer $buffer ) {
 
         $datafile = new Buffer;
 
@@ -687,81 +679,14 @@ abstract class Channel {
         }
         $buffer->close();
 
-        if ($lastrow AND $this->period[1] == self::LAST) {
-            // recreate temp. file with last row only
-            $datafile->close();
-            $datafile = new Buffer;
-            $datafile->write($lastrow);
-        }
-
-        if (!$attributes) return $datafile;
-
-        // -------------------------------------------------------------------
-        // Mostly last call, return attributes and data
-        $buffer = new Buffer;
-
-        $attr = $this->getAttributes();
-        $attr['consumption'] = $consumption * $this->resolution;
-        $dec = slimMVC\Config::getInstance()->get('Currency.Decimals');
-        $attr['costs'] = round($attr['consumption'] * $this->cost, $dec);
-
-        $buffer->write($attr);
-
-        // Bitmask : 00000011
-        //                  ^----- Full
-        //                 ^------ Mobile
-        $mode = 0;
-        if ($this->full)   $mode |= 1;
-        if ($this->mobile) $mode |= 2;
-
-        // optimized flow, switch before loop, not switch inside loop...
-        switch ($mode) {
-            // -------------------
-            case 3: // Full mobile
-
-                foreach ($datafile as $row) {
-                    $buffer->write(array_values($row));
-                }
-                break;
-
-            // -------------------
-            case 2: // Short mobile
-
-                foreach ($datafile as $row) {
-                    // default mobile result: only timestamp and data
-                    $buffer->write(array(
-                        /* 0 */ $row['timestamp'],
-                        /* 1 */ $row['data']
-                    ));
-
-                }
-                break;
-
-            // -------------------
-            case 1: // Full
-
-                // do nothing with $row
-                foreach ($datafile as $row) {
-                    $buffer->write($row);
-                }
-                break;
-
-            // -------------------
-            default: // Short, default
-
-                foreach ($datafile as $row) {
-                    // default result: only timestamp and data
-                    $buffer->write(array(
-                        'timestamp' => $row['timestamp'],
-                        'data'      => $row['data']
-                    ));
-                }
-                break;
-
-        }
-        $datafile->close();
-
-        return $buffer;
+//         if ($lastrow AND $this->period[1] == self::LAST) {
+//             // recreate temp. file with last row only
+//             $datafile->close();
+//             $datafile = new Buffer;
+//             $datafile->write($lastrow);
+//         }
+//
+        return $datafile;
     }
 
     // -------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <?php
 /**
- * Hide all attributes relevant for numeric channels only
+ *
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
@@ -19,45 +19,17 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
-    'resolution' => array(
-        'visible' => FALSE
-    ),
-
-    'decimals' => array(
-        'visible' => FALSE
-    ),
-
-    'meter' => array(
-        'visible' => FALSE
-    ),
-
-    'numeric' => array(
-        'visible' => FALSE,
-        'default' => 0
-    ),
-
-    'offset' => array(
-        'visible' => FALSE
-    ),
-
-    'adjust' => array(
-        'visible' => FALSE
-    ),
-
-    'cost' => array(
-        'visible' => FALSE
-    ),
-
     'threshold' => array(
-        'visible' => FALSE
+        'visible'  => FALSE
     ),
-
+    'offset' => array(
+        'visible'  => FALSE
+    ),
     'valid_from' => array(
-        'visible' => FALSE
+        'visible'  => FALSE
     ),
-
     'valid_to' => array(
-        'visible' => FALSE
-    ),
+        'visible'  => FALSE
+    )
 
 );

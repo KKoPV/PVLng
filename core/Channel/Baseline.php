@@ -15,50 +15,37 @@ namespace Channel;
 /**
  *
  */
-class Baseline extends Sensor {
+class Baseline extends InternalCalc {
+
+    /**
+     * Channel type
+     * UNDEFINED_CHANNEL - concrete channel decides
+     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
+     * SENSOR_CHANNEL    - numeric
+     * METER_CHANNEL     - numeric
+     */
+    const TYPE = SENSOR_CHANNEL;
 
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function before_read( $request ) {
 
-        $baseline = $ts_min = $ts_max = NAN;
+        parent::before_read($request);
+
+        $min = PHP_INT_MAX;
+        $ts_min = FALSE;
 
         foreach ($this->getChild(1)->read($request) as $row) {
-            $baseline = min($baseline, $row['data']);
-            $ts_min = min($ts_min, $row['timestamp']);
-            $ts_max = max($row['timestamp'], $ts_max);
+            if ($ts_min === FALSE) $ts_min = $row['timestamp'];
+            $min = min($min, $row['data']);
         }
 
-        $result = new \Buffer;
-
-        if ($baseline != NAN) {
-
-            $result->write(array(
-                'datetime'    => date('Y-m-d H:i:s', $ts_min),
-                'timestamp'   => $ts_min,
-                'data'        => $baseline,
-                'min'         => $baseline,
-                'max'         => $baseline,
-                'count'       => 1,
-                'timediff'    => 0,
-                'consumption' => 0
-            ), $this->start);
-
-            $result->write(array(
-                'datetime'    => date('Y-m-d H:i:s', $ts_max),
-                'timestamp'   => $ts_max,
-                'data'        => $baseline,
-                'min'         => $baseline,
-                'max'         => $baseline,
-                'count'       => 1,
-                'timediff'    => 0,
-                'consumption' => 0
-            ), $this->end);
-
+        if ($ts_min !== FALSE) {
+            $this->saveValues(array(
+                $ts_min           => $min,
+                $row['timestamp'] => $min
+            ));
         }
-
-        return $this->after_read($result, $attributes);
     }
-
 }
