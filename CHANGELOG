@@ -1,3 +1,38 @@
+ v2.1.0
+========
+
+FIXED
+
+ - Fix wrong SQL select for channel read when used as sub channel ~ Knut Kohl <github@knutkohl.de>
+ - Fix missing decimals formated data values for scatter plotted channels in charts ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust data readout as child channel ~ Knut Kohl <github@knutkohl.de>
+ - Adjust channel creation from template ~ Knut Kohl <github@knutkohl.de>
+ - Adjust S0 listener, make compile more simple, only gcc required ~ Knut Kohl <github@knutkohl.de>
+ - Change estimate calculation for given day based on month values ~ Knut Kohl <github@knutkohl.de>
+ - Adjust Dashboard layout ~ Knut Kohl <github@knutkohl.de>
+ - Adjust Controller::before() and after() handling ~ Knut Kohl <github@knutkohl.de>
+ - Accessing curl through the given path, if not auto detected ~ Knut Kohl <github@knutkohl.de>
+ - Configuration option for curl executable ~ Patrick Feisthammel <patrick.feisthammel@citrin.ch>
+ - Ubuntu/Debian don't have the same awk as openSUSE, so the GUID match didn't work well #18 ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Allow split seconds reading values, align during readout to at least one minute ~ Knut Kohl <github@knutkohl.de>
+ - Add flag to add a new created channel automatic to overview ~ Knut Kohl <github@knutkohl.de>
+ - Add hint in README how to install development branch ~ Knut Kohl <github@knutkohl.de>
+ - Add Widget ~ Knut Kohl <github@knutkohl.de>
+ - Add channel widget script, see frontend/View/Widget/README for help ~ Knut Kohl <github@knutkohl.de>
+ - Add param type cast functions ~ Knut Kohl <github@knutkohl.de>
+ - Store also seconds into CSV log files during API push from script ~ Knut Kohl <github@knutkohl.de>
+ - Put template search paths into Controller::before() to allow manual rendering from within controller actions ~ Knut Kohl <github@knutkohl.de>
+
+DELETED
+
+ - Remove time step for saveed readings, save real timestamps and calculate during readout if required ~ Knut Kohl <github@knutkohl.de>
+
 
  v2.0.0
 ========
