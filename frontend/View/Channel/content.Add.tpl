@@ -38,12 +38,14 @@
     <!-- BEGIN ENTITYTYPES -->
     <tr>
         <td>
-            <input type="radio" name="type" value="{ID}" class="iCheck" />
+            <input type="radio" id="type-{ID}" name="type" value="{ID}" class="iCheck" />
         </td>
-        <td style="white-space:nowrap">
-            <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                 src="{ICON}" width="16" height="16" alt="" />
-            <strong>{NAME}</strong>
+        <td style="white-space:nowrap;font-weight:bold">
+            <label for="type-{ID}">
+                <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
+                     src="{ICON}" width="16" height="16" alt="" />
+                {NAME}
+            </label>
         </td>
         <td>{UNIT}</td>
         <td class="c">
@@ -56,13 +58,8 @@
             <!-- ENDIF -->
         </td>
         <td style="white-space:nowrap">
-            <!-- IF {CHILDS} -->
-            <img src="/images/ico/node_select_child.png" class="imgbar tip"
-                 style="width:16px;height:16px" width="16p" height="16"
-                 alt="c" title="{{MustHaveChilds}}" />
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
             <!-- IF {WRITE} -->
-            <img src="/images/ico/write.png" class="imgbar tip"
+            <img src="/images/ico/write.png" class="imgbar wide tip"
                  style="width:16px;height:16px" width="16p" height="16"
                  alt="w" title="{{WritableEntity}}" />
             <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
@@ -72,14 +69,15 @@
                  alt="r" title="{{ReadableEntity}}" />
             <!-- ENDIF -->
         </td>
-        <td><small>{DESCRIPTION}</small></td>
+        <td style="font-size:smaller">{DESCRIPTION}</td>
     </tr>
     <!-- END -->
 
     </tbody>
+
 </table>
 
-<h3>{{SelectEntityTemplate}}</h3>
+<h2>{{SelectEntityTemplate}}</h2>
 
 <table id="tplTable" class="dataTable">
     <thead>
@@ -93,21 +91,28 @@
 
     <!-- BEGIN TEMPLATES -->
     <tr>
-        <td>
-            <input type="radio" name="type" value="{FILE}" class="iCheck" />
+        <td><input type="radio" id="{FILE}" name="type" value="{FILE}" class="iCheck" /></td>
+        <td style="white-space:nowrap;font-weight:bold">
+            <label for="{FILE}">
+                <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
+                     src="{ICON}" width="16" height="16" alt="" />
+                {NAME}
+            </label>
         </td>
-        <td style="white-space:nowrap">
-            <strong>{NAME}</strong>
-        </td>
-        <td>
-            <small>{DESCRIPTION}</small>
-        </td>
+        <td style="font-size:smaller">{DESCRIPTION}</td>
     </tr>
     <!-- END -->
 
     </tbody>
-</table>
 
+    <tfoot>
+    <tr>
+        <th></th>
+        <th class="l i" colspan="2">{{AdjustTemplateAfterwards}}</th>
+    </tr>
+    </tfoot>
+
+</table>
 
 <p><input type="submit" value="{{proceed}} &raquo;" /></p>
 

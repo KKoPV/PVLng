@@ -28,11 +28,10 @@ $(function() {
             },
             function(data) {
                 var attr = data.shift();
-                /* Test for numeric data */
-                if (data[0].data == +data[0].data) {
+                if (attr.numeric) {
                     $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
                 } else {
-                    $(el).html(data[0].data);
+                    $(el).html(data[0].data != "" ? data[0].data : '&lt;empty>');
                 }
             }
         ).fail(function(jqxhr) {
@@ -65,6 +64,15 @@ $(function() {
         bPaginate: false,
         bJQueryUI: true,
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
+        aoColumns: [
+            null,
+            null,
+            null,
+            null,
+            null,
+            { 'asSorting': false },
+            null
+        ]
     });
 
 });

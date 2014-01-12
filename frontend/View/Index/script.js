@@ -192,11 +192,9 @@ function ToggleTree( force ) {
         $(el).toggle(TreeExpanded);
     });
 
-    var css;
-
     if (TreeExpanded) {
-        $('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
-        $('#tiptoggle').html('{{CollapseAll}}');
+        $('#treetoggle').prop('src','/images/ico/toggle.png').prop('alt','[-]');
+        $('#tiptoggle').html('{{CollapseAll}} (F4)');
 
         $('span.indenter').each(function(id, el) {
             el = $(el);
@@ -204,8 +202,8 @@ function ToggleTree( force ) {
             el.css('padding-left', el.data('indent')).css('width', '19px');
         });
     } else {
-        $('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
-        $('#tiptoggle').html('{{ExpandAll}}');
+        $('#treetoggle').prop('src','/images/ico/toggle_expand.png').prop('alt','[+]');
+        $('#tiptoggle').html('{{ExpandAll}} (F4)');
 
         $('span.indenter').each(function(id, el) {
             /* Remove left indent */
@@ -213,16 +211,7 @@ function ToggleTree( force ) {
         });
     }
 
-    $('#tree tbody tr:visible').each(function(id, el) {
-        el = $(el);
-        if (id & 1) {
-            /* Set to odd if needed */
-            if (el.hasClass('even')) el.removeClass('even').addClass('odd');
-        } else {
-            /* Set to even if needed */
-            if (el.hasClass('odd'))  el.removeClass('odd').addClass('even');
-        }
-    });
+    setTimeout(function() { zebra('#tree') }, 1000);
 }
 
 /**
@@ -248,11 +237,12 @@ function ChartDialog( id, name ) {
     $('#d-color-neg').spectrum($('#d-color-use-neg').is(':checked') ? 'enable' : 'disable');
     $('#d-threshold').val(p.threshold);
     $('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'));
+
     $('input').iCheck('update');
+    $('#d-table tbody tr.line-style').toggle((p.type != 'bar' && p.type != 'scatter'));
+
     /* set the id into the dialog for onClose to write data back */
-    $('#dialog-chart').data('id', id);
-    $('#dialog-chart').dialog('option', 'title', name);
-    $('#dialog-chart').dialog('open');
+    $('#dialog-chart').data('id',id).dialog('option','title',name).dialog('open');
 }
 
 /**
@@ -624,24 +614,9 @@ $(function() {
         resizeTimeout = setTimeout(resizeChart, 500);
     });
 
-    $('#tree').DataTable({
-        bSort: false,
-        bLengthChange: false,
-        bFilter: false,
-        bInfo: false,
-        bPaginate: false,
-        bJQueryUI: true,
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
-    });
-
-    $('.treeTable').treetable({
-        initialState: 'expanded',
-        indent: 24,
-        column: 1
-    });
-
     $("#dialog-chart").dialog({
         autoOpen: false,
+        position: [ null, 20 ],
         width: 750,
         modal: true,
         buttons: {
@@ -681,7 +656,6 @@ $(function() {
             ['#A47D7C', '#B5CA92']
         ],
         showInitial: true,
-        showInput: false,
         showButtons: false,
         preferredFormat: 'hex',
         hide: function(color) { color.toHexString(); }
@@ -745,12 +719,6 @@ $(function() {
         }
     });
 
-    /* Remember left padding of indenter */
-    $('span.indenter').each(function(id, el) {
-        el = $(el);
-        el.data('indent', el.css('padding-left'));
-    });
-
     <!-- IF {USER} -->
     $.ajaxSetup({
         beforeSend: function setHeader(xhr) {
@@ -759,13 +727,37 @@ $(function() {
     });
     <!-- ENDIF -->
 
-    if ($('#loaddeleteview').val()) {
-        ToggleTree(false);
-        updateChart();
-    }
+    $('#tree').DataTable({
+        bSort: false,
+        bLengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        bPaginate: false,
+        bJQueryUI: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
+        fnInitComplete: function() {
+            /* Init treetable AFTER databale is ready */
+            $('.treeTable').treetable({
+                initialState: 'expanded',
+                indent: 24,
+                column: 1,
+                onInitialized: function() {
+                    /* Remember left padding of indenter */
+                    $('span.indenter').each(function(id, el) {
+                        el = $(el);
+                        el.data('indent', el.css('padding-left'));
+                    });
+                    if ($('#loaddeleteview').val()) {
+                        updateChart();
+                        ToggleTree(false);
+                    }
+                }
+            });
+        }
+    });
 
     $('#d-type').change(function() {
-        $('#d-style').prop('disabled', (this.value == 'bar' || this.value == 'scatter'));
+        $('#d-table tbody tr.line-style').toggle((this.value != 'bar' && this.value != 'scatter'));
     });
 
     $('input').iCheck('update');
@@ -858,7 +850,6 @@ $(function() {
     shortcut.add('F4',    function() { ToggleTree(); });
     shortcut.add('F6',    function() { updateChart(); });
     shortcut.add('F7',    function() { updateChart(true); });
-
 });
 
 </script>

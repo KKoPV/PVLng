@@ -32,6 +32,45 @@ Loader::register(
     TEMP_DIR
 );
 
+class API extends Slim\Slim {
+
+    /**
+     *
+     */
+    public function strParam( $name, $default ) {
+        $value = trim($this->request->params($name));
+        return !is_null($value) ? $value : $default;
+    }
+
+    /**
+     *
+     */
+    public function intParam( $name, $default ) {
+        $value = trim($this->request->params($name));
+        return $value != '' ? (int) $value : (int) $default;
+    }
+
+    /**
+     *
+     */
+    public function boolParam( $name, $default ) {
+        $value = strtolower(trim($this->request->params($name)));
+        return $value != ''
+             ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
+             : $default;
+    }
+
+    /**
+     *
+     */
+    public function stopAPI( $message, $code=400 ) {
+        $this->status($code);
+        $this->response()->header('X-Status-Reason', $message);
+        $this->render(array( 'status'=>'error', 'message'=>$message ));
+        $this->stop();
+    }
+}
+
 $config = slimMVC\Config::getInstance()
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.app.php')
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
@@ -54,7 +93,7 @@ slimMVC\MySQLi::$SETTINGS_TABLE = 'pvlng_config';
 
 require 'View.php';
 
-$app = new Slim\Slim(array(
+$api = new API(array(
     'mode'      => 'production',
     'log.level' => Slim\Log::ALERT,
     'debug'     => FALSE,
@@ -62,13 +101,13 @@ $app = new Slim\Slim(array(
 ));
 
 if ($config->get('develop')) {
-    $app->config('mode', 'development');
-    $app->config('log.level', Slim\Log::INFO);
+    $api->config('mode', 'development');
+    $api->config('log.level', Slim\Log::INFO);
 }
 
-$app->db = slimMVC\MySQLi::getInstance();
+$api->db = slimMVC\MySQLi::getInstance();
 
-$app->cache = Cache::factory(
+$api->cache = Cache::factory(
     array(
         'Token'     => 'PVLng',
         'Directory' => TEMP_DIR,
@@ -82,30 +121,22 @@ $app->cache = Cache::factory(
 include_once LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
 
 NestedSet::Init(array (
-    'db'    => $app->db,
-    'debug'    => true,
-    'lang'    => 'en',
-    'path'    => LIB_DIR . DS . 'contrib' . DS . 'messages',
+    'db'    => $api->db,
+    'debug' => true,
+    'lang'  => 'en',
+    'path'  => LIB_DIR . DS . 'contrib' . DS . 'messages',
     'db_table' => array (
-        'tbl' => 'pvlng_tree',
-        'nid' => 'id',
-        'l'   => 'lft',
-        'r'   => 'rgt',
-        'mov' => 'moved',
-        'pay' => 'entity'
+        'tbl'  => 'pvlng_tree',
+        'nid'  => 'id',
+        'l'    => 'lft',
+        'r'    => 'rgt',
+        'mov'  => 'moved',
+        'pay'  => 'entity'
     )
 ));
 
-function stopAPI( $message, $code=400 ) {
-    $app = Slim\Slim::getInstance();
-    $app->status($code);
-    $app->response()->header('X-Status-Reason', $message);
-    $app->render(array( 'status'=>'error', 'message'=>$message ));
-    $app->stop();
-}
-
-$app->error(function($e) {
-    stopAPI($e->getMessage(), $e->getCode());
+$api->error(function($e) use ($api) {
+    $api->stopAPI($e->getMessage(), $e->getCode());
 });
 
 /**
@@ -116,8 +147,8 @@ define('PVLNG',              'PhotoVoltaic Logger new generation');
 define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
-$app->response->headers->set('X-Version', PVLNG_VERSION);
-$app->response->headers->set('X-API-Version', 'r2');
+$api->response->headers->set('X-Version', PVLNG_VERSION);
+$api->response->headers->set('X-API-Version', 'r2');
 
 /**
  * Detect requested content type by file extension, correct PATH_INFO value
@@ -125,13 +156,13 @@ $app->response->headers->set('X-API-Version', 'r2');
  *
  * Analyse X-PVLng-Key header
  */
-$app->hook('slim.before', function() use ($app) {
-    $PathInfo = $app->environment['PATH_INFO'];
+$api->hook('slim.before', function() use ($api) {
+    $PathInfo = $api->environment['PATH_INFO'];
     if ($dot = strrpos($PathInfo, '.')) {
         // File extension
         $ext = substr($PathInfo, $dot+1);
         // Correct PATH_INFO, remove extension
-        $app->environment['PATH_INFO'] = substr($PathInfo, 0, $dot);
+        $api->environment['PATH_INFO'] = substr($PathInfo, 0, $dot);
         // All supported content types
         switch ($ext) {
             case 'csv':   $type = 'application/csv';   break;
@@ -140,48 +171,47 @@ $app->hook('slim.before', function() use ($app) {
             case 'xml':   $type = 'application/xml';   break;
             case 'json':  $type = 'application/json';  break;
             default:
-                $app->contentType('text/plain');
-                $app->halt(400, 'Unknown Accept content type: '.$ext);
+                $api->contentType('text/plain');
+                $api->halt(400, 'Unknown Accept content type: '.$ext);
         }
     } else {
         // Defaults to JSON
         $type = 'application/json';
     }
     // Set the response header, used also by View to build proper response body
-    $app->contentType($type);
+    $api->contentType($type);
 
     // Analyse X-PVLng-Key header
-    $APIKey = $app->request->headers->get('X-PVLng-Key');
+    $APIKey = $api->request->headers->get('X-PVLng-Key');
 
     if ($APIKey == '') {
         // Not given
-        $app->APIKeyValid = 0;
-    } elseif ($APIKey == $app->db->queryOne('SELECT getAPIKey()')) {
+        $api->APIKeyValid = 0;
+    } elseif ($APIKey == $api->db->queryOne('SELECT getAPIKey()')) {
         // Key is valid
-        $app->APIKeyValid = 1;
+        $api->APIKeyValid = 1;
     } else {
         // Key is invalid
-        stopAPI('Invalid API key given.', 403);
+        $api->stopAPI('Invalid API key given.', 403);
     }
 });
 
 /**
  *
  */
-$APIkeyRequired = function() {
-    Slim\Slim::getInstance()->APIKeyValid || stopAPI('Access only with valid API key!', 403);
+$APIkeyRequired = function() use ($api) {
+    $api->APIKeyValid || $api->stopAPI('Access only with valid API key!', 403);
 };
 
 /**
  *
  */
-$accessibleChannel = function(Slim\Route $route) {
-    $app = Slim\Slim::getInstance();
-    if ($app->APIKeyValid == 0) {
+$accessibleChannel = function(Slim\Route $route) use ($api) {
+    if ($api->APIKeyValid == 0) {
         // No API key given, check channel is public
         $channel = Channel::byGUID($route->getParam('guid'));
         if (!$channel->public) {
-            stopAPI('Access to private channel \''.$channel->name.'\' only with valid API key!', 403);
+            $api->stopAPI('Access to private channel \''.$channel->name.'\' only with valid API key!', 403);
         }
     }
 };
@@ -199,48 +229,48 @@ Slim\Route::setDefaultConditions(array(
 // ---------------------------------------------------------------------------
 // Help
 // ---------------------------------------------------------------------------
-$app->notFound(function() use ($app) {
+$api->notFound(function() use ($api) {
     // Catch also /
-    $app->redirect($app->request()->getRootUri() . '/help');
+    $api->redirect($api->request()->getRootUri() . '/help');
 });
 
-$app->any('/help', function() use ($app) {
+$api->any('/help', function() use ($api) {
     $content = array();
 
-    foreach ($app->router()->getNamedRoutes() as $route) {
+    foreach ($api->router()->getNamedRoutes() as $route) {
         $name    = $route->getName();
         $pattern = implode('|', $route->getHttpMethods()) . ' '
-                 . $app->request()->getRootUri() . $route->getPattern();
+                 . $api->request()->getRootUri() . $route->getPattern();
         $help = array( 'description' => $route->getName() );
         $content[$pattern] = isset($route->help)
                            ? array_merge($help, $route->help)
                            : $help;
     }
 
-    $app->response->headers->set('Content-Type', 'application/json');
-    $app->render($content);
+    $api->response->headers->set('Content-Type', 'application/json');
+    $api->render($content);
 })->name('This help, overview of valid calls');
 
 // ---------------------------------------------------------------------------
 // Attributes
 // ---------------------------------------------------------------------------
-$app->get('/:guid', $accessibleChannel, function($guid) use ($app) {
-    $app->render(Channel::byGUID($guid)->getAttributes());
+$api->get('/:guid', $accessibleChannel, function($guid) use ($api) {
+    $api->render(Channel::byGUID($guid)->getAttributes());
 })->name('Fetch channel attributes');
 
-$app->get('/:guid/:attribute', $accessibleChannel, function($guid, $attribute='') use ($app) {
-    $app->render(Channel::byGUID($guid)->$attribute);
+$api->get('/:guid/:attribute', $accessibleChannel, function($guid, $attribute='') use ($api) {
+    $api->render(Channel::byGUID($guid)->$attribute);
 })->name('Fetch single channel attribute');
 
-$app->get('/attributes/:guid(/:attribute)', $accessibleChannel, function($guid, $attribute='') use ($app) {
-    $app->render(Channel::byGUID($guid)->getAttributes($attribute));
+$api->get('/attributes/:guid(/:attribute)', $accessibleChannel, function($guid, $attribute='') use ($api) {
+    $api->render(Channel::byGUID($guid)->getAttributes($attribute));
 })->name('Fetch all channel attributes or specific channel attribute');
 
 // ---------------------------------------------------------------------------
 // Data
 // ---------------------------------------------------------------------------
-$app->put('/data/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
-    $request = json_decode($app->request->getBody(), TRUE);
+$api->put('/data/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($api) {
+    $request = json_decode($api->request->getBody(), TRUE);
     // Check request for 'timestamp' attribute, take as is if numeric,
     // otherwise try to convert datetime to timestamp
     $timestamp = isset($request['timestamp'])
@@ -249,15 +279,15 @@ $app->put('/data/:guid', $APIkeyRequired, $accessibleChannel, function($guid) us
                  : strtotime($request['timestamp'])
                  )
                : NULL;
-    Channel::byGUID($guid)->write($request, $timestamp) && $app->halt(201);
+    Channel::byGUID($guid)->write($request, $timestamp) && $api->halt(201);
 })->name('put data')->help = array(
     'description' => 'Save a reading value',
     'payload'     => '{"<data>":"<value>"}',
 );
 
-$app->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='', $p2='') use ($app) {
+$api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='', $p2='') use ($api) {
 
-    $request = $app->request->get();
+    $request = $api->request->get();
     $request['p1'] = $p1;
     $request['p2'] = $p2;
 
@@ -266,17 +296,20 @@ $app->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
     // Special models can provide an own GET functionality
     // e.g. for special return formats like PVLog or Sonnenertrag
     if (method_exists($channel, 'GET')) {
-        $app->render($channel->GET($request));
+        $api->render($channel->GET($request));
         return;
     }
 
     $buffer = $channel->read($request);
     $result = new Buffer;
 
-    if ($app->request->get('attributes')) {
+    $full  = $api->boolParam('full', FALSE);
+    $short = $api->boolParam('short', FALSE);
+
+    if ($api->boolParam('attributes', FALSE)) {
         $attr = $channel->getAttributes();
 
-        if ($app->request->get('full')) {
+        if ($full) {
             // Calculate overall consumption and costs
             foreach($buffer as $row) {
                 $attr['consumption'] += $row['consumption'];
@@ -292,15 +325,15 @@ $app->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
     }
 
     // optimized flow...
-    if ($app->request->get('full') and $app->request->get('short')) {
+    if ($full and $short) {
         // passthrough all values as numeric based array
         foreach ($buffer as $row) {
             $result->write(array_values($row));
         }
-    } elseif ($app->request->get('full')) {
+    } elseif ($full) {
         // do nothing, use as is
         $result->append($buffer);
-    } elseif ($app->request->get('short')) {
+    } elseif ($short) {
         // default mobile result: only timestamp and data
         foreach ($buffer as $row) {
             $result->write(array(
@@ -318,10 +351,10 @@ $app->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
         }
     }
 
-    $app->response->headers->set('X-Data-Rows', count($result));
-    $app->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+    $api->response->headers->set('X-Data-Rows', count($result));
+    $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
 
-    $app->render($result);
+    $api->render($result);
 
 })->name('get data')->help = array(
     'description' => 'Read reading values',
@@ -367,16 +400,16 @@ $app->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
 // ---------------------------------------------------------------------------
 // File
 // ---------------------------------------------------------------------------
-$app->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
+$api->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($api) {
 
     $channel = Channel::byGUID($guid);
 
     // Diasble AutoCommit in case of errors
-    $app->db->autocommit(FALSE);
+    $api->db->autocommit(FALSE);
     $count = 0;
 
     try {
-        foreach (explode(PHP_EOL, $app->request->getBody()) as $send=>$dataset) {
+        foreach (explode(PHP_EOL, $api->request->getBody()) as $send=>$dataset) {
             if ($dataset == '') continue;
 
             $data = explode(';', $dataset);
@@ -404,21 +437,21 @@ $app->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use
             $count += $channel->write(array('data'=>$data), $timestamp);
         }
         // All fine, commit changes
-        $app->db->commit();
+        $api->db->commit();
 
-        if ($count) $app->status(201);
+        if ($count) $api->status(201);
 
         $result = array(
             'status'  => 'succes',
             'message' => ($send+1) . ' row(s) sended, ' . $count . ' row(s) inserted'
         );
 
-        $app->render($result);
+        $api->render($result);
 
     } catch (Exception $e) {
         // Rollback all correct data
-        $app->db->rollback();
-        stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
+        $api->db->rollback();
+        $api->stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
     }
 
 })->name('put data from file')->help = array(
@@ -433,16 +466,16 @@ $app->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use
 // ---------------------------------------------------------------------------
 // Batch
 // ---------------------------------------------------------------------------
-$app->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($app) {
+$api->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use ($api) {
 
     $channel = Channel::byGUID($guid);
 
     // Diasble AutoCommit in case of errors
-    $app->db->autocommit(FALSE);
+    $api->db->autocommit(FALSE);
     $count = 0;
 
     try {
-        foreach (explode(';', $app->request->getBody()) as $dataset) {
+        foreach (explode(';', $api->request->getBody()) as $dataset) {
             if ($dataset == '') continue;
 
             $data = explode(',', $dataset);
@@ -470,21 +503,21 @@ $app->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) u
             $count += $channel->write(array('data'=>$data), $timestamp);
         }
         // All fine, commit changes
-        $app->db->commit();
+        $api->db->commit();
 
-        if ($count) $app->status(201);
+        if ($count) $api->status(201);
 
         $result = array(
             'status'  => 'succes',
             'message' => $count . ' row(s) inserted'
         );
 
-        $app->render($result);
+        $api->render($result);
 
     } catch (Exception $e) {
         // Rollback all correct data
-        $app->db->rollback();
-        stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
+        $api->db->rollback();
+        $api->stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
     }
 
 })->name('put batch data')->help = array(
@@ -499,30 +532,29 @@ $app->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) u
 // ---------------------------------------------------------------------------
 // Log
 // ---------------------------------------------------------------------------
-$checkLogId = function(Slim\Route $route) {
+$checkLogId = function(Slim\Route $route) use ($api) {
 
-    $app = Slim\Slim::getInstance();
     $id = $route->getParam('id');
 
     if ($id == 'all') return;
 
     if ($id == '') {
-        stopAPI('Missing log entry Id');
+        $api->stopAPI('Missing log entry Id');
     }
 
     $log = new ORM\Log($id);
 
     if ($log->id == '') {
-        stopAPI('No log entry found for Id: '.$id, 404);
+        $api->stopAPI('No log entry found for Id: '.$id, 404);
     }
 };
 
 /**
  *
  */
-$app->put('/log', $APIkeyRequired, function() use ($app) {
+$api->put('/log', $APIkeyRequired, function() use ($api) {
 
-    $request = json_decode($app->request->getBody(), TRUE);
+    $request = json_decode($api->request->getBody(), TRUE);
 
     $log = new ORM\Log;
 
@@ -530,15 +562,15 @@ $app->put('/log', $APIkeyRequired, function() use ($app) {
     $log->data  = !empty($request['message']) ? trim($request['message']) : '';
 
     if ($log->insert()) {
-        $app->status(201);
+        $api->status(201);
         $result = array('status' => 'success', 'id' => $log->id);
     } else {
-        $app->status(400);
+        $api->status(400);
         $result = array('status' => 'error');
     }
 
-    $app->render($result);
-    $app->stop();
+    $api->render($result);
+    $api->stop();
 
 })->name('put log')->help = array(
     'description' => 'Store new log entry, scope defaults to \'API r2\'',
@@ -548,7 +580,7 @@ $app->put('/log', $APIkeyRequired, function() use ($app) {
 /**
  *
  */
-$app->get('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
+$api->get('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
 
     $log = new ORM\Log($id);
 
@@ -563,11 +595,11 @@ $app->get('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
         )
     );
 
-    $app->render($result);
+    $api->render($result);
 
 })->name('Read a log entry');
 
-$app->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count=50) use ($app) {
+$api->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count=50) use ($api) {
 
     if ($page < 1) $page = 1;
     if ($count < 1) $count = 1;
@@ -580,7 +612,7 @@ $app->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count
     // Read all entries
     $q = DBQuery::forge('pvlng_log')->order('id')->limit($count, ($page-1)*$count);
 
-    if ($res = $app->db->query($q)) {
+    if ($res = $api->db->query($q)) {
         while ($log = $res->fetch_object()) {
             $result['log'][] = array(
                 'id'        => +$log->id,
@@ -592,13 +624,13 @@ $app->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count
         }
     }
 
-    $app->render($result);
+    $api->render($result);
 
 })->name('Read all log entries, paginated for :page, :count entries');
 
-$app->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
+$api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
 
-    $request = json_decode($app->request->getBody(), TRUE);
+    $request = json_decode($api->request->getBody(), TRUE);
 
     $log = new ORM\Log($id);
 
@@ -617,9 +649,9 @@ $app->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
                 'message'   => $log->data
             ))
         );
-        $app->render($result);
+        $api->render($result);
     } else {
-        $app->halt(400);
+        $api->halt(400);
     }
 
 })->name('post log')->help = array(
@@ -627,15 +659,15 @@ $app->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
     'payload'     => '{"scope":"...", "message":"..."}',
 );
 
-$app->delete('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($app) {
+$api->delete('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
     $log = new ORM\Log($id);
-    $app->status($log->delete() ? 204 : 400);
+    $api->status($log->delete() ? 204 : 400);
 })->name('Delete a log entry');
 
 // ---------------------------------------------------------------------------
 // Status
 // ---------------------------------------------------------------------------
-$app->get('/status', function() use ($app) {
+$api->get('/status', function() use ($api) {
 
     $result = array(
         'version' => exec('cat /proc/version')
@@ -703,9 +735,9 @@ $app->get('/status', function() use ($app) {
           }
     }
 
-    $app->response->headers->set('Content-Type', 'application/json');
+    $api->response->headers->set('Content-Type', 'application/json');
 
-    $app->render($result);
+    $api->render($result);
 
 })->name('System status');
 
@@ -718,4 +750,4 @@ if (file_exists($custom_routes)) include $custom_routes;
 /**
  * Let's go
  */
-$app->run();
+$api->run();

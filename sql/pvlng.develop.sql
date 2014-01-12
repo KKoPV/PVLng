@@ -9,7 +9,6 @@ ALTER TABLE `pvlng_tree` ADD INDEX `guid` (`guid`);
 ALTER TABLE `pvlng_channel` DROP INDEX `Name-Description-Type`;
 
 DROP TRIGGER `pvlng_reading_num_bi`;
-DROP TRIGGER `pvlng_reading_str_bi`;
 
 DELIMITER ;;
 
@@ -17,6 +16,12 @@ CREATE TRIGGER `pvlng_reading_num_bi` BEFORE INSERT ON `pvlng_reading_num` FOR E
 IF new.`timestamp` = 0 THEN
   SET new.`timestamp` = UNIX_TIMESTAMP();
 END IF;;
+
+DELIMITER ;
+
+DROP TRIGGER `pvlng_reading_str_bi`;
+
+DELIMITER ;;
 
 CREATE TRIGGER `pvlng_reading_str_bi` BEFORE INSERT ON `pvlng_reading_str` FOR EACH ROW
 IF new.`timestamp` = 0 THEN
@@ -30,6 +35,10 @@ DROP PROCEDURE `getTimestamp`;
 DELETE FROM `pvlng_config` WHERE `key` = 'TimeStep';
 
 REPLACE INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`) VALUES
+('app', 'de', 'AdjustTemplateAfterwards', 'Korrigiere z.B. Dezimalstellen, Einheiten und Öffentlich-Kennzeichen im Nachgang.'),
+('app', 'en', 'AdjustTemplateAfterwards', 'Adjust e.g. units, decimals and public settings afterwards.'),
+('model', 'de', 'Topline', 'Erzeugt eine Oberlinie für Sensoren für den größten Wert im Zeitbereich'),
+('model', 'en', 'Topline', 'Generates a top line for sensors for the highest value in time range'),
 ('app', 'de', 'AsChild', 'Als Kind-Kanal'),
 ('app', 'en', 'AsChild', 'As sub channel'),
 ('app', 'de', 'TopLevel', 'Auf oberster Ebene'),

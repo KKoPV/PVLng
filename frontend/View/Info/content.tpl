@@ -63,13 +63,11 @@
     </thead>
 
     <tbody>
-
     <!-- BEGIN STATS -->
-
     <tr>
         <td>
-            <img src="{ICON}" style="width:16px;height:16px;margin-right:8px"
-                 width="16" height="16" alt="" />
+            <img src="{ICON}" class="tip" style="width:16px;height:16px;margin-right:8px"
+                 width="16" height="16" alt="" title="{TYPE}" />
             {NAME}
         </td>
         <td>{DESCRIPTION}</td>
@@ -81,14 +79,12 @@
         </td>
         <td>{UNIT}</td>
     </tr>
-
     <!-- END -->
-
     </tbody>
 
     <tfoot>
     <tr>
-        <th colspan="3"></th>
+        <th class="l" colspan="3">{CHANNELCOUNT}&nbsp;{{Channels}}</th>
         <th class="l">{{Total}}</th>
         <th class="r">{numf:READINGS}</th>
         <th colspan="2"></th>
