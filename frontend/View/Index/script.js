@@ -614,6 +614,12 @@ function changePreset() {
     var preset = $('#preset').val().match(/(\d+)(\w+)/);
     var from = new Date($("#from").datepicker('getDate'));
 
+    if (!preset) {
+        $('#periodcnt').val(1);
+        $('#period').val('');
+        return;
+    }
+
     switch (preset[2]) {
         case 'd': // day - set start to 1st day of month
             from.setDate(1);
@@ -776,12 +782,14 @@ $(function() {
                         el.data('indent', el.css('padding-left'));
                     });
                     if ($('#loaddeleteview').val()) {
-                        changePreset();
-                        updateChart();
                         ToggleTree(false);
                     }
                 }
             });
+            if ($('#loaddeleteview').val()) {
+                changePreset();
+                updateChart();
+            }
         }
     });
 
