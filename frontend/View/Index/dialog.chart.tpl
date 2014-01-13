@@ -46,7 +46,7 @@
                 </select>
             </td>
         </tr>
-        <tr class="line-style">
+        <tr class="not-bar not-scatter">
             <td>
                 <label for="d-style">{{dashStyle}}</label>
             </td>
@@ -71,7 +71,7 @@
                 </select>
             </td>
         </tr>
-        <tr class="line-style">
+        <tr class="not-bar not-scatter">
             <td>{{LineWidth}}</td>
             <td>
                 <div class="fl" style="margin-right:.5em">
@@ -88,18 +88,22 @@
                 </div>
             </td>
         </tr>
-        <tr class="line-style">
+        <tr class="not-scatter">
             <td>
                 {{MarkExtremes}}
             </td>
             <td>
-                <div class="fl" style="margin-right:.5em">
+                <div class="fl not-bar" style="margin-right:.5em">
                     <input type="checkbox" id="d-min" class="iCheckLine" />
                     <label for="d-min">{{min}}</label>
                 </div>
-                <div class="fl">
+                <div class="fl" style="margin-right:.5em">
                     <input type="checkbox" id="d-max" class="iCheckLine" />
                     <label for="d-max">{{max}}</label>
+                </div>
+                <div class="fl not-bar">
+                    <input type="checkbox" id="d-last" class="iCheckLine" />
+                    <label for="d-last">{{lastone}}</label>
                 </div>
             </td>
         </tr>

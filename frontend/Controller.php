@@ -145,8 +145,8 @@ class Controller extends slimMVC\Controller {
             }
         }
 
-        // Check for new version once a day
-        if (Session::get('VersionCheck', 0)+86400 < time()) {
+        // Check for new version once a hour
+        if (Session::get('VersionCheck', 0)+3600 < time()) {
             $version = $this->checkVersion();
             $this->db->VersionNew = isset($version[0]) ? $version[0] : FALSE;
             Session::set('VersionCheck', time());

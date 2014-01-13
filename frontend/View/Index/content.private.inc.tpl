@@ -24,7 +24,7 @@
                 <img id="treetoggle" src="/images/ico/toggle<!-- IF {VIEW} -->_expand<!-- ENDIF -->.png"
                      style="width:16px;height:16px" width="16" height="16"
                      class="tip" onclick="ToggleTree()" alt="[+]" tip="#tiptoggle" />
-                <div id="tiptoggle">{{CollapseAll}} (F4)></div>
+                <div id="tiptoggle">{{CollapseAll}} (F4)</div>
             </th>
             <th class="l">
                 <span class="indenter" style="padding-left: 0px;"></span>

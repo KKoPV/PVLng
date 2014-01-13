@@ -31,6 +31,7 @@ function presentation( data ) {
     this.threshold = 0;
     this.min = false;
     this.max = false;
+    this.last = false;
 
     try { $.extend(this, JSON.parse(data));    } catch(e) {}
 
@@ -116,21 +117,33 @@ function setMinMax( serie, channel ) {
         min = { id: null, x: null, y:  Number.MAX_VALUE },
         max = { id: null, x: null, y: -Number.MAX_VALUE };
 
+    var d, dataLabels = {
+        enabled: true,
+        formatter: function() {
+            return Highcharts.numberFormat(+this.y, serie.decimals)
+        },
+        color: serie.color,
+        style: { fontWeight: 'bold' },
+        borderRadius: 3,
+        backgroundColor: 'rgba(252, 255, 197, 0.7)',
+        borderWidth: 1,
+        borderColor: '#AAA'
+    };
+
     /* search min. and max. values */
     $.each(serie.data, function(i, point) {
         ts.min = Math.min(ts.min, point[0]);
+        if (channel.min && (point[1] < min.y)) min = { id: i, x: point[0], y: point[1] };
         ts.max = Math.max(ts.max, point[0]);
-
-        if (channel.min && (point[1] < min.y)) {
-            min = { id: i, x: point[0], y: point[1] }
-        } else if (channel.max && (point[1] > max.y)) {
-            max = { id: i, x: point[0], y: point[1] }
-        }
+        if (channel.max && (point[1] > max.y)) max = { id: i, x: point[0], y: point[1] };
     });
 
     if (min.id != null) {
 
-        var left = ((ts.min + (ts.max - ts.min)/2 - min.x) > 0);
+        d = $.extend({}, dataLabels, {
+            align: ((ts.min + (ts.max - ts.min)/2 - min.x) > 0) ? 'left' : 'right',
+            y: 26
+        });
 
         serie.data[min.id] = {
             marker: {
@@ -138,20 +151,7 @@ function setMinMax( serie, channel ) {
                 symbol: 'triangle',
                 fillColor: serie.color
             },
-            dataLabels: {
-                enabled: true,
-                formatter: function() {
-                    return Highcharts.numberFormat(+this.y, serie.decimals)
-                },
-                color: serie.color,
-                style: { fontWeight: 'bold' },
-                align: left ? 'left' : 'right',
-                y: 26,
-                borderRadius: 3,
-                backgroundColor: 'rgba(252, 255, 197, 0.7)',
-                borderWidth: 1,
-                borderColor: '#AAA'
-            },
+            dataLabels: d,
             x: min.x,
             y: min.y
         };
@@ -161,7 +161,10 @@ function setMinMax( serie, channel ) {
 
     if (max.id != null) {
 
-        var left = ((ts.min + (ts.max - ts.min)/2 - max.x) > 0);
+        d = $.extend({}, dataLabels, {
+            align: ((ts.min + (ts.max - ts.min)/2 - max.x) > 0) ? 'left' : 'right',
+            y: -7
+        });
 
         serie.data[max.id] = {
             marker: {
@@ -169,25 +172,31 @@ function setMinMax( serie, channel ) {
                 symbol: 'triangle-down',
                 fillColor: serie.color
             },
-            dataLabels: {
-                enabled: true,
-                formatter: function() {
-                    return Highcharts.numberFormat(+this.y, serie.decimals)
-                },
-                color: serie.color,
-                style: { fontWeight: 'bold' },
-                align: left ? 'left' : 'right',
-                y: -7,
-                borderRadius: 3,
-                backgroundColor: 'rgba(252, 255, 197, 0.7)',
-                borderWidth: 1,
-                borderColor: '#AAA'
-            },
+            dataLabels: d,
             x: max.x,
             y: max.y
         };
 
         $('#max'+serie.id).html(Highcharts.numberFormat(max.y, serie.decimals) + ' ' + serie.unit);
+    }
+
+    var last = serie.data.length-1;
+
+    if (channel.last && (last >= 0)) {
+
+        d = $.extend({}, dataLabels, { align: 'left' });
+
+        serie.data[last] = {
+            marker: {
+                enabled: true,
+                symbol: 'circle',
+                fillColor: serie.color
+            },
+            dataLabels: d,
+            x: serie.data[last][0],
+            y: serie.data[last][1]
+        };
+
     }
 
     return serie;

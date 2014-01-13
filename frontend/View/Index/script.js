@@ -228,6 +228,7 @@ function ChartDialog( id, name ) {
     $('input[name="d-width"][value="' + p.width + '"]').prop('checked', true);
     $('#d-min').prop('checked', p.min);
     $('#d-max').prop('checked', p.max);
+    $('#d-last').prop('checked', p.last);
     $('#d-style').val(p.style);
     $('#d-color').val(p.color);
     $('#d-color').spectrum('set', p.color);
@@ -239,7 +240,7 @@ function ChartDialog( id, name ) {
     $('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'));
 
     $('input').iCheck('update');
-    $('#d-table tbody tr.line-style').toggle((p.type != 'bar' && p.type != 'scatter'));
+    $('#d-type').trigger('change');
 
     /* set the id into the dialog for onClose to write data back */
     $('#dialog-chart').data('id',id).dialog('option','title',name).dialog('open');
@@ -608,6 +609,32 @@ function resizeChart() {
 /**
  *
  */
+function changePreset() {
+
+    var preset = $('#preset').val().match(/(\d+)(\w+)/);
+    var from = new Date($("#from").datepicker('getDate'));
+
+    switch (preset[2]) {
+        case 'd': // day - set start to 1st day of month
+            from.setDate(1);
+            break;
+        case 'w': // week - set start to 1st day of month
+            from.setDate(1);
+            break;
+        case 'm': // month - set start to 1st day of year
+            from.setDate(1);
+            from.setMonth(0);
+            break;
+    }
+
+    $("#from").datepicker('setDate', from);
+    $('#periodcnt').val(preset[1]);
+    $('#period').val(preset[2]);
+}
+
+/**
+ *
+ */
 $(function() {
 
     $(window).resize(function() {
@@ -629,6 +656,7 @@ $(function() {
                 p.width = +$('input[name="d-width"]:checked').val();
                 p.min = $('#d-min').is(':checked');
                 p.max = $('#d-max').is(':checked');
+                p.last = $('#d-last').is(':checked');
                 p.color = $('#d-color').spectrum('get').toHexString();
                 p.coloruseneg = $('#d-color-use-neg').is(':checked');
                 p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
@@ -748,6 +776,7 @@ $(function() {
                         el.data('indent', el.css('padding-left'));
                     });
                     if ($('#loaddeleteview').val()) {
+                        changePreset();
                         updateChart();
                         ToggleTree(false);
                     }
@@ -756,8 +785,18 @@ $(function() {
         }
     });
 
+    $('#preset').change(function() {
+        changePreset();
+        updateChart();
+    });
+
     $('#d-type').change(function() {
-        $('#d-table tbody tr.line-style').toggle((this.value != 'bar' && this.value != 'scatter'));
+        $('.not-bar, .not-scatter').show();
+        if (this.value == 'bar') {
+            $('.not-bar').hide();
+        } else if (this.value == 'scatter') {
+            $('.not-scatter').hide();
+        }
     });
 
     $('input').iCheck('update');
