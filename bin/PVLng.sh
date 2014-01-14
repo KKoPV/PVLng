@@ -230,6 +230,26 @@ function PVLngPUT2 {
 
     log 2 "Send     : $data"
 
+    ### Log data
+    if test "$SAVEDATA"; then
+        ### Each GUID get its own directory
+        test -d $SaveDataDir/$GUID || mkdir -p $SaveDataDir/$GUID
+
+        if test "$dataraw"; then
+            file=$SaveDataDir/$GUID/$(date +"%Y-%m-%d").csv
+            log 2 "Save $dataraw to $file"
+            echo $(date +"%Y-%m-%d %H:%M:%S")";$dataraw" >>$file
+        elif test "$datafile"; then
+            ### Because of multiple files each day, so each day get its own directory
+            dir=$SaveDataDir/$GUID/$(date +"%Y-%m-%d")
+            test -d $dir || mkdir -p $dir
+            file=$dir/$(date +"%H:%M:%S")
+            log 2 "Save data from $datafile"
+            log 2 "  to $file"
+            cp "$datafile" $file
+        fi
+    fi
+
     ### Clear temp. file before
     rm $TMPFILE >/dev/null 2>&1
 
@@ -245,26 +265,6 @@ function PVLngPUT2 {
         ### 200/201/202 ok
         log 1 "HTTP code : $1"
         test -f $TMPFILE && log 2 @$TMPFILE
-
-        ### Log sended data
-        if test "$SAVEDATA"; then
-            ### Each GUID get its own directory
-            test -d $SaveDataDir/$GUID || mkdir -p $SaveDataDir/$GUID
-
-            if test "$dataraw"; then
-                file=$SaveDataDir/$GUID/$(date +"%Y-%m-%d").csv
-                log 2 "Save $dataraw to $file"
-                echo $(date +"%Y-%m-%d %H:%M:%S")";$dataraw" >>$file
-            elif test "$datafile"; then
-                ### Because of multiple files each day, so each day get its own directory
-                dir=$SaveDataDir/$GUID/$(date +"%Y-%m-%d")
-                test -d $dir || mkdir -p $dir
-                file=$dir/$(date +"%H:%M:%S")
-                log 2 "Save data from $datafile"
-                log 2 "  to $file"
-                mv "$datafile" $file
-            fi
-        fi
     else
         ### errors
         log -1 "HTTP code : $1"
