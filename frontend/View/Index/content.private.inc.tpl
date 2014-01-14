@@ -135,11 +135,11 @@
         <input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
     </td>
     <td class="r" style="white-space:nowrap">
-        <a id="btn-permanent" class="tip" title="{{DragPermanent}}" data-text="{VIEW} & | {TITLE}" data-url="/chart/{SLUG}">
-            {VIEW} | {TITLE}
+        <a id="btn-permanent" class="tip" title="{{DragPermanent}}" data-text="{VIEW} & | {strip_tags:TITLE}" data-url="/chart/{SLUG}">
+            {VIEW} | {strip_tags:TITLE}
         </a>
         <a href="/chart/{SLUG}" id="btn-bookmark" class="tip" style="margin-left:.5em" title="{{DragBookmark}}">
-            {VIEW} | {TITLE}
+            {VIEW} | {strip_tags:TITLE}
         </a>
     </td>
     </tr></table>
