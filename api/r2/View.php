@@ -77,8 +77,8 @@ class View extends Slim\View {
 
         require_once LIB_DIR . DS . 'contrib' . DS . 'Array2XML.php';
 
-        $config = yMVC\Config::getInstance();
-        $app = Slim\Slim::getInstance();
+        $config = slimMVC\Config::getInstance();
+        $app = slimMVC\App::getInstance();
 
         $data = $config->get('View.XML.Data', 'data');
         $node = $config->get('View.XML.Node', 'reading');
