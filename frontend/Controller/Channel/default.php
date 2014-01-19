@@ -11,8 +11,7 @@ return array(
 
     /**
      * Possible keys:
-     * - type     : (text|textarea|textextra|numeric|integer|radio), default text
-     *              radio results in (0|1)
+     * - type     : (text|textarea|textextra|numeric|integer|select), default text
      * - visible  : (TRUE|FALSE), default TRUE
      * - required : (TRUE|FALSE), default FALSE
      * - readonly : (TRUE|FALSE), default FALSE
@@ -20,139 +19,72 @@ return array(
      */
 
     'name' => array(
-        'type'     => 'text',
-        'visible'  => TRUE,
-        'required' => TRUE,
-        'readonly' => FALSE,
-        'default'  => ''
+        'required' => TRUE
     ),
 
-    'description' => array(
-        'type'     => 'text',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => ''
-    ),
+    'description' => array(),
 
-    'serial' => array(
-        'type'     => 'text',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => ''
-    ),
+    'serial' => array(),
 
-    'channel' => array(
-        'type'     => 'text',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => ''
-    ),
+    'channel' => array(),
 
     'resolution' => array(
         'type'     => 'numeric',
-        'visible'  => TRUE,
         'required' => TRUE,
-        'readonly' => FALSE,
         'default'  => 1
     ),
 
     'unit' => array(
         'type'     => 'textsmall',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => ''
     ),
 
     'decimals' => array(
         'type'     => 'integer',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
         'default'  => 2
     ),
 
     'meter' => array(
-        'type'     => 'radio',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
+        'type'     => 'select;1:yes;0:no',
         'default'  => 0
     ),
 
     'numeric' => array(
-        'type'     => 'radio',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
+        'type'     => 'select;1:yes;0:no',
         'default'  => 1
     ),
 
     'offset' => array(
         'type'     => 'numeric',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => NULL
     ),
 
     'adjust' => array(
-        'type'     => 'radio',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
+        'type'     => 'select;1:yes;0:no',
         'default'  => 0
     ),
 
     'cost' => array(
         'type'     => 'numeric',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => NULL
     ),
 
     'threshold' => array(
         'type'     => 'numeric',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => NULL
     ),
 
     'valid_from' => array(
         'type'     => 'numeric',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => NULL
     ),
 
     'valid_to' => array(
         'type'     => 'numeric',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => NULL
     ),
 
     'public' => array(
-        'type'     => 'radio',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
+        'type'     => 'select;1:yes;0:no',
         'default'  => 1
     ),
 
     'comment' => array(
         'type'     => 'textarea',
-        'visible'  => TRUE,
-        'required' => FALSE,
-        'readonly' => FALSE,
-        'default'  => ''
     ),
 
 );

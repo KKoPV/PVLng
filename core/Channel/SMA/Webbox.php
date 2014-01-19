@@ -1,10 +1,33 @@
 <?php
 /**
+ * Accept JSON data from several equipments, like SMA Webboxes, Fronius
+ * inverters or SmartGrid
  *
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2014 - Knut Kohl <github@knutkohl.de>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 namespace Channel\SMA;
@@ -12,41 +35,32 @@ namespace Channel\SMA;
 /**
  *
  */
-class Webbox extends \Channel {
+use \Channel\JSON;
+
+/**
+ *
+ */
+class Webbox extends JSON {
 
     /**
      *
      */
     public function write( $request, $timestamp=NULL ) {
 
-        if (!isset($request['result']['devices'][0]['channels']))
-            throw new \Exception('Invalid Webbox response:'."\n\n".print_r($request, TRUE), 400);
+        // Check for request errors
+        if (!isset($request['result']['devices'][0]['channels'])) {
+            throw new \Exception(
+                "Invalid Webbox response:\n".print_r($request, TRUE),
+                400
+            );
+        }
 
-        // find valid child channels
+        // Transform
         $channels = array();
-        foreach ($this->getChilds() as $child) {
-            if ($child->write AND $child->channel != '') {
-                $channels[$child->channel] = $child;
-            }
-        }
-
-        $ok = 0;
-
-        // check for a suitable channel object
         foreach ($request['result']['devices'][0]['channels'] as $channel) {
-            // Look for a suitable child channel
-            $name = $channel['meta'];
-            if (isset($channels[$name])) {
-                try {                              // Simulate $request['data']
-                    $ok += $channels[$name]->write(array('data'=>$channel['value']), $timestamp);
-                } catch (\Exception $e) {
-                    $code = $e->getCode();
-                    if ($code != 200 AND $code != 201 AND $code != 422) throw $e;
-                }
-            }
+            $channels[$channel['meta']] = $channel['value'];
         }
 
-        return $ok;
+        return parent::write($channels, $timestamp);
     }
-
 }

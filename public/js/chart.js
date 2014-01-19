@@ -117,43 +117,34 @@ function setMinMax( serie, channel ) {
         min = { id: null, x: null, y:  Number.MAX_VALUE },
         max = { id: null, x: null, y: -Number.MAX_VALUE };
 
-    var d, dataLabels = {
-        enabled: true,
-        formatter: function() {
-            return Highcharts.numberFormat(+this.y, serie.decimals)
-        },
-        color: serie.color,
-        style: { fontWeight: 'bold' },
-        borderRadius: 3,
-        backgroundColor: 'rgba(252, 255, 197, 0.7)',
-        borderWidth: 1,
-        borderColor: '#AAA'
-    };
-
     /* search min. and max. values */
     $.each(serie.data, function(i, point) {
-        ts.min = Math.min(ts.min, point[0]);
-        if (channel.min && (point[1] < min.y)) min = { id: i, x: point[0], y: point[1] };
-        ts.max = Math.max(ts.max, point[0]);
-        if (channel.max && (point[1] > max.y)) max = { id: i, x: point[0], y: point[1] };
+        ts.min = Math.min(ts.min, point.x);
+        if (channel.min && (point.y < min.y)) min = { id: i, x: point.x, y: point.y };
+        ts.max = Math.max(ts.max, point.x);
+        if (channel.max && (point.y > max.y)) max = { id: i, x: point.x, y: point.y };
     });
 
     if (min.id != null) {
 
-        d = $.extend({}, dataLabels, {
+        serie.data[min.id].marker = {
+            enabled: true,
+            symbol: 'triangle',
+            fillColor: serie.color
+        };
+        serie.data[min.id].dataLabels = {
+            enabled: true,
+            formatter: function() {
+                return Highcharts.numberFormat(+this.y, serie.decimals)
+            },
+            color: serie.color,
+            style: { fontWeight: 'bold' },
+            borderRadius: 3,
+            backgroundColor: 'rgba(252, 255, 197, 0.7)',
+            borderWidth: 1,
+            borderColor: '#AAA',
             align: ((ts.min + (ts.max - ts.min)/2 - min.x) > 0) ? 'left' : 'right',
             y: 26
-        });
-
-        serie.data[min.id] = {
-            marker: {
-                enabled: true,
-                symbol: 'triangle',
-                fillColor: serie.color
-            },
-            dataLabels: d,
-            x: min.x,
-            y: min.y
         };
 
         $('#min'+serie.id).html(Highcharts.numberFormat(min.y, serie.decimals) + ' ' + serie.unit);
@@ -161,20 +152,24 @@ function setMinMax( serie, channel ) {
 
     if (max.id != null) {
 
-        d = $.extend({}, dataLabels, {
+        serie.data[max.id].marker = {
+            enabled: true,
+            symbol: 'triangle-down',
+            fillColor: serie.color
+        };
+        serie.data[max.id].dataLabels = {
+            enabled: true,
+            formatter: function() {
+                return Highcharts.numberFormat(+this.y, serie.decimals)
+            },
+            color: serie.color,
+            style: { fontWeight: 'bold' },
+            borderRadius: 3,
+            backgroundColor: 'rgba(252, 255, 197, 0.7)',
+            borderWidth: 1,
+            borderColor: '#AAA',
             align: ((ts.min + (ts.max - ts.min)/2 - max.x) > 0) ? 'left' : 'right',
             y: -7
-        });
-
-        serie.data[max.id] = {
-            marker: {
-                enabled: true,
-                symbol: 'triangle-down',
-                fillColor: serie.color
-            },
-            dataLabels: d,
-            x: max.x,
-            y: max.y
         };
 
         $('#max'+serie.id).html(Highcharts.numberFormat(max.y, serie.decimals) + ' ' + serie.unit);
@@ -182,21 +177,28 @@ function setMinMax( serie, channel ) {
 
     var last = serie.data.length-1;
 
-    if (channel.last && (last >= 0)) {
+    /* Only if not still marked as min or max */
+    if (channel.last && (last != max.id) && (last != min.id) && (last >= 0)) {
 
-        d = $.extend({}, dataLabels, { align: 'left' });
-
-        serie.data[last] = {
-            marker: {
-                enabled: true,
-                symbol: 'circle',
-                fillColor: serie.color
-            },
-            dataLabels: d,
-            x: serie.data[last][0],
-            y: serie.data[last][1]
+        serie.data[last].marker = {
+            enabled: true,
+            symbol: 'circle',
+            fillColor: serie.color
         };
-
+        serie.data[last].dataLabels = {
+            enabled: true,
+            formatter: function() {
+                return Highcharts.numberFormat(+this.y, serie.decimals)
+            },
+            color: serie.color,
+            style: { fontWeight: 'bold' },
+            borderRadius: 3,
+            backgroundColor: 'rgba(252, 255, 197, 0.7)',
+            borderWidth: 1,
+            borderColor: '#AAA',
+            align: 'right',
+            y: -7
+        };
     }
 
     return serie;

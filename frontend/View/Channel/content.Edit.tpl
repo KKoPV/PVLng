@@ -46,15 +46,15 @@
     <!-- BEGIN FIELDS -->
 
     <!-- IF {VISIBLE} -->
-    <tr>
-        <td>
+    <tr <!-- IF {ERROR} -->style="background-color:#FFE0E0;border-top:solid 1px white;border-bottom:solid 1px white"<!-- ENDIF -->>
+        <td style="vertical-align:top;padding-top:.75em">
             <label for="{FIELD}">{NAME}</label>
             <!-- IF {REQUIRED} -->
                 <img style="width:16px;height:16px" width="16" height="16"
                     src="/images/required.gif" alt="*" />
             <!-- ENDIF -->
         </td>
-        <td style="white-space:nowrap">
+        <td style="vertical-align:top;padding-top:.5em;padding-bottom:.5em">
             <!-- IF {TYPE} == "numeric" -->
                 <input type="number" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10" step="0.000000000000001"
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
@@ -65,28 +65,19 @@
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                 />
-            <!-- ELSEIF {TYPE} == "radio" -->
-                <div class="fl">
-                    <input type="radio" id="y{FIELD}" name="c[{FIELD}]" value="1"
-                        class="iCheckLine" style="margin-right:.3em"
-                        <!-- IF {READONLY} --> readonly="readonly"<!-- ENDIF -->
-                        <!-- IF {VALUE} == 1 --> checked="checked"<!-- ENDIF --> />
-                    <label for="y{FIELD}">{{Yes}}</label>
-                </div>
-                <div class="fl" style="margin-left:1em">
-                    <input type="radio" id="n{FIELD}" name="c[{FIELD}]" value="0"
-                        class="iCheckLine" style="margin-right:.3em"
-                        <!-- IF {READONLY} --> readonly="readonly"<!-- ENDIF -->
-                        <!-- IF {VALUE} == 0 --> checked="checked"<!-- ENDIF --> />
-                    <label for="n{FIELD}">{{No}}</label>
-                </div>
+            <!-- ELSEIF {TYPE} == "select" -->
+                <select id="{FIELD}" name="c[{FIELD}]" <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->>
+                    <!-- BEGIN OPTIONS -->
+                    <option value="{VALUE}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>{OPTION}</option>
+                    <!-- END -->
+                </select>
             <!-- ELSEIF {TYPE} == "textarea" -->
-                <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="5"
+                <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="4"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                           <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                 >{VALUE}</textarea>
             <!-- ELSEIF {TYPE} == "textextra" -->
-                <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="15"
+                <textarea id="{FIELD}" name="c[{FIELD}]" style="width:98%" rows="12"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                           <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                 >{VALUE}</textarea>
@@ -99,8 +90,11 @@
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
             <!-- ENDIF -->
+            <span style="color:red" class="s">
+                <!-- BEGIN ERROR --><br class="clear" />{ERROR}<!-- END -->
+            </span>
         </td>
-        <td>
+        <td style="vertical-align:top;padding-top:.5em;padding-bottom:.5em">
             <small>{HINT}</small>
         </td>
     </tr>
@@ -117,11 +111,12 @@
         <td>
             <select name="add2tree">
                 <option value="0">--- {{Select}} ---</option>
-                <option value="1">> {{TopLevel}}</option>
-                <option disabled="disabled">> {{AsChild}}:</option>
-                <!-- BEGIN ADDTREE -->
-                <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
-                <!-- END -->
+                <option value="1">{{TopLevel}}</option>
+                <optgroup label="{{AsChild}}">
+                    <!-- BEGIN ADDTREE -->
+                    <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
+                    <!-- END -->
+                </optgroup>
             </select>
 
         </td>

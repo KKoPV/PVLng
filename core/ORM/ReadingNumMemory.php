@@ -29,7 +29,7 @@ class ReadingNumMemory extends \slimMVC\ORMTable {
         $this->app->db->query('
             CREATE TABLE IF NOT EXISTS `pvlng_reading_num_tmp` (
                 `id` int(10) unsigned NOT NULL,
-                `timestamp` int(10) unsigned NOT NULL,
+                `timestamp` int(11) NOT NULL,
                 `data` decimal(13,4) NOT NULL,
                 PRIMARY KEY (`id`, `timestamp`)
             ) ENGINE=MEMORY

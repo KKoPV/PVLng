@@ -23,9 +23,11 @@ return array(
         'visible' => TRUE
     ),
     'valid_from' => array(
+        'type'     => 'integer',
         'required' => TRUE
     ),
     'valid_to' => array(
+        'type'     => 'integer',
         'required' => TRUE,
         'default'  => 0
     )

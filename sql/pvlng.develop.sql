@@ -2,7 +2,60 @@
 -- For development branch only!
 --
 
-REPLACE INTO `v_babelkit_changed` (`code_set`, `code_lang`, `code_code`, `code_desc`) VALUES
+ALTER TABLE `pvlng_channel` ADD `extra` text NOT NULL COMMENT 'Not visible field for models to store extra info' AFTER `public`;
+
+DROP TRIGGER `pvlng_reading_num_bi`;
+
+DELIMITER ;;
+
+CREATE TRIGGER `pvlng_reading_num_bi` BEFORE INSERT ON `pvlng_reading_num` FOR EACH ROW
+IF new.`timestamp` = 0 THEN
+
+  SET @NOW = UNIX_TIMESTAMP();
+  SELECT IFNULL(`value`,0) INTO @VALUE FROM `pvlng_config` WHERE `key` = 'DoubleRead';
+
+  IF @VALUE <> 0 THEN
+    SELECT COUNT(*) INTO @FOUND FROM `pvlng_reading_num` WHERE `id` = new.`id` AND `timestamp` BETWEEN @NOW-@VALUE AND @NOW+@VALUE;
+    IF @FOUND THEN
+      SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = 'DoubleRead';
+    END IF;
+  END IF;
+
+  SET new.`timestamp` = @NOW;
+
+END IF;;
+
+DELIMITER ;
+
+DROP TRIGGER `pvlng_reading_str_bi`;
+
+DELIMITER ;;
+
+CREATE TRIGGER `pvlng_reading_num_bi` BEFORE INSERT ON `pvlng_reading_num` FOR EACH ROW
+IF new.`timestamp` = 0 THEN
+
+  SET @NOW = UNIX_TIMESTAMP();
+  SELECT IFNULL(`value`,0) INTO @VALUE FROM `pvlng_config` WHERE `key` = 'DoubleRead';
+
+  IF @VALUE <> 0 THEN
+    SELECT COUNT(*) INTO @FOUND FROM `pvlng_reading_str` WHERE `id` = new.`id` AND `timestamp` BETWEEN @NOW-@VALUE AND @NOW+@VALUE;
+    IF @FOUND THEN
+      SIGNAL SQLSTATE '99999' SET MESSAGE_TEXT = 'DoubleRead';
+    END IF;
+  END IF;
+
+  SET new.`timestamp` = @NOW;
+
+END IF;;
+
+DELIMITER ;
+
+
+REPLACE INTO `pvlng_config` (`key`, `value`, `comment`, `type`) VALUES
+('db', 5, 'Database version number', 0),
+('DoubleRead', 5, 'Detect double readings by timestamp -+ seconds, set 0 to disable', 2);
+
+REPLACE INTO `pvlng_babelkit` (`code_set`, `code_lang`, `code_code`, `code_desc`) VALUES
 ('app', 'de', 'MarkExtremes', 'Markiere Messwerte'),
 ('app', 'en', 'MarkExtremes', 'Mark reading values'),
 ('app', 'de', 'lastone', 'letzter'),

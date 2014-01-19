@@ -27,9 +27,12 @@ class Channel extends \Controller {
 
         foreach (include __DIR__ . DS . 'Channel' . DS . 'default.php' as $key=>$field) {
             $this->fields[$key] = array_merge(array(
-                'FIELD' => $key,
-                'NAME'  => __('channel::'.$key),
-                'HINT'  => __('channel::'.$key.'Hint'),
+                'FIELD'    => $key,
+                'TYPE'     => 'text',
+                'VISIBLE'  => TRUE,
+                'REQUIRED' => FALSE,
+                'READONLY' => FALSE,
+                'DEFAULT'  => NULL
             ), array_change_key_case($field, CASE_UPPER));
         }
     }
@@ -70,7 +73,7 @@ class Channel extends \Controller {
             $this->view->Type = $type;
 
             // Preset channel unit
-            $type = new \ORM\EntityType($type);
+            $type = new \ORM\ChannelType($type);
             $this->fields['unit']['VALUE'] = $type->unit;
 
             $this->ignore_returnto = TRUE;
@@ -156,7 +159,7 @@ class Channel extends \Controller {
             $templates = array();
             foreach (glob(CORE_DIR . DS . 'Channel' . DS . 'Templates' . DS . '*.php') as $file) {
                 $template = include $file;
-                $type = new \ORM\EntityType($template['channels'][0]['type']);
+                $type = new \ORM\ChannelType($template['channels'][0]['type']);
                 $templates[] = array(
                     'FILE'         => $file,
                     'NAME'         => $template['name'] . ' (Type: ' . $type->name . ')',
@@ -210,7 +213,6 @@ class Channel extends \Controller {
      */
     public function EditPOST_Action() {
         if ($channel = $this->request->post('c')) {
-            $ok = TRUE;
 
             $entity = new \ORM\Channel($channel['id']);
 
@@ -219,29 +221,34 @@ class Channel extends \Controller {
 
             $this->prepareFields($entity);
 
-            /* check required fields */
-            foreach ($this->fields as $key=>$data) {
-                if ($data['VISIBLE'] AND $data['REQUIRED'] AND $entity->$key == '') {
-                    \Messages::Error(__('channel::ParamIsRequired', $data['NAME']), TRUE);
-                    $ok = FALSE;
-                }
-            }
+            $type = new \ORM\ChannelType($channel['type']);
+            $model = $type->ModelClass();
+            $ok = $model::checkData($this->fields, $this->request->post('add2tree'));
 
             if ($ok) {
                 $entity->throwException();
                 try {
                     // CAN'T simply replace because of the foreign key in the tree!
                     if (!$entity->id) {
+                        $model::beforeSave($this->fields, $entity);
                         $entity->insert();
                         \Messages::Success(__('ChannelSaved'));
 
+                        $tree = 0;
+
                         if ($addTo = $this->request->post('add2tree')) {
-                            \NestedSet::getInstance()->insertChildNode($entity->id, $addTo);
+                            $tree = \NestedSet::getInstance()->insertChildNode($entity->id, $addTo);
                             \Messages::Success(__('HierarchyCreated', 1));
                         }
+
+                        $model::afterSave($entity, $tree);
+
                     } else {
+                        $model::beforeSave($this->fields, $entity);
                         $entity->update();
                         \Messages::Success(__('ChannelSaved'));
+
+                        $model::afterSave($entity);
 
                         // Update possible alias channel!
                         $tree = new \ORM\Tree;
@@ -282,7 +289,13 @@ class Channel extends \Controller {
      */
     public function EditGET_Action() {
         if ($id = $this->app->params->get('id')) {
-            $this->prepareFields(new \ORM\Channel($id));
+            $channel = new \ORM\Channel($id);
+            $this->prepareFields($channel);
+
+            $type = new \ORM\ChannelType($channel->type);
+            $model = $type->ModelClass();
+            $model::beforeEdit($channel, $this->fields);
+
             $this->view->Id = $id;
         }
     }
@@ -292,6 +305,12 @@ class Channel extends \Controller {
      */
     public function Edit_Action() {
         $this->view->SubTitle = __('EditChannel');
+
+        // Move comment to the end of list
+        $comment = $this->fields['comment'];
+        unset($this->fields['comment']);
+        $this->fields['comment'] = $comment;
+
         $this->view->Fields = $this->fields;
 
         if (!$this->view->Id) {
@@ -348,10 +367,10 @@ class Channel extends \Controller {
 
         if ($addMode) {
             // Got channel type number to create new channel
-            $type = new \ORM\EntityType($entity);
+            $type = new \ORM\ChannelType($entity);
         } else {
             // Got real channel object to edit
-            $type = new \ORM\EntityType($entity->type);
+            $type = new \ORM\ChannelType($entity->type);
         }
 
         if ($type->id == '') {
@@ -359,9 +378,10 @@ class Channel extends \Controller {
             $this->app->redirect('/channel');
         }
 
+        $model = $type->ModelClass();
+
         if ($addMode) {
             // Get prefered type settings from Model
-            $model = $type->ModelClass();
             if ($model::TYPE != UNDEFINED_CHANNEL) {
                 $this->applyFieldSettings('numeric');
                 if ($model::TYPE == SENSOR_CHANNEL) {
@@ -378,7 +398,10 @@ class Channel extends \Controller {
             }
         }
 
-        if ($type->write AND $type->read) {
+        if ($model::TYPE == GROUP_CHANNEL) {
+            // A grouping channel
+            $this->applyFieldSettings('group');
+        } elseif ($type->write AND $type->read) {
             // No specials for writable AND readable channels
         } elseif ($type->write) {
             // Write only
@@ -388,24 +411,39 @@ class Channel extends \Controller {
            $this->applyFieldSettings('read');
         } else {
             // A grouping channel, not write, not read
-           $this->applyFieldSettings('group');
+            $this->applyFieldSettings('group');
         }
 
         // Last apply model specific settings
         $this->applyFieldSettings(str_replace('\\', DS, $type->model));
 
         foreach ($this->fields as $key=>&$data) {
-            $h = 'model::'.$type->model.'_'.$key;
-            $name = __($h);
-            if ($name != $h) $data['NAME'] = $name;
+            $m = str_replace('\\', DS, $type->model);
 
-            $h = 'model::'.$type->model.'_'.$key.'Hint';
+            $h = 'model::'.$m.'_'.$key;
             $name = __($h);
-            if ($name != $h) $data['HINT'] = $name;
+            $data['NAME'] = ($name != $h) ? $name : __('channel::'.$key);
 
-            $data['VALUE'] = isset($entity->$key)
+            $h = 'model::'.$m.'_'.$key.'Hint';
+            $name = __($h);
+            $data['HINT'] = ($name != $h) ? $name : __('channel::'.$key.'Hint');
+
+            $data['VALUE'] = !$addMode
                            ? htmlspecialchars($entity->$key)
-                           : htmlspecialchars($data['DEFAULT']);
+                           : htmlspecialchars(trim($data['DEFAULT']));
+
+            if (strpos($data['TYPE'], 'select') === 0) {
+                $options = explode(';', $data['TYPE']);
+                $data['TYPE'] = trim(array_shift($options)); // 'select'
+                foreach ($options as $option) {
+                    $option = explode(':', $option);
+                    $data['OPTIONS'][] = array(
+                        'VALUE'    => trim($option[0]),
+                        'OPTION'   => __(trim($option[1])),
+                        'SELECTED' => (trim($option[0]) == $data['VALUE'])
+                    );
+                }
+            }
         }
 
         $this->view->Type = $type->id;
@@ -434,14 +472,24 @@ class Channel extends \Controller {
         $attr = include $config;
 
         // check all fields
-        foreach ($this->fields as $key=>$data) {
-            if (isset($attr[$key])) {
-                // apply settings for this field
-                $this->fields[$key] = array_merge(
-                    $this->fields[$key],
-                    array_change_key_case($attr[$key], CASE_UPPER)
-                );
-            }
+        foreach ($attr as $key=>$data) {
+            // apply settings for this field
+            $this->fields[$key] = isset($this->fields[$key])
+                                ? array_merge(
+                                      $this->fields[$key],
+                                      array_change_key_case($data, CASE_UPPER)
+                                  )
+                                : array_merge(
+                                      array(
+                                        'FIELD'    => $key,
+                                        'TYPE'     => 'text',
+                                        'VISIBLE'  => TRUE,
+                                        'REQUIRED' => FALSE,
+                                        'READONLY' => FALSE,
+                                        'DEFAULT'  => NULL
+                                      ),
+                                      array_change_key_case($data, CASE_UPPER)
+                                  );
         }
     }
 }

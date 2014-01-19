@@ -15,6 +15,7 @@ abstract class Channel {
      * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
      * SENSOR_CHANNEL    - numeric
      * METER_CHANNEL     - numeric
+     * GROUP_CHANNEL     - generic group
      */
     const TYPE = UNDEFINED_CHANNEL;
 
@@ -61,6 +62,52 @@ abstract class Channel {
 
         throw new Exception('No channel found for GUID: '.$guid, 400);
     }
+
+    /**
+     * Run additional code before existing data presented to user
+     */
+    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {}
+
+    /**
+     *
+     * @param $add2tree integer|null
+     */
+    public static function checkData( Array &$fields, $add2tree ) {
+        $ok = TRUE;
+
+        foreach ($fields as $name=>&$data) {
+            if ($data['VISIBLE']) {
+                /* check required fields */
+                if ($data['REQUIRED'] AND $data['VALUE'] == '') {
+                    $data['ERROR'][] = __('channel::ParamIsRequired');
+                    $ok = FALSE;
+                }
+                /* check numeric fields */
+                if ($data['VALUE'] != '') {
+                    if ($data['TYPE'] == 'numeric' AND !is_numeric($data['VALUE'])) {
+                        $data['ERROR'][] = __('channel::ParamMustNumeric');
+                        $ok = FALSE;
+                    } elseif ($data['TYPE'] == 'integer' AND (string) floor($data['VALUE']) != $data['VALUE']) {
+                        $data['ERROR'][] = __('channel::ParamMustInteger');
+                        $ok = FALSE;
+                    }
+                }
+            }
+        }
+
+        return $ok;
+    }
+
+    /**
+     * Run additional code before data saved to database
+     */
+    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {}
+
+    /**
+     * Run additional code after channel was created / changed
+     * If $tree is set, channel was just created
+     */
+    public static function afterSave( \ORM\Channel $channel, $tree=NULL ) {}
 
     /**
      *
@@ -531,6 +578,12 @@ abstract class Channel {
             throw new Exception('Missing data value', 400);
         }
 
+        // Check if a WRITEMAP::{...} exists to rewrite e.g. from numeric to non-numeric
+        if (preg_match('~^WRITEMAP::(.*?)$~m', $this->comment, $args) AND
+            $map = json_decode($args[1], TRUE)) {
+            $request['data'] = ($_=&$map[$request['data']]) ?: 'unknown ('.$request['data'].')';
+        }
+
         $this->value = $request['data'];
 
         Hook::process('data.save.before', $this);
@@ -548,7 +601,6 @@ abstract class Channel {
 
                 if ($this->meter AND $this->value + $this->offset < $lastReading AND $this->adjust) {
                     // Auto-adjust channel offset
-
                     ORM\Log::save(
                         $this->name,
                         sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
@@ -567,6 +619,11 @@ abstract class Channel {
             // MUST also work for sensor channels
             // Apply offset
             $this->value += $this->offset;
+
+            if ($this->meter AND $this->value == $lastReading) {
+                // Ignore for meters values which are equal last reading
+                throw new Exception(NULL, 200);
+            }
         }
     }
 
@@ -679,13 +736,6 @@ abstract class Channel {
         }
         $buffer->close();
 
-//         if ($lastrow AND $this->period[1] == self::LAST) {
-//             // recreate temp. file with last row only
-//             $datafile->close();
-//             $datafile = new Buffer;
-//             $datafile->write($lastrow);
-//         }
-//
         return $datafile;
     }
 
@@ -707,3 +757,4 @@ define('UNDEFINED_CHANNEL', 0);
 define('NUMERIC_CHANNEL',   1);
 define('SENSOR_CHANNEL',    2);
 define('METER_CHANNEL',     3);
+define('GROUP_CHANNEL',     4);

@@ -107,7 +107,7 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="not-scatter">
             <td>
                 <label for="d-cons">{{Presentation}}</label>
             </td>

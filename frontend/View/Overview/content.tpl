@@ -179,14 +179,14 @@
 </table>
 
 <p>
-    <a class="button" href="/channel/add">{{CreateChannel}}</a>
+    <a class="button tip" href="/channel/add" title="Alt+N">{{CreateChannel}}</a>
 </p>
 
 </div>
 
 <div class="clear"></div>
 
-<!-- Dialogs -->
+<!-- Dialogs ------------------------------------------------------------- -->
 
 <div id="dialog-addchild" style="display:none" title="{{AddChild}}">
     <form id="form-addchild" action="/overview/addchild" method="post">

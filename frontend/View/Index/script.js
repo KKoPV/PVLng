@@ -33,10 +33,14 @@ var RefreshTimeout = 300;
 <script src="/js/palettes.js"></script>
 -->
 
-<!-- load Highcharts scripts direct from highcharts.com -->
+<!-- load Highcharts scripts direct from highcharts.com -- >
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
+-->
+<script src="/js/highcharts.js"></script>
+<script src="/js/highcharts-more.js"></script>
+<script src="/js/highcharts-exporting.js"></script>
 
 <script>
 
@@ -50,6 +54,9 @@ var
             paddingRight: 15,
             alignTicks: false,
             zoomType: 'x',
+            resetZoomButton: {
+                position: { x: 0, y: -50 }
+            },
             events: {
                 selection: function(event) {
                     setTimeout(setExtremes, 100);
@@ -58,6 +65,36 @@ var
         },
         title: { text: '' },
         plotOptions: {
+            series: {
+                point: {
+                    events: {
+                        click: function() {
+                            console.log(this);
+                            if (confirm('Do you really want delete this reading value?\n\n '+
+                                (new Date(this.x).toLocaleString().replace(' 00:00', ''))+' : '+this.y)) {
+
+                                var point = this,
+                                    url = PVLngAPI + 'data/' +
+                                          point.reading.guid + '/' +
+                                          point.reading.timestamp + '.json';
+                                _log(url);
+
+                                $.ajax({
+                                    dataType: 'json',
+                                    url: url,
+                                    type: 'DELETE',
+                                    success: function(data) {
+                                        point.remove();
+                                    },
+                                    error: function(data) {
+                                        alert(data.responseJSON.message);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            },
             line: {
                 marker: { enabled: false }
             },
@@ -102,14 +139,19 @@ var
                     }
                     body += '<tr style="color:' + color + '"';
                     if (id & 1) body += ' class="even"'; /* id starts by 0 */
-                    body += '>' +
-                            '<td class="name">' + point.series.name + '</td>' +
-                            '<td class="value">' + value + '</td>' +
-                            '<td class="unit"> ' + point.series.tooltipOptions.valueSuffix + '</td>' +
-                            '</tr>';
+                    body += '><td class="name">' + point.series.name + '</td>';
+                    if (point.series.tooltipOptions.valueSuffix) {
+                        /* Show value and unit only for channels which have a unit */
+                        body += '<td class="value">' + value + '</td>' +
+                                '<td class="unit">' + point.series.tooltipOptions.valueSuffix;
+                    } else {
+                        body += '<td colspan="2">';
+                    }
+                    body += '</td></tr>';
                 });
                 return '<table id="chart-tooltip"><thead><tr><th colspan="3">' +
-                       Highcharts.dateFormat('%a. %Y-%m-%d %H:%M',this.x).replace(' 00:00', '') +
+                       Highcharts.dateFormat('%a. ',this.x) +
+                       (new Date(this.x).toLocaleString()).replace(' 00:00:00', '').replace(':00', '') +
                        '</th></tr></thead><tbody>' + body + '</tbody></table>';
             },
             borderWidth: 0,
@@ -462,7 +504,7 @@ function updateChart( forceUpdate ) {
                 }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
-                if (attr.unit) serie.tooltip = { valueSuffix: attr.unit };
+                serie.tooltip = { valueSuffix: attr.unit ? attr.unit : '' };
 
                 if (channel.type == 'scatter') {
                     serie.dataLabels = {
@@ -474,12 +516,12 @@ function updateChart( forceUpdate ) {
                                  : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
                         }
                     };
-                    if (!attr.unit) {
+                    if (attr.unit.trim() == '') {
                         /* mostly non-numeric channels */
                         serie.dataLabels.align = 'left';
                         serie.dataLabels.rotation = 270;
                         serie.dataLabels.x = 3;
-                        serie.dataLabels.y = -7;
+                        serie.dataLabels.y = -8;
                     }
                 } else if (channel.type != 'bar') {
                     serie.dashStyle = channel.style;
@@ -488,19 +530,21 @@ function updateChart( forceUpdate ) {
 
                 $(data).each(function(id, row) {
                     var ts = Math.round(row.timestamp / res) * res * 1000;
+                    var reading = { guid: attr.guid, timestamp: row.timestamp };
                     if ($.isNumeric(row.data)) {
                         if (channel.type == 'areasplinerange') {
-                            serie.data.push([ts, row.min, row.max]);
+                            serie.data.push({ x: ts, low: row.min, high: row.max, reading: reading });
                         } else if (channel.consumption) {
-                            serie.data.push([ts, row.consumption]);
+                            serie.data.push({ x: ts, y: row.consumption, reading: reading });
                         } else {
-                            serie.data.push([ts, row.data]);
+                            serie.data.push({ x: ts, y: row.data, reading: reading });
                         }
                     } else {
                         serie.data.push({
-                            x: row.timestamp*1000,
+                            x: ts,
                             y: 0,
-                            name: row.data
+                            name: row.data,
+                            reading: reading
                         });
                     }
                 });

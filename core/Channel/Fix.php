@@ -33,9 +33,6 @@ class Fix extends InternalCalc {
         // make sure, only until now :-)
         $this->end = min($this->end, time());
 
-        $this->saveValues(array(
-            $this->start => 1,
-            $this->end   => 1
-        ));
+        $this->saveValues(array( $this->start => 1, $this->end => 1 ));
     }
 }

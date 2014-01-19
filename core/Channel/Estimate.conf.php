@@ -9,8 +9,7 @@ return array(
 
     /**
      * Possible keys:
-     * - type     : (text|textarea|numeric|integer|radio), default text
-     *              radio results in (0|1)
+     * - type     : (text|textarea|numeric|integer|select), default text
      * - visible  : (TRUE|FALSE), default TRUE
      * - required : (TRUE|FALSE), default FALSE
      * - readonly : (TRUE|FALSE), default FALSE
@@ -18,13 +17,20 @@ return array(
      */
 
     'valid_from' => array(
-        'visible'  => FALSE,
+        'visible'  => FALSE
     ),
     'valid_to' => array(
-        'visible'  => FALSE,
+        'visible'  => FALSE
     ),
-    'comment' => array(
-        'type'     => 'textextra'
-    )
+    'estimates' => array(
+        'type'     => 'textextra',
+        'required' => TRUE
+    ),
+    'latitude' => array(
+        'type'     => 'numeric'
+    ),
+    'longitude' => array(
+        'type'     => 'numeric'
+    ),
 
 );

@@ -29,6 +29,7 @@ abstract class InternalCalc extends \Channel {
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
         $this->data = $this->numeric ? new \ORM\ReadingNumMemory :  new \ORM\ReadingStrMemory;
+        $this->data->id = $this->entity;
         /* Clean up */
         $this->data->deleteById($this->entity);
     }
@@ -49,9 +50,17 @@ abstract class InternalCalc extends \Channel {
     /**
      *
      */
+    protected function saveValue( $timestamp, $value ) {
+        $this->data->timestamp = $timestamp;
+        $this->data->data      = $value;
+        return $this->data->insert();
+    }
+
+    /**
+     *
+     */
     protected function saveValues( $values ) {
         $cnt = 0;
-        $this->data->id = $this->entity;
         if ($values instanceof \Buffer) {
             foreach ($values as $row) {
                 $this->data->timestamp = $row['timestamp'];
