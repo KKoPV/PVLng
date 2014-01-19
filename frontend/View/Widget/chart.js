@@ -8,6 +8,7 @@
  */
 
 document.write('<div id="pvlng-{GUID}" style="width:{WIDTH}px;height:{HEIGHT}px"></div>');
+
 runOnLoad(function() {
     _pvlng_chart('pvlng-{GUID}', {WIDTH}, {HEIGHT}, {DATA}, '{MAX} {UNIT}', '{AREA}', '{COLOR}', '{LABELS}', '{TIME1}', '{TIME2}');
 });

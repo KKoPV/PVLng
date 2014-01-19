@@ -65,6 +65,12 @@ class Widget extends \Controller {
             // Last row
             if (isset($row)) $time2 = $row['timestamp'];
 
+            if ($time1 == $time2) {
+                // before 1st reading of day saved, at least 12 hours,
+                // but max. until midnight
+                $time2 = min($time2 + 12*60*60, strtotime('24:00'));
+            }
+
             $this->view->GUID    = $channel->guid;
             $this->view->Unit    = $channel->unit;
             $this->view->Width   = $this->intParam('width', 320);
