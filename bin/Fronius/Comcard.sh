@@ -37,7 +37,15 @@ test "$TRACE" && set -x
 test "$APIURL" || error_exit "Solar Net API URL is required!"
 
 GUID_N=$(int "$GUID_N")
-test $GUID_N -gt 0  || error_exit "No GUIDs defined"
+test $GUID_N -gt 0  || error_exit "No GUIDs defined (GUID_N)"
+
+if test "$LOCATION"; then
+    ### Location given, test for daylight time
+    loc=$(echo $LOCATION | sed -e 's/,/\//g')
+    daylight=$(PVLngGET "daylight/$loc/60.txt")
+    log 2 "Daylight: $daylight"
+    test $daylight -eq 1 || exit 127
+fi
 
 ##############################################################################
 ### Go
@@ -62,8 +70,8 @@ while test $i -lt $GUID_N; do
     test "$GUID" || error_exit "Inverter GUID is required (GUID_$i)"
 
     ### request serial and type, required fields
-    DEVICEID=$(PVLngGET2 $GUID/serial.txt)
-    TYPE=$(int $(PVLngGET2 $GUID/channel.txt))
+    DEVICEID=$(PVLngGET $GUID/serial.txt)
+    TYPE=$(int $(PVLngGET $GUID/channel.txt))
 
     if test $TYPE -eq 1 -o $TYPE -eq 2; then
         requestComCard GetInverterRealtimeData CommonInverterData

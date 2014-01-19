@@ -16,6 +16,14 @@
 APIURL        "http://<IP>/solar_api/v1"
 
 ##############################################################################
+### Plant location
+### Query inverter(s) only during daylight times (+- 60 min.) if defined
+### Cron can then run all time
+### 2 decimals comma separated: "51.2345,11.2345" (latitude, longitude)
+##############################################################################
+LOCATION      ""
+
+##############################################################################
 ### Count of following GUIDs
 ##############################################################################
 GUID_N        0

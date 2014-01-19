@@ -30,15 +30,23 @@ shift $((OPTIND-1))
 
 read_config "$1"
 
-GUID_N=$(int "$GUID_N")
-test $GUID_N -gt 0  || error_exit "No GUIDs defined"
-
 ##############################################################################
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
 
 test "$WEBBOX" || error_exit "IP address is required!"
+
+GUID_N=$(int "$GUID_N")
+test $GUID_N -gt 0  || error_exit "No GUIDs defined (GUID_N)"
+
+if test "$LOCATION"; then
+    ### Location given, test for daylight time
+    loc=$(echo $LOCATION | sed -e 's/,/\//g')
+    daylight=$(PVLngGET "daylight/$loc/60.txt")
+    log 2 "Daylight: $daylight"
+    test $daylight -eq 1 || exit 127
+fi
 
 ##############################################################################
 ### Go
