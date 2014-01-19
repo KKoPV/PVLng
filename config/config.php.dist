@@ -57,6 +57,14 @@ return array(
     ),
 
     /**
+     * Loaction for sunrise/sunset
+     */
+    'Location' => array(
+        'Latitude'  => NULL, // decimal, Defaults to north, pass in a negative value for south
+        'Longitude' => NULL  // decimal, Defaults to east, pass in a negative value for west
+    ),
+
+    /**
      * Preferd cache mode, auto detect best one if empty
      */
 //    'Cache' => 'APC',

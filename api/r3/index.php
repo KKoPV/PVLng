@@ -409,7 +409,8 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
             'value'       => array(
                 'YYYY-mm-dd HH:ii:ss',
                 'seconds since 1970',
-                'relative from now, see http://php.net/manual/en/datetime.formats.relative.php'
+                'relative from now, see http://php.net/manual/en/datetime.formats.relative.php',
+                '"sunrise", needs location configured in config/config.php'
             ),
         ),
         'end' => array(
@@ -417,7 +418,8 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
             'value'       => array(
                 'YYYY-mm-dd HH:ii:ss',
                 'seconds since 1970',
-                'relative from now, see http://php.net/manual/en/datetime.formats.relative.php'
+                'relative from now, see http://php.net/manual/en/datetime.formats.relative.php',
+                '"sunset", needs location configured in config/config.php'
             ),
         ),
         'period' => array(

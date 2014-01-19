@@ -499,6 +499,7 @@ abstract class Channel {
     protected function __construct( ORM\Tree $channel ) {
         $this->time = microtime(TRUE);
         $this->db = slimMVC\MySQLi::getInstance();
+        $this->config = slimMVC\Config::getInstance();
 
         foreach ($channel->getAll() as $key=>$value) {
             $this->$key = $value;
@@ -631,13 +632,16 @@ abstract class Channel {
      *
      */
     protected function before_read( $request ) {
+        // Readable channel?
         if (!$this->read)
             throw new \Exception('Can\'t read data from '.$this->name.', '
                                 .'instance of '.get_class($this), 400);
 
+        // Required number of child channels?
         if ($this->childs >= 0 AND count($this->getChilds()) != $this->childs)
             throw new \Exception($this->name.' must have '.$this->childs.' child(s)', 400);
 
+        // Prepare analysis of request
         $request = array_merge(
             array(
                 'start'  => '00:00',
@@ -647,20 +651,40 @@ abstract class Channel {
             $request
         );
 
-        $this->start = is_numeric($request['start'])
-                     ? $request['start']
-                     : strtotime($request['start']);
+        $latitude  = $this->config->get('Location.Latitude');
+        $longitude = $this->config->get('Location.Longitude');
+
+        // Start timestamp
+        if ($request['start'] == 'sunrise') {
+            if ($latitude == '' OR $longitude == '') {
+                throw new \Exception('Invalid start timestamp: "sunrise", missing Location in config/config.php', 400);
+            }
+            $this->start = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
+        } else {
+            $this->start = is_numeric($request['start'])
+                         ? $request['start']
+                         : strtotime($request['start']);
+        }
 
         if ($this->start === FALSE)
-            throw new \Exception('No valid start timestamp: '.$this->start, 400);
+            throw new \Exception('Invalid start timestamp: '.$request['start'], 400);
 
-        $this->end = is_numeric($request['end'])
-                   ? $request['end']
-                   : strtotime($request['end']);
+        // End timestamp
+        if ($request['end'] == 'sunset') {
+            if ($latitude == '' OR $longitude == '') {
+                throw new \Exception('Invalid start timestamp: "sunrise", missing Location in config/config.php', 400);
+            }
+            $this->end = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
+        } else {
+            $this->end = is_numeric($request['end'])
+                       ? $request['end']
+                       : strtotime($request['end']);
+        }
 
         if ($this->end === FALSE)
-            throw new \Exception('No valid end timestamp: '.$this->end, 400);
+            throw new \Exception('Invalid end timestamp: '.$request['end'], 400);
 
+        // Consolidation period
         if ($request['period'] != '') {
             // normalize aggr. periods
             if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
@@ -738,6 +762,15 @@ abstract class Channel {
 
         return $datafile;
     }
+
+    // -------------------------------------------------------------------------
+    // PROTECTED
+    // -------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected $config;
 
     // -------------------------------------------------------------------------
     // PRIVATE
