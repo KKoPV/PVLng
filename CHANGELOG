@@ -1,3 +1,31 @@
+ v2.2.0
+========
+
+FIXED
+
+ - Fix configuration for Nginx, see config/pvlng.nginx.conf.dist for details #23 ~ Knut Kohl <github@knutkohl.de>
+ - Fix data saving from scipts, save before send to API not afterwards ~ Knut Kohl <github@knutkohl.de>
+ - Fix API XML generation ~ Knut Kohl <github@knutkohl.de>
+ - Fix Javascript error for not logged in visitors ~ Knut Kohl <github@knutkohl.de>
+ - Fix type update for foreign key restrictions ~ Knut Kohl <github@knutkohl.de>
+ - Allow HTML tags in configured application title ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust widget to draw chart also before 1st reading of day was saved ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Add script for Smart Energy Groups update #21 ~ Knut Kohl <github@knutkohl.de>
+ - Add loacation search via Google maps to AdminPass for initial configuration ~ Knut Kohl <github@knutkohl.de>
+ - Add new model Daylight for sunrise/sunset related functions in API r3 and charts ~ Knut Kohl <github@knutkohl.de>
+ - Add template for Fronius inverters ~ Knut Kohl <github@knutkohl.de>
+ - Add API r3, see /api/r3/help.json for details
+   Can also act as Volkszaehler Middleware on request but without security ~ Knut Kohl <github@knutkohl.de>
+ - Add logic for Fronius solar inverters ~ Knut Kohl <github@knutkohl.de>
+ - Add consolidation presets for charts ~ Knut Kohl <github@knutkohl.de>
+ - Accept "sunrise" and "sunset" as start/end parameter for data readout ~ Knut Kohl <github@knutkohl.de>
+
  v2.1.0
 ========
 
