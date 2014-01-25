@@ -1,0 +1,15 @@
+##############################################################################
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2013 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     1.0.0
+##############################################################################
+
+##############################################################################
+### SEG API URL
+### We use the "The Simple Stream API" here
+### http://api.smartenergygroups.com/api_streams/<stream_token>/add_point?value=47.2
+### See http://smartenergygroups.com/api
+### required
+##############################################################################
+APIURL      "http://api.smartenergygroups.com/api_streams"

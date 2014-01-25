@@ -1,0 +1,66 @@
+http://smartenergygroups.com/api
+
+You will need to know some details of your tokens.
+
+All the relevant details of your stuff can be found here:
+https://smartenergygroups.com/my_things/show_keys
+
+Now, streams are that, streams of data, each with a point in time, and
+a corresponding value. Streams are defined for units, i.e. kWh etc as part of
+the stream type associated for the device.
+
+1. The Resource is:
+
+http://api.smartenergygroups.com/api_sites/stream
+
+2. The Method to use is:
+:PUT
+
+3. The body of the request is:
+data_post = "(site  <your site's site_token>
+               (node <your device's node_name> <a date time stamp e.g. 2010-01-10T23:22:12 or a ? if you want SEG server time>
+                 (<your devices stream_name> <value>)(<your devices stream_name> <value>)
+               )
+             )"
+
+a working example for a device sending data to 4 streams on a device may be:
+
+data_post = "(site 7adfe67f35a (node segmeter ? (p_1 567.00)(e_1 2.70)(p_2 402.00)(e_2 2.2)))"
+
+or with the time specified
+
+data_post = "(site 7adfe67f35a (node segmeter 2010-01-10T23:22:12 (p_1 567.00)(e_1 2.70)(p_2 402.00)(e_2 2.2)))"
+
+The SEG server runs all data at UTC, so make sure to send UTC time -
+that is unless you would like some headaches!
+
+The Simple Stream API
+---------------------
+
+This API is designed for this type of device, it's a simple GET method to the
+stream's resource, with the value on the parameter string, e.g.
+
+http://api.smartenergygroups.com/api_streams/<stream_token>/add_point?value=47.2
+
+This will add a data point to the stream identified by the <stream_token>
+with the date time taken from the SEG server date time.  Simple!
+
+You can get your stream_token from the my_keys, or by editiing your stream.
+
+SEG API Response Codes
+
+These are useful for working out what happened with your call to the SEG API.
+Note the SEGbox uses these codes for seamless control and integration.
+
+All is Ok
+
+(status ok)                        Processed by SEG without fail
+(status ok request_delayed)        SEG has the data, and it's in the queus for processing, usually because it's a large request.
+
+Failure
+
+(status fail seg_internal)         Fail in the SEG API, somepthing borked out, we may have caught it, retry the request.
+(status fail invalid_site_token)   Self explainatory, your site could not be found!  Go check
+(status fail no_data_sent)         Self explanatory, your request contained no useful data to process.
+(status fail api_timeout)          The API timed out, retry
+(status fail writing_response)     SEG could not write the response for some reason.
