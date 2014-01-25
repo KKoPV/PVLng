@@ -129,7 +129,7 @@ function setMinMax( serie, channel ) {
 
         serie.data[min.id].marker = {
             enabled: true,
-            symbol: 'triangle',
+            symbol: 'triangle-down',
             fillColor: serie.color
         };
         serie.data[min.id].dataLabels = {
@@ -154,7 +154,7 @@ function setMinMax( serie, channel ) {
 
         serie.data[max.id].marker = {
             enabled: true,
-            symbol: 'triangle-down',
+            symbol: 'triangle',
             fillColor: serie.color
         };
         serie.data[max.id].dataLabels = {
