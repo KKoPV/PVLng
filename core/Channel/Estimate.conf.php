@@ -26,11 +26,5 @@ return array(
         'type'     => 'textextra',
         'required' => TRUE
     ),
-    'latitude' => array(
-        'type'     => 'numeric'
-    ),
-    'longitude' => array(
-        'type'     => 'numeric'
-    ),
 
 );

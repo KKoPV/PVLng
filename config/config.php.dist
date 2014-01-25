@@ -58,10 +58,15 @@ return array(
 
     /**
      * Loaction for sunrise/sunset
+     *
+     * Decimals
+     *
+     * Latitude defaults to North, pass in a negative value for South
+     * Longitude defaults to East, pass in a negative value for West
      */
     'Location' => array(
-        'Latitude'  => NULL, // decimal, Defaults to north, pass in a negative value for south
-        'Longitude' => NULL  // decimal, Defaults to east, pass in a negative value for west
+        'Latitude'  => NULL,
+        'Longitude' => NULL
     ),
 
     /**

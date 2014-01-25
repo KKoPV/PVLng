@@ -76,6 +76,9 @@ class Channel extends \Controller {
             $type = new \ORM\ChannelType($type);
             $this->fields['unit']['VALUE'] = $type->unit;
 
+            $model = $type->ModelClass();
+            $model::beforeCreate($this->fields);
+
             $this->ignore_returnto = TRUE;
             $this->app->foreward('Edit');
         } else {
@@ -137,24 +140,34 @@ class Channel extends \Controller {
     public function Add_Action() {
         $this->view->SubTitle = __('CreateChannel');
 
-        $q = \DBQuery::forge('pvlng_type')->whereGT('id', 0);
-
-        $types = array();
-        foreach ($this->db->queryRows($q) as $type) {
-            $type->description = __($type->description);
-            $types[] = array_change_key_case((array) $type, CASE_UPPER);
-        }
-        $this->view->EntityTypes = $types;
-
         if ($clone = $this->app->params->get('clone')) {
-            $entity = new \ORM\Channel($clone);
-            if ($entity->id) {
-                unset($entity->id, $entity->guid);
-                $this->prepareFields($entity);
+
+            $channel = new \ORM\Channel($clone);
+
+            if ($channel->id) {
+                unset($channel->id, $channel->guid);
+                $channel->name = 'Copy of '.$channel->name;
+                $this->prepareFields($channel);
+
+                $type = new \ORM\ChannelType($channel->type);
+                $model = $type->ModelClass();
+                $model::beforeEdit($channel, $this->fields);
             }
 
             $this->app->foreward('Edit');
+
         } else {
+
+            // Get all channel types
+            $q = \DBQuery::forge('pvlng_type')->whereGT('id', 0);
+            $types = array();
+            foreach ($this->db->queryRows($q) as $type) {
+                $type->description = __($type->description);
+                $types[] = array_change_key_case((array) $type, CASE_UPPER);
+            }
+
+            $this->view->EntityTypes = $types;
+
             // Search for equipment templates
             $templates = array();
             foreach (glob(CORE_DIR . DS . 'Channel' . DS . 'Templates' . DS . '*.php') as $file) {
@@ -167,6 +180,7 @@ class Channel extends \Controller {
                     'ICON'         => $type->icon
                 );
             }
+
             $this->view->Templates = $templates;
         }
     }

@@ -52,7 +52,7 @@ return array(
         array(
             'type'        => 50, // Energy meter, absolute
             'name'        => 'E-Total',
-            'channel'     => 'Body.Data.TOTAL_ENERGY',
+            'channel'     => 'Body->Data->TOTAL_ENERGY',
             'unit'        => 'Wh',
             'decimals'    => 0,
             'meter'       => 1,
@@ -61,7 +61,7 @@ return array(
         array(
             'type'        => 51, // Power sensor
             'name'        => 'Pac',
-            'channel'     => 'Body.Data.PAC',
+            'channel'     => 'Body->Data->PAC',
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 1,
@@ -70,7 +70,7 @@ return array(
         array(
             'type'        => 51, // Power sensor
             'name'        => 'Sac (Reactive power)',
-            'channel'     => 'Body.Data.SAC',
+            'channel'     => 'Body->Data->SAC',
             'resolution'  => 1,
             'unit'        => 'VA',
             'decimals'    => 0,
@@ -80,7 +80,7 @@ return array(
         array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac',
-            'channel'     => 'Body.Data.UAC',
+            'channel'     => 'Body->Data->UAC',
             'unit'        => 'V',
             'decimals'    => 0,
             'valid_from'  => 1,
@@ -89,7 +89,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac',
-            'channel'     => 'Body.Data.IAC',
+            'channel'     => 'Body->Data->IAC',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -98,7 +98,7 @@ return array(
         array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Udc',
-            'channel'     => 'Body.Data.UDC',
+            'channel'     => 'Body->Data->UDC',
             'unit'        => 'V',
             'decimals'    => 0,
             'valid_from'  => 1,
@@ -107,7 +107,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Idc',
-            'channel'     => 'Body.Data.IDC',
+            'channel'     => 'Body->Data->IDC',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -116,23 +116,23 @@ return array(
         array(
             'type'        => 91, // Switch, non-numeric
             'name'        => 'State',
-            'channel'     => 'Body.Data.DeviceStatus.StatusCode',
+            'channel'     => 'Body->Data->DeviceStatus->StatusCode',
             'numeric'     => 0,
             'decimals'    => 0,
-            'comment'     => "The following JSON map object will translate the numeric reading value during write to textual representations (ALL IN ONE LINE)\n\n".
-                             'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"Startup","5":"Startup","6":"Startup","7":"Running","8":"Standby","9":"Boot loading","19":"Error"}',
+            'comment'     => 'The following JSON map object will translate the numeric reading value during write to textual representation (ALL IN ONE LINE).'."\n\n"
+                            .'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"Startup","5":"Startup","6":"Startup","7":"Running","8":"Standby","9":"Boot loading","19":"Error"}'
         ),
         array(
             'type'        => 91, // Switch, numeric
             'name'        => 'Error',
-            'channel'     => 'Body.Data.DeviceStatus.ErrorCode',
+            'channel'     => 'Body->Data->DeviceStatus->ErrorCode',
             'decimals'    => 0,
             'comment'     => 'Numeric error codes',
         ),
         array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Mains frequency',
-            'channel'     => 'Body.Data.FAC',
+            'channel'     => 'Body->Data->FAC',
             'unit'        => 'Hz',
             'decimals'    => 1,
             'valid_from'  => 40,

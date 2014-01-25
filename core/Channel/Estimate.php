@@ -28,9 +28,7 @@ class Estimate extends InternalCalc {
      * Read latitude / longitude from extra attribute
      */
     public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
-        list($fields['latitude']['VALUE'],
-             $fields['longitude']['VALUE'],
-             $fields['estimates']['VALUE']) = $channel->extra;
+        $fields['estimates']['VALUE'] = $channel->extra;
     }
 
     /**
@@ -38,11 +36,7 @@ class Estimate extends InternalCalc {
      * Save latitude / longitude to extra attribute
      */
     public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
-        $channel->extra = array(
-            +$fields['latitude']['VALUE'],
-            +$fields['longitude']['VALUE'],
-            $fields['estimates']['VALUE']
-        );
+        $channel->extra = $fields['estimates']['VALUE'];
     }
 
     /**
@@ -64,10 +58,8 @@ class Estimate extends InternalCalc {
         $timestamp = max(strtotime(date('Y-m-d 12:00', $this->start)), $this->start);
         $this->end = min(strtotime(date('Y-m-d 12:00', $this->end)), $this->end);
 
-        $extra = \slimMVC\ORMTable::forge('ORM\Channel', $this->entity)->getExtra();
-
         $estimates = array();
-        foreach (explode("\n", $extra[2]) as $line) {
+        foreach (explode("\n", $this->extra) as $line) {
             $line = explode(':', $line, 2);
             if (isset($line[1])) {
                 if (preg_match('~0?(\d+)-0?(\d+)~', $line[0], $parts)) {
@@ -82,13 +74,16 @@ class Estimate extends InternalCalc {
         if (isset($estimates[1])) $estimates[13] = $estimates[1];
         if (isset($estimates[12])) $estimates[0] = $estimates[12];
 
+        $lat = $this->config->get('Location.Latitude');
+        $lon = $this->config->get('Location.Longitude');
+
         while ($timestamp <= $this->end) {
             $day = date('n-j', $timestamp);
             $month = date('n', $timestamp);
 
-            if ($extra[0] != '' AND $extra[1] != '') {
+            if ($lat != '' AND $lon != '') {
                 // Set to sunset time
-                $ts = date_sunset($timestamp, SUNFUNCS_RET_TIMESTAMP, $extra[0], $extra[1], 90, date('Z')/3600);
+                $ts = date_sunset($timestamp, SUNFUNCS_RET_TIMESTAMP, $lat, $lon, 90, date('Z')/3600);
             } else {
                 // Round between 16:00 and 21:30 during the year in seconds
                 $ts = (16 + sin((date('z', $timestamp)+10) * M_PI / 366) * 5.5) *60*60;

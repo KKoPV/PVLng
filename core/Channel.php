@@ -64,6 +64,11 @@ abstract class Channel {
     }
 
     /**
+     * Run additional code before a new channel is presented to the user
+     */
+    public static function beforeCreate( Array &$fields ) {}
+
+    /**
      * Run additional code before existing data presented to user
      */
     public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {}
@@ -302,7 +307,7 @@ abstract class Channel {
                 $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
                   ->get($q->MIN('timestamp'), 'timestamp');
 
-			    switch (TRUE) {
+                switch (TRUE) {
                     case !$this->numeric:
                         // Raw data for non-numeric channels
                         $q->get('data');  break;
@@ -369,25 +374,16 @@ abstract class Channel {
                         $last = $row['max'];
                     }
 
-                    if ($this->period[1] != self::LAST) {
-                        // remove grouping value
-                        $id = $row['g'];
-                        unset($row['g']);
+                    // remove grouping value
+                    $id = $row['g'];
+                    unset($row['g']);
 
-                        // Write only if NOT only last value was requested
-                        $buffer->write($row, $id);
-                    }
+                    // Write only if NOT only last value was requested
+                    $buffer->write($row, $id);
 
                     $lastRow = $row;
                 }
             }
-
-            if ($this->period[1] == self::LAST AND $lastRow) {
-                // Write ONLY last row if only last value was requested
-                unset($lastRow['g']);
-                $buffer->write($lastRow);
-            }
-
         }
 
         if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
@@ -504,6 +500,7 @@ abstract class Channel {
         foreach ($channel->getAll() as $key=>$value) {
             $this->$key = $value;
         }
+        $this->extra = json_decode($this->extra);
 
         $this->performance = new ORM\Performance;
     }
@@ -715,7 +712,7 @@ abstract class Channel {
 
         $datafile = new Buffer;
 
-        $last = $consumption = 0;
+        $last = 0;
         $lastrow = FALSE;
 
         foreach ($buffer as $id=>$row) {
@@ -726,7 +723,6 @@ abstract class Channel {
                     $this->resolution < 0 AND $row['data'] > $last) {
                     $row['data'] = $last;
                 }
-                $consumption += $row['consumption'];
                 $last = $row['data'];
             }
 
@@ -739,8 +735,11 @@ abstract class Channel {
 
             if ($this->numeric) {
                 // Skip invalid (numeric) rows
-                if ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
-                    (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to)) {
+                // Apply valid_from and valid_to here ONLY if channel
+                // is NOT writable, this will be handled during write()
+                if ($this->write OR
+                    ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
+                     (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to))) {
 
                     $this->value = $row['data'];
                     Hook::process('data.read.after', $this);
@@ -759,6 +758,11 @@ abstract class Channel {
             }
         }
         $buffer->close();
+
+        if ($this->period[1] == self::LAST AND $lastrow) {
+            $datafile = new \Buffer;
+            $datafile->write($lastrow);
+        }
 
         return $datafile;
     }

@@ -219,6 +219,18 @@ $accessibleChannel = function(Slim\Route $route) use ($api) {
 /**
  *
  */
+$checkLocation = function() use ($api) {
+    $api->Latitude  = $api->config->get('Location.Latitude');
+    $api->Longitude = $api->config->get('Location.Longitude');
+
+    if ($api->Latitude == '' OR $api->Longitude == '') {
+        $api->stopAPI('No valid location defined in configuration', 404);
+    }
+};
+
+/**
+ *
+ */
 Slim\Route::setDefaultConditions(array(
     'guid' => '(\w{4}-){7}\w{4}',
     'id'   => '\d+',
@@ -410,7 +422,7 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
                 'YYYY-mm-dd HH:ii:ss',
                 'seconds since 1970',
                 'relative from now, see http://php.net/manual/en/datetime.formats.relative.php',
-                '"sunrise", needs location configured in config/config.php'
+                'sunrise - needs location in config/config.php'
             ),
         ),
         'end' => array(
@@ -419,7 +431,7 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
                 'YYYY-mm-dd HH:ii:ss',
                 'seconds since 1970',
                 'relative from now, see http://php.net/manual/en/datetime.formats.relative.php',
-                '"sunset", needs location configured in config/config.php'
+                'sunset - needs location in config/config.php'
             ),
         ),
         'period' => array(
@@ -863,6 +875,19 @@ $api->get('/status', function() use ($api) {
 // sunrise, sunset and daylight routes
 // ---------------------------------------------------------------------------
 
+$api->get('/sunrise/(/:date)', $checkLocation, function($date=NULL) use ($api) {
+    $date = isset($date) ? strtotime($date) : time();
+    $api->render(array(
+        'sunrise' =>
+        date_sunrise($date, SUNFUNCS_RET_TIMESTAMP, $api->Latitude, $api->Longitude, 90, date('Z')/3600)
+    ));
+})->conditions(array(
+    'date' => '\d{4}-\d{2}-\d{2}'
+))->name('sunrise intern')->help = array(
+    'since'       => 'v3',
+    'description' => 'Get sunrise of day, using configured loaction'
+);
+
 $api->get('/sunrise/:latitude/:longitude(/:date)', function($latitude, $longitude, $date=NULL) use ($api) {
     $date = isset($date) ? strtotime($date) : time();
     $api->render(array(
@@ -872,10 +897,23 @@ $api->get('/sunrise/:latitude/:longitude(/:date)', function($latitude, $longitud
 })->conditions(array(
     'latitude'  => '[\d.-]+',
     'longitude' => '[\d.-]+',
-    'date'      => '\d{4}-\d{2}-\d{2}',
+    'date'      => '\d{4}-\d{2}-\d{2}'
 ))->name('sunrise')->help = array(
     'since'       => 'v3',
-    'description' => 'Get sunrise of day',
+    'description' => 'Get sunrise for location and day'
+);
+
+$api->get('/sunset/(/:date)', $checkLocation, function($date=NULL) use ($api) {
+    $date = isset($date) ? strtotime($date) : time();
+    $api->render(array(
+        'sunrise' =>
+        date_sunset($date, SUNFUNCS_RET_TIMESTAMP, $api->Latitude, $api->Longitude, 90, date('Z')/3600)
+    ));
+})->conditions(array(
+    'date' => '\d{4}-\d{2}-\d{2}'
+))->name('sunset intern')->help = array(
+    'since'       => 'v3',
+    'description' => 'Get sunset of day, using configured loaction'
 );
 
 $api->get('/sunset/:latitude/:longitude(/:date)', function($latitude, $longitude, $date=NULL) use ($api) {
@@ -887,22 +925,34 @@ $api->get('/sunset/:latitude/:longitude(/:date)', function($latitude, $longitude
 })->conditions(array(
     'latitude'  => '[\d.-]+',
     'longitude' => '[\d.-]+',
-    'date'      => '\d{4}-\d{2}-\d{2}',
+    'date'      => '\d{4}-\d{2}-\d{2}'
 ))->name('sunset')->help = array(
     'since'       => 'v3',
-    'description' => 'Get sunset of day',
+    'description' => 'Get sunset of day'
+);
+
+$api->get('/daylight/(/:offset)', $checkLocation, function($offset=0) use ($api) {
+    $offset *= 60; // Minutes to seconds
+    $now     = time();
+    $sunrise = date_sunrise($now, SUNFUNCS_RET_TIMESTAMP, $api->Latitude, $api->Longitude, 90, date('Z')/3600);
+    $sunset  = date_sunset($now, SUNFUNCS_RET_TIMESTAMP, $api->Latitude, $api->Longitude, 90, date('Z')/3600);
+    $api->render(array(
+        'daylight' => (int) ($sunrise-$offset <= $now AND $now <= $sunset+$offset)
+    ));
+})->conditions(array(
+    'offset' => '\d+'
+))->name('daylight intern')->help = array(
+    'since'       => 'v3',
+    'description' => 'Check for daylight for configured location, accept additional minutes before/after',
 );
 
 $api->get('/daylight/:latitude/:longitude(/:offset)', function($latitude, $longitude, $offset=0) use ($api) {
-    $now = time();
-
+    $offset *= 60; // Minutes to seconds
+    $now     = time();
     $sunrise = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
     $sunset  = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
-
-    $offset *= 60; // Minutes to seconds
     $api->render(array(
         'daylight' => (int) ($sunrise-$offset <= $now AND $now <= $sunset+$offset)
-
     ));
 })->conditions(array(
     'latitude'  => '[\d.-]+',
@@ -910,7 +960,7 @@ $api->get('/daylight/:latitude/:longitude(/:offset)', function($latitude, $longi
     'offset'    => '\d+',
 ))->name('daylight')->help = array(
     'since'       => 'v3',
-    'description' => 'Find out daylight time, accept additional minutes before/after',
+    'description' => 'Check for daylight, accept additional minutes before/after',
 );
 
 /**

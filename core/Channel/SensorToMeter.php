@@ -25,6 +25,10 @@ class SensorToMeter extends Meter {
 
         $last = $consumption = $sum = 0;
 
+        if (isset($request['period']) AND $request['period'] == 'last') {
+            unset($request['period']);
+        }
+
         foreach ($this->getChild(1)->read($request) as $id=>$row) {
 
             if ($last) {

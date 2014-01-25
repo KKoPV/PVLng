@@ -28,6 +28,16 @@ class Daylight extends InternalCalc {
     const TYPE = SENSOR_CHANNEL;
 
     /**
+     * Run additional code before channel edited by user
+     * Read latitude / longitude from extra config
+     */
+    public static function beforeCreate( Array &$fields ) {
+        $config = \slimMVC\Config::getInstance();
+        $fields['latitude']['VALUE']  = $config->get('Location.Latitude');
+        $fields['longitude']['VALUE'] = $config->get('Location.Longitude');
+    }
+
+    /**
      * Run additional code before data saved to database
      * Read latitude / longitude from extra attribute
      */
@@ -67,11 +77,10 @@ class Daylight extends InternalCalc {
         parent::before_read($request);
 
         $day = $this->start;
-        $loc = \slimMVC\ORMTable::forge('ORM\Channel', $this->entity)->getExtra();
 
         do {
-            $sunrise = date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, $loc[0], $loc[1], 90, date('Z')/3600);
-            $sunset  = date_sunset($day, SUNFUNCS_RET_TIMESTAMP, $loc[0], $loc[1], 90, date('Z')/3600);
+            $sunrise = date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, $this->extra[0], $this->extra[1], 90, date('Z')/3600);
+            $sunset  = date_sunset($day, SUNFUNCS_RET_TIMESTAMP, $this->extra[0], $this->extra[1], 90, date('Z')/3600);
 
             if (!$this->numeric) {
 
