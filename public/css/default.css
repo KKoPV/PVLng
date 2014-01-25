@@ -155,6 +155,10 @@ td.imgbar {
     white-space: nowrap;
 }
 
+tt {
+    font-size: 120%;
+}
+
 .s {
     font-size: smaller;
 }

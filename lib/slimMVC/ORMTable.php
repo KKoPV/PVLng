@@ -19,6 +19,15 @@ abstract class ORMTable {
      * @param mixed $id Key describing one row, on primary keys
      *                  with more than field, provide an array
      */
+    public static function forge ( $class, $id=NULL ) {
+        return new $class($id);
+    }
+
+    /**
+     *
+     * @param mixed $id Key describing one row, on primary keys
+     *                  with more than field, provide an array
+     */
     public function __construct ( $id=NULL ) {
         $this->app = App::getInstance();
 
@@ -190,7 +199,11 @@ abstract class ORMTable {
      *
      */
     public function __get( $field ) {
-        return $this->get($field);
+        // Getter
+        $method = 'get'.ucwords($field);
+        return ($field AND method_exists($this, $method))
+             ? $this->$method()
+             : $this->get($field);
     }
 
     /**
@@ -219,7 +232,12 @@ abstract class ORMTable {
      *
      */
     public function __set( $field, $value ) {
-        $this->set($field, $value);
+        // Setter
+        $method = 'set'.ucwords($field);
+        if ($field AND method_exists($this, $method))
+            $this->$method($value);
+        else
+            $this->set($field, $value);
     }
 
     /**

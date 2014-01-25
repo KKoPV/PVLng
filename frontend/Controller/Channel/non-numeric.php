@@ -27,6 +27,10 @@ return array(
         'visible' => FALSE
     ),
 
+    'unit' => array(
+        'visible' => FALSE
+    ),
+
     'meter' => array(
         'visible' => FALSE
     ),

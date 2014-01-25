@@ -79,6 +79,8 @@
 
 <h2>{{SelectEntityTemplate}}</h2>
 
+<p>{{CreateTreeWithoutReqest}}</p>
+
 <table id="tplTable" class="dataTable">
     <thead>
     <tr>

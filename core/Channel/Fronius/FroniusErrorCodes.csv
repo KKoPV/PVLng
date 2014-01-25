@@ -1,0 +1,60 @@
+102;AC voltage too high
+103;AC voltage too low
+105;AC frequency too high
+106;AC frequency too low
+107;No AC grid detected
+108;Islanding detected
+112;The RCMU has detected a fault current in the inverter
+301;Overcurrent (AC)
+302;Overcurrent (DC)
+303;Over-temperature cooling element
+304;Interior temperature too high
+305;No power transfer to grid possible
+306;Power low, Intermediate circuit voltage has dropped below the permissible threshold value for feed in
+307;DC low, DC input voltage is too low for feed in
+308;Intermediate circuit voltage too high
+309;DC input voltage too high
+401;No internal communication with power stage set
+406;Error in temperature sensor
+407;Error in temperature sensor
+408;Direct current feed-in
+412;The fixed voltage setting has been selected instead of MPP voltage operation
+416;No communication between power stage set and control unit
+425;Communication with the power stage set is not possible
+426;The intermediate circuit charging takes too long
+427;Power stage set inoperative for too long (timeout)
+428;Timeout error during connection
+429;Timeout error when disconnecting
+431;Power stage set software being updated
+432;Internal database error during power stage set allocation
+433;No dynamic identification can be assigned to the power stage set
+436;Incorrect error information received from power stage set
+437;General troubleshooting started in power stage set
+438;Incorrect error information received from power stage set
+442;Power stage set was not detected
+443;Energy transfer not possible
+445;Compatibility error (e.g. due to a PC board replacement) or Invalid power stage set configuration
+447;Solar module ground, insulation error (connection between solar module and ground)
+450;Error in Guard Control
+451;Guard Control memory is defective
+452;Communication between Guard and the digital signal processor (DSP) has been interrupted
+453;Error in grid voltage recording of Guard Control
+454;Error in grid frequency recording of Guard Control
+456;Error in islanding check of Guard Control
+457;Grid relay defective
+458;DSP and Guard Control measure different RCMU values
+459;Measurement signal recording not possible for the insulation test
+460;Reference power source for the digital signal processor (DSP) is operating outside of tolerances
+461;Error in DSP data memory
+462;Error in DC feed-in monitoring routine
+463;AC polarity inverted (L/N)
+474;RCMU sensor is defective
+475;Error in safety relay
+476;Internal component defective
+509;No feed-in within the last 24 hours
+515;Communication with solar module string monitoring not possible
+516;Communication with memory unit not possible
+517;Power derating due to excessive temperature
+518;Internal DSP malfunction
+558;Function incompatibility (one or more PC boards in the inverter are not compatible with each other, e.g. after PC board replacement)
+560;Power derating due to over-frequency

@@ -1,94 +1,78 @@
 <?php
 
-#ini_set('display_startup_errors', 1);
-#ini_set('display_errors', 1);
-#error_reporting(-1);
+# ini_set('display_startup_errors',1); ini_set('display_errors',1); error_reporting(-1);
 
-define('CACHEDIR', realpath('../../tmp'));
+// ---------------------------------------------------------------------------
+// Cache dir, must be writeable!
+// ---------------------------------------------------------------------------
+$CACHEDIR = realpath('../../tmp');
 
-$files = array();
-$lastModified = 0;
-$force = FALSE;
+// ---------------------------------------------------------------------------
+// DON'T CHANGE FROM HERE
+// ---------------------------------------------------------------------------
 
-foreach (explode('&', $_SERVER['QUERY_STRING']) as $file) {
-  $file = trim($file, '%20/');
+$file = __DIR__ . DIRECTORY_SEPARATOR . $_SERVER['QUERY_STRING'];
 
-  if ($file == '~f') {
-    $force = TRUE;
-  } else {
-    $file = (substr($file, 0, 1) == '/')
-          ? $_SERVER['DOCUMENT_ROOT'] . $file
-          : __DIR__ . DIRECTORY_SEPARATOR . $file;
-
-    if (is_file($file)) {
-      $mtime = filemtime($file);
-      if ($mtime > $lastModified) $lastModified = $mtime;
-      $files[] = $file;
-    }
-  }
+if (file_exists($file)) {
+  $lastModified = filemtime($file);
+} else {
+  die('/* Missing: '.$_SERVER['QUERY_STRING'].' */');
 }
 
-$cacheFile = CACHEDIR . DIRECTORY_SEPARATOR
-           . substr(md5(implode($files) . $lastModified), 0, 7) . '.css';
+$cacheFile = strpos($file, '.min.')
+           ? $file // Don't recompress minimized files
+           : $CACHEDIR . DIRECTORY_SEPARATOR . $lastModified
+           . str_replace(DIRECTORY_SEPARATOR, '~',
+                         str_replace($_SERVER['DOCUMENT_ROOT'], '', $file));
 
-$cacheExists = is_file($cacheFile);
+$cacheExists = file_exists($cacheFile);
 
-$clientIsCurrent = isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-                 ? (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified)
-                 : FALSE;
-
-if ($cacheExists AND $clientIsCurrent) {
+if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) AND
+    (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified) AND
+    $cacheExists) {
   header('HTTP/1.1 304 Not Modified');
   exit;
 }
 
-if ($force OR !$cacheExists) {
-  // Create the combined css and cache it
-  $content = '';
-  $l0 = $l1 = 0;
+if (!$cacheExists) {
 
-  foreach ($files as $file) {
+  $css = file_get_contents($file);
+  $l0 = strlen($css);
 
-    $css = file_get_contents($file);
-    $l0 += strlen($css);
+  $css = preg_replace(array(
+           /* remove multiline comments */
+           '~/\*.*?\*/~s',
+           /* remove tabs, spaces, newlines, etc. */
+           '~\r|\n|\t|\s\s+~',
+           /* remove whitespace on both sides of colons : , and ; */
+           '~\s?([,:;])\s?~',
+           /* remove whitespace on both sides of curly brackets {} */
+           '~;?\s?([{}])\s?~',
+         ), array(
+           '',
+           '',
+           '$1',
+           '$1',
+         ), $css);
 
-    // fix image URLs for each file
-    if (preg_match_all('~url\([\'"]?(.*?)[\'"]?\)~i', $css, $matches, PREG_SET_ORDER)) {
-      $base = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($file));
-      foreach ($matches as $match) {
-        if (strpos($match[0], '//') === FALSE)
-          $css = str_replace($match[0], sprintf('url(%s/%s)', $base, $match[1]), $css);
-      }
-    }
-
-    $css = preg_replace(array(
-             /* remove multiline comments */
-             '~/\*.*?\*/~s',
-             /* remove tabs, spaces, newlines, etc. */
-             '~\r|\n|\t|\s\s+~',
-             /* remove whitespace on both sides of colons : , and ; */
-             '~\s?([,:;])\s?~',
-             /* remove whitespace on both sides of curly brackets {} */
-             '~;?\s?([{}])\s?~',
-           ), array(
-             '',
-             '',
-             '$1',
-             '$1',
-           ), $css);
-
-    $l1 += strlen($css);
-    $content .= '/* ' . str_replace($_SERVER['DOCUMENT_ROOT'], '', $file) . ' */' . "\n" . $css . "\n";
-  }
-
-  $content .= sprintf('/* %d > %d bytes */', $l0, $l1);
-
-  file_put_contents($cacheFile, $content);
+  file_put_contents($cacheFile,
+    '/* ' . str_replace($_SERVER['DOCUMENT_ROOT'], '', $file) . ' - ' .
+    sprintf('%d > %d', $l0, strlen($css)) . ' bytes */' . "\n" . $css
+  );
   touch($cacheFile, $lastModified);
 }
 
-header('Content-Type: text/css; charset: UTF-8');
+header('Content-Type: text/css; charset=utf-8');
 header('Content-Length: ' . filesize($cacheFile));
 header(sprintf('Last-Modified: %s GMT', gmdate('D, d M Y H:i:s', $lastModified)));
+header('Expires: ' . date('D, d M Y H:i:s', time() + (60*60*24*365)) . ' GMT');
+header('Cache-Control: max-age='.(60*60*24*365).', s-maxage='.(60*60*24*365));
+
+// GZip compress content if applicable
+if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) AND
+    strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') AND
+    extension_loaded('zlib') ) {
+    ob_start('ob_gzhandler');
+}
 
 readfile($cacheFile);

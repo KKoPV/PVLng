@@ -97,13 +97,14 @@ class Differentiator extends \Channel {
 
                 } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                    // missing row 2, skip
+                    // write $row1 only, if not yet another row was written
+                    if (count($result) == 0) $result->write($row1, $key1);
+
                     // read only row 1
                     $row1 = $buffer->next()->current();
 
                 } else /* $key1 > $key2 */ {
 
-                    // missing row 1, skip
                     // read only row 2
                     $row2 = $next->next()->current();
 

@@ -17,6 +17,24 @@ class History extends InternalCalc {
     /**
      *
      */
+    public static function checkData( Array &$fields, $add2tree ) {
+        $ok = parent::checkData($fields, $add2tree);
+
+        if ($fields['valid_from']['VALUE'] >= 0) {
+            $fields['valid_from']['ERROR'][] = __('Must be lower than 0');
+            $ok = FALSE;
+        }
+        if ($fields['valid_to']['VALUE'] < 0) {
+            $fields['valid_to']['ERROR'][] = __('Must be greater or equal 0');
+            $ok = FALSE;
+        }
+
+        return $ok;
+    }
+
+    /**
+     *
+     */
     public function read( $request ) {
 
         $this->before_read($request);

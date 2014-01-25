@@ -15,7 +15,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-    <title>{SUBTITLE} | {TITLE}</title>
+    <title>{SUBTITLE} | {strip_tags:TITLE}</title>
     <meta name="description" content="{PVLNG}" />
     <meta name="author" content="Knut Kohl" />
 

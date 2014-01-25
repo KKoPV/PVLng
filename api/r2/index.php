@@ -66,7 +66,7 @@ class API extends Slim\Slim {
     public function stopAPI( $message, $code=400 ) {
         $this->status($code);
         $this->response()->header('X-Status-Reason', $message);
-        $this->render(array( 'status'=>'error', 'message'=>$message ));
+        $this->render(array( 'status'=>$code<400?'success':'error', 'message'=>$message ));
         $this->stop();
     }
 }
@@ -220,7 +220,7 @@ $accessibleChannel = function(Slim\Route $route) use ($api) {
  *
  */
 Slim\Route::setDefaultConditions(array(
-    'guid' => '\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w-\w\w\w\w',
+    'guid' => '(\w{4}-){7}\w{4}',
     'id'   => '\d+',
 ));
 
@@ -241,30 +241,39 @@ $api->any('/help', function() use ($api) {
         $name    = $route->getName();
         $pattern = implode('|', $route->getHttpMethods()) . ' '
                  . $api->request()->getRootUri() . $route->getPattern();
-        $help = array( 'description' => $route->getName() );
-        $content[$pattern] = isset($route->help)
-                           ? array_merge($help, $route->help)
-                           : $help;
+        $content[$pattern] = $route->help;
     }
 
     $api->response->headers->set('Content-Type', 'application/json');
     $api->render($content);
-})->name('This help, overview of valid calls');
+})->name('help')->help = array(
+    'since'       => 'v1',
+    'description' => 'This help, overview of valid calls',
+);
 
 // ---------------------------------------------------------------------------
 // Attributes
 // ---------------------------------------------------------------------------
 $api->get('/:guid', $accessibleChannel, function($guid) use ($api) {
     $api->render(Channel::byGUID($guid)->getAttributes());
-})->name('Fetch channel attributes');
+})->name('channel attributes')->help = array(
+    'since'       => 'v2',
+    'description' => 'Fetch attributes',
+);
 
 $api->get('/:guid/:attribute', $accessibleChannel, function($guid, $attribute='') use ($api) {
     $api->render(Channel::byGUID($guid)->$attribute);
-})->name('Fetch single channel attribute');
+})->name('single channel attribute')->help = array(
+    'since'       => 'v2',
+    'description' => 'Fetch single channel attribute',
+);
 
 $api->get('/attributes/:guid(/:attribute)', $accessibleChannel, function($guid, $attribute='') use ($api) {
     $api->render(Channel::byGUID($guid)->getAttributes($attribute));
-})->name('Fetch all channel attributes or specific channel attribute');
+})->name('all or single channel attribute')->help = array(
+    'since'       => 'v2',
+    'description' => 'Fetch all channel attributes or specific channel attribute',
+);
 
 // ---------------------------------------------------------------------------
 // Data
@@ -281,8 +290,23 @@ $api->put('/data/:guid', $APIkeyRequired, $accessibleChannel, function($guid) us
                : NULL;
     Channel::byGUID($guid)->write($request, $timestamp) && $api->halt(201);
 })->name('put data')->help = array(
+    'since'       => 'v2',
     'description' => 'Save a reading value',
-    'payload'     => '{"<data>":"<value>"}',
+    'payload'     => '{"data":"<value>"}',
+);
+
+$api->delete('/data/:guid/:timestamp', $APIkeyRequired, $accessibleChannel, function($guid, $timestamp) use ($api) {
+    $channel = Channel::byGUID($guid);
+    $tbl = $channel->numeric ? new \ORM\ReadingNum : new \ORM\ReadingStr;
+    if ($tbl->findPrimary(array($channel->entity, $timestamp))->id) {
+        $tbl->delete();
+        $api->halt(204);
+    } else {
+        $api->stopAPI('Reading not found', 400);
+    }
+})->name('delete data')->help = array(
+    'since'       => 'v2',
+    'description' => 'Delete a reading value'
 );
 
 $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='', $p2='') use ($api) {
@@ -357,6 +381,7 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
     $api->render($result);
 
 })->name('get data')->help = array(
+    'since'       => 'v2',
     'description' => 'Read reading values',
     'parameters'  => array(
         'start' => array(
@@ -455,6 +480,7 @@ $api->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use
     }
 
 })->name('put data from file')->help = array(
+    'since'       => 'v2',
     'description' => 'Save multiple reading values',
     'payload'     => array(
         '<timestamp>;<value>'   => 'Semicolon separated timestamp and value data rows',
@@ -521,6 +547,7 @@ $api->put('/batch/:guid', $APIkeyRequired, $accessibleChannel, function($guid) u
     }
 
 })->name('put batch data')->help = array(
+    'since'       => 'v2',
     'description' => 'Save multiple reading values',
     'payload'     => array(
         '<timestamp>,<value>;...'   => 'Semicolon separated timestamp and value data sets',
@@ -573,6 +600,7 @@ $api->put('/log', $APIkeyRequired, function() use ($api) {
     $api->stop();
 
 })->name('put log')->help = array(
+    'since'       => 'v2',
     'description' => 'Store new log entry, scope defaults to \'API r2\'',
     'payload'     => '{"scope":"...", "message":"..."}',
 );
@@ -597,7 +625,10 @@ $api->get('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
 
     $api->render($result);
 
-})->name('Read a log entry');
+})->name('read log entry')->help = array(
+    'since'       => 'v2',
+    'description' => 'Read a log entry',
+);
 
 $api->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count=50) use ($api) {
 
@@ -626,7 +657,10 @@ $api->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count
 
     $api->render($result);
 
-})->name('Read all log entries, paginated for :page, :count entries');
+})->name('read log entries paginated')->help = array(
+    'since'       => 'v2',
+    'description' => 'Read all log entries, paginated for :page, :count entries',
+);
 
 $api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
 
@@ -655,6 +689,7 @@ $api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
     }
 
 })->name('post log')->help = array(
+    'since'       => 'v2',
     'description' => 'Update a log entry',
     'payload'     => '{"scope":"...", "message":"..."}',
 );
@@ -662,7 +697,10 @@ $api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
 $api->delete('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
     $log = new ORM\Log($id);
     $api->status($log->delete() ? 204 : 400);
-})->name('Delete a log entry');
+})->name('delete log entry')->help = array(
+    'since'       => 'v2',
+    'description' => 'Delete a log entry',
+);
 
 // ---------------------------------------------------------------------------
 // Status
@@ -739,7 +777,10 @@ $api->get('/status', function() use ($api) {
 
     $api->render($result);
 
-})->name('System status');
+})->name('system status')->help = array(
+    'since'       => 'v2',
+    'description' => 'System status',
+);
 
 /**
  *

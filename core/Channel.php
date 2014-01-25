@@ -15,6 +15,7 @@ abstract class Channel {
      * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
      * SENSOR_CHANNEL    - numeric
      * METER_CHANNEL     - numeric
+     * GROUP_CHANNEL     - generic group
      */
     const TYPE = UNDEFINED_CHANNEL;
 
@@ -61,6 +62,57 @@ abstract class Channel {
 
         throw new Exception('No channel found for GUID: '.$guid, 400);
     }
+
+    /**
+     * Run additional code before a new channel is presented to the user
+     */
+    public static function beforeCreate( Array &$fields ) {}
+
+    /**
+     * Run additional code before existing data presented to user
+     */
+    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {}
+
+    /**
+     *
+     * @param $add2tree integer|null
+     */
+    public static function checkData( Array &$fields, $add2tree ) {
+        $ok = TRUE;
+
+        foreach ($fields as $name=>&$data) {
+            if ($data['VISIBLE']) {
+                /* check required fields */
+                if ($data['REQUIRED'] AND $data['VALUE'] == '') {
+                    $data['ERROR'][] = __('channel::ParamIsRequired');
+                    $ok = FALSE;
+                }
+                /* check numeric fields */
+                if ($data['VALUE'] != '') {
+                    if ($data['TYPE'] == 'numeric' AND !is_numeric($data['VALUE'])) {
+                        $data['ERROR'][] = __('channel::ParamMustNumeric');
+                        $ok = FALSE;
+                    } elseif ($data['TYPE'] == 'integer' AND (string) floor($data['VALUE']) != $data['VALUE']) {
+                        $data['ERROR'][] = __('channel::ParamMustInteger');
+                        $ok = FALSE;
+                    }
+                }
+            }
+        }
+
+        return $ok;
+    }
+
+    /**
+     * Run additional code before data saved to database
+     */
+    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {}
+
+    /**
+     * Run additional code after channel was created / changed
+     * If $tree is set, channel was just created
+     */
+    public static function afterSave( \ORM\Channel $channel, $tree=NULL ) {}
 
     /**
      *
@@ -255,7 +307,7 @@ abstract class Channel {
                 $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
                   ->get($q->MIN('timestamp'), 'timestamp');
 
-			    switch (TRUE) {
+                switch (TRUE) {
                     case !$this->numeric:
                         // Raw data for non-numeric channels
                         $q->get('data');  break;
@@ -322,25 +374,16 @@ abstract class Channel {
                         $last = $row['max'];
                     }
 
-                    if ($this->period[1] != self::LAST) {
-                        // remove grouping value
-                        $id = $row['g'];
-                        unset($row['g']);
+                    // remove grouping value
+                    $id = $row['g'];
+                    unset($row['g']);
 
-                        // Write only if NOT only last value was requested
-                        $buffer->write($row, $id);
-                    }
+                    // Write only if NOT only last value was requested
+                    $buffer->write($row, $id);
 
                     $lastRow = $row;
                 }
             }
-
-            if ($this->period[1] == self::LAST AND $lastRow) {
-                // Write ONLY last row if only last value was requested
-                unset($lastRow['g']);
-                $buffer->write($lastRow);
-            }
-
         }
 
         if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
@@ -452,10 +495,12 @@ abstract class Channel {
     protected function __construct( ORM\Tree $channel ) {
         $this->time = microtime(TRUE);
         $this->db = slimMVC\MySQLi::getInstance();
+        $this->config = slimMVC\Config::getInstance();
 
         foreach ($channel->getAll() as $key=>$value) {
             $this->$key = $value;
         }
+        $this->extra = json_decode($this->extra);
 
         $this->performance = new ORM\Performance;
     }
@@ -531,6 +576,12 @@ abstract class Channel {
             throw new Exception('Missing data value', 400);
         }
 
+        // Check if a WRITEMAP::{...} exists to rewrite e.g. from numeric to non-numeric
+        if (preg_match('~^WRITEMAP::(.*?)$~m', $this->comment, $args) AND
+            $map = json_decode($args[1], TRUE)) {
+            $request['data'] = ($_=&$map[$request['data']]) ?: 'unknown ('.$request['data'].')';
+        }
+
         $this->value = $request['data'];
 
         Hook::process('data.save.before', $this);
@@ -548,7 +599,6 @@ abstract class Channel {
 
                 if ($this->meter AND $this->value + $this->offset < $lastReading AND $this->adjust) {
                     // Auto-adjust channel offset
-
                     ORM\Log::save(
                         $this->name,
                         sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
@@ -567,6 +617,11 @@ abstract class Channel {
             // MUST also work for sensor channels
             // Apply offset
             $this->value += $this->offset;
+
+            if ($this->meter AND $this->value == $lastReading) {
+                // Ignore for meters values which are equal last reading
+                throw new Exception(NULL, 200);
+            }
         }
     }
 
@@ -574,13 +629,16 @@ abstract class Channel {
      *
      */
     protected function before_read( $request ) {
+        // Readable channel?
         if (!$this->read)
             throw new \Exception('Can\'t read data from '.$this->name.', '
                                 .'instance of '.get_class($this), 400);
 
+        // Required number of child channels?
         if ($this->childs >= 0 AND count($this->getChilds()) != $this->childs)
             throw new \Exception($this->name.' must have '.$this->childs.' child(s)', 400);
 
+        // Prepare analysis of request
         $request = array_merge(
             array(
                 'start'  => '00:00',
@@ -590,20 +648,40 @@ abstract class Channel {
             $request
         );
 
-        $this->start = is_numeric($request['start'])
-                     ? $request['start']
-                     : strtotime($request['start']);
+        $latitude  = $this->config->get('Location.Latitude');
+        $longitude = $this->config->get('Location.Longitude');
+
+        // Start timestamp
+        if ($request['start'] == 'sunrise') {
+            if ($latitude == '' OR $longitude == '') {
+                throw new \Exception('Invalid start timestamp: "sunrise", missing Location in config/config.php', 400);
+            }
+            $this->start = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
+        } else {
+            $this->start = is_numeric($request['start'])
+                         ? $request['start']
+                         : strtotime($request['start']);
+        }
 
         if ($this->start === FALSE)
-            throw new \Exception('No valid start timestamp: '.$this->start, 400);
+            throw new \Exception('Invalid start timestamp: '.$request['start'], 400);
 
-        $this->end = is_numeric($request['end'])
-                   ? $request['end']
-                   : strtotime($request['end']);
+        // End timestamp
+        if ($request['end'] == 'sunset') {
+            if ($latitude == '' OR $longitude == '') {
+                throw new \Exception('Invalid start timestamp: "sunrise", missing Location in config/config.php', 400);
+            }
+            $this->end = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
+        } else {
+            $this->end = is_numeric($request['end'])
+                       ? $request['end']
+                       : strtotime($request['end']);
+        }
 
         if ($this->end === FALSE)
-            throw new \Exception('No valid end timestamp: '.$this->end, 400);
+            throw new \Exception('Invalid end timestamp: '.$request['end'], 400);
 
+        // Consolidation period
         if ($request['period'] != '') {
             // normalize aggr. periods
             if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
@@ -634,7 +712,7 @@ abstract class Channel {
 
         $datafile = new Buffer;
 
-        $last = $consumption = 0;
+        $last = 0;
         $lastrow = FALSE;
 
         foreach ($buffer as $id=>$row) {
@@ -645,7 +723,6 @@ abstract class Channel {
                     $this->resolution < 0 AND $row['data'] > $last) {
                     $row['data'] = $last;
                 }
-                $consumption += $row['consumption'];
                 $last = $row['data'];
             }
 
@@ -658,8 +735,11 @@ abstract class Channel {
 
             if ($this->numeric) {
                 // Skip invalid (numeric) rows
-                if ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
-                    (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to)) {
+                // Apply valid_from and valid_to here ONLY if channel
+                // is NOT writable, this will be handled during write()
+                if ($this->write OR
+                    ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
+                     (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to))) {
 
                     $this->value = $row['data'];
                     Hook::process('data.read.after', $this);
@@ -679,15 +759,22 @@ abstract class Channel {
         }
         $buffer->close();
 
-//         if ($lastrow AND $this->period[1] == self::LAST) {
-//             // recreate temp. file with last row only
-//             $datafile->close();
-//             $datafile = new Buffer;
-//             $datafile->write($lastrow);
-//         }
-//
+        if ($this->period[1] == self::LAST AND $lastrow) {
+            $datafile = new \Buffer;
+            $datafile->write($lastrow);
+        }
+
         return $datafile;
     }
+
+    // -------------------------------------------------------------------------
+    // PROTECTED
+    // -------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected $config;
 
     // -------------------------------------------------------------------------
     // PRIVATE
@@ -707,3 +794,4 @@ define('UNDEFINED_CHANNEL', 0);
 define('NUMERIC_CHANNEL',   1);
 define('SENSOR_CHANNEL',    2);
 define('METER_CHANNEL',     3);
+define('GROUP_CHANNEL',     4);

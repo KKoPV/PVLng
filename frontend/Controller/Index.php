@@ -30,17 +30,25 @@ class Index extends \Controller {
     public function after() {
         $this->view->PeriodCount = isset($this->Channels->c) ? $this->Channels->c : 1;
 
-        $this->view->PeriodSelect =
-            \BabelKitMySQLi::getInstance()->select(
-                'period',
-                LANGUAGE,
-                array(
-                    'var_name'     => 'v[p]',
-                    'blank_prompt' => \I18N::_('None'),
-                    'value'        => isset($this->Channels->p) ? $this->Channels->p : '',
-                    'options'      => 'id="period"'
-                )
-            );
+        $bk = \BabelKitMySQLi::getInstance();
+
+        $this->view->PresetSelect = $bk->select(
+            'preset',
+            LANGUAGE,
+            array(
+                'var_name' => 'v[p]',
+                'value'    => ($_=&$this->Channels->p) ?: '-',
+                'options'  => 'id="preset"'
+            )
+        );
+
+        $this->view->PeriodSelect = $bk->select(
+            'period',
+            LANGUAGE,
+            array(
+                'options' => 'id="period"'
+            )
+        );
 
         parent::after();
     }

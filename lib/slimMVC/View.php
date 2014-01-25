@@ -278,19 +278,28 @@ class View extends \Slim\View {
             if (preg_match_all('~<!-- BEGIN (\w[\w\d_]*) -->~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $match) {
                     $id = rand(100, 999);
-                    $html = str_replace($match[0], '<?php '
-                          . 'if ($_'.$id.' = $this->__get(\''.$match[1].'\')): '
-                          . 'array_push($this->dataStack, $this->dataPointer); '
-                          . 'foreach ($_'.$id.' as &$this->dataPointer):'
-                          . ' ?'.'>', $html);
+                    $html = str_replace(
+                        $match[0],
+                        '<?php if ($_'.$id.' = $this->__get(\''.$match[1].'\')): '
+                       .'array_push($this->dataStack, $this->dataPointer); '
+                       .'foreach ($_'.$id.' as $__key=>&$this->dataPointer): '
+                       .'if (!is_array($this->dataPointer)) {'
+                       .'  $this->dataPointer = array("\x00"=>$this->dataPointer, \'KEY\'=>$__key, \''.$match[1].'\'=>$this->dataPointer); '
+                       .'} ?'.'>',
+                        $html
+                    );
                 }
             }
 
-            $html = preg_replace('~<!-- END .*?-->~',
-                                 '<?php endforeach; '
-                                .'$this->dataPointer = array_pop($this->dataStack); '
-                                .'endif; ?'.'>',
-                                 $html);
+            $html = preg_replace(
+                '~<!-- END .*?-->~',
+                '<?php '
+               .'if (array_key_exists("\x00", $this->dataPointer)) $this->dataPointer = $this->dataPointer["\x00"]; '
+               .'endforeach; '
+               .'$this->dataPointer = array_pop($this->dataStack); '
+               .'endif; ?'.'>',
+                $html
+            );
 
             // Variables
             $html = preg_replace('~'.$this->RegexVar.'~e',

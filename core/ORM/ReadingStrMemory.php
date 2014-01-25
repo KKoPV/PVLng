@@ -29,7 +29,7 @@ class ReadingStrMemory extends \slimMVC\ORMTable {
         $this->app->db->query('
             CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
                 `id` int(10) unsigned NOT NULL,
-                `timestamp` int(10) unsigned NOT NULL,
+                `timestamp` int(11) NOT NULL,
                 `data` varchar(50) NOT NULL,
                 PRIMARY KEY (`id`,`timestamp`)
             ) ENGINE=MEMORY
@@ -41,7 +41,7 @@ class ReadingStrMemory extends \slimMVC\ORMTable {
      *
      */
     public function deleteById( $id ) {
-        $this->app->db->query('DELETE FROM `pvlng_reading_num_tmp` WHERE `id` = {1}', $id);
+        $this->app->db->query('DELETE FROM `pvlng_reading_str_tmp` WHERE `id` = {1}', $id);
         return $this->app->db->affected_rows;
     }
 

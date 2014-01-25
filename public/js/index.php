@@ -1,76 +1,98 @@
 <?php
 
-#ini_set('display_startup_errors', 1);
-#ini_set('display_errors', 1);
-#error_reporting(-1);
+#ini_set('display_startup_errors',1); ini_set('display_errors',1); error_reporting(-1);
 
-define('CACHEDIR', realpath('../../tmp'));
+#$ACTIVE = TRUE;
+$ACTIVE = 0;
 
-// 0, 10, 62, 95 or 'None', 'Numeric', 'Normal', 'High ASCII'
-define('JSENCODING', 62);
+// ---------------------------------------------------------------------------
+// Cache dir, must be writeable!
+// ---------------------------------------------------------------------------
+$CACHEDIR = realpath('../../tmp');
 
-$files = array();
+// 0, 10, 62, 95  for  None, Numeric, Normal, High ASCII
+$JSENCODING = 62;
+
+// ---------------------------------------------------------------------------
+// DON'T CHANGE FROM HERE
+// ---------------------------------------------------------------------------
+
+header('Content-Type: application/javascript; charset: UTF-8');
+
+// Double decode, Nginx delivers %43 and Litespeed/Apache +
+$files = explode(' ', urldecode(urldecode($_SERVER['QUERY_STRING'])));
 $lastModified = 0;
-$force = FALSE;
 
-foreach (explode('&', $_SERVER['QUERY_STRING']) as $file) {
-  $file = trim($file, '%20');
-
-  if ($file == '~f') { $force = TRUE; continue; }
-
-  $file = (substr($file, 0, 1) == '/')
-        ? $_SERVER['DOCUMENT_ROOT'] . $file
-        : __DIR__ . DIRECTORY_SEPARATOR . $file;
-
-  if (!is_file($file)) continue;
-
-  $mtime = filemtime($file);
-  if ($mtime > $lastModified) $lastModified = $mtime;
-  $files[] = $file;
+foreach ($files as $id=>$file) {
+  $file = __DIR__ . DIRECTORY_SEPARATOR . $file;
+  if ($ACTIVE) {
+    $lastModified = max($lastModified, filemtime($file));
+    $files[$id] = $file;
+  } else {
+    readfile($file);
+  }
 }
 
-$cacheFile = CACHEDIR . DIRECTORY_SEPARATOR
-           . substr(md5(implode($files) . $lastModified . JSENCODING), 0, 7) . '.js';
+if (!$ACTIVE) exit;
 
-$cacheExists = is_file($cacheFile);
+$cacheFile = $CACHEDIR . DIRECTORY_SEPARATOR . str_replace('+', '~', $_SERVER['QUERY_STRING']);
 
-$clientIsCurrent = isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
-                 ? (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified)
-                 : FALSE;
-
-if ($cacheExists AND $clientIsCurrent) {
+if (is_file($cacheFile) AND isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) AND
+    (strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $lastModified)) {
   header('HTTP/1.1 304 Not Modified');
   exit;
 }
 
-if (JSENCODING) {
-  require_once 'class.JavaScriptPacker.php';
-}
+if (!is_file($cacheFile) OR filemtime($cacheFile) < $lastModified) {
 
-if ($force OR !$cacheExists) {
+  // Recompile
 
-  // Create the combined js and cache it
-  $content = '';
+  if ($JSENCODING) {
+    require 'class.JavaScriptPacker.php';
+  }
+
+  $fh = fopen($cacheFile, 'w');
 
   foreach ($files as $file) {
 
-    $js = file_get_contents($file);
+    if (strpos($file, '.min.') !== FALSE) {
+      fwrite($fh, file_get_contents($file));
+    } else {
 
-    if (JSENCODING) {
-      $packer = new JavaScriptPacker($js, JSENCODING);
-      $js = $packer->pack();
+      $js = file_get_contents($file);
+      $l0 = strlen($js);
+
+      if ($JSENCODING) {
+        $packer = new JavaScriptPacker($js, $JSENCODING);
+        $js = $packer->pack();
+      }
+
+      $file = str_replace(__DIR__ . DIRECTORY_SEPARATOR, '', $file);
+
+      $l1 = strlen($js);
+      fwrite($fh, sprintf('/* %s - %d > %d bytes (%.1f%%) */', $file, $l0, $l1, $l1/$l0*100) . "\n" . trim($js) . "\n");
+
     }
 
-    $content .= '/* ' . str_replace($_SERVER['DOCUMENT_ROOT'], '', $file) . ' */' . "\n" . $js;
+  }
 
-  } 
+  fclose($fh);
 
-  file_put_contents($cacheFile, $content);
   touch($cacheFile, $lastModified);
+
 }
 
-header('Content-Type: application/javascript; charset: UTF-8');
+header('Content-Type: application/javascript; charset=utf-8');
 header('Content-Length: ' . filesize($cacheFile));
 header(sprintf('Last-Modified: %s GMT', gmdate('D, d M Y H:i:s', $lastModified)));
+header('Expires: ' . date('D, d M Y H:i:s', time() + 60*60*24*365) . ' GMT');
+header('Cache-Control: max-age='.(60*60*24*365).', s-maxage='.(60*60*24*365));
+
+// GZip compress content if applicable
+if (isset($_SERVER['HTTP_ACCEPT_ENCODING']) AND
+    strstr($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') AND
+    extension_loaded('zlib') ) {
+  ob_start('ob_gzhandler');
+}
 
 readfile($cacheFile);

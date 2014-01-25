@@ -73,6 +73,7 @@ class Accumulator extends \Channel {
 
             $row1 = $buffer->rewind()->current();
             $row2 = $next->rewind()->current();
+            $first1 = $first2 = TRUE;
 
             $result = new \Buffer;
 
@@ -90,20 +91,30 @@ class Accumulator extends \Channel {
                     $row1['consumption'] += $row2['consumption'];
 
                     $result->write($row1, $key1);
+                    $last = $row1['data'];
 
                     // read both next rows
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
+                    $first1 = $first2 = FALSE;
 
                 } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
+                    // write $row1 only, if data set 2 is not yet started
+                    if ($first2) $result->write($row1, $key1);
+
                     // read only row 1
                     $row1 = $buffer->next()->current();
+                    $first1 = FALSE;
 
                 } else /* $key1 > $key2 */ {
 
+                    // write $row2 only, if data set 1 is not yet started
+                    if ($first1) $result->write($row2, $key2);
+
                     // read only row 2
                     $row2 = $next->next()->current();
+                    $first2 = FALSE;
 
                 }
             }

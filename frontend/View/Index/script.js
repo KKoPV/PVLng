@@ -33,10 +33,14 @@ var RefreshTimeout = 300;
 <script src="/js/palettes.js"></script>
 -->
 
-<!-- load Highcharts scripts direct from highcharts.com -->
+<!-- load Highcharts scripts direct from highcharts.com -- >
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
+-->
+<script src="/js/highcharts.js"></script>
+<script src="/js/highcharts-more.js"></script>
+<script src="/js/highcharts-exporting.js"></script>
 
 <script>
 
@@ -50,6 +54,9 @@ var
             paddingRight: 15,
             alignTicks: false,
             zoomType: 'x',
+            resetZoomButton: {
+                position: { x: 0, y: -50 }
+            },
             events: {
                 selection: function(event) {
                     setTimeout(setExtremes, 100);
@@ -58,6 +65,36 @@ var
         },
         title: { text: '' },
         plotOptions: {
+            series: {
+                point: {
+                    events: {
+                        click: function() {
+                            console.log(this);
+                            if (confirm('Do you really want delete this reading value?\n\n '+
+                                (new Date(this.x).toLocaleString().replace(' 00:00', ''))+' : '+this.y)) {
+
+                                var point = this,
+                                    url = PVLngAPI + 'data/' +
+                                          point.reading.guid + '/' +
+                                          point.reading.timestamp + '.json';
+                                _log(url);
+
+                                $.ajax({
+                                    dataType: 'json',
+                                    url: url,
+                                    type: 'DELETE',
+                                    success: function(data) {
+                                        point.remove();
+                                    },
+                                    error: function(data) {
+                                        alert(data.responseJSON.message);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            },
             line: {
                 marker: { enabled: false }
             },
@@ -102,14 +139,19 @@ var
                     }
                     body += '<tr style="color:' + color + '"';
                     if (id & 1) body += ' class="even"'; /* id starts by 0 */
-                    body += '>' +
-                            '<td class="name">' + point.series.name + '</td>' +
-                            '<td class="value">' + value + '</td>' +
-                            '<td class="unit"> ' + point.series.tooltipOptions.valueSuffix + '</td>' +
-                            '</tr>';
+                    body += '><td class="name">' + point.series.name + '</td>';
+                    if (point.series.tooltipOptions.valueSuffix) {
+                        /* Show value and unit only for channels which have a unit */
+                        body += '<td class="value">' + value + '</td>' +
+                                '<td class="unit">' + point.series.tooltipOptions.valueSuffix;
+                    } else {
+                        body += '<td colspan="2">';
+                    }
+                    body += '</td></tr>';
                 });
                 return '<table id="chart-tooltip"><thead><tr><th colspan="3">' +
-                       Highcharts.dateFormat('%a. %Y-%m-%d %H:%M',this.x).replace(' 00:00', '') +
+                       Highcharts.dateFormat('%a. ',this.x) +
+                       (new Date(this.x).toLocaleString()).replace(' 00:00:00', '').replace(':00', '') +
                        '</th></tr></thead><tbody>' + body + '</tbody></table>';
             },
             borderWidth: 0,
@@ -228,6 +270,7 @@ function ChartDialog( id, name ) {
     $('input[name="d-width"][value="' + p.width + '"]').prop('checked', true);
     $('#d-min').prop('checked', p.min);
     $('#d-max').prop('checked', p.max);
+    $('#d-last').prop('checked', p.last);
     $('#d-style').val(p.style);
     $('#d-color').val(p.color);
     $('#d-color').spectrum('set', p.color);
@@ -239,7 +282,7 @@ function ChartDialog( id, name ) {
     $('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'));
 
     $('input').iCheck('update');
-    $('#d-table tbody tr.line-style').toggle((p.type != 'bar' && p.type != 'scatter'));
+    $('#d-type').trigger('change');
 
     /* set the id into the dialog for onClose to write data back */
     $('#dialog-chart').data('id',id).dialog('option','title',name).dialog('open');
@@ -461,7 +504,7 @@ function updateChart( forceUpdate ) {
                 }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
-                if (attr.unit) serie.tooltip = { valueSuffix: attr.unit };
+                serie.tooltip = { valueSuffix: attr.unit ? attr.unit : '' };
 
                 if (channel.type == 'scatter') {
                     serie.dataLabels = {
@@ -473,12 +516,12 @@ function updateChart( forceUpdate ) {
                                  : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
                         }
                     };
-                    if (!attr.unit) {
+                    if (attr.unit.trim() == '') {
                         /* mostly non-numeric channels */
                         serie.dataLabels.align = 'left';
                         serie.dataLabels.rotation = 270;
                         serie.dataLabels.x = 3;
-                        serie.dataLabels.y = -7;
+                        serie.dataLabels.y = -8;
                     }
                 } else if (channel.type != 'bar') {
                     serie.dashStyle = channel.style;
@@ -487,19 +530,21 @@ function updateChart( forceUpdate ) {
 
                 $(data).each(function(id, row) {
                     var ts = Math.round(row.timestamp / res) * res * 1000;
+                    var reading = { guid: attr.guid, timestamp: row.timestamp };
                     if ($.isNumeric(row.data)) {
                         if (channel.type == 'areasplinerange') {
-                            serie.data.push([ts, row.min, row.max]);
+                            serie.data.push({ x: ts, low: row.min, high: row.max, reading: reading });
                         } else if (channel.consumption) {
-                            serie.data.push([ts, row.consumption]);
+                            serie.data.push({ x: ts, y: row.consumption, reading: reading });
                         } else {
-                            serie.data.push([ts, row.data]);
+                            serie.data.push({ x: ts, y: row.data, reading: reading });
                         }
                     } else {
                         serie.data.push({
-                            x: row.timestamp*1000,
+                            x: ts,
                             y: 0,
-                            name: row.data
+                            name: row.data,
+                            reading: reading
                         });
                     }
                 });
@@ -608,6 +653,38 @@ function resizeChart() {
 /**
  *
  */
+function changePreset() {
+
+    var preset = $('#preset').val().match(/(\d+)(\w+)/);
+    var from = new Date($("#from").datepicker('getDate'));
+
+    if (!preset) {
+        $('#periodcnt').val(1);
+        $('#period').val('');
+        return;
+    }
+
+    switch (preset[2]) {
+        case 'd': // day - set start to 1st day of month
+            from.setDate(1);
+            break;
+        case 'w': // week - set start to 1st day of month
+            from.setDate(1);
+            break;
+        case 'm': // month - set start to 1st day of year
+            from.setDate(1);
+            from.setMonth(0);
+            break;
+    }
+
+    $("#from").datepicker('setDate', from);
+    $('#periodcnt').val(preset[1]);
+    $('#period').val(preset[2]);
+}
+
+/**
+ *
+ */
 $(function() {
 
     $(window).resize(function() {
@@ -629,6 +706,7 @@ $(function() {
                 p.width = +$('input[name="d-width"]:checked').val();
                 p.min = $('#d-min').is(':checked');
                 p.max = $('#d-max').is(':checked');
+                p.last = $('#d-last').is(':checked');
                 p.color = $('#d-color').spectrum('get').toHexString();
                 p.coloruseneg = $('#d-color-use-neg').is(':checked');
                 p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
@@ -748,16 +826,29 @@ $(function() {
                         el.data('indent', el.css('padding-left'));
                     });
                     if ($('#loaddeleteview').val()) {
-                        updateChart();
                         ToggleTree(false);
                     }
                 }
             });
+            if ($('#loaddeleteview').val()) {
+                changePreset();
+                updateChart();
+            }
         }
     });
 
+    $('#preset').change(function() {
+        changePreset();
+        updateChart();
+    });
+
     $('#d-type').change(function() {
-        $('#d-table tbody tr.line-style').toggle((this.value != 'bar' && this.value != 'scatter'));
+        $('.not-bar, .not-scatter').show();
+        if (this.value == 'bar') {
+            $('.not-bar').hide();
+        } else if (this.value == 'scatter') {
+            $('.not-scatter').hide();
+        }
     });
 
     $('input').iCheck('update');

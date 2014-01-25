@@ -1,6 +1,7 @@
 apc.php
 memcache.php
 config.php
+*.conf
 run/*
 tmp/*
 custom/

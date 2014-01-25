@@ -39,16 +39,19 @@ shift $((OPTIND-1))
 
 read_config "$1"
 
-test $SERVER || SERVER="localhost:4304"
-
-GUID_N=$(int "$GUID_N")
-test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
-
 ##############################################################################
 ### Start
 ##############################################################################
 test "$TRACE" && set -x
 
+test "$SERVER" || SERVER="localhost:4304"
+
+GUID_N=$(int "$GUID_N")
+test $GUID_N -gt 0 || error_exit "No sections defined (GUID_N)"
+
+##############################################################################
+### Go
+##############################################################################
 test $(bool "$CACHED") -eq 0 && CACHED='/uncached' || CACHED=
 test -z "$CACHED" && log 1 "Use cached channel values"
 
@@ -64,8 +67,8 @@ while test $i -lt $GUID_N; do
     eval GUID=\$GUID_$i
     test "$GUID" || error_exit "Sensor GUID is required (GUID_$i)"
 
-    SERIAL=$(PVLngGET2 $GUID/serial.txt)
-    CHANNEL=$(PVLngGET2 $GUID/channel.txt)
+    SERIAL=$(PVLngGET $GUID/serial.txt)
+    CHANNEL=$(PVLngGET $GUID/channel.txt)
 
 #     SERIAL=$(PVLngNC "$GUID,serial")
 #     CHANNEL=$(PVLngNC "$GUID,channel")
@@ -77,7 +80,7 @@ while test $i -lt $GUID_N; do
     log 1 "Value        = $value"
 
     ### Save data
-    test "$TEST" || PVLngPUT2 $GUID $value
+    test "$TEST" || PVLngPUT $GUID $value
 
 done
 

@@ -39,11 +39,17 @@
             <button id="btn-reset" style="margin-left:1em">{{Today}}</button>
         </td>
         <td style="width:99%;text-align:right">
-            <label for="periodcnt" style="margin-right:1em" >{{Aggregation}}:</label>
-            <input class="numbersOnly r" style="margin-right:.5em" type="text"
-                   id="periodcnt" name="periodcnt" value="1" size="2" />
-            {PERIODSELECT} &nbsp;
-            <button id="btn-refresh" class="tip" title="{{ChartRefreshHint}}">{{Refresh}}</button>
+            <img src="/images/ico/arrow-switch.png" onclick="$('.p-select').toggle();"
+                 class="tip" tip="{{UseOwnConsolidation}}" />
+            <span class="p-select">{PRESETSELECT}</span>
+            <span class="p-select" style="display:none">
+                <input class="numbersOnly r" style="margin-right:.5em" type="text"
+                       id="periodcnt" name="periodcnt" value="1" size="2" />
+                {PERIODSELECT}
+            </span>
+            <span style="margin-left:.5em">
+                <button id="btn-refresh" class="tip" title="{{ChartRefreshHint}}">{{Refresh}}</button>
+            </span>
         </td>
     </tr>
     </table>

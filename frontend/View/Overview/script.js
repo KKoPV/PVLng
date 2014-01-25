@@ -206,6 +206,8 @@ $(function() {
         }
     });
 
+    shortcut.add('Alt+N', function() { window.location = '/channel/add'; });
+
 });
 
 </script>

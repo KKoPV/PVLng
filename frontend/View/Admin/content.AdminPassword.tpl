@@ -9,28 +9,15 @@
  */
 -->
 
-<div class="grid_10" style="margin-top:4em;margin-bottom:4em">
+<div class="grid_10">
 
-<!-- IF {ADMINPASS} -->
-
-<p>
-    Please update your
-    <tt style="font-size:120%"><strong>config/config.php</strong></tt>
-    with
-</p>
-
-<pre id="code" style="padding:1em 0.5em; border:dashed 1px #AAA; background-color:#EEE">
-    'Admin' => array(
-        'User'     => '{ADMINUSER}',
-        'Password' => '{ADMINPASS}'
-    ),
-</pre>
-
-<!-- ELSE -->
+<!-- IF ! {ADMINPASS} -->
 
 <div class="push_3 grid_4">
 
-    <form method="post">
+<h2>Admin user</h2>
+
+<form method="post">
 
     <table id="adminpass">
     <thead>
@@ -58,7 +45,66 @@
     <p><input type="submit" value="Send" /></p>
     &nbsp;
 
-    </form>
+</form>
+
+</div>
+
+<!-- ELSE -->
+
+<div class="push_2 grid_6">
+
+<h2>Admin user</h2>
+
+<p>
+    Please update your
+    <tt style="font-size:120%"><strong>config/config.php</strong></tt>
+    with
+</p>
+
+<textarea class="pre" readonly="readonly">
+    'Admin' => array(
+        'User'     => '{ADMINUSER}',
+        'Password' => '{ADMINPASS}'
+    ),</textarea>
+
+<h2>Location</h2>
+
+<p>
+    For use of all daylight related functions (sunrise, sunset etc.), you need to configure your location.
+</p>
+
+<p>
+    Just type in your street and city and let Google Maps API find your coordinates :-)
+</p>
+
+<p>
+    <input id="text" type="text" size="50" placeholder="Street, City, Country" />
+    <button id="geoloc" style="margin-left:.5em" class="tipbtn" title="Serach by Google Maps API">Search</button>
+</p>
+
+<div id="locresult" style="display:none">
+
+<p>
+    Please update your
+    <tt style="font-size:120%"><strong>config/config.php</strong></tt>
+    with
+</p>
+
+<textarea id="location" class="pre" readonly="readonly"></textarea>
+
+<!-- MUST be pre to avoid compression -->
+<pre id="pre" style="display:none">
+    'Location' => array(
+        'Latitude'  => $lat,
+        'Longitude' => $lon
+    ),</pre>
+
+<br /><br />
+
+<iframe id="map" class="map" width="100%" height="350" frameborder="0"
+        scrolling="no" marginheight="0" marginwidth="0"></iframe>
+
+</div>
 
 </div>
 

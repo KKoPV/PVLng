@@ -24,7 +24,7 @@
                 <img id="treetoggle" src="/images/ico/toggle<!-- IF {VIEW} -->_expand<!-- ENDIF -->.png"
                      style="width:16px;height:16px" width="16" height="16"
                      class="tip" onclick="ToggleTree()" alt="[+]" tip="#tiptoggle" />
-                <div id="tiptoggle">{{CollapseAll}} (F4)></div>
+                <div id="tiptoggle">{{CollapseAll}} (F4)</div>
             </th>
             <th class="l">
                 <span class="indenter" style="padding-left: 0px;"></span>
@@ -135,11 +135,11 @@
         <input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
     </td>
     <td class="r" style="white-space:nowrap">
-        <a id="btn-permanent" class="tip" title="{{DragPermanent}}" data-text="{VIEW} & | {TITLE}" data-url="/chart/{SLUG}">
-            {VIEW} | {TITLE}
+        <a id="btn-permanent" class="tip" title="{{DragPermanent}}" data-text="{VIEW} & | {strip_tags:TITLE}" data-url="/chart/{SLUG}">
+            {VIEW} | {strip_tags:TITLE}
         </a>
         <a href="/chart/{SLUG}" id="btn-bookmark" class="tip" style="margin-left:.5em" title="{{DragBookmark}}">
-            {VIEW} | {TITLE}
+            {VIEW} | {strip_tags:TITLE}
         </a>
     </td>
     </tr></table>
