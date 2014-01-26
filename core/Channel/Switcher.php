@@ -22,13 +22,14 @@ class Switcher extends \Channel {
         $this->before_write($request);
 
         // Get last value and ...
-        $last = $this->getLastReading();
+        $last = \ORM\Reading::factory($this->numeric)->getLastReading($this->entity);
 
-        // ... save only on changes
-        if ($this->numeric  AND (float)  $last != (float)  $this->value OR
-            !$this->numeric AND (string) $last != (string) $this->value) {
-            return parent::write($request, $timestamp);
+        // ... skip not changed value since last write
+        if ($this->numeric  AND (float)  $last == (float)  $this->value OR
+            !$this->numeric AND (string) $last == (string) $this->value) {
+            return 0;
         }
-        return 0;
+
+        return parent::write($request, $timestamp);
     }
 }

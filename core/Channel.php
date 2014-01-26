@@ -64,6 +64,19 @@ abstract class Channel {
     }
 
     /**
+     * Helper function to build an instance
+     */
+    public static function byChannel( $id ) {
+        $channel = new ORM\ChannelView($id);
+
+        if ($channel->guid) {
+            return self::byGUID($channel->guid);
+        }
+
+        throw new Exception('No channel found for ID: '.$guid, 400);
+    }
+
+    /**
      * Run additional code before a new channel is presented to the user
      */
     public static function beforeCreate( Array &$fields ) {}
@@ -191,6 +204,9 @@ abstract class Channel {
 
         $this->before_write($request);
 
+        // Default behavior
+        $reading = ORM\Reading::factory($this->numeric);
+
         if ($this->numeric) {
             // Check that new value is inside the valid range
             if ((!is_null($this->valid_from) AND $this->value < $this->valid_from) OR
@@ -206,7 +222,7 @@ abstract class Channel {
                 throw new Exception($msg, 200);
             }
 
-            $lastReading = $this->getLastReading();
+            $lastReading = $reading->getLastReading($this->entity);
 
             // Check that new reading value is inside the threshold range
             if ($this->threshold > 0 AND abs($this->value-$lastReading) > $this->threshold) {
@@ -223,9 +239,6 @@ abstract class Channel {
         // Write performance only for "real" savings if the program flow
         // can to here and not returned earlier
         $this->performance->action = 'write';
-
-        // Default behavior
-        $reading = $this->numeric ? new ORM\ReadingNum : new ORM\ReadingStr;
 
         $reading->id        = $this->entity;
         $reading->timestamp = $timestamp;
@@ -552,19 +565,6 @@ abstract class Channel {
     /**
      *
      */
-    protected function getLastReading() {
-        return $this->db->queryOne(
-            DBQuery::forge($this->table[$this->numeric])
-            ->get('data')
-            ->whereEQ('id', $this->entity)
-            ->orderDescending('timestamp')
-            ->limit(1)
-        );
-    }
-
-    /**
-     *
-     */
     protected function before_write( $request ) {
 
         if (!$this->write) {
@@ -595,7 +595,7 @@ abstract class Channel {
                     throw new Exception('Invalid meter reading: 0', 422);
                 }
 
-                $lastReading = $this->getLastReading();
+                $lastReading = ORM\Reading::factory($this->numeric)->getLastReading($this->entity);
 
                 if ($this->meter AND $this->value + $this->offset < $lastReading AND $this->adjust) {
                     // Auto-adjust channel offset

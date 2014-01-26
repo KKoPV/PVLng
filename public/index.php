@@ -201,6 +201,14 @@ $version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
 define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
+/**
+ * Check for upgrade and delete user cache if required
+ */
+if ($app->cache->AppVersion != PVLNG_VERSION) {
+    $app->cache->flush();
+    $app->cache->AppVersion = PVLNG_VERSION;
+}
+
 if (isset($_COOKIE[Session::token()])) {
     // Ok, remembered user
     Session::set('user', $app->config->get('Admin.User'));
@@ -285,6 +293,14 @@ $app->get('/ed', function() use ($app) {
 
 $app->get('/md', function() use ($app) {
     $app->process('Dashboard', 'IndexEmbedded');
+});
+
+// ---------------------------------------------------------------------------
+// List
+// ---------------------------------------------------------------------------
+$app->get('/list(/:id)', $checkAuth, function( $id=NULL ) use ($app) {
+    $app->params->set('id', $id);
+    $app->process('Lists');
 });
 
 // ---------------------------------------------------------------------------

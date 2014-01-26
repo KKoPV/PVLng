@@ -18,6 +18,15 @@ namespace ORM;
  */
 class ChannelView extends \slimMVC\ORMTable {
 
+    /**
+     *
+     */
+    public function __construct ( $id=NULL ) {
+        /* Build WITHOUT $id lookup, views have no primary key... */
+        parent::__construct();
+        if (isset($id)) $this->find('id', $id);
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------

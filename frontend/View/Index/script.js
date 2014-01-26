@@ -69,7 +69,6 @@ var
                 point: {
                     events: {
                         click: function() {
-                            console.log(this);
                             if (confirm('Do you really want delete this reading value?\n\n '+
                                 (new Date(this.x).toLocaleString().replace(' 00:00', ''))+' : '+this.y)) {
 

@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-class ReadingNum extends \slimMVC\ORMTable {
+class ReadingNum extends Reading {
 
     // -------------------------------------------------------------------------
     // PROTECTED

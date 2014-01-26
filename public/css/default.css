@@ -103,6 +103,10 @@ img.tip {
     color: black;
 }
 
+.menu .ui-button-text {
+    font-size: 85%;
+}
+
 /* Footer
 --------------------------------------------------------------------------- */
 #footer {
@@ -127,6 +131,10 @@ img.tip {
 
 .ui-button-text {
     color: black;
+}
+
+.ui-pnotify-text {
+    margin-left: 25px;
 }
 
 input[type=text],
