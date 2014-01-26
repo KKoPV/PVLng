@@ -23,6 +23,38 @@ CREATE TABLE `pvlng_babelkit` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pvlng_changes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `table` enum('babelkit','channel','config','log','options','performance','performance_avg','reading_num','reading_str','tree','type','view') NOT NULL COMMENT 'Table name',
+  `key` varchar(50) NOT NULL COMMENT 'Primary key value(s), for composed keys separated by "::" ',
+  `field` varchar(50) NOT NULL COMMENT 'Field name',
+  `timestamp` int(10) unsigned NOT NULL COMMENT 'When was changed',
+  `old` varchar(256) NOT NULL COMMENT 'Old value',
+  `new` varchar(256) NOT NULL COMMENT 'New value',
+  PRIMARY KEY (`id`),
+  KEY `table` (`table`,`key`,`field`,`timestamp`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = '' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 */ /*!50003 TRIGGER `pvlng_changes_bi` BEFORE INSERT ON `pvlng_changes` FOR EACH ROW
+IF new.`timestamp`= 0 THEN
+  SET new.`timestamp` = UNIX_TIMESTAMP();
+END IF */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pvlng_channel` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique Id',
   `guid` varchar(39) DEFAULT NULL COMMENT 'Unique GUID',
