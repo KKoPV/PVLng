@@ -22,6 +22,10 @@ $(function() {
         bJQueryUI: true
     });
 
+    $('#add2tree').on('ifChanged', function(){
+        $('#tree').prop('disabled', !this.checked)
+    });
+
 });
 
 </script>

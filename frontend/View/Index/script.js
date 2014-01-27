@@ -664,13 +664,13 @@ function changePreset() {
     }
 
     switch (preset[2]) {
-        case 'd': // day - set start to 1st day of month
+        case 'd': /* day - set start to 1st day of month */
             from.setDate(1);
             break;
-        case 'w': // week - set start to 1st day of month
+        case 'w': /* week - set start to 1st day of month */
             from.setDate(1);
             break;
-        case 'm': // month - set start to 1st day of year
+        case 'm': /* month - set start to 1st day of year */
             from.setDate(1);
             from.setMonth(0);
             break;

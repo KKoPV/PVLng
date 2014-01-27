@@ -106,6 +106,7 @@
         var ThousandSeparator = '{TSEP}';
 
         var language = '{LANGUAGE}';
+        var user = '{USER}';
     </script>
 
     {SCRIPTS}

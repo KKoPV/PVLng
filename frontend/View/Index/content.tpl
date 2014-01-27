@@ -39,8 +39,8 @@
             <button id="btn-reset" style="margin-left:1em">{{Today}}</button>
         </td>
         <td style="width:99%;text-align:right">
-            <img src="/images/ico/arrow-switch.png" onclick="$('.p-select').toggle();"
-                 class="tip" tip="{{UseOwnConsolidation}}" />
+            <img src="/images/ico/arrow-switch.png" style="margin-right:.5em"
+                 onclick="$('.p-select').toggle();" class="tip" tip="{{UseOwnConsolidation}}" />
             <span class="p-select">{PRESETSELECT}</span>
             <span class="p-select" style="display:none">
                 <input class="numbersOnly r" style="margin-right:.5em" type="text"

@@ -11,9 +11,7 @@
 
 <div class="grid_10">
 
-<p>
-    {{ChannelType}}: <img src="{ICON}" alt="" />&nbsp;<strong>{TYPENAME}</strong>
-</p>
+<h3><img src="{ICON}" alt="" />&nbsp;<strong>{TYPENAME}</strong></h3>
 
 <!-- IF {TYPEHELP} -->
 <p>
@@ -109,10 +107,12 @@
             {{Overview}}
         </td>
         <td>
-            <select name="add2tree">
-                <option value="0">--- {{Select}} ---</option>
-                <option value="1">{{TopLevel}}</option>
-                <optgroup label="{{AsChild}}">
+            <div class="fl" style="margin:.5em 1em 0 0">
+                <input type="checkbox" id="add2tree" name="add2tree" class="iCheck" onchange="$('#tree').prop('disabled',!this.checked)" />
+            </div>
+            <select id="tree" name="tree" disabled="disabled">
+                <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
+                <option value="0" disabled="disabled">{{AsChild}}</option>
                     <!-- BEGIN ADDTREE -->
                     <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
                     <!-- END -->

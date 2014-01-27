@@ -128,6 +128,7 @@ class Channel extends \Controller {
                     $tree->insertChildNode($channel['id'], $groupId);
                 }
             }
+            $this->app->cache->delete('Tree');
             \Messages::Success(__('HierarchyCreated', count($channels)));
 
             $this->app->redirect('/overview');
@@ -250,8 +251,9 @@ class Channel extends \Controller {
 
                         $tree = 0;
 
-                        if ($addTo = $this->request->post('add2tree')) {
+                        if ($this->request->post('add2tree') AND $addTo = $this->request->post('tree')) {
                             $tree = \NestedSet::getInstance()->insertChildNode($entity->id, $addTo);
+                            $this->app->cache->delete('Tree');
                             \Messages::Success(__('HierarchyCreated', 1));
                         }
 
@@ -328,9 +330,10 @@ class Channel extends \Controller {
         $this->view->Fields = $this->fields;
 
         if (!$this->view->Id) {
+            // Add mode
             $q = new \DBQuery('pvlng_tree_view');
             $q->get('id')
-              ->get('REPEAT("- ", `level`-2)', 'indent')
+              ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
               ->get('name')
               ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
               ->whereNE('childs', 0);
