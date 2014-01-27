@@ -16,7 +16,7 @@
 
     <table style="width:100%">
     <tr>
-        <td class="l" style="width:49%">
+        <td class="l" style="width:1%;white-space:nowrap">
             <select id="channel">
                 <option value="">--- {{SelectChannel}} ---</option>
                 <!-- BEGIN CHANNELS -->
@@ -28,36 +28,39 @@
                     <!-- ENDIF -->
                 >
                     <span style="font-size:120%">{INDENT}</span>{NAME}
-                    <!-- IF {DESCRIPTION} --> / {DESCRIPTION}<!-- ENDIF -->
+                    <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
                     <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
-                    ({TYPE})
                 </option>
                 <!-- END -->
             </select>
             <img id="icon" src="/images/pix.gif" data-none="/images/pix.gif"
                  style="width:16px;height:16px;margin-left:1em" width="16" height="16" />
         </td>
-        <td>
-            <span class="ui-icon ui-icon-triangle-1-w tip"
-                  title="{{PrevDay}} (Alt+P)" onclick="changeDates(-1)"></span>
+        <td class="c">
+            <table><tr>
+            <td>
+                <span class="ui-icon ui-icon-triangle-1-w tip"
+                      title="{{PrevDay}} (Alt+P)" onclick="changeDates(-1)"></span>
+            </td>
+            <td>
+                <input class="c" type="text" id="from" name="from" size="10" />
+            </td>
+            <td style="padding:0 .5em;font-weight:bold">
+                &mdash;
+            </td>
+            <td>
+                <input class="c" type="text" id="to" name="to" size="10" />
+            </td>
+            <td>
+                <span class="ui-icon ui-icon-triangle-1-e tip"
+                      title="{{NextDay}} (Alt+N)" onclick="changeDates(1)"></span>
+            </td>
+            <td style="padding-left:.5em">
+                <button id="btn-reset">{{Today}}</button>
+            </td>
+            </tr></table>
         </td>
-        <td>
-            <input class="c" type="text" id="from" name="from" size="10" />
-        </td>
-        <td style="padding:0 .75em;font-weight:bold">
-            &mdash;
-        </td>
-        <td>
-            <input class="c" type="text" id="to" name="to" size="10" />
-        </td>
-        <td>
-            <span class="ui-icon ui-icon-triangle-1-e tip"
-                  title="{{NextDay}} (Alt+N)" onclick="changeDates(1)"></span>
-        </td>
-        <td>
-            <button id="btn-reset" style="margin-left:1em">{{Today}}</button>
-        </td>
-        <td class="r" style="width:49%">
+        <td class="r" style="width:1%;white-space:nowrap">
             <img src="/images/ico/arrow-switch.png" style="margin-right:.5em"
                  onclick="$('.p-select').toggle();" class="tip" tip="{{UseOwnConsolidation}}" />
             <span class="p-select">{PRESETSELECT}</span>
