@@ -41,7 +41,7 @@ function changeDates( dir ) {
 /**
  *
  */
-var channel = {},
+var channel = {}, consumption_raw,
     /* String length for Datetime column */
     dtLen = { '': 19, i: 16, h: 13, d: 10, w: 10, m: 7, q: 7, y: 4 };
 
@@ -88,9 +88,12 @@ function updateList() {
             $('#icon').prop('src', channel.icon);
             $('.export').button( 'option', 'disabled', data.length == 0);
 
+            consumption_raw = {};
+
             $(data).each(function(id, row) {
-                /* Omit 1st row with data == 0 for meter channels */
-                if (data.length > 1 && channel.meter && id == 0) return;
+                /* remeber raw consumption data for footer calculation */
+                if (channel.meter) consumption_raw[id] = row.consumption;
+
                 listTable.fnAddData(
                     [
                         row.timestamp,
@@ -110,18 +113,18 @@ function updateList() {
             listTable.fnSetColumnVis( 4, channel.numeric && period && !channel.meter );
             listTable.fnSetColumnVis( 5, channel.numeric && channel.meter );
             listTable.fnSetColumnVis( 6, channel.numeric && period );
-            listTable.fnDraw();
-            listTable.fnAdjustColumnSizing();
-            listTable.fnProcessingIndicator(false);
-
         }
-    ).fail(function(jqxhr, textStatus, error) {
+    ).fail(function (jqxhr, textStatus, error) {
         $.pnotify({
             type: textStatus,
             text: jqxhr.responseText,
             hide: false,
             sticker: false
         });
+    }).complete(function () {
+        listTable.fnDraw();
+        listTable.fnAdjustColumnSizing();
+        listTable.fnProcessingIndicator(false);
     });
 }
 
@@ -247,12 +250,9 @@ $(function() {
             $('#tf-consumption').html('&nbsp;');
             if (!channel.meter || (iEnd - iStart) == 0) return;
 
-            var i, consumption = 0;
-            for (i=iStart; i<iEnd; i++) {
-                consumption += +aData[aiDisplay[i]][5]
-                                /* deformat value, remove thousand separator, make decimal separator to dot */
-                                .replace(/[{{TSEP}}]/g, '')
-                                .replace('{{DSEP}}', '.');
+            var consumption = 0;
+            for (var i=iStart; i<iEnd; i++) {
+                consumption += consumption_raw[aiDisplay[i]];
             }
             $('#tf-consumption').number(consumption, channel.decimals, '{{DSEP}}', '{{TSEP}}');
         },
@@ -277,7 +277,8 @@ $(function() {
             primary: 'ui-icon-calendar'
         },
         text: false
-    }).click(function(e) {
+    }).click(function(event) {
+        event.preventDefault();
         var d = new Date;
         /* Reset max. date today */
         $('#from').datepicker( 'option', 'maxDate', d );
@@ -286,7 +287,6 @@ $(function() {
         $('#from').datepicker('setDate', d);
         $('#to').datepicker('setDate', d);
         updateList();
-        return false;
     });
 
     $('#btn-refresh').button({
@@ -299,7 +299,9 @@ $(function() {
         return false;
     });
 
-    $('.export').click(function(e) {
+    $('.export').click(function(event) {
+        event.preventDefault();
+
         var i,
             separator = $(this).data('separator'),
             mime = $(this).data('mime'),
@@ -324,21 +326,40 @@ $(function() {
 
         if (channel.description) name += '-' + channel.description;
 
-        /* Transform to array of strings for saveAs */
-        for (i=0; i<len; i++) csv.push(data[i].join(separator) + "\n");
+        listTable.fnProcessingIndicator();
+
+        var period_count = +$('#periodcnt').val(),
+            period = $('#period').val();
 
         $.getJSON(
-            PVLngAPI + 'hash.json',
-            { text: name },
+            PVLngAPI + 'data/' + channel.guid + '.json',
+            {
+                full:       true,
+                short:      true,
+                start:      $('#fromdate').val(),
+                end:        $('#todate').val() + ' 24:00',
+                period:     period_count + period
+            },
             function(data) {
-                saveAs(
-                    new Blob(csv, { type: mime + ';charset=utf-8' }),
-                    data.slug + '.' + extension
+                /* Transform to array of strings for saveAs */
+                $(data).each(function (id, row) {
+                    csv.push(row.join(separator) + "\n");
+                });
+
+                $.getJSON(
+                    PVLngAPI + 'hash.json',
+                    { text: name },
+                    function(data) {
+                        saveAs(
+                            new Blob(csv, { type: mime + ';charset=utf-8' }),
+                            data.slug + '.' + extension
+                        );
+                    }
                 );
             }
-        );
-
-        return false;
+        ).complete(function () {
+            listTable.fnProcessingIndicator(false);
+        });
     });
 
     shortcut.add('Alt+P', function() { changeDates(-1); });

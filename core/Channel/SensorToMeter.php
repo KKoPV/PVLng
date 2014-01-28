@@ -23,24 +23,40 @@ class SensorToMeter extends Meter {
 
         $result = new \Buffer;
 
-        $last = $consumption = $sum = 0;
-
-        if (isset($request['period']) AND $request['period'] == 'last') {
+        if ($this->period[1] == self::LAST) {
+            // Festch ALL data from child channel for correct consumption calculation
             unset($request['period']);
         }
 
-        foreach ($this->getChild(1)->read($request) as $id=>$row) {
+        if ($this->TimestampMeterOffset[$this->period[1]] === 0) {
+            // No consolidation
+            $buffer = $this->getChild(1)->read($request)->rewind();
+            $last = FALSE;
+        } else {
+            // Fetch add. row before start timestamp
+            $request['start'] = $this->start - $this->TimestampMeterOffset[$this->period[1]];
+            $buffer = $this->getChild(1)->read($request)->rewind();
+            $row = $buffer->current();
+            $last = $row['timestamp'];
+            // Move data pointer to next row
+            $buffer->next();
+        }
+
+        $consumption = $id = 0;
+
+        while ($row = $buffer->current()) {
 
             if ($last) {
-                $consumption = ($row['timestamp'] - $last) / 3600 * $row['data'];
-                $sum += $consumption;
+                $c = ($row['timestamp'] - $last) / 3600 * $row['data'];
+                $row['consumption'] = $c;
+                $consumption += $c;
             }
 
-            $row['data']        = $sum;
-            $row['consumption'] = $consumption * $this->resolution;
-            $result->write($row, $id);
+            $row['data'] = $consumption;
+            $result->write($row, $id++);
 
             $last = $row['timestamp'];
+            $buffer->next();
         }
 
         return $this->after_read($result);
@@ -52,7 +68,7 @@ class SensorToMeter extends Meter {
 
     /**
      *
-     */
+     * /
     protected function __construct( $guid ) {
         parent::__construct($guid);
 
@@ -64,5 +80,5 @@ class SensorToMeter extends Meter {
             $this->resolution = 1;
         }
     }
-
+*/
 }

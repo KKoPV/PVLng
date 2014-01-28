@@ -398,8 +398,9 @@ class MySQLi extends \MySQLi {
     private function bootstrap() {
         $this->SQL = new SQLs;
         $this->Cli = !isset($_SERVER['REQUEST_METHOD']);
-        $this->query('SET NAMES "utf8"');
-        $this->query('SET CHARACTER SET utf8');
+        // Call org. query with less overhead
+        parent::query('SET NAMES "utf8"');
+        parent::query('SET CHARACTER SET utf8');
         mysqli_report(MYSQLI_REPORT_STRICT);
     }
 

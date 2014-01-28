@@ -86,8 +86,8 @@
 
         <tfoot>
             <tr>
-                <th colspan="3">&nbsp;</th>
-                <th colspan="2" class="l">{{Total}}</th>
+                <th colspan="4">&nbsp;</th>
+                <th class="l">{{Total}}:</th>
                 <th id="costs" style="padding-right:10px" class="r"></th>
                 <th></th>
             </tr>

@@ -318,7 +318,7 @@ abstract class Channel {
             } else {
 
                 $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
-                  ->get($q->MIN('timestamp'), 'timestamp');
+                  ->get($q->MAX('timestamp'), 'timestamp');
 
                 switch (TRUE) {
                     case !$this->numeric:
@@ -349,7 +349,7 @@ abstract class Channel {
                     if (!$this->meter) {
                         $q->whereGE('timestamp', $this->start);
                     } else {
-                        // Fetch also period before start for consumption calculation!
+                        // Fetch also period before start for correct consumption calculation!
                         $q->whereGE('timestamp', $this->start-$this->TimestampMeterOffset[$this->period[1]]);
                     }
                 }
@@ -362,39 +362,40 @@ abstract class Channel {
 
             if ($res = $this->db->query($q)) {
 
-                $offset = $last = 0;
-                $lastRow = NULL;
+                if ($this->meter) {
+                    if ($this->TimestampMeterOffset[$this->period[1]] > 0) {
+                        $row = $res->fetch_assoc();
+                        $offset = $row['data'];
+                    } else {
+                        $offset = 0;
+                    }
+                    $last = 0;
+                }
 
                 while ($row = $res->fetch_assoc()) {
 
                     $row['consumption'] = 0;
 
                     if ($this->meter) {
-                        // calc meter offset for uncompressed data
+
                         if ($offset === 0) {
+                            // 1st row, calculate start data
                             $offset = $row['data'];
                         }
 
-                        if ($this->db->affected_rows > 1) {
-                            // ONLY if more than 1 row was returned
-                            $row['data'] = $row['data'] - $offset;
-                            $row['min']  = $row['min']  - $offset;
-                            $row['max']  = $row['max']  - $offset;
-                        }
+                        $row['data'] -= $offset;
+                        $row['min']  -= $offset;
+                        $row['max']  -= $offset;
 
                         // calc consumption from previous max value
-                        $row['consumption'] = $row['max'] - $last;
-                        $last = $row['max'];
+                        $row['consumption'] = $row['data'] - $last;
+                        $last = $row['data'];
                     }
 
-                    // remove grouping value
+                    // remove grouping value and save
                     $id = $row['g'];
                     unset($row['g']);
-
-                    // Write only if NOT only last value was requested
                     $buffer->write($row, $id);
-
-                    $lastRow = $row;
                 }
             }
         }
@@ -527,7 +528,7 @@ abstract class Channel {
             self::ASCHILD   => '`timestamp` DIV 60',
             self::MINUTE    => '-((UNIX_TIMESTAMP() - `timestamp`) DIV 60) DIV %d',
             self::HOUR      => '`timestamp` DIV (3600 * %f)',
-            self::DAY       => '`timestamp` DIV (86400 * %d)',
+            self::DAY       => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m%%d") DIV %d',
             self::WEEK      => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
             self::MONTH     => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
             self::QUARTER   => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
