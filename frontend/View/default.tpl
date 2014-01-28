@@ -92,7 +92,7 @@
     <script src="/js/dataTables.js+script.js+shortcut.js"></script>
 
     <script>
-        var PVLngAPI    = 'http://{SERVERNAME}/api/r2/';
+        var PVLngAPI    = 'http://{SERVERNAME}/api/r3/';
         var PVLngAPIkey = '<!-- IF {USER} -->{APIKEY}<!-- ENDIF -->';
 
         /* Inititilize Pines Notify labels here */
@@ -106,6 +106,7 @@
         var ThousandSeparator = '{TSEP}';
 
         var language = '{LANGUAGE}';
+        var user = '{USER}';
     </script>
 
     {SCRIPTS}

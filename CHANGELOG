@@ -1,3 +1,14 @@
+ v2.3.0
+========
+
+FIXED
+
+ - Fix readout for meter channels with consolidation periods ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Add List module to show reading values as table ~ Knut Kohl <github@knutkohl.de>
+
  v2.2.0
 ========
 

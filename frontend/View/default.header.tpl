@@ -46,19 +46,18 @@
 
 <div class="grid_10">
     <div class="fl">
-        <span class="toolbar">
+        <span class="toolbar menu">
             <a class="tipbtn" title="{{ChartHint}}" href="/">{{Charts}}</a>
-            <!-- IF {USER} -->
-            <a class="tipbtn" title="{{DashboardHint}}" href="/dashboard">{{Dashboard}}</a>
-            <a class="tipbtn" title="{{OverviewHint}}" href="/overview">{{Overview}}</a>
-            <a class="tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
-            <a class="tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
-            <!-- ENDIF -->
+            <a class="login tipbtn" title="{{DashboardHint}}" href="/dashboard">{{Dashboard}}</a>
+            <a class="login tipbtn" title="{{ListHint}}" href="/list">{{List}}</a>
+            <a class="login tipbtn" title="{{OverviewHint}}" href="/overview">{{Overview}}</a>
+            <a class="login tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
+            <a class="login tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
             <a class="tipbtn" title="{{PlantDescriptionHint}}" href="/description">{{Description}}</a>
         </span>
     </div>
     <div class="r">
-        <span class="toolbar">
+        <span class="toolbar menu">
             <a class="tipbtn" title="Deutsch" href="?lang=de">
                 <img style="width:20px;height:12px" src="/images/de.png" alt="D" width="20" height="12" />
             </a>

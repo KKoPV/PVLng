@@ -50,6 +50,8 @@ $(function() {
 
     $('button, a.button, input[type="submit"]').button();
     $('.toolbar').buttonset();
+    $('.login').button('option', 'disabled', (user == ''));
+
     $('input[type=text], input[type=number], input[type=password], select, textarea').addClass('ui-corner-all');
 
     $(messages).each(function(id, msg) {
@@ -82,6 +84,8 @@ $(function() {
             insert: '<div class="icheck_line-icon"></div>' + label_text
         });
     });
+
+    $('input').iCheck('update');
 
     /* Back to top */
     var fadeDuration = 500;

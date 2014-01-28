@@ -26,7 +26,7 @@
         <td style="vertical-align:top">{{APIURL}}</td>
         <td>
             <code class="b">
-                http://{SERVERNAME}/api/r2/\{action\}/\{GUID\}
+                http://{SERVERNAME}/api/r3/\{action\}/\{GUID\}
             </code>
             <br /><br />
             {{SeeAPIReference}}

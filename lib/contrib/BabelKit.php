@@ -195,7 +195,7 @@ class BabelKit {
         if ($options) $options = " $options";
 
         # Drop down box.
-        $select = "<select name=\"$var_name\"$options>\n";
+        $select = "<select name=\"$var_name\"$options>";
 
         # Blank options.
         $selected = '';
@@ -203,10 +203,10 @@ class BabelKit {
             if ($select_prompt == '')
                 $select_prompt =
                     $this->ucwords('code_set', $code_lang, $code_set).'?';
-            $select .= "<option value=\"\" selected>$select_prompt</option>\n";
+            $select .= "<option value=\"\" selected>$select_prompt</option>";
             $selected = 1;
         } elseif ($blank_prompt <> '') {
-            $select .= "<option value=\"\">$blank_prompt</option>\n";
+            $select .= "<option value=\"\">$blank_prompt</option>";
         }
 
         # Show code set options.
@@ -219,18 +219,18 @@ class BabelKit {
 
             if ($code_code == $value) {
                 $selected = 1;
-                $select .= "<option value=\"$code_code\" selected>$code_desc</option>\n";
+                $select .= "<option value=\"$code_code\" selected>$code_desc</option>";
             } elseif ($row[3] <> 'd') {
-                $select .= "<option value=\"$code_code\">$code_desc</option>\n";
+                $select .= "<option value=\"$code_code\">$code_desc</option>";
             }
         }
 
         # Show a missing value.
         if (!$selected) {
-            $select .= "<option value=\"$value\" selected>$value</option>\n";
+            $select .= "<option value=\"$value\" selected>$value</option>";
         }
 
-        $select .= "</select>\n";
+        $select .= "</select>";
         return $select;
     }
 
@@ -258,7 +258,7 @@ class BabelKit {
             foreach ( $subset as $val ) $Subset[$val] = 1;
         }
         if ($options) $options = " $options";
-        if (!isset($sep)) $sep = "<br>\n";
+        if (!isset($sep)) $sep = "<br>";
 
         # Blank options.
         if ($value == '') {
@@ -339,7 +339,7 @@ class BabelKit {
         # Select multiple box.
         $select = "<select multiple name=\"$var_name"."[]\"$options";
         if ($size) $select .= " size=\"$size\"";
-        $select .= ">\n";
+        $select .= ">";
 
         # Show code set options.
         $set_list = $this->full_set($code_set, $code_lang);
@@ -349,19 +349,19 @@ class BabelKit {
                 continue;
             $code_desc = htmlspecialchars(ucfirst($code_desc));
             if ( $Value[$code_code] ) {
-                $select .= "<option value=\"$code_code\" selected>$code_desc\n";
+                $select .= "<option value=\"$code_code\" selected>$code_desc";
                 unset($Value[$code_code]);
             } elseif ($row[3] <> 'd') {
-                $select .= "<option value=\"$code_code\">$code_desc\n";
+                $select .= "<option value=\"$code_code\">$code_desc";
             }
         }
 
         # Show missing values.
         foreach ( $Value as $code_code => $true ) {
-            $select .= "<option value=\"$code_code\" selected>$code_code\n";
+            $select .= "<option value=\"$code_code\" selected>$code_code";
         }
 
-        $select .= "</select>\n";
+        $select .= "</select>";
         return $select;
     }
 
@@ -394,7 +394,7 @@ class BabelKit {
             foreach ( $subset as $val ) $Subset[$val] = 1;
         }
         if ($options) $options = " $options";
-        if (!isset($sep)) $sep = "<br>\n";
+        if (!isset($sep)) $sep = "<br>";
 
         # Show code set options.
         $set_list = $this->full_set($code_set, $code_lang);

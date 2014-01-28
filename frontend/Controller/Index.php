@@ -19,7 +19,6 @@ class Index extends \Controller {
      */
     public function before() {
         parent::before();
-        $this->Tree = \NestedSet::getInstance();
         $this->channels = array();
         $this->views = $this->model->getViews();
     }
@@ -113,8 +112,11 @@ class Index extends \Controller {
     public function Index_Action() {
         $this->view->SubTitle = \I18N::_('Charts');
 
-        $tree = $this->Tree->getFullTree();
-        array_shift($tree);
+        while ($this->app->cache->save('Tree', $tree)) {
+            $tree = \NestedSet::getInstance()->getFullTree();
+            // Skip root node
+            array_shift($tree);
+        }
         $parent = array( 1 => 0 );
 
         $data = array();
@@ -123,8 +125,11 @@ class Index extends \Controller {
             $parent[$node['level']] = $node['id'];
             $node['parent'] = $parent[$node['level']-1];
 
-            if ($entity = $this->model->getEntity($node['entity'])) {
+#            while ($this->app->cache->save('Channel.'.$node['entity'], $entity)) {
+                $entity = $this->model->getEntity($node['entity']);
+#            }
 
+            if ($entity) {
                 // remove id, is the same as $node['entity']
                 unset($entity->id);
                 $guid = $node['guid'] ?: $entity->guid;
@@ -171,11 +176,6 @@ class Index extends \Controller {
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected $Tree;
 
     /**
      *

@@ -85,13 +85,7 @@ while test $i -lt $CHANNEL_N; do
     log 2 "STREAM   : $STREAM_NAME"
     test "$STREAM_NAME" || error_exit "SEG stream name is required (STREAM_NAME_$i)"
 
-    if test $(int $(PVLngGET $GUID/meter.txt)) -eq 0; then
-        ### Get for sensors average of last $INTERVAL minutes
-        fetch="data/$GUID.tsv?start=-${INTERVAL}minutes&period=${INTERVAL}minutes"
-    else
-        ### Get for meters last reading of today
-        fetch="data/$GUID.tsv?period=last"
-    fi
+    fetch="data/$GUID.tsv?start=-${INTERVAL}minutes&period=${INTERVAL}minutes"
     log 2 "Fetch    : $fetch"
 
     ### read value, get last row

@@ -16,10 +16,6 @@
 
 <div class="grid_10">
 
-<div>{MESSAGE}</div>
-
-<br />
-
 <table id="tree" class="dataTable treeTable">
     <thead>
     <tr>

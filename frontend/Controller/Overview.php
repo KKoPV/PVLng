@@ -42,12 +42,13 @@ class Overview extends \Controller {
      *
      */
     public function Index_Action() {
-
         $this->view->SubTitle = \I18N::_('Overview');
 
-        $tree = $this->Tree->getFullTree();
-        // Skip root node
-        array_shift($tree);
+        while ($this->app->cache->save('Tree', $tree)) {
+            $tree = \NestedSet::getInstance()->getFullTree();
+            // Skip root node
+            array_shift($tree);
+        }
 
         $parent = array( 1 => 0 );
 
@@ -86,6 +87,7 @@ class Overview extends \Controller {
             foreach ($childs as $child) {
                 if ($child) $this->Tree->insertChildNode($child, $parent);
             }
+            $this->app->cache->delete('Tree');
         }
         $this->redirect();
     }
@@ -101,6 +103,7 @@ class Overview extends \Controller {
                 // Alias channel if exists will be deleted by trigger,
                 // because it is only valid for a channel in tree!
                 $this->Tree->DeleteNode($id);
+                $this->app->cache->delete('Tree');
             }
         }
         $this->redirect();
@@ -117,6 +120,7 @@ class Overview extends \Controller {
                 // Alias channel if exists will be deleted by trigger,
                 // because it is only valid for a channel in tree!
                 $this->Tree->DeleteBranch($id);
+                $this->app->cache->delete('Tree');
             }
         }
         $this->redirect();
@@ -129,6 +133,7 @@ class Overview extends \Controller {
         if ($id = $this->request->post('id')) {
             // Remove from old position
             $this->Tree->DeleteNode($id);
+            $this->app->cache->delete('Tree');
         }
 
         if ($target = $this->request->post('target') AND
@@ -160,7 +165,9 @@ class Overview extends \Controller {
                     if (!$this->Tree->moveLft($new)) break;
                 }
             }
+            $this->app->cache->delete('Tree');
         }
+
         $this->redirect();
     }
 
@@ -174,6 +181,7 @@ class Overview extends \Controller {
             while ($count--) {
                 if (!$this->Tree->moveLft($id)) break;
             }
+            $this->app->cache->delete('Tree');
         }
         $this->redirect();
     }
@@ -188,6 +196,7 @@ class Overview extends \Controller {
             while ($count--) {
                 if (!$this->Tree->moveRgt($id)) break;
             }
+            $this->app->cache->delete('Tree');
         }
         $this->redirect();
     }
@@ -198,6 +207,7 @@ class Overview extends \Controller {
     public function MoveUpPOST_Action() {
         if ($id = $this->request->post('id')) {
             $this->Tree->moveUp($id);
+            $this->app->cache->delete('Tree');
         }
         $this->redirect();
     }
@@ -208,6 +218,7 @@ class Overview extends \Controller {
     public function MoveDownPOST_Action() {
         if ($id = $this->request->post('id')) {
             $this->Tree->moveDown($id);
+            $this->app->cache->delete('Tree');
         }
         $this->redirect();
     }

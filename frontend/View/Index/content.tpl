@@ -25,7 +25,7 @@
         <td>
             <input class="c" type="text" id="from" name="from" size="10" />
         </td>
-        <td style="padding:0 .75em;font-weight:bold">
+        <td style="padding:0 .5em;font-weight:bold">
             &mdash;
         </td>
         <td>
@@ -35,12 +35,12 @@
             <span class="ui-icon ui-icon-triangle-1-e tip"
                   title="{{NextDay}} (Alt+N)" onclick="changeDates(1)"></span>
         </td>
-        <td>
-            <button id="btn-reset" style="margin-left:1em">{{Today}}</button>
+        <td style="padding-left:.5em">
+            <button id="btn-reset">{{Today}}</button>
         </td>
         <td style="width:99%;text-align:right">
-            <img src="/images/ico/arrow-switch.png" onclick="$('.p-select').toggle();"
-                 class="tip" tip="{{UseOwnConsolidation}}" />
+            <img src="/images/ico/arrow-switch.png" style="margin-right:.5em"
+                 onclick="$('.p-select').toggle();" class="tip" tip="{{UseOwnConsolidation}}" />
             <span class="p-select">{PRESETSELECT}</span>
             <span class="p-select" style="display:none">
                 <input class="numbersOnly r" style="margin-right:.5em" type="text"

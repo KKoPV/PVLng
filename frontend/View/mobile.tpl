@@ -48,7 +48,7 @@
     <script src="/js/mobile.js"></script>
 
     <script>
-    var PVLngAPI = 'http://{SERVERNAME}/api/r2/';
+    var PVLngAPI = 'http://{SERVERNAME}/api/r3/';
     </script>
 
     {SCRIPTS}

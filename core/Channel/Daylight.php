@@ -94,7 +94,10 @@ class Daylight extends InternalCalc {
 
                 if ($this->TimestampMeterOffset[$this->period[1]]) {
                     // Calculate exact stepping during daylight times
-                    $step = $daylight / floor($daylight / ($this->period[0] * $this->TimestampMeterOffset[$this->period[1]]));
+                    $range = $this->period[0] * $this->TimestampMeterOffset[$this->period[1]];
+                    if ($range > $daylight) $range = $daylight;
+                    $step = floor($daylight / $range);
+                    $step = $daylight / $step;
                 } else {
                     $step = 60;
                 }
