@@ -10,23 +10,24 @@
 
 console.time('Duration');
 
-/**
- * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
- */
-jQuery.extend({
-    parseQueryString: function() {
-        var nvpair = {};
-        var qs = window.location.search.replace('?', '');
-        var pairs = qs.split('&');
-        $.each(pairs, function(i, v){
-            var pair = v.split('=');
-            nvpair[pair[0]] = pair[1];
-        });
-        return nvpair;
-    }
-});
-
 $(function() {
+
+    /**
+     * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+     */
+    jQuery.extend({
+        parseQueryString: function() {
+            var qs = window.location.search.replace('?', '');
+            if (qs == '') return {};
+            result = {};
+            $.each(qs.split('&'), function(i, v){
+                var pair = v.split('=');
+                /* decodeURI doesn't work for the date strings :-( */
+                result[pair[0]] = (pair.length > 1) ? pair[1].replace(/%2F/g, '/') : '';
+            });
+            return result;
+        }
+    });
 
     /* Inititilize Pines Notify */
     $.pnotify.defaults.styling = 'jqueryui';
@@ -105,10 +106,11 @@ $(function() {
 
     shortcut.add('Shift+F1', function() { window.location = '/'; });
     shortcut.add('Shift+F2', function() { window.location = '/dashboard'; });
-    shortcut.add('Shift+F3', function() { window.location = '/overview'; });
-    shortcut.add('Shift+F4', function() { window.location = '/channel'; });
-    shortcut.add('Shift+F5', function() { window.location = '/info'; });
-    shortcut.add('Shift+F6', function() { window.location = '/description'; });
+    shortcut.add('Shift+F3', function() { window.location = '/list'; });
+    shortcut.add('Shift+F4', function() { window.location = '/overview'; });
+    shortcut.add('Shift+F5', function() { window.location = '/channel'; });
+    shortcut.add('Shift+F6', function() { window.location = '/info'; });
+    shortcut.add('Shift+F7', function() { window.location = '/description'; });
     shortcut.add('Alt+L',    function() { window.location = '/logout'; });
 
 });
