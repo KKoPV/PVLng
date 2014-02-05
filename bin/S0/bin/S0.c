@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
     FILE *logfd;
     char buf[8];
     struct timeval t0, now;
-    double diff;
+    double ts, diff;
 
     /* bind signal handler */
     bind_signals("quit");
@@ -105,6 +105,11 @@ int main(int argc, char **argv) {
 
     print(log_debug, "Start listening", NULL);
 
+    if (options.foreground) {
+        options.format = "%.3f - %f";
+        print(log_warning, "Press Ctrl+C to abort ...", NULL);
+    }
+
     /* start listening */
     while (TRUE) {
         /* blocking until one character/pulse is read */
@@ -128,7 +133,8 @@ int main(int argc, char **argv) {
 
         if (options.foreground) {
             /* log data to console */
-            print(log_warning, options.format, NULL, diff);
+            ts = ((double) now.tv_sec*1000000 + (double) now.tv_usec) / 1000000;
+            print(log_warning, options.format, NULL, ts, diff);
         } else {
             /* open log file on each write, because it might be moved away ... */
             logfd = fopen(options.log, "a");
