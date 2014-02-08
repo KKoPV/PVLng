@@ -81,7 +81,7 @@ if ($config->get('develop')) {
 }
 
 if ($config->get('Admin.User') == '' AND
-    isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO'] != '/adminpass') {
+    (!isset($_SERVER['REQUEST_URI']) OR strpos($_SERVER['REQUEST_URI'], '/adminpass') === FALSE)) {
     _redirect('adminpass');
 }
 
