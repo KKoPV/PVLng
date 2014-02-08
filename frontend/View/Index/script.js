@@ -43,6 +43,9 @@ var RefreshTimeout = 300;
 <script>
 
 function View( slug ) {
+    this._slug = '';
+    this._name = '';
+
     this.slug = slug;
 
     this.fetch = function( el, callback ) {
@@ -90,6 +93,7 @@ function View( slug ) {
                 }
 
                 $('#preset').val(preset).trigger('change');
+                $('#wrapper').show();
             }
         ).fail(function () {
             oTable.fnProcessingIndicator(false);
@@ -243,31 +247,7 @@ var
                 top: '40%',
                 fontSize: '200%'
             }
-        },
-/*
-        exporting: {
-            buttons: {
-                contextButton: {
-                    menuItems: [{
-                        text: 'Export to PNG (small)',
-                        onclick: function() {
-                            this.exportChart({
-                                width: 250
-                            });
-                        }
-                    }, {
-                        separator: true
-                    }, {
-                        text: 'Export to PNG (large)',
-                        onclick: function() {
-                            this.exportChart();
-                        },
-                        separator: false
-                    }]
-                }
-            }
         }
-*/
     };
 
 /**
@@ -828,7 +808,7 @@ $(function() {
         bPaginate: false,
         bProcessing: true,
         bJQueryUI: true,
-        sDom: ' <"H"r>t<"F">',
+        sDom: '<"H"r>t<"F">',
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
         fnInitComplete: function() {
             /* Init treetable AFTER databale is ready */
@@ -1017,7 +997,6 @@ $(function() {
     }).click(function(event) {
         view.slug = $('#loaddeleteview option:selected').val();
         view.load();
-        $('#wrapper').show();
     });
 
     $('#btn-delete').button({

@@ -37,8 +37,7 @@
     </div>
     <div class="grid_4 r">
         <span id="title1">{TITLE}</span>
-        <br /><br />
-        <!-- IF {USER} --><em>{USER}</em><!-- ELSE -->&nbsp;<!-- ENDIF -->
+        <!-- IF {USER} --><br /><br /><em>{USER}</em><!-- ELSE -->&nbsp;<!-- ENDIF -->
     </div>
 </div>
 
