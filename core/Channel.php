@@ -84,7 +84,13 @@ abstract class Channel {
     /**
      * Run additional code before existing data presented to user
      */
-    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {}
+    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
+        foreach ($fields as $name=>&$data) {
+            if ($data['TYPE'] == 'numeric') {
+                $data['VALUE'] = str_replace('.', __('DSEP'), $data['VALUE']);
+            }
+        }
+    }
 
     /**
      *
@@ -94,6 +100,8 @@ abstract class Channel {
         $ok = TRUE;
 
         foreach ($fields as $name=>&$data) {
+            $data['VALUE'] = trim($data['VALUE']);
+
             if ($data['VISIBLE']) {
                 /* check required fields */
                 if ($data['REQUIRED'] AND $data['VALUE'] == '') {
@@ -102,9 +110,13 @@ abstract class Channel {
                 }
                 /* check numeric fields */
                 if ($data['VALUE'] != '') {
-                    if ($data['TYPE'] == 'numeric' AND !is_numeric($data['VALUE'])) {
-                        $data['ERROR'][] = __('channel::ParamMustNumeric');
-                        $ok = FALSE;
+                    if ($data['TYPE'] == 'numeric') {
+                        $data['VALUE'] = str_replace(__('TSEP'), '', $data['VALUE']);
+                        $data['VALUE'] = str_replace(__('DSEP'), '.', $data['VALUE']);
+                        if (!is_numeric($data['VALUE'])) {
+                            $data['ERROR'][] = __('channel::ParamMustNumeric');
+                            $ok = FALSE;
+                        }
                     } elseif ($data['TYPE'] == 'integer' AND (string) floor($data['VALUE']) != $data['VALUE']) {
                         $data['ERROR'][] = __('channel::ParamMustInteger');
                         $ok = FALSE;
@@ -119,7 +131,11 @@ abstract class Channel {
     /**
      * Run additional code before data saved to database
      */
-    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {}
+    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
+        foreach ($fields as $name=>$data) {
+            $channel->$name = $data['VALUE'];
+        }
+    }
 
     /**
      * Run additional code after channel was created / changed
@@ -192,6 +208,7 @@ abstract class Channel {
             'read'        => $this->read,
             'write'       => $this->write,
             'graph'       => $this->graph,
+            'public'      => $this->public,
             'icon'        => $this->icon,
             'comment'     => trim($this->comment)
         );
@@ -289,6 +306,8 @@ abstract class Channel {
               ->limit(1);
             $row = $this->db->queryRow($q);
 
+            if (!$row) return $this->after_read($buffer);
+
             if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
 
             // Reset query and read add. data
@@ -299,7 +318,6 @@ abstract class Channel {
               ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
               ->whereEQ('id', $this->entity)
               ->limit(1);
-
             $buffer->write(array_merge((array) $row, (array) $this->db->queryRow($q)));
 
         } else {
@@ -318,7 +336,7 @@ abstract class Channel {
             } else {
 
                 $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
-                  ->get($q->MAX('timestamp'), 'timestamp');
+                  ->get($q->MIN('timestamp'), 'timestamp');
 
                 switch (TRUE) {
                     case !$this->numeric:
@@ -526,9 +544,11 @@ abstract class Channel {
         static $GroupBy = array(
             self::NO        => '`timestamp`',
             self::ASCHILD   => '`timestamp` DIV 60',
-            self::MINUTE    => '-((UNIX_TIMESTAMP() - `timestamp`) DIV 60) DIV %d',
-            self::HOUR      => '`timestamp` DIV (3600 * %f)',
-            self::DAY       => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m%%d") DIV %d',
+#            self::MINUTE    => '-((UNIX_TIMESTAMP() - `timestamp`) DIV 60) DIV %d',
+            self::MINUTE    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%H%%i") DIV %d',
+#            self::HOUR      => '`timestamp` DIV (3600 * %f)',
+            self::HOUR      => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%k") DIV %d',
+            self::DAY       => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j") DIV %d',
             self::WEEK      => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
             self::MONTH     => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
             self::QUARTER   => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',

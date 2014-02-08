@@ -236,13 +236,13 @@ abstract class Cache {
      */
     public function set( $key, $data, $ttl=0 ) {
         if (!is_array($key)) {
-            return $this->write($key, $this->serialize(array($this->ts, $ttl, $data)));
+            return $this->write($key, array($this->ts, $ttl, $data));
         }
 
         // Multiple values
         $ok = TRUE;
         foreach ($key as $k=>$v) {
-            $ok = ($ok AND $this->write($key, $this->serialize(array($this->ts, $ttl, $v))));
+            $ok = ($ok AND $this->write($key, array($this->ts, $ttl, $v)));
         }
         return $ok;
     }
@@ -279,12 +279,12 @@ abstract class Cache {
      * @return mixed
      */
     public function get( $key, $expire=0 ) {
-        $data = $this->fetch($key);
+        $cdata = $this->fetch($key);
 
-        if ($data === NULL) return;
+        if ($cdata === NULL) return;
 
         // Split into store time, ttl, data
-        list($ts, $ttl, $data) = $this->unserialize($data);
+        list($ts, $ttl, $data) = $cdata;
 
         // Data valid?
         if ($this->valid($ts, $ttl, $expire)) return $data;
@@ -402,7 +402,8 @@ abstract class Cache {
      * @return string
      */
     protected function serialize( $data ) {
-        return serialize($data);
+        return json_encode($data);
+        #return serialize($data);
     } // function serialize()
 
     /**
@@ -412,7 +413,8 @@ abstract class Cache {
      * @return mixed
      */
     protected function unserialize( $data ) {
-        return unserialize($data);
+        return json_decode($data, TRUE);
+        #return unserialize($data);
     } // function unserialize()
 
     // -------------------------------------------------------------------------

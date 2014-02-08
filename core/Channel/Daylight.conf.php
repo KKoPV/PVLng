@@ -38,26 +38,33 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
+    'resolution' => array(
+        'type'     => 'select;0:Marker;1:Curve',
+        'required' => FALSE
+    ),
     'unit' => array(
-        'visible'  => FALSE,
+        'visible'  => FALSE
     ),
     'decimals' => array(
         'visible'  => FALSE,
-        'default'  => 0,
+        'default'  => 0
     ),
     'valid_from' => array(
-        'visible'  => FALSE,
+        'visible'  => FALSE
     ),
     'valid_to' => array(
-        'visible'  => FALSE,
+        'visible'  => FALSE
     ),
     'latitude' => array(
         'type'     => 'numeric',
-        'required' => TRUE,
+        'required' => TRUE
     ),
     'longitude' => array(
         'type'     => 'numeric',
-        'required' => TRUE,
+        'required' => TRUE
+    ),
+    'irradiation' => array(
+        'type'     => 'guid'
     ),
 
 );

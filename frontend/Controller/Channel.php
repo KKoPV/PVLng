@@ -35,6 +35,8 @@ class Channel extends \Controller {
                 'DEFAULT'  => NULL
             ), array_change_key_case($field, CASE_UPPER));
         }
+
+        $this->view->Id = $this->app->params->get('id');
     }
 
     /**
@@ -303,24 +305,17 @@ class Channel extends \Controller {
     /**
      *
      */
-    public function EditGET_Action() {
-        if ($id = $this->app->params->get('id')) {
-            $channel = new \ORM\Channel($id);
+    public function Edit_Action() {
+        $this->view->SubTitle = __('EditChannel');
+
+        if ($this->view->Id) {
+            $channel = new \ORM\Channel($this->view->Id);
             $this->prepareFields($channel);
 
             $type = new \ORM\ChannelType($channel->type);
             $model = $type->ModelClass();
             $model::beforeEdit($channel, $this->fields);
-
-            $this->view->Id = $id;
         }
-    }
-
-    /**
-     *
-     */
-    public function Edit_Action() {
-        $this->view->SubTitle = __('EditChannel');
 
         // Move comment to the end of list
         $comment = $this->fields['comment'];

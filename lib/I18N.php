@@ -79,6 +79,7 @@ abstract class I18N {
     public static function translate( $str ) {
         $fargs = func_get_args();
         $str = array_shift($fargs);
+        $cnt = (isset($fargs[0]) AND intval($fargs[0]) == $fargs[0]) ? +$fargs[0] : FALSE;
 
         if (strpos($str, self::SEP) !== FALSE) {
             // Defined code set
@@ -95,7 +96,24 @@ abstract class I18N {
         }
 
         if ($trans !== $code) {
-            $str = $trans;
+            if (strpos($trans, '|') === FALSE) {
+                $str = $trans;
+            } else {
+                // Analyse translation for 0, 1 ... n markers
+                $parts = array();
+                foreach (explode('|', $trans) as $part) {
+                    $part = explode(':', $part);
+                    $parts[$part[0]] = $parts[1];
+                }
+
+                if (isset($parts[$cnt])) {
+                    $str = $parts[$cnt];
+                } elseif (isset($parts['n'])) {
+                    $str = $parts['n'];
+                } else {
+                    $str = $trans;
+                }
+            }
         } elseif (self::$add) {
             if ($code_set == '') $code_set = self::$code_sets[0];
             self::$bk->slave($code_set, $code, $code);

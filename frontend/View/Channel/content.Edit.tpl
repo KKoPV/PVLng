@@ -54,7 +54,7 @@
         </td>
         <td style="vertical-align:top;padding-top:.5em;padding-bottom:.5em">
             <!-- IF {TYPE} == "numeric" -->
-                <input type="number" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10" step="0.000000000000001"
+                <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10"
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                 />
@@ -81,6 +81,11 @@
                 >{VALUE}</textarea>
             <!-- ELSEIF {TYPE} == "textsmall" -->
                 <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10"
+                       <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
+                       <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
+            <!-- ELSEIF {TYPE} == "guid" -->
+                <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="50"
+                       placeholder="0000-0000-0000-0000-0000-0000-0000-0000"
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
             <!-- ELSE -->

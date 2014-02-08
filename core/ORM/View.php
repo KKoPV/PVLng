@@ -22,7 +22,7 @@ class View extends \slimMVC\ORMTable {
      *
      */
     public function findBySlug( $slug ) {
-        $this->find('slug', $slug);
+        return $this->find('slug', $slug);
     }
 
     // -------------------------------------------------------------------------

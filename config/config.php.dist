@@ -23,6 +23,8 @@ return array(
      */
     'Database' => array(
         'Host'     => '<HOST>',
+        'Socket'   => '<SOCKET>',
+        'Port'     => <PORT>,
         'Username' => '<USER>',
         'Password' => '<PASSWORD>',
         'Database' => '<DATABASE>'

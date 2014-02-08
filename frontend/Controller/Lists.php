@@ -44,23 +44,14 @@ class Lists extends \Controller {
 
         $bk = \BabelKitMySQLi::getInstance();
 
-        $this->view->PresetSelect = $bk->select(
-            'preset',
-            LANGUAGE,
-            array(
-                'value'    => '-',
-                'options'  => 'id="preset"'
-            )
-        );
+        while ($this->app->cache->save('preset', $preset)) {
+            $preset = $bk->select('preset', LANGUAGE);
+        }
+        $this->view->PresetSelect = $preset;
 
-        $this->view->PeriodSelect = $bk->select(
-            'period',
-            LANGUAGE,
-            array(
-                'options' => 'id="period"'
-            )
-        );
-
-        parent::after();
+        while ($this->app->cache->save('period', $period)) {
+            $period = $bk->select('period', LANGUAGE);
+        }
+        $this->view->PeriodSelect = $period;
     }
 }

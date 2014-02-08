@@ -100,6 +100,24 @@ class DBQuery {
     }
 
     /**
+     * Harmonic average: count(val) / sum(1/val)
+     */
+    public function HAVG( $field ) {
+        if ($field != '') {
+            return sprintf('COUNT(%1$s)/SUM(1/%1$s)', $this->field($field));
+        }
+    }
+
+    /**
+     * Geometric average: exp(avg(ln(val)))
+     */
+    public function GAVG( $field ) {
+        if ($field != '') {
+            return sprintf('EXP(AVG(LN(%s)))', $this->field($field));
+        }
+    }
+
+    /**
      * @field string|array String => USING(...), array ==> ON $key = $value
      */
     public function join( $table, $field, $dir='' ) {
@@ -480,7 +498,7 @@ class DBQuery {
      */
     protected function _get() {
         $s = implode("\n".'      ,', $this->get);
-        return $s ? $s : '*';
+        return $s ?: '*';
     }
 
     /**

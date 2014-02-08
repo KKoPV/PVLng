@@ -25,6 +25,13 @@ class Tree extends \slimMVC\ORMTable {
         return $this->model ? 'Channel\\'.$this->model : NULL;
     }
 
+    /**
+     *
+     */
+    public function findByGUID( $guid ) {
+        return $this->find('guid', $guid);
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------

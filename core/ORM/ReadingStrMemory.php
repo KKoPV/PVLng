@@ -28,7 +28,7 @@ class ReadingStrMemory extends \slimMVC\ORMTable {
         parent::__construct();
         $this->app->db->query('
             CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
-                `id` int(10) unsigned NOT NULL,
+                `id` smallint(5) unsigned NOT NULL,
                 `timestamp` int(11) NOT NULL,
                 `data` varchar(50) NOT NULL,
                 PRIMARY KEY (`id`,`timestamp`)

@@ -50,15 +50,8 @@ class Controller extends slimMVC\Controller {
 
         $this->view->User = $this->User;
         $this->view->Embedded = $this->app->request->get('embedded');
-    }
-
-    /**
-     *
-     */
-    public function before() {
-        parent::before();
-
         $controller = str_replace('Controller\\', '', get_class($this));
+
         $this->view->BaseDir = array(
             APP_DIR . DS . 'View' . DS . $controller . DS . 'custom',
             APP_DIR . DS . 'View' . DS . $controller,
@@ -73,7 +66,7 @@ class Controller extends slimMVC\Controller {
     public function after() {
         /* For Logout */
         $this->view->User = $this->User;
-        $this->view->APIkey = $this->model->getAPIkey();
+        if ($this->User) $this->view->APIkey = (new \ORM\Config)->getAPIkey();
         parent::after();
     }
 

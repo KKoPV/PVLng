@@ -78,9 +78,12 @@ class JSON extends Channel {
             $value = &$request;
             $found = TRUE; // optimistic search :-)
 
-            while ($key = array_shift($path)) {
-                if (isset($value[$key])) {
+            // To handle [0] array keys use all as strings and array_key_exists
+            while (($key = array_shift($path)) != '') {
+                if (array_key_exists($key, $value)) {
                     $value = &$value[$key];
+                    print_r($value);
+                    echo ' - ';
                 } else {
                     $found = FALSE;
                     break;

@@ -358,15 +358,17 @@ abstract class ORMTable {
         foreach ($this->fields as $field=>$value) {
             // Don't insert/replace empty fields
             if ((string) $value != '') {
-                $keys[]     = $field;
-                $values[] = $this->app->db->real_escape_string($value);
+                $keys[]   = $field;
+                $values[] = is_numeric($value)
+                          ? $value
+                          : '"' . $this->app->db->real_escape_string($value) . '"';
             }
         }
 
         $sql = $mode.' INTO ' . $this->table
              . ' (`' . implode('`, `', $keys) . '`) '
              . 'VALUES'
-             . ' ("' . implode('", "', $values) . '")';
+             . ' (' . implode(', ', $values) . ')';
 
         try {
             if ($this->_query($sql) AND $this->autoinc AND $this->app->db->insert_id) {

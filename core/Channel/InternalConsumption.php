@@ -47,22 +47,25 @@ class InternalConsumption extends \Channel {
         $childs = $this->getChilds();
 
         $child1 = $childs[0]->read($request);
-        $child2 = $childs[1]->read($request);
+        $row1   = $child1->rewind()->current();
 
-        $row2 = $child2->rewind()->current();
+        $child2 = $childs[1]->read($request);
+        $row2   = $child2->rewind()->current();
         $FirstKey2 = $child2->key();
 
         $result = new \Buffer;
 
         $last = 0;
 
-        foreach ($child1 as $key1=>$row1) {
+        while (!empty($row1) OR !empty($row2)) {
 
+            $key1 = $child1->key();
             $key2 = $child2->key();
 
-            if (!$key2) {
+            if (empty($row2)) {
                 $last = $row1['data'] = $last + $row1['consumption'];
                 $result->write($row1, $key1);
+                $row1 = $child1->next()->current();
                 continue;
             }
 
@@ -79,6 +82,7 @@ class InternalConsumption extends \Channel {
 
                 $result->write($row1, $key1);
 
+                $row1 = $child1->next()->current();
                 $row2 = $child2->next()->current();
 
             } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
@@ -89,13 +93,16 @@ class InternalConsumption extends \Channel {
                     $last = $row1['data'];
 
                     $result->write($row1, $key1);
-                }
+               }
+
+                $row1 = $child1->next()->current();
 
             } else /* $key1 > $key2 */ {
 
-                $last = $row1['data'];
-
-                $result->write($row1, $key1);
+                if (!empty($row1)) {
+                    $last = $row1['data'];
+                    $result->write($row1, $key1);
+                }
 
                 $row2 = $child2->next()->current();
             }

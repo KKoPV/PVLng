@@ -181,6 +181,31 @@ class gMemCache {
   /**
    *
    */
+  function fetch() {
+    $buf = '';
+    while ($c = fread($this->socket,2048))  {
+      $buf .= $c;
+      if ( substr($c,-5,3) == "END") break;
+    }
+    /* Getting first line */
+
+    $lines = explode(self::EOL,$buf,2);
+
+    if ($lines[0] == 'END') return;
+
+    $parts = explode(' ',$lines[0]);
+
+    $value = substr($lines[1], 0, $parts[3]);
+
+    if ($parts[2] & self::IS_COMPRESSED) $value = gzuncompress($value);
+    if ($parts[2] & self::IS_ARRAY) $value = unserialize($value);
+
+    return $value;
+  }
+
+  /**
+   *
+   */
   function getStats() {
     if (!$this->isConnected() ) return FALSE;
     $buf = '';
