@@ -18,30 +18,26 @@
  *
  */
 function changeDates( dir ) {
-    var from = Date.parse($('#from').datepicker('getDate')) + dir*24*60*60*1000;
-    if (from > (new Date).getTime()) {
+    dir *= 24*60*60*1000;
+
+    var from = new Date(Date.parse($('#from').datepicker('getDate')) + dir),
+        to = new Date(Date.parse($('#to').datepicker('getDate')) + dir);
+
+    if (to > new Date) {
         $.pnotify({ type: 'info', text: "Can't go beyond today." });
         return;
     }
-    var to = Date.parse($('#to').datepicker('getDate')) + dir*24*60*60*1000;
-    $('#from').datepicker('option', 'maxDate', 0);
-    $('#to').datepicker('option', 'maxDate', 0);
-    if (dir < 0) {
-        /* backwards */
-        $('#from').datepicker('setDate', new Date(from));
-        $('#to').datepicker('setDate', new Date(to));
-    } else {
-        /* foreward */
-        $('#to').datepicker('setDate', new Date(to));
-        $('#from').datepicker('setDate', new Date(from));
-    }
+
+    $('#from').datepicker('option', 'maxDate', to).datepicker('setDate', from);
+    $('#to').datepicker('option', 'minDate', from).datepicker('setDate', to);
+
     updateList();
 }
 
 /**
  *
  */
-var channel = {}, consumption_raw,
+var channel = {},
     /* String length for Datetime column */
     dtLen = { '': 19, i: 16, h: 13, d: 10, w: 10, m: 7, q: 7, y: 4 };
 
@@ -50,11 +46,12 @@ var channel = {}, consumption_raw,
  */
 function updateList() {
 
-    var guid = $('#channel').find('option:selected').val();
+    var guid = $('#channel option:selected').val();
 
     if (!guid) {
         var icon = $('#icon');
         icon.prop('src', icon.data('none'));
+        $('#icon-private').hide();
         listTable.fnClearTable();
         $('.export').button('option', 'disabled', true);
         return;
@@ -85,34 +82,31 @@ function updateList() {
             _log('Attributes', channel);
             _log('Data', data);
 
-            $('#icon').prop('src', channel.icon);
+            $('#icon').prop('src', channel.icon).prop('title', channel.type).tipTip();
+            $('#icon-private').toggle(!channel.public);
             $('.export').button( 'option', 'disabled', data.length == 0);
 
-            consumption_raw = {};
-
             $(data).each(function(id, row) {
-                /* remeber raw consumption data for footer calculation */
-                if (channel.meter) consumption_raw[id] = row.consumption;
-
                 listTable.fnAddData(
                     [
-                        row.timestamp,
                         row.datetime.substr(0, dtLen[period]),
-                        channel.numeric ? $.number(row.data, channel.decimals, '{{DSEP}}', '{{TSEP}}') : row.data,
+                        channel.numeric ? +row.data.toFixed(channel.decimals) : row.data,
                         /* These 3 columns are hidden for non-numeric channels */
-                        channel.numeric ? $.number(row.min, channel.decimals, '{{DSEP}}', '{{TSEP}}') : null,
-                        channel.numeric ? $.number(row.max, channel.decimals, '{{DSEP}}', '{{TSEP}}') : null,
-                        channel.numeric ? $.number(row.consumption, channel.decimals, '{{DSEP}}', '{{TSEP}}') : null,
-                        row.count
+                        channel.numeric ? +row.min.toFixed(channel.decimals) : null,
+                        channel.numeric ? +row.max.toFixed(channel.decimals) : null,
+                        channel.numeric ? +row.consumption.toFixed(channel.decimals) : null,
+                        row.count,
+                        period ? '' : '<img class="delete-reading" class="tip" title="{{DeleteReading}}" src="/images/ico/minus_circle.png" data-timestamp="'+row.timestamp+'" data-value="'+row.data+'" />'
                     ],
                     false
                 );
             });
 
+            listTable.fnSetColumnVis( 2, channel.numeric && period && !channel.meter );
             listTable.fnSetColumnVis( 3, channel.numeric && period && !channel.meter );
-            listTable.fnSetColumnVis( 4, channel.numeric && period && !channel.meter );
-            listTable.fnSetColumnVis( 5, channel.numeric && channel.meter );
-            listTable.fnSetColumnVis( 6, channel.numeric && period );
+            listTable.fnSetColumnVis( 4, channel.numeric && channel.meter );
+            listTable.fnSetColumnVis( 5, channel.numeric && period );
+            listTable.fnSetColumnVis( 6, !period );
         }
     ).fail(function (jqxhr, textStatus, error) {
         $.pnotify({
@@ -172,7 +166,7 @@ $(function() {
 
     $.ajaxSetup({
         beforeSend: function setHeader(xhr) {
-            xhr.setRequestHeader('X-PVLng-Key', '{APIKEY}');
+            xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
         }
     });
 
@@ -181,9 +175,9 @@ $(function() {
         this.oApi._fnProcessingDisplay( oSettings, onoff );
     };
 
-    <!-- IF {LANGUAGE} != 'en' -->
-    $.datepicker.setDefaults($.datepicker.regional['{LANGUAGE}']);
-    <!-- ENDIF -->
+    if (language != "en") {
+        $.datepicker.setDefaults($.datepicker.regional[language]);
+    }
 
     var d = new Date();
 
@@ -197,7 +191,6 @@ $(function() {
         changeYear: true,
         onClose: function( selectedDate ) {
             $('#to').datepicker( 'option', 'minDate', selectedDate );
-            $('#to').datepicker( 'option', 'maxDate', 0 );
         }
     }).datepicker('setDate', d);
 
@@ -220,31 +213,25 @@ $(function() {
         bDeferRender: true,
         bProcessing: true,
         /* Add placeholder div into table header */
-        sDom: 'r<"H"l<"#dt-toolbar">>t<"F"ip><"clear">',
+        sDom: 'r<"H"l<"#dt-toolbar">>t<"F"ip>',
         aLengthMenu: [ [10, 20, 50, 100, -1], [10, 20, 50, 100, '{{All}}'] ],
         iDisplayLength: 20,
         sPaginationType: 'full_numbers',
-        aaSorting: [[ 1, 'desc' ]],
+        bAutoWidth: false,
+        aaSorting: [[ 0, 'desc' ]],
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
         aoColumnDefs: [
-            { bVisible: false, aTargets: [ 0 ] },
-            { sType: 'numeric', aTargets: [ 2, 3, 4, 5, 6 ] },
-            { sClass: 'r', aTargets: [ 2, 3, 4, 5, 6 ] }
+            { sClass: 'r', aTargets: [ 1, 2, 3, 4, 5 ] },
+            { bSortable: false, aTargets: [ 6 ] },
+            { sWidth: "20%", aTargets: [ 0 ] },
+            { sWidth: "1%", aTargets: [ 6 ] }
         ],
         fnInitComplete: function(oSettings, json) {
-            /* Fill extra div in sDom with pre defined content */
-            $('#dt-toolbar')
-                /* replacing filter div, so reuse styling... */
-                .addClass('dataTables_filter')
-                /* Move buttons toolbar in */
-                .append($('#toolbar').unwrap());
+            /* Fill extra div #dt-toolbar in sDom with pre defined content,
+               Remove wrapper div, replace filter div - reuse styling, Move in */
+            $('#toolbar').unwrap().addClass('dataTables_filter').appendTo('#dt-toolbar');
             $('select[name=list_length]').addClass('ui-corner-all');
             updateList();
-        },
-        fnHeaderCallback: function( nHead, aData, iStart, iEnd, aiDisplay ) {
-            var th = nHead.getElementsByTagName('th')[1],
-                match = th.innerHTML.match(/{{Reading}}[^<]*/g),
-                unit = channel.unit ? ' ['+channel.unit+']' : '';
-            th.innerHTML = th.innerHTML.replace(match[0], '{{Reading}}' + unit);
         },
         fnFooterCallback: function( nFoot, aData, iStart, iEnd, aiDisplay ) {
             $('#tf-consumption').html('&nbsp;');
@@ -252,11 +239,35 @@ $(function() {
 
             var consumption = 0;
             for (var i=iStart; i<iEnd; i++) {
-                consumption += consumption_raw[aiDisplay[i]];
+                consumption += aData[aiDisplay[i]][4];
             }
-            $('#tf-consumption').number(consumption, channel.decimals, '{{DSEP}}', '{{TSEP}}');
+            $('#tf-consumption').html(consumption.toFixed(channel.decimals));
         },
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
+        fnDrawCallback: function(oSettings) {
+            $('img.delete-reading').button();
+        }
+    });
+
+    /* Bind click listener to all delete buttons */
+    $('#list tbody').on('click', 'img.delete-reading', function() {
+        var ts = $(this).data('timestamp'),
+            prompt = (new Date(ts*1000).toLocaleString().replace(' 00:00', ''))+' : ' + $(this).data('value').toFixed(channel.decimals);
+
+        if (confirm('{{DeleteReadingConfirm}}\n\n'+prompt)) {
+            var pos = listTable.fnGetPosition(this.parentNode.parentNode);
+
+            $.ajax({
+                type: 'DELETE',
+                url: PVLngAPI + 'data/' + channel.guid + '/' + ts + '.json',
+                dataType: 'json',
+                success: function() {
+                    listTable.fnDeleteRow(pos);
+                },
+                error: function(jqXHR) {
+                    alert(jqXHR.responseJSON.message);
+                }
+            });
+        }
     });
 
     $(window).bind('resize', function() {
@@ -273,26 +284,22 @@ $(function() {
     });
 
     $('#btn-reset').button({
-        icons: {
-            primary: 'ui-icon-calendar'
-        },
+        icons: { primary: 'ui-icon-calendar' },
         text: false
     }).click(function(event) {
         event.preventDefault();
         var d = new Date;
-        /* Reset max. date today */
-        $('#from').datepicker( 'option', 'maxDate', d );
-        $('#to').datepicker( 'option', 'maxDate', d );
-        /* Set max. date today */
+        /* Set date ranges */
+        $('#from').datepicker('option', 'maxDate', d);
+        $('#to').datepicker('option', 'minDate', d);
+        /* Set date today */
         $('#from').datepicker('setDate', d);
         $('#to').datepicker('setDate', d);
         updateList();
     });
 
     $('#btn-refresh').button({
-        icons: {
-            primary: 'ui-icon-refresh'
-        },
+        icons: { primary: 'ui-icon-refresh' },
         text: false
     }).click(function(e) {
         updateList();
@@ -301,23 +308,14 @@ $(function() {
 
     $('.export').click(function(event) {
         event.preventDefault();
+        listTable.fnProcessingIndicator();
 
-        var i,
-            separator = $(this).data('separator'),
+        var separator = $(this).data('separator'),
             mime = $(this).data('mime'),
             extension = $(this).data('extension'),
-            data = listTable.fnGetData(),
-            len = data.length,
             csv = [
-                [
-                    'Timestamp',
-                    '"Date time"',
-                    'Data',
-                    'Min',
-                    'Max',
-                    'Consumption',
-                    '"Row count"'
-                ].join(separator) + "\n"
+                ['Timestamp', '"Date time"', 'Data', 'Min', 'Max',
+                 'Consumption', '"Row count"'].join(separator) + "\n"
             ],
             d = new Date(),
             name = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate() + '-' +
@@ -326,38 +324,34 @@ $(function() {
 
         if (channel.description) name += '-' + channel.description;
 
-        listTable.fnProcessingIndicator();
-
-        var period_count = +$('#periodcnt').val(),
-            period = $('#period').val();
-
-        $.getJSON(
-            PVLngAPI + 'data/' + channel.guid + '.json',
-            {
-                full:       true,
-                short:      true,
-                start:      $('#fromdate').val(),
-                end:        $('#todate').val() + ' 24:00',
-                period:     period_count + period
-            },
-            function(data) {
+        $.when(
+            /* Fetch raw data */
+            $.getJSON(
+                PVLngAPI + 'data/' + channel.guid + '.json',
+                {   full:       true,
+                    short:      true,
+                    start:      $('#fromdate').val(),
+                    end:        $('#todate').val() + ' 24:00',
+                    period:     $('#periodcnt').val() + $('#period').val()
+                }
+            ),
+            /* Get hashes for channel name */
+            $.getJSON(PVLngAPI + 'hash.json', { text: name })
+        ).then(
+            function(jqXHR1, jqXHR2) {
                 /* Transform to array of strings for saveAs */
-                $(data).each(function (id, row) {
+                $(jqXHR1[0]).each(function (id, row) {
                     csv.push(row.join(separator) + "\n");
                 });
-
-                $.getJSON(
-                    PVLngAPI + 'hash.json',
-                    { text: name },
-                    function(data) {
-                        saveAs(
-                            new Blob(csv, { type: mime + ';charset=utf-8' }),
-                            data.slug + '.' + extension
-                        );
-                    }
+                saveAs(
+                    new Blob(csv, { type: mime + ';charset=utf-8' }),
+                    jqXHR2[0].text + '.' + extension
                 );
+            },
+            function(jqXHR) {
+                alert(jqXHR.responseText);
             }
-        ).complete(function () {
+        ).always(function() {
             listTable.fnProcessingIndicator(false);
         });
     });

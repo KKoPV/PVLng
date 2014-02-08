@@ -13,7 +13,7 @@
 
 <h3>{{SystemInformation}}</h3>
 
-<table id="table-info">
+<table id="table-info" class="display">
     <thead>
     <tr>
         <th></th>
@@ -49,7 +49,7 @@
 
 <h3>{{Statistics}}</h3>
 
-<table id="table-stats">
+<table id="table-stats" class="display">
     <thead>
     <tr>
         <th class="l">{{ChannelName}}</th>
@@ -74,9 +74,7 @@
         <td>{SERIAL}</td>
         <td>{CHANNEL}</td>
         <td class="r">{numf:READINGS}</td>
-        <td class="r last-reading" data-guid="{GUID}">
-            <img src="/images/spinner.gif" style="width:16px;height:16px" width="16" height="16" alt="..." />
-        </td>
+        <td class="r last-reading" data-guid="{GUID}">?</td>
         <td>{UNIT}</td>
     </tr>
     <!-- END -->
@@ -84,10 +82,9 @@
 
     <tfoot>
     <tr>
-        <th class="l" colspan="3">{CHANNELCOUNT}&nbsp;{{Channels}}</th>
-        <th class="l">{{Total}}</th>
-        <th class="r">{numf:READINGS}</th>
-        <th colspan="2"></th>
+        <th class="l" colspan="4"></th>
+        <th class="r"></th>
+        <th class="l" colspan="2">{{Readings}}</th>
     </tr>
     </tfoot>
 

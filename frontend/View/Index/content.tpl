@@ -9,12 +9,10 @@
  */
 -->
 
-<form method="post" action="/">
+<input type="hidden" id="fromdate" />
+<input type="hidden" id="todate" />
 
-<input type="hidden" id="fromdate" name="fromdate" />
-<input type="hidden" id="todate" name="todate" />
-
-<div id="nav" class="grid_10" style="margin-top:1em<!-- IF {EMBEDDED} == "2" -->;display:none<!-- ENDIF -->">
+<div id="nav" class="grid_10" style="margin-top:1em">
 
     <table style="width:100%">
     <tr>
@@ -23,20 +21,20 @@
                   title="{{PrevDay}} (Alt+P)" onclick="changeDates(-1)"></span>
         </td>
         <td>
-            <input class="c" type="text" id="from" name="from" size="10" />
+            <input class="c" type="text" id="from" size="10" />
         </td>
         <td style="padding:0 .5em;font-weight:bold">
             &mdash;
         </td>
         <td>
-            <input class="c" type="text" id="to" name="to" size="10" />
+            <input class="c" type="text" id="to" size="10" />
         </td>
         <td>
             <span class="ui-icon ui-icon-triangle-1-e tip"
                   title="{{NextDay}} (Alt+N)" onclick="changeDates(1)"></span>
         </td>
         <td style="padding-left:.5em">
-            <button id="btn-reset">{{Today}}</button>
+            <button id="btn-reset" class="tip" title="{{ChartTodayHint}}">{{Today}}</button>
         </td>
         <td style="width:99%;text-align:right">
             <img src="/images/ico/arrow-switch.png" style="margin-right:.5em"
@@ -44,7 +42,7 @@
             <span class="p-select">{PRESETSELECT}</span>
             <span class="p-select" style="display:none">
                 <input class="numbersOnly r" style="margin-right:.5em" type="text"
-                       id="periodcnt" name="periodcnt" value="1" size="2" />
+                       id="periodcnt" value="1" size="2" />
                 {PERIODSELECT}
             </span>
             <span style="margin-left:.5em">
@@ -58,64 +56,19 @@
 <div class="clear"></div>
 
 <div id="chart" class="grid_10">
-    <!-- IF {VIEW} -->
-        <p style="height:528px;text-align:center">
-            <img src="/images/loading.gif" alt="{{JustAMoment}}"
-                 style="margin-top:250px;width:48px;height47px" width="48" height="47" />
-        </p>
-    <!-- ELSEIF {USER} -->
-        <p class="b">
-            {{NoChannelsSelectedYet}}
-        </p>
-
-        <label for="top-loadview" class="b" style="margin-right:1em">{{Variants}}:</label>
-
-        <select id="top-loadview" name="top-loadview" onChange="this.form.submit()">
-            <option value="">--- {{Select}} ---</option>
-            <!-- BEGIN VIEWS -->
-                <!-- IF {__USER} -->
-                    <!-- show all charts and mark public charts -->
-                    <option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-                        {NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
-                    </option>
-                <!-- ELSEIF {PUBLIC} -->
-                    <!-- show only public charts -->
-                    <option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-                        {NAME}
-                    </option>
-                <!-- ENDIF -->
-            <!-- END -->
-        </select>
-        <noscript>
-            <input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
-        </noscript>
-    <!-- ENDIF -->
+    <div id="top-select" style="display:none">
+        <p class="b">{{NoChannelsSelectedYet}}</p>
+        <label for="top-load-view" class="b" style="margin-right:1em">{{Variants}}:</label>
+        <select id="top-load-view"></select>
+    </div>
 </div>
 
 <div class="clear"></div>
 
-<!-- IF {EMBEDDED} != "2" -->
-
-    <!-- IF {USER} -->
-        <!-- INCLUDE content.private.inc.tpl -->
-    <!-- ELSE -->
-        <!-- INCLUDE content.public.inc.tpl -->
-    <!-- ENDIF -->
-
+<!-- IF {USER} -->
+    <!-- INCLUDE content.private.inc.tpl -->
 <!-- ELSE -->
-
-    <!-- BEGIN DATA -->
-    <!-- IF {PUBLIC} AND {CHECKED} -->  <!-- MUST have also {GRAPH} before :-) -->
-        <input id="c{ID}" style="display:none" class="channel"
-               type="checkbox" checked="checked"
-               data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}"
-               value='{PRESENTATION}' />
-    <!-- ENDIF -->
-    <!-- END -->
-    <input id="loaddeleteview" type="hidden" value="{VIEW}"/>
-
+    <!-- INCLUDE content.public.inc.tpl -->
 <!-- ENDIF -->
-
-</form>
 
 <!-- INCLUDE dialog.chart.tpl -->

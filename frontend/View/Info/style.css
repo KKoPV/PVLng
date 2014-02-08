@@ -10,3 +10,9 @@
     padding-top: 1em !important;
     padding-bottom: 1em !important;
 }
+
+table.dataTable tr.even td.ok { background-color: #BBFFBB; }
+table.dataTable tr.odd td.ok { background-color: #DDFFDD; }
+
+table.dataTable tr.even td.fail { background-color: #FFBBBB; }
+table.dataTable tr.odd td.fail { background-color: #FFDDDD; }

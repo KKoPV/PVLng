@@ -13,7 +13,7 @@
 
 <script>
 
-var oTable, TreeExpanded = true;
+var oTable;
 
 /**
  *
@@ -38,34 +38,33 @@ function moveChild( id, action ) {
 /**
  *
  */
-function ToggleTree() {
-    if (TreeExpanded) {
-        $('#tree').treetable('collapseAll');
-        $('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
-        $('#tiptoggle').html('{{ExpandAll}}');
-    } else {
-        $('#tree').treetable('expandAll');
-        $('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
-        $('#tiptoggle').html('{{CollapseAll}}');
-    }
-    TreeExpanded = !TreeExpanded;
-    return false;
-}
+var ForceFullDraw = false;
 
 /**
  *
  */
 $(function() {
 
+    $.fn.dataTableExt.afnFiltering.push(
+        function( oSettings, aData, iDataIndex ) {
+            return (ForceFullDraw || !$(oTable.fnGetNodes()[iDataIndex]).hasClass('hidden'));
+        }
+    );
+
+    $.fn.dataTableExt.oApi.fnProcessingIndicator = function( oSettings, onoff ) {
+        this.oApi._fnProcessingDisplay( oSettings, onoff );
+    };
+
     lscache.setBucket('Overview');
 
     oTable = $('#tree').DataTable({
         bSort: false,
-        bLengthChange: false,
-        bFilter: false,
         bInfo: false,
+        bLengthChange: false,
         bPaginate: false,
+        bProcessing: true,
         bJQueryUI: true,
+        sDom: ' <"H"r>t<"F">',
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
 
         fnInitComplete: function() {
@@ -99,20 +98,49 @@ $(function() {
                 },
                 onInitialized: function() {
                     /* set callbacks here AFTER stripes are initialized */
-                    this.settings.onNodeCollapse = function() {
+                    this.settings.onNodeCollapse = function(node) {
+                        oTable.fnDraw()
                         /* mark node as collapsed */
                         this.settings.markCollapsed(this.id, true);
-                        setTimeout(function() { zebra('#tree') }, 1);
                     };
-                    this.settings.onNodeExpand = function() {
+                    this.settings.onNodeExpand = function(node) {
+                        ForceFullDraw = true;
+                        oTable.fnDraw();
+                    };
+                    this.settings.onNodeExpanded = function(node) {
+                        ForceFullDraw = false;
+                        oTable.fnDraw();
                         this.settings.markCollapsed(this.id, false);
-                        setTimeout(function() { zebra('#tree') }, 1);
                     };
-                    zebra('#tree');
                 }
             });
         }
     }).disableSelection();
+
+    $('#treetoggle').click(function(event) {
+        event.preventDefault();
+
+        oTable.fnProcessingIndicator(true);
+        $(document.body).addClass('wait');
+
+        /* Forces show of processing indicator ... */
+        setTimeout(function() {
+            var toggler = $('#treetoggle');
+            if (toggler.data('expanded') == 1) {
+                $('#tree').treetable('collapseAll');
+                $('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
+                $('#tiptoggle').html('{{ExpandAll}}');
+                toggler.data('expanded', 0);
+            } else {
+                $('#tree').treetable('expandAll');
+                $('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
+                $('#tiptoggle').html('{{CollapseAll}}');
+                toggler.data('expanded', 1);
+            }
+            $(document.body).removeClass('wait');
+            oTable.fnProcessingIndicator(false);
+        }, 1);
+    });
 
     $('.droppable').droppable({
         accept: '.draggable',

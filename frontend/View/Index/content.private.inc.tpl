@@ -10,20 +10,20 @@
 -->
 
 <div class="grid_10">
-    <a id="togglewrapper" href="#" class="tip" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</a>
+    <button id="togglewrapper" class="tip" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</button>
 </div>
 
 <div class="clear"></div>
 
 <div id="wrapper" class="grid_10" style="padding-top:1em">
 
-    <table id="tree" class="dataTable treeTable">
+    <table id="data-table" class="dataTable treeTable">
         <thead>
         <tr>
             <th style="width:1%">
                 <img id="treetoggle" src="/images/ico/toggle<!-- IF {VIEW} -->_expand<!-- ENDIF -->.png"
                      style="width:16px;height:16px" width="16" height="16"
-                     class="tip" onclick="ToggleTree()" alt="[+]" tip="#tiptoggle" />
+                     class="tip" alt="[+]" tip="#tiptoggle" />
                 <div id="tiptoggle">{{CollapseAll}} (F4)</div>
             </th>
             <th class="l">
@@ -44,14 +44,12 @@
 
         <tbody>
             <!-- BEGIN DATA -->
-            <tr data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->
-                <!-- IF !{GRAPH} -->class="no-graph"<!-- ENDIF -->>
+            <tr id="rc{ID}" class="channel<!-- IF !{GRAPH} --> no-graph<!-- ENDIF -->"
+                data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF --> >
                 <td>
                     <!-- IF {GRAPH} -->
-                    <input id="c{ID}" class="channel iCheck" type="checkbox" name="v[{ID}]"
-                           data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}"
-                           value='{PRESENTATION}'
-                           <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
+                    <input id="c{ID}" type="checkbox" class="channel iCheck"
+                           data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
                     <!-- ENDIF -->
                 </td>
                 <td style="padding:0.4em 0">
@@ -96,6 +94,8 @@
 
 </div>
 
+<div class="clear"></div>
+
 <h3 class="grid_10">
     {{Variants}}
     <img style="margin-left:.5em;width:16px;height:16px" class="tip"
@@ -105,44 +105,25 @@
 
 <div class="clear"></div>
 
-<div class="grid_10">
-    <table style="width:100%"><tr>
-    <td style="width:60%">
-        <select id="loaddeleteview" name="loaddeleteview">
-            <option value="">--- {{Select}} ---</option>
-            <!-- BEGIN VIEWS -->
-                <!-- show all charts and mark public charts -->
-                <option value="{NAME}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>
-                    {NAME} <!-- IF {PUBLIC} --> ({{public}})<!-- ENDIF -->
-                </option>
-            <!-- END -->
-        </select>
-        <input type="submit" name="load" value="{{Load}}" style="margin-left:.5em" />
-        <input type="submit" id="delete-view" name="delete" value="{{Delete}}" style="margin-left:.5em" />
-    </td>
-    <td>
-        <input id="saveview" type="text" style="margin-left:3em"
-               name="saveview" value="{VIEW}"/>
-    </td>
-    <td>
-        <input type="checkbox" class="iCheckLine" id="public" name="public" value="1"
+<div class="grid_8">
+    <select id="loaddeleteview"></select>
+    <button id="btn-load" class="tip" style="margin:0 .5em" title="{{Load}}">{{Load}}</button>
+    <button id="btn-delete" class="tip" title="{{Delete}}" data-confirmed="0">{{Delete}}</button>
+    <br /><br />
+    <input class="fl" id="saveview" type="text" value="{VIEW}" size="35" />
+    <div class="fl" style="margin:.4em .5em 0 .5em">
+        <input id="public" type="checkbox" class="iCheck" value="1"
                <!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF --> />
-        <label for="public">{{public}}</label>
-    </td>
-    <td style="width:30%">
-        <img src="/images/ico/information_frame.png" class="tip" title="{{publicHint}}"
-             style="margin-left:.5em;width:16px;height:16px" width="16" height="16" />
-        <input type="submit" name="save" value="{{Save}}" style="margin:0 3em 0 .5em" />
-    </td>
-    <td class="r" style="white-space:nowrap">
-        <a id="btn-permanent" class="tip" title="{{DragPermanent}}" data-text="{VIEW} & | {strip_tags:TITLE}" data-url="/chart/{SLUG}">
-            {VIEW} | {strip_tags:TITLE}
-        </a>
-        <a href="/chart/{SLUG}" id="btn-bookmark" class="tip" style="margin-left:.5em" title="{{DragBookmark}}">
-            {VIEW} | {strip_tags:TITLE}
-        </a>
-    </td>
-    </tr></table>
+    </div>
+    <label for="public">{{public}}</label>
+    <img src="/images/ico/information_frame.png" class="tip" title="{{publicHint}}"
+         style="margin-left:.25em;width:16px;height:16px" width="16" height="16" />
+    <button id="btn-save" class="tip" style="margin-left:1em" title="{{Save}}">{{Save}}</button>
+</div>
+<div class="grid_2 r">
+    <a id="btn-bookmark" href="#" class="tip" title="{{DragBookmark}}">Bookmark</a>
+    <br /><br />
+    <a id="btn-permanent" href="#" class="tip" title="{{DragPermanent}}">Permanent bookmark</a>
 </div>
 
 <div class="clear"></div>

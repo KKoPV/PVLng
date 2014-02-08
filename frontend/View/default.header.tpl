@@ -47,13 +47,13 @@
 <div class="grid_10">
     <div class="fl">
         <span class="toolbar menu">
-            <a class="tipbtn" title="{{ChartHint}}" href="/">{{Charts}}</a>
-            <a class="login tipbtn" title="{{DashboardHint}}" href="/dashboard">{{Dashboard}}</a>
-            <a class="login tipbtn" title="{{ListHint}}" href="/list">{{List}}</a>
-            <a class="login tipbtn" title="{{OverviewHint}}" href="/overview">{{Overview}}</a>
-            <a class="login tipbtn" title="{{ChannelsHint}}" href="/channel">{{Channels}}</a>
-            <a class="login tipbtn" title="{{InfoHint}}" href="/info">{{Information}}</a>
-            <a class="tipbtn" title="{{PlantDescriptionHint}}" href="/description">{{Description}}</a>
+            <a class="tipbtn" title="{{ChartHint}} (Shift+F1)" href="/">{{Charts}}</a>
+            <a class="login tipbtn" title="{{DashboardHint}} (Shift+F2)" href="/dashboard">{{Dashboard}}</a>
+            <a class="login tipbtn" title="{{ListHint}} (Shift+F3)" href="/list">{{List}}</a>
+            <a class="login tipbtn" title="{{OverviewHint}} (Shift+F4)" href="/overview">{{Overview}}</a>
+            <a class="login tipbtn" title="{{ChannelsHint}} (Shift+F5)" href="/channel">{{Channels}}</a>
+            <a class="login tipbtn" title="{{InfoHint}} (Shift+F6)" href="/info">{{Information}}</a>
+            <a class="tipbtn" title="{{PlantDescriptionHint}} (Shift+F7)" href="/description">{{Description}}</a>
         </span>
     </div>
     <div class="r">

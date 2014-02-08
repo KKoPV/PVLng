@@ -224,11 +224,13 @@ function updateChart() {
     }
 
     var series = [], costs = 0;
+    $('#table-cons').hide();
 
     /* get data */
     $(channels).each(function(id, channel) {
 
-        var url = PVLngAPI + 'data/' + channel.guid + '.json';
+        var table = false,
+            url = PVLngAPI + 'data/' + channel.guid + '.json';
         _log('Fetch: ' + url);
 
         $.getJSON(
@@ -244,8 +246,8 @@ function updateChart() {
             function(data) {
                 var t, attr = data.shift();
                 _log('Attributes:', attr);
-                _log('Data:', data);
-
+/*                _log('Data:', data);
+*/
                 var serie = {     /* A trick to HTML-decode channel name */
                         name:     $('<div/>').html(attr.name).text(),
                         id:       channel.id,
@@ -271,27 +273,10 @@ function updateChart() {
                     }
                 });
 
-                if (channel.min || channel.max || attr.consumption) {
+                if (attr.consumption) {
                     tr = $('<tr/>');
                     t = (attr.description) ? ' (' + attr.description + ')' : '';
                     $('<th/>').html(attr.name + t).appendTo(tr);
-                }
-
-                if (channel.min) {
-                    td = $('<td/>').attr('id', 'min'+channel.id).addClass('r');
-                } else {
-                    td = $('<td/>');
-                }
-                td.appendTo(tr);
-
-                if (channel.max) {
-                    td = $('<td/>').attr('id', 'max'+channel.id).addClass('r');
-                } else {
-                    td = $('<td/>');
-                }
-                td.appendTo(tr);
-
-                if (attr.consumption) {
                     $('<td/>')
                         .addClass('r')
                         .html(Highcharts.numberFormat(attr.consumption, attr.decimals) + ' ' + attr.unit)
@@ -306,7 +291,10 @@ function updateChart() {
                         .appendTo(tr);
                 }
 
-                if (tr) tr.appendTo('#table-cons tbody');
+                if (tr) {
+                    tr.appendTo('#table-cons tbody');
+                    table = true;
+                }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
                 if (attr.unit) serie.tooltip = { valueSuffix: attr.unit };
@@ -337,7 +325,7 @@ function updateChart() {
         ).always(function() {
             /* Force redraw */
             chart.hideLoading();
-            chart.showLoading('- ' + (--loading) + ' -');
+            if (--loading) chart.showLoading('- ' + (loading) + ' -');
 
             /* check real count of elements in series array! */
             var completed = series.filter(function(a){ return a !== undefined }).length;
@@ -353,6 +341,7 @@ function updateChart() {
                         .html(costs)
                         .appendTo(tr);
                     tr.appendTo('#table-cons tbody');
+                    $('#table-cons').show();
                 }
 
                 /*
