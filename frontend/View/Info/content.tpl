@@ -73,7 +73,7 @@
         <td>{DESCRIPTION}</td>
         <td>{SERIAL}</td>
         <td>{CHANNEL}</td>
-        <td class="r">{numf:READINGS}</td>
+        <td class="r">{READINGS}</td>
         <td class="r last-reading" data-guid="{GUID}">?</td>
         <td>{UNIT}</td>
     </tr>

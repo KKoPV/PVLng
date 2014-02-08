@@ -9,7 +9,7 @@
  */
 -->
 
-<div class="push_3 grid_3" style="margin-top:5em;margin-bottom:5em">
+<div class="push_3 grid_7" style="margin-top:5em;margin-bottom:5em">
 
     <p>{{WelcomeToAdministration}}</p>
 
