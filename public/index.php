@@ -20,6 +20,7 @@ ini_set('display_startup_errors', 0);
 ini_set('display_errors', 0);
 error_reporting(0);
 
+setlocale(LC_NUMERIC, 'C');
 iconv_set_encoding('internal_encoding', 'UTF-8');
 mb_internal_encoding('UTF-8');
 clearstatcache();
@@ -102,10 +103,12 @@ $app->config = $config;
 /**
  * Database
  */
+slimMVC\MySQLi::setHost($config->get('Database.Host'));
+slimMVC\MySQLi::setPort($config->get('Database.Port'));
+slimMVC\MySQLi::setSocket($config->get('Database.Socket'));
 slimMVC\MySQLi::setUser($config->get('Database.Username'));
 slimMVC\MySQLi::setPassword($config->get('Database.Password'));
 slimMVC\MySQLi::setDatabase($config->get('Database.Database'));
-slimMVC\MySQLi::setHost($config->get('Database.Host'));
 slimMVC\MySQLi::$SETTINGS_TABLE = 'pvlng_config';
 
 try {
@@ -267,13 +270,21 @@ $app->map('/index', function() use ($app) {
 })->via('GET', 'POST');
 
 $app->get('/index(/:view)', function( $view='' ) use ($app) {
-    $app->params->set('view', $view);
-    $app->process();
+    // Put chart name at the begin
+    $params = array_merge(
+        array('chart' => $view),
+        $app->request->get()
+    );
+    $app->redirect('/?' . http_build_query($params));
 });
 
 $app->get('/chart/:view', function( $view ) use ($app) {
-    $app->params->set('view', $view);
-    $app->process();
+    // Put chart name at the begin
+    $params = array_merge(
+        array('chart' => $view),
+        $app->request->get()
+    );
+    $app->redirect('/?' . http_build_query($params));
 });
 
 // ---------------------------------------------------------------------------

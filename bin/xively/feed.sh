@@ -50,8 +50,6 @@ test -f "$LASTFILE" && LAST=$(<$LASTFILE) || LAST=$NOW
 INTERVAL=$(echo "scale=0; ( $NOW - $LAST ) / 60" | bc -l)
 echo $NOW >$LASTFILE
 
-LC_NUMERIC=en_US
-
 curl=$(curl_cmd)
 i=0
 found=

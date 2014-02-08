@@ -45,14 +45,19 @@ function twitter_maximum {
     PVLngGET2 "data/$2.tsv?start=$1" >$TMPFILE
 
     ### Loop all rows and find max. value
-    max=0
+    imax=0; vmax=0
     while read line; do
         value=$(echo "$line" | cut -f2)
-        test $value -gt $max && max=$value
+        ### Cut of decimals for testing
+        int=$(printf "%.0f" $value)
+        if test $int -gt $imax; then
+            imax=$int
+            vmax=$value
+        fi
     done <$TMPFILE
 
-    log 1 "$url => $max"
-    echo $max
+    log 1 "$url => $vmax"
+    echo $vmax
 }
 
 ##############################################################################
@@ -72,7 +77,7 @@ function twitter_production {
 twitter_overall_help='Overall production in MWh'
 ##############################################################################
 function twitter_overall {
-    value=$(PVLngGET2 "data/$1.tsv?start=0&period=99y" | cut -f2)
+    value=$(PVLngGET2 "data/$1.tsv?period=readlast" | cut -f2)
     log 1 "$url => $value"
     echo $value
 }

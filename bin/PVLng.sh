@@ -28,6 +28,8 @@ TEST=
 VERBOSE=0
 TRACE=
 
+LC_NUMERIC=en_US
+
 ### Automatic logging of all data pushed to PVLng API,
 ### flag -l required
 SAVEDATA=
@@ -39,16 +41,15 @@ test "$SaveDataDir" || SaveDataDir=$(readlink -f $(dirname ${BASH_SOURCE[0]}))/d
 ##############################################################################
 function log {
     test $VERBOSE -ge $1 || return
-
     shift
-
+    d=$(date +"[%H:%M:%S]")
     {   ### Detect if now $1 is a "@filename"
         if test "${1:0:1}" == '@'; then
-            echo $(date +"[%H:%M:%S]") File: ${1:1}
+            echo "$d File: ${1:1}"
             cat ${1:1}
             echo
         else
-            echo -e $(date +"[%H:%M:%S]") "$*"
+            echo -e "$d $*"
         fi
     } >&2
 }
@@ -71,17 +72,19 @@ function usage {
 ### read config file
 ##############################################################################
 function read_config {
-    test "$1"    || error_exit 'Missing config file!'
-    test -r "$1" || error_exit 'Configuration file is not readable!'
+    local file="$1"
+    test "$file" || error_exit 'Configuration file required!'
+    test -f "$file" || file="$pwd/$file"
+    test -r "$file" || error_exit 'Configuration file is not readable!'
 
-    log 2 "--- $1 ---"
+    log 2 "--- $file ---"
 
     while read var value; do
         test -n "$var" -a "${var:0:1}" != '#' || continue
         value=$(echo -e "$value" | sed -e 's/^"[ \t]*//g' -e 's/[ \t]*"$//g')
         log 2 "$(printf '%-20s = %s' $var "$value")"
         eval "$var=\$value"
-    done <"$1"
+    done <"$file"
 }
 
 ##############################################################################
@@ -221,6 +224,8 @@ function PVLngPUT {
     else
         ### File
         datafile="${data:1}"
+        log 2 "Send file :"
+        log 2 @$datafile
     fi
 
     ### Log data
