@@ -366,7 +366,7 @@ var xAxisResolution = {
     y: 60 * 60 * 24 * 360
 };
 
-var lastChanged = (new Date).getTime() / 1000 / 60
+var lastChanged = (new Date).getTime() / 1000 / 60,
     inUpdate = false;
 
 /**
@@ -764,16 +764,6 @@ $(function() {
      */
     qs = $.parseQueryString();
 
-    view = new View();
-
-    view.fetch($('#top-load-view'), function(el) {
-        el.find('option').clone().appendTo('#loaddeleteview');
-        $('#top-select').toggle(!!user);
-        /* Chart slug provided by URL, load and collapse tree */
-        view.slug = qs.chart;
-        view.load(true);
-    });
-
     options.chart.height = qs.ChartHeight || ChartHeight;
 
     $(window).resize(function() {
@@ -1129,6 +1119,16 @@ $(function() {
     shortcut.add('F4',    function() { tree.toggle(); });
     shortcut.add('F6',    function() { updateChart(); });
     shortcut.add('F7',    function() { updateChart(true); });
+
+    view = new View();
+
+    view.fetch($('#top-load-view'), function(el) {
+        el.find('option').clone().appendTo('#loaddeleteview');
+        $('#top-select').toggle(!!user);
+        /* Chart slug provided by URL, load and collapse tree */
+        view.slug = qs.chart;
+        view.load(true);
+    });
 
 });
 
