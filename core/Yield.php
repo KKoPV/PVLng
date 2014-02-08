@@ -61,7 +61,7 @@ abstract class AbstractYield {
 /**
  *
  */
-class Yield extends AbstractYield {
+class YieldOverall extends AbstractYield {
 
     /**
      *
