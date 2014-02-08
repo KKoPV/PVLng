@@ -26,10 +26,14 @@
                 </a>
             </p>
             <!-- ENDIF -->
+            <!-- IF {DEVELOPMENT} -->
+            <!-- Show actual branch -->
+            <br /><small class="b" style="color:red">{BRANCH}</small>
+            <!-- ENDIF -->
         </div>
     </div>
     <div class="grid_4 c">
-        <h3>{SUBTITLE}</h3>
+        <h3 style="margin-bottom:0">{SUBTITLE}</h3>
     </div>
     <div class="grid_4 r">
         <span id="title1">{TITLE}</span>

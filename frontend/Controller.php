@@ -98,7 +98,10 @@ class Controller extends slimMVC\Controller {
         $this->view->DateFormatJS        = $bk->render('locale', LANGUAGE, 'DateJS');
         $this->view->Year                = date('Y');
 
-        $this->view->Development = $this->config->get('develop');
+        if ($this->config->get('develop')) {
+            $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
+            $this->view->Development = TRUE;
+        }
         $this->view->Language = LANGUAGE;
 
         $this->view->CurrencyISO = $this->config->get('Currency.ISO');
