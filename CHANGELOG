@@ -1,3 +1,25 @@
+ v2.4.0
+========
+
+FIXED
+
+ - Rename Yield class for PV-Log, yield is reserved since PHP 5.5 ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Several fixes for PHP 5.5.* ~ Knut Kohl <github@knutkohl.de>
+ - Adjust Nginx server definition template ~ Knut Kohl <github@knutkohl.de>
+ - Adjust several scripts ~ Knut Kohl <github@knutkohl.de>
+ - Adjust API and split into more maintainable files ~ Knut Kohl <github@knutkohl.de>
+ - Adjust S0 serial listener, improve foreground mode ~ Knut Kohl <github@knutkohl.de>
+ - Adjust CSS and JS Compession ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Make Index charts view single page, no reload for load, delete or save of charts ~ Knut Kohl <github@knutkohl.de>
+ - Add OpenWeatherMap template and script for storing weather data ~ Knut Kohl <github@knutkohl.de>
+ - Add status mail script ~ Knut Kohl <github@knutkohl.de>
+
  v2.3.0
 ========
 
