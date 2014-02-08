@@ -35,17 +35,8 @@ class Info extends \Controller {
     public function Index_Action() {
         $this->view->set('SubTitle', \I18N::_('Information'));
         $this->view->set('ServerName', $_SERVER['SERVER_NAME']);
-        $this->view->set('APIkey', $this->model->getAPIkey());
-
-        $rows = $this->model->getReadingCounts();
-        $this->view->set('Stats', $this->rows2view($rows));
-
-        $readings = 0;
-        foreach ($rows as $id=>$row) {
-            $readings += $row->readings;
-        }
-        $this->view->set('readings', $readings);
-        $this->view->ChannelCount = $id+1;
+        $q = \DBQuery::forge('pvlng_reading_statistics');
+        $this->view->set('Stats', $this->rows2view($this->db->queryRows($q)));
     }
 
 }

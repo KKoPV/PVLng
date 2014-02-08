@@ -77,6 +77,8 @@
 
 </table>
 
+<p><input type="submit" value="{{proceed}} &raquo;" /></p>
+
 <h2>{{SelectEntityTemplate}}</h2>
 
 <p>{{CreateTreeWithoutReqest}}</p>

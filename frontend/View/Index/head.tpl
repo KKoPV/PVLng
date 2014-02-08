@@ -8,5 +8,4 @@
  * @version     1.0.0
  */
 -->
-<link rel="stylesheet" href="/css/jquery.treetable.css" />
-<link rel="stylesheet" href="/css/spectrum.css" />
+<link rel="stylesheet" href="/css/jquery.treetable.css+spectrum.css" />

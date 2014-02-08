@@ -39,20 +39,20 @@ ITEM_N           6
 ##############################################################################
 ### Pac channel of inverter or an accumulator of many Pac
 ### last week
-ITEM_1           "average first%20day%20of%20this%20week"
+ITEM_1           "average first+day+of+this+week+midnight"
 GUID_1           ""
 
 ### Pac channel of inverter or an accumulator of many Pac
-ITEM_2           "maximum first%20day%20of%20this%20week"
+ITEM_2           "maximum first+day+of+this+week+midnight"
 GUID_2           ""
 
 ### E-Total channel of inverter or an accumulator of many E-Total
-ITEM_3           "production first%20day%20of%20this%20week"
+ITEM_3           "production first+day+of+this+week+midnight"
 GUID_3           ""
 FACTOR_3         0.001
 
 ### E-Total channel of inverter or an accumulator of many E-Total
-ITEM_4           "production first%20day%20of%20this%20week"
+ITEM_4           "production first+day+of+this+week+midnight"
 GUID_4           ""
 ###              relative values in kWh / installed power in kWp = kWh/kWp
 FACTOR_4         "1 / 1000 / <your installed power here>"

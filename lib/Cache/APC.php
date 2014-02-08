@@ -37,7 +37,7 @@ class APC extends \Cache {
      * @return bool
      */
     public function write( $key, $data ) {
-        return apc_store($this->key($key), $data);
+        return apc_store($this->key($key), $this->serialize($data));
     }
 
     /**
@@ -49,7 +49,7 @@ class APC extends \Cache {
     public function fetch( $key ) {
         $data = apc_fetch($this->key($key));
 
-        return ($data === FALSE) ? NULL : $data;
+        return ($data === FALSE) ? NULL : $this->unserialize($data);
     }
 
     /**

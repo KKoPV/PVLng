@@ -1,0 +1,9 @@
+
+Copy either
+
+- grid.10.960px.css (10 colums, 960px wide) or
+- grid.10.fluid.css (10 colums, fluid )
+
+to grid.css
+
+You can use any grid from http://960.gs - WITH 10 COLUMNS!

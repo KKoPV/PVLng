@@ -20,9 +20,8 @@
     <thead>
     <tr>
         <th style="text-align:left !important">
-            <img src="/images/ico/toggle.png" id="treetoggle" class="fl tip"
-                 width="16p" height="16"
-                 onclick="return ToggleTree()" tip="#tiptoggle" alt="[+]" />
+            <img id="treetoggle" data-expanded="1" src="/images/ico/toggle.png" class="fl tip"
+                 width="16p" height="16" tip="#tiptoggle" alt="[+]" />
             <div class="c">{{ChannelHierarchy}}</div>
             <div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
         </th>
@@ -40,7 +39,7 @@
     <tr data-tt-id="{ID}" class="droppable"
         <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
         <td style="width:90%">
-            <span class="<!-- IF {ACCEPTCHILDS} -->non-draggable<!-- ELSE -->draggable<!-- ENDIF -->"
+            <span class="<!-- IF {CHILDS} -->non-<!-- ENDIF -->draggable"
                   data-id="{ID}" data-entity="{ENTITY}">
                 <img style="vertical-align:top;margin-right:8px"
                      width="16" height="16" class="tip" title="{TYPE}"
@@ -59,7 +58,7 @@
         </td>
 
         <td style="white-space:nowrap">
-            <!-- IF {ACCEPTCHILDS} -->
+            <!-- IF {CHILDS} -->
             <a href="#" onclick="addChild({ID}); return false" class="tip"
                title="{{AssignEntity}}">
                 <img src="/images/ico/node_insert_next.png" class="imgbar"
@@ -90,7 +89,7 @@
                      width="16p" height="16" alt="edit" />
             </a>
 
-            <!-- IF {ACCEPTCHILDS} AND {GUID} AND !{ALIAS} -->
+            <!-- IF {CHILDS} AND {GUID} AND !{ALIAS} -->
             <form action="/channel/alias" method="post">
             <input type="hidden" name="id" value="{ENTITY}" />
             <input type="image" src="/images/ico/arrow-split.png"

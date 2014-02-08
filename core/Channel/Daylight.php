@@ -32,6 +32,7 @@ class Daylight extends InternalCalc {
      * Read latitude / longitude from extra config
      */
     public static function beforeCreate( Array &$fields ) {
+        parent::beforeCreate($fields);
         $config = \slimMVC\Config::getInstance();
         $fields['latitude']['VALUE']  = $config->get('Location.Latitude');
         $fields['longitude']['VALUE'] = $config->get('Location.Longitude');
@@ -42,7 +43,39 @@ class Daylight extends InternalCalc {
      * Read latitude / longitude from extra attribute
      */
     public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
-        list($fields['latitude']['VALUE'], $fields['longitude']['VALUE']) = $channel->extra;
+        list(
+            $fields['latitude']['VALUE'],
+            $fields['longitude']['VALUE'],
+            $fields['irradiation']['VALUE']
+        ) = $channel->extra;
+        parent::beforeEdit($channel, $fields);
+    }
+
+    /**
+     *
+     * @param $add2tree integer|null
+     */
+    public static function checkData( Array &$fields, $add2tree ) {
+        if ($ok = parent::checkData($fields, $add2tree)) {
+            $guid = &$fields['irradiation'];
+            if ($fields['resolution']['VALUE'] == 1 AND $guid['VALUE'] == '') {
+                $fields['irradiation']['ERROR'][] = __('channel::ParamIsRequired');
+                $ok = false;
+            }
+            if ($guid['VALUE']) {
+                if (!preg_match('~^([0-9a-z]{4}-){7}[0-9a-z]{4}$~', $guid['VALUE'])) {
+                    $guid['ERROR'][] = __('channel::NoValidGUID');
+                    $ok = FALSE;
+                } else {
+                    $channel = new \ORM\Tree;
+                    if ($channel->findByGUID($guid['VALUE'])->id == '') {
+                        $guid['ERROR'][] = __('channel::NoChannelForGUID');
+                        $ok = FALSE;
+                    }
+                }
+            }
+        }
+        return $ok;
     }
 
     /**
@@ -50,8 +83,32 @@ class Daylight extends InternalCalc {
      * Save latitude / longitude to extra attribute
      */
     public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
-        $channel->extra = array(+$fields['latitude']['VALUE'], +$fields['longitude']['VALUE']);
+        parent::beforeSave($fields, $channel);
+        $channel->extra = array(
+            +$fields['latitude']['VALUE'],
+            +$fields['longitude']['VALUE'],
+            $fields['irradiation']['VALUE']
+        );
     }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected $latitude;
+
+    /**
+     *
+     */
+    protected $longitude;
+
+    /**
+     *
+     */
+    protected $irradiation;
 
     /**
      *
@@ -59,8 +116,10 @@ class Daylight extends InternalCalc {
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
 
+        list($this->latitude, $this->longitude, $this->irradiation) = $this->extra;
+
         // Switch data table
-        if ($this->resolution == 1) {
+        if ($this->resolution == 0) {
             $this->numeric = 0;
             $this->data = new \ORM\ReadingStrMemory;
             $this->data->id = $this->entity;
@@ -76,11 +135,24 @@ class Daylight extends InternalCalc {
 
         parent::before_read($request);
 
+        if ($this->numeric AND $this->irradiation) {
+            // Fetch average of last x days of irradiation channel to buid curve
+            $channel = \Channel::byGUID($this->irradiation);
+            $q = new \DBQuery('pvlng_reading_num');
+            $q->get($q->MAX('data'), 'data')
+              ->whereEQ('id', $channel->entity)
+              ->whereGE('timestamp', $this->start - 5*24*60*60)
+              ->whereLT('timestamp', $this->start);
+            $this->resolution = $this->db->queryOne($q);
+        }
+
         $day = $this->start;
 
+        #if ($this->period[1] == self::HOUR) $this->period[0] = 0.5;
+
         do {
-            $sunrise = date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, $this->extra[0], $this->extra[1], 90, date('Z')/3600);
-            $sunset  = date_sunset($day, SUNFUNCS_RET_TIMESTAMP, $this->extra[0], $this->extra[1], 90, date('Z')/3600);
+            $sunrise = date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, +$this->latitude, +$this->longitude, 90, date('Z')/3600);
+            $sunset  = date_sunset($day, SUNFUNCS_RET_TIMESTAMP, +$this->latitude, +$this->longitude, 90, date('Z')/3600);
 
             if (!$this->numeric) {
 
@@ -105,7 +177,7 @@ class Daylight extends InternalCalc {
                 do {
                     $this->saveValue( $sunrise, sin(($sunset-$sunrise) * M_PI / $daylight) );
                     $sunrise += $step;
-                } while ($sunrise <= $sunset);
+                } while ($sunrise <= $sunset+1);
             }
 
             $day += 24*60*60;

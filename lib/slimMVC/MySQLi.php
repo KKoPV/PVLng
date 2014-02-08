@@ -19,9 +19,10 @@ namespace slimMVC;
 class MySQLi extends \MySQLi {
 
     /**
-     *
+     * Some shortcuts to connections
      */
-    const DEFAULT_CONNECTION = 'default';
+    const MASTER = 0;
+    const SLAVE  = 1;
 
     /**
      *
@@ -61,85 +62,127 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public static $Queries = array();
+    public $queries = array();
 
     /**
      *
      */
-    public $SQL = FALSE;
+    public $SQL;
 
     /**
      * Call this as 1st!
      */
-    public static function setCredentials( $user, $password=NULL, $db=NULL, $host='localhost', $connection=self::DEFAULT_CONNECTION ) {
+    public static function setCredentials( $host, $user, $password, $database, $port=3309, $socket='', $connection=self::MASTER ) {
         self::$credentials[$connection] = array(
+            'host'     => $host,
             'user'     => $user,
             'password' => $password,
-            'database' => $db,
-            'host'     => $host
+            'database' => $database,
+            'port'     => $port,
+            'socket'   => $socket
         );
     }
 
     /**
      *
      */
-    public static function setUser( $user, $connection=self::DEFAULT_CONNECTION ) {
+    public static function setUser( $user, $connection=self::MASTER ) {
+        self::initConnection($connection);
         self::$credentials[$connection]['user'] = $user;
     }
 
     /**
      *
      */
-    public static function getUser( $connection=self::DEFAULT_CONNECTION ) {
+    public static function getUser( $connection=self::MASTER ) {
+        self::initConnection($connection);
         return self::$credentials[$connection]['user'];
     }
 
     /**
      *
      */
-    public static function setPassword( $password, $connection=self::DEFAULT_CONNECTION ) {
+    public static function setPassword( $password, $connection=self::MASTER ) {
+        self::initConnection($connection);
         self::$credentials[$connection]['password'] = $password;
     }
 
     /**
      *
      */
-    public static function getPassword( $connection=self::DEFAULT_CONNECTION ) {
+    public static function getPassword( $connection=self::MASTER ) {
+        self::initConnection($connection);
         return self::$credentials[$connection]['password'];
     }
 
     /**
      *
      */
-    public static function setDatabase( $database, $connection=self::DEFAULT_CONNECTION ) {
+    public static function setDatabase( $database, $connection=self::MASTER ) {
+        self::initConnection($connection);
         self::$credentials[$connection]['database'] = $database;
     }
 
     /**
      *
      */
-    public static function getDatabase( $connection=self::DEFAULT_CONNECTION ) {
+    public static function getDatabase( $connection=self::MASTER ) {
+        self::initConnection($connection);
         return self::$credentials[$connection]['database'];
     }
 
     /**
      *
      */
-    public static function setHost( $host, $connection=self::DEFAULT_CONNECTION ) {
+    public static function setHost( $host, $connection=self::MASTER ) {
+        self::initConnection($connection);
         self::$credentials[$connection]['host'] = $host;
     }
 
     /**
      *
      */
-    public static function getHost( $connection=self::DEFAULT_CONNECTION ) {
+    public static function getHost( $connection=self::MASTER ) {
+        self::initConnection($connection);
         return self::$credentials[$connection]['host'];
     }
 
     /**
      *
      */
-    public static function getInstance( $connection=self::DEFAULT_CONNECTION ) {
+    public static function setPort( $port, $connection=self::MASTER ) {
+        self::initConnection($connection);
+        self::$credentials[$connection]['port'] = $port;
+    }
+
+    /**
+     *
+     */
+    public static function getPort( $connection=self::MASTER ) {
+        self::initConnection($connection);
+        return self::$credentials[$connection]['port'];
+    }
+
+    /**
+     *
+     */
+    public static function setSocket( $socket, $connection=self::MASTER ) {
+        self::initConnection($connection);
+        self::$credentials[$connection]['socket'] = $socket;
+    }
+
+    /**
+     *
+     */
+    public static function getSocket( $connection=self::MASTER ) {
+        self::initConnection($connection);
+        return self::$credentials[$connection]['socket'];
+    }
+
+    /**
+     *
+     */
+    public static function getInstance( $connection=self::MASTER ) {
         if (!isset(self::$Instance[$connection])) {
             self::$Instance[$connection] = new self($connection);
             if (self::$Instance[$connection]->connect_errno) {
@@ -171,7 +214,8 @@ class MySQLi extends \MySQLi {
      */
     public function load( $file ) {
         foreach (simplexml_load_file($file) as $key=>$value) {
-            $this->SQL->$key = $value;
+            // Force SimpleXMLElement with CDATA correct as string
+            $this->SQL->$key = (string) $value;
         }
         return $this;
     }
@@ -220,7 +264,7 @@ class MySQLi extends \MySQLi {
         }
 
         self::$QueryCount++;
-        self::$Queries[] = preg_replace('~\s+~', ' ', $query);
+        $this->queries[] = preg_replace('~\s+~', ' ', $query);
 
         $t = microtime(TRUE);
 
@@ -244,10 +288,27 @@ class MySQLi extends \MySQLi {
         $rows = array();
         if ($result = $this->query($query, $args)) {
             /// $t = microtime(TRUE);
+#            for ($rows=array(); $row=$result->fetch_object();) $rows[] = $row;
+#            return $rows;
             while ($row = $result->fetch_object()) $rows[] = $row;
             /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
         }
         return $rows;
+    }
+
+    /**
+     *
+     */
+    public function queryRowsArray( $query ) {
+        $args = func_get_args();
+        $query = array_shift($args);
+
+        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+
+        if ($result = $this->query($query, $args)) {
+            return $result->fetch_all(MYSQLI_ASSOC);
+        }
+        return array();
     }
 
     /**
@@ -319,7 +380,7 @@ class MySQLi extends \MySQLi {
      *
      */
     public function set( $key, $value ) {
-        $replace = sprintf('REPLACE `%s` (`%s`, `%s`) VALUES (LOWER(\'{1}\'), \'{2}\')',
+        $replace = sprintf('REPLACE `%s` (`%s`, `%s`) VALUES (LOWER("{1}"), "{2}")',
                            self::$SETTINGS_TABLE, self::$SETTINGS_KEY_FIELD,
                            self::$SETTINGS_VALUE_FIELD);
 
@@ -340,7 +401,7 @@ class MySQLi extends \MySQLi {
      *
      */
     public function get( $key ) {
-        $query = sprintf('SELECT `%s` FROM `%s` WHERE `%s` = LOWER(\'{1}\')',
+        $query = sprintf('SELECT `%s` FROM `%s` WHERE `%s` = LOWER("{1}")',
                          self::$SETTINGS_VALUE_FIELD, self::$SETTINGS_TABLE,
                          self::$SETTINGS_KEY_FIELD);
 
@@ -368,6 +429,15 @@ class MySQLi extends \MySQLi {
      */
     protected static $credentials = array();
 
+    /**
+     *
+     */
+    protected static function initConnection($connection) {
+        if (!isset(self::$credentials[$connection])) {
+            self::setCredentials( 'localhost', '', '', '', 3309, '', $connection);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // PRIVATE
     // -------------------------------------------------------------------------
@@ -386,10 +456,14 @@ class MySQLi extends \MySQLi {
      *
      */
     private function __construct($connection) {
-        $c = self::$credentials[$connection];
-        if (!isset($c['host'])) $c['host'] = 'localhost';
-        if (!isset($c['database'])) $c['database'] = $c['user'];
-        @parent::__construct($c['host'], $c['user'], $c['password'], $c['database']);
+        @parent::__construct(
+            self::$credentials[$connection]['host'],
+            self::$credentials[$connection]['user'],
+            self::$credentials[$connection]['password'],
+            self::$credentials[$connection]['database'],
+            self::$credentials[$connection]['port'],
+            self::$credentials[$connection]['socket']
+        );
     }
 
     /**
@@ -437,8 +511,7 @@ class SQLs {
      *
      */
     public function __get( $key ) {
-        $key = strtolower($key);
-        return isset($this->sql[$key]) ? $this->sql[$key] : '';
+        return ($_=&$this->sql[strtolower($key)]) ?: '';
     }
 
     // -------------------------------------------------------------------------

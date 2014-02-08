@@ -72,6 +72,10 @@
       this._showChildren();
       this.expander.attr("title", this.settings.stringCollapse);
 
+      if (this.initialized && this.settings.onNodeExpanded != null) {
+        this.settings.onNodeExpanded.apply(this);
+      }
+
       return this;
     };
 
@@ -81,7 +85,8 @@
 
     Node.prototype.hide = function() {
       this._hideChildren();
-      this.row.hide();
+      this.row.addClass("hidden");
+      /* this.row.hide(); */
       return this;
     };
 
@@ -163,7 +168,8 @@
       if (!this.initialized) {
         this._initialize();
       }
-      this.row.show();
+      this.row.removeClass("hidden");
+      /* this.row.show(); */
       if (this.expanded()) {
         this._showChildren();
       }
@@ -225,7 +231,7 @@
 
     Tree.prototype.collapseAll = function() {
       var node, _i, _len, _ref, _results;
-      _ref = this.nodes;
+      _ref = this.roots;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         node = _ref[_i];
@@ -236,7 +242,7 @@
 
     Tree.prototype.expandAll = function() {
       var node, _i, _len, _ref, _results;
-      _ref = this.nodes;
+      _ref = this.roots;
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         node = _ref[_i];
@@ -367,6 +373,7 @@
         onInitialized: null,
         onNodeCollapse: null,
         onNodeExpand: null,
+        onNodeExpanded: null,
         onNodeInitialized: null
       }, options);
 

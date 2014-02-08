@@ -1,0 +1,9 @@
+Production today:
+
+- {NAME_1} ({DESCRIPTION_1}): {VALUE_1} {UNIT_1}
+- {NAME_2} ({DESCRIPTION_2}): {VALUE_2} {UNIT_2}
+
+Estimation was:
+
+- {NAME_3} ({DESCRIPTION_3}): {VALUE_3} {UNIT_3}
+- {NAME_4} ({DESCRIPTION_4}): {VALUE_4} {UNIT_4}

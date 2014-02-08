@@ -1,47 +1,80 @@
-#############################################################################
-# Install script
-#
-# @author      Knut Kohl <github@knutkohl.de>
-# @copyright   2012-2013 Knut Kohl
-# @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-# @version     $Id$
-#############################################################################
 #! /bin/bash
+#############################################################################
+### Install script
+###
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2014 Knut Kohl
+### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+### @version     $Id$
+#############################################################################
 
-function e { echo; echo "$*"; echo; }
+### echo ...
+function e { echo =========================================================
+  echo "= $*"; echo =========================================================; }
+### return default value $2, if $1 was empty
+function d { ( [ "$1" ] && echo "$1" ) || echo "$2"; }
 
-e '- Clone PVLng Github repository ...'
-
+e 'Clone PVLng Github repository'
 git clone https://github.com/K-Ko/PVLng.git .
-
 [ $? -eq 0 ] || exit 1
 
-e '- Setup MySQL database'
+while [ "$ok" != Y ]; do
+    e 'Setup MySQL database'
 
-read -p 'Server (required) [localhost] : ' dbhost <&1
-[ -z "$dbhost" ] && dbhost=localhost
+    dbhost=$(d "$dbhost" localhost)
+    read -p "Server (required) [$dbhost] : " input <&1
+    dbhost=$(d "$input" "$dbhost")
 
-read -p 'Username (required) [root]    : ' dbuser <&1
-[ -z "$dbuser" ] && dbhost=root
+    dbport=$(d "$dbport" 3309)
+    read -p "Port (required) [$dbport] : " input <&1
+    dbport=$(d "$input" "$dbport")
 
-read -p 'Password                      : ' dbpass <&1
+    [ -z "$dbsocket" -a -r /var/run/mysqld/mysqld.sock ] && dbsocket=/var/run/mysqld/mysqld.sock
+    [ -z "$dbsocket" -a -r /tmp/mysqld.sock ] && dbsocket=/tmp/mysqld.sock
+    read -p "Socket (required PHP=>5.5) [$dbsocket] : " input <&1
+    dbsocket=$(d "$input" "$dbsocket")
 
-while [ -z "$dbname" ]; do
-	read -p 'Database (required)           : ' dbname <&1
+    dbuser=$(d "$dbuser" root)
+    read -p "User (required) [$dbuser] : " input <&1
+    dbuser=$(d "$input" "$dbuser")
+
+    dbpas1=x
+    while [ "$dbpass" != "$dbpas1" ]; do
+        read -p 'Password : ' dbpass <&1
+        read -p 'repeat   : ' dbpas1 <&1
+    done
+
+    dbname=$(d "$dbname" pvlng)
+    read -p "Database (required) [$dbname] : " input <&1
+    dbname=$(d "$input" "$dbname")
+
+    e 'Please check your inputs/defaults'
+    echo "Server   : $dbhost"
+    echo "Port     : $dbport"
+    echo "Socket   : $dbsocket"
+    echo "User     : $dbuser"
+    echo "Password : $dbpass"
+    echo "Database : $dbname"
+    read -p 'All correct? [Y/n] ' ok <&1
+    [ -z "$ok" -o "$ok" == y ] && ok=Y
 done
 
-[ "$dbpass" ] && p="-p$dbpass"
+params="-h $dbhost -P $dbport -u $dbuser"
 
-e '- Import SQL definitions ...'
+[ "$dbsocket" ] && params="$params -S $dbsocket"
+[ "$dbpass" ]   && params="$params -p$dbpass"
 
-mysql -h $dbhost -u $dbuser $p $dbname <$PWD/sql/pvlng.sql
+e 'Import SQL definitions'
+echo "mysql $params $dbname <$PWD/sql/pvlng.sql"
+mysql $params $dbname <$PWD/sql/pvlng.sql
 
-e '- Prepare config/config.php and set database credentials ...'
+e 'Prepare config/config.php and set database credentials'
 
-sed -e "s/<HOST>/$dbhost/g" -e "s/<USER>/$dbuser/g" \
-    -e "s/<PASSWORD>/$dbpass/g" -e "s/<DATABASE>/$dbname/g" \
+sed -e "s~<HOST>~$dbhost~g"     -e "s~<PORT>~$dbport~g" \
+    -e "s~<SOCKET>~$dbsocket~g" -e "s~<USER>~$dbuser~g" \
+    -e "s~<PASSWORD>~$dbpass~g" -e "s~<DATABASE>~$dbname~g" \
     $PWD/config/config.php.dist >$PWD/config/config.php
 
-e 'Finished!'
+e 'All done.'
 
 set +x

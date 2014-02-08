@@ -128,7 +128,7 @@ abstract class AbstractFile extends \Cache {
         @flock($fh, LOCK_UN);
         @fclose($fh);
         // Return
-        return $data;
+        return $this->unserialize($data);
     } // function ReadFile()
 
     /**
@@ -152,6 +152,7 @@ abstract class AbstractFile extends \Cache {
             // Lock file exclusive for write
             @flock($fh, LOCK_EX);
             // Write data and check success
+            $data = $this->serialize($data);
             $ok = (@fwrite($fh, $data, strlen($data)) !== FALSE);
             // Release lock
             @flock($fh, LOCK_UN);

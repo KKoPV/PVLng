@@ -27,7 +27,7 @@ class Plant extends Base {
             $plant->addInverter($inverter);
         }
 
-        $yield = new \Yield;
+        $yield = new \YieldOverall;
         $yield->setPlant($plant);
 
         return $this->finish($yield, $request);

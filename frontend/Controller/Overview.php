@@ -52,7 +52,7 @@ class Overview extends \Controller {
 
         $parent = array( 1 => 0 );
 
-        $entity = new \ORM\Tree;
+        $channel = new \ORM\Tree;
 
         $data = array();
         foreach ($tree as $i=>$node) {
@@ -60,6 +60,18 @@ class Overview extends \Controller {
             $parent[$node['level']] = $node['id'];
             $node['parent'] = $parent[$node['level']-1];
 
+            $id = $node['id'];
+
+#            while ($this->app->cache->save('ChannelView'.$node['entity'], $attr)) {
+                $attr = $channel->find('entity', $node['entity'])->getAll();
+#            }
+            $guid = $node['guid'] ?: $attr['guid'];
+
+            $node = array_merge($node, $attr);
+            $node['id'] = $id;
+            $node['guid'] = $guid;
+
+/*
             if ($entity->find('id', $node['id'])) {
                 $node['type']         = $entity->type;
                 $node['name']         = $entity->name;
@@ -73,6 +85,7 @@ class Overview extends \Controller {
                 $node['icon']         = $entity->icon;
                 $node['alias']        = $entity->alias;
             }
+*/
             $data[] = array_change_key_case($node, CASE_UPPER);
         }
         $this->view->Data = $data;

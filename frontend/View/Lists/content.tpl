@@ -33,8 +33,11 @@
                 </option>
                 <!-- END -->
             </select>
-            <img id="icon" src="/images/pix.gif" data-none="/images/pix.gif"
-                 style="width:16px;height:16px;margin-left:1em" width="16" height="16" />
+            <img id="icon" src="/images/pix.gif" class="tip" data-none="/images/pix.gif" alt=""
+                 style="width:16px;height:16px;margin-left:.5em" width="16" height="16" />
+            <img id="icon-private" src="/images/ico/lock.png" class="tip" alt="[private]"
+                 style="margin-left:.5em;width:16px;height:16px;display:none"
+                 width="16" height="16" title="{{PrivateChannel}}"/>
         </td>
         <td class="c">
             <table><tr>
@@ -84,13 +87,13 @@
 <table id="list" class="dataTable">
     <thead>
     <tr>
-        <th><!-- Timestamp, hidden --></th>
         <th class="l">{{DateTime}}</th>
         <th class="r">{{Reading}}</th>
         <th class="l">{{Minimum}}</th>
         <th class="r">{{Maximum}}</th>
         <th class="r">{{Production}} / {{Consumption}}</th>
         <th class="r tip" title="{{RowCountHint}}">{{RowCount}}</th>
+        <th><img src="/images/ico/minus_circle.png" /></th>
     </tr>
     </thead>
 
@@ -98,10 +101,10 @@
 
     <tfoot>
     <tr>
-        <th></th>
         <th colspan="2"></th>
         <th colspan="2"></th>
         <th id="tf-consumption" class="r">&nbsp;</th>
+        <th></th>
         <th></th>
     </tr>
     </tfoot>

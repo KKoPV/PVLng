@@ -8,6 +8,8 @@
  * @version      1.0.0
  */
 
+setlocale(LC_NUMERIC, 'C');
+
 /**
  * Directories
  */
@@ -85,10 +87,12 @@ if ($config->get('develop')) {
 /**
  * Setup database connection
  */
+slimMVC\MySQLi::setHost($config->get('Database.Host'));
+slimMVC\MySQLi::setPort($config->get('Database.Port'));
+slimMVC\MySQLi::setSocket($config->get('Database.Socket'));
 slimMVC\MySQLi::setUser($config->get('Database.Username'));
 slimMVC\MySQLi::setPassword($config->get('Database.Password'));
 slimMVC\MySQLi::setDatabase($config->get('Database.Database'));
-slimMVC\MySQLi::setHost($config->get('Database.Host'));
 slimMVC\MySQLi::$SETTINGS_TABLE = 'pvlng_config';
 
 require 'View.php';

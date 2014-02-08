@@ -36,17 +36,10 @@
     </script>
 
     <meta http-equiv="Content-Style-Type" content="text/css" />
-
-    <link rel="stylesheet" href="/css/default.css" />
+    <link rel="stylesheet" href="/css/normalize.css+default.css+grid.css" />
     <link rel="stylesheet" href="/css/jquery-ui.min.css" />
-
-    <link rel="stylesheet" href="/css/jquery.dataTables.css" />
-    <link rel="stylesheet" href="/css/jquery.dataTables_themeroller.css" />
-    <link rel="stylesheet" href="/css/superfish.css" />
-    <link rel="stylesheet" href="/css/tipTip.css" />
-
-    <link rel="stylesheet" href="/css/jquery.pnotify.default.css" />
-
+    <link rel="stylesheet" href="/css/jquery.dataTables.css+jquery.dataTables_themeroller.css+jquery.pnotify.default.css+superfish.css+tipTip.css" />
+    <!-- With background images -->
     <link rel="stylesheet" href="/css/iCheck/flat.css" />
     <link rel="stylesheet" href="/css/iCheck/line.css" />
 
@@ -76,24 +69,21 @@
 
     </div>
 
-    <script src="/js/trmix.js"></script>
     <script src="//code.jquery.com/jquery-2.0.0.js"></script>
     <script>
         window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>');
     </script>
     <script src="/js/jquery-ui.min.js"></script>
-    <!-- IF {LANGUAGE} != "en" -->
     <script src="/js/jquery-ui-i18n.min.js"></script>
-    <!-- ENDIF -->
-
-    <script src="/js/jquery.tipTip.js+jquery.dataTables.min.js" defer></script>
-    <script src="/js/jquery.pnotify.js+jquery.icheck.js+jquery.number.min.js" defer></script>
-    <script src="/js/hoverIntent.js+superfish.js+supersubs.js+sprintf.js+lscache.js" defer></script>
-    <script src="/js/dataTables.js+script.js+shortcut.js"></script>
+    <script src="/js/jquery.dataTables.min.js"></script>
+    <script src="/js/jquery.number.min.js"></script>
+    <script src="/js/jquery.tipTip.js+jquery.icheck.js+jquery.pnotify.js+dataTables.js+shortcut.js+script.js"></script>
+    <script src="/js/trmix.min.js"></script>
+    <script src="/js/hoverIntent.js+superfish.js+supersubs.js+sprintf.js+lscache.js"></script>
 
     <script>
         var PVLngAPI    = 'http://{SERVERNAME}/api/r3/';
-        var PVLngAPIkey = '<!-- IF {USER} -->{APIKEY}<!-- ENDIF -->';
+        var PVLngAPIkey = '{APIKEY}';
 
         /* Inititilize Pines Notify labels here */
         var pnotify_defaults_labels_redisplay = '{{Redisplay}}';

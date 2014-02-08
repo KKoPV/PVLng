@@ -38,12 +38,10 @@ PAGE 1
     <div data-role="content">
         <div id="chart"></div>
 
-        <table data-role="table" id="table-cons" class="ui-responsive">
+        <table id="table-cons" data-role="table" class="ui-responsive">
             <thead>
             <tr>
                 <th>{{Channel}}</th>
-                <th>{{Min}}</th>
-                <th>{{Max}}</th>
                 <th>{{Production}} / {{Consumption}}</th>
                 <th>{{Cost}}</th>
             </tr>
@@ -58,7 +56,7 @@ PAGE 1
 
     <!-- Footer -->
     <div data-role="footer" data-id="footer">
-        <h1>{TITLE}</h1>
+        <h1>{strip_tags:TITLE}</h1>
     </div>
 
 </div>
@@ -94,7 +92,7 @@ PAGE 2
 
     <!-- Footer -->
     <div data-role="footer" data-id="footer" data-position="fixed">
-        <h1>{TITLE}</h1>
+        <h1>{strip_tags:TITLE}</h1>
     </div>
 
 

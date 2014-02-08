@@ -35,7 +35,7 @@ class File extends AbstractFile {
             $this->filename = $this->FileName(NULL);
             // Load cached data
             if ($data = $this->ReadFile($this->filename)) {
-                $this->data = $this->unserialize($data);
+                $this->data = $data;
             }
             return TRUE;
         }
@@ -95,7 +95,7 @@ class File extends AbstractFile {
     public function __destruct() {
         // Save only if data was modified
         if ($this->modified) {
-            $this->WriteFile($this->filename, $this->serialize($this->data));
+            $this->WriteFile($this->filename, $this->data);
         }
     } // function __destruct()
 

@@ -21,14 +21,14 @@ class Model extends slimMVC\Model {
      *
      */
     public function getAPIkey() {
-        return $this->db->queryOne('APIkey');
+        return $this->db->queryOne('SELECT `getAPIkey`()');
     }
 
     /**
      *
      */
     public function resetAPIkey() {
-        return $this->db->query('resetAPIkey');
+        return $this->db->query('DELETE FROM `pvlng_config` WHERE `key` = "APIKey" LIMIT 1');
     }
 
 

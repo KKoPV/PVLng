@@ -27,7 +27,7 @@ return array(
             <li>Error (string)</li>
             <li>Mains frequency (Hz)</li>
         </ul>
-        Don\'t forget to adjust inverters <strong>DevideId</strong> afterwards!
+        Don\'t forget to adjust inverters <strong>DeviceId</strong> afterwards!
     ',
 
 

@@ -173,6 +173,7 @@ class BabelKit {
     function select($code_set, $code_lang, $param=array()) {
 
         $var_name      = @$param['var_name'];
+        $id            = @$param['id'];
         $value         = @$param['value'];
         $default       = @$param['default'];
         $subset        = @$param['subset'];
@@ -182,6 +183,7 @@ class BabelKit {
 
         # Variable name.
         if (!$var_name) $var_name = $code_set;
+        if (!$id) $id = $code_set;
 /*
         if (!isset($value)) {
             $value = $_POST ? $_POST[$var_name] : $_GET[$var_name];
@@ -195,7 +197,7 @@ class BabelKit {
         if ($options) $options = " $options";
 
         # Drop down box.
-        $select = "<select name=\"$var_name\"$options>";
+        $select = "<select id=\"$id\" name=\"$var_name\"$options>";
 
         # Blank options.
         $selected = '';
@@ -210,6 +212,7 @@ class BabelKit {
         }
 
         # Show code set options.
+        $optgroup = FALSE;
         $set_list = $this->full_set($code_set, $code_lang);
         foreach ( $set_list as $row ) {
             list($code_code, $code_desc) = $row;
@@ -217,13 +220,20 @@ class BabelKit {
                 continue;
             $code_desc = htmlspecialchars(ucfirst($code_desc));
 
-            if ($code_code == $value) {
-                $selected = 1;
-                $select .= "<option value=\"$code_code\" selected>$code_desc</option>";
-            } elseif ($row[3] <> 'd') {
-                $select .= "<option value=\"$code_code\">$code_desc</option>";
+            if (preg_match('~^::(.*?)::$~', $code_desc, $args)) {
+                if ($optgroup) $select .= "</optgroup>";
+                $select .= '<optgroup label="'.$args[1].'">';
+                $optgroup = TRUE;
+            } else {
+                if ($code_code == $value) {
+                    $selected = 1;
+                    $select .= "<option value=\"$code_code\" selected>$code_desc</option>";
+                } elseif ($row[3] <> 'd') {
+                    $select .= "<option value=\"$code_code\">$code_desc</option>";
+                }
             }
         }
+        if ($optgroup) $select .= "</optgroup>";
 
         # Show a missing value.
         if (!$selected) {
@@ -243,15 +253,17 @@ class BabelKit {
         $value        = $param['value'];
         $default      = $param['default'];
         $subset       = $param['subset'];
-        $options       = $param['options'];
+        $options      = $param['options'];
         $blank_prompt = $param['blank_prompt'];
         $sep          = $param['sep'];
 
         # Variable name.
         if (!$var_name) $var_name = $code_set;
+/*
         if (!isset($value)) {
             $value = $_POST ? $_POST[$var_name] : $_GET[$var_name];
         }
+*/
         if (!isset($value)) $value = $default;
         if (is_array($subset)) {
             $Subset = array();
@@ -311,15 +323,17 @@ class BabelKit {
     #
     function multiple($code_set, $code_lang, $param=array()) {
 
-        $var_name = $param['var_name'];
-        $value    = $param['value'];
-        $default  = $param['default'];
-        $subset   = $param['subset'];
-        $options       = $param['options'];
-        $size     = $param['size'];
+        $var_name = @$param['var_name'];
+        $id       = @$param['id'];
+        $value    = @$param['value'];
+        $default  = @$param['default'];
+        $subset   = @$param['subset'];
+        $options  = @$param['options'];
+        $size     = @$param['size'];
 
         # Variable name.
         if (!$var_name) $var_name = $code_set;
+        if (!$id) $id = $code_set;
         if (!isset($value)) {
             $value = $_POST ? $_POST[$var_name] : $_GET[$var_name];
         }
@@ -334,12 +348,11 @@ class BabelKit {
             $Subset = array();
             foreach ( $subset as $val ) $Subset[$val] = 1;
         }
-        if ($options) $options = " $options";
 
         # Select multiple box.
-        $select = "<select multiple name=\"$var_name"."[]\"$options";
+        $select = "<select id=\"$id\" name=\"$var_name"."[]\"";
         if ($size) $select .= " size=\"$size\"";
-        $select .= ">";
+        $select .= "multiple $options>";
 
         # Show code set options.
         $set_list = $this->full_set($code_set, $code_lang);

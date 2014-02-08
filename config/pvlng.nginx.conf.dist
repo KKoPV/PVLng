@@ -1,52 +1,118 @@
-##############################################################################
-### @author Knut Kohl <knutkohl@users.sourceforge.net>
-### @copyright 2012 Knut Kohl
-### @license GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version 1.0.0
+###
+### The MIT License (MIT)
+###
+### Copyright (c) 2014 - Knut Kohl <github@knutkohl.de>
+###
+### Permission is hereby granted, free of charge, to any person obtaining a copy
+### of this software and associated documentation files (the "Software"), to deal
+### in the Software without restriction, including without limitation the rights
+### to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+### copies of the Software, and to permit persons to whom the Software is
+### furnished to do so, subject to the following conditions:
+###
+### The above copyright notice and this permission notice shall be included in
+### all copies or substantial portions of the Software.
+###
+### THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+### IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+### FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+### AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+### LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+### OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+### THE SOFTWARE.
+###
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2014 Knut Kohl
+### @license     MIT License (MIT) http://opensource.org/licenses/MIT
+### @version     1.0.0
+###
 ##############################################################################
 ###
 ### NGINX configuration file
 ###
+### Set your server_name and listen port
+###
+### Configure your path to PVLng at
+### - root, access_log, error_log
+###
 ### Make a link in /etc/nginx/sites-enabled
 ###
 
+upstream php {
+    # With php5-cgi alone:
+#   server 127.0.0.1:9000;
+    # With php5-fpm:
+    server unix:/var/run/php5-fpm.sock;
+}
+
 server {
     ###
-    # Server port
-    listen       80;
-
-    ###
-    # Server name
+    # Server name & port
+    #
     server_name  example.com;
+    listen       8000;
 
     ###
     # Prepare paths by
-    # $ mkdir -p /var/www/html/{log,public_html}
+    # $ mkdir -p /var/www/{log,public_html}
     #
-    root         /var/www/html/public_html;
-    access_log   /var/www/html/log/access.log;
-    error_log    /var/www/html/log/error.log;
+    root         /var/www/public_html;
+    access_log   /var/www/log/access-nginx.log;
+    error_log    /var/www/log/error-nginx.log;
 
-    location / {
-        fastcgi_pass unix:/tmp/pvlng.fcgi;
-        # for a TCP host/port:
-        # fastcgi_pass   {hostname}:{port};
+    ###
+    # Allows file uploads up to 500 megabytes
+    #
+    client_max_body_size 500M;
 
-        # necessary parameter
-        fastcgi_param PATH_INFO $fastcgi_script_name;
+    ###
+    # Rewrite calls to /css and /js to compressors
+    #
+    rewrite /(css|js)/(.*\.\\1)$ /public/$1/index.php?$2 last;
 
-        ###
-        # to deal with POST requests
-        fastcgi_param REQUEST_METHOD $request_method;
-        fastcgi_param REQUEST_URI $request_uri;
-        fastcgi_param CONTENT_TYPE $content_type;
-        fastcgi_param CONTENT_LENGTH $content_length;
-        fastcgi_param REMOTE_ADDR $remote_addr;
-        fastcgi_param REMOTE_PORT $remote_port;
-        fastcgi_param SERVER_ADDR $server_addr;
-        fastcgi_param SERVER_PORT $server_port;
-        fastcgi_param SERVER_NAME $server_name;
-        fastcgi_param SERVER_PROTOCOL $server_protocol;
+    ###
+    # Rewrite API calls
+    #
+    rewrite /api/([^/]+)/(.*)$ /api/$1/index.php?$2 last;
+
+    ###
+    # Handle images
+    #
+    location ~* \.(png|jpg|jpeg|gif|ico)$ {
+        try_files /public/$uri =404;
+        expires 1y;
+        log_not_found off;
+        access_log off;
     }
 
+    ###
+    # Rewrite all calls to /public
+    #
+    location / {
+        try_files /public/$uri /public/index.php?$args;
+    }
+
+    ###
+    # Handle calls to *.php files
+    #
+    location ~ \.php$ {
+        try_files $uri =404;
+
+        # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+
+        # Pass to upstream
+        fastcgi_pass php;
+
+        fastcgi_index index.php;
+        include fastcgi_params;
+    }
+
+    ###
+    # Deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    location ~ /\. {
+        deny all;
+    }
 }

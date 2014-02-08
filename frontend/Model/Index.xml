@@ -36,7 +36,7 @@
 
 	<DeleteView>
 		<![CDATA[
-			DELETE FROM `pvlng_view` WHERE `name` = "{1}"
+			DELETE FROM `pvlng_view` WHERE `slug` = "{1}"
 		]]>
 	</DeleteView>
 

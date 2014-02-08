@@ -222,7 +222,11 @@ class View extends \Slim\View {
             // Translations
             if (preg_match_all('~\{\{([^}]+?)\}\}~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $data) {
-                    $html = str_replace($data[0], $this->e('I18N::translate(\''.$data[1].'\')'), $html);
+                    $html = str_replace(
+                        $data[0],
+                        '<?php echo I18N::translate(\''.$data[1].'\'); ?'.'>',
+                        $html
+                    );
                 }
             }
 
@@ -268,9 +272,11 @@ class View extends \Slim\View {
 
                     if ($this->Helper->is_callable($func)) $func = '$this->Helper->'.$func;
 
-                    $html = str_replace($match[0],
-                                        $this->e($func.'('.substr($args, 1).')'),
-                                        $html);
+                    $html = str_replace(
+                        $match[0],
+                        '<?php echo '.$func.'('.substr($args, 1).'); ?'.'>',
+                        $html
+                    );
                 }
             }
 
@@ -302,8 +308,11 @@ class View extends \Slim\View {
             );
 
             // Variables
-            $html = preg_replace('~'.$this->RegexVar.'~e',
-                                 '$this->e(\'$this->__get(\\\'$1\\\')\')', $html);
+            $html = preg_replace_callback(
+                '~'.$this->RegexVar.'~',
+                function($m) { return '<?php echo $this->__get(\''.$m[1].'\'); ?'.'>'; },
+                $html
+            );
 
             $html = str_replace('\ ', "&nbsp;", $html);
 
@@ -313,13 +322,6 @@ class View extends \Slim\View {
         }
 
         $this->compressCode($html);
-    }
-
-    /**
-     *
-     */
-    protected function e( $str ) {
-        return '<?php echo ' . $str . '; ?'.'>';
     }
 
     /**

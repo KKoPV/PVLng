@@ -6,6 +6,10 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 RewriteRule ^index$ / [R,L]
-RewriteRule ^(.*) public/$1  [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^(.*) public/$1 [L]
 
 Options -MultiViews

@@ -48,8 +48,6 @@ test $CHANNEL_N -gt 0 || error_exit "No channel sections defined (CHANNEL_N)"
 ##############################################################################
 curl="$(curl_cmd)"
 
-LC_NUMERIC=en_US
-
 if test -z "$INTERVAL"; then
     ifile=$(run_file SEG "$1" last)
     if test -f "$ifile"; then

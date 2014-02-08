@@ -62,8 +62,6 @@ TWITTER_URL="https://api.twitter.com/1/statuses/update.json"
 
 curl="$(curl_cmd)"
 
-LC_NUMERIC=en_US
-
 i=0
 
 while test $i -lt $ITEM_N; do
