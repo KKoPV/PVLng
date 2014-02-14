@@ -53,35 +53,35 @@ $(function() {
             null
         ],
         fnFooterCallback: function( nFoot, aData, iStart, iEnd, aiDisplay ) {
-          var th = nFoot.getElementsByTagName('th');
-          var len = aData.length, re = new RegExp('['+ThousandSeparator+']', 'g'), cnt = 0;
-          th[0].innerHTML = len + " {{Channels}}";
-          while (len--) cnt += parseInt(aData[len][4].replace(re, ''));
-          th[1].innerHTML = $.number(cnt, 0, '', ThousandSeparator);
-       }
+            var th = nFoot.getElementsByTagName('th');
+            var len = aData.length, re = new RegExp('['+ThousandSeparator+']', 'g'), cnt = 0;
+            th[0].innerHTML = len + " {{Channels}}";
+            while (len--) cnt += parseInt(aData[len][4].replace(re, ''));
+            th[1].innerHTML = $.number(cnt, 0, '', ThousandSeparator);
+        },
+        fnInitComplete: function() {
+            $('.last-reading').each(function(id, el){
+                $.getJSON(
+                    PVLngAPI + 'data/' + $(el).data('guid') + '.json',
+                    {
+                        attributes: true, /* need decimals for formating */
+                        period:     'readlast'
+                    },
+                    function(data) {
+                        if (data.length < 2) return;
+                        var attr = data.shift();
+                        if (attr.numeric) {
+                            $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
+                        } else {
+                            $(el).html(data[0].data != "" ? data[0].data : '<empty>');
+                        }
+                        $(el).addClass('ok');
+                    }
+                ).fail(function(jqXHR) {
+                    $(el).html('<small>'+jqXHR.responseJSON.message+'</small>').addClass('fail');
+                });
+            });
+        }
     });
-
-    $('.last-reading').each(function(id, el){
-        $.getJSON(
-            PVLngAPI + 'data/' + $(el).data('guid') + '.json',
-            {
-                attributes: true, /* need decimals for formating */
-                period:     'readlast'
-            },
-            function(data) {
-                if (data.length < 2) return;
-                var attr = data.shift();
-                if (attr.numeric) {
-                    $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
-                } else {
-                    $(el).html(data[0].data != "" ? data[0].data : '<empty>');
-                }
-                $(el).addClass('ok');
-            }
-        ).fail(function(jqXHR) {
-            $(el).html('<small>'+jqXHR.responseJSON.message+'</small>').addClass('fail');
-        });
-    });
-
 });
 </script>

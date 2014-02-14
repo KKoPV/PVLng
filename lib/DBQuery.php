@@ -209,6 +209,20 @@ class DBQuery {
     /**
      *
      */
+    public function whereLIKE( $field, $value ) {
+        return $this->where($field, 'LIKE', $value);
+    }
+
+    /**
+     *
+     */
+    public function whereNotLIKE( $field, $value ) {
+        return $this->where($field, 'NOT LIKE', $value);
+    }
+
+    /**
+     *
+     */
     public function whereNULL( $field ) {
         $this->where[] = $field . ' IS NULL';
         return $this;
@@ -306,16 +320,26 @@ class DBQuery {
     }
 
     /**
+     *
+     */
+    public function quote( $value ) {
+        // Interpret values beginning with ! as raw data
+        if (substr($value, 0, 1) == '!') return substr($value, 1);
+
+        if ((string) $value == (string) +$value) return $value;
+
+        return '"' . str_replace(array('\\',   '"',   '\'',   "\r", "\n"),
+                                 array('\\\\', '\\"', '\\\'', '\r', '\n'), $value) . '"';
+    }
+
+    /**
      * Wrap raw SQL functions
      *
      * $this->MAX('field')      => MAX(`field`)
      * $this->ROUND('field', 4) => ROUND(`field`, 4)
      */
     public function __call( $method, $params ) {
-        return $method . '('
-             . $this->field(array_shift($params))
-             . (count($params) ? ','.implode(',', array_map(array($this, 'quote'), $params)) : '')
-             . ')';
+        return $method . '(' . implode(', ', $params) . ')';
     }
 
     /**
@@ -471,19 +495,6 @@ class DBQuery {
      */
     protected function field( $field ) {
         return preg_match('~^[[:alpha:]_]\w*$~', $field) ? '`' . $field . '`' : $field;
-    }
-
-    /**
-     *
-     */
-    protected function quote( $value ) {
-        // Interpret values beginning with ! as raw data
-        if (substr($value, 0, 1) == '!') return substr($value, 1);
-
-        if ((string) $value == (string) +$value) return $value;
-
-        return '"' . str_replace(array('\\',   '"',   '\'',   "\r", "\n"),
-                                 array('\\\\', '\\"', '\\\'', '\r', '\n'), $value) . '"';
     }
 
     /**

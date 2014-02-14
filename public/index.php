@@ -392,29 +392,15 @@ $app->get('/widget.js', function() use ($app) {
 /**
  *
  */
-$app->any('/apcclear(/:mode)', $checkAuth, function( $mode='' ) use ($app) {
-    $app->showStats = FALSE;
-    $app->ContentType('text/plain');
-    if (!extension_loaded('apc') OR !ini_get('apc.enabled')) {
-        echo 'Alternative PHP Cache (APC) extension not loaded and/or enabled';
-    } else {
-        if ($mode == 'all') {
-            // Clear OpCode cache
-            echo 'Clear APC system cache - ', (apc_clear_cache() ? 'Done' : 'ERROR'), "\n";
-        }
-        // Clear User data cache
-        echo 'Clear APC user cache   - ', (apc_clear_cache('user') ? 'Done' : 'ERROR');
-    }
-});
-
-/**
- *
- */
 $app->get('/clearcache', $checkAuth, function() use ($app) {
     $app->showStats = FALSE;
     shell_exec('rm '.TEMP_DIR.DS.'*');
     echo '<p>Cached templates cleared from <tt>'.TEMP_DIR.'</tt></p>';
-    echo '<p><a href="/">back</a></p>';
+    echo '<p>Cache stats</p><ul>';
+    foreach ($app->cache->info() as $key=>$value) {
+        echo '<li>', ucwords(str_replace('_', ' ', $key)), ' : <tt>', $value, '</tt></li>';
+    }
+    echo '</ul><p><a href="/">back</a></p>';
 });
 
 /**
@@ -427,8 +413,7 @@ if ($app->showStats) {
      * Some statistics
      */
     printf(PHP_EOL.PHP_EOL
-          .'<!-- %.3fs, Q: %d (%.3fs), M (max.): %.1f (%.1f) kByte -->',
-           (microtime(TRUE)-$_SERVER['REQUEST_TIME']),
-           slimMVC\MySQLi::$QueryCount, slimMVC\MySQLi::$QueryTime/1000,
-           memory_get_usage(TRUE)/1024, memory_get_peak_usage(TRUE)/1024);
+          .'<!-- Build time: %.0f ms / Queries: %d (%.0f ms) / Memory: %.0f kByte -->'.PHP_EOL,
+           (microtime(TRUE)-$_SERVER['REQUEST_TIME'])*1000,
+           slimMVC\MySQLi::$QueryCount, slimMVC\MySQLi::$QueryTime, memory_get_peak_usage(TRUE)/1024);
 }

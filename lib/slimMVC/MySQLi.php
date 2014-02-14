@@ -62,6 +62,11 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
+    public $Buffered = FALSE;
+
+    /**
+     *
+     */
     public $queries = array();
 
     /**
@@ -264,11 +269,13 @@ class MySQLi extends \MySQLi {
         }
 
         self::$QueryCount++;
-        $this->queries[] = preg_replace('~\s+~', ' ', $query);
+        if (self::$DEBUG) {
+            $this->queries[] = preg_replace('~\s+~', ' ', $query);
+        }
 
         $t = microtime(TRUE);
 
-        $result = parent::query($query);
+        $result = parent::query($query, $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT);
         $this->error();
 
         self::$QueryTime += (microtime(TRUE) - $t) * 1000;
@@ -285,14 +292,16 @@ class MySQLi extends \MySQLi {
 
         if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
 
+        $this->Buffered = TRUE;
         $rows = array();
         if ($result = $this->query($query, $args)) {
             /// $t = microtime(TRUE);
-#            for ($rows=array(); $row=$result->fetch_object();) $rows[] = $row;
-#            return $rows;
             while ($row = $result->fetch_object()) $rows[] = $row;
             /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
+            $result->close();
         }
+        $this->Buffered = FALSE;
+
         return $rows;
     }
 
@@ -305,10 +314,15 @@ class MySQLi extends \MySQLi {
 
         if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
 
+        $this->Buffered = TRUE;
+        $rows = array();
         if ($result = $this->query($query, $args)) {
-            return $result->fetch_all(MYSQLI_ASSOC);
+            $rows = $result->fetch_all(MYSQLI_ASSOC);
+            $result->close();
         }
-        return array();
+        $this->Buffered = FALSE;
+
+        return $rows;
     }
 
     /**
@@ -320,12 +334,17 @@ class MySQLi extends \MySQLi {
 
         if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
 
+        $this->Buffered = TRUE;
+        $row = NULL;
         if ($result = $this->query($query, $args)) {
             /// $t = microtime(TRUE);
             $row = $result->fetch_object();
             /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
-            return $row;
+            $result->close();
         }
+        $this->Buffered = FALSE;
+
+        return $row;
     }
 
     /**

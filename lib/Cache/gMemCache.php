@@ -17,235 +17,222 @@
  * - increment()
  * - decrement()
  *
- * @ingroup    Cache
- * @author     Cesar D. Rodas (saddor@cesarodas.com)
- * @author     Knut Kohl <knutkohl@users.sourceforge.net>
- * @license    GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version    1.0.0
+ * @ingroup        Cache
+ * @author         Cesar D. Rodas (saddor@cesarodas.com)
+ * @author         Knut Kohl <knutkohl@users.sourceforge.net>
+ * @license        GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version        1.0.0
  */
 
 /* *************************************************************************
-   **  gMemCache                                                           *
-   **  Cesar D. Rodas (saddor@cesarodas.com)                               *
+   ** gMemCache                                                            *
+   ** Cesar D. Rodas (saddor@cesarodas.com)                                *
    *************************************************************************
-   **  A purely implementation of a MemCache client in php.                *
-   **  With this class you could connect to a memcache server, store,      *
-   **  get vars without download nothing more than this class.             *
+   ** A purely implementation of a MemCache client in php.                 *
+   ** With this class you could connect to a memcache server, store,       *
+   ** get vars without download nothing more than this class.              *
    *************************************************************************
-   **  Bugs Report at:                                                     *
-   **      http://www.phclasses.org/gmemcache (in forums)                  *
+   ** Bugs Report at:                                                      *
+   **         http://www.phclasses.org/gmemcache (in forums)               *
    *************************************************************************
-   **  If you are a window$ user you get a port of memcache here           *
-   **  http://jehiah.com/projects/memcached-win32                          *
+   ** If you are a window$ user you get a port of memcache here            *
+   ** http://jehiah.com/projects/memcached-win32                           *
    *************************************************************************
-   **  The author disclaims the copyright of this project                  *
-   **  You are legaly free to do what you want with this code              *
+   ** The author disclaims the copyright of this project                   *
+   ** You are legaly free to do what you want with this code               *
    ************************************************************************* */
 
 class gMemCache {
 
-  const CONNECTED     = 0xF0;
-  const DISCONNECTED  = 0x00;
-  const IS_STRING     = 0x02;
-  const IS_ARRAY      = 0x04;
-  const IS_COMPRESSED = 0x08;
+    const DISCONNECTED  = 0x00;
+    const CONNECTED     = 0xF0;
 
-  const EOL           = "\r\n";
+    const IS_STRING     = 0x02;
+    const IS_ARRAY      = 0x04;
+    const IS_COMPRESSED = 0x08;
 
-  private $host;
-  private $port;
-  private $status;
-  private $socket;
+    const EOL           = "\r\n";
 
-  /*
-   *  Connect to a memcache server.
-   *  On fail return FALSE.
-   */
-  function connect($host, $port=0) {
-    $this->host = $host;
-    $this->port = $port;
-    if ($this->isConnected()) return FALSE;
-    $this->status = self::DISCONNECTED;
-    if ($this->host == '' || $this->port == 0) return FALSE;
-    $this->socket = @fsockopen($this->host, $this->port);
-    if ($this->socket !== FALSE) $this->status = self::CONNECTED;
-    return $this->isConnected();
-  }
+    /**
+     * Connect to a memcache server.
+     * On fail return FALSE.
+     */
+    public function connect($host='127.0.0.1', $port=11211) {
+        if ($this->status == self::CONNECTED) return FALSE;
 
-  function isConnected() {
-    return ($this->status == self::CONNECTED);
-  }
+        $this->host = $host;
+        $this->port = $port;
 
-  /*
-   *  Read the content from of $name from memcache
-   *  On fail return FALSE.
-   */
-  function get($name) {
-    if (!$this->isConnected() ) return FALSE;
-    $buf = '';
-    fwrite($this->socket, 'get "'.$name.'"'.self::EOL);
-    while ($c = fread($this->socket,2048))  {
-      $buf .= $c;
-      if ( substr($c,-5,3) == "END") break;
-    }
-    /* Getting first line */
+        $this->status = self::DISCONNECTED;
+        if ($this->host == '' || $this->port == '') return FALSE;
 
-    $lines = explode(self::EOL,$buf,2);
-
-    if ($lines[0] == 'END') return;
-
-    $parts = explode(' ',$lines[0]);
-
-    $value = substr($lines[1], 0, $parts[3]);
-
-    if ($parts[2] & self::IS_COMPRESSED)
-      $value = gzuncompress($value);
-
-    if ($parts[2] & self::IS_ARRAY)
-      $value = unserialize($value);
-
-    return $value;
-  }
-
-  /*
-   *  Set the var $name with the content $value
-   *  into the $lifetime seconds (forever=0; max = 2592000 [30 days])
-   *  Also can compress variables, for reduce network overhead.
-   *
-   *  On fail return FALSE.
-   */
-  function set($name, $value, $lifetime = 0, $compress = FALSE) {
-    if (! $this->isConnected() ) return FALSE;
-
-    $magic = $this->getVarType($value);
-    if ( $magic == self::IS_ARRAY)
-      $value = serialize($value);
-
-    if ($compress) {
-      $magic |= self::IS_COMPRESSED;
-      $value = gzcompress($value);
+        $this->socket = @fsockopen($this->host, $this->port);
+        if ($this->socket !== FALSE) {
+            stream_set_timeout($this->socket, 2);
+            $this->status = self::CONNECTED;
+        }
+        return ($this->status == self::CONNECTED);
     }
 
-#   $len = strlen($value);
-#   fwrite($this->socket, 'set "'.$name.'" '.$magic.' 0 '.$len.self::EOL.$value.self::EOL);
-
-    $value = sprintf('set "%2$s" %3$s 0 %4$d %1$s%5$s%1$s', self::EOL, $name, $magic, strlen($value), $value);
-    fwrite($this->socket, $value);
-
-    $buf = '';
-    while ($c = fread($this->socket, 2048))  {
-      $buf .= $c;
-      if (substr($c, -2, 2) == self::EOL) break;
+    /**
+     *
+     */
+    public function isConnected() {
+        return ($this->status == self::CONNECTED);
     }
-    return (trim($buf) == 'STORED');
-  }
 
-  /**
-   *
-   */
-  public function delete($name) {
-    if (!$this->isConnected()) return FALSE;
-    fwrite($this->socket, 'delete "'.$name.'"'.self::EOL);
-    return (trim($this->fetch()) == 'DELETED');
-  }
+    /**
+     * Read the content from of $name from memcache
+     * On fail return FALSE.
+     */
+    public function get($name) {
+        if ($this->status != self::CONNECTED) return FALSE;
 
-  /**
-   *
-   */
-  public function flush() {
-    if (!$this->isConnected()) return FALSE;
-    fwrite($this->socket, 'flush_all'.self::EOL);
-    return (trim($this->fetch()) == 'OK');
-  }
-
-  /**
-   *
-   */
-  public function increment($name, $value=1) {
-    if (!$this->isConnected()) return FALSE;
-    fwrite($this->socket, 'incr '.$name.' '.$value.self::EOL);
-    $ret = trim($this->fetch());
-    return ($ret != 'NOT_FOUND') ? $ret : NULL;
-  }
-
-  /**
-   *
-   */
-  public function decrement($name, $value=1) {
-    if (!$this->isConnected()) return FALSE;
-    fwrite($this->socket, 'decr '.$name.' '.$value.self::EOL);
-    $ret = trim($this->fetch());
-    return ($ret != 'NOT_FOUND') ? $ret : NULL;
-  }
-
-  /**
-   *
-   */
-  function fetch() {
-    $buf = '';
-    while ($c = fread($this->socket,2048))  {
-      $buf .= $c;
-      if ( substr($c,-5,3) == "END") break;
+        return $this->fetch('get "'.$name.'"');
     }
-    /* Getting first line */
 
-    $lines = explode(self::EOL,$buf,2);
+    /**
+     * Set the var $name with the content $value
+     * into the $lifetime seconds (forever=0; max = 2592000 [30 days])
+     * Also can compress variables, for reduce network overhead.
+     *
+     * On fail return FALSE.
+     */
+    public function set($name, $value, $lifetime = 0, $compress = FALSE) {
+        if ($this->status != self::CONNECTED) return FALSE;
 
-    if ($lines[0] == 'END') return;
+        $magic = $this->getVarType($value);
 
-    $parts = explode(' ',$lines[0]);
+        if ($magic == self::IS_ARRAY) {
+            $value = serialize($value);
+        }
 
-    $value = substr($lines[1], 0, $parts[3]);
+        if ($compress) {
+            $magic |= self::IS_COMPRESSED;
+            $value = gzcompress($value);
+        }
 
-    if ($parts[2] & self::IS_COMPRESSED) $value = gzuncompress($value);
-    if ($parts[2] & self::IS_ARRAY) $value = unserialize($value);
+        $value = 'set "'.$name.'" '.$magic.' 0 '.strlen($value).' '.self::EOL
+               . $value;
 
-    return $value;
-  }
-
-  /**
-   *
-   */
-  function getStats() {
-    if (!$this->isConnected() ) return FALSE;
-    $buf = '';
-    fwrite($this->socket, 'stats'.self::EOL);
-    while ($c = fread($this->socket,32))  {
-      $buf .= $c;
+        return (trim($this->fetch($value)) == 'STORED');
     }
-    $info = array();
-    foreach (explode(self::EOL, $buf) as $value) {
-        $value = explode(' ', $value, 3);
-        if ($value[0] == 'STAT') $info[$value[1]] = $value[2];
 
+    /**
+     *
+     */
+    public function delete($name) {
+        if ($this->status != self::CONNECTED) return FALSE;
+
+        return (trim($this->fetch('delete "'.$name.'"')) == 'DELETED');
     }
-    return $info;
-  }
 
-  /*
-   *  Disconnect from a memcache server.
-   *  On fail return FALSE.
-   */
-  function close() {
-    if (!$this->isConnected()) return FALSE;
-    fclose($this->socket);
-  }
+    /**
+     *
+     */
+    public function flush() {
+        if ($this->status != self::CONNECTED) return FALSE;
 
-  /*
-   *  This method return the type of the var.
-   *  The possible results are self::IS_ARRAY (need serialize)
-   *  or self::IS_STRING (do not need)
-   */
-  function getVarType( &$var ) {
-    switch (gettype($var)) {
-      case 'array':
-      case 'object':
-        $r = self::IS_ARRAY;
-        break;
-      default:
-        $r = self::IS_STRING;
+        return (trim($this->fetch('flush_all')) == 'OK');
     }
-    return $r;
-  }
 
+    /**
+     *
+     */
+    public function increment($name, $value=1) {
+        if ($this->status != self::CONNECTED) return FALSE;
+
+        $ret = trim($this->fetch('incr '.$name.' '.$value));
+
+        return ($ret != 'NOT_FOUND') ? $ret : NULL;
+    }
+
+    /**
+     *
+     */
+    public function decrement($name, $value=1) {
+        if ($this->status != self::CONNECTED) return FALSE;
+
+        $ret = trim($this->fetch('decr '.$name.' '.$value));
+
+        return ($ret != 'NOT_FOUND') ? $ret : NULL;
+    }
+
+    /**
+     *
+     */
+    public function getStats() {
+        if ($this->status != self::CONNECTED) return FALSE;
+
+        fwrite($this->socket, 'stats'.self::EOL);
+        $buf = '';
+        while ($c = fread($this->socket,32)) $buf .= $c;
+
+        $info = array();
+        foreach (explode(self::EOL, $buf) as $value) {
+            $value = explode(' ', $value, 3);
+            if ($value[0] == 'STAT') $info[$value[1]] = $value[2];
+        }
+
+        return $info;
+    }
+
+    /**
+     * Disconnect from a memcache server.
+     * On fail return FALSE.
+     */
+    public function close() {
+        if ($this->status != self::CONNECTED) return FALSE;
+
+        fclose($this->socket);
+    }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    protected $host;
+    protected $port;
+    protected $status;
+    protected $socket;
+
+    /**
+     * This method return the type of the var.
+     * The possible results are self::IS_ARRAY (need serialize)
+     * or self::IS_STRING (do not need)
+     */
+    protected function getVarType( &$var ) {
+        switch (gettype($var)) {
+            case 'array':
+            case 'object': return self::IS_ARRAY;
+            default:       return self::IS_STRING;
+        }
+    }
+
+    /**
+     *
+     */
+    protected function fetch( $data ) {
+
+        fwrite($this->socket, $data.self::EOL);
+
+        $buf = '';
+        while ($c = fread($this->socket, 2048))    {
+            $buf .= $c;
+            if (substr($c, -5, 3) == 'END') break;
+        }
+        $lines = explode(self::EOL, $buf, 2);
+
+        if ($lines[0] == 'END') return;
+
+        $parts = explode(' ', $lines[0]);
+        if (count($parts) < 4) return $lines[0];
+
+        $value = substr($lines[1], 0, $parts[3]);
+
+        if ($parts[2] & self::IS_COMPRESSED) $value = gzuncompress($value);
+        if ($parts[2] & self::IS_ARRAY)      $value = unserialize($value);
+
+        return $value;
+    }
 }

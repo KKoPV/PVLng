@@ -49,7 +49,18 @@ $(function() {
     });
     $('#tiptip_content').addClass('ui-state-default');
 
-    $('button, a.button, input[type="submit"]').button();
+    $('button, a.button, input[type=submit], input[type=checkbox].button, input[type=radio].button').each(function(id, el) {
+        var options = { icons: { primary: null, secondary: null } };
+        el = $(el);
+        if (el.data('primary')) {
+            options.icons.primary = el.data('primary');
+        }
+        if (el.data('secondary')) {
+            options.icons.secondary = el.data('secondary');
+        }
+        el.button(options);
+    });
+
     $('.toolbar').buttonset();
     $('.login').button('option', 'disabled', (user == ''));
 

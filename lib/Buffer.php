@@ -71,7 +71,7 @@ class Buffer implements Iterator, Countable {
 
             list($this->id, $keys, $values) = explode(self::SEP1, $data);
 
-            $keys   = explode(self::SEP2, $keys);
+            $keys = explode(self::SEP2, $keys);
 
             // Restore newlines
             $values = str_replace(self::NL, PHP_EOL, $values);

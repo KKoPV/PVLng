@@ -1,3 +1,22 @@
+ v2.5.0
+========
+
+FIXED
+
+ - Fix gMemCache ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust caches ~ Knut Kohl <github@knutkohl.de>
+ - Adjust channel readout ~ Knut Kohl <github@knutkohl.de>
+ - Change order of load last readings, after datatable was initialized ~ Knut Kohl <github@knutkohl.de>
+ - Adjust layout for public charts view ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Add output of actual branch in development mode ~ Knut Kohl <github@knutkohl.de>
+ - Add buffered queries ~ Knut Kohl <github@knutkohl.de>
+
  v2.4.0
 ========
 

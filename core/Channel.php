@@ -28,15 +28,12 @@ abstract class Channel {
      * Helper function to build an instance
      */
     public static function byId( $id ) {
-        $channel = new ORM\Tree;
-        $channel->find('id', $id);
+        $channel = new ORM\Tree($id);
 
         if ($channel->alias_of) {
             // Is an alias channel, switch direct to the original channel
             return self::byId($channel->alias_of);
-        }
-
-        if ($channel->model) {
+        } elseif ($channel->model) {
             $model = $channel->ModelClass();
             return new $model($channel);
         }
@@ -49,15 +46,25 @@ abstract class Channel {
      */
     public static function byGUID( $guid ) {
         $channel = new ORM\Tree;
-        $channel->find('guid', $guid);
 
-        if ($channel->alias_of) {
+        if ($channel->findByGUID($guid)->alias_of) {
             // Is an alias channel, switch direct to the original channel
             return self::byId($channel->alias_of);
         } elseif ($channel->model) {
             // Channel is in tree
             $model = $channel->ModelClass();
             return new $model($channel);
+        } else {
+            // NOT in tree, may be a real writable channel?! "Fake" a tree entry
+            $c = new ORM\ChannelView;
+            $c->find('guid', $guid);
+            if ($c->id AND $c->write) {
+                foreach ($c->getAll() as $key=>$value) $channel->set($key, $value);
+                $channel->id = 0;
+                $channel->entity = $c->id;
+                $model = $c->ModelClass();
+                return new $model($channel);
+            }
         }
 
         throw new Exception('No channel found for GUID: '.$guid, 400);
@@ -84,15 +91,10 @@ abstract class Channel {
     /**
      * Run additional code before existing data presented to user
      */
-    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
-        foreach ($fields as $name=>&$data) {
-            if ($data['TYPE'] == 'numeric') {
-                $data['VALUE'] = str_replace('.', __('DSEP'), $data['VALUE']);
-            }
-        }
-    }
+    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {}
 
     /**
+     * Run additional code after attributes was maintained by user
      *
      * @param $add2tree integer|null
      */
@@ -100,29 +102,36 @@ abstract class Channel {
         $ok = TRUE;
 
         foreach ($fields as $name=>&$data) {
+            // Don't check invisible fields
+            if (!$data['VISIBLE']) continue;
+
             $data['VALUE'] = trim($data['VALUE']);
 
-            if ($data['VISIBLE']) {
-                /* check required fields */
-                if ($data['REQUIRED'] AND $data['VALUE'] == '') {
+            if ($data['VALUE'] == '') {
+                // Check required fields
+                if ($data['REQUIRED']) {
                     $data['ERROR'][] = __('channel::ParamIsRequired');
                     $ok = FALSE;
                 }
-                /* check numeric fields */
-                if ($data['VALUE'] != '') {
-                    if ($data['TYPE'] == 'numeric') {
-                        $data['VALUE'] = str_replace(__('TSEP'), '', $data['VALUE']);
-                        $data['VALUE'] = str_replace(__('DSEP'), '.', $data['VALUE']);
-                        if (!is_numeric($data['VALUE'])) {
-                            $data['ERROR'][] = __('channel::ParamMustNumeric');
-                            $ok = FALSE;
-                        }
-                    } elseif ($data['TYPE'] == 'integer' AND (string) floor($data['VALUE']) != $data['VALUE']) {
+                // No further checks for empty fields required
+                continue;
+            }
+
+            // Check numeric fields
+            switch ($data['TYPE']) {
+                case 'numeric':
+                    if (!is_numeric($data['VALUE'])) {
+                        $data['ERROR'][] = __('channel::ParamMustNumeric');
+                        $ok = FALSE;
+                    }
+                    break;
+                case 'integer':
+                    if ((string) floor($data['VALUE']) != $data['VALUE']) {
                         $data['ERROR'][] = __('channel::ParamMustInteger');
                         $ok = FALSE;
                     }
-                }
-            }
+                    break;
+            } // switch
         }
 
         return $ok;
@@ -378,6 +387,9 @@ abstract class Channel {
 
             $q->whereEQ('id', $this->entity)->order('timestamp');
 
+            // Use bufferd result set
+            $this->db->Buffered = TRUE;
+
             if ($res = $this->db->query($q)) {
 
                 if ($this->meter) {
@@ -415,7 +427,12 @@ abstract class Channel {
                     unset($row['g']);
                     $buffer->write($row, $id);
                 }
+
+                // Don't forget to close for buffered results!
+                $res->close();
             }
+
+            $this->db->Buffered = FALSE;
         }
 
         if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
@@ -423,7 +440,7 @@ abstract class Channel {
         if (array_key_exists('sql', $request) AND $request['sql']) {
             $sql = $this->name;
             if ($this->description) $sql .= ' (' . $this->description . ')';
-            Header('X-SQL-'.substr(md5($sql), 8).': '.$sql.': '.$q);
+            Header('X-SQL-'.substr(md5($sql), 8) . ': ' . $sql . ': ' . $q);
         }
 
         return $this->after_read($buffer);
@@ -544,10 +561,8 @@ abstract class Channel {
         static $GroupBy = array(
             self::NO        => '`timestamp`',
             self::ASCHILD   => '`timestamp` DIV 60',
-#            self::MINUTE    => '-((UNIX_TIMESTAMP() - `timestamp`) DIV 60) DIV %d',
-            self::MINUTE    => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%H%%i") DIV %d',
-#            self::HOUR      => '`timestamp` DIV (3600 * %f)',
-            self::HOUR      => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%k") DIV %d',
+            self::MINUTE    => '`timestamp` DIV (60 * %d)',
+            self::HOUR      => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%H") DIV %d',
             self::DAY       => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j") DIV %d',
             self::WEEK      => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
             self::MONTH     => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',

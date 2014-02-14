@@ -75,7 +75,8 @@ return array(
      * Preferd cache mode, auto detect best one if empty
      */
 //    'Cache' => 'APC',
-//    'Cache' => 'MemCache',
+//    'Cache' => 'MemCache',     // Save each key
+//    'Cache' => 'MemCacheOne',  // Save all data into one key (like file cache)
 //    'Cache' => 'File',
     'Cache' => 'Mock', // Disable caching complete
 

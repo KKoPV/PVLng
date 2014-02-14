@@ -264,6 +264,7 @@ class Channel extends \Controller {
                     } else {
                         $model::beforeSave($this->fields, $entity);
                         $entity->update();
+                        $this->app->cache->delete('ChannelView'.$entity->id);
                         \Messages::Success(__('ChannelSaved'));
 
                         $model::afterSave($entity);
@@ -280,6 +281,7 @@ class Channel extends \Controller {
                             $alias->public = $entity->public;
                             $alias->unit = $entity->unit;
                             $alias->update();
+                            $this->app->cache->delete('ChannelView'.$tree->alias);
                             \Messages::Success(__('AliasesUpdated'));
 
                             if (\slimMVC\Config::getInstance()->get('Log.SQL')) {

@@ -82,7 +82,7 @@ class Average extends \Channel {
 
                 if ($key1 == $key2) {
 
-                    // same timestamp, combine
+                    // Same timestamp, combine
                     $row1['data']        = ($row1['data']*$i        + $row2['data'])        / ($i+1);
                     $row1['min']         = ($row1['min']*$i         + $row2['min'])         / ($i+1);
                     $row1['max']         = ($row1['max']*$i         + $row2['max'])         / ($i+1);
@@ -96,18 +96,12 @@ class Average extends \Channel {
 
                 } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                    // missing row 2, save row 1 as is
-                    $result->write($row1, $key1);
-
-                    // read only row 1
+                    // Missing row 2, read only row 1
                     $row1 = $buffer->next()->current();
 
                 } else /* $key1 > $key2 */ {
 
-                    // missing row 1, save row 2 as is
-                    $result->write($row2, $key2);
-
-                    // read only row 2
+                    // Missing row 1, read only row 2
                     $row2 = $next->next()->current();
 
                 }

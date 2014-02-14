@@ -7,14 +7,6 @@
  * @version     1.0.0
  */
 
-#nav {
-    text-align: center;
-}
-
-#nav table {
-    margin: 0 auto;
-}
-
 #nav table td {
     vertical-align: middle;
 }
@@ -26,7 +18,11 @@
 
 #d-table td {
     padding: .5em .5em;
-    vertical-align: top;
+    vertical-align: middle;
+}
+
+#d-table tr.even {
+    background-color: #F0F0F0;
 }
 
 #td-axis .fl {
@@ -59,4 +55,19 @@
 
 #chart-tooltip td.unit {
     padding-right: .5em;
+}
+
+.icheckbox_line disabled,
+.iradio_line disabled {
+    background-color: #606060;
+}
+
+.alias {
+    color: gray;
+    font-style: italic;
+}
+
+.consumption,
+.costs {
+    text-align: right;
 }

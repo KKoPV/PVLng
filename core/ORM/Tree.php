@@ -21,8 +21,10 @@ class Tree extends \slimMVC\ORMTable {
     /**
      *
      */
-    public function ModelClass() {
-        return $this->model ? 'Channel\\'.$this->model : NULL;
+    public function __construct ( $id=NULL ) {
+        /* Build WITHOUT $id lookup, views have no primary key... */
+        parent::__construct();
+        if (isset($id)) $this->find('id', $id);
     }
 
     /**
@@ -30,6 +32,13 @@ class Tree extends \slimMVC\ORMTable {
      */
     public function findByGUID( $guid ) {
         return $this->find('guid', $guid);
+    }
+
+    /**
+     *
+     */
+    public function ModelClass() {
+        return 'Channel\\'.$this->model;
     }
 
     // -------------------------------------------------------------------------

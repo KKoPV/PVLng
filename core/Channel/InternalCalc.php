@@ -28,10 +28,18 @@ abstract class InternalCalc extends \Channel {
      */
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
+
         $this->data = $this->numeric ? new \ORM\ReadingNumMemory :  new \ORM\ReadingStrMemory;
-        $this->data->id = $this->entity;
-        /* Clean up */
+
+        // If the same channel is used in one chart multiple times (also as Alias),
+        // we have a race condition and the instances deletes the data of the others ...
+        // So save for each instance its own data set
+        $this->entity = rand(60000, 65535);
+
+        // Clean up
         $this->data->deleteById($this->entity);
+
+        $this->data->id = $this->entity;
     }
 
     /**
@@ -80,7 +88,7 @@ abstract class InternalCalc extends \Channel {
      */
     protected function after_read( \Buffer $buffer ) {
         /* Clean up */
-        #$this->data->deleteById($this->entity);
+        $this->data->deleteById($this->entity);
         return parent::after_read($buffer);
     }
 

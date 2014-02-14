@@ -52,7 +52,7 @@
                            data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
                     <!-- ENDIF -->
                 </td>
-                <td style="padding:0.4em 0">
+                <td style="padding:0.4em 0" <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
                     <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
                          src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" />
                     <strong class="tip" title="{GUID}">{NAME}</strong>
@@ -68,9 +68,9 @@
                     <img id="s{ID}" src="/images/spinner.gif" width="16" height="16"
                          style="float:right;display:none;width:16px;height:16px" />
                 </td>
-                <td id="cons{ID}" class="consumption r"></td>
+                <td id="cons{ID}" class="consumption"></td>
                 <td id="u{ID}">{UNIT}</td>
-                <td id="costs{ID}" class="costs r"></td>
+                <td id="costs{ID}" class="costs"></td>
                 <td>
                     <!-- IF {GRAPH} -->
                     <img style="cursor:pointer;width:16px;height:16px"
@@ -107,13 +107,12 @@
 
 <div class="grid_8">
     <select id="loaddeleteview"></select>
-    <button id="btn-load" class="tip" style="margin:0 .5em" title="{{Load}}">{{Load}}</button>
-    <button id="btn-delete" class="tip" title="{{Delete}}" data-confirmed="0">{{Delete}}</button>
+    <button id="btn-load" style="margin:0 .5em" class="tip" title="{{Load}}">{{Load}}</button>
+    <button id="btn-delete" data-confirmed="0" class="tip" title="{{Delete}}">{{Delete}}</button>
     <br /><br />
     <input class="fl" id="saveview" type="text" value="{VIEW}" size="35" />
     <div class="fl" style="margin:.4em .5em 0 .5em">
-        <input id="public" type="checkbox" class="iCheck" value="1"
-               <!-- IF {VIEWPUBLIC} -->checked="checked"<!-- ENDIF --> />
+        <input id="public" type="checkbox" class="iCheck" />
     </div>
     <label for="public">{{public}}</label>
     <img src="/images/ico/information_frame.png" class="tip" title="{{publicHint}}"

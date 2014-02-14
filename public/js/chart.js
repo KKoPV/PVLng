@@ -32,6 +32,7 @@ function presentation( data ) {
     this.min = false;
     this.max = false;
     this.last = false;
+    this.all = false;
 
     try { $.extend(this, JSON.parse(data));    } catch(e) {}
 

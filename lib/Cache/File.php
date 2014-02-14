@@ -32,7 +32,7 @@ class File extends AbstractFile {
      */
     public function isAvailable() {
         if (parent::isAvailable()) {
-            $this->filename = $this->FileName(NULL);
+            $this->filename = $this->FileName(__FILE__);
             // Load cached data
             if ($data = $this->ReadFile($this->filename)) {
                 $this->data = $data;
@@ -61,7 +61,7 @@ class File extends AbstractFile {
      * @return string
      */
     public function fetch( $key, $expire=0 ) {
-        return isset($this->data[$key]) ? $this->data[$key] : NULL;
+        return array_key_exists($key, $this->data) ? $this->data[$key] : NULL;
     } // function fetch()
 
     /**
@@ -71,7 +71,7 @@ class File extends AbstractFile {
      * @return bool
      */
     public function delete($key) {
-        if (isset($this->data[$key])) {
+        if (array_key_exists($key, $this->data)) {
             unset($this->data[$key]);
             $this->modified = TRUE;
         }
