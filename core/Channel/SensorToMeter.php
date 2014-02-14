@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class SensorToMeter extends InternalCalc {
+class SensorToMeter extends \Channel {
 
     /**
      * Channel type
@@ -26,12 +26,9 @@ class SensorToMeter extends InternalCalc {
     /**
      *
      */
-    protected function before_read( $request ) {
+    public function read( $request ) {
 
-        parent::before_read($request);
-
-        // Fake period to pre-read all data
-        unset($request['period']);
+        $this->before_read($request);
 
         $offset = $this->TimestampMeterOffset[$this->period[1]];
 
@@ -49,12 +46,18 @@ class SensorToMeter extends InternalCalc {
             $buffer->next();
         }
 
-        $cons = 0;
+        $result = new \Buffer;
+
+        $consumption = 0;
         while ($row = $buffer->current()) {
-            if ($last) $cons += ($row['timestamp'] - $last) / 3600 * $row['data'];
-            $this->saveValue($row['timestamp'], $cons);
+            $row['consumption'] = $last ? ($row['timestamp'] - $last) / 3600 * $row['data'] : 0;
+            $consumption += $row['consumption'];
+            $row['data'] = $consumption;
+            $result->write($row, $buffer->key());
             $last = $row['timestamp'];
             $buffer->next();
         }
+
+        return $this->after_read($result);
     }
 }

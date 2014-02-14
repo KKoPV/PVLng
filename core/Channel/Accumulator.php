@@ -54,77 +54,78 @@ class Accumulator extends \Channel {
         $childs = $this->getChilds();
         $childCnt = count($childs);
 
-        // no childs, return empty file
-        if ($childCnt == 0) {
-            return $this->after_read(new \Buffer);
-        }
+        switch($childCnt) {
 
-        $buffer = $childs[0]->read($request);
+            case 0: // No childs, return empty result
+                $result = new \Buffer;
+                break;
 
-        // only one child, return as is
-        if ($childCnt == 1) {
-            return $this->after_read($buffer);
-        }
+            case 1: // Only one child, return as is
+                $result = $childs[0]->read($request);
+                break;
 
-        // combine all data for same timestamp
-        for ($i=1; $i<$childCnt; $i++) {
+            default:
+                $buffer = $childs[0]->read($request);
 
-            $next = $childs[$i]->read($request);
+                // Combine all data for same timestamp
+                for ($i=1; $i<$childCnt; $i++) {
 
-            $row1 = $buffer->rewind()->current();
-            $row2 = $next->rewind()->current();
-            $first1 = $first2 = TRUE;
+                    $next = $childs[$i]->read($request);
 
-            $result = new \Buffer;
+                    $row1 = $buffer->rewind()->current();
+                    $row2 = $next->rewind()->current();
+                    $first1 = $first2 = TRUE;
 
-            while (!empty($row1) OR !empty($row2)) {
+                    $result = new \Buffer;
 
-                $key1 = $buffer->key();
-                $key2 = $next->key();
+                    while (!empty($row1) OR !empty($row2)) {
 
-                if ($key1 == $key2) {
+                        $key1 = $buffer->key();
+                        $key2 = $next->key();
 
-                    // same timestamp, combine
-                    $row1['data']        += $row2['data'];
-                    $row1['min']         += $row2['min'];
-                    $row1['max']         += $row2['max'];
-                    $row1['consumption'] += $row2['consumption'];
+                        if ($key1 == $key2) {
 
-                    $result->write($row1, $key1);
-                    $last = $row1['data'];
+                            // same timestamp, combine
+                            $row1['data']        += $row2['data'];
+                            $row1['min']         += $row2['min'];
+                            $row1['max']         += $row2['max'];
+                            $row1['consumption'] += $row2['consumption'];
 
-                    // read both next rows
-                    $row1 = $buffer->next()->current();
-                    $row2 = $next->next()->current();
-                    $first1 = $first2 = FALSE;
+                            $result->write($row1, $key1);
+                            $last = $row1['data'];
 
-                } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
+                            // read both next rows
+                            $row1 = $buffer->next()->current();
+                            $row2 = $next->next()->current();
+                            $first1 = $first2 = FALSE;
 
-                    // write $row1 only, if data set 2 is not yet started
-                    if ($first2) $result->write($row1, $key1);
+                        } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                    // read only row 1
-                    $row1 = $buffer->next()->current();
-                    $first1 = FALSE;
+                            // write $row1 only, if data set 2 is not yet started
+                            if ($first2) $result->write($row1, $key1);
 
-                } else /* $key1 > $key2 */ {
+                            // read only row 1
+                            $row1 = $buffer->next()->current();
+                            $first1 = FALSE;
 
-                    // write $row2 only, if data set 1 is not yet started
-                    if ($first1) $result->write($row2, $key2);
+                        } else /* $key1 > $key2 */ {
 
-                    // read only row 2
-                    $row2 = $next->next()->current();
-                    $first2 = FALSE;
+                            // write $row2 only, if data set 1 is not yet started
+                            if ($first1) $result->write($row2, $key2);
 
+                            // read only row 2
+                            $row2 = $next->next()->current();
+                            $first2 = FALSE;
+
+                        }
+                    }
+                    $next->close();
+
+                    // Set result to buffer for next loop
+                    $buffer = $result;
                 }
-            }
-            $next->close();
-
-            // Set result to buffer for next loop
-            $buffer = $result;
-        }
+        } // switch
 
         return $this->after_read($result);
     }
-
 }

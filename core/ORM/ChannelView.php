@@ -27,6 +27,13 @@ class ChannelView extends \slimMVC\ORMTable {
         if (isset($id)) $this->find('id', $id);
     }
 
+    /**
+     *
+     */
+    public function ModelClass() {
+        return 'Channel\\'.$this->model;
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
