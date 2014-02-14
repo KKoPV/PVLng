@@ -57,6 +57,7 @@ function updateList() {
         return;
     }
 
+    $(document.body).addClass('wait');
     listTable.fnClearTable(false);
     listTable.fnProcessingIndicator();
 
@@ -108,10 +109,10 @@ function updateList() {
             listTable.fnSetColumnVis( 5, channel.numeric && period );
             listTable.fnSetColumnVis( 6, !period );
         }
-    ).fail(function (jqxhr, textStatus, error) {
+    ).fail(function (jqXHR, textStatus, error) {
         $.pnotify({
             type: textStatus,
-            text: jqxhr.responseText,
+            text: jqXHR.responseText.trim(),
             hide: false,
             sticker: false
         });
@@ -119,6 +120,7 @@ function updateList() {
         listTable.fnDraw();
         listTable.fnAdjustColumnSizing();
         listTable.fnProcessingIndicator(false);
+        $(document.body).removeClass('wait');
     });
 }
 
@@ -165,8 +167,8 @@ var listTable;
 $(function() {
 
     $.ajaxSetup({
-        beforeSend: function setHeader(xhr) {
-            xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
+        beforeSend: function setHeader(XHR) {
+            XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
         }
     });
 
@@ -175,7 +177,7 @@ $(function() {
         this.oApi._fnProcessingDisplay( oSettings, onoff );
     };
 
-    if (language != "en") {
+    if (language != 'en') {
         $.datepicker.setDefaults($.datepicker.regional[language]);
     }
 
@@ -251,21 +253,32 @@ $(function() {
     /* Bind click listener to all delete buttons */
     $('#list tbody').on('click', 'img.delete-reading', function() {
         var ts = $(this).data('timestamp'),
-            prompt = (new Date(ts*1000).toLocaleString().replace(' 00:00', ''))+' : ' + $(this).data('value').toFixed(channel.decimals);
+            question = '{{ConfirmDeleteReading}}\n\n' +
+                       '- ' + (new Date(ts*1000)).toLocaleString() + '\n' +
+                       '- {{Reading}} : ' + $(this).data('value');
 
-        if (confirm('{{DeleteReadingConfirm}}\n\n'+prompt)) {
-            var pos = listTable.fnGetPosition(this.parentNode.parentNode);
+        if (confirm(question)) {
+            listTable.fnProcessingIndicator();
+            $(document.body).addClass('wait');
+
+            var url = PVLngAPI + 'data/' + channel.guid + '/' + ts + '.json',
+                pos = listTable.fnGetPosition(this.parentNode.parentNode);
 
             $.ajax({
                 type: 'DELETE',
-                url: PVLngAPI + 'data/' + channel.guid + '/' + ts + '.json',
+                url: url,
                 dataType: 'json',
-                success: function() {
-                    listTable.fnDeleteRow(pos);
-                },
-                error: function(jqXHR) {
-                    alert(jqXHR.responseJSON.message);
-                }
+            }).done(function(data, textStatus, jqXHR) {
+                listTable.fnDeleteRow(pos);
+                $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $.pnotify({
+                    type: textStatus, hide: false, sticker: false,
+                    text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+                });
+            }).always(function() {
+                listTable.fnProcessingIndicator(false);
+                $(document.body).removeClass('wait');
             });
         }
     });

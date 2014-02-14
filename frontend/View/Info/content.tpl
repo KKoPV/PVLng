@@ -84,7 +84,7 @@
     <tr>
         <th class="l" colspan="4"></th>
         <th class="r"></th>
-        <th class="l" colspan="2">{{Readings}}</th>
+        <th class="l" colspan="2"></th>
     </tr>
     </tfoot>
 

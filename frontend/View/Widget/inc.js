@@ -15,14 +15,14 @@ function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $la
         tooltip: { enabled: false },
         chart: {
             renderTo: $chart,
-            margin: [ $labels ? 5 : 0, 0, 15, $labels ? null : 0 ]
+            margin: [ $labels ? 5 : 0, 0, 17, $labels ? null : 0 ]
         },
         title: { text: '' }, /* Hide title at all */
         subtitle: {
             text: $text,
             x: $labels ? 15 : 0,
             /* Put at bottom between times */
-            y: $height - 10
+            y: $height - 12
         },
         xAxis: [{
             title: { enabled: false },
@@ -46,14 +46,14 @@ function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $la
     }, function(chart) {
         /* Start time on left */
         var box = chart.renderer
-        .text($time1, chart.plotLeft, chart.chartHeight)
+        .text($time1, chart.plotLeft, chart.chartHeight-2)
         .attr({ zIndex: 5 })
         .add()
         .getBBox();
 
         /* End time on right */
         chart.renderer
-        .text($time2, chart.chartWidth - box.width, chart.chartHeight)
+        .text($time2, chart.chartWidth - box.width, chart.chartHeight-2)
         .attr({ zIndex: 5 })
         .add();
     });

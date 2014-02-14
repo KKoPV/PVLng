@@ -255,13 +255,11 @@ $(function() {
 
     updateClock();
 
-    <!-- IF {USER} -->
     $.ajaxSetup({
         beforeSend: function setHeader(xhr) {
-            xhr.setRequestHeader('X-PVLng-Key', '{APIKEY}');
+            xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
         }
     });
-    <!-- ENDIF -->
 
     Highcharts.setOptions({
         lang: {
@@ -302,25 +300,13 @@ $(function() {
         text: false
     });
 
-    $('#togglewrapper').click(function() {
-        var visible = ! $('#wrapper').is(':visible');
-            var link = $(this);
-
-        $('#wrapper').animate(
-            { height: 'toggle', opacity: 'toggle' }, 'slow', 'linear',
-            function() {
-                if (visible) {
-                    $('#wrapper').css('visibility', 'visible');
-                    link.button({ icons: { primary:'ui-icon-carat-1-n' }, text:false });
-                } else {
-                    $('#wrapper').css('visibility', 'hidden');
-                    link.button({ icons: { primary:'ui-icon-carat-1-s' }, text:false });
-                }
-            }
-        );
-
-        return false;
-    }).button({ icons: { primary: 'ui-icon-carat-1-n' }, text: false });
+    $('#togglewrapper').button({
+        icons: { primary: 'ui-icon-carat-2-n-s' },
+        label: '&nbsp;',
+        text: false
+    }).click(function() {
+        $('#wrapper').animate( { height: 'toggle', opacity: 'toggle' } );
+    });
 
     if ('{CHANNELCOUNT}' != 0) {
         ToggleTree(false);

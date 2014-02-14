@@ -12,10 +12,8 @@
 <div id="dialog-chart" style="display:none" title="{{ChartSettings}}">
     <table id="d-table">
         <tbody>
-        <tr>
-            <td style="width:50%">
-                {{Axis}}
-            </td>
+        <tr class="odd">
+            <td style="width:50%">{{Axis}}</td>
             <td id="td-axis">
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="9" /></div>
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="7" /></div>
@@ -23,7 +21,7 @@
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="3" /></div>
                 <div class="fl nm"><input class="iCheck" type="radio" name="d-axis" value="1" /></div>
                 <img class="fl nm" src="/images/chart.png" width="35" height="20"
-                     style="margin-left:.5em;margin-right:.5em;vertical-align:top;width:35px;height:20px"/>
+                     style="margin:0 .5em;vertical-align:top;width:35px;height:20px"/>
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="2" /></div>
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="4" /></div>
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="6" /></div>
@@ -31,88 +29,96 @@
                 <div class="fl nm"><input class="iCheck" type="radio" name="d-axis" value="10" /></div>
             </td>
         </tr>
-        <tr>
-            <td>
-                <label for="d-type">{{SeriesType}}</label>
-            </td>
+        <tr class="even">
+            <td><label for="d-type">{{SeriesType}}</label></td>
             <td>
                 <select id="d-type">
-                    <option value="line">Line</option>
-                    <option value="spline">Spline</option>
-                    <option value="areasplinerange">Spline min/max</option>
-                    <option value="areaspline">Spline with area</option>
-                    <option value="bar">Bar</option>
-                    <option value="scatter">Scatter</option>
+                    <option value="line">{{LineChart}}</option>
+                    <option value="spline">{{SplineChart}}</option>
+                    <option value="areasplinerange"> {{AreaSplineRangeChart}}</option>
+                    <option value="areaspline">{{AreaSplineChart}}</option>
+                    <option value="bar">{{BarChart}}</option>
+                    <option value="scatter">{{ScatterChart}}</option>
                 </select>
+                <img style="margin-left:.5em;width:16px;height:16px" class="tip"
+                     src="/images/ico/information_frame.png" width="16" height="16"
+                     title="{{ChartTypeHint}}" />
             </td>
         </tr>
-        <tr class="not-bar not-scatter">
-            <td>
-                <label for="d-style">{{dashStyle}}</label>
-            </td>
-            <td>
+        <tr class="odd">
+            <td><label for="d-style">{{dashStyle}}</label></td>
+            <td class="not-bar not-scatter">
                 <select id="d-style">
-                    <option value="">None</option>
-                    <option value="Solid">Solid</option>
-                    <option value="LongDash">Long Dash</option>
-                    <option value="Dash">Dash</option>
-                    <option value="Dot">Dot</option>
-                    <option value="DashDot">Dash-Dot</option>
-                    <optgroup label="Long">
-                        <option value="LongDashDot">Dash-Dot</option>
-                        <option value="LongDashDotDot">Dash-Dot-Dot</option>
+                    <option value="Solid">{{LineSolid}}</option>
+                    <optgroup label="{{LinesDashed}}">
+                        <option value="Dash">{{LineDash}}</option>
+                        <option value="LongDash">{{LineLongDash}}</option>
+                        <option value="ShortDash">{{LineShortDash}}</option>
                     </optgroup>
-                    <optgroup label="Short">
-                        <option value="ShortDash">Dash</option>
-                        <option value="ShortDot">Dot</option>
-                        <option value="ShortDashDot">Dash-Dot</option>
-                        <option value="ShortDashDotDot">Dash-Dot-Dot</option>
+                    <optgroup label="{{LinesDotted}}">
+                        <option value="Dot">{{LineDot}}</option>
+                        <option value="ShortDot">{{LineShortDot}}</option>
+                    </optgroup>
+                    <optgroup label="{{LinesDashedDotted}}">
+                        <option value="DashDot">{{LineDashDot}}</option>
+                        <option value="LongDashDot">{{LineLongDashDot}}</option>
+                        <option value="ShortDashDot">{{LineShortDashDot}}</option>
+                    </optgroup>
+                    <optgroup label="{{LinesDashedDottedDotted}}">
+                        <option value="LongDashDotDot">{{LineLongDashDotDot}}</option>
+                        <option value="ShortDashDotDot">{{LineShortDashDotDot}}</option>
                     </optgroup>
                 </select>
             </td>
         </tr>
-        <tr class="not-bar not-scatter">
+        <tr class="even">
             <td>{{LineWidth}}</td>
             <td>
-                <div class="fl" style="margin-right:.5em">
-                    <input type="radio" class="iCheckLine" id="d-width-1" name="d-width" value="1" />
+                <div class="fl not-bar not-scatter" style="margin-right:.5em">
+                    <input id="d-width-1" type="radio" class="iCheckLine" name="d-width" value="1" />
                     <label for="d-width-1">{{ThinLine}}</label>
                 </div>
-                <div class="fl" style="margin-right:.5em">
-                    <input type="radio" class="iCheckLine" id="d-width-2" name="d-width" value="2" />
+                <div class="fl not-bar not-scatter" style="margin-right:.5em">
+                    <input id="d-width-2" type="radio" class="iCheckLine" name="d-width" value="2" />
                     <label for="d-width-2">{{LineNormal}}</label>
                 </div>
-                <div class="fl">
-                    <input type="radio" class="iCheckLine" id="d-width-3" name="d-width" value="4" />
+                <div class="fl not-bar not-scatter">
+                    <input id="d-width-3" type="radio" class="iCheckLine" name="d-width" value="4" />
                     <label for="d-width-3">{{LineBold}}</label>
                 </div>
             </td>
         </tr>
-        <tr class="not-scatter">
+        <tr class="odd">
+            <td>{{MarkExtremes}}</td>
             <td>
-                {{MarkExtremes}}
-            </td>
-            <td>
-                <div class="fl not-bar" style="margin-right:.5em">
-                    <input type="checkbox" id="d-min" class="iCheckLine" />
-                    <label for="d-min">{{min}}</label>
+                <div class="fl not-bar not-scatter" style="margin-right:.5em">
+                    <input id="d-min" type="checkbox" class="iCheckLine" />
+                    <label for="d-min">{{MarkMin}}</label>
                 </div>
-                <div class="fl" style="margin-right:.5em">
-                    <input type="checkbox" id="d-max" class="iCheckLine" />
-                    <label for="d-max">{{max}}</label>
+                <div class="fl not-scatter">
+                    <input id="d-max" type="checkbox" class="iCheckLine" />
+                    <label for="d-max">{{MarkMax}}</label>
                 </div>
-                <div class="fl not-bar">
-                    <input type="checkbox" id="d-last" class="iCheckLine" />
-                    <label for="d-last">{{lastone}}</label>
+
+                <div style="clear:both;padding-top:.25em">
+                    <div class="fl not-bar not-scatter" style="margin-right:.5em">
+                        <input id="d-last" type="checkbox" class="iCheckLine" />
+                        <label for="d-last">{{MarkLast}}</label>
+                    </div>
+                    <div class="fl only-bar">
+                        <input id="d-all" type="checkbox" class="iCheckLine" />
+                        <label for="d-all">{{MarkAll}}</label>
+                    </div>
+                    <img style="margin-left:.5em;width:16px;height:16px" class="tip"
+                         src="/images/ico/information_frame.png" width="16" height="16"
+                         title="{{MarkAllHint}}" />
                 </div>
             </td>
         </tr>
-        <tr class="not-scatter">
+        <tr class="even">
+            <td><label for="d-cons">{{Presentation}}</label></td>
             <td>
-                <label for="d-cons">{{Presentation}}</label>
-            </td>
-            <td>
-                <div class="fl">
+                <div class="fl not-scatter">
                     <input type="checkbox" id="d-cons" class="iCheckLine tip" />
                     <label for="d-cons">{{ShowConsumption}}</label>
                 </div>
@@ -121,30 +127,27 @@
                      title="{{ShowConsumptionHint}}" />
             </td>
         </tr>
-        <tr>
-            <td>
-                {{Color}}
-            </td>
-            <td>
-                <input id="d-color" type="color" class="spectrum" />
-            </td>
+        <tr class="odd">
+            <td>{{Color}}</td>
+            <td><input id="d-color" type="color" class="spectrum" /></td>
         </tr>
-        <tr>
-            <td>
-                <label for="d-color-use-neg">{{UseNegativeColor}}</label>
-            </td>
+        <tr class="even">
+            <td><label for="d-color-use-neg">{{UseNegativeColor}}</label></td>
             <td>
                 <table>
                 <tr>
                     <!-- Align controls correct using a table ... -->
-                    <td style="padding-left:0;vertical-align:middle">
-                        <input type="checkbox" id="d-color-use-neg" class="iCheck" />
+                    <td style="padding-left:0">
+                        <input id="d-color-use-neg" type="checkbox" class="not-scatter iCheck" />
                     </td>
-                    <td style="vertical-align:middle">
-                        <input id="d-threshold" type="number" style="width:6em" class="tip" title="{{Threshold}}" />
-                    </td>
-                    <td style="vertical-align:middle">
+                    <td>
                         <input id="d-color-neg" type="color" class="spectrum" />
+                    </td>
+                    <td>
+                        {{below}}
+                    </td>
+                    <td>
+                        <input id="d-threshold" type="number" style="width:6em" class="tip" title="{{Threshold}}" />
                     </td>
                 </tr>
                 </table>

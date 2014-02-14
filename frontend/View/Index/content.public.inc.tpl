@@ -9,7 +9,7 @@
  */
 -->
 
-<div class="grid_10" style="margin-bottom:1em">
+<div id="public-select" class="grid_10" style="margin-bottom:1em;display:none">
     <label for="loaddeleteview">{{VariantsPublic}}:</label>
     <select id="loaddeleteview" style="margin:0 .5em"></select>
     <button id="btn-load" class="tip" title="{{Load}}">{{Load}}</button>

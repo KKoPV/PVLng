@@ -82,7 +82,7 @@
 <div class="push_2 grid_6">
 
 <p>
-    <a id="togglewrapper" href="#">{{ToggleChannels}}</a>
+    <button id="togglewrapper" class="tipbtn" title="{{ToggleChannels}}">{{ToggleChannels}}</button>
 </p>
 
 <form method="post" action="/dashboard">

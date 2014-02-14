@@ -42,108 +42,100 @@ var RefreshTimeout = 300;
 
 <script>
 
-function View( slug ) {
-    this._slug = '';
-    this._name = '';
+function Views() {
+    this.views = {};
+    this.actual = { slug: '', name: '', public: 0 };
 
-    this.slug = slug;
-
-    this.fetch = function( el, callback ) {
-        if (el.length == 0) return;
+    this.fetch = function( callback ) {
+        this.views = {};
+        var that = this;
         $.getJSON(
             PVLngAPI + '/views.json',
             { select: true },
             function(data) {
-                el.empty();
                 $(data).each(function(id, view) {
-                    $('<option/>').val(view.slug).text(view.name).appendTo(el);
+                    that.views[view.slug] = view;
                 });
-                if (typeof callback != 'undefined') callback(el);
             }
-        );
-    };
-
-    this.load = function( collapse ) {
-        if (this._slug == '') return;
-
-        oTable.fnProcessingIndicator(true);
-
-        $.getJSON(
-            PVLngAPI + '/view/' + this._slug + '.json',
-            {},
-            function(data) {
-                var expanded = tree.expanded, preset;
-                if (!expanded) tree.toggle(true);
-
-                /* Uncheck all channels and ... */
-                $('tr.channel').removeClass('checked');
-                $('input.channel').iCheck('uncheck');
-                /* ... re-check all channels in view */
-                $.each(data, function (id, p) {
-                    if (id == 'p') {
-                        preset = p;
-                    } else {
-                        $('#c'+id).val(p).iCheck('check');
-                    }
-                });
-
-                /* Re-arrange channels in collapsed tree */
-                if (((typeof collapse != 'undefined') && collapse) || !expanded) {
-                    tree.toggle(false);
-                }
-
-                $('#preset').val(preset).trigger('change');
-                $('#wrapper').show();
-            }
-        ).fail(function () {
-            oTable.fnProcessingIndicator(false);
+        ).always(function() {
+            if (typeof callback != 'undefined') callback(that);
         });
     };
 
-};
+    this.buildSelect = function(el, selected) {
+        var option;
+        el = $(el).empty();
 
-Object.defineProperty( View.prototype, 'slug', {
-    set: function( slug ) {
-        if (typeof slug != 'string') return;
-        this._slug = slug.trim();
-        $('#loaddeleteview').val(slug);
-        this.name = slug ? $('#loaddeleteview option:selected').text() : '';
-        $('#saveview').val(this._name);
-    },
-    get: function() {
-        return this._slug;
-    }
-});
+        $.each(this.views, function(id, view) {
+            option = $('<option/>');
+            if (user) {
+                if (view.public && view.slug) {
+                    option.text(view.name + ' ({{Public}})');
+                } else {
+                    option.text(view.name);
+                }
+            } else if (view.public) {
+                option.text(view.name);
+            }
+            option.val(view.slug).appendTo(el);
+        });
+        el.val(selected);
+    };
 
-Object.defineProperty( View.prototype, 'name', {
-    set: function( name ) {
-        this._name = name.trim();
-    },
-    get: function() {
-        return this._name;
-    }
-});
+    this.load = function( slug, collapse, callback ) {
+        if (typeof this.views[slug] == 'undefined') return;
+        if (typeof collapse == 'undefined') collapse = false;
+
+        oTable.fnProcessingIndicator(true);
+
+        var expanded = tree.expanded, preset;
+        if (!expanded) tree.toggle(true);
+
+        this.actual = this.views[slug];
+
+        /* Uncheck all channels and ... */
+        $('input.channel').iCheck('uncheck').val('');
+        $('tr.channel').removeClass('checked');
+        /* ... re-check all channels in view */
+        $.each(JSON.parse(this.actual.data), function (id, p) {
+            if (id == 'p') {
+                preset = p;
+            } else {
+                $('#c'+id).val(p).iCheck('check');
+            }
+        });
+
+        /* Re-arrange channels in collapsed tree */
+        if (collapse || !expanded) tree.toggle(false);
+
+        $('#wrapper').show();
+        $('#preset').val(preset).trigger('change');
+
+        $('#loaddeleteview').val(this.actual.slug);
+        $('#saveview').val(this.actual.name);
+        $('#public').prop('checked', this.actual.public).iCheck('update');
+
+        if (typeof callback != 'undefined') callback(this.actual);
+
+        oTable.fnProcessingIndicator(false);
+    };
+}
 
 /**
  *
  */
 var
-    qs, view,
-    chart = false, timeout,
+    qs = {}, views = {}, chart = false, timeout,
 
-    options = {
+    chartOptions = {
         chart: {
             renderTo: 'chart',
             paddingRight: 15,
             alignTicks: false,
             zoomType: 'x',
-            resetZoomButton: {
-                position: { x: 0, y: -50 }
-            },
+            resetZoomButton: { position: { x: 0, y: -50 } },
             events: {
-                selection: function(event) {
-                    setTimeout(setExtremes, 100);
-                }
+                selection: function(event) { setTimeout(setExtremes, 100); }
             }
         },
         title: { text: '' },
@@ -152,25 +144,36 @@ var
                 point: {
                     events: {
                         click: function() {
-                            if (confirm('Do you really want delete this reading value?\n\n '+
-                                (new Date(this.x).toLocaleString().replace(' 00:00', ''))+' : '+this.y)) {
+                            if (!this.series.userOptions.raw) return;
 
-                                var point = this,
-                                    url = PVLngAPI + 'data/' +
-                                          point.reading.guid + '/' +
-                                          point.reading.timestamp + '.json';
-                                _log(url);
+                            var dateLocale = (new Date(this.x)).toLocaleString(),
+                                question = '{{DeleteReadingConfirm}}\n\n' +
+                                           '- ' + this.series.name + '\n' +
+                                           '- ' + dateLocale + '\n' +
+                                           '- {{Reading}} : ' + this.y + ' ' + this.series.userOptions.unit;
+
+                            if (confirm(question)) {
+                                chart.showLoading('{{JustAMoment}}');
+                                $(document.body).addClass('wait');
+
+                                var url = PVLngAPI + 'data/' + this.series.userOptions.guid + '/' + (this.x/1000).toFixed(0) + '.json',
+                                    point = this; /* Remember for deleting series point */
 
                                 $.ajax({
-                                    dataType: 'json',
-                                    url: url,
                                     type: 'DELETE',
-                                    success: function(data) {
-                                        point.remove();
-                                    },
-                                    error: function(data) {
-                                        alert(data.responseJSON.message);
-                                    }
+                                    url: url,
+                                    dataType: 'json'
+                                }).done(function(data, textStatus, jqXHR) {
+                                    point.remove();
+                                    $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
+                                }).fail(function(jqXHR, textStatus, errorThrown) {
+                                    $.pnotify({
+                                        type: textStatus, hide: false, sticker: false,
+                                        text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+                                    });
+                                }).always(function() {
+                                    chart.hideLoading();
+                                    $(document.body).removeClass('wait');
                                 });
                             }
                         }
@@ -178,12 +181,8 @@ var
                 },
                 turboThreshold: 0
             },
-            line: {
-                marker: { enabled: false }
-            },
-            spline: {
-                marker: { enabled: false },
-            },
+            line: { marker: { enabled: false } },
+            spline: { marker: { enabled: false } },
             areaspline: {
                 marker: { enabled: false },
                 shadow: false,
@@ -194,13 +193,9 @@ var
                 shadow: false,
                 fillOpacity: 0.2
             },
-            bar: {
-                groupPadding: 0.1
-            }
+            bar: { groupPadding: 0.1 }
         },
-        xAxis : {
-            type: 'datetime'
-        },
+        xAxis : { type: 'datetime' },
         tooltip: {
             useHTML: true,
             formatter: function() {
@@ -232,8 +227,7 @@ var
                 });
                 return (body)
                      ? '<table id="chart-tooltip"><thead><tr><th colspan="3">' +
-                       Highcharts.dateFormat('%a. ',this.x) +
-                       (new Date(this.x).toLocaleString()).replace(' 00:00:00', '').replace(':00', '') +
+                       (new Date(this.x).toLocaleString()).replace(/:00$/, '') +
                        '</th></tr></thead><tbody>' + body + '</tbody></table>'
                      : null;
             },
@@ -242,12 +236,7 @@ var
             crosshairs: true,
             shared: true
         },
-        loading: {
-            labelStyle: {
-                top: '40%',
-                fontSize: '200%'
-            }
-        }
+        loading: { labelStyle: { top: '40%', fontSize: '200%' } }
     };
 
 /**
@@ -302,6 +291,7 @@ tree = new Tree(!!user);
 function ChartDialog( id, name ) {
     /* get stringified settings */
     var p = new presentation($('#c'+id).val());
+
     /* set dialog properties */
     /* find the radio button with the axis value and check it */
     $('input[name="d-axis"][value="' + p.axis + '"]').prop('checked', true);
@@ -311,6 +301,7 @@ function ChartDialog( id, name ) {
     $('#d-min').prop('checked', p.min);
     $('#d-max').prop('checked', p.max);
     $('#d-last').prop('checked', p.last);
+    $('#d-all').prop('checked', p.all);
     $('#d-style').val(p.style);
     $('#d-color').val(p.color);
     $('#d-color').spectrum('set', p.color);
@@ -324,7 +315,7 @@ function ChartDialog( id, name ) {
     $('input').iCheck('update');
     $('#d-type').trigger('change');
 
-    /* set the id into the dialog for onClose to write data back */
+    /* Set the id into the dialog for onClose to write data back */
     $('#dialog-chart').data('id',id).dialog('option','title',name).dialog('open');
 }
 
@@ -336,7 +327,7 @@ var channels = [];
 /**
  * Scale timestamps down to full minute, hour, day, week, month, quarter or year
  */
-var xAxisResolution = {
+var xResolution = {
     i: 60,
     h: 60 * 60,
     d: 60 * 60 * 24,
@@ -346,21 +337,19 @@ var xAxisResolution = {
     y: 60 * 60 * 24 * 360
 };
 
-var lastChanged = (new Date).getTime() / 1000 / 60,
-    inUpdate = false;
+var lastChanged = (new Date).getTime() / 1000 / 60;
 
 /**
  *
  */
 function updateChart( forceUpdate ) {
 
-    if (inUpdate) return;
-
-    inUpdate = true;
-
     clearTimeout(timeout);
 
-    if (view.slug) {
+    /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
+    if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
+
+    if (views.actual) {
         /* Provide permanent link only for logged in user and not embedded view level 2 */
         var from = $('#from').val(), to = $('#to').val(),
             date = (from == to)
@@ -368,27 +357,35 @@ function updateChart( forceUpdate ) {
                  : 'from=' + $('#fromdate').val() + '&to=' + $('#todate').val();
 
         $('#btn-permanent').button({
-            label: view.name + ' ' + from + ' | {strip_tags:TITLE}',
-            disabled: (view.slug == '')
-        }).prop('href', '/chart/' + view.slug + encodeURI('?' + date));
+            label: views.actual.name + ' ' + from + ' | {strip_tags:TITLE}',
+            disabled: (views.actual.slug == '')
+        }).prop('href', '/chart/' + views.actual.slug + encodeURI('?' + date));
 
         $('#btn-bookmark').button({
-            label: view.name + ' | {strip_tags:TITLE}',
-            disabled: (view.slug == '')
-        }).prop('href', '/chart/' + view.slug);
+            label: views.actual.name + ' | {strip_tags:TITLE}',
+            disabled: (views.actual.slug == '')
+        }).prop('href', '/chart/' + views.actual.slug);
     }
 
     var ts = (new Date).getTime(),
         channels_new = [], yAxisMap = [], yAxis = [],
         channel, channel_clone, buffer = [],
+        aborted = false,
         period_count = +$('#periodcnt').val(),
         period = $('#period').val(),
-        res;
+        res = xResolution[period] ? xResolution[period] : 1,
+        expanded = tree.expanded;
 
-    /* reset consumption and costs data */
+    /* Show all rows to reset consumption and cost columns */
+    if (!expanded) tree.toggle(true);
+
+    /* Reset consumption and costs data */
     $('.minmax, .consumption, .costs, #costs').each(function(id, el) {
         $(el).html('');
     });
+
+    /* Re-collapse if needed */
+    if (!expanded) tree.toggle(false);
 
     /* find active channels, map and sort axis */
     $('input.channel:checked').each(function(id, el) {
@@ -459,10 +456,7 @@ function updateChart( forceUpdate ) {
     }
 
     /* Any channels checked for drawing? */
-    if (channels_new.length == 0) {
-        inUpdate = false;
-        return;
-    }
+    if (channels_new.length == 0) return;
 
     _log('Channels:', channels_new);
     _log('yAxis:', yAxis);
@@ -484,30 +478,23 @@ function updateChart( forceUpdate ) {
         }
     }
 
-    switch(period) {
-        case 'd':  res = xAxisResolution['h'];  break;
-        case 'w':  res = xAxisResolution['d'];  break;
-        case 'm':  res = xAxisResolution['w'];  break;
-        case 'q':  res = xAxisResolution['m'];  break;
-        case 'y':  res = xAxisResolution['q'];  break;
-        default:   res = xAxisResolution['i'];
-    }
-
     if (changed) {
         /* use UTC for timestamps with a period >= day to avoid wrong hours in hint */
-        Highcharts.setOptions({ global: { useUTC: (res >= xAxisResolution.d) } });
+        Highcharts.setOptions({ global: { useUTC: (res > xResolution.h) } });
 
         /* happens also on 1st call! */
-        options.yAxis = yAxis;
+        chartOptions.yAxis = yAxis;
+        chartOptions.exporting = { filename: views.actual.slug };
 
         /* (re)create chart */
-        options.exporting = { filename: view.slug };
-        chart = new Highcharts.Chart(options);
+        chart = new Highcharts.Chart(chartOptions);
+        /* Help chart with fluid layout to find its correct size... */
+        chart.reflow();
     }
 
     var f = $('#from').val(), t = $('#to').val();
     if (f != t) f += ' - ' + t;
-    chart.setTitle({ text: $('<div/>').html(view.name).text() }, { text: f });
+    chart.setTitle({ text: $('<div/>').html(views.actual.name).text() }, { text: f });
 
     var loading = channels.length;
     chart.showLoading('- ' + loading + ' -');
@@ -552,12 +539,14 @@ function updateChart( forceUpdate ) {
 
                 var serie = { /* HTML decode channel name */
                     name: $('<div/>').html(attr.name + t).text(),
+                    guid: channel.guid,
                     id: channel.id,
                     decimals: attr.decimals,
                     unit: attr.unit,
                     color: channel.color,
                     type: channel.type,
                     yAxis: channel.axis,
+                    raw: (period == ''),
                     data: []
                 };
 
@@ -592,27 +581,37 @@ function updateChart( forceUpdate ) {
                 }
 
                 $(data).each(function(id, row) {
-                    var ts = Math.round(row.timestamp / res) * res * 1000;
-                    var reading = { guid: attr.guid, timestamp: row.timestamp };
+                    var point = {};
+
+                    if (channel.type == 'scatter') {
+                        /* Show scatters at their real timestamps, ALSO for consolidaten data */
+                        point.x = row.timestamp * 1000;
+                    } else {
+                        point.x = Math.round(row.timestamp / res) * res * 1000;
+                    }
+
                     if ($.isNumeric(row.data)) {
                         if (channel.type == 'areasplinerange') {
-                            serie.data.push({ x: ts, low: row.min, high: row.max, reading: reading });
-                        } else if (channel.consumption) {
-                            serie.data.push({ x: ts, y: row.consumption, reading: reading });
+                            point.low  = row.min;
+                            point.high = row.max;
                         } else {
-                            serie.data.push({ x: ts, y: row.data, reading: reading });
+                            if (!channel.all) {
+                                point.y = channel.consumption ? row.consumption : row.data;
+                            } else {
+                                /* Format data label */
+                                point.y = +(channel.consumption ? row.consumption : row.data).toFixed(attr.decimals);
+                                point.dataLabels = { enabled: true };
+                            }
                         }
                     } else {
-                        serie.data.push({
-                            x: ts,
-                            y: 0,
-                            name: row.data,
-                            reading: reading
-                        });
+                        point.y = 0;
+                        point.name = row.data;
                     }
+
+                    serie.data.push(point);
                 });
 
-                if (channel.type != 'areasplinerange' && (channel.min || channel.max)) {
+                if (channel.type != 'areasplinerange' && !channel.all && (channel.min || channel.max)) {
                     serie = setMinMax(serie, channel);
                 }
 
@@ -626,17 +625,22 @@ function updateChart( forceUpdate ) {
                 });
             }
         ).fail(function(jqXHR, textStatus, error) {
-            $.pnotify({
-                type: textStatus,
-                text: error + "\n" + (jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText),
-                hide: false,
-                sticker: false
-            });
-
-            /* Set pseudo channel */
-            series[id] = {};
-
+            if (textStatus == 'abort') {
+                /* Aborted during loading */
+                aborted = true;
+            } else {
+                $.pnotify({
+                    type: textStatus,
+                    text: error + "\n" + (jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText),
+                    hide: false,
+                    sticker: false
+                });
+                /* Set pseudo channel */
+                series[id] = {};
+            }
         }).always(function(data, status) {
+
+            if (aborted) return;
 
             $('#s'+channel.id).hide();
 
@@ -678,7 +682,10 @@ function updateChart( forceUpdate ) {
                 $.each(series, function(i, serie) {
                     if (serie.id) {
                         /* Valid channel with id */
-                        chart.series[sid++].setData(serie.data, false);
+                        chart.series[sid].setData(serie.data, false);
+                        /* Do we have raw data? Only then deletion of reading value is possible */
+                        chart.series[sid].userOptions.raw = serie.raw;
+                        sid++;
                     }
                 });
             }
@@ -687,10 +694,8 @@ function updateChart( forceUpdate ) {
             chart.redraw();
 
             setExtremes();
-            resizeChart();
 
             oTable.fnProcessingIndicator(false);
-            inUpdate = false;
 
             if (RefreshTimeout > 0) {
                 timeout = setTimeout(updateChart, RefreshTimeout*1000);
@@ -700,23 +705,39 @@ function updateChart( forceUpdate ) {
     });
 }
 
-var resizeTimeout;
-
 /**
  *
  */
-function resizeChart() {
-    if (!chart) return;
-    clearTimeout(resizeTimeout);
-    /* Resize chart correct into parent container */
-    var c = $('#chart')[0];
-    chart.setSize(c.offsetWidth, c.offsetHeight);
-}
+var oTable, xhrPool = [];
 
 /**
- *
+ * Idea from http://stackoverflow.com/a/11612641
  */
-var oTable;
+$.ajaxQ = (function() {
+
+    var id = 0, queue = {};
+
+    $(document).ajaxSend(function(e, jqXHR) {
+        jqXHR._id = ++id;
+        queue[jqXHR._id] = jqXHR;
+    });
+
+    $(document).ajaxComplete(function(e, jqXHR) {
+        delete queue[jqXHR._id];
+    });
+
+    return {
+        abortAll: function() {
+            var cnt = 0;
+            $.each(queue, function(i, jqXHR) {
+                jqXHR.abort();
+                cnt++;
+            });
+            return cnt;
+        }
+    };
+
+})();
 
 /**
  *
@@ -744,11 +765,7 @@ $(function() {
      */
     qs = $.parseQueryString();
 
-    options.chart.height = qs.ChartHeight || ChartHeight;
-
-    $(window).resize(function() {
-        resizeTimeout = setTimeout(resizeChart, 500);
-    });
+    chartOptions.chart.height = qs.ChartHeight || ChartHeight;
 
     if (language != "en") {
         $.datepicker.setDefaults($.datepicker.regional[language]);
@@ -787,9 +804,7 @@ $(function() {
     }).datepicker('setDate', d);
 
     Highcharts.setOptions({
-        global: {
-            alignTicks: false
-        },
+        global: { alignTicks: false },
         lang: {
             thousandsSep: '{TSEP}',
             decimalPoint: '{DSEP}',
@@ -815,17 +830,8 @@ $(function() {
             var tt = $('.treeTable').treetable({
                 initialState: 'expanded',
                 indent: 24,
-                column: 1,
-                onInitialized: function() {
-                    if (view.slug) {
-                        view.load();
-                        updateChart();
-                        tree.toggle(false);
-                    }
-                }
+                column: 1
             });
-            /* Public view builds no treetable! */
-            if (tt.length == 0) updateChart();
         }
     });
 
@@ -833,30 +839,28 @@ $(function() {
      *
      */
     $('#preset').change(function() {
-        var preset = ($('#preset').val() || '').match(/(\d+)(\w+)/);
+        var preset = ($('#preset').val() || '').match(/(\d+)(\w+)/),
+            pcount = $('#periodcnt'), period = $('#period'),
+            before = pcount.val() + period.val();
 
         if (!preset) {
-            $('#periodcnt').val(1);
-            $('#period').val('');
+            pcount.val(1);
+            period.val('');
         } else {
             var from = new Date($("#from").datepicker('getDate'));
             switch (preset[2]) {
-                case 'd': /* day - set start to 1st day of month */
-                    from.setDate(1);
-                    break;
-                case 'w': /* week - set start to 1st day of month */
-                    from.setDate(1);
-                    break;
-                case 'm': /* month - set start to 1st day of year */
-                    from.setDate(1);
-                    from.setMonth(0);
-                    break;
+                case 'd': /* day, week - set start to 1st day of month */
+                case 'w':
+                    from.setDate(1);  break;
+                case 'm': /* month, quarter - set start to 1st day of year */
+                case 'q':
+                    from.setDate(1);  from.setMonth(0);  break;
             }
             $("#from").datepicker('setDate', from);
-            $('#periodcnt').val(preset[1]);
-            $('#period').val(preset[2]);
+            pcount.val(preset[1]);
+            period.val(preset[2]);
         }
-
+        /* Force chart reload */
         updateChart();
     });
 
@@ -879,6 +883,7 @@ $(function() {
                 p.min = $('#d-min').is(':checked');
                 p.max = $('#d-max').is(':checked');
                 p.last = $('#d-last').is(':checked');
+                p.all = $('#d-all').is(':checked');
                 p.color = $('#d-color').spectrum('get').toHexString();
                 p.coloruseneg = $('#d-color-use-neg').is(':checked');
                 p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
@@ -915,12 +920,29 @@ $(function() {
      *
      */
     $('#d-type').change(function() {
-        $('.not-bar, .not-scatter').show();
+        var notBar = $('.not-bar'), onlyBar = $('.only-bar'), notScatter = $('.not-scatter');
+
+        /* Reset all */
+        notBar.find('.iradio_line, .icheckbox_line').removeClass('disabled');
+        notBar.find('input, select').prop('disabled', false);
+        onlyBar.find('.iradio_line, .icheckbox_line').addClass('disabled');
+        onlyBar.find('input, select').prop('disabled', true);
+
+        notScatter.find('.iradio_line, .icheckbox_line').removeClass('disabled');
+        notScatter.find('input, select').prop('disabled', false);
+
+        /* Disable all invalid options for given type */
         if (this.value == 'bar') {
-            $('.not-bar').hide();
+            notBar.find('.iradio_line, .icheckbox_line').addClass('disabled');
+            notBar.find('input, select').prop('disabled', true);
+            onlyBar.find('.iradio_line, .icheckbox_line').removeClass('disabled');
+            onlyBar.find('input, select').prop('disabled', false);
         } else if (this.value == 'scatter') {
-            $('.not-scatter').hide();
+            $('#d-color-use-neg').iCheck('uncheck').trigger('ifToggled');
+            notScatter.find('.iradio_line, .icheckbox_line').addClass('disabled');
+            notScatter.find('input, select').prop('disabled', true);
         }
+        $('input').iCheck('update');
     });
 
     $('#d-color-use-neg').on('ifToggled', function(e) {
@@ -973,21 +995,18 @@ $(function() {
     $('#treetoggle').click(function() { tree.toggle() });
 
     $('#togglewrapper').button({
-        icons: { primary: 'ui-icon-carat-1-n' },
+        icons: { primary: 'ui-icon-carat-2-n-s' },
         label: '&nbsp;',
         text: false
-    }).click(function(event) {
-        event.preventDefault();
-        $(this).button({
-            icons: { primary: 'ui-icon-carat-1-' + ($('#wrapper').is(':visible')?'s':'n') },
-            text: false
-        });
+    }).click(function() {
         $('#wrapper').animate( { height: 'toggle', opacity: 'toggle' } );
     });
 
     $('#top-load-view').change(function() {
-        view.slug = $('#top-load-view option:selected').val();
-        view.load(true);
+        views.load($('#top-load-view option:selected').val(), true, function(view) {
+            $('#loaddeleteview').val(view.slug);
+            $('#saveview').val(view.name);
+        });
     });
 
     $('#btn-load').button({
@@ -995,8 +1014,7 @@ $(function() {
         label: '&nbsp;',
         text: false
     }).click(function(event) {
-        view.slug = $('#loaddeleteview option:selected').val();
-        view.load();
+        views.load($('#loaddeleteview option:selected').val(), true);
     });
 
     $('#btn-delete').button({
@@ -1004,92 +1022,105 @@ $(function() {
         label: '&nbsp;',
         text: false
     }).click(function(event) {
-        if ($(this).data('confirmed') == 0) {
-            /* Replace text, make bold and mark confirmed for next click */
-            $(this).button({ label: '{{Sure}}?', text: true }).data('confirmed', 1);
+        var option = $('#loaddeleteview option:selected'), btn = $(this);
+
+        if (option.val() == '') return;
+
+        if (btn.data('confirmed') == 0) {
+            /* Replace text, make red and mark confirmed for next click */
+            btn.button({ label: '{{Sure}}?', text: true }).data('confirmed', 1)
+               .find('.ui-button-text').css('color', 'red');
             /* Reset after 5s */
             setTimeout(
                 function() {
                     $('#btn-delete').button({ label: '&nbsp;', text: false }).data('confirmed', 0);
-                },
-                5000
+                }, 5000
             );
         } else {
-            $(this).button({ label: '&nbsp;', text: false }).data('confirmed', 0);
-            var option = $('#loaddeleteview option:selected');
-            if (option.val() == '') return;
-
-            var btn = $(this);
-            view.slug = option.val();
-
             btn.button('disable');
             $(document.body).addClass('wait');
 
             $.ajax({
                 type: 'DELETE',
                 dataType: 'json',
-                url: PVLngAPI + '/view/'+view.slug+'.json'
+                url: PVLngAPI + '/view/'+option.val()+'.json'
             }).done(function(data, textStatus, jqXHR) {
-                $.pnotify({ type: 'success', text: view.name + ' deleted' });
-                view.slug = '';
-                /* Delete select option */
+                $.pnotify({ type: 'success', text: option.text() + ' {{deleted}}' });
+                /* Just delete selected option and clear save name input */
                 option.remove();
+                $('#saveview').val('');
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
-                    type: textStatus,
-                    text: jqXHR.responseText,
-                    hide: false,
-                    sticker: false
+                    type: textStatus, hide: false, sticker: false,
+                    text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
                 $(document.body).removeClass('wait');
-                btn.button('enable');
+                btn.button({ label: '&nbsp;', text: false }).data('confirmed', 0).button('enable');
             });
         }
-    }).css('font-weight', 'bold').css('color', 'red');
+    }).css('font-weight', 'bold');
 
     $('#btn-save').button({
         icons: { primary: 'ui-icon-disk' },
         label: '&nbsp;',
         text: false
-    }).click(function(event) {
-        event.preventDefault();
+    }).click(function() {
+        $(this).button('disable');
+        $(document.body).addClass('wait');
+
         /* Save view */
         var btn = this,
             data = {
-            name: $('#saveview').val(),
-            data: { p: $('#preset').val() },
-            public: $('#public').is('checked') ? 1 : 0
-        };
+                name: $('#saveview').val(),
+                data: { p: $('#preset').val() },
+                public: ($('#public').prop('checked') ? 1 : 0)
+            };
 
         $('input.channel:checked').each(function(id, el) {
             data.data[$(el).data('id')] = $(el).val();
         });
 
-        $(this).button('disable');
-        $(document.body).addClass('wait');
-
         $.ajax({
             type: 'PUT',
             dataType: 'json',
             url: PVLngAPI + '/view.json',
-            processData: false,
             contentType: 'application/json',
+            processData: false, /* Send prepared JSON in body */
             data: JSON.stringify(data)
         }).done(function (data, textStatus, jqXHR) {
-            $.pnotify({ type: 'success', text: data.name + ' saved' });
-            view.fetch($('#loaddeleteview'), data.slug);
-        }).fail(function(jqxhr, textStatus, errorThrown) {
+            $.pnotify({ type: textStatus, text: data.name + ' saved' });
+            views.fetch(function(views) {
+                /* Rebuild select */
+                views.buildSelect('#loaddeleteview', data.slug);
+                views.load(data.slug);
+                /* Adjust chart title */
+                if (chart) chart.setTitle(views.actual.name);
+            });
+        }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
-                type: textStatus,
-                text: jqxhr.responseText,
-                hide: false,
-                sticker: false
+                type: textStatus, hide: false, sticker: false, text: jqXHR.responseText
             });
         }).always(function() {
             $(document.body).removeClass('wait');
             $(btn).button('enable');
         });
+    });
+
+    views = new Views();
+
+    views.fetch(function(views) {
+        if (user) {
+            views.buildSelect('#top-load-view');
+            $('#top-select').show();
+            $('#top-load-view').children('option').clone().appendTo('#loaddeleteview');
+        } else {
+            views.buildSelect('#loaddeleteview');
+            $('#public-select').show();
+        }
+        $('#loading').html('&nbsp;');
+        /* Chart slug provided by URL, load and collapse tree */
+        views.load(qs.chart, true);
     });
 
     shortcut.add('Alt+P', function() { changeDates(-1); });
@@ -1098,17 +1129,6 @@ $(function() {
     shortcut.add('F4',    function() { tree.toggle(); });
     shortcut.add('F6',    function() { updateChart(); });
     shortcut.add('F7',    function() { updateChart(true); });
-
-    view = new View();
-
-    view.fetch($('#top-load-view'), function(el) {
-        el.find('option').clone().appendTo('#loaddeleteview');
-        $('#top-select').toggle(!!user);
-        /* Chart slug provided by URL, load and collapse tree */
-        view.slug = qs.chart;
-        view.load(true);
-    });
-
 });
 
 </script>

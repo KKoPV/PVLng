@@ -66,7 +66,10 @@ $(function() {
         bJQueryUI: true,
         sDom: ' <"H"r>t<"F">',
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
-
+        aoColumnDefs: [
+            { sWidth: "90%", aTargets: [ 0 ] },
+            { sWidth: "1%", aTargets: [ 1, 2, 3 ] },
+        ],
         fnInitComplete: function() {
 
             /* Init treetable AFTER databale is ready */
@@ -97,9 +100,10 @@ $(function() {
                     if (this.settings.isCollapsed(this.id)) this.collapse();
                 },
                 onInitialized: function() {
+                    oTable.fnDraw();
                     /* set callbacks here AFTER stripes are initialized */
                     this.settings.onNodeCollapse = function(node) {
-                        oTable.fnDraw()
+                        oTable.fnDraw();
                         /* mark node as collapsed */
                         this.settings.markCollapsed(this.id, true);
                     };
@@ -115,7 +119,7 @@ $(function() {
                 }
             });
         }
-    }).disableSelection();
+    });
 
     $('#treetoggle').click(function(event) {
         event.preventDefault();
@@ -156,7 +160,7 @@ $(function() {
         }
     });
 
-    $('.draggable').draggable({
+    $('#drag-new, .draggable').draggable({
         distance: 5,
         opacity: .9,
         revert: true,
@@ -181,8 +185,8 @@ $(function() {
     $('#add-child').change(function() {
         var el = $(this).find('option:selected');
         if (el && el.val()) {
-            $('#drag-new').data('entity', el.val());
-            $('#drag-text').text(el.text());
+            $('#drag-new').data('entity', el.val()).addClass('draggable');
+            $('#drag-text').text(el.text().replace(/.*: */, ''));
             $('#drag-new-wrapper').show();
         } else {
             $('#drag-new-wrapper').hide();
@@ -232,6 +236,11 @@ $(function() {
             '{{Ok}}': function() { $('#form-movechild').submit() },
             '{{Cancel}}': function() { $(this).dialog('close'); return false }
         }
+    });
+
+    $('#addmorechild').click(function() {
+        var select = $('#child').clone().removeAttr('id');
+        $('#form-addchild').append(select);
     });
 
     shortcut.add('Alt+N', function() { window.location = '/channel/add'; });

@@ -38,7 +38,7 @@
 
     <tr data-tt-id="{ID}" class="droppable"
         <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
-        <td style="width:90%">
+        <td>
             <span class="<!-- IF {CHILDS} -->non-<!-- ENDIF -->draggable"
                   data-id="{ID}" data-entity="{ENTITY}">
                 <img style="vertical-align:top;margin-right:8px"
@@ -99,7 +99,7 @@
             <!-- ENDIF -->
         </td>
 
-        <td style="width:1%;white-space:nowrap">
+        <td style="white-space:nowrap">
             <!-- IF {LEVEL} > "2" -->
             <form action="/overview/moveup" method="post">
             <input type="hidden" name="id" value="{ID}" />
@@ -127,37 +127,42 @@
         </td>
 
         <td>
-            <input style="background-color:transparent;border:0;width:27em;font-family:monospace"
+            <input style="background-color:transparent;border:0;width:24em;font-family:monospace"
                    class="guid" value="{GUID}" readonly="readonly" />
         </td>
     </tr>
 
     <!-- END -->
 
+    <tr data-tt-id="1" class="droppable">
+        <td>
+            <span class="non-draggable">
+                <img src="/images/ico/plus_circle_frame.png" alt="add"
+                     style="width:16px;height:16px" width="16" height="16"
+                     onclick="addChild(1)" class="tip" title="{{AddOneToManyChannels}}" />
+            </span>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
     </tbody>
 
     <tfoot>
     <tr>
         <th colspan="5" style="padding-top:8px;padding-bottom:8px;text-align:left">
-            <p>
-                <span class="indenter"></span>
-                <a href="#" title="{{AddOneToManyChannels}}" class="tip" onclick="addChild(1); return false">
-                    <img src="/images/ico/plus_circle_frame.png" width="16" height="16" alt="add" />
-                </a>
-                <span id="drag-new-wrapper" style="margin-left:.5em;display:none">
+                <div id="drag-new-wrapper" style="display:none;margin-top:.5em;margin-bottom:1em">
                     <span id="drag-new" class="draggable">
                         <img src="/images/ico/hand.png"
-                             style="width:16px;height:16px;vertical-align:top;margin-right:8px"
+                             style="width:16px;height:16px;margin-right:8px"
                              width="16" height="16" />
                         <span id="drag-text"></span>
                     </span>
-                </span>
-            </p>
-
-            <p>
-                <span class="indenter"></span>
-                <select id="add-child">
-                    <option value="">--- {{Select}} ---</option>
+                </div>
+                <select id="add-child" style="margin-right:1em">
+                    <option value="">--- Drag & Drop ---</option>
                     <!-- BEGIN ENTITIES -->
                     <option value="{ID}">
                         {TYPE}: {NAME}
@@ -166,8 +171,6 @@
                     </option>
                     <!-- END -->
                 </select>
-            </p>
-
         </th>
     </tr>
     <tfoot>
@@ -185,7 +188,7 @@
 
 <div id="dialog-addchild" style="display:none" title="{{AddChild}}">
     <form id="form-addchild" action="/overview/addchild" method="post">
-        <div id="add1child">
+        <input type="hidden" id="parent" name="parent" />
         <p>
             <label for="child">{{SelectEntity}}:</label>
         </p>
@@ -199,11 +202,9 @@
             </option>
             <!-- END -->
         </select>
-        </div>
-        <input type="hidden" id="parent" name="parent" />
     </form>
-    <img src="/images/ico/plus_circle_frame.png" width="16p" height="16"
-         onclick="$('#form-addchild').append($('#child').clone().removeAttr('id')); return false"
+    <img id="addmorechild" src="/images/ico/plus_circle_frame.png"
+         style="width:16px;height:16px" width="16" height="16"
          class="tip" title="{{AddAnotherChild}}" alt="[new select]" />
 </div>
 
