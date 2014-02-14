@@ -74,6 +74,7 @@ abstract class Cache {
      */
     public static final function factory( $settings=array(), $classes=NULL ) {
         $caches = ($classes == '') ? self::$Caches : explode(',', $classes);
+
         foreach ($caches as $class) {
             $class = 'Cache\\'.$class;
 
@@ -81,9 +82,7 @@ abstract class Cache {
                 throw new CacheException('Missing class: '.$class);
 
             $cache = new $class($settings);
-            if ($cache->isAvailable()) {
-                return $cache;
-            }
+            if ($cache->isAvailable()) return $cache;
         }
 
         return new Cache\Mock;
@@ -350,7 +349,7 @@ abstract class Cache {
      * @var array $Caches
      */
     protected static $Caches = array(
-        'APC', 'MemCache',
+        'APC', 'MemCache', 'MemCacheOne',
         // Only avail. with a writeable directory
         'File', 'Files',
         // Always avail.

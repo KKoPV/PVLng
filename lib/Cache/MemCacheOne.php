@@ -19,12 +19,12 @@ namespace Cache;
 /**
  *
  */
-class MemCache extends \Cache {
+class MemCacheOne extends \Cache {
 
     /**
      * Default server
      */
-    const HOST = 'localhost';
+    const HOST = '127.0.0.1';
 
     /**
      * Default port
@@ -67,23 +67,41 @@ class MemCache extends \Cache {
      * @{
      */
     public function isAvailable() {
-        return $this->memcache->connect($this->host, $this->port);
+        if (!$this->memcache->connect($this->host, $this->port)) return FALSE;
+
+        $data = $this->memcache->get($this->key(__FILE__));
+        $this->data = is_array($data) ? $data : array();
+        $this->modified = FALSE;
+
+        return TRUE;
     }
 
     public function write( $key, $data ) {
-        return $this->memcache->set($this->key($key), $data);
+        $key = strtolower($key);
+        $this->data[$key] = $data;
+        $this->modified = TRUE;
+        return TRUE;
     }
 
     public function fetch( $key ) {
-        return $this->memcache->get($this->key($key));
+        $key = strtolower($key);
+        return array_key_exists($key, $this->data) ? $this->data[$key] : NULL;
     }
 
     public function delete( $key ) {
-        return $this->memcache->delete($this->key($key));
+        $key = strtolower($key);
+        if (array_key_exists($key, $this->data)) {
+            unset($this->data[$key]);
+            $this->modified = TRUE;
+            return TRUE;
+        }
+        return FALSE;
     }
 
     public function flush() {
-        return $this->memcache->flush();
+        $this->data = array();
+        $this->modified = TRUE;
+        return TRUE;
     }
 
     public function info() {
@@ -105,11 +123,17 @@ class MemCache extends \Cache {
     /** @} */
 
     /**
-     * Close connection
+     * Class destructor
+     *
+     * Save changes to file if modified
      */
-    public function __destruct(){
+    public function __destruct() {
+        // Save only if data was modified
+        if ($this->modified) {
+            $this->memcache->set($this->key(__FILE__), $this->data);
+        }
         $this->memcache->close();
-    }
+    } // function __destruct()
 
     // -------------------------------------------------------------------------
     // PROTECTED
@@ -135,5 +159,19 @@ class MemCache extends \Cache {
      * @var MemCache $memcache
      */
     protected $memcache;
+
+    /**
+     * Track cache mdification to detect need of save at the end
+     *
+     * @var bool $modified
+     */
+    protected $modified;
+
+    /**
+     * Data cache
+     *
+     * @var array $data
+     */
+    protected $data;
 
 }
