@@ -75,8 +75,9 @@ code=$($curl --request POST --header "Content-Type: application/json" \
              --data-binary @$RESPONSEFILE $PVLngURL/json/cod.txt)
 
 if test "$code" != "200"; then
+    echo "API URL: $API_URL"
     cat $RESPONSEFILE
-    exit $code
+    error_exit "$code"
 fi
 
 ### Test mode

@@ -21,13 +21,7 @@ $api->get('/views', function() use ($api) {
             : array();
 
     foreach ($views->findMany(NULL, NULL, 'name') as $view) {
-        if ($api->APIKeyValid == 1) {
-            $view = $view->getAll();
-            if ($view['public'] AND strpos($view['name'], '@') === FALSE) {
-                $view['name'] .= ' (' . I18N::_('Public') . ')';
-            }
-            $result[] = $view;
-        } elseif ($view->public == 1) {
+        if ($api->APIKeyValid == 1 OR $view->public == 1) {
             $result[] = $view->getAll();
         }
     }

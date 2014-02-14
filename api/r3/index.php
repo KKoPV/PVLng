@@ -187,7 +187,7 @@ define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
 $api->response->headers->set('X-Version', PVLNG_VERSION);
-$api->response->headers->set('X-API-Version', 'r2');
+$api->response->headers->set('X-API-Version', 'r3');
 
 // ---------------------------------------------------------------------------
 // The helper functions and routes
@@ -205,6 +205,7 @@ include 'route.json.php';
 include 'route.view.php';
 include 'route.hash.php';
 include 'route.status.php';
+include 'route.translation.php';
 
 if (file_exists('route.custom.php')) include 'route.custom.php';
 
