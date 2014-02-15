@@ -39,7 +39,7 @@ define('APP_DIR',  ROOT_DIR . DS . 'frontend');
 // Outside document root!
 define('TEMP_DIR', ROOT_DIR . DS . 'tmp');
 
-if (!file_exists(CONF_DIR . DS . 'config.php')) _redirect('setup');
+if (!file_exists(CONF_DIR . DS . 'config.php')) _redirect('public/setup.php');
 
 /**
  * Check mobile client
@@ -115,7 +115,7 @@ try {
     // Try connect to database
     $app->db = slimMVC\MySQLi::getInstance();
 } catch (Exception $e) {
-    _redirect('setup');
+    _redirect('public/setup.php');
 }
 
 // ---------------------------------------------------------------------------

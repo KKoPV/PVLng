@@ -30,15 +30,16 @@
 
 <?php
 
-ini_set('show_errors', 0);
+ini_set('display_errors', 0);
 error_reporting(0);
 
-$configFile = '../../config/config.php';
+$configFile = '../config/config.php';
 
 if (file_exists($configFile)) {
     $config = include $configFile;
     $db = new MySQLi($config['Database']['Host'], $config['Database']['Username'],
-                     $config['Database']['Password'], $config['Database']['Database']);
+                     $config['Database']['Password'], $config['Database']['Database'],
+                     +$config['Database']['Port'], $config['Database']['Socket']);
     if (!$db->connect_error AND $config['Admin']['User']) {
         echo '<p>Your PVLng installation is successful configured!</p>';
         echo '<p>Please start <a href="/">here</a>.</p>';
@@ -106,7 +107,8 @@ if (file_exists($configFile)) {
         echo '<strong style="color:green"> done</strong>';
         $config = include $configFile;
         $db = new MySQLi($config['Database']['Host'], $config['Database']['Username'],
-                         $config['Database']['Password'], $config['Database']['Database']);
+                         $config['Database']['Password'], $config['Database']['Database'],
+                         +$config['Database']['Port'], $config['Database']['Socket']);
     } else {
         echo '<strong style="color:red"> failed</strong></p>';
         echo '<p>Copy <tt>config/config.php.dist</tt> to <tt>config/config.php</tt>';
@@ -128,7 +130,7 @@ if (file_exists($configFile)) {
 if (!$db->connect_error) {
     echo '<strong style="color:green"> ok</strong>';
 } else {
-    echo '<strong style="color:red"> failed</strong>';
+    echo '<strong style="color:red"> ', htmlspecialchars($db->connect_error), '</strong>';
     echo '</p><p>';
     echo 'Please check your database settings in <tt>config/config.php</tt> section <tt>"Database"</tt>.';
     $ok = FALSE;

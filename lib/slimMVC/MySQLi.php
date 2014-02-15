@@ -83,7 +83,7 @@ class MySQLi extends \MySQLi {
             'user'     => $user,
             'password' => $password,
             'database' => $database,
-            'port'     => $port,
+            'port'     => +$port,
             'socket'   => $socket
         );
     }
@@ -157,7 +157,7 @@ class MySQLi extends \MySQLi {
      */
     public static function setPort( $port, $connection=self::MASTER ) {
         self::initConnection($connection);
-        self::$credentials[$connection]['port'] = $port;
+        self::$credentials[$connection]['port'] = +$port;
     }
 
     /**
