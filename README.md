@@ -20,6 +20,10 @@ If you are interested in the latest development version, you can also direct ins
 wget -qO - https://raw.github.com/K-Ko/PVLng/develop/install | bash
 ```
 
+# Scripts for data acquisition
+
+The scripts for data acquisition resides in its own repository: [PVLng-scripts](https://github.com/K-Ko/PVLng-scripts)
+
 ## Issues
 
 Please use appropriately tagged github [issues](https://github.com/K-Ko/PVLng/issues) to request features or report bugs.
