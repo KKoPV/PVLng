@@ -10,7 +10,7 @@
  */
 return array(
 
-    'name' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a> weather data',
+    'name' => '<a href="http://www.wunderground.com/" targe="_blank">Wunderground</a> weather data',
 
     'description' => '
         Pre-configured sensors:
@@ -18,12 +18,9 @@ return array(
             <li>Temperature (°C)</li>
             <li>Atmospheric pressure (hPa)</li>
             <li>Humidity (%)</li>
-            <li>Wind speed (m/s)</li>
+            <li>Wind speed (km/h)</li>
             <li>Wind direction (°)</li>
-            <li>Clouds (%)</li>
             <li>Condition</li>
-            <li>Condition code</li>
-            <li>Condition icon Id</li>
         </ul>
     ',
 
@@ -31,16 +28,16 @@ return array(
 
         // Grouping channel
         array(
-            'type'        => 45, // OpenWeatherMap
-            'name'        => 'OpenWeatherMap',
-            'description' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a> weather data',
+            'type'        => 46, // Wunderground
+            'name'        => 'Wunderground',
+            'description' => '<a href="http://www.wunderground.com.org/" targe="_blank">Wunderground</a> weather data',
         ),
 
         // Real channels
         array(
             'type'        => 60, // Temperature sensor
             'name'        => 'Temperature',
-            'channel'     => 'main->temp',
+            'channel'     => 'current_observation->temp_c',
             'unit'        => '°C',
             'decimals'    => 1,
         ),
@@ -48,7 +45,7 @@ return array(
         array(
             'type'        => 58, // Pressure sensor
             'name'        => 'Atmospheric pressure',
-            'channel'     => 'main->pressure',
+            'channel'     => 'current_observation->pressure_mb',
             'unit'        => 'hPa',
             'decimals'    => 1,
         ),
@@ -56,7 +53,7 @@ return array(
         array(
             'type'        => 56, // Humidity sensor
             'name'        => 'Humidity',
-            'channel'     => 'main->humidity',
+            'channel'     => 'current_observation->relative_humidity',
             'unit'        => '%',
             'decimals'    => 0,
             'valid_from'  => 0,
@@ -66,15 +63,15 @@ return array(
         array(
             'type'        => 63, // Windspeed sensor
             'name'        => 'Wind speed',
-            'channel'     => 'wind->speed',
-            'unit'        => 'm/s',
+            'channel'     => 'current_observation->wind_kph',
+            'unit'        => 'km/h',
             'decimals'    => 1,
         ),
 
         array(
             'type'        => 91, // Switch
             'name'        => 'Wind direction',
-            'channel'     => 'wind->deg',
+            'channel'     => 'current_observation->wind_degrees',
             'unit'        => '°',
             'decimals'    => 0,
             'valid_from'  => 0,
@@ -83,32 +80,8 @@ return array(
 
         array(
             'type'        => 91, // Switch
-            'name'        => 'Clouds',
-            'channel'     => 'clouds->all',
-            'unit'        => '%',
-            'decimals'    => 0,
-            'valid_from'  => 0,
-            'valid_to'    => 100,
-        ),
-
-        array(
-            'type'        => 91, // Switch
             'name'        => 'Condition',
-            'channel'     => 'weather->0->description',
-            'numeric'     => 0,
-        ),
-
-        array(
-            'type'        => 91, // Switch
-            'name'        => 'Condition code',
-            'channel'     => 'weather->0->id',
-            'decimals'    => 0,
-        ),
-
-        array(
-            'type'        => 91, // Switch
-            'name'        => 'Condition icon Id',
-            'channel'     => 'weather->0->icon',
+            'channel'     => 'current_observation->weather',
             'numeric'     => 0,
         ),
     )
