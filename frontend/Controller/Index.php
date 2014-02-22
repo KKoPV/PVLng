@@ -53,12 +53,12 @@ class Index extends \Controller {
 
         $bk = \BabelKitMySQLi::getInstance();
 
-        while ($this->app->cache->save('preset', $preset)) {
+        while ($this->app->cache->save('preset/'.LANGUAGE, $preset)) {
             $preset = $bk->select('preset', LANGUAGE);
         }
         $this->view->PresetSelect = $preset;
 
-        while ($this->app->cache->save('period', $period)) {
+        while ($this->app->cache->save('period/'.LANGUAGE, $period)) {
             $period = $bk->select('period', LANGUAGE);
         }
         $this->view->PeriodSelect = $period;

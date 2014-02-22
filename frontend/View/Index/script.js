@@ -144,7 +144,11 @@ var
                 point: {
                     events: {
                         click: function() {
-                            if (!this.series.userOptions.raw) return;
+                            if (!PVLngAPIkey) return;
+                            if (!this.series.userOptions.raw) {
+                                alert('Can\'t delete from consolidated data.');
+                                return;
+                            }
 
                             var dateLocale = (new Date(this.x)).toLocaleString(),
                                 question = '{{DeleteReadingConfirm}}\n\n' +
@@ -520,8 +524,15 @@ function updateChart( forceUpdate ) {
                 _ts:        (new Date).getTime()
             },
             function(data) {
-                /* pop out 1st row with attributes */
-                attr = data.shift();
+                try {
+                    /* pop out 1st row with attributes */
+                    attr = data.shift();
+                } catch(err) {
+                    console.error(data);
+                    /* Set pseudo channel */
+                    series[id] = {};
+                    return;
+                }
 /*
                 _log('Attributes', attr);
                 _log('Data', data);

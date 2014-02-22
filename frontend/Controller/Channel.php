@@ -234,7 +234,9 @@ class Channel extends \Controller {
             $entity = new \ORM\Channel($channel['id']);
 
             // set values
-            foreach ($channel as $key=>$value) $entity->set($key, trim($value));
+            foreach ($channel as $key=>$value) {
+                $entity->set($key, trim($value));
+            }
 
             $this->prepareFields($entity);
 
@@ -442,9 +444,10 @@ class Channel extends \Controller {
             $name = __($h);
             $data['HINT'] = ($name != $h) ? $name : __('channel::'.$key.'Hint');
 
-            $data['VALUE'] = !$addMode
-                           ? htmlspecialchars($entity->$key)
-                           : htmlspecialchars(trim($data['DEFAULT']));
+//             $data['VALUE'] = !$addMode
+//                            ? htmlspecialchars($entity->$key)
+//                            : htmlspecialchars(trim($data['DEFAULT']));
+            $data['VALUE'] = !$addMode ? $entity->$key : trim($data['DEFAULT']);
 
             if (strpos($data['TYPE'], 'select') === 0) {
                 $options = explode(';', $data['TYPE']);
