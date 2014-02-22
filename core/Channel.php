@@ -623,6 +623,8 @@ abstract class Channel {
         Hook::process('data.save.before', $this);
 
         if ($this->numeric) {
+            // Remove all non-numeric characters
+            $this->value = preg_replace('~[^0-9.eE-]~', '', $this->value);
 
             $this->value = +$this->value;
 
