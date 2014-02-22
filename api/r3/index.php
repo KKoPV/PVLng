@@ -8,6 +8,8 @@
  * @version      1.0.0
  */
 
+file_exists('prepend.php') && include 'prepend.php';
+
 setlocale(LC_NUMERIC, 'C');
 
 /**

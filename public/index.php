@@ -13,6 +13,8 @@ function _redirect( $route ) {
     die(Header('Location: '.$protocol.'://'.$_SERVER['HTTP_HOST'].'/'.$route));
 }
 
+file_exists('..'.DIRECTORY_SEPARATOR.'prepend.php') && include '..'.DIRECTORY_SEPARATOR.'prepend.php';
+
 /**
  * Initialize
  */
