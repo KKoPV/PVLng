@@ -21,10 +21,6 @@
     vertical-align: middle;
 }
 
-#d-table tr.even {
-    background-color: #F0F0F0;
-}
-
 #td-axis .fl {
     margin-right: 3px;
 }
@@ -55,6 +51,10 @@
 
 #chart-tooltip td.unit {
     padding-right: .5em;
+}
+
+#data-table tr:hover {
+    background-color: #C0FFC0 !important;
 }
 
 .icheckbox_line disabled,
