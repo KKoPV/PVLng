@@ -18,7 +18,9 @@ class Loader {
         $classMap  = self::getClassMap();
 
         if (isset($classMap[$className])) {
-            require_once $classMap[$className];
+            $callback = self::$callback;
+            $source = $callback ? $callback($classMap[$className]) : $classMap[$className];
+            require_once $source;
             return TRUE;
         }
     }
@@ -33,15 +35,31 @@ class Loader {
 
         self::$ClassMapFile = $cache
                             ? sprintf('%s%sclassmap.%s.php', $cache, DS,
-                              substr(md5(serialize(self::$settings)),-7))
+                              substr(md5(serialize(self::$settings)), -7))
                             : FALSE;
 
         spl_autoload_register('Loader::autoload');
     }
 
+    /**
+     *
+     */
+    public static function registerCallback( $callback ) {
+        if (is_callable($callback)) {
+            self::$callback = $callback;
+        } else {
+            throw new Exception('Not a callable function provided for Loader::registerCallback()');
+        }
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected static $callback;
 
     /**
      *

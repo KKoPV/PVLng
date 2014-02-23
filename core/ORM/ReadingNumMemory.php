@@ -1,4 +1,5 @@
 <?php
+/* // AOP // */
 /**
  *
  *
@@ -28,6 +29,7 @@ class ReadingNumMemory extends \slimMVC\ORMTable {
         parent::__construct();
 
         if (self::$first) {
+            /// Yryie::Info('Create performance table');
             $this->app->db->query('
                 CREATE TABLE IF NOT EXISTS `pvlng_reading_num_tmp` (
                     `id` smallint(5) unsigned NOT NULL,

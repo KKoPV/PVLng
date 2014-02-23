@@ -67,7 +67,9 @@
             <!-- INCLUDE default.footer.tpl -->
         <!-- ENDIF -->
 
+        <!-- YRYIE -->
     </div>
+
 
     <script src="//code.jquery.com/jquery-2.0.0.js"></script>
     <script>

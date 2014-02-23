@@ -87,11 +87,10 @@ if ($config->get('Admin.User') == '' AND
     _redirect('adminpass');
 }
 
-Session::start($config->get('Cookie.Name', 'PVLng'));
-
 // ---------------------------------------------------------------------------
 // Let's go
 // ---------------------------------------------------------------------------
+Session::start($config->get('Cookie.Name', 'PVLng'));
 
 /**
  * Run in /public - fake SCRIPT_NAME for correct Slim routing
@@ -101,6 +100,73 @@ $_SERVER['SCRIPT_NAME'] = '/';
 $app = new slimMVC\App();
 
 $app->config = $config;
+
+Session::checkRequest('debug');
+
+if (Session::get('debug')) {
+
+    Loader::registerCallback(function( $filename ) {
+        // Insert .AOP before file extension, so .../file.php becomes .../file.AOP.php
+        $parts = explode('.', $filename);
+        array_splice($parts, -1, 0, 'AOP');
+        $filenameAOP = implode('.', $parts);
+
+        if (!file_exists($filenameAOP) OR filemtime($filenameAOP) < filemtime($filename)) {
+            // (Re-)Create AOP file
+            $code = file_get_contents($filename);
+
+            if (strpos($code, '/* // AOP // */') !== FALSE) {
+                // Only files marked as AOP relevant will be analysed
+
+                // Build file content hash to check if AOP relevant code was found
+                $hash = sha1($code, TRUE);
+
+                // Single line comments: /// PHP code...
+                $code = preg_replace('~^(\s*)///\s+([^*]*?)$~m', '$1$2 /// AOP', $code);
+
+                // Multi line comments start: /* ///
+                $code = preg_replace('~^(\s*)/\*\s+///(.*?)$~m', '$1/// >>> AOP$2', $code);
+                // Multi line comments end: /// */
+                $code = preg_replace('~^(\s*)///\s+\*/$~m', '$1/// <<< AOP', $code);
+
+                if ($hash != sha1($code, TRUE) AND file_put_contents($filenameAOP, $code)) {
+                    // File content was changed and AOP file could created
+                    $filename = $filenameAOP;
+                }
+            }
+        } else {
+            // AOP file still exists and is ut-to-date
+            $filename = $filenameAOP;
+        }
+
+        return $filename;
+    });
+
+    class YryieMiddleware extends Slim\Middleware {
+        public function call() {
+            // Get reference to application
+            $app = $this->app;
+
+            Yryie::Versions();
+
+            // Run inner middleware and application
+            $this->next->call();
+
+            Yryie::Finalize();
+
+            $body = $app->response->getBody();
+
+            $body = str_replace('<!-- YRYIE -->',
+                                Yryie::getCSS().Yryie::getJS(TRUE, TRUE).Yryie::Render(),
+                                $body);
+
+            $app->response->setBody($body);
+        }
+    }
+
+    $app->add(new YryieMiddleware());
+
+}
 
 /**
  * Database
