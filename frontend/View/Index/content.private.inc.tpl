@@ -54,7 +54,7 @@
                 </td>
                 <td style="padding:0.4em 0" <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
                     <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                         src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" />
+                         src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" alt="">
                     <strong class="tip" title="{GUID}">{NAME}</strong>
                     <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
                     <!-- IF !{PUBLIC} -->
@@ -66,7 +66,7 @@
                 </td>
                 <td>
                     <img id="s{ID}" src="/images/spinner.gif" width="16" height="16"
-                         style="float:right;display:none;width:16px;height:16px" />
+                         style="float:right;display:none;width:16px;height:16px" alt="">
                 </td>
                 <td id="cons{ID}" class="consumption"></td>
                 <td id="u{ID}">{UNIT}</td>
@@ -75,7 +75,7 @@
                     <!-- IF {GRAPH} -->
                     <img style="cursor:pointer;width:16px;height:16px"
                          src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
-                         class="tip" title="{{ChartSettingsTip}}" width="16" height="16" />
+                         class="tip" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
                     <!-- ENDIF -->
                 </td>
             </tr>

@@ -62,11 +62,6 @@
     background-color: #606060;
 }
 
-.alias {
-    color: gray;
-    font-style: italic;
-}
-
 .consumption,
 .costs {
     text-align: right;

@@ -40,8 +40,13 @@
         </tr>
         </table>
     </div>
-    <div id="loading" class="grid_2 c" style="margin:0 2%">
-        <img src="/images/loading.gif" style="width:48px;height:47px" width="48" height="47" alt="loading ..." />
+    <div class="grid_2 c" style="margin:0 2%">
+        &nbsp;
+        <img id="loading" src="/images/loading.gif" style="width:48px;height:47px" width="48" height="47" alt="loading ..." />
+        <img id="modified" src="/images/modified.png" width="24" height="24"
+             style="display:none;margin-top:6px;width:24px;height:24px" alt="[ unsaved changes ]"
+             class="tip" title="{{UnsavedChanges}}" />
+        &nbsp;
     </div>
     <div class="grid_4 omega" style="text-align:right">
         <img src="/images/ico/arrow-switch.png" style="margin-right:.5em"
@@ -75,5 +80,17 @@
 <!-- ELSE -->
     <!-- INCLUDE content.public.inc.tpl -->
 <!-- ENDIF -->
+
+<div id="dialog-reading" title="{{DeleteReading}}">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left;margin:0 7px 20px 0"></span>
+        {{DeleteReadingConfirm}}
+    </p>
+    <ul>
+        <li id="reading-serie"></li>
+        <li id="reading-timestamp"></li>
+        <li>{{Reading}} : <span id="reading-value"></span></li>
+    </ul>
+</div>
 
 <!-- INCLUDE dialog.chart.tpl -->

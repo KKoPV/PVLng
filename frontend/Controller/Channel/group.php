@@ -46,9 +46,6 @@ return array(
     'adjust' => array(
         'visible' => FALSE,
     ),
-    'public' => array(
-        'visible' => FALSE,
-    ),
     'cost' => array(
         'visible' => FALSE,
     ),

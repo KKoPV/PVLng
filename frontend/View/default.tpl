@@ -67,7 +67,11 @@
             <!-- INCLUDE default.footer.tpl -->
         <!-- ENDIF -->
 
-        <!-- YRYIE -->
+        <div class="clear"></div>
+
+        <div class="grid_10">
+            <!-- YRYIE -->
+        </div>
     </div>
 
 

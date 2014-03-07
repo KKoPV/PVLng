@@ -77,7 +77,7 @@ class API extends Slim\Slim {
 $config = slimMVC\Config::getInstance()
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.app.php')
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
-        ->load('config.php', false);
+        ->load('config.php', FALSE);
 
 if ($config->get('develop')) {
     ini_set('display_startup_errors', 1);
@@ -215,3 +215,5 @@ if (file_exists('route.custom.php')) include 'route.custom.php';
  * Let's go
  */
 $api->run();
+
+file_exists('append.php') && include 'append.php';

@@ -434,14 +434,18 @@ class Yryie {
   public static function CSV() {
     while (count(self::$Timer)) self::StopTimer();
 
-    $csv = array('Time'.self::$TraceDelimiter.'Type'.self::$TraceDelimiter.'Class'
-                .self::$TraceDelimiter.'Function'.self::$TraceDelimiter.'Message');
+    $csv = array(
+        sprintf('Time%1$sType%1$sClass%1$sFunction%1$sMessage', self::$TraceDelimiter)
+    );
 
     foreach (self::$Data as $data) {
       if (!$data[0]) continue;
 
       $data[0] -= $_SERVER['REQUEST_TIME'];
+
       if (is_array($data[4])) $data[4] = self::format($data[4]);
+      // skip empty messages
+      if ($data[4] == '') continue;
 
       // remove timer level
       unset($data[5]);
@@ -457,6 +461,7 @@ class Yryie {
       }
       $csv[] = implode(self::$TraceDelimiter, $fields);
     }
+
     return implode("\n", $csv)."\n";
   } // function CSV()
 

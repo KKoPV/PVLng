@@ -317,7 +317,9 @@ class MySQLi extends \MySQLi {
         $this->Buffered = TRUE;
         $rows = array();
         if ($result = $this->query($query, $args)) {
-            $rows = $result->fetch_all(MYSQLI_ASSOC);
+            /// $t = microtime(TRUE);
+            while ($row = $result->fetch_assoc()) $rows[] = $row;
+            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
         $this->Buffered = FALSE;

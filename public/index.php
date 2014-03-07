@@ -8,12 +8,12 @@
  * @version     1.0.0
  */
 
+file_exists('..'.DIRECTORY_SEPARATOR.'prepend.php') && include '..'.DIRECTORY_SEPARATOR.'prepend.php';
+
 function _redirect( $route ) {
     $protocol = (isset($_SERVER['HTTPS']) AND $_SERVER['HTTPS']) ? 'https' : 'http';
     die(Header('Location: '.$protocol.'://'.$_SERVER['HTTP_HOST'].'/'.$route));
 }
-
-file_exists('..'.DIRECTORY_SEPARATOR.'prepend.php') && include '..'.DIRECTORY_SEPARATOR.'prepend.php';
 
 /**
  * Initialize
@@ -103,7 +103,7 @@ $app->config = $config;
 
 Session::checkRequest('debug');
 
-if (Session::get('debug')) {
+if ($app->debug = Session::get('debug')) {
 
     Loader::registerCallback(function( $filename ) {
         // Insert .AOP before file extension, so .../file.php becomes .../file.AOP.php
@@ -156,9 +156,17 @@ if (Session::get('debug')) {
 
             $body = $app->response->getBody();
 
-            $body = str_replace('<!-- YRYIE -->',
-                                Yryie::getCSS().Yryie::getJS(TRUE, TRUE).Yryie::Render(),
-                                $body);
+            if ($app->debug == 'trace') {
+                Session::set('debug', NULL);
+                $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
+                Yryie::$TraceDelimiter = ';';
+                Yryie::Save($file);
+                $body = str_replace('<!-- YRYIE -->', '<b>Trace saved as '.$file.'</b>', $body);
+            } else {
+                $body = str_replace('<!-- YRYIE -->',
+                                    Yryie::getCSS().Yryie::getJS(TRUE, TRUE).Yryie::Render(),
+                                    $body);
+            }
 
             $app->response->setBody($body);
         }
@@ -306,170 +314,9 @@ $app->notFound(function() use ($app) {
     $app->redirect('/');
 });
 
-// ---------------------------------------------------------------------------
-// Admin
-// ---------------------------------------------------------------------------
-$app->map('/login', function() use ($app) {
-    $app->process('Admin', 'Login');
-})->via('GET', 'POST');
+$AppFiles = glob(APP_DIR . DS . 'Application' . DS . '*.php');
 
-$app->any('/logout', function() use ($app) {
-    $app->process('Admin', 'Logout');
-});
-
-$app->map('/adminpass', function() use ($app) {
-    $app->process('Admin', 'AdminPassword');
-})->via('GET', 'POST');
-
-$app->map('/_config', $checkAuth, function() use ($app) {
-    $app->process('Admin', 'Config');
-})->via('GET', 'POST');
-
-// ---------------------------------------------------------------------------
-// Index
-// ---------------------------------------------------------------------------
-// User check is done inside controller, only save and delete needs login!
-$app->map('/', function() use ($app) {
-    $app->process();
-})->via('GET', 'POST');
-
-$app->map('/index', function() use ($app) {
-    $app->process();
-})->via('GET', 'POST');
-
-$app->get('/index(/:view)', function( $view='' ) use ($app) {
-    // Put chart name at the begin
-    $params = array_merge(
-        array('chart' => $view),
-        $app->request->get()
-    );
-    $app->redirect('/?' . http_build_query($params));
-});
-
-$app->get('/chart/:view', function( $view ) use ($app) {
-    // Put chart name at the begin
-    $params = array_merge(
-        array('chart' => $view),
-        $app->request->get()
-    );
-    $app->redirect('/?' . http_build_query($params));
-});
-
-// ---------------------------------------------------------------------------
-// Dashboard
-// ---------------------------------------------------------------------------
-$app->map('/dashboard', $checkAuth, function() use ($app) {
-    $app->process('Dashboard');
-})->via('GET', 'POST');
-
-$app->get('/dashboard/embedded', function() use ($app) {
-    $app->process('Dashboard', 'IndexEmbedded');
-});
-
-$app->get('/ed', function() use ($app) {
-    $app->process('Dashboard', 'IndexEmbedded');
-});
-
-$app->get('/md', function() use ($app) {
-    $app->process('Dashboard', 'IndexEmbedded');
-});
-
-// ---------------------------------------------------------------------------
-// List
-// ---------------------------------------------------------------------------
-$app->get('/list(/:id)', $checkAuth, function( $id=NULL ) use ($app) {
-    $app->params->set('id', $id);
-    $app->process('Lists');
-});
-
-// ---------------------------------------------------------------------------
-// Overview
-// ---------------------------------------------------------------------------
-$app->get('/overview', $checkAuth, function() use ($app) {
-    $app->process('Overview');
-});
-
-$app->post('/overview/:action', $checkAuth, function( $action ) use ($app) {
-    // Tree manipulation requests
-    $app->process('Overview', $action);
-});
-
-// ---------------------------------------------------------------------------
-// Channel
-// ---------------------------------------------------------------------------
-$app->get('/channel', $checkAuth, function() use ($app) {
-    $app->process('Channel');
-});
-
-$app->map('/channel/add(/:clone)', $checkAuth, function( $clone=0 ) use ($app) {
-    $app->params->set('clone', $clone);
-    $app->process('Channel', 'Add');
-})->via('GET', 'POST');
-
-$app->get('/channel/edit/:id', $checkAuth, function( $id ) use ($app) {
-    $app->params->set('id', $id);
-    $app->process('Channel', 'Edit');
-});
-
-$app->post('/channel/alias', $checkAuth, function() use ($app) {
-    $app->process('Channel', 'Alias');
-});
-
-$app->post('/channel/edit', $checkAuth, function() use ($app) {
-    $app->process('Channel', 'Edit');
-});
-
-$app->post('/channel/delete', $checkAuth, function() use ($app) {
-    $app->process('Channel', 'Delete');
-});
-
-// ---------------------------------------------------------------------------
-// Info
-// ---------------------------------------------------------------------------
-$app->map('/info', $checkAuth, function() use ($app) {
-    $app->process('Info');
-})->via('GET', 'POST');
-
-// ---------------------------------------------------------------------------
-// Description
-// ---------------------------------------------------------------------------
-$app->get('/description', function() use ($app) {
-    $app->process('Description');
-});
-
-// ---------------------------------------------------------------------------
-// Mobile
-// ---------------------------------------------------------------------------
-$app->get('/m', function() use ($app) {
-    $app->process('Mobile');
-});
-
-// ---------------------------------------------------------------------------
-// Other
-// ---------------------------------------------------------------------------
-$app->get('/widget.inc.js', function() use ($app) {
-    $app->showStats = FALSE;
-    $app->process('Widget', 'Inc');
-});
-
-$app->get('/widget.js', function() use ($app) {
-    $app->showStats = FALSE;
-    $app->process('Widget', 'Chart');
-});
-
-/**
- *
- */
-$app->get('/clearcache', $checkAuth, function() use ($app) {
-    $app->showStats = FALSE;
-    shell_exec('rm '.TEMP_DIR.DS.'*');
-    echo '<p>Cached templates cleared from <tt>'.TEMP_DIR.'</tt></p>';
-    echo '<p>Cache stats</p><ul>';
-    foreach ($app->cache->info() as $key=>$value) {
-        echo '<li>', ucwords(str_replace('_', ' ', $key)), ' : <tt>', $value, '</tt></li>';
-    }
-    echo '</ul><p><a href="/">back</a></p>';
-});
+foreach ($AppFiles as $file) include $file;
 
 /**
  * Run application
@@ -485,3 +332,5 @@ if ($app->showStats) {
            (microtime(TRUE)-$_SERVER['REQUEST_TIME'])*1000,
            slimMVC\MySQLi::$QueryCount, slimMVC\MySQLi::$QueryTime, memory_get_peak_usage(TRUE)/1024);
 }
+
+file_exists('..'.DS.'append.php') && include '..'.DS.'append.php';

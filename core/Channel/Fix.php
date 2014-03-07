@@ -30,9 +30,10 @@ class Fix extends InternalCalc {
 
         parent::before_read($request);
 
-        // make sure, only until now :-)
-        $this->end = min($this->end, time());
+        $this->saveValue($this->start, 1);
 
-        $this->saveValues(array( $this->start => 1, $this->end => 1 ));
+        // make sure, only until now or end minus 1 second :-)
+        $now = time();
+        $this->saveValue($this->end < $now ? $this->end-1 : $now, 1);
     }
 }

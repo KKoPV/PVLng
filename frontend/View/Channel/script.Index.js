@@ -21,10 +21,10 @@ $(function() {
     $('#entities').DataTable({
         bSort: true,
         bLengthChange: false,
-        bFilter: false,
         bInfo: false,
         bPaginate: false,
         bJQueryUI: true,
+        sDom: '<"H"f>t<"F">',
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
         aoColumns: [
             { 'asSorting': false },

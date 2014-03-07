@@ -1,6 +1,7 @@
 prepend.php
-*.AOP.php
+append.php
 config.php
+*.AOP.php
 *.conf
 run/*
 tmp/*

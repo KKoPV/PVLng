@@ -18,7 +18,7 @@ Width is 940px,
 - Ratio 16 x  9 : 528
  */
 
-var ChartHeight = 564;
+var ChartHeight = 528;
 
 /* refresh timeout in sec., set 0 for no automatic refresh */
 var RefreshTimeout = 300;
@@ -50,7 +50,7 @@ function Views() {
         this.views = {};
         var that = this;
         $.getJSON(
-            PVLngAPI + '/views.json',
+            PVLngAPI + '/views/'+language+'.json',
             { select: true },
             function(data) {
                 $(data).each(function(id, view) {
@@ -104,6 +104,7 @@ function Views() {
                 $('#c'+id).val(p).iCheck('check');
             }
         });
+        $('#modified').hide();
 
         /* Re-arrange channels in collapsed tree */
         if (collapse || !expanded) tree.toggle(false);
@@ -150,36 +151,16 @@ var
                                 return;
                             }
 
-                            var dateLocale = (new Date(this.x)).toLocaleString(),
-                                question = '{{DeleteReadingConfirm}}\n\n' +
-                                           '- ' + this.series.name + '\n' +
-                                           '- ' + dateLocale + '\n' +
-                                           '- {{Reading}} : ' + this.y + ' ' + this.series.userOptions.unit;
+                            $('#reading-serie').html(this.series.name);
+                            $('#reading-timestamp').html((new Date(this.x)).toLocaleString());
+                            $('#reading-value').html(this.y + ' ' + this.series.userOptions.unit);
 
-                            if (confirm(question)) {
-                                chart.showLoading('{{JustAMoment}}');
-                                $(document.body).addClass('wait');
+                            $('#dialog-reading')
+                                .data('guid', this.series.userOptions.guid)
+                                .data('timestamp', (this.x/1000).toFixed(0))
+                                .data('point', this)
+                                .dialog('open');
 
-                                var url = PVLngAPI + 'data/' + this.series.userOptions.guid + '/' + (this.x/1000).toFixed(0) + '.json',
-                                    point = this; /* Remember for deleting series point */
-
-                                $.ajax({
-                                    type: 'DELETE',
-                                    url: url,
-                                    dataType: 'json'
-                                }).done(function(data, textStatus, jqXHR) {
-                                    point.remove();
-                                    $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
-                                }).fail(function(jqXHR, textStatus, errorThrown) {
-                                    $.pnotify({
-                                        type: textStatus, hide: false, sticker: false,
-                                        text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
-                                    });
-                                }).always(function() {
-                                    chart.hideLoading();
-                                    $(document.body).removeClass('wait');
-                                });
-                            }
                         }
                     }
                 },
@@ -778,8 +759,10 @@ $(function() {
 
     chartOptions.chart.height = qs.ChartHeight || ChartHeight;
 
-    if (language != "en") {
+    if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);
+    } else {
+        $.datepicker.setDefaults($.datepicker.regional['']);
     }
 
     if (qs.date) {
@@ -885,7 +868,10 @@ $(function() {
         modal: true,
         buttons: {
             '{{Ok}}': function() {
-                p = new presentation();
+                $(this).dialog('close');
+                var chk = $('#c'+$(this).data('id'));
+                var old = chk.val();
+                var p = new presentation();
                 p.axis = +$('input[name="d-axis"]:checked').val();
                 p.type = $('#d-type').val();
                 p.consumption = $('#d-cons').is(':checked');
@@ -899,8 +885,11 @@ $(function() {
                 p.coloruseneg = $('#d-color-use-neg').is(':checked');
                 p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
                 p.threshold = +$('#d-threshold').val().replace(',', '.');
-                $('#c'+$(this).data('id')).val(p.toString());
-                $(this).dialog('close');
+                p = p.toString();
+                if (p != old) {
+                    chk.val(p);
+                    $('#modified').show();
+                }
             },
             '{{Cancel}}': function() {
                 $(this).dialog('close');
@@ -966,6 +955,7 @@ $(function() {
 
     $('input.channel').on('ifToggled', function() {
         $('#r'+this.id).toggleClass('checked', this.checked);
+        $('#modified').show();
     });
 
     $('#btn-reset').button({
@@ -1108,6 +1098,7 @@ $(function() {
                 /* Adjust chart title */
                 if (chart) chart.setTitle(views.actual.name);
             });
+            $('#modified').hide();
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
                 type: textStatus, hide: false, sticker: false, text: jqXHR.responseText
@@ -1129,9 +1120,47 @@ $(function() {
             views.buildSelect('#loaddeleteview');
             $('#public-select').show();
         }
-        $('#loading').html('&nbsp;');
+        $('#loading').hide();
         /* Chart slug provided by URL, load and collapse tree */
         views.load(qs.chart, true);
+    });
+
+    $("#dialog-reading").dialog({
+        modal: true,
+        resizable: false,
+        bgiframe: true,
+        width: 500,
+        autoOpen: false,
+        buttons: {
+            '{{Yes}}': function() {
+                var self = $(this);
+
+                self.dialog('close');
+                chart.showLoading('{{JustAMoment}}');
+                $(document.body).addClass('wait');
+
+                var url = PVLngAPI + 'data/' + self.data('guid') + '/' + self.data('timestamp') + '.json';
+
+                $.ajax(
+                    { type: 'DELETE', url: url, dataType: 'json' }
+                ).done(function(data, textStatus, jqXHR) {
+                    self.data('point').remove();
+                    $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    $.pnotify({
+                        type: textStatus, hide: false, sticker: false,
+                        text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+                    });
+                }).always(function() {
+                    chart.hideLoading();
+                    $(document.body).removeClass('wait');
+                });
+
+            },
+            '{{No}}': function() {
+                $(this).dialog('close');
+            }
+        }
     });
 
     shortcut.add('Alt+P', function() { changeDates(-1); });

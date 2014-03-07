@@ -9,26 +9,30 @@
 /**
  *
  */
-$api->get('/views', function() use ($api) {
-    $views = new ORM\View;
+$api->get('/views(/:language)', function( $language='en' ) use ($api) {
+    I18N::setLanguage($language);
+
     $result = $api->request->get('select')
             ? array( array(
                 'name'   => '--- ' . I18N::_('Select') . ' ---',
-                'data'   => '',
+                'data'   => NULL,
                 'public' => 1,
-                'slug'   => ''
+                'slug'   => NULL
               ))
             : array();
+
+    $views = new ORM\View;
 
     foreach ($views->findMany(NULL, NULL, 'name') as $view) {
         if ($api->APIKeyValid == 1 OR $view->public == 1) {
             $result[] = $view->getAll();
         }
     }
+
     $api->render($result);
 })->name('get views')->help = array(
     'since'       => 'v3',
-    'description' => 'Fetch chart view data via slug',
+    'description' => 'Fetch chart view data via slug, provide for Top select entry the correct language',
 );
 
 /**
@@ -82,7 +86,7 @@ $api->get('/view/:slug', function( $slug ) use ($api) {
 );
 
 /**
- *
+ * @ToDo
  */
 $api->post('/view/:slug', function( $slug ) use ($api) {
 

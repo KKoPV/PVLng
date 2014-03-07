@@ -208,6 +208,11 @@ tt {
     float: right;
 }
 
+.alias {
+    color: gray;
+    font-style: italic;
+}
+
 form {
     display: inline;
 }
