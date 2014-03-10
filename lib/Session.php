@@ -216,11 +216,12 @@ abstract class Session {
      *
      * @param string $param Request parameter
      * @param mixed $default Default value
-     * @return void
+     * @return mixed
      */
     public static function checkRequest( $param, $default=NULL ) {
         if (array_key_exists($param, $_REQUEST)) self::set($param, $_REQUEST[$param]);
         if (!self::is_set($param)) self::set($param, $default);
+        return self::get($param);
     }
 
     /**
