@@ -126,7 +126,7 @@ function Views() {
  *
  */
 var
-    qs = {}, views = {}, chart = false, timeout,
+    qs = {}, views = {}, chart = false, updateTimeout,
 
     chartOptions = {
         chart: {
@@ -322,14 +322,18 @@ var xResolution = {
     y: 60 * 60 * 24 * 360
 };
 
-var lastChanged = (new Date).getTime() / 1000 / 60;
+var windowVisible = true, browserPrefix = null,
+    lastChanged = (new Date).getTime() / 1000 / 60;
 
 /**
  *
  */
 function updateChart( forceUpdate ) {
 
-    clearTimeout(timeout);
+    clearTimeout(updateTimeout);
+    updateTimeout = null;
+
+    if (!windowVisible) return;
 
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
     if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
@@ -690,7 +694,7 @@ function updateChart( forceUpdate ) {
             oTable.fnProcessingIndicator(false);
 
             if (RefreshTimeout > 0) {
-                timeout = setTimeout(updateChart, RefreshTimeout*1000);
+                updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
             }
 
         });
@@ -1162,6 +1166,38 @@ $(function() {
             }
         }
     });
+
+    /**
+     * HTML5 Page Visibility API
+     *
+     * http://www.sitepoint.com/introduction-to-page-visibility-api/
+     * http://www.w3.org/TR/page-visibility
+     */
+    if (document.hidden !== undefined) {
+        browserPrefix = '';
+    } else {
+        var browserPrefixes = ['webkit', 'moz', 'ms', 'o'];
+        /* Test all vendor prefixes */
+        for (var i=0; i<browserPrefixes.length; i++) {
+            if (document[browserPrefixes[i] + 'Hidden'] != undefined) {
+                browserPrefix = browserPrefixes[i];
+                break;
+            }
+        }
+    }
+
+    if (browserPrefix !== null) {
+        document.addEventListener(browserPrefix + 'visibilitychange', function() {
+            if (document.hidden === false || document[browserPrefix + 'Hidden'] === false) {
+                /* The page is in foreground and visible */
+                windowVisible = true;
+                /* Was longer in background, so the updateTimeout was cleared */
+                if (!updateTimeout) setTimeout(updateChart, 1500);
+            } else {
+                windowVisible = false;
+            }
+        });
+    }
 
     shortcut.add('Alt+P', function() { changeDates(-1); });
     shortcut.add('Alt+N', function() { changeDates(1); });
