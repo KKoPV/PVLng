@@ -11,9 +11,9 @@
 
 <script>
 
-verbose = true;
+verbose = false;
 
-var    Period = '{MOBILE_PERIOD}';
+var Period = '{MOBILE_PERIOD}';
 
 var ChartHeight = '{MOBILE_CHARTHEIGHT}';
 
@@ -22,15 +22,19 @@ var ChartHeight = '{MOBILE_CHARTHEIGHT}';
 
 <script src="/js/chart.js"></script>
 
-<!-- load Highcharts scripts direct from highcharts.com -->
+<!-- load Highcharts scripts direct from highcharts.com
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
+-->
+
+<script src="/js/highcharts.js"></script>
+<script src="/js/highcharts-more.js"></script>
 
 <script>
 
 var views = {
         <!-- BEGIN VIEWS -->
-        "{NAME}": '{DATA}',
+        '{NAME}': { period: '{PERIOD}', data: '{DATA}' },
         <!-- END -->
     },
 
@@ -80,7 +84,7 @@ var views = {
             showDuration: 0,
             labelStyle: {
                 top: '40%',
-                fontSize: '200%',
+                fontSize: '150%',
                 color: 'black'
             }
         }
@@ -103,11 +107,22 @@ Highcharts.setOptions({
  *
  */
 var lock = false,
-    channels = [];
-
-var chart = new Highcharts.Chart(options);
+    channels = [],
+    chart = new Highcharts.Chart(options);
 
 $('#page-home').on('pageshow', function( event, ui ) {
+    updateChart();
+});
+
+$('#btn-home').on('click', function(e) {
+    e.preventDefault();
+    for (var v in views) if (views.hasOwnProperty(v)) break;
+    $('#page-home').data('view', v);
+    updateChart();
+});
+
+$('#btn-refresh').on('click', function(e) {
+    e.preventDefault();
     updateChart();
 });
 
@@ -119,22 +134,27 @@ function updateChart() {
     if (lock) return;
     lock = true;
 
-    var view = $('#page-home').data('view');
+    var view = $('#page-home').data('view'),
+        period = views[view].period;
 
     $('#view').html(view);
 
-    view = views[view];
+    view = views[view].data;
 
     try {
         view = JSON.parse(view);
     } catch (e) {
-        return
+        lock = false;
+        return;
     }
 
-    if (view == '') return;
+    if (view == '') {
+        lock = false;
+        return;
+    }
 
     var loading = view.length;
-    chart.showLoading(' -' + loading + ' - ');
+    chart.showLoading('- ' + loading + ' -');
 
     $('#table-cons tbody tr').remove();
 
@@ -240,7 +260,7 @@ function updateChart() {
                 attributes: true,
                 full:       true,
                 short:      true,
-                period:     (channel.type != 'scatter') ? Period : '',
+                period:     (channel.type != 'scatter') ? period : '',
                 _ts:        (new Date).getTime() /* force reload */
             },
             function(data) {

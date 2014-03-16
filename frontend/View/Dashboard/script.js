@@ -168,7 +168,7 @@ function updateCharts() {
             },
             function(data) {
                 /* pop out 1st row with attributes */
-                var    attr = data.shift();
+                var attr = data.shift();
 
                 _log('Attributes:', attr);
                 _log('Data:', data);
@@ -184,7 +184,7 @@ function updateCharts() {
                         var options = $.extend({}, chartOptions, {
                             chart:    { renderTo: 'chart-'+chart_id, type: 'gauge' },
                             title:    { text: attr.name },
-                            subtitle: { text: attr.description ? $('<div/>').html(attr.description).text() : ' ' },
+                            subtitle: { text: attr.description ? $('<div/>').html(attr.description).text() : ' ' },
                             yAxis: {
                                 min: attr.valid_from,
                                 max: attr.valid_to,
@@ -194,18 +194,15 @@ function updateCharts() {
                             series: [ { name: attr.name } ]
                         });
 
-                        if (attr.comment) {
+                        if (attr.extra) {
                             /* draw colored plot bands
-                               <from> > <to> : <color>
-                               > <to> : <color>
-                               <from> > : <color>
-                               missing <from> and <to> are replaced
-                               by valid_from and valid_to
+                               start > end : color
+                               > end : color
+                               start > : color
+                               missing <start> and <end> are replaced by valid_from and valid_to */
 
                             /* split into bands */
-                            var bands = attr.comment.split("\n");
-
-                            $(bands).each(function(id, band) {
+                            $(attr.extra.split("\n")).each(function(id, band) {
                                 /* split into from-to and color */
                                 var fromto_color = band.trim().split(':');
 

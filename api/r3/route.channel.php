@@ -16,11 +16,6 @@ $api->get('/channels', function() use ($api) {
 
     if ($api->APIKeyValid == 0) $q->whereEQ('public', 1);
 
-    // Transform into array of arrays, not objects
-//     $data = array();
-//     foreach ($api->db->queryRows($q) as $row) $data[] = (array) $row;
-//     $api->render($data);
-
     $api->render($api->db->queryRowsArray($q));
 
 })->name('channels')->help = array(

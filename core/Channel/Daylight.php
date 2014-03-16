@@ -157,7 +157,8 @@ class Daylight extends InternalCalc {
             if (!$this->numeric) {
 
                 // Static sunrise / sunset marker
-                $this->saveValues(array( $sunrise => 'Sunrise', $sunset => 'Sunset' ));
+                $this->saveValue($sunrise, 'Sunrise');
+                $this->saveValue($sunset,  'Sunset');
 
             } else {
 

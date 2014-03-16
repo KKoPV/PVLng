@@ -91,7 +91,7 @@ abstract class Session {
         self::__dbg('Old name was "%s"', $name);
 
         // Set SSL level
-        $https = isset($secure) ? $secure : isset($_SERVER['HTTPS']);
+        $https = $secure ?: (isset($_SERVER['HTTPS']) AND $_SERVER['HTTPS']);
 
         session_set_cookie_params($ttl, $path, $domain, $https, TRUE);
 
@@ -216,11 +216,12 @@ abstract class Session {
      *
      * @param string $param Request parameter
      * @param mixed $default Default value
-     * @return void
+     * @return mixed
      */
     public static function checkRequest( $param, $default=NULL ) {
-        if (isset($_REQUEST[$param])) self::set($param, $_REQUEST[$param]);
-        if (!self::is_set($param))        self::set($param, $default);
+        if (array_key_exists($param, $_REQUEST)) self::set($param, $_REQUEST[$param]);
+        if (!self::is_set($param)) self::set($param, $default);
+        return self::get($param);
     }
 
     /**
@@ -335,7 +336,7 @@ abstract class Session {
      * @return bool
      */
     public static function is_set( $key ) {
-        return isset($_SESSION[self::__mapKey($key)]);
+        return array_key_exists(self::__mapKey($key), $_SESSION);
     }
 
     /**

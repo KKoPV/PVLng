@@ -26,14 +26,20 @@ class ReadingStrMemory extends \slimMVC\ORMTable {
     public function __construct ( $id=NULL ) {
         /* Build WITHOUT $id lookup, must be done later, if table not exists yet */
         parent::__construct();
-        $this->app->db->query('
-            CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
-                `id` smallint(5) unsigned NOT NULL,
-                `timestamp` int(11) NOT NULL,
-                `data` varchar(50) NOT NULL,
-                PRIMARY KEY (`id`,`timestamp`)
-            ) ENGINE=MEMORY
-        ');
+
+        if (self::$first) {
+            $this->app->db->query('
+                CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
+                    `id` smallint(5) unsigned NOT NULL,
+                    `timestamp` int(11) NOT NULL,
+                    `data` varchar(50) NOT NULL,
+                    PRIMARY KEY (`id`,`timestamp`)
+                ) ENGINE=MEMORY
+            ');
+
+            self::$first = FALSE;
+        }
+
         if (isset($id)) $this->findPrimary($id);
     }
 
@@ -48,6 +54,11 @@ class ReadingStrMemory extends \slimMVC\ORMTable {
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
+
+    /**
+     * First call
+     */
+    protected static $first = TRUE;
 
     /**
      *

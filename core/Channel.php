@@ -178,11 +178,12 @@ abstract class Channel {
      *
      */
     public function getAttributes( $attribute=NULL ) {
-
-        return $attribute != ''
+        if ($attribute != '') {
+            // Accept attribute name 'factor' for resolution
             // Here WITHOUT check, will be handled by __get()
-            ? array($attribute => $this->$attribute)
-            : array_merge(
+            return array($attribute => $attribute == 'factor' ? $this->resolution : $this->$attribute);
+        } else {
+            return array_merge(
                 $this->getAttributesShort(),
                 array(
                     'start'       => $this->start,
@@ -191,6 +192,7 @@ abstract class Channel {
                     'costs'       => 0
                 )
             );
+        }
     }
 
     /**
@@ -219,6 +221,7 @@ abstract class Channel {
             'graph'       => $this->graph,
             'public'      => $this->public,
             'icon'        => $this->icon,
+            'extra'       => is_array($this->extra) ? implode("\n", $this->extra) : $this->extra,
             'comment'     => trim($this->comment)
         );
     }
@@ -623,6 +626,8 @@ abstract class Channel {
         Hook::process('data.save.before', $this);
 
         if ($this->numeric) {
+            // Remove all non-numeric characters
+            $this->value = preg_replace('~[^0-9.eE-]~', '', $this->value);
 
             $this->value = +$this->value;
 
@@ -705,7 +710,7 @@ abstract class Channel {
         // End timestamp
         if ($request['end'] == 'sunset') {
             if ($latitude == '' OR $longitude == '') {
-                throw new \Exception('Invalid start timestamp: "sunrise", missing Location in config/config.php', 400);
+                throw new \Exception('Invalid end timestamp: "sunset", missing Location in config/config.php', 400);
             }
             $this->end = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
         } else {

@@ -1,3 +1,7 @@
+#tree tr:hover {
+    background-color: #C0FFC0;
+}
+
 .draggable,
 .non-draggable {
     padding: 4px;

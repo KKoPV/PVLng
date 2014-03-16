@@ -1,7 +1,6 @@
 <?php
 /**
- * Accept JSON data from several equipments, like SMA Webboxes, Fronius
- * inverters or SmartGrid
+ * Accept JSON data from SMA Webboxes
  *
  * The MIT License (MIT)
  *
@@ -54,6 +53,10 @@ class Webbox extends JSON {
                 400
             );
         }
+
+        // Request timestamp to webbox is saved as request id,
+        // used also for reload of failed files!
+        $timestamp = strtotime($request['id']);
 
         // Transform
         $channels = array();

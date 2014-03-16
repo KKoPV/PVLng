@@ -34,9 +34,9 @@
                 <!-- END -->
             </select>
             <img id="icon" src="/images/pix.gif" class="tip" data-none="/images/pix.gif" alt=""
-                 style="width:16px;height:16px;margin-left:.5em" width="16" height="16" />
+                 style="margin:0 16px;width:16px;height:16px" width="16" height="16" />
             <img id="icon-private" src="/images/ico/lock.png" class="tip" alt="[private]"
-                 style="margin-left:.5em;width:16px;height:16px;display:none"
+                 style="width:16px;height:16px;display:none"
                  width="16" height="16" title="{{PrivateChannel}}"/>
         </td>
         <td class="c">

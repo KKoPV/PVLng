@@ -8,3 +8,7 @@
  * @version     1.0.0
  */
 -->
+
+<h3 class="ui-corner-all ui-state-default c" style="padding:0.5em;font-weight:bold">
+    {TITLE}
+</h3>

@@ -234,7 +234,9 @@ class Channel extends \Controller {
             $entity = new \ORM\Channel($channel['id']);
 
             // set values
-            foreach ($channel as $key=>$value) $entity->set($key, trim($value));
+            foreach ($channel as $key=>$value) {
+                $entity->set($key, trim($value));
+            }
 
             $this->prepareFields($entity);
 
@@ -432,19 +434,18 @@ class Channel extends \Controller {
         $this->applyFieldSettings(str_replace('\\', DS, $type->model));
 
         foreach ($this->fields as $key=>&$data) {
-            $m = str_replace('\\', DS, $type->model);
-
-            $h = 'model::'.$m.'_'.$key;
+            $h = 'model::'.$type->model.'_'.$key;
             $name = __($h);
             $data['NAME'] = ($name != $h) ? $name : __('channel::'.$key);
 
-            $h = 'model::'.$m.'_'.$key.'Hint';
+            $h = 'model::'.$type->model.'_'.$key.'Hint';
             $name = __($h);
             $data['HINT'] = ($name != $h) ? $name : __('channel::'.$key.'Hint');
 
-            $data['VALUE'] = !$addMode
-                           ? htmlspecialchars($entity->$key)
-                           : htmlspecialchars(trim($data['DEFAULT']));
+//             $data['VALUE'] = !$addMode
+//                            ? htmlspecialchars($entity->$key)
+//                            : htmlspecialchars(trim($data['DEFAULT']));
+            $data['VALUE'] = !$addMode ? $entity->$key : trim($data['DEFAULT']);
 
             if (strpos($data['TYPE'], 'select') === 0) {
                 $options = explode(';', $data['TYPE']);

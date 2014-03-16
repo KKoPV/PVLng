@@ -47,7 +47,7 @@ class Admin extends \Controller {
             if ($r = \Session::get('returnto')) {
                 // Clear before redirect
                 \Session::set('returnto');
-                $this->app->redirect($r);
+                $app->redirect($r);
             } else {
                 $this->app->redirect('index');
             }
@@ -117,6 +117,19 @@ class Admin extends \Controller {
 
         $q = \DBQuery::forge('pvlng_config')->whereNE('type');
         $this->view->Data = $this->rows2view($this->db->queryRows($q));
+    }
+
+    /**
+     *
+     */
+    public function Clearcache_Action() {
+        foreach (glob(TEMP_DIR.DS.'*') as $file) {
+            // Ignore .githold
+            if (strpos($file, '.') !== 0) unlink($file);
+        }
+        $this->app->cache->flush();
+
+        $this->view->TempDir = TEMP_DIR;
     }
 
 }

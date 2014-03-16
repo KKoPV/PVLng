@@ -1,4 +1,5 @@
 <?php
+/* // AOP // */
 /**
  *
  *
@@ -26,14 +27,21 @@ class ReadingNumMemory extends \slimMVC\ORMTable {
     public function __construct ( $id=NULL ) {
         /* Build WITHOUT $id lookup, must be done later, if table not exists yet */
         parent::__construct();
-        $this->app->db->query('
-            CREATE TABLE IF NOT EXISTS `pvlng_reading_num_tmp` (
-                `id` smallint(5) unsigned NOT NULL,
-                `timestamp` int(11) NOT NULL,
-                `data` decimal(13,4) NOT NULL,
-                PRIMARY KEY (`id`, `timestamp`)
-            ) ENGINE=MEMORY
-        ');
+
+        if (self::$first) {
+            /// Yryie::Info('Create performance table');
+            $this->app->db->query('
+                CREATE TABLE IF NOT EXISTS `pvlng_reading_num_tmp` (
+                    `id` smallint(5) unsigned NOT NULL,
+                    `timestamp` int(11) NOT NULL,
+                    `data` decimal(13,4) NOT NULL,
+                    PRIMARY KEY (`id`, `timestamp`)
+                ) ENGINE=MEMORY
+            ');
+
+            self::$first = FALSE;
+        }
+
         if (isset($id)) $this->findPrimary($id);
     }
 
@@ -48,6 +56,11 @@ class ReadingNumMemory extends \slimMVC\ORMTable {
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
+
+    /**
+     * First call
+     */
+    protected static $first = TRUE;
 
     /**
      *

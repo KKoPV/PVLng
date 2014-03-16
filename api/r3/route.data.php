@@ -27,32 +27,6 @@ $api->put('/data/:guid', $APIkeyRequired, $accessibleChannel, function($guid) us
 );
 
 /**
- * Act as vzlogger middleware?
- */
-if ($config->get('vzlogger.enabled')) {
-
-    /**
-     * vzlogger compatible data saving
-     *
-     * Original:
-     *   POST http://demo.volkszaehler.org/middleware.php/data/550e8400-e29b-11d4-a716-446655441352.json?ts=1284677961150&value=12
-     * Here:
-     *   POST http://your.domain.here/api/r2/vz/d8e3-1dd6-a75b-a6b4-1394-f45d-2ee2-66c9.json?ts=1284677961150&value=12
-     */
-    $app->post('/vz/:guid', function($guid) use ($app) {
-        Channel::byGUID($guid)->write(
-            array( 'data' => $app->request->post('value') ),
-            $app->request->post('ts')
-        ) && $app->halt(201);
-    })->name('post data from vzlogger')->help = array(
-        'since'       => 'v3',
-        'description' => 'Save a reading value from vzlogger (http://wiki.volkszaehler.org/software/controller/vzlogger)',
-        'payload'     => '?ts=<timestamp>&value=<value>'
-    );
-
-}
-
-/**
  *
  */
 $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='', $p2='') use ($api) {

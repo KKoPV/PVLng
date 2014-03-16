@@ -121,11 +121,19 @@ class View extends Slim\View {
             $result = array($result);
         }
 
-        foreach ($result as $value) {
+        $cnt = count($result);
+        $line = 0;
+
+        foreach ($result as $key=>$value) {
             if (is_array($value)) $value = implode(' ', $value);
             $value = str_replace("\r", '', $value);
             $value = str_replace("\n", '\n', $value);
-            echo $value, "\n";
+            if ($cnt > 1) {
+                echo trim($key . ': ' . $value);
+                if (++$line < $cnt) echo ' / ';
+            } else {
+                echo $value;
+            }
         }
     }
 

@@ -21,6 +21,22 @@ namespace Channel;
 class Dashboard extends Calculator {
 
     /**
+     * Run additional code before data saved to database
+     * Read latitude / longitude from extra attribute
+     */
+    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
+        $fields['colors']['VALUE'] = $channel->extra;
+    }
+
+    /**
+     * Run additional code before data saved to database
+     * Save latitude / longitude to extra attribute
+     */
+    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
+        $channel->extra = $fields['colors']['VALUE'];
+    }
+
+    /**
      *
      */
     public function read( $request ) {

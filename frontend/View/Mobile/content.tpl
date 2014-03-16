@@ -12,22 +12,21 @@
 <!-- -------------------------------------------------------------------------
 PAGE 1
 -------------------------------------------------------------------------- -->
-<div data-role="page" id="page-home" data-theme="a" data-view="@mobile">
+<div data-role="page" id="page-home" data-theme="a" data-view="{VIEW1ST}">
 
     <!-- Header -->
     <div data-role="header" data-id="header">
-        <a class="ui-btn-left ui-btn ui-btn-icon-notext ui-btn-corner-all"
-           data-iconpos="notext" data-role="button" data-icon="home" title=" Home "
-           onclick="$('#page-home').data('view','@mobile'); updateChart()">
+        <a id="btn-home" class="ui-btn-left ui-btn ui-btn-icon-notext ui-btn-corner-all"
+           data-iconpos="notext" data-role="button" data-icon="home" title=" Home ">
             <span class="ui-btn-inner ui-btn-corner-all">
                 <span class="ui-btn-text"> Home </span>
                 <span data-form="ui-icon" class="ui-icon ui-icon-home ui-icon-shadow"></span>
             </span>
         </a>
         <h1 id="view"></h1>
-        <a class="ui-btn-right ui-btn ui-btn-icon-notext ui-btn-corner-all"
+        <a id="btn-refresh" class="ui-btn-right ui-btn ui-btn-icon-notext ui-btn-corner-all"
            data-iconpos="notext" data-role="button" data-icon="refresh" title=" {{Refresh}} ">
-            <span class="ui-btn-inner ui-btn-corner-all" onClick="updateChart()">
+            <span class="ui-btn-inner ui-btn-corner-all">
                 <span class="ui-btn-text"> Navigation </span>
                 <span data-form="ui-icon" class="ui-icon ui-icon-refresh ui-icon-shadow"></span>
             </span>

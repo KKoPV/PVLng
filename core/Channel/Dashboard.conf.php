@@ -26,25 +26,14 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
-    'meter' => array(
-        'visible' => FALSE
-    ),
-    'cost' => array(
-        'visible' => FALSE
-    ),
-    'resolution' => array(
-        'visible'  => TRUE,
-    ),
     'valid_from' => array(
-        'visible'  => TRUE,
-        'required' => TRUE,
+        'required' => TRUE
     ),
     'valid_to' => array(
-        'visible'  => TRUE,
-        'required' => TRUE,
+        'required' => TRUE
     ),
-    'comment' => array(
-        'type'     => 'textextra'
+    'colors' => array(
+        'type'     => 'textarea'
     )
 
 );

@@ -35,7 +35,7 @@ $api->put('/log', $APIkeyRequired, function() use ($api) {
 
     $log = new ORM\Log;
 
-    $log->scope = !empty($request['scope']) ? $request['scope'] : 'API r2';
+    $log->scope = !empty($request['scope']) ? $request['scope'] : 'API r'.$api->version;
     $log->data  = !empty($request['message']) ? trim($request['message']) : '';
 
     if ($log->insert()) {
@@ -51,7 +51,7 @@ $api->put('/log', $APIkeyRequired, function() use ($api) {
 
 })->name('put log')->help = array(
     'since'       => 'v2',
-    'description' => 'Store new log entry, scope defaults to \'API r2\'',
+    'description' => 'Store new log entry, scope defaults to \'API r'.$api->version.'\'',
     'payload'     => '{"scope":"...", "message":"..."}',
 );
 
@@ -124,7 +124,7 @@ $api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
 
     $log = new ORM\Log($id);
 
-    $log->scope = !empty($request['scope']) ? $request['scope'] : 'API r2';
+    $log->scope = !empty($request['scope']) ? $request['scope'] : 'API r'.$api->version;
     $log->data  = !empty($request['message']) ? trim($request['message']) : '';
 
     if ($log->replace()) {

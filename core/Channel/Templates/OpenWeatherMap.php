@@ -10,7 +10,7 @@
  */
 return array(
 
-    'name' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a>',
+    'name' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a> weather data',
 
     'description' => '
         Pre-configured sensors:
@@ -33,7 +33,7 @@ return array(
         array(
             'type'        => 45, // OpenWeatherMap
             'name'        => 'OpenWeatherMap',
-            'description' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a>',
+            'description' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a> weather data',
         ),
 
         // Real channels

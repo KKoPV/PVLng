@@ -54,13 +54,18 @@ class DifferentiatorFull extends Differentiator {
             $row2 = $next->rewind()->current();
 
             $result = new \Buffer;
+            $last = NULL;
 
             while (!empty($row1) OR !empty($row2)) {
 
                 $key1 = $buffer->key();
                 $key2 = $next->key();
 
+
                 if ($key1 == $key2) {
+
+                    // Remember original row
+                    $last = $row1;
 
                     // same timestamp, combine
                     $row1['data']        -= $row2['data'];
@@ -76,6 +81,9 @@ class DifferentiatorFull extends Differentiator {
 
                 } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
+                    // Remember original row
+                    $last = $row1;
+
                     // missing row 2, save row 1 as is
                     $result->write($row1, $key1);
 
@@ -85,10 +93,17 @@ class DifferentiatorFull extends Differentiator {
                 } else /* $key1 > $key2 */ {
 
                     // missing row 1
-                    $row2['data']        = -$row2['data'];
-                    $row2['min']         = -$row2['min'];
-                    $row2['max']         = -$row2['max'];
-                    $row2['consumption'] = -$row2['consumption'];
+                    if ($this->meter AND $last) {
+                        $row2['data']        = $last['data'] - $row2['data'];
+                        $row2['min']         = $last['min'] - $row2['min'];
+                        $row2['max']         = $last['max'] - $row2['max'];
+                        $row2['consumption'] = $last['consumption'] - $row2['consumption'];
+                    } else {
+                        $row2['data']        = -$row2['data'];
+                        $row2['min']         = -$row2['min'];
+                        $row2['max']         = -$row2['max'];
+                        $row2['consumption'] = -$row2['consumption'];
+                    }
 
                     $result->write($row2, $key2);
 
@@ -103,6 +118,8 @@ class DifferentiatorFull extends Differentiator {
             // Set result to buffer for next loop
             $buffer = $result;
         }
+
+        $this->meter = FALSE;
 
         return $this->after_read($result);
     }

@@ -10,11 +10,6 @@
 return array(
 
     /**
-     * Aggregation period, DON't use minutes, use the hour representation!
-     */
-    'Period' => '10i',
-
-    /**
      * Chart canvas height
      */
     'ChartHeight' => 320,

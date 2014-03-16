@@ -1,4 +1,5 @@
 <?php
+/* // AOP // */
 /**
  *
  *
@@ -20,14 +21,18 @@ class Index extends \Controller {
     public function Index_Action() {
         $this->view->SubTitle = \I18N::_('Charts');
 
+        /// \Yryie::StartTimer('LoadTree', NULL, 'CacheDB');
         while ($this->app->cache->save('Tree', $tree)) {
             $tree = \NestedSet::getInstance()->getFullTree();
+            /// \Yryie::Info('Loaded tree from Database');
             // Skip root node
             array_shift($tree);
         }
+        /// \Yryie::StopTimer('LoadTree');
 
         $channel = new \ORM\ChannelView;
 
+        /// \Yryie::StartTimer('BuildTree');
         $parent = array( 1 => 0 );
         $data = array();
         foreach ($tree as $node) {
@@ -47,20 +52,28 @@ class Index extends \Controller {
 
             $data[] = array_change_key_case($node, CASE_UPPER);
         }
+        /// \Yryie::Debug('Channel count: '.count($tree));
+        /// \Yryie::StopTimer('BuildTree');
         $this->view->Data = $data;
 
         $this->view->NotifyLoad = $this->config->Controller_Chart_NotifyLoad;
 
         $bk = \BabelKitMySQLi::getInstance();
 
-        while ($this->app->cache->save('preset', $preset)) {
+        /// \Yryie::StartTimer('LoadPreset', NULL, 'CacheDB');
+        while ($this->app->cache->save('preset/'.LANGUAGE, $preset)) {
             $preset = $bk->select('preset', LANGUAGE);
+            /// \Yryie::Info('Loaded preset from Database');
         }
+        /// \Yryie::StopTimer('LoadPreset');
         $this->view->PresetSelect = $preset;
 
-        while ($this->app->cache->save('period', $period)) {
+        /// \Yryie::StartTimer('LoadPeriod', NULL, 'CacheDB');
+        while ($this->app->cache->save('period/'.LANGUAGE, $period)) {
             $period = $bk->select('period', LANGUAGE);
+            /// \Yryie::Info('Loaded period from Database');
         }
+        /// \Yryie::StopTimer('LoadPeriod');
         $this->view->PeriodSelect = $period;
     }
 }

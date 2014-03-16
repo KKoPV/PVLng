@@ -50,23 +50,18 @@
 <div class="grid_10">
     <div class="fl">
         <span class="toolbar menu">
-            <a class="tipbtn" title="{{ChartHint}} (Shift+F1)" href="/">{{Charts}}</a>
-            <a class="login tipbtn" title="{{DashboardHint}} (Shift+F2)" href="/dashboard">{{Dashboard}}</a>
-            <a class="login tipbtn" title="{{ListHint}} (Shift+F3)" href="/list">{{List}}</a>
-            <a class="login tipbtn" title="{{OverviewHint}} (Shift+F4)" href="/overview">{{Overview}}</a>
-            <a class="login tipbtn" title="{{ChannelsHint}} (Shift+F5)" href="/channel">{{Channels}}</a>
-            <a class="login tipbtn" title="{{InfoHint}} (Shift+F6)" href="/info">{{Information}}</a>
-            <a class="tipbtn" title="{{PlantDescriptionHint}} (Shift+F7)" href="/description">{{Description}}</a>
+            <!-- BEGIN MENU -->
+            <a class="tipbtn<!-- IF LOGIN --> login<!-- ENDIF -->" title="{HINT}" href="{ROUTE}">{LABEL}</a>
+            <!-- END -->
         </span>
     </div>
     <div class="r">
         <span class="toolbar menu">
-            <a class="tipbtn" title="Deutsch" href="?lang=de">
-                <img style="width:20px;height:12px" src="/images/de.png" alt="D" width="20" height="12" />
+            <!-- BEGIN LANGUAGES -->
+            <a class="tipbtn" title="{LABEL}" href="?lang={CODE}">
+                <img style="width:20px;height:12px" src="/images/{CODE}.png" alt="{CODE}" width="20" height="12" />
             </a>
-            <a class="tipbtn" title="English" href="?lang=en">
-                <img style="width:20px;height:12px" src="/images/en.png" alt="E" width="20" height="12" />
-            </a>
+            <!-- END -->
             <!-- IF {USER} -->
             <a class="tipbtn" title="{{Logout}} (Alt+L)" href="/logout">
                 <img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />

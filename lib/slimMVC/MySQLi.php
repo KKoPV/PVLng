@@ -83,7 +83,7 @@ class MySQLi extends \MySQLi {
             'user'     => $user,
             'password' => $password,
             'database' => $database,
-            'port'     => $port,
+            'port'     => +$port,
             'socket'   => $socket
         );
     }
@@ -157,7 +157,7 @@ class MySQLi extends \MySQLi {
      */
     public static function setPort( $port, $connection=self::MASTER ) {
         self::initConnection($connection);
-        self::$credentials[$connection]['port'] = $port;
+        self::$credentials[$connection]['port'] = +$port;
     }
 
     /**
@@ -317,7 +317,9 @@ class MySQLi extends \MySQLi {
         $this->Buffered = TRUE;
         $rows = array();
         if ($result = $this->query($query, $args)) {
-            $rows = $result->fetch_all(MYSQLI_ASSOC);
+            /// $t = microtime(TRUE);
+            while ($row = $result->fetch_assoc()) $rows[] = $row;
+            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
         $this->Buffered = FALSE;

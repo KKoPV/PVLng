@@ -1,3 +1,30 @@
+ v2.6.0
+========
+
+FIXED
+
+ - Fix session handling for Nginx, $_SERVER[HTTPS] ist set every time, but empty ~ Knut Kohl <github@knutkohl.de>
+ - Fix setup redirect, config.php.dist and script ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Update Highcharts to v3.0.10 ~ Knut Kohl <github@knutkohl.de>
+ - Adjust cache TTL usage, use native APC TTL handling ~ Knut Kohl <github@knutkohl.de>
+ - Adjust SMA Webbox JSON handling for loading failed files ~ Knut Kohl <github@knutkohl.de>
+ - Adjust application flow logic ~ Knut Kohl <github@knutkohl.de>
+ - Adjust creation of memory tables to only once per session ~ Knut Kohl <github@knutkohl.de>
+ - Change performance colletion to memory table ~ Knut Kohl <github@knutkohl.de>
+ - Force numeric channels to have only numerics in submitted value ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Separate data acquisition scripts into own repository: https://github.com/K-Ko/PVLng-scripts ~ Knut Kohl <github@knutkohl.de>
+ - Add HTML5 Page Visible API to charts view ~ Knut Kohl <github@knutkohl.de>
+ - Add hover effect to data table rows ~ Knut Kohl <github@knutkohl.de>
+ - Add Wunderground weather template and channel ~ Knut Kohl <github@knutkohl.de>
+ - Add ability to define custom commands at start via prepend.php file ~ Knut Kohl <github@knutkohl.de>
+
+
  v2.5.0
 ========
 

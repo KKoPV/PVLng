@@ -132,6 +132,8 @@ var timer;
  *
  */
 function _log() {
+    if (!verbose) return;
+
     console.timeEnd('Duration');
     console.time('Duration');
     if (arguments.length == 1) {

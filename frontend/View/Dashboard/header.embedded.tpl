@@ -9,4 +9,6 @@
  */
 -->
 
-<h3 class="c"><span id="date-time">&nbsp;</span></h3>
+<h3 class="ui-corner-all ui-state-default c" style="padding:0.5em;font-weight:bold">
+    <span id="date-time">&nbsp;</span>
+</h3>

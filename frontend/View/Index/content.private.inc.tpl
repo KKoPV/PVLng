@@ -54,7 +54,7 @@
                 </td>
                 <td style="padding:0.4em 0" <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
                     <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                         src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" />
+                         src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" alt="">
                     <strong class="tip" title="{GUID}">{NAME}</strong>
                     <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
                     <!-- IF !{PUBLIC} -->
@@ -66,7 +66,7 @@
                 </td>
                 <td>
                     <img id="s{ID}" src="/images/spinner.gif" width="16" height="16"
-                         style="float:right;display:none;width:16px;height:16px" />
+                         style="float:right;display:none;width:16px;height:16px" alt="">
                 </td>
                 <td id="cons{ID}" class="consumption"></td>
                 <td id="u{ID}">{UNIT}</td>
@@ -75,7 +75,7 @@
                     <!-- IF {GRAPH} -->
                     <img style="cursor:pointer;width:16px;height:16px"
                          src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
-                         class="tip" title="{{ChartSettingsTip}}" width="16" height="16" />
+                         class="tip" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
                     <!-- ENDIF -->
                 </td>
             </tr>
@@ -96,12 +96,7 @@
 
 <div class="clear"></div>
 
-<h3 class="grid_10">
-    {{Variants}}
-    <img style="margin-left:.5em;width:16px;height:16px" class="tip"
-         src="/images/ico/information_frame.png" width="16" height="16"
-         title="{{MobileVariantHint}}" />
-</h3>
+<h3 class="grid_10">{{Variants}}</h3>
 
 <div class="clear"></div>
 
@@ -111,12 +106,15 @@
     <button id="btn-delete" data-confirmed="0" class="tip" title="{{Delete}}">{{Delete}}</button>
     <br /><br />
     <input class="fl" id="saveview" type="text" value="{VIEW}" size="35" />
-    <div class="fl" style="margin:.4em .5em 0 .5em">
-        <input id="public" type="checkbox" class="iCheck" />
-    </div>
-    <label for="public">{{public}}</label>
+
+    <select id="visibility" style="margin-left:1em">
+        <option value="0">{{PrivateChart}}</option>
+        <option value="1">{{PublicChart}}</option>
+        <option value="2">{{MobileChart}}</option>
+    </select>
+
     <img src="/images/ico/information_frame.png" class="tip" title="{{publicHint}}"
-         style="margin-left:.25em;width:16px;height:16px" width="16" height="16" />
+         style="margin-left:8px;width:16px;height:16px" width="16" height="16" />
     <button id="btn-save" class="tip" style="margin-left:1em" title="{{Save}}">{{Save}}</button>
 </div>
 <div class="grid_2 r">

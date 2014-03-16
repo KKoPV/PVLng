@@ -37,7 +37,7 @@ class APC extends \Cache {
      * @return bool
      */
     public function write( $key, $data ) {
-        return apc_store($this->key($key), $this->serialize($data));
+        return apc_store($this->key($key), $this->serialize($data), $data[1]);
     }
 
     /**
@@ -68,7 +68,7 @@ class APC extends \Cache {
      * @return bool
      */
     public function flush() {
-        return apc_clear_cache('user');
+        return (apc_clear_cache() && apc_clear_cache('user'));
     }
 
     /**
@@ -106,8 +106,10 @@ class APC extends \Cache {
         return apc_dec($this->key($key), $step);
     } // function dec()
 
-    public function info() {
-        return array_merge(parent::info(), apc_sma_info());
+    public function info( $full=FALSE ) {
+        $return = parent::info();
+        if ($full) $return = array_merge($return, apc_cache_info());
+        return array_merge($return, apc_sma_info());
     } // function info()
 
     // -------------------------------------------------------------------------

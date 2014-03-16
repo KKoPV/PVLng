@@ -9,26 +9,36 @@
 /**
  *
  */
-$api->get('/views', function() use ($api) {
-    $views = new ORM\View;
+$api->get('/views(/:language)', function( $language='en' ) use ($api) {
+    I18N::setLanguage($language);
+
     $result = $api->request->get('select')
             ? array( array(
                 'name'   => '--- ' . I18N::_('Select') . ' ---',
-                'data'   => '',
+                'data'   => NULL,
                 'public' => 1,
-                'slug'   => ''
+                'slug'   => NULL
               ))
             : array();
 
-    foreach ($views->findMany(NULL, NULL, 'name') as $view) {
-        if ($api->APIKeyValid == 1 OR $view->public == 1) {
-            $result[] = $view->getAll();
+    $views = new ORM\View;
+
+    $q = new DBQuery('pvlng_view');
+
+    if ($api->request->get('sort_by_visibilty')) $q->order('public');
+
+    $q->order('name');
+
+    foreach ($api->db->queryRowsArray($q) as $view) {
+        if ($api->APIKeyValid == 1 OR $view['public'] == 1) {
+            $result[] = $view;
         }
     }
+
     $api->render($result);
 })->name('get views')->help = array(
     'since'       => 'v3',
-    'description' => 'Fetch chart view data via slug',
+    'description' => 'Fetch chart view data via slug, provide for Top select entry the correct language',
 );
 
 /**
@@ -39,12 +49,15 @@ $api->put('/view', function() use ($api) {
 
     if (empty($request['name'])) return;
 
-    $slug = Slug::encode($request['name']);
-
     $view = new ORM\View;
     $view->name = $request['name'];
     $view->data = json_encode(($_=&$request['data']?:''));
     $view->public = ($_=&$request['public']?:0);
+
+    $slug = Slug::encode($request['name']);
+    if ($view->public == 2) {
+        $slug .= '-mobile';
+    }
     $view->slug = $slug;
 
     if (!$view->replace()) {
@@ -82,7 +95,7 @@ $api->get('/view/:slug', function( $slug ) use ($api) {
 );
 
 /**
- *
+ * @ToDo
  */
 $api->post('/view/:slug', function( $slug ) use ($api) {
 

@@ -58,6 +58,9 @@ class Controller extends slimMVC\Controller {
             APP_DIR . DS . 'View' . DS . 'custom',
             APP_DIR . DS . 'View'
         );
+
+        $this->view->Menu = PVLng::getMenu();
+        $this->view->Languages = PVLng::getLanguages();
     }
 
     /**

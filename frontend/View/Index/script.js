@@ -8,6 +8,8 @@
  * @version     1.0.0
  */
 
+verbose = false;
+
 /**
 Chart canvas height
 Width is 940px,
@@ -18,7 +20,7 @@ Width is 940px,
 - Ratio 16 x  9 : 528
  */
 
-var ChartHeight = 564;
+var ChartHeight = 528;
 
 /* refresh timeout in sec., set 0 for no automatic refresh */
 var RefreshTimeout = 300;
@@ -50,7 +52,7 @@ function Views() {
         this.views = {};
         var that = this;
         $.getJSON(
-            PVLngAPI + '/views.json',
+            PVLngAPI + '/views/'+language+'.json',
             { select: true },
             function(data) {
                 $(data).each(function(id, view) {
@@ -63,22 +65,45 @@ function Views() {
     };
 
     this.buildSelect = function(el, selected) {
-        var option;
+        var option,
+            optgroups = [ [], [], [] ];
         el = $(el).empty();
 
+        /* Build optgroups */
         $.each(this.views, function(id, view) {
-            option = $('<option/>');
-            if (user) {
-                if (view.public && view.slug) {
-                    option.text(view.name + ' ({{Public}})');
-                } else {
-                    option.text(view.name);
+            if (view.slug) {
+                if (user) {
+                    optgroups[view.public].push(view);
+                } else if (view.public == 1) {
+                    /* Only public views */
+                    optgroups[1].push(view);
                 }
-            } else if (view.public) {
-                option.text(view.name);
+            } else {
+                /* --- Select --- append direct */
+                $('<option/>').text(view.name).val('').appendTo(el);
             }
-            option.val(view.slug).appendTo(el);
         });
+
+        $.each(optgroups, function(id, optgroup) {
+            if (optgroup.length == 0) return;
+
+            var o = $('<optgroup/>');
+
+            if (id == 0) {
+                o.prop('label', '{{private}}');
+            } else if (id == 1) {
+                o.prop('label', '{{public}}');
+            } else if (id == 2) {
+                o.prop('label', '{{mobile}}');
+            }
+
+            $.each(optgroup, function(id, view) {
+               $('<option/>').text(view.name).val(view.slug).appendTo(o);
+            });
+
+            o.appendTo(el);
+        });
+
         el.val(selected);
     };
 
@@ -104,6 +129,7 @@ function Views() {
                 $('#c'+id).val(p).iCheck('check');
             }
         });
+        $('#modified').hide();
 
         /* Re-arrange channels in collapsed tree */
         if (collapse || !expanded) tree.toggle(false);
@@ -114,6 +140,7 @@ function Views() {
         $('#loaddeleteview').val(this.actual.slug);
         $('#saveview').val(this.actual.name);
         $('#public').prop('checked', this.actual.public).iCheck('update');
+        $('#visibility').val(this.actual.public);
 
         if (typeof callback != 'undefined') callback(this.actual);
 
@@ -125,7 +152,7 @@ function Views() {
  *
  */
 var
-    qs = {}, views = {}, chart = false, timeout,
+    qs = {}, views = {}, chart = false, updateTimeout,
 
     chartOptions = {
         chart: {
@@ -144,38 +171,22 @@ var
                 point: {
                     events: {
                         click: function() {
-                            if (!this.series.userOptions.raw) return;
-
-                            var dateLocale = (new Date(this.x)).toLocaleString(),
-                                question = '{{DeleteReadingConfirm}}\n\n' +
-                                           '- ' + this.series.name + '\n' +
-                                           '- ' + dateLocale + '\n' +
-                                           '- {{Reading}} : ' + this.y + ' ' + this.series.userOptions.unit;
-
-                            if (confirm(question)) {
-                                chart.showLoading('{{JustAMoment}}');
-                                $(document.body).addClass('wait');
-
-                                var url = PVLngAPI + 'data/' + this.series.userOptions.guid + '/' + (this.x/1000).toFixed(0) + '.json',
-                                    point = this; /* Remember for deleting series point */
-
-                                $.ajax({
-                                    type: 'DELETE',
-                                    url: url,
-                                    dataType: 'json'
-                                }).done(function(data, textStatus, jqXHR) {
-                                    point.remove();
-                                    $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
-                                }).fail(function(jqXHR, textStatus, errorThrown) {
-                                    $.pnotify({
-                                        type: textStatus, hide: false, sticker: false,
-                                        text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
-                                    });
-                                }).always(function() {
-                                    chart.hideLoading();
-                                    $(document.body).removeClass('wait');
-                                });
+                            if (!PVLngAPIkey) return;
+                            if (!this.series.userOptions.raw) {
+                                alert('Can\'t delete from consolidated data.');
+                                return;
                             }
+
+                            $('#reading-serie').html(this.series.name);
+                            $('#reading-timestamp').html((new Date(this.x)).toLocaleString());
+                            $('#reading-value').html(this.y + ' ' + this.series.userOptions.unit);
+
+                            $('#dialog-reading')
+                                .data('guid', this.series.userOptions.guid)
+                                .data('timestamp', (this.x/1000).toFixed(0))
+                                .data('point', this)
+                                .dialog('open');
+
                         }
                     }
                 },
@@ -236,7 +247,7 @@ var
             crosshairs: true,
             shared: true
         },
-        loading: { labelStyle: { top: '40%', fontSize: '200%' } }
+        loading: { labelStyle: { top: '40%', fontSize: '150%' } }
     };
 
 /**
@@ -311,6 +322,8 @@ function ChartDialog( id, name ) {
     $('#d-color-neg').spectrum($('#d-color-use-neg').is(':checked') ? 'enable' : 'disable');
     $('#d-threshold').val(p.threshold);
     $('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'));
+    $('#d-time1').val(p.time1);
+    $('#d-time2').val(p.time2);
 
     $('input').iCheck('update');
     $('#d-type').trigger('change');
@@ -337,24 +350,33 @@ var xResolution = {
     y: 60 * 60 * 24 * 360
 };
 
-var lastChanged = (new Date).getTime() / 1000 / 60;
+var windowVisible = true,
+    browserPrefix = null,
+    lastChanged = (new Date).getTime() / 1000 / 60;
+
+var tzOffset = (new Date()).getTimezoneOffset();
 
 /**
  *
  */
 function updateChart( forceUpdate ) {
 
-    clearTimeout(timeout);
+    clearTimeout(updateTimeout);
+    updateTimeout = null;
+
+    if (!windowVisible) return;
 
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
     if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
+
+    var fromDate = $('#fromdate').val(), toDate = $('#todate').val();
 
     if (views.actual) {
         /* Provide permanent link only for logged in user and not embedded view level 2 */
         var from = $('#from').val(), to = $('#to').val(),
             date = (from == to)
-                 ? 'date=' + $('#fromdate').val()
-                 : 'from=' + $('#fromdate').val() + '&to=' + $('#todate').val();
+                 ? 'date=' + fromDate
+                 : 'from=' + fromDate + '&to=' + toDate;
 
         $('#btn-permanent').button({
             label: views.actual.name + ' ' + from + ' | {strip_tags:TITLE}',
@@ -458,6 +480,9 @@ function updateChart( forceUpdate ) {
     /* Any channels checked for drawing? */
     if (channels_new.length == 0) return;
 
+    $(document.body).addClass('wait');
+    oTable.fnProcessingIndicator(true);
+
     _log('Channels:', channels_new);
     _log('yAxis:', yAxis);
 
@@ -506,7 +531,14 @@ function updateChart( forceUpdate ) {
 
         $('#s'+channel.id).show();
 
-        var t, url = PVLngAPI + 'data/' + channel.guid + '.json';
+        var t,
+            time1 = (channel.time1+':00').split(':', 2),
+            time2 = (channel.time2+':00').split(':', 2),
+            url = PVLngAPI + 'data/' + channel.guid + '.json';
+
+        time1 = time1[0] * 3600 + time1[1] * 60 + tzOffset * 60;
+        time2 = time2[0] * 3600 + time2[1] * 60 + tzOffset * 60;
+
         _log('Fetch', url);
 
         $.getJSON(
@@ -514,14 +546,21 @@ function updateChart( forceUpdate ) {
             {
                 attributes: true,
                 full:       true,
-                start:      $('#fromdate').val(),
-                end:        $('#todate').val() + '+1day',
+                start:      fromDate,
+                end:        toDate + '+1day',
                 period:     (channel.type != 'scatter') ? period_count + period : '',
                 _ts:        (new Date).getTime()
             },
             function(data) {
-                /* pop out 1st row with attributes */
-                attr = data.shift();
+                try {
+                    /* pop out 1st row with attributes */
+                    attr = data.shift();
+                } catch(err) {
+                    console.error(data);
+                    /* Set pseudo channel */
+                    series[id] = {};
+                    return;
+                }
 /*
                 _log('Attributes', attr);
                 _log('Data', data);
@@ -581,12 +620,18 @@ function updateChart( forceUpdate ) {
                 }
 
                 $(data).each(function(id, row) {
-                    var point = {};
+                    var point = {}, time;
 
                     if (channel.type == 'scatter') {
                         /* Show scatters at their real timestamps, ALSO for consolidaten data */
                         point.x = row.timestamp * 1000;
                     } else {
+                        if (fromDate == toDate) {
+                            /* Extract seconds */
+                            time = row.timestamp - Math.floor(row.timestamp / 86400) * 86400 ;
+                            /* Skip data outside display time range */
+                            if (time < time1 || time > time2) return;
+                        }
                         point.x = Math.round(row.timestamp / res) * res * 1000;
                     }
 
@@ -646,7 +691,7 @@ function updateChart( forceUpdate ) {
 
             /* Force redraw */
             chart.hideLoading();
-            if (--loading) chart.showLoading('- ' + (loading) + ' -');
+            chart.showLoading('- ' + (--loading) + ' -');
 
             /* check real count of elements in series array! */
             var completed = series.filter(function(a){ return a !== undefined }).length;
@@ -695,10 +740,11 @@ function updateChart( forceUpdate ) {
 
             setExtremes();
 
+            $(document.body).removeClass('wait');
             oTable.fnProcessingIndicator(false);
 
             if (RefreshTimeout > 0) {
-                timeout = setTimeout(updateChart, RefreshTimeout*1000);
+                updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
             }
 
         });
@@ -742,6 +788,13 @@ $.ajaxQ = (function() {
 /**
  *
  */
+function resetDeleteButton() {
+    $('#btn-delete').button({ label: '&nbsp;', text: false }).data('confirmed', 0);
+}
+
+/**
+ *
+ */
 $(function() {
 
     $.fn.dataTableExt.afnFiltering.push(
@@ -767,8 +820,10 @@ $(function() {
 
     chartOptions.chart.height = qs.ChartHeight || ChartHeight;
 
-    if (language != "en") {
+    if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);
+    } else {
+        $.datepicker.setDefaults($.datepicker.regional['']);
     }
 
     if (qs.date) {
@@ -874,7 +929,9 @@ $(function() {
         modal: true,
         buttons: {
             '{{Ok}}': function() {
-                p = new presentation();
+                $(this).dialog('close');
+                var chk = $('#c'+$(this).data('id')), old = chk.val(),
+                    p = new presentation(), h;
                 p.axis = +$('input[name="d-axis"]:checked').val();
                 p.type = $('#d-type').val();
                 p.consumption = $('#d-cons').is(':checked');
@@ -888,8 +945,21 @@ $(function() {
                 p.coloruseneg = $('#d-color-use-neg').is(':checked');
                 p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
                 p.threshold = +$('#d-threshold').val().replace(',', '.');
-                $('#c'+$(this).data('id')).val(p.toString());
-                $(this).dialog('close');
+
+                h = $('#d-time1').val().trim();
+                if (h == '') h = '00';
+                p.time1 = (h + ':00').split(':', 2).join(':');
+
+                h = $('#d-time2').val().trim();
+                if (h == '') h = '24';
+                p.time2 = (h + ':00').split(':', 2).join(':');
+
+                p = p.toString();
+
+                if (p != old) {
+                    chk.val(p);
+                    $('#modified').show();
+                }
             },
             '{{Cancel}}': function() {
                 $(this).dialog('close');
@@ -955,6 +1025,7 @@ $(function() {
 
     $('input.channel').on('ifToggled', function() {
         $('#r'+this.id).toggleClass('checked', this.checked);
+        $('#modified').show();
     });
 
     $('#btn-reset').button({
@@ -1031,12 +1102,9 @@ $(function() {
             btn.button({ label: '{{Sure}}?', text: true }).data('confirmed', 1)
                .find('.ui-button-text').css('color', 'red');
             /* Reset after 5s */
-            setTimeout(
-                function() {
-                    $('#btn-delete').button({ label: '&nbsp;', text: false }).data('confirmed', 0);
-                }, 5000
-            );
+            setTimeout(resetDeleteButton, 5000);
         } else {
+            resetDeleteButton();
             btn.button('disable');
             $(document.body).addClass('wait');
 
@@ -1074,7 +1142,7 @@ $(function() {
             data = {
                 name: $('#saveview').val(),
                 data: { p: $('#preset').val() },
-                public: ($('#public').prop('checked') ? 1 : 0)
+                public: $('#visibility option:selected').val()
             };
 
         $('input.channel:checked').each(function(id, el) {
@@ -1097,6 +1165,7 @@ $(function() {
                 /* Adjust chart title */
                 if (chart) chart.setTitle(views.actual.name);
             });
+            $('#modified').hide();
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
                 type: textStatus, hide: false, sticker: false, text: jqXHR.responseText
@@ -1114,14 +1183,85 @@ $(function() {
             views.buildSelect('#top-load-view');
             $('#top-select').show();
             $('#top-load-view').children('option').clone().appendTo('#loaddeleteview');
+            $('#top-load-view').children('optgroup').clone().appendTo('#loaddeleteview');
         } else {
             views.buildSelect('#loaddeleteview');
             $('#public-select').show();
         }
-        $('#loading').html('&nbsp;');
+        $('#loading').hide();
         /* Chart slug provided by URL, load and collapse tree */
         views.load(qs.chart, true);
     });
+
+    $("#dialog-reading").dialog({
+        modal: true,
+        resizable: false,
+        bgiframe: true,
+        width: 500,
+        autoOpen: false,
+        buttons: {
+            '{{Yes}}': function() {
+                var self = $(this);
+
+                self.dialog('close');
+                chart.showLoading('{{JustAMoment}}');
+                $(document.body).addClass('wait');
+
+                var url = PVLngAPI + 'data/' + self.data('guid') + '/' + self.data('timestamp') + '.json';
+
+                $.ajax(
+                    { type: 'DELETE', url: url, dataType: 'json' }
+                ).done(function(data, textStatus, jqXHR) {
+                    self.data('point').remove();
+                    $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    $.pnotify({
+                        type: textStatus, hide: false, sticker: false,
+                        text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+                    });
+                }).always(function() {
+                    chart.hideLoading();
+                    $(document.body).removeClass('wait');
+                });
+
+            },
+            '{{No}}': function() {
+                $(this).dialog('close');
+            }
+        }
+    });
+
+    /**
+     * HTML5 Page Visibility API
+     *
+     * http://www.sitepoint.com/introduction-to-page-visibility-api/
+     * http://www.w3.org/TR/page-visibility
+     */
+    if (document.hidden !== undefined) {
+        browserPrefix = '';
+    } else {
+        var browserPrefixes = ['webkit', 'moz', 'ms', 'o'];
+        /* Test all vendor prefixes */
+        for (var i=0; i<browserPrefixes.length; i++) {
+            if (document[browserPrefixes[i] + 'Hidden'] != undefined) {
+                browserPrefix = browserPrefixes[i];
+                break;
+            }
+        }
+    }
+
+    if (browserPrefix !== null) {
+        document.addEventListener(browserPrefix + 'visibilitychange', function() {
+            if (document.hidden === false || document[browserPrefix + 'Hidden'] === false) {
+                /* The page is in foreground and visible */
+                windowVisible = true;
+                /* Was longer in background, so the updateTimeout was cleared */
+                if (!updateTimeout) setTimeout(updateChart, 1000);
+            } else {
+                windowVisible = false;
+            }
+        });
+    }
 
     shortcut.add('Alt+P', function() { changeDates(-1); });
     shortcut.add('Alt+N', function() { changeDates(1); });

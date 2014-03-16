@@ -16,13 +16,21 @@
     margin-bottom: 1em;
 }
 
-#d-table td {
-    padding: .5em .5em;
-    vertical-align: middle;
+#d-table {
+    width: 100%;
+}
+
+#d-table tr.odd {
+    background-color: #F4F4F4;
 }
 
 #d-table tr.even {
-    background-color: #F0F0F0;
+    background-color: #E8E8E8;
+}
+
+#d-table td {
+    padding: .5em .5em;
+    vertical-align: middle;
 }
 
 #td-axis .fl {
@@ -57,14 +65,13 @@
     padding-right: .5em;
 }
 
+#data-table tr:hover {
+    background-color: #C0FFC0 !important;
+}
+
 .icheckbox_line disabled,
 .iradio_line disabled {
     background-color: #606060;
-}
-
-.alias {
-    color: gray;
-    font-style: italic;
 }
 
 .consumption,

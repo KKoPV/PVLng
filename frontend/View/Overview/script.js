@@ -64,11 +64,13 @@ $(function() {
         bPaginate: false,
         bProcessing: true,
         bJQueryUI: true,
+        bAutoWidth: false,
         sDom: ' <"H"r>t<"F">',
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
         aoColumnDefs: [
             { sWidth: "90%", aTargets: [ 0 ] },
             { sWidth: "1%", aTargets: [ 1, 2, 3 ] },
+            { sWidth: "30em", aTargets: [ 4 ] }
         ],
         fnInitComplete: function() {
 

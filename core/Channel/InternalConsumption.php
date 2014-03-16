@@ -93,7 +93,7 @@ class InternalConsumption extends \Channel {
                     $last = $row1['data'];
 
                     $result->write($row1, $key1);
-               }
+                }
 
                 $row1 = $child1->next()->current();
 
