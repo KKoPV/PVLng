@@ -143,7 +143,7 @@ abstract class Cache {
      * @param int $ttl Time to live, if set to 0, expire never
      * @return bool
      */
-    public final function save( $key, &$data, $ttl=0 ) {
+    public final function save( $key, &$data, $ttl=NULL ) {
         if ($key == end($this->stack)) {
             $this->set($key, $data, $ttl);
             // done, remove id from stack
@@ -233,7 +233,9 @@ abstract class Cache {
      *                                 - < 0 - Timestamp of expiration
      * @return bool
      */
-    public function set( $key, $data, $ttl=0 ) {
+    public function set( $key, $data, $ttl=NULL ) {
+        if (!isset($ttl)) $ttl = $this->settings['TTL'];
+
         if (!is_array($key)) {
             return $this->write($key, array($this->ts, $ttl, $data));
         }
@@ -340,6 +342,7 @@ abstract class Cache {
     protected $settings = array(
         'Token'       => '',
         'Directory'   => '',
+        'TTL'         => 3600
     );
 
     /**
