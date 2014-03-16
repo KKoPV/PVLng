@@ -61,8 +61,11 @@
  * http://newrelic.com/monitor-everything
  */
 // $api->hook('slim.before.dispatch', function() use ($api) {
-//     if (extension_loaded ('newrelic') AND
-//         preg_match('~^/([^/]+)/?~', $api->request->getResourceUri(), $args)) {
-//         newrelic_name_transaction ($api->request->getMethod() . '/' . $args[1]);
+//     if (!extension_loaded ('newrelic')) return;
+//
+//     if (preg_match('~^/([^/]+)/?~', $api->request->getResourceUri(), $args)) {
+//         newrelic_name_transaction($api->request->getMethod() . '/' . $args[1]);
+//     } else {
+//         newrelic_name_transaction($api->request->getMethod());
 //     }
 // });

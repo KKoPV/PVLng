@@ -107,12 +107,10 @@ define('LANGUAGE', $lang);
 /**
  * Setup database connection
  */
-slimMVC\MySQLi::setHost($config->get('Database.Host'));
-slimMVC\MySQLi::setPort($config->get('Database.Port'));
-slimMVC\MySQLi::setSocket($config->get('Database.Socket'));
-slimMVC\MySQLi::setUser($config->get('Database.Username'));
-slimMVC\MySQLi::setPassword($config->get('Database.Password'));
-slimMVC\MySQLi::setDatabase($config->get('Database.Database'));
+$c = $config->get('Database');
+slimMVC\MySQLi::setCredentials(
+    $c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']
+);
 slimMVC\MySQLi::$SETTINGS_TABLE = 'pvlng_config';
 
 require 'View.php';
@@ -123,6 +121,8 @@ $api = new API(array(
     'debug'     => FALSE,
     'view'      => new View
 ));
+
+$api->version = substr($api->request()->getRootUri(), -1);
 
 if ($config->get('develop')) {
     $api->config('mode', 'development');
@@ -135,6 +135,7 @@ $api->cache = Cache::factory(
     array(
         'Token'     => 'PVLng',
         'Directory' => TEMP_DIR,
+        'TTL'       => 86400
     ),
     $config->get('Cache')
 );
@@ -159,9 +160,7 @@ NestedSet::Init(array (
     )
 ));
 
-BabelKitMySQLi::setParams(array(
-    'table' => 'pvlng_babelkit'
-));
+BabelKitMySQLi::setParams(array( 'table' => 'pvlng_babelkit' ));
 BabelKitMySQLi::setDB($api->db);
 BabelKitMySQLi::setCache($api->cache);
 
@@ -189,7 +188,7 @@ define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
 $api->response->headers->set('X-Version', PVLNG_VERSION);
-$api->response->headers->set('X-API-Version', 'r3');
+$api->response->headers->set('X-API', 'r'.$api->version);
 
 // ---------------------------------------------------------------------------
 // The helper functions and routes
@@ -209,7 +208,7 @@ include 'route.hash.php';
 include 'route.status.php';
 include 'route.translation.php';
 
-if (file_exists('route.custom.php')) include 'route.custom.php';
+file_exists('route.custom.php') && include 'route.custom.php';
 
 /**
  * Let's go

@@ -23,9 +23,15 @@ $api->get('/views(/:language)', function( $language='en' ) use ($api) {
 
     $views = new ORM\View;
 
-    foreach ($views->findMany(NULL, NULL, 'name') as $view) {
-        if ($api->APIKeyValid == 1 OR $view->public == 1) {
-            $result[] = $view->getAll();
+    $q = new DBQuery('pvlng_view');
+
+    if ($api->request->get('sort_by_visibilty')) $q->order('public');
+
+    $q->order('name');
+
+    foreach ($api->db->queryRowsArray($q) as $view) {
+        if ($api->APIKeyValid == 1 OR $view['public'] == 1) {
+            $result[] = $view;
         }
     }
 
@@ -43,12 +49,15 @@ $api->put('/view', function() use ($api) {
 
     if (empty($request['name'])) return;
 
-    $slug = Slug::encode($request['name']);
-
     $view = new ORM\View;
     $view->name = $request['name'];
     $view->data = json_encode(($_=&$request['data']?:''));
     $view->public = ($_=&$request['public']?:0);
+
+    $slug = Slug::encode($request['name']);
+    if ($view->public == 2) {
+        $slug .= '-mobile';
+    }
     $view->slug = $slug;
 
     if (!$view->replace()) {

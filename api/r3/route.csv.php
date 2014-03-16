@@ -17,11 +17,13 @@ $api->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use
 
     // Diasble AutoCommit in case of errors
     $api->db->autocommit(FALSE);
-    $count = 0;
+    $send = $saved = 0;
 
     try {
-        foreach (explode(PHP_EOL, $api->request->getBody()) as $send=>$dataset) {
+        foreach (explode(PHP_EOL, $api->request->getBody()) as $dataset) {
             if ($dataset == '') continue;
+
+            $send++;
 
             $data = explode(';', $dataset);
             switch (count($data)) {
@@ -36,25 +38,26 @@ $api->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use
                 case 3:
                     // date, time and data
                     $timestamp = strtotime($data[0] . ' ' . $data[1]);
-                    if ($timestamp === FALSE) {
-                        throw new Exception('Invalid timestamp in data: '.$dataset, 400);
-                    }
                     $data = $data[2];
                     break;
                 default:
-                    throw new Exception('Invalid batch data: '.$dataset, 400);
+                    throw new Exception('Invalid data: '.$dataset, 400);
             } // switch
 
-            $count += $channel->write(array('data'=>$data), $timestamp);
+            if ($timestamp === FALSE) {
+                throw new Exception('Invalid timestamp in data: '.$dataset, 400);
+            }
+
+            $saved += $channel->write(array('data'=>$data), $timestamp);
         }
         // All fine, commit changes
         $api->db->commit();
 
-        if ($count) $api->status(201);
+        if ($saved) $api->status(201);
 
         $result = array(
             'status'  => 'succes',
-            'message' => ($send+1) . ' row(s) sended, ' . $count . ' row(s) inserted'
+            'message' => $send . ' row(s) sended, ' . $saved . ' row(s) inserted'
         );
 
         $api->render($result);
@@ -67,7 +70,7 @@ $api->put('/csv/:guid', $APIkeyRequired, $accessibleChannel, function($guid) use
 
 })->name('put data from file')->help = array(
     'since'       => 'v2',
-    'description' => 'Save multiple reading values',
+    'description' => 'Save multiple reading values from CSV file',
     'payload'     => array(
         '<timestamp>;<value>'   => 'Semicolon separated timestamp and value data rows',
         '<date time>;<value>'   => 'Semicolon separated date time and value data rows',
