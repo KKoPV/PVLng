@@ -1,3 +1,10 @@
+ v2.6.1
+========
+
+FIXED
+
+ - Fix missing JS variable ~ Knut Kohl <github@knutkohl.de>
+
  v2.6.0
 ========
 
@@ -23,7 +30,6 @@ NEW
  - Add hover effect to data table rows ~ Knut Kohl <github@knutkohl.de>
  - Add Wunderground weather template and channel ~ Knut Kohl <github@knutkohl.de>
  - Add ability to define custom commands at start via prepend.php file ~ Knut Kohl <github@knutkohl.de>
-
 
  v2.5.0
 ========

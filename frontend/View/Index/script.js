@@ -8,8 +8,6 @@
  * @version     1.0.0
  */
 
-verbose = false;
-
 /**
 Chart canvas height
 Width is 940px,
