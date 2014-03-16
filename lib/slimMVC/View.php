@@ -207,7 +207,7 @@ class View extends \Slim\View {
             }
 
             // <!-- DEFINE MACRO name -->...<!-- END DEFINE -->
-            if (preg_match_all('~<!-- DEFINE MACRO (.+?) -->(.+?)<!-- END DEFINE -->~s', $html, $args, PREG_SET_ORDER)) {
+            if (preg_match_all('~<!-- DEFINE MACRO (.+?) -->\s*(.+?)\s*<!-- END DEFINE -->~s', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $macro) {
                     // Remove macro definition
                     $html = str_replace($macro[0], '', $html);
@@ -216,7 +216,7 @@ class View extends \Slim\View {
                 }
             }
 
-            // mask masked delimiters
+            // Mask masked delimiters
             $html = str_replace(array('\{', '\}'), array("\x01", "\x02"), $html);
 
             // Translations

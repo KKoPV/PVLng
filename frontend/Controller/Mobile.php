@@ -22,35 +22,38 @@ class Mobile extends \Controller {
         $this->Layout = 'mobile';
 
         // Get views
-        $q = \DBQuery::forge('pvlng_view')->order('name');
+        $q = \DBQuery::forge('pvlng_view')->whereEQ('public', 2)->order('name');
         $views = array();
-        $view = new \ORM\Tree;
+        $tree = new \ORM\Tree;
 
         foreach ($this->db->queryRows($q) as $row) {
-            // Accept only views starting with "@"
-            if (strstr($row->name, '@') != $row->name) continue;
 
             $data = json_decode($row->data);
-            unset($data->c, $data->p);
 
             $new_data = array();
             foreach ($data as $id=>$presentation) {
+                if ($id == 'p') continue;
+
                 // Get entity attributes
-                $view->find('id', $id);
+                $tree->find('id', $id);
                 $new_data[] = array(
-                    'id'           => +$view->id,
-                    'guid'         => $view->guid,
-                    'unit'         => $view->unit,
-                    'public'       => +$view->public,
+                    'id'           => +$tree->id,
+                    'guid'         => $tree->guid,
+                    'unit'         => $tree->unit,
+                    'public'       => +$tree->public,
                     'presentation' => addslashes($presentation)
                 );
             }
+
             $views[] = array(
-                'NAME' => $row->name,
-                'DATA' => json_encode($new_data)
+                'NAME'    => $row->name,
+                'PERIOD'  => $data->p,
+                'DATA'    => json_encode($new_data)
             );
 
+            if ($this->view->View1st == '') $this->view->View1st = $row->name;
         }
+
         $this->view->Views = $views;
     }
 

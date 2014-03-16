@@ -153,6 +153,14 @@
                 </table>
             </td>
         </tr>
+        <tr class="odd">
+            <td>{{TimeRange}}</td>
+            <td>
+                <input id="d-time1" type="text" class="c" style="width:5em" />
+                <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
+                <input id="d-time2" type="text" class="c" style="width:5em" />
+            </td>
+        </tr>
         </tbody>
     </table>
 </div>

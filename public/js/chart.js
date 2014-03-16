@@ -33,12 +33,12 @@ function presentation( data ) {
     this.max = false;
     this.last = false;
     this.all = false;
+    this.time1 = '00:00';
+    this.time2 = '24:00';
 
-    try { $.extend(this, JSON.parse(data));    } catch(e) {}
+    try { $.extend(this, JSON.parse(data)); } catch(e) {}
 
-    this.toString = function() {
-        return JSON.stringify(this);
-    }
+    this.toString = function() { return JSON.stringify(this) }
 }
 
 /**

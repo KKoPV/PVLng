@@ -10,8 +10,9 @@
 -->
 
 <!-- Use this image as spacer for not available moving actions of channels -->
-<!-- DEFINE MACRO SpacerImg -->
-<img src="/images/pix.gif" class="imgbar" style="width:16px;height:16px" width="16" height="16" alt="">
+<!-- DEFINE MACRO PIX -->
+src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw"
+style="width:16px;height:16px" width="16" height="16" alt=""
 <!-- END DEFINE -->
 
 <div class="grid_10">
@@ -64,7 +65,9 @@
                 <img src="/images/ico/node_insert_next.png" class="imgbar"
                      width="16p" height="16" alt="add">
             </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <!-- ELSE -->
+            <img <!-- MACRO PIX --> class="imgbar" />
+            <!-- ENDIF -->
 
             <!-- IF {CHILDS} == "0" -->
             <form action="/overview/delete" method="post" class="delete-form">
@@ -84,9 +87,18 @@
         </td>
 
         <td style="white-space:nowrap">
+            <!-- IF {READ} -->
+            <a href="/list/{ENTITY}" class="tip" title="{{ListHint}}">
+                <img src="/images/ico/document-invoice.png" class="imgbar"
+                     width="16p" height="16" alt="l">
+            </a>
+            <!-- ELSE -->
+            <img <!-- MACRO PIX --> class="imgbar" />
+            <!-- ENDIF -->
+
             <a href="/channel/edit/{ENTITY}?returnto=/overview" class="tip" title="{{EditEntity}}">
                 <img src="/images/ico/node_design.png" class="imgbar"
-                     width="16p" height="16" alt="edit">
+                     width="16" height="16" alt="e">
             </a>
 
             <!-- IF {CHILDS} AND {GUID} AND !{ALIAS} -->
@@ -107,7 +119,9 @@
                    class="imgbar tip" style="background-color:transparent"
                    title="{{MoveEntityLeft}}" alt="h">
             </form>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <!-- ELSE -->
+            <img <!-- MACRO PIX --> class="imgbar" />
+            <!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {UPPER} != 0 -->
             <a href="/overview/moveleft" title="{{MoveEntityUp}}" class="tip"
@@ -115,7 +129,9 @@
                 <img src="/images/ico/navigation_090_frame.png" class="imgbar"
                      width="16p" height="16" alt="u">
             </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <!-- ELSE -->
+            <img <!-- MACRO PIX --> class="imgbar" />
+            <!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {LOWER} != 0 -->
             <a href="/overview/moveright" title="{{MoveEntityDown}}" class="tip"
@@ -123,7 +139,9 @@
                 <img src="/images/ico/navigation_270_frame.png" class="imgbar"
                      width="16p" height="16" alt="d">
             </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <!-- ELSE -->
+            <img <!-- MACRO PIX --> class="imgbar" />
+            <!-- ENDIF -->
         </td>
 
         <td>

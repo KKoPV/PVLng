@@ -16,6 +16,18 @@
     margin-bottom: 1em;
 }
 
+#d-table {
+    width: 100%;
+}
+
+#d-table tr.odd {
+    background-color: #F4F4F4;
+}
+
+#d-table tr.even {
+    background-color: #E8E8E8;
+}
+
 #d-table td {
     padding: .5em .5em;
     vertical-align: middle;

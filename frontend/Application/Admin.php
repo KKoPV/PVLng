@@ -21,3 +21,8 @@ $app->map('/_config', $checkAuth, function() use ($app) {
 $app->get('/clearcache', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Clearcache');
 });
+
+$app->get('/bk', function() {
+    Header('Location: /public/bk/index.php');
+    exit;
+});
