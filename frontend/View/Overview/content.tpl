@@ -88,7 +88,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
         <td style="white-space:nowrap">
             <!-- IF {READ} -->
-            <a href="/list/{ENTITY}" class="tip" title="{{ListHint}}">
+            <a href="/list/{GUID}" class="tip" title="{{ListHint}}">
                 <img src="/images/ico/document-invoice.png" class="imgbar"
                      width="16p" height="16" alt="l">
             </a>

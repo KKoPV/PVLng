@@ -33,23 +33,26 @@ class Lists extends \Controller {
 
         $this->view->Channels = $this->rows2view($this->db->queryRows($q));
 
-        if ($id = $this->app->params['id']) {
-            try {
+        try {
+            if ($id = $this->app->params['id']) {
                 $channel = \Channel::byChannel($id);
                 $this->view->GUID = $channel->guid;
-            } catch(Exception $e) {
-                Messages::Info('Unknown channel');
+            } elseif ($guid = $this->app->params['guid']) {
+                $channel = \Channel::byGUID($guid);
+                $this->view->GUID = $channel->guid;
             }
+        } catch(Exception $e) {
+            Messages::Info('Unknown channel');
         }
 
         $bk = \BabelKitMySQLi::getInstance();
 
-        while ($this->app->cache->save('preset', $preset)) {
+        while ($this->app->cache->save('preset/'.LANGUAGE, $preset)) {
             $preset = $bk->select('preset', LANGUAGE);
         }
         $this->view->PresetSelect = $preset;
 
-        while ($this->app->cache->save('period', $period)) {
+        while ($this->app->cache->save('period/'.LANGUAGE, $period)) {
             $period = $bk->select('period', LANGUAGE);
         }
         $this->view->PeriodSelect = $period;

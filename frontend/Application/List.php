@@ -16,4 +16,13 @@ PVLng::Menu(array(
 $app->get('/list(/:id)', $checkAuth, function( $id=NULL ) use ($app) {
     $app->params->set('id', $id);
     $app->process('Lists');
-});
+})->conditions(array(
+    'id' => '\d+'
+));
+
+$app->get('/list(/:guid)', $checkAuth, function( $guid=NULL ) use ($app) {
+    $app->params->set('guid', $guid);
+    $app->process('Lists');
+})->conditions(array(
+    'guid' => '(\w{4}-){7}\w{4}'
+));

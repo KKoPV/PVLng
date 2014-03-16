@@ -9,6 +9,12 @@
  */
 -->
 
+<!-- Use this image as spacer for not available moving actions of channels -->
+<!-- DEFINE MACRO PIX -->
+src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw"
+style="width:16px;height:16px" width="16" height="16" alt=""
+<!-- END DEFINE -->
+
 <div class="grid_10">
     <button id="togglewrapper" class="tip" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</button>
 </div>
@@ -71,11 +77,21 @@
                 <td id="cons{ID}" class="consumption"></td>
                 <td id="u{ID}">{UNIT}</td>
                 <td id="costs{ID}" class="costs"></td>
-                <td>
+                <td style="white-space:nowrap">
                     <!-- IF {GRAPH} -->
                     <img style="cursor:pointer;width:16px;height:16px"
                          src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
-                         class="tip" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
+                         class="tip imgbar" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
+                    <!-- ELSE -->
+                    <img <!-- MACRO PIX --> class="imgbar" />
+                    <!-- ENDIF -->
+                    <!-- IF {READ} -->
+                    <a href="/list/{GUID}" class="tip" title="{{ListHint}}">
+                        <img src="/images/ico/document-invoice.png" class="imgbar"
+                             width="16p" height="16" alt="l">
+                    </a>
+                    <!-- ELSE -->
+                    <img <!-- MACRO PIX --> class="imgbar" />
                     <!-- ENDIF -->
                 </td>
             </tr>

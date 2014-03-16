@@ -80,7 +80,7 @@ abstract class Channel {
             return self::byGUID($channel->guid);
         }
 
-        throw new Exception('No channel found for ID: '.$guid, 400);
+        throw new Exception('No channel found for ID: '.$id, 400);
     }
 
     /**
