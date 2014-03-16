@@ -11,8 +11,6 @@
 
 <script>
 
-verbose = false;
-
 var Period = '{MOBILE_PERIOD}';
 
 var ChartHeight = '{MOBILE_CHARTHEIGHT}';

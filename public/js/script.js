@@ -126,7 +126,7 @@ $(function() {
 
 });
 
-var timer;
+var timer, verbose = false;
 
 /**
  *
