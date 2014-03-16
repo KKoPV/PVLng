@@ -4,6 +4,20 @@
 
 ALTER TABLE `pvlng_performance` DROP `id`;
 
+-- Update mobile views to new logic
+-- Remove leading @ from name, set public to 2 and change slug
+UPDATE `pvlng_view`
+   SET `name` = SUBSTR(`name`, 2), `public` = 2, `slug` = CONCAT(SUBSTR(`slug`, 2), '-mobile')
+ WHERE SUBSTR(`name`, 1, 1) = '@' AND `public`= 1;
+
+ALTER TABLE `pvlng_view`
+    CHANGE `public` `public` tinyint(1) unsigned NOT NULL COMMENT 'Public view' AFTER `name`,
+    CHANGE `data` `data` text COLLATE 'utf8_general_ci' NOT NULL COMMENT 'Serialized channel data' AFTER `public`;
+
+ALTER TABLE `pvlng_view`
+    ADD PRIMARY KEY `name_public` (`name`, `public`),
+    DROP INDEX `PRIMARY`;
+
 DELETE FROM `pvlng_babelkit` WHERE `code_set` = 'preset' AND `code_code` = '60i';
 
 REPLACE INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `childs`, `read`, `write`, `graph`, `icon`)

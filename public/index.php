@@ -76,6 +76,7 @@ $cache = Cache::factory(
     array(
         'Token'     => 'PVLng',
         'Directory' => TEMP_DIR,
+        'TTL'       => 86400
     ),
     $config->get('Cache')
 );
@@ -124,12 +125,10 @@ $app->cache  = $cache;
 /**
  * Database
  */
-slimMVC\MySQLi::setHost($config->get('Database.Host'));
-slimMVC\MySQLi::setPort($config->get('Database.Port'));
-slimMVC\MySQLi::setSocket($config->get('Database.Socket'));
-slimMVC\MySQLi::setUser($config->get('Database.Username'));
-slimMVC\MySQLi::setPassword($config->get('Database.Password'));
-slimMVC\MySQLi::setDatabase($config->get('Database.Database'));
+$c = $config->get('Database');
+slimMVC\MySQLi::setCredentials(
+    $c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']
+);
 slimMVC\MySQLi::$SETTINGS_TABLE = 'pvlng_config';
 
 try {
@@ -186,9 +185,7 @@ NestedSet::Init(array(
     )
 ));
 
-BabelKitMySQLi::setParams(array(
-    'table' => 'pvlng_babelkit'
-));
+BabelKitMySQLi::setParams(array( 'table' => 'pvlng_babelkit' ));
 BabelKitMySQLi::setDB($app->db);
 BabelKitMySQLi::setCache($cache);
 
