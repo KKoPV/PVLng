@@ -18,10 +18,10 @@
             v{VERSION}
             <!-- IF {VERSIONNEW} -->
             <p class="b">
-                <a href="https://github.com/K-Ko/PVLng/releases/tag/v{VERSIONNEW}" class="tip" title="Changelog">
+                <a href="https://github.com/KKoPV/PVLng/releases/tag/v{VERSIONNEW}" class="tip" title="Changelog">
                     v{VERSIONNEW}
                 </a>
-                <a href="https://github.com/K-Ko/PVLng/tree/master" class="tip" title="Check me out on Github">
+                <a href="https://github.com/KKoPV/PVLng/tree/master" class="tip" title="Check me out on Github">
                     <img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.25em" width="16" height="16" />
                 </a>
             </p>

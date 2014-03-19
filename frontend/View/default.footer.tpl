@@ -12,20 +12,25 @@
 <div class="grid_10 hr"></div>
 <div class="clear"></div>
 
-<div id="footer" style="height:5em">
+<div id="footer">
 
-    <div class="grid_4 s">
-        Version {VERSION} / {VERSIONDATE}
-        <a href="https://github.com/K-Ko/PVLng/releases/tag/v{VERSION}" class="tip" title="Changelog">
-            <img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.5em" width="16" height="16" />
+    <div class="grid_4 xs">
+        <a href="http://pvlng.com" class="fl tip" title="PVLng Homepage">
+            <img src="/images/logo.png" style="width:50px;height:30px" width="50" height="30" alt="[PVLng]">
         </a>
+        <div class="fl" style="margin-left:10px">
+            Version {VERSION} / {VERSIONDATE}
+            <a href="https://github.com/KKoPV/PVLng/releases/tag/v{VERSION}" class="tip" title="Changelog">
+                <img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.5em" width="16" height="16" />
+            </a>
 
-        <br />
-        &copy; 2012-{YEAR} by
-        <a href="http://pvlng.com/PVLng:About" class="tip" title="Knut Kohl PhotoVoltaics"
-           tip="<strong>K</strong>nut <strong>Ko</strong>hl <strong>P</strong>hoto<strong>V</strong>oltaics">
-            <strong>KKoPV</strong>
-        </a>
+            <br />
+            &copy; 2012-{YEAR} by
+            <a href="http://pvlng.com/PVLng:About" class="tip" title="Knut Kohl PhotoVoltaics"
+               tip="<strong>K</strong>nut <strong>Ko</strong>hl <strong>P</strong>hoto<strong>V</strong>oltaics">
+                <strong>KKoPV</strong>
+            </a>
+        </div>
     </div>
 
     <div id="powered" class="grid_6 s r">
