@@ -9,7 +9,7 @@ Please see http://pvlng.com for details
 If you want to use git für installing PVLng, you can simply execute from a shell in the directory to install PVLng into:
 
 ```
-wget -qO - https://raw.github.com/K-Ko/PVLng/master/install | bash
+wget -qO - https://raw.github.com/KKoPV/PVLng/master/install | bash
 ```
 
 The installer will ask for your MySQL credentials, install the basic SQL script and create a basic configuration file with this credentials.
@@ -17,16 +17,16 @@ The installer will ask for your MySQL credentials, install the basic SQL script 
 If you are interested in the latest development version, you can also direct install the development branch with:
 
 ```
-wget -qO - https://raw.github.com/K-Ko/PVLng/develop/install | bash
+wget -qO - https://raw.github.com/KKoPV/PVLng/develop/install | bash
 ```
 
 # Scripts for data acquisition
 
-The scripts for data acquisition resides in its own repository: [PVLng-scripts](https://github.com/K-Ko/PVLng-scripts)
+The scripts for data acquisition resides in its own repository: [PVLng-scripts](https://github.com/KKoPV/PVLng-scripts)
 
 ## Issues
 
-Please use appropriately tagged github [issues](https://github.com/K-Ko/PVLng/issues) to request features or report bugs.
+Please use appropriately tagged github [issues](https://github.com/KKoPV/PVLng/issues) to request features or report bugs.
 
 ## Contributing
 
