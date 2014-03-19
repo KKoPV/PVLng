@@ -81,16 +81,4 @@
     <!-- INCLUDE content.public.inc.tpl -->
 <!-- ENDIF -->
 
-<div id="dialog-reading" title="{{DeleteReading}}">
-    <p>
-        <span class="ui-icon ui-icon-alert" style="float:left;margin:0 7px 20px 0"></span>
-        {{DeleteReadingConfirm}}
-    </p>
-    <ul>
-        <li id="reading-serie"></li>
-        <li id="reading-timestamp"></li>
-        <li>{{Reading}} : <span id="reading-value"></span></li>
-    </ul>
-</div>
-
 <!-- INCLUDE dialog.chart.tpl -->

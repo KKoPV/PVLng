@@ -106,9 +106,14 @@ function Views() {
     };
 
     this.load = function( slug, collapse, callback ) {
-        if (typeof this.views[slug] == 'undefined') return;
+        if (typeof this.views[slug] == 'undefined') {
+            $('#wrapper').show();
+            return;
+        }
+
         if (typeof collapse == 'undefined') collapse = false;
 
+        $(document.body).addClass('wait');
         oTable.fnProcessingIndicator(true);
 
         var expanded = tree.expanded, preset;
@@ -142,6 +147,7 @@ function Views() {
 
         if (typeof callback != 'undefined') callback(this.actual);
 
+        $(document.body).removeClass('wait');
         oTable.fnProcessingIndicator(false);
     };
 }

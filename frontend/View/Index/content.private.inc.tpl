@@ -21,7 +21,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
 <div class="clear"></div>
 
-<div id="wrapper" class="grid_10" style="padding-top:1em">
+<div id="wrapper" class="grid_10" style="padding-top:1em;display:none">
 
     <table id="data-table" class="dataTable treeTable">
         <thead>

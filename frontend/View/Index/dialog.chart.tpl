@@ -9,6 +9,18 @@
  */
 -->
 
+<div id="dialog-reading" style="display:none" title="{{DeleteReading}}">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left;margin:0 7px 20px 0"></span>
+        {{DeleteReadingConfirm}}
+    </p>
+    <ul>
+        <li id="reading-serie"></li>
+        <li id="reading-timestamp"></li>
+        <li>{{Reading}} : <span id="reading-value"></span></li>
+    </ul>
+</div>
+
 <div id="dialog-chart" style="display:none" title="{{ChartSettings}}">
     <table id="d-table">
         <tbody>

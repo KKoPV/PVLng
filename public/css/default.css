@@ -115,10 +115,11 @@ img.tip {
 /* Footer
 --------------------------------------------------------------------------- */
 #footer {
+    height: 3em;
 }
 
 #powered {
-    margin-top: 1em;
+    margin-top: .5em;
 }
 
 #powered a {
@@ -178,6 +179,10 @@ tt {
 
 .s {
     font-size: smaller;
+}
+
+.xs {
+    font-size: x-small;
 }
 
 .b {
