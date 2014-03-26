@@ -30,10 +30,15 @@ class Fix extends InternalCalc {
 
         parent::before_read($request);
 
-        $this->saveValue($this->start, 1);
+        $ts = $this->start;
 
-        // make sure, only until now or end minus 1 second :-)
-        $now = time();
-        $this->saveValue($this->end < $now ? $this->end-1 : $now, 1);
+        // Show pseudo reading at each considation range point or at least each hour
+        $delta = $this->TimestampMeterOffset[$this->period[1]];
+        $delta = $delta ?: 3600; // 1hr
+
+        while ($ts <= $this->end) {
+            $this->saveValue($ts, 1);
+            $ts += $delta;
+        }
     }
 }
