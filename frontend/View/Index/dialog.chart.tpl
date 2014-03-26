@@ -103,11 +103,11 @@
         <tr class="odd">
             <td>{{MarkExtremes}}</td>
             <td>
-                <div class="fl not-bar not-scatter" style="margin-right:.5em">
+                <div class="fl not-bar not-scatter not-meter" style="margin-right:.5em">
                     <input id="d-min" type="checkbox" class="iCheckLine" />
                     <label for="d-min">{{MarkMin}}</label>
                 </div>
-                <div class="fl not-scatter">
+                <div class="fl not-scatter not-meter">
                     <input id="d-max" type="checkbox" class="iCheckLine" />
                     <label for="d-max">{{MarkMax}}</label>
                 </div>
@@ -168,9 +168,32 @@
         <tr class="odd">
             <td>{{TimeRange}}</td>
             <td>
-                <input id="d-time1" type="text" class="c" style="width:5em" />
-                <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
-                <input id="d-time2" type="text" class="c" style="width:5em" />
+<!--
+                <table>
+                <tbody>
+                <tr>
+                    <td>
+                        <input id="d-time" type="radio" class="iCheck" name="d-time" checked="checked" />
+                    </td>
+                    <td>
+-->
+                        <input id="d-time1" type="text" class="c" style="width:5em" />
+                        <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
+                        <input id="d-time2" type="text" class="c" style="width:5em" />
+<!--
+                    <td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="d-time-daylight" type="radio" class="iCheck" name="d-time" />
+                    </td>
+                    <td>
+                        {{DuringDaylight}}
+                    <td>
+                </tr>
+                </tbody>
+                </table>
+-->
             </td>
         </tr>
         </tbody>

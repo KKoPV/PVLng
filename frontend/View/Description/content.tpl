@@ -10,6 +10,10 @@
 -->
 
 <div class="grid_10">
+    {TOC}
+    <p>
+        <a href="http://pvlng.com"><img src="http://pvlng.com/images/banner.gif" /></a>
+    </p>
     {CONTENT}
 </div>
 

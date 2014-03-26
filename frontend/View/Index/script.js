@@ -660,7 +660,7 @@ function updateChart( forceUpdate ) {
                     serie.data.push(point);
                 });
 
-                if (channel.type != 'areasplinerange' && !channel.all && (channel.min || channel.max)) {
+                if (!channel.all && (channel.min || channel.max || channel.last)) {
                     serie = setMinMax(serie, channel);
                 }
 
@@ -891,6 +891,13 @@ $(function() {
                 indent: 24,
                 column: 1
             });
+        }
+    });
+
+    $('#data-table tbody tr').click(function() {
+        var ckbx = $(this).find('input[type=checkbox]');
+        if (typeof ckbx !== 'undefined') {
+            ChartDialog(ckbx.data('id'), ckbx.data('name'))
         }
     });
 

@@ -50,8 +50,15 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
         <tbody>
             <!-- BEGIN DATA -->
-            <tr id="rc{ID}" class="channel<!-- IF !{GRAPH} --> no-graph<!-- ENDIF -->"
-                data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF --> >
+            <tr id="rc{ID}" data-tt-id="{ID}"
+                <!-- IF {GRAPH} -->
+                    <!-- React on click with ChartDialog() -->
+                    class="channel" style="cursor:pointer"
+                <!-- ELSE -->
+                    class="channel no-graph"
+                <!-- ENDIF -->
+                <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->
+                >
                 <td>
                     <!-- IF {GRAPH} -->
                     <input id="c{ID}" type="checkbox" class="channel iCheck"
@@ -79,7 +86,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
                 <td id="costs{ID}" class="costs"></td>
                 <td style="white-space:nowrap">
                     <!-- IF {GRAPH} -->
-                    <img style="cursor:pointer;width:16px;height:16px"
+                    <img style="width:16px;height:16px"
                          src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
                          class="tip imgbar" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
                     <!-- ELSE -->
