@@ -30,14 +30,13 @@ abstract class PVLng {
     /**
      *
      */
-    public static function Language( Array $language ) {
-        $language = array_merge(array(
-            'position' => 0,
-            'code'     => '',
-            'label'    => ''
-        ), $language);
-        while (isset(self::$Language[$language['position']])) $language['position']++;
-        self::$Language[$language['position']] = array_change_key_case($language, CASE_UPPER);
+    public static function Language( $code, $label, $position=0 ) {
+        while (isset(self::$Language[$position])) $position++;
+        self::$Language[$position] = array(
+            'POSITION' => $position,
+            'CODE'     => $code,
+            'LABEL'    => $label
+        );
     }
 
     /**
