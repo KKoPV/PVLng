@@ -28,10 +28,11 @@ class Reading extends \slimMVC\ORMTable {
     /**
      *
      */
-    public function getLastReading( $id ) {
+    public function getLastReading( $id, $timestamp=NULL ) {
+        if (isset($timestamp)) $timestamp = ' AND `timestamp` <= '.$timestamp;
         return $this->app->db->queryOne('
             SELECT `data` FROM `'.$this->table.'`
-             WHERE `id` = '.$id.'
+             WHERE `id` = '.$id.$timestamp.'
              ORDER BY `timestamp` DESC
              LIMIT 1
         ');
