@@ -304,7 +304,7 @@ tree = new Tree(!!user);
  *
  */
 function TimeStrToSec( str, _default ) {
-    if (str == '') str = _default;
+    if (typeof str == 'undefined' || str == '') str = _default;
     /* Split into hours and minutes */
     var time = (str.trim()+':0').split(':', 2);
     return time[0] * 3600 + time[1] * 60;
