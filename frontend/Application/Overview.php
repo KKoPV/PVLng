@@ -15,8 +15,7 @@ PVLng::Menu(array(
     'position' => 40,
     'label'    => I18N::translate('Overview'),
     'hint'     => I18N::translate('OverviewHint') . ' (Shift+F4)',
-    'route'    => '/overview',
-    'login'    => TRUE
+    'route'    => '/overview'
 ));
 
 /**

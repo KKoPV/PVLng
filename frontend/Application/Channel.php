@@ -15,8 +15,7 @@ PVLng::Menu(array(
     'position' => 50,
     'label'    => I18N::translate('Channel'),
     'hint'     => I18N::translate('ChannelsHint') . ' (Shift+F5)',
-    'route'    => '/channel',
-    'login'    => TRUE
+    'route'    => '/channel'
 ));
 
 /**

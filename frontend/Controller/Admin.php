@@ -40,7 +40,7 @@ class Admin extends \Controller {
 
             $this->User = $AdminUser;
             \Session::set('user', $AdminUser);
-            \Messages::Success(__('Welcome', $this->User));
+            \Messages::Success(\I18N::_('Welcome', $this->User));
 
             if ($this->request->post('save')) self::RememberLogin();
 
@@ -53,7 +53,7 @@ class Admin extends \Controller {
             }
 
         } else {
-            \Messages::Error(__('UnknownUser'));
+            \Messages::Error(\I18N::_('UnknownUser'));
         }
     }
 
@@ -61,12 +61,9 @@ class Admin extends \Controller {
      *
      */
     public function Logout_Action() {
-        if ($this->User) {
-            $this->view->Message = __('LogoutSuccessful', $this->User);
-        }
-        $this->User = '';
         \Session::destroy();
         setcookie(\Session::token(), '', time()-60*60*24, '/');
+        $this->app->redirect('index');
     }
 
     /**
@@ -76,12 +73,12 @@ class Admin extends \Controller {
         if ($this->request->post('u') == '' OR
             $this->request->post('p1') == '' OR
             $this->request->post('p2') == '') {
-            \Messages::Error(I18N::_('AdminAndPasswordRequired'), TRUE);
+            \Messages::Error(\I18N::_('AdminAndPasswordRequired'), TRUE);
             return;
         }
 
         if ($this->request->post('p1') != $this->request->post('p2')) {
-            \Messages::Error(__('PasswordsNotEqual'), TRUE);
+            \Messages::Error(\I18N::_('PasswordsNotEqual'), TRUE);
             return;
         }
 
@@ -94,7 +91,7 @@ class Admin extends \Controller {
      *
      */
     public function AdminPassword_Action() {
-        $this->view->SubTitle = __('GenerateAdminHash');
+        $this->view->SubTitle = \I18N::_('GenerateAdminHash');
     }
 
     /**
@@ -106,14 +103,14 @@ class Admin extends \Controller {
                  ->set('value', $value)->whereEQ('key', $key)->limit(1);
             $this->db->query($q);
         }
-        \Messages::success(__('DataSaved'));
+        \Messages::success(\I18N::_('DataSaved'));
     }
 
     /**
      *
      */
     public function Config_Action() {
-        $this->view->SubTitle = __('Configuration');
+        $this->view->SubTitle = \I18N::_('Configuration');
 
         $q = \DBQuery::forge('pvlng_config')->whereNE('type');
         $this->view->Data = $this->rows2view($this->db->queryRows($q));

@@ -15,8 +15,7 @@ PVLng::Menu(array(
     'position' => 30,
     'label'    => I18N::translate('List'),
     'hint'     => I18N::translate('ListHint') . ' (Shift+F3)',
-    'route'    => '/list',
-    'login'    => TRUE
+    'route'    => '/list'
 ));
 
 /**

@@ -30,7 +30,7 @@ class Overview extends \Controller {
         if ($this->Tree->isError()) {
             foreach ($this->Tree->getError() as $value) {
                 if (strstr($value, 'NestedSet::checkRootNode()') == '')
-                    Messages::Error($value);
+                    \Messages::Error($value);
             }
         }
 
@@ -59,6 +59,7 @@ class Overview extends \Controller {
 
             $parent[$node['level']] = $node['id'];
             $node['parent'] = $parent[$node['level']-1];
+            $node['childcount'] = $node['childs'];
 
             $id = $node['id'];
 

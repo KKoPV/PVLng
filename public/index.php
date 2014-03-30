@@ -156,7 +156,7 @@ if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 }
 
 // 3rd check the request parameters
-define('LANGUAGE', Session::checkRequest('lang', $lang));
+define('LANGUAGE', Session::checkRequest('lang', $lang) ?: 'en');
 
 /**
  * BBCode parser

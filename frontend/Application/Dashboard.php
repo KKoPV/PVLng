@@ -15,8 +15,7 @@ PVLng::Menu(array(
     'position' => 20,
     'label'    => I18N::translate('Dashboard'),
     'hint'     => I18N::translate('DashboardHint') . ' (Shift+F2)',
-    'route'    => '/dashboard',
-    'login'    => TRUE
+    'route'    => '/dashboard'
 ));
 
 /**

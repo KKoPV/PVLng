@@ -58,7 +58,7 @@
     <div class="r">
         <span class="toolbar menu">
             <!-- BEGIN LANGUAGES -->
-            <a class="tipbtn" title="{LABEL}" href="?lang={CODE}">
+            <a class="tipbtn language" title="{LABEL}" data-lang="{CODE}" href="?lang={CODE}">
                 <img style="width:20px;height:12px" src="/images/{CODE}.png" alt="{CODE}" width="20" height="12" />
             </a>
             <!-- END -->

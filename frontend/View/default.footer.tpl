@@ -63,7 +63,7 @@
                  title="DataTables is a plug-in for the jQuery Javascript library"
                  alt="DataTables">
         </a>
-        <a href="http://code.drewwilson.com/entry/tiptip-jquery-plugin" target="_blank">
+        <a href="https://github.com/drewwilson/TipTip" target="_blank">
             <img style="width:80px;height:15px" class="tip"
                  src="/images/tiptip.gif" width="80" height="15"
                  title="TipTip is a very lightweight and intelligent custom tooltip jQuery plugin."

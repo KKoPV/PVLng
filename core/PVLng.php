@@ -12,8 +12,7 @@ abstract class PVLng {
             'position' => 0,
             'label'    => '',
             'hint'     => '',
-            'route'    => '',
-            'login'    => FALSE,
+            'route'    => ''
         ), $menu);
         while (isset(self::$Menu[$menu['position']])) $menu['position']++;
         self::$Menu[$menu['position']] = array_change_key_case($menu, CASE_UPPER);

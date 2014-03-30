@@ -52,7 +52,6 @@ style="width:16px;height:16px" width="16" height="16" alt=""
             <!-- BEGIN DATA -->
             <tr id="rc{ID}" data-tt-id="{ID}"
                 <!-- IF {GRAPH} -->
-                    <!-- React on click with ChartDialog() -->
                     class="channel" style="cursor:pointer"
                 <!-- ELSE -->
                     class="channel no-graph"
