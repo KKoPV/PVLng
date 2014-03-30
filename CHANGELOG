@@ -1,3 +1,23 @@
+ v2.7.0
+========
+
+FIXED
+
+ - Fix last reading logic, consider timestamp if given ~ Knut Kohl <github@knutkohl.de>
+ - Fix links to List view from Index and Overview ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust language selection ~ Knut Kohl <github@knutkohl.de>
+ - Adjust Github links ~ Knut Kohl <github@knutkohl.de>
+ - Adjust Fix model for time range display in chart ~ Knut Kohl <github@knutkohl.de>
+ - Adjust accessible modules logic depending on session user ~ Knut Kohl <github@knutkohl.de>
+ - Adjust JSON routing ~ Knut Kohl <github@knutkohl.de>
+ - Adjust frontend layout ~ Knut Kohl <github@knutkohl.de>
+ - Adjust Github links ~ Knut Kohl <github@knutkohl.de>
+ - Split navigation and content in template ~ Knut Kohl <github@knutkohl.de>
+ - Rework hook logic ~ Knut Kohl <github@knutkohl.de>
+
  v2.6.1
 ========
 

@@ -9,11 +9,23 @@
  */
 -->
 
+<div id="dialog-reading" style="display:none" title="{{DeleteReading}}">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left;margin:0 7px 20px 0"></span>
+        {{DeleteReadingConfirm}}
+    </p>
+    <ul>
+        <li id="reading-serie"></li>
+        <li id="reading-timestamp"></li>
+        <li>{{Reading}} : <span id="reading-value"></span></li>
+    </ul>
+</div>
+
 <div id="dialog-chart" style="display:none" title="{{ChartSettings}}">
     <table id="d-table">
         <tbody>
         <tr class="odd">
-            <td style="width:50%">{{Axis}}</td>
+            <td style="width:40%">{{Axis}}</td>
             <td id="td-axis">
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="9" /></div>
                 <div class="fl"><input class="iCheck" type="radio" name="d-axis" value="7" /></div>
@@ -91,27 +103,21 @@
         <tr class="odd">
             <td>{{MarkExtremes}}</td>
             <td>
-                <div class="fl not-bar not-scatter" style="margin-right:.5em">
+                <div class="fl not-bar not-scatter not-meter" style="margin-right:.5em">
                     <input id="d-min" type="checkbox" class="iCheckLine" />
                     <label for="d-min">{{MarkMin}}</label>
                 </div>
-                <div class="fl not-scatter">
+                <div class="fl not-scatter not-meter" style="margin-right:.5em">
                     <input id="d-max" type="checkbox" class="iCheckLine" />
                     <label for="d-max">{{MarkMax}}</label>
                 </div>
-
-                <div style="clear:both;padding-top:.25em">
-                    <div class="fl not-bar not-scatter" style="margin-right:.5em">
-                        <input id="d-last" type="checkbox" class="iCheckLine" />
-                        <label for="d-last">{{MarkLast}}</label>
-                    </div>
-                    <div class="fl only-bar">
-                        <input id="d-all" type="checkbox" class="iCheckLine" />
-                        <label for="d-all">{{MarkAll}}</label>
-                    </div>
-                    <img style="margin-left:.5em;width:16px;height:16px" class="tip"
-                         src="/images/ico/information_frame.png" width="16" height="16"
-                         title="{{MarkAllHint}}" />
+                <div class="fl not-bar not-scatter" style="margin-right:.5em">
+                    <input id="d-last" type="checkbox" class="iCheckLine" />
+                    <label for="d-last">{{MarkLast}}</label>
+                </div>
+                <div class="fl">
+                    <input id="d-all" type="checkbox" class="iCheckLine" />
+                    <label for="d-all">{{MarkAll}}</label>
                 </div>
             </td>
         </tr>
@@ -154,11 +160,13 @@
             </td>
         </tr>
         <tr class="odd">
-            <td>{{TimeRange}}</td>
+            <td><label for="d-time1">{{TimeRange}}</label></td>
             <td>
                 <input id="d-time1" type="text" class="c" style="width:5em" />
                 <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
                 <input id="d-time2" type="text" class="c" style="width:5em" />
+                <br />
+                <div id="d-time-slider" style="margin-top:.5em;margin-left:.3em;width:13em"></div>
             </td>
         </tr>
         </tbody>

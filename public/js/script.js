@@ -99,6 +99,8 @@ $(function() {
 
     $('input').iCheck('update');
 
+    $('input[type=number]').prop('type', 'text').addClass('number-spinner').spinner();
+
     /* Back to top */
     var fadeDuration = 500;
     $(window).scroll(function() {
@@ -107,6 +109,13 @@ $(function() {
         } else {
             $('.back-to-top').fadeOut(fadeDuration);
         }
+    });
+
+    $('.language').click(function(e) {
+        e.preventDefault();
+        var sep = (window.location.search == '') ? '?' : '&';
+        window.location = window.location + sep + 'lang=' + $(this).data('lang');
+        return false;
     });
 
     $('.back-to-top').click(function(e) {

@@ -63,8 +63,8 @@ function Views() {
     };
 
     this.buildSelect = function(el, selected) {
-        var option,
-            optgroups = [ [], [], [] ];
+        var option, optgroups = [ [], [], [] ];
+
         el = $(el).empty();
 
         /* Build optgroups */
@@ -106,9 +106,14 @@ function Views() {
     };
 
     this.load = function( slug, collapse, callback ) {
-        if (typeof this.views[slug] == 'undefined') return;
+        if (typeof this.views[slug] == 'undefined') {
+            $('#wrapper').show();
+            return;
+        }
+
         if (typeof collapse == 'undefined') collapse = false;
 
+        $('#chart').addClass('wait');
         oTable.fnProcessingIndicator(true);
 
         var expanded = tree.expanded, preset;
@@ -142,6 +147,7 @@ function Views() {
 
         if (typeof callback != 'undefined') callback(this.actual);
 
+        $('#chart').removeClass('wait');
         oTable.fnProcessingIndicator(false);
     };
 }
@@ -297,6 +303,22 @@ tree = new Tree(!!user);
 /**
  *
  */
+function TimeStrToSec( str, _default ) {
+    if (str == '') str = _default;
+    /* Split into hours and minutes */
+    var time = (str.trim()+':0').split(':', 2);
+    return time[0] * 3600 + time[1] * 60;
+}
+
+function SecToTimeStr( s ) {
+    var h = Math.floor(s/60/60), m = Math.floor((s - h*60*60)/60);
+    /* Make hours and minutes 2 characters long */
+    return '0'.concat(h).slice(-2) + ':' + '0'.concat(m).slice(-2);
+}
+
+/**
+ *
+ */
 function ChartDialog( id, name ) {
     /* get stringified settings */
     var p = new presentation($('#c'+id).val());
@@ -319,9 +341,11 @@ function ChartDialog( id, name ) {
     $('#d-color-neg').spectrum('set', p.colorneg);
     $('#d-color-neg').spectrum($('#d-color-use-neg').is(':checked') ? 'enable' : 'disable');
     $('#d-threshold').val(p.threshold);
-    $('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'));
+    $('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'))
+                     .spinner('option', 'disabled', !$('#d-color-use-neg').is(':checked'));
     $('#d-time1').val(p.time1);
     $('#d-time2').val(p.time2);
+    $('#d-time-slider').slider('values', [ TimeStrToSec(p.time1), TimeStrToSec(p.time2) ]);
 
     $('input').iCheck('update');
     $('#d-type').trigger('change');
@@ -364,10 +388,10 @@ function updateChart( forceUpdate ) {
 
     if (!windowVisible) return;
 
+    var fromDate = $('#fromdate').val(), toDate = $('#todate').val();
+
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
     if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
-
-    var fromDate = $('#fromdate').val(), toDate = $('#todate').val();
 
     if (views.actual) {
         /* Provide permanent link only for logged in user and not embedded view level 2 */
@@ -478,7 +502,7 @@ function updateChart( forceUpdate ) {
     /* Any channels checked for drawing? */
     if (channels_new.length == 0) return;
 
-    $(document.body).addClass('wait');
+    $('#chart').addClass('wait');
     oTable.fnProcessingIndicator(true);
 
     _log('Channels:', channels_new);
@@ -530,12 +554,9 @@ function updateChart( forceUpdate ) {
         $('#s'+channel.id).show();
 
         var t,
-            time1 = (channel.time1+':00').split(':', 2),
-            time2 = (channel.time2+':00').split(':', 2),
+            time1 = TimeStrToSec(channel.time1) + tzOffset * 60,
+            time2 = TimeStrToSec(channel.time2) + tzOffset * 60,
             url = PVLngAPI + 'data/' + channel.guid + '.json';
-
-        time1 = time1[0] * 3600 + time1[1] * 60 + tzOffset * 60;
-        time2 = time2[0] * 3600 + time2[1] * 60 + tzOffset * 60;
 
         _log('Fetch', url);
 
@@ -547,7 +568,7 @@ function updateChart( forceUpdate ) {
                 start:      fromDate,
                 end:        toDate + '+1day',
                 period:     (channel.type != 'scatter') ? period_count + period : '',
-                _ts:        (new Date).getTime()
+                _ts:        ts
             },
             function(data) {
                 try {
@@ -654,7 +675,7 @@ function updateChart( forceUpdate ) {
                     serie.data.push(point);
                 });
 
-                if (channel.type != 'areasplinerange' && !channel.all && (channel.min || channel.max)) {
+                if (!channel.all && (channel.min || channel.max || channel.last)) {
                     serie = setMinMax(serie, channel);
                 }
 
@@ -738,7 +759,7 @@ function updateChart( forceUpdate ) {
 
             setExtremes();
 
-            $(document.body).removeClass('wait');
+            $('#chart').removeClass('wait');
             oTable.fnProcessingIndicator(false);
 
             if (RefreshTimeout > 0) {
@@ -888,6 +909,13 @@ $(function() {
         }
     });
 
+    $('#data-table tbody tr').click(function() {
+        var ckbx = $(this).find('input[type=checkbox]');
+        if (typeof ckbx !== 'undefined') {
+            ChartDialog(ckbx.data('id'), ckbx.data('name'))
+        }
+    });
+
     /**
      *
      */
@@ -929,7 +957,7 @@ $(function() {
             '{{Ok}}': function() {
                 $(this).dialog('close');
                 var chk = $('#c'+$(this).data('id')), old = chk.val(),
-                    p = new presentation(), h;
+                    p = new presentation();
                 p.axis = +$('input[name="d-axis"]:checked').val();
                 p.type = $('#d-type').val();
                 p.consumption = $('#d-cons').is(':checked');
@@ -944,13 +972,8 @@ $(function() {
                 p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
                 p.threshold = +$('#d-threshold').val().replace(',', '.');
 
-                h = $('#d-time1').val().trim();
-                if (h == '') h = '00';
-                p.time1 = (h + ':00').split(':', 2).join(':');
-
-                h = $('#d-time2').val().trim();
-                if (h == '') h = '24';
-                p.time2 = (h + ':00').split(':', 2).join(':');
+                p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
+                p.time2 = SecToTimeStr(TimeStrToSec($('#d-time2').val(), 24));
 
                 p = p.toString();
 
@@ -988,13 +1011,11 @@ $(function() {
      *
      */
     $('#d-type').change(function() {
-        var notBar = $('.not-bar'), onlyBar = $('.only-bar'), notScatter = $('.not-scatter');
+        var notBar = $('.not-bar'), notScatter = $('.not-scatter');
 
         /* Reset all */
         notBar.find('.iradio_line, .icheckbox_line').removeClass('disabled');
         notBar.find('input, select').prop('disabled', false);
-        onlyBar.find('.iradio_line, .icheckbox_line').addClass('disabled');
-        onlyBar.find('input, select').prop('disabled', true);
 
         notScatter.find('.iradio_line, .icheckbox_line').removeClass('disabled');
         notScatter.find('input, select').prop('disabled', false);
@@ -1003,8 +1024,6 @@ $(function() {
         if (this.value == 'bar') {
             notBar.find('.iradio_line, .icheckbox_line').addClass('disabled');
             notBar.find('input, select').prop('disabled', true);
-            onlyBar.find('.iradio_line, .icheckbox_line').removeClass('disabled');
-            onlyBar.find('input, select').prop('disabled', false);
         } else if (this.value == 'scatter') {
             $('#d-color-use-neg').iCheck('uncheck').trigger('ifToggled');
             notScatter.find('.iradio_line, .icheckbox_line').addClass('disabled');
@@ -1015,8 +1034,21 @@ $(function() {
 
     $('#d-color-use-neg').on('ifToggled', function(e) {
         var checked = $(this).is(':checked');
-        $('#d-threshold').prop('disabled', !checked);
+        $('#d-threshold').prop('disabled', !checked).spinner('option', 'disabled', !checked );
         $('#d-color-neg').spectrum(checked ? 'enable' : 'disable');
+    });
+
+    $('#d-time-slider').slider({
+        range: true,
+        min: 0, /* 00:00 */ max: 86400, /* 24:00 */
+        values: [ 0, 86400 ], /* 00:00 - 24:00 */
+        slide: function( e, ui ) {
+            /* Simulate hour stepping, but allow fine grained set from input */
+            var step = 3600;
+            /* Calc hour and minutes parts */
+            $('#d-time1').val(SecToTimeStr(Math.floor(ui.values[0]/step)*step));
+            $('#d-time2').val(SecToTimeStr(Math.floor(ui.values[1]/step)*step));
+        }
     });
 
     $('input').iCheck('update');
@@ -1104,7 +1136,7 @@ $(function() {
         } else {
             resetDeleteButton();
             btn.button('disable');
-            $(document.body).addClass('wait');
+            $('#chart').addClass('wait');
 
             $.ajax({
                 type: 'DELETE',
@@ -1121,7 +1153,7 @@ $(function() {
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
-                $(document.body).removeClass('wait');
+                $('#chart').removeClass('wait');
                 btn.button({ label: '&nbsp;', text: false }).data('confirmed', 0).button('enable');
             });
         }
@@ -1133,7 +1165,7 @@ $(function() {
         text: false
     }).click(function() {
         $(this).button('disable');
-        $(document.body).addClass('wait');
+        $('#chart').addClass('wait');
 
         /* Save view */
         var btn = this,
@@ -1169,7 +1201,7 @@ $(function() {
                 type: textStatus, hide: false, sticker: false, text: jqXHR.responseText
             });
         }).always(function() {
-            $(document.body).removeClass('wait');
+            $('#chart').removeClass('wait');
             $(btn).button('enable');
         });
     });
@@ -1203,7 +1235,7 @@ $(function() {
 
                 self.dialog('close');
                 chart.showLoading('{{JustAMoment}}');
-                $(document.body).addClass('wait');
+                $('#chart').addClass('wait');
 
                 var url = PVLngAPI + 'data/' + self.data('guid') + '/' + self.data('timestamp') + '.json';
 
@@ -1219,7 +1251,7 @@ $(function() {
                     });
                 }).always(function() {
                     chart.hideLoading();
-                    $(document.body).removeClass('wait');
+                    $('#chart').removeClass('wait');
                 });
 
             },

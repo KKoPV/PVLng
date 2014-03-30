@@ -33,7 +33,7 @@ class Widget extends \Controller {
      *
      */
     public function Inc_Action() {
-        // Aplly content direct
+        // Apply content direct
         $this->view->Content = $this->view->render('inc.js');
     }
 
@@ -82,7 +82,7 @@ class Widget extends \Controller {
             $this->view->Time2   = date('H:i', $time2);
             $this->view->Data    = json_encode($data);
             $this->view->Max     = round($max, $channel->decimals);
-            // Aplly content direct
+            // Apply content direct
             $this->view->Content = $this->view->render('chart.js');
 
         } catch (\Exception $e) {

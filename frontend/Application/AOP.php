@@ -2,10 +2,10 @@
 /**
  * AOP
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 
 if (!($app->debug = Session::checkRequest('debug'))) return;
@@ -59,9 +59,6 @@ class YryieMiddleware extends Slim\Middleware {
      *
      */
     public function call() {
-        // Get reference to application
-        $app = $this->app;
-
         // Put versions infos on top
         Yryie::Versions();
 
@@ -70,9 +67,9 @@ class YryieMiddleware extends Slim\Middleware {
 
         Yryie::Finalize();
 
-        $body = $app->response->getBody();
+        $body = $this->app->response->getBody();
 
-        if ($app->debug == 'trace') {
+        if ($this->app->debug == 'trace') {
 
             $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
             Yryie::$TraceDelimiter = ';';
@@ -84,11 +81,11 @@ class YryieMiddleware extends Slim\Middleware {
         } else {
             // Replace placeholder with debug data
             $body = str_replace('<!-- YRYIE -->',
-                                Yryie::getCSS().Yryie::getJS(TRUE, TRUE).Yryie::Render(),
+                                Yryie::getCSS() . Yryie::getJS(TRUE, TRUE) . Yryie::Render(),
                                 $body);
         }
 
-        $app->response->setBody($body);
+        $this->app->response->setBody($body);
     }
 }
 

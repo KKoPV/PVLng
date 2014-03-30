@@ -9,13 +9,19 @@
  */
 -->
 
+<!-- Use this image as spacer for not available moving actions of channels -->
+<!-- DEFINE MACRO PIX -->
+src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw"
+style="width:16px;height:16px" width="16" height="16" alt=""
+<!-- END DEFINE -->
+
 <div class="grid_10">
     <button id="togglewrapper" class="tip" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</button>
 </div>
 
 <div class="clear"></div>
 
-<div id="wrapper" class="grid_10" style="padding-top:1em">
+<div id="wrapper" class="grid_10" style="padding-top:1em;display:none">
 
     <table id="data-table" class="dataTable treeTable">
         <thead>
@@ -44,8 +50,14 @@
 
         <tbody>
             <!-- BEGIN DATA -->
-            <tr id="rc{ID}" class="channel<!-- IF !{GRAPH} --> no-graph<!-- ENDIF -->"
-                data-tt-id="{ID}" <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF --> >
+            <tr id="rc{ID}" data-tt-id="{ID}"
+                <!-- IF {GRAPH} -->
+                    class="channel" style="cursor:pointer"
+                <!-- ELSE -->
+                    class="channel no-graph"
+                <!-- ENDIF -->
+                <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->
+                >
                 <td>
                     <!-- IF {GRAPH} -->
                     <input id="c{ID}" type="checkbox" class="channel iCheck"
@@ -71,11 +83,21 @@
                 <td id="cons{ID}" class="consumption"></td>
                 <td id="u{ID}">{UNIT}</td>
                 <td id="costs{ID}" class="costs"></td>
-                <td>
+                <td style="white-space:nowrap">
                     <!-- IF {GRAPH} -->
-                    <img style="cursor:pointer;width:16px;height:16px"
+                    <img style="width:16px;height:16px"
                          src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
-                         class="tip" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
+                         class="tip imgbar" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
+                    <!-- ELSE -->
+                    <img <!-- MACRO PIX --> class="imgbar" />
+                    <!-- ENDIF -->
+                    <!-- IF {READ} -->
+                    <a href="/list/{GUID}" class="tip" title="{{ListHint}}">
+                        <img src="/images/ico/document-invoice.png" class="imgbar"
+                             width="16p" height="16" alt="l">
+                    </a>
+                    <!-- ELSE -->
+                    <img <!-- MACRO PIX --> class="imgbar" />
                     <!-- ENDIF -->
                 </td>
             </tr>
@@ -107,7 +129,7 @@
     <br /><br />
     <input class="fl" id="saveview" type="text" value="{VIEW}" size="35" />
 
-    <select id="visibility" style="margin-left:1em">
+    <select id="visibility" style="margin-left:.5em">
         <option value="0">{{PrivateChart}}</option>
         <option value="1">{{PublicChart}}</option>
         <option value="2">{{MobileChart}}</option>
@@ -115,7 +137,7 @@
 
     <img src="/images/ico/information_frame.png" class="tip" title="{{publicHint}}"
          style="margin-left:8px;width:16px;height:16px" width="16" height="16" />
-    <button id="btn-save" class="tip" style="margin-left:1em" title="{{Save}}">{{Save}}</button>
+    <button id="btn-save" class="tip" style="margin-left:.5em" title="{{Save}}">{{Save}}</button>
 </div>
 <div class="grid_2 r">
     <a id="btn-bookmark" href="#" class="tip" title="{{DragBookmark}}">Bookmark</a>

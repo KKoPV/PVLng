@@ -16,7 +16,9 @@ abstract class JSON {
     /**
      *
      */
-    public static function check( $error ) {
+    public static function check( $error=NULL ) {
+
+        if (is_null($error)) $error = json_last_error();
 
         switch ($error) {
             case JSON_ERROR_NONE:

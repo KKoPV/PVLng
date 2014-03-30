@@ -80,7 +80,7 @@ abstract class Channel {
             return self::byGUID($channel->guid);
         }
 
-        throw new Exception('No channel found for ID: '.$guid, 400);
+        throw new Exception('No channel found for ID: '.$id, 400);
     }
 
     /**
@@ -251,7 +251,7 @@ abstract class Channel {
                 throw new Exception($msg, 200);
             }
 
-            $lastReading = $reading->getLastReading($this->entity);
+            $lastReading = $reading->getLastReading($this->entity, $timestamp);
 
             // Check that new reading value is inside the threshold range
             if ($this->threshold > 0 AND abs($this->value-$lastReading) > $this->threshold) {

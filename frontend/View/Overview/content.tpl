@@ -37,7 +37,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
     <!-- BEGIN DATA -->
 
-    <tr data-tt-id="{ID}" class="droppable"
+    <tr data-tt-id="{ID}" class="droppable<!-- IF {CHILDCOUNT} --> have-childs<!-- ENDIF -->"
         <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
         <td>
             <span class="<!-- IF {CHILDS} -->non-<!-- ENDIF -->draggable"
@@ -69,7 +69,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
             <img <!-- MACRO PIX --> class="imgbar" />
             <!-- ENDIF -->
 
-            <!-- IF {CHILDS} == "0" -->
+            <!-- IF !{CHILDCOUNT} -->
             <form action="/overview/delete" method="post" class="delete-form">
             <input type="hidden" name="id" value="{ID}">
             <input type="image" src="/images/ico/node_delete_next.png"
@@ -88,7 +88,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
         <td style="white-space:nowrap">
             <!-- IF {READ} -->
-            <a href="/list/{ENTITY}" class="tip" title="{{ListHint}}">
+            <a href="/list/{GUID}" class="tip" title="{{ListHint}}">
                 <img src="/images/ico/document-invoice.png" class="imgbar"
                      width="16p" height="16" alt="l">
             </a>
@@ -146,7 +146,8 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
         <td>
             <input style="background-color:transparent;border:0;width:24em;font-family:monospace"
-                   class="guid" value="{GUID}" readonly="readonly">
+                   class="guid tip" value="{GUID}" readonly="readonly"
+                   title="{{ClickAndPressCtrlC}}">
         </td>
     </tr>
 

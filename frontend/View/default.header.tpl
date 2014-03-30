@@ -18,10 +18,10 @@
             v{VERSION}
             <!-- IF {VERSIONNEW} -->
             <p class="b">
-                <a href="https://github.com/K-Ko/PVLng/releases/tag/v{VERSIONNEW}" class="tip" title="Changelog">
+                <a href="https://github.com/KKoPV/PVLng/releases/tag/v{VERSIONNEW}" class="tip" title="Changelog">
                     v{VERSIONNEW}
                 </a>
-                <a href="https://github.com/K-Ko/PVLng/tree/master" class="tip" title="Check me out on Github">
+                <a href="https://github.com/KKoPV/PVLng/tree/master" class="tip" title="Check me out on Github">
                     <img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.25em" width="16" height="16" />
                 </a>
             </p>
@@ -58,7 +58,7 @@
     <div class="r">
         <span class="toolbar menu">
             <!-- BEGIN LANGUAGES -->
-            <a class="tipbtn" title="{LABEL}" href="?lang={CODE}">
+            <a class="tipbtn language" title="{LABEL}" data-lang="{CODE}" href="?lang={CODE}">
                 <img style="width:20px;height:12px" src="/images/{CODE}.png" alt="{CODE}" width="20" height="12" />
             </a>
             <!-- END -->

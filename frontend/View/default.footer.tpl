@@ -12,20 +12,25 @@
 <div class="grid_10 hr"></div>
 <div class="clear"></div>
 
-<div id="footer" style="height:5em">
+<div id="footer">
 
-    <div class="grid_4 s">
-        Version {VERSION} / {VERSIONDATE}
-        <a href="https://github.com/K-Ko/PVLng/releases/tag/v{VERSION}" class="tip" title="Changelog">
-            <img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.5em" width="16" height="16" />
+    <div class="grid_4 xs">
+        <a href="http://pvlng.com" class="fl tip" title="PVLng Homepage">
+            <img src="/images/logo.png" style="width:50px;height:30px" width="50" height="30" alt="[PVLng]">
         </a>
+        <div class="fl" style="margin-left:10px">
+            Version {VERSION} / {VERSIONDATE}
+            <a href="https://github.com/KKoPV/PVLng/releases/tag/v{VERSION}" class="tip" title="Changelog">
+                <img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.5em" width="16" height="16" />
+            </a>
 
-        <br />
-        &copy; 2012-{YEAR} by
-        <a href="http://pvlng.com/PVLng:About" class="tip" title="Knut Kohl PhotoVoltaics"
-           tip="<strong>K</strong>nut <strong>Ko</strong>hl <strong>P</strong>hoto<strong>V</strong>oltaics">
-            <strong>KKoPV</strong>
-        </a>
+            <br />
+            &copy; 2012-{YEAR} by
+            <a href="http://pvlng.com/PVLng:About" class="tip" title="Knut Kohl PhotoVoltaics"
+               tip="<strong>K</strong>nut <strong>Ko</strong>hl <strong>P</strong>hoto<strong>V</strong>oltaics">
+                <strong>KKoPV</strong>
+            </a>
+        </div>
     </div>
 
     <div id="powered" class="grid_6 s r">
@@ -58,7 +63,7 @@
                  title="DataTables is a plug-in for the jQuery Javascript library"
                  alt="DataTables">
         </a>
-        <a href="http://code.drewwilson.com/entry/tiptip-jquery-plugin" target="_blank">
+        <a href="https://github.com/drewwilson/TipTip" target="_blank">
             <img style="width:80px;height:15px" class="tip"
                  src="/images/tiptip.gif" width="80" height="15"
                  title="TipTip is a very lightweight and intelligent custom tooltip jQuery plugin."

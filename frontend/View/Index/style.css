@@ -16,6 +16,10 @@
     margin-bottom: 1em;
 }
 
+#dialog-chart {
+    padding: 0;
+}
+
 #d-table {
     width: 100%;
 }
