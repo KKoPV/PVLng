@@ -554,8 +554,8 @@ function updateChart( forceUpdate ) {
         $('#s'+channel.id).show();
 
         var t,
-            time1 = TimeStrToSec(channel.time1) + tzOffset * 60,
-            time2 = TimeStrToSec(channel.time2) + tzOffset * 60,
+            time1 = TimeStrToSec(channel.time1,  0) + tzOffset * 60,
+            time2 = TimeStrToSec(channel.time2, 24) + tzOffset * 60,
             url = PVLngAPI + 'data/' + channel.guid + '.json';
 
         _log('Fetch', url);
