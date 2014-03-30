@@ -51,7 +51,7 @@
     <div class="fl">
         <span class="toolbar menu">
             <!-- BEGIN MENU -->
-            <a class="tipbtn<!-- IF LOGIN --> login<!-- ENDIF -->" title="{HINT}" href="{ROUTE}">{LABEL}</a>
+            <a class="tipbtn" title="{HINT}" href="{ROUTE}">{LABEL}</a>
             <!-- END -->
         </span>
     </div>
