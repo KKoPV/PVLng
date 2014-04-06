@@ -47,9 +47,12 @@
 
     <style>{STYLES}</style>
 
+    <!-- INCLUDE hook.head.tpl -->
+
 </head>
 
 <body>
+    <!-- INCLUDE hook.body.before.tpl -->
 
     <div id="container" class="container_10">
 
@@ -112,5 +115,6 @@
         <img src="/images/ico/arrow-stop-090.png" style="width:16px;height:16px" width="16" height="16" />
     </a>
 
+    <!-- INCLUDE hook.body.after.tpl -->
 </body>
 </html>
