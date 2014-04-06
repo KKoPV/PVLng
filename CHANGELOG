@@ -1,3 +1,11 @@
+ v2.8.0
+========
+
+CHANGED
+
+ - Adjust config files handling and naming convention ~ Knut Kohl <github@knutkohl.de>
+ - Minor frontend changes ~ Knut Kohl <github@knutkohl.de>
+
  v2.7.4
 ========
 
