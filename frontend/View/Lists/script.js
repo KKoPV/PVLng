@@ -301,9 +301,8 @@ $(function() {
         bProcessing: true,
         /* Add placeholder div into table header */
         sDom: 'r<"H"l<"#dt-toolbar">>t<"F"ip>',
-        aLengthMenu: [ [10, 20, 50, 100, -1], [10, 20, 50, 100, '{{All}}'] ],
-        iDisplayLength: 20,
-        sPaginationType: 'full_numbers',
+        aLengthMenu: [ [25, 50, 100, -1], [25, 50, 100, '{{All}}'] ],
+        iDisplayLength: 25,
         sPaginationType: 'listbox',
         bAutoWidth: false,
         aaSorting: [[ 0, 'desc' ]],

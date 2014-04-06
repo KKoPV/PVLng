@@ -62,7 +62,6 @@ $(function() {
     });
 
     $('.toolbar').buttonset();
-    $('.login').button('option', 'disabled', (user == ''));
 
     $('input[type=text], input[type=number], input[type=password], select, textarea').addClass('ui-corner-all');
 

@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class InternalConsumption extends \Channel {
+class InternalConsumption extends InternalCalc {
 
     /**
      * Channel type
@@ -40,11 +40,14 @@ class InternalConsumption extends \Channel {
     /**
      *
      */
-    public function read( $request ) {
+    protected function before_read( $request ) {
 
-        $this->before_read($request);
+        parent::before_read($request);
 
         $childs = $this->getChilds();
+
+        // For correct calculations read all child data
+        $request['period'] = '1i';
 
         $child1 = $childs[0]->read($request);
         $row1   = $child1->rewind()->current();
@@ -64,7 +67,7 @@ class InternalConsumption extends \Channel {
 
             if (empty($row2)) {
                 $last = $row1['data'] = $last + $row1['consumption'];
-                $result->write($row1, $key1);
+                $this->saveValue($row1['timestamp'], $row1['data']);
                 $row1 = $child1->next()->current();
                 continue;
             }
@@ -80,7 +83,7 @@ class InternalConsumption extends \Channel {
                     $row1['consumption'] = 0;
                 }
 
-                $result->write($row1, $key1);
+                $this->saveValue($row1['timestamp'], $row1['data']);
 
                 $row1 = $child1->next()->current();
                 $row2 = $child2->next()->current();
@@ -92,7 +95,7 @@ class InternalConsumption extends \Channel {
                     // starts and NOT for data holes
                     $last = $row1['data'];
 
-                    $result->write($row1, $key1);
+                    $this->saveValue($row1['timestamp'], $row1['data']);
                 }
 
                 $row1 = $child1->next()->current();
@@ -101,7 +104,7 @@ class InternalConsumption extends \Channel {
 
                 if (!empty($row1)) {
                     $last = $row1['data'];
-                    $result->write($row1, $key1);
+                    $this->saveValue($row1['timestamp'], $row1['data']);
                 }
 
                 $row2 = $child2->next()->current();
@@ -109,8 +112,6 @@ class InternalConsumption extends \Channel {
         }
         $child1->close();
         $child2->close();
-
-        return $this->after_read($result);
     }
 
 }

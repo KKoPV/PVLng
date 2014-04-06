@@ -12,11 +12,11 @@ return array(
     /**
      * Show notification for each loaded channel
      */
-    #'NotifyLoadEach' => TRUE,
+    'NotifyLoadEach' => FALSE,
 
     /**
      * Show notification for loaded channels when all channels was loaded
      */
-    #'NotifyLoadAll' => TRUE,
+    'NotifyLoadAll' => TRUE,
 
 );

@@ -41,26 +41,22 @@ $(function() {
         bFilter: false,
         bInfo: false,
         bPaginate: false,
+        bAutoWidth: false,
         bJQueryUI: true,
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
-        aoColumns: [
-            null,
-            null,
-            null,
-            null,
-            null,
-            { asSorting: false },
-            null
+        aoColumnDefs: [
+            { bSortable: false, aTargets: [ 3 ] },
+            { sWidth: '1%', aTargets: [ 2, 4 ] }
         ],
         fnFooterCallback: function( nFoot, aData, iStart, iEnd, aiDisplay ) {
             var th = nFoot.getElementsByTagName('th');
             var len = aData.length, re = new RegExp('['+ThousandSeparator+']', 'g'), cnt = 0;
             th[0].innerHTML = len + " {{Channels}}";
-            while (len--) cnt += parseInt(aData[len][4].replace(re, ''));
+            while (len--) cnt += parseInt(aData[len][2].replace(re, ''));
             th[1].innerHTML = $.number(cnt, 0, '', ThousandSeparator);
         },
         fnInitComplete: function() {
-            $('.last-reading').each(function(id, el){
+            $('.last-reading').each(function(id, el) {
                 $.getJSON(
                     PVLngAPI + 'data/' + $(el).data('guid') + '.json',
                     {
@@ -69,7 +65,7 @@ $(function() {
                     },
                     function(data) {
                         if (data.length < 2) return;
-                        var attr = data.shift();
+                        var attr = data.shift(), val;
                         if (attr.numeric) {
                             $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
                         } else {

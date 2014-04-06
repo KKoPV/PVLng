@@ -175,6 +175,10 @@ td.imgbar {
     white-space: nowrap;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 tt {
     font-size: 120%;
 }

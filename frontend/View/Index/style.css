@@ -37,11 +37,11 @@
     vertical-align: middle;
 }
 
-#td-axis .fl {
+#td-axis .iradio_flat {
     margin-right: 3px;
 }
 
-#td-axis .fl.nm {
+#td-axis .iradio_flat.nm {
     /* no margin */
     margin-right: 0;
 }
@@ -76,6 +76,16 @@
 .icheckbox_line disabled,
 .iradio_line disabled {
     background-color: #606060;
+}
+
+.disabled {
+    color: #C0C0C0;
+}
+
+.iradio_flat,
+.icheckbox_flat {
+    float: left;
+    margin-right: .25em;
 }
 
 .consumption,

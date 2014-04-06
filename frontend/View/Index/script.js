@@ -376,8 +376,6 @@ var windowVisible = true,
     browserPrefix = null,
     lastChanged = (new Date).getTime() / 1000 / 60;
 
-var tzOffset = (new Date()).getTimezoneOffset();
-
 /**
  *
  */
@@ -438,6 +436,8 @@ function updateChart( forceUpdate ) {
         channel.name = $('<div/>').html($(el).data('name')).text();
         channel.guid = $(el).data('guid');
         channel.unit = $(el).data('unit');
+        channel.time1 = TimeStrToSec(channel.time1,  0);
+        channel.time2 = TimeStrToSec(channel.time2, 24);
         /* remember channel */
         buffer.push(channel);
         /* still mapped? */
@@ -546,17 +546,14 @@ function updateChart( forceUpdate ) {
     var loading = channels.length;
     chart.showLoading('- ' + loading + ' -');
 
-    var series = [], costs = 0;
+    var series = [], costs = 0, date = new Date();
 
     /* get data */
     $(channels).each(function(id, channel) {
 
         $('#s'+channel.id).show();
 
-        var t,
-            time1 = TimeStrToSec(channel.time1,  0) + tzOffset * 60,
-            time2 = TimeStrToSec(channel.time2, 24) + tzOffset * 60,
-            url = PVLngAPI + 'data/' + channel.guid + '.json';
+        var url = PVLngAPI + 'data/' + channel.guid + '.json';
 
         _log('Fetch', url);
 
@@ -568,7 +565,7 @@ function updateChart( forceUpdate ) {
                 start:      fromDate,
                 end:        toDate + '+1day',
                 period:     (channel.type != 'scatter') ? period_count + period : '',
-                _ts:        ts
+                _ts:        date.getTime()
             },
             function(data) {
                 try {
@@ -638,19 +635,25 @@ function updateChart( forceUpdate ) {
                     serie.lineWidth = channel.width;
                 }
 
+
                 $(data).each(function(id, row) {
-                    var point = {}, time;
+                    var time;
+
+                    /* Check time range channels, only if not full day 00:00 .. 24:00 */
+                    if (channel.time2-channel.time1 < 86400 && fromDate == toDate) {
+                        /* Get todays seconds from timestamp */
+                        date.setTime(row.timestamp * 1000);
+                        time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
+                        /* Skip data outside display time range */
+                        if (time < channel.time1 || time > channel.time2) return;
+                    }
+
+                    var point = {};
 
                     if (channel.type == 'scatter') {
-                        /* Show scatters at their real timestamps, ALSO for consolidaten data */
+                        /* Show scatters at their real timestamps, ALSO for consolidated data */
                         point.x = row.timestamp * 1000;
                     } else {
-                        if (fromDate == toDate) {
-                            /* Extract seconds */
-                            time = row.timestamp - Math.floor(row.timestamp / 86400) * 86400 ;
-                            /* Skip data outside display time range */
-                            if (time < time1 || time > time2) return;
-                        }
                         point.x = Math.round(row.timestamp / res) * res * 1000;
                     }
 
@@ -683,9 +686,10 @@ function updateChart( forceUpdate ) {
 
                 series[id] = serie;
 
-                if ('{INDEX_NOTIFYLOAD}') $.pnotify({
+                if ('{INDEX_NOTIFYLOADEACH}') $.pnotify({
                     type: 'success',
-                    text: attr.name + ' loaded'
+                    text: attr.name + ' loaded ' +
+                          '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
                 });
             }
         ).fail(function(jqXHR, textStatus, error) {
@@ -719,7 +723,7 @@ function updateChart( forceUpdate ) {
             /* check if all getJSON() calls finished */
             if (completed != channels.length) return;
 
-            $.pnotify({
+            if ('{INDEX_NOTIFYLOADALL}') $.pnotify({
                 type: 'success',
                 text: completed + ' channels loaded ' +
                       '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
@@ -887,6 +891,16 @@ $(function() {
         }
     });
 
+    if (user) {
+        var aoColumnDefs = [
+            { sWidth: '1%', aTargets: [ 0, 2, 3, 4, 5, 6 ] }
+        ];
+    } else {
+        var aoColumnDefs = [
+            { sWidth: '1%', aTargets: [ 1, 2, 3 ] }
+        ];
+    }
+
     /**
      *
      */
@@ -896,12 +910,16 @@ $(function() {
         bLengthChange: false,
         bPaginate: false,
         bProcessing: true,
+        bAutoWidth: false,
         bJQueryUI: true,
         sDom: '<"H"r>t<"F">',
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
+        aoColumnDefs: user
+            ? [ { sWidth: '1%', aTargets: [ 0, 2, 3, 4, 5, 6 ] } ]
+            : [ { sWidth: '1%', aTargets: [ 1, 2, 3 ] } ],
         fnInitComplete: function() {
             /* Init treetable AFTER databale is ready */
-            var tt = $('.treeTable').treetable({
+            $('.treeTable').treetable({
                 initialState: 'expanded',
                 indent: 24,
                 column: 1
@@ -909,7 +927,7 @@ $(function() {
         }
     });
 
-    $('#data-table tbody tr').click(function() {
+    if (user) $('#data-table tbody tr.graph').addClass('clickable').click(function() {
         var ckbx = $(this).find('input[type=checkbox]');
         if (typeof ckbx !== 'undefined') {
             ChartDialog(ckbx.data('id'), ckbx.data('name'))
@@ -1014,19 +1032,19 @@ $(function() {
         var notBar = $('.not-bar'), notScatter = $('.not-scatter');
 
         /* Reset all */
-        notBar.find('.iradio_line, .icheckbox_line').removeClass('disabled');
+        notBar.removeClass('disabled');
         notBar.find('input, select').prop('disabled', false);
 
-        notScatter.find('.iradio_line, .icheckbox_line').removeClass('disabled');
+        notScatter.removeClass('disabled');
         notScatter.find('input, select').prop('disabled', false);
 
         /* Disable all invalid options for given type */
         if (this.value == 'bar') {
-            notBar.find('.iradio_line, .icheckbox_line').addClass('disabled');
+            notBar.addClass('disabled');
             notBar.find('input, select').prop('disabled', true);
         } else if (this.value == 'scatter') {
             $('#d-color-use-neg').iCheck('uncheck').trigger('ifToggled');
-            notScatter.find('.iradio_line, .icheckbox_line').addClass('disabled');
+            notScatter.addClass('disabled');
             notScatter.find('input, select').prop('disabled', true);
         }
         $('input').iCheck('update');

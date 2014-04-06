@@ -16,8 +16,6 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
 <div class="grid_10">
 
-<div>{MESSAGE}</div>
-
 <p>
     <a class="button tip" href="/channel/add" title="Alt+N">{{CreateChannel}}</a>
 </p>
@@ -26,14 +24,14 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
     <thead>
     <tr>
-        <th style="width:1%"></th>
+        <th></th>
         <th class="l">{{Channel}}</th>
         <th class="l">{{Description}}</th>
         <th class="l">{{Unit}}</th>
         <th class="l">{{Type}}</th>
         <th></th>
         <th class="l">{{Serial}}</th>
-        <th style="width:1%"></th>
+        <th></th>
     </tr>
     </thead>
 
