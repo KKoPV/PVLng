@@ -36,6 +36,10 @@ class Controller extends slimMVC\Controller {
         $controller = str_replace('Controller\\', '', get_class($this));
 
         $this->config->loadNamespace('Controller.'.$controller,
+                                     APP_DIR . DS . 'Controller' . DS . $controller . '.default.php',
+                                     FALSE);
+
+        $this->config->loadNamespace('Controller.'.$controller,
                                      APP_DIR . DS . 'Controller' . DS . $controller . '.config.php',
                                      FALSE);
 

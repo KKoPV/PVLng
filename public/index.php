@@ -58,7 +58,7 @@ Loader::register(
 );
 
 $config = slimMVC\Config::getInstance()
-        ->load(CONF_DIR . DS . 'config.app.php')
+        ->load(CONF_DIR . DS . 'config.default.php')
         ->load(CONF_DIR . DS . 'config.php');
 
 /**

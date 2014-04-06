@@ -47,16 +47,16 @@ return array(
     /**
      * Your personal title :-)
      */
-    'Title' => 'PhotoVoltaic Logger new generation',
+//     'Title' => 'PhotoVoltaic Logger new generation',
 
     /**
      * Currency settings
      */
-    'Currency' => array(
-        'ISO'      => 'EUR',
-        'Symbol'   => '€',
-        'Decimals' => 2
-    ),
+//     'Currency' => array(
+//         'ISO'      => 'EUR',
+//         'Symbol'   => '€',
+//         'Decimals' => 2
+//     ),
 
     /**
      * Loaction for sunrise/sunset
@@ -66,10 +66,10 @@ return array(
      * Latitude defaults to North, pass in a negative value for South
      * Longitude defaults to East, pass in a negative value for West
      */
-    'Location' => array(
-        'Latitude'  => NULL,
-        'Longitude' => NULL
-    ),
+//     'Location' => array(
+//         'Latitude'  => NULL,
+//         'Longitude' => NULL
+//     ),
 
     /**
      * Preferd cache mode, auto detect best one if empty
@@ -78,40 +78,39 @@ return array(
 //    'Cache' => 'MemCache',     // Save each key
 //    'Cache' => 'MemCacheOne',  // Save all data into one key (like file cache)
 //    'Cache' => 'File',
-    'Cache' => 'Mock', // Disable caching complete
+//    'Cache' => 'Mock', // Disable caching complete
 
     /**
      * Default language, 'en' or 'de', Translators are welcome :-)
      *
      * Will be overwritten by browsers accept language settings if exists
      */
-    'Language' => 'en',
+//     'Language' => 'en',
 
     /**
      * Defaults, no need to change
      *
      * Login cookie settings for private installation
      */
-    'Cookie' => array(
-        'Name' => 'PVLng',
-    ),
+//     'Cookie' => array(
+//         'Name' => 'PVLng',
+//     ),
 
     /**
      * Model flags
      */
-    'Model' => array(
-
-        /**
-         * How to calculate the average of data in History channels
-         *
-         * 0 - linear (default)
-         * 1 - harmonic
-         * 2 - geometric
-         */
-//         'History' => array(
-//             'Average' => 0
-//         ),
-
-     ),
+//     'Model' => array(
+//
+//         /**
+//          * How to calculate the average of data in History channels
+//          *
+//          * 0 - linear (default)
+//          * 1 - harmonic
+//          * 2 - geometric
+//          */
+//          'History' => array(
+//              'Average' => 0
+//          ),
+//     ),
 
 );
