@@ -54,16 +54,17 @@ class Webbox extends JSON {
             );
         }
 
-        // Request timestamp to webbox is saved as request id,
-        // used also for reload of failed files!
-        $timestamp = strtotime($request['id']);
-
         // Transform
         $channels = array();
         foreach ($request['result']['devices'][0]['channels'] as $channel) {
             $channels[$channel['meta']] = $channel['value'];
         }
 
-        return parent::write($channels, $timestamp);
+        return parent::write(
+            $channels,
+            // Request timestamp to webbox is saved as request id,
+            // used also for reload of failed files!
+            is_numeric($request['id']) ? $request['id'] : strtotime($request['id'])
+        );
     }
 }

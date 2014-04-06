@@ -54,8 +54,6 @@
     <tr>
         <th class="l">{{ChannelName}}</th>
         <th class="l">{{Description}}</th>
-        <th class="l">{{Serial}}</th>
-        <th class="l">{{Channel}}</th>
         <th class="r">{{Readings}}</th>
         <th class="r">{{LastReading}}</th>
         <th class="l">{{Unit}}</th>
@@ -64,15 +62,13 @@
 
     <tbody>
     <!-- BEGIN STATS -->
-    <tr>
+    <tr class="tip" tip="#tip-{GUID}">
         <td>
             <img src="{ICON}" class="tip" style="width:16px;height:16px;margin-right:8px"
                  width="16" height="16" alt="" title="{TYPE}" />
             {NAME}
         </td>
         <td>{DESCRIPTION}</td>
-        <td>{SERIAL}</td>
-        <td>{CHANNEL}</td>
         <td class="r">{READINGS}</td>
         <td class="r last-reading" data-guid="{GUID}">?</td>
         <td>{UNIT}</td>
@@ -82,7 +78,7 @@
 
     <tfoot>
     <tr>
-        <th class="l" colspan="4"></th>
+        <th class="l" colspan="2"></th>
         <th class="r"></th>
         <th class="l" colspan="2"></th>
     </tr>
@@ -93,3 +89,10 @@
 </div>
 
 <div class="clear"></div>
+
+<!-- BEGIN STATS -->
+<div id="tip-{GUID}" style="display:none">
+    {{Serial}}: {SERIAL}<br />
+    {{Channel}}: {CHANNEL}
+</div>
+<!-- END -->
