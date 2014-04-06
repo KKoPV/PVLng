@@ -75,7 +75,7 @@ class API extends Slim\Slim {
 }
 
 $config = slimMVC\Config::getInstance()
-        ->load(ROOT_DIR . DS . 'config' . DS . 'config.app.php')
+        ->load(ROOT_DIR . DS . 'config' . DS . 'config.default.php')
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
         ->load('config.php', FALSE);
 
