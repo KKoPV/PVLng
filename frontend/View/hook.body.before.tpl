@@ -10,3 +10,15 @@
  * @version    1.0.0
  */
 -->
+
+<!-- For module dependend content use this: -->
+
+<!-- IF {MODULE} == "..." -->
+
+<div class="grid_10">
+    ...
+</div>
+
+<div class="clear"></div>
+
+<!-- ENDIF -->

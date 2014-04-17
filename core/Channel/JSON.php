@@ -82,14 +82,17 @@ class JSON extends Channel {
             while (($key = array_shift($path)) != '') {
                 if (array_key_exists($key, $value)) {
                     $value = &$value[$key];
-                    print_r($value);
-                    echo ' - ';
+                    #print_r($value);
+                    #echo ' - ';
                 } else {
                     $found = FALSE;
                     break;
                 }
             }
             if (!$found) continue;
+
+            // Interpret empty numeric value as invalid
+            if ($child->numeric AND $value == '') continue;
 
             try { //                 Simulate $request['data']
                 $ok += $child->write(array('data' => $value), $timestamp);
