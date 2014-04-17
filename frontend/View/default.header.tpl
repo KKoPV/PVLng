@@ -26,9 +26,9 @@
                 </a>
             </p>
             <!-- ENDIF -->
-            <!-- IF {DEVELOPMENT} -->
+            <!-- IF {USER} AND {DEVELOPMENT} -->
             <!-- Show actual branch -->
-            <br /><small class="b" style="color:red">{BRANCH}</small>
+            <p class="xs b" style="color:red">{BRANCH}</p>
             <!-- ENDIF -->
         </div>
     </div>
@@ -40,48 +40,3 @@
         <!-- IF {USER} --><br /><br /><em>{USER}</em><!-- ELSE -->&nbsp;<!-- ENDIF -->
     </div>
 </div>
-
-<div class="clear"></div>
-
-<div class="grid_10 hr"></div>
-
-<div class="clear"></div>
-
-<div class="grid_10">
-    <div class="fl">
-        <span class="toolbar menu">
-            <!-- BEGIN MENU -->
-            <a class="tipbtn" title="{HINT}" href="{ROUTE}">{LABEL}</a>
-            <!-- END -->
-        </span>
-    </div>
-    <div class="r">
-        <span class="toolbar menu">
-            <!-- BEGIN LANGUAGES -->
-            <a class="tipbtn language" title="{LABEL}" data-lang="{CODE}" href="?lang={CODE}">
-                <img style="width:20px;height:12px" src="/images/{CODE}.png" alt="{CODE}" width="20" height="12" />
-            </a>
-            <!-- END -->
-            <!-- IF {USER} -->
-            <a class="tipbtn" title="{{Logout}} (Alt+L)" href="/logout">
-                <img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
-            </a>
-            <!-- ELSE -->
-            <a class="tipbtn" title="{{Login}}" href="/login">
-                <img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
-            </a>
-            <!-- ENDIF -->
-        </span>
-    </div>
-</div>
-
-<div class="clear"></div>
-
-<br />
-
-<!-- IF {MESSAGES} -->
-<div class="grid_10 b" style="margin-bottom:1em;padding-left:4px">
-    {MESSAGES}
-</div>
-<div class="clear"></div>
-<!-- ENDIF -->
