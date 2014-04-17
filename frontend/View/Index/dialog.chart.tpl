@@ -132,7 +132,7 @@
             </td>
             <td>
                 <div class="fl not-scatter">
-                    <input type="checkbox" id="d-cons" class="iCheck tip" />
+                    <input type="checkbox" id="d-cons" class="iCheck" />
                     <label for="d-cons">{{ShowConsumption}}</label>
                 </div>
             </td>
@@ -170,7 +170,7 @@
                 <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
                 <input id="d-time2" type="text" class="c" style="width:5em" />
                 <br />
-                <div id="d-time-slider" style="margin-top:.5em;margin-left:.3em;width:13em"></div>
+                <div id="d-time-slider" style="margin-top:.5em;margin-left:.4em;width:13em"></div>
             </td>
         </tr>
         </tbody>

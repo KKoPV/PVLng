@@ -12,7 +12,7 @@
 <input type="hidden" id="fromdate" name="fromdate" />
 <input type="hidden" id="todate" name="todate" />
 
-<div id="nav" class="grid_10">
+<div id="nav" class="grid_10" style="margin-top:1em">
 
     <table style="width:100%">
     <tr>
