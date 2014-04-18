@@ -30,6 +30,10 @@ $app->map('/channel/add(/:clone)', $checkAuth, function( $clone=0 ) use ($app) {
     $app->process('Channel', 'Add');
 })->via('GET', 'POST');
 
+$app->map('/channel/template', $checkAuth, function() use ($app) {
+    $app->process('Channel', 'Template');
+})->via('POST');
+
 $app->get('/channel/edit/:id', $checkAuth, function( $id ) use ($app) {
     $app->params->set('id', $id);
     $app->process('Channel', 'Edit');

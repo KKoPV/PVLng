@@ -16,16 +16,18 @@
 
 <div class="grid_10">
 
-<h2>{{SelectEntityType}}</h2>
+<p>
+    <a href="#type">{{SelectEntityType}}</a> | <a href="#template">{{SelectEntityTemplate}}</a>
+</p>
+
+<h2><a name="type"></a>{{SelectEntityType}}</h2>
 
 <form action="/channel/add" method="post">
 
 <table id="typeTable" class="dataTable">
     <thead>
     <tr>
-        <th style="width:1%">
-            <input type="radio" name="type" value="" class="iCheck" checked="checked" />
-        </th>
+        <th style="width:1%"></th>
         <th>{{EntityType}}</th>
         <th style="white-space:nowrap">{{ExampleUnit}}</th>
         <th style="white-space:nowrap">{{Childs}}</th>
@@ -79,7 +81,11 @@
 
 <p><input type="submit" value="{{proceed}} &raquo;" /></p>
 
-<h2>{{SelectEntityTemplate}}</h2>
+</form>
+
+<form action="/channel/template" method="post">
+
+<h2><a name="template"></a>{{SelectEntityTemplate}}</h2>
 
 <p>{{CreateTreeWithoutReqest}}</p>
 
@@ -95,7 +101,7 @@
 
     <!-- BEGIN TEMPLATES -->
     <tr>
-        <td><input type="radio" id="{FILE}" name="type" value="{FILE}" class="iCheck" /></td>
+        <td><input type="radio" id="{FILE}" name="template" value="{FILE}" class="iCheck" /></td>
         <td style="white-space:nowrap;font-weight:bold">
             <label for="{FILE}">
                 <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
@@ -118,7 +124,18 @@
 
 </table>
 
-<p><input type="submit" value="{{proceed}} &raquo;" /></p>
+<p>
+    <select id="tree" name="tree">
+        <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
+        <option value="0" disabled="disabled">{{AsChild}}</option>
+            <!-- BEGIN ADDTREE -->
+            <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
+            <!-- END -->
+        </optgroup>
+    </select>
+    &nbsp;
+    <input type="submit" value="{{Create}}" />
+</p>
 
 </form>
 
