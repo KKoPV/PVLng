@@ -13,6 +13,13 @@
  */
 $(function() {
 
+    $("#radios").buttonset();
+
+    $("#radios input").change(function() {
+        $('#type').toggle($("#rbtype").checked);
+        $('#template').toggle($("#rbtemplate").checked);
+    });
+
     $('#typeTable').DataTable({
         bSort: true,
         bLengthChange: false,
