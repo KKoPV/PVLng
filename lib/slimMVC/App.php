@@ -44,7 +44,9 @@ class App extends \Slim\Slim {
      * @param  string $action Controller action
      * @return void
      */
-    public function process( $class='Index', $action='Index' ) {
+    public function process( $class='Index', $action='Index', $params=array() ) {
+
+        $this->params->replace($params);
 
         $class = '\Controller\\' . $class;
 

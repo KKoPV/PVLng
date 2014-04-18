@@ -2,7 +2,7 @@
 /**
  * @author      Patrick Feisthammel <patrick.feisthammel@citrin.ch>
  * @copyright   2014 Patrick Feisthammel
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  *
  * 1.0.0
@@ -16,9 +16,7 @@ return array(
     'description' => '
         Accumulator group for three power phases:
         <ul>
-            <li>Power sensor, phase 1 (W)</li>
-            <li>Power sensor, phase 2 (W)</li>
-            <li>Power sensor, phase 3 (W)</li>
+            <li>Power sensor, phases 1, 2 and 3 (W)</li>
         </ul>
     ',
 

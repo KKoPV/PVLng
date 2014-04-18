@@ -17,7 +17,8 @@
 <div class="grid_10">
 
 <p>
-    <a href="#type">{{SelectEntityType}}</a> | <a href="#template">{{SelectEntityTemplate}}</a>
+    <a class="button" data-primary="ui-icon-triangle-1-s" href="#type">{{SelectEntityType}}</a>
+    <a class="button" data-primary="ui-icon-triangle-1-s" href="#template">{{SelectEntityTemplate}}</a>
 </p>
 
 <h2><a name="type"></a>{{SelectEntityType}}</h2>
@@ -83,11 +84,11 @@
 
 </form>
 
-<form action="/channel/template" method="post">
-
 <h2><a name="template"></a>{{SelectEntityTemplate}}</h2>
 
 <p>{{CreateTreeWithoutReqest}}</p>
+
+<form action="/channel/template" method="post">
 
 <table id="tplTable" class="dataTable">
     <thead>

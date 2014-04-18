@@ -26,8 +26,7 @@ $app->get('/channel', $checkAuth, function() use ($app) {
 });
 
 $app->map('/channel/add(/:clone)', $checkAuth, function( $clone=0 ) use ($app) {
-    $app->params->set('clone', $clone);
-    $app->process('Channel', 'Add');
+    $app->process('Channel', 'Add', array('clone' => $clone));
 })->via('GET', 'POST');
 
 $app->map('/channel/template', $checkAuth, function() use ($app) {
@@ -35,8 +34,7 @@ $app->map('/channel/template', $checkAuth, function() use ($app) {
 })->via('POST');
 
 $app->get('/channel/edit/:id', $checkAuth, function( $id ) use ($app) {
-    $app->params->set('id', $id);
-    $app->process('Channel', 'Edit');
+    $app->process('Channel', 'Edit', array('id' => $id));
 });
 
 $app->post('/channel/alias', $checkAuth, function() use ($app) {
