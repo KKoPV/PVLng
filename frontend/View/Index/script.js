@@ -853,7 +853,7 @@ $(function() {
      */
     qs = $.parseQueryString();
 
-    chartOptions.chart.height = qs.ChartHeight || ChartHeight;
+    chartOptions.chart.height = qs.height || ChartHeight;
 
     if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);

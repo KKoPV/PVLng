@@ -12,7 +12,7 @@
 <input type="hidden" id="fromdate" />
 <input type="hidden" id="todate" />
 
-<div id="nav" class="grid_10" style="margin-top:1em">
+<div id="nav" class="grid_10" style="margin-top:1em<!-- IF {EMBEDDED} == "2" -->;display:none<!-- ENDIF -->">
 
     <div class="alpha grid_4">
         <table>
@@ -75,6 +75,8 @@
 
 <div class="clear"></div>
 
+<div <!-- IF {EMBEDDED} == "2" -->style="display:none<!-- ENDIF -->">
+
 <!-- IF {USER} -->
     <!-- INCLUDE content.private.inc.tpl -->
 <!-- ELSE -->
@@ -82,3 +84,5 @@
 <!-- ENDIF -->
 
 <!-- INCLUDE dialog.chart.tpl -->
+
+</div>
