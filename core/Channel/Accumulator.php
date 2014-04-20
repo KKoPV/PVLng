@@ -35,7 +35,7 @@ class Accumulator extends \Channel {
 
         // Check if the new child have the same type as the 1st (and any other) child
         $first = self::byID($childs[0]['entity']);
-        $new     = self::byGUID($guid);
+        $new   = self::byGUID($guid);
         if ($first->type == $new->type) {
             // ok, add new child
             return parent::addChild($guid);
@@ -92,7 +92,6 @@ class Accumulator extends \Channel {
                             $row1['consumption'] += $row2['consumption'];
 
                             $result->write($row1, $key1);
-                            $last = $row1['data'];
 
                             // read both next rows
                             $row1 = $buffer->next()->current();

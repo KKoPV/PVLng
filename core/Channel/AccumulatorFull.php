@@ -35,13 +35,13 @@ class AccumulatorFull extends \Channel {
 
         // Check if the new child have the same type as the 1st (and any other) child
         $first = self::byID($childs[0]['entity']);
-        $new     = self::byGUID($guid);
+        $new   = self::byGUID($guid);
         if ($first->type == $new->type) {
             // ok, add new child
             return parent::addChild($guid);
         }
 
-        throw new Exception('"'.$this->name.'" accepts only childs of type "'.$first->type.'"', 400);
+        throw new Exception('"'.$this->name.'" accepts only childs of the same type!', 400);
     }
 
     /**
@@ -66,6 +66,7 @@ class AccumulatorFull extends \Channel {
 
             default:
                 $buffer = $childs[0]->read($request);
+                $meter  = $childs[0]->meter;
 
                 // Combine all data for same timestamp
                 for ($i=1; $i<$childCnt; $i++) {
@@ -76,6 +77,7 @@ class AccumulatorFull extends \Channel {
                     $row2 = $next->rewind()->current();
 
                     $result = new \Buffer;
+                    $last1 = $last2 = NULL;
 
                     while (!empty($row1) OR !empty($row2)) {
 
@@ -84,6 +86,11 @@ class AccumulatorFull extends \Channel {
 
                         if ($key1 === $key2) {
 
+                            if ($meter) {
+                                $last1 = $row1;
+                                $last2 = $row2;
+                            }
+
                             // same timestamp, combine
                             $row1['data']        += $row2['data'];
                             $row1['min']         += $row2['min'];
@@ -91,7 +98,6 @@ class AccumulatorFull extends \Channel {
                             $row1['consumption'] += $row2['consumption'];
 
                             $result->write($row1, $key1);
-                            $last = $row1['data'];
 
                             // read both next rows
                             $row1 = $buffer->next()->current();
@@ -99,6 +105,16 @@ class AccumulatorFull extends \Channel {
 
                         } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
+                            if ($meter) {
+                                $last1 = $row1;
+                            }
+
+                            if ($meter AND $last2) {
+                                $row1['data']        += $last2['data'];
+                                $row1['min']         += $last2['min'];
+                                $row1['max']         += $last2['max'];
+                                $row1['consumption'] += $last2['consumption'];
+                            }
                             $result->write($row1, $key1);
 
                             // read only row 1
@@ -106,6 +122,16 @@ class AccumulatorFull extends \Channel {
 
                         } else /* $key1 > $key2 */ {
 
+                            if ($meter) {
+                                $last2 = $row2;
+                            }
+
+                            if ($meter AND $last1) {
+                                $row2['data']        += $last1['data'];
+                                $row2['min']         += $last1['min'];
+                                $row2['max']         += $last1['max'];
+                                $row2['consumption'] += $last1['consumption'];
+                            }
                             $result->write($row2, $key2);
 
                             // read only row 2
