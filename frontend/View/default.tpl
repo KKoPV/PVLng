@@ -204,7 +204,7 @@
             DecimalSeparator = '{DSEP}',
             ThousandSeparator = '{TSEP}',
 
-            language = '{LANGUAGE}'
+            language = '{LANGUAGE}',
             user = '{USER}';
     </script>
 
