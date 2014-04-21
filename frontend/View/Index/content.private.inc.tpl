@@ -56,42 +56,39 @@ style="width:16px;height:16px" width="16" height="16" alt=""
                 >
                 <td>
                     <!-- IF {GRAPH} -->
-                    <input id="c{ID}" type="checkbox" class="channel iCheck"
-                           data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
+                    <input id="c{ID}" type="checkbox" class="channel iCheck" data-id="{ID}" />
                     <!-- ENDIF -->
                 </td>
                 <td style="padding:0.4em 0" <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
                     <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                         src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" alt="">
+                         src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" alt="" />
                     <strong class="tip" title="{GUID}">{NAME}</strong>
-                    <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+                    <!-- IF {DESCRIPTION} --> <small>({DESCRIPTION})</small><!-- ENDIF -->
                     <!-- IF !{PUBLIC} -->
-                        <img src="/images/ico/lock.png" class="tip"
-                             style="margin-left:8px;width:16px;height:16px"
-                             width="16" height="16" title="{{PrivateChannel}}"
-                             alt="[private]"/>
+                    <img src="/images/ico/lock.png" class="tip" alt="[private]"
+                         style="margin-left:8px;width:16px;height:16px"
+                         width="16" height="16" title="{{PrivateChannel}}" />
                     <!-- ENDIF -->
                 </td>
                 <td>
                     <img id="s{ID}" src="/images/spinner.gif" width="16" height="16"
-                         style="float:right;display:none;width:16px;height:16px" alt="">
+                         style="float:right;display:none;width:16px;height:16px" alt="" />
                 </td>
                 <td id="cons{ID}" class="consumption"></td>
-                <td id="u{ID}">{UNIT}</td>
+                <td>{UNIT}</td>
                 <td id="costs{ID}" class="costs"></td>
                 <td style="white-space:nowrap">
                     <!-- IF {GRAPH} -->
-                    <img style="width:16px;height:16px"
-                         src="/images/ico/chart.png" onclick="ChartDialog({ID}, '{NAME}')"
-                         class="tip imgbar" title="{{ChartSettingsTip}}" width="16" height="16" alt="">
+                    <img src="/images/ico/chart.png" data-id="{ID}"
+                         class="tip imgbar chartdialog" title="{{ChartSettingsTip}}"
+                         style="width:16px;height:16px" width="16" height="16" alt="c" />
                     <!-- ELSE -->
                     <img <!-- MACRO PIX --> class="imgbar" />
                     <!-- ENDIF -->
                     <!-- IF {READ} -->
-                    <a href="/list/{GUID}" class="tip" title="{{ListHint}}">
-                        <img src="/images/ico/document-invoice.png" class="imgbar"
-                             width="16p" height="16" alt="l">
-                    </a>
+                    <img src="/images/ico/document-invoice.png" data-id="{ID}"
+                         class="tip imgbar showlist" width="16" height="16"
+                         title="{{ListHint}}" alt="l" />
                     <!-- ELSE -->
                     <img <!-- MACRO PIX --> class="imgbar" />
                     <!-- ENDIF -->

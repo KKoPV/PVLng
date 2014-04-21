@@ -1,3 +1,26 @@
+ v2.9.0
+========
+
+FIXED
+
+ - Fix sum of AccumulatorFull model ~ Knut Kohl <github@knutkohl.de>
+ - Fix wrong config include ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust AccumulatorFull to work correct with meter channels ~ Knut Kohl <github@knutkohl.de>
+ - Adjust add channel layout for channel type or template ~ Knut Kohl <github@knutkohl.de>
+ - Adjust route parameter handling in route definitions ~ Knut Kohl <github@knutkohl.de>
+ - Adjust HTML hooks ~ Knut Kohl <github@knutkohl.de>
+ - Adjust sone models ~ Knut Kohl <github@knutkohl.de>
+ - Make index view compatible with embedded=2 parameter ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Add new model AccumulatorFull ~ Knut Kohl <github@knutkohl.de>
+ - Add select for inserting templated channels into hierarchy ~ Knut Kohl <github@knutkohl.de>
+ - Add HTML hooks for head and body (before and after) content ~ Knut Kohl <github@knutkohl.de>
+
  v2.8.0
 ========
 

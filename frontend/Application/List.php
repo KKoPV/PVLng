@@ -22,15 +22,13 @@ PVLng::Menu(array(
  * Routes
  */
 $app->get('/list(/:id)', $checkAuth, function( $id=NULL ) use ($app) {
-    $app->params->set('id', $id);
-    $app->process('Lists');
+    $app->process('Lists', 'Index', array('id' => $id));
 })->conditions(array(
     'id' => '\d+'
 ));
 
 $app->get('/list(/:guid)', $checkAuth, function( $guid=NULL ) use ($app) {
-    $app->params->set('guid', $guid);
-    $app->process('Lists');
+    $app->process('Lists', 'Index', array('guid' => $guid));
 })->conditions(array(
     'guid' => '(\w{4}-){7}\w{4}'
 ));

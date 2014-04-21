@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Accumulator extends \Channel {
+class AccumulatorFull extends \Channel {
 
     /**
      * Channel type
@@ -41,7 +41,7 @@ class Accumulator extends \Channel {
             return parent::addChild($guid);
         }
 
-        throw new Exception('"'.$this->name.'" accepts only childs of type "'.$first->type.'"', 400);
+        throw new Exception('"'.$this->name.'" accepts only childs of the same type!', 400);
     }
 
     /**
@@ -66,6 +66,7 @@ class Accumulator extends \Channel {
 
             default:
                 $buffer = $childs[0]->read($request);
+                $meter  = $childs[0]->meter;
 
                 // Combine all data for same timestamp
                 for ($i=1; $i<$childCnt; $i++) {
@@ -74,9 +75,9 @@ class Accumulator extends \Channel {
 
                     $row1 = $buffer->rewind()->current();
                     $row2 = $next->rewind()->current();
-                    $first1 = $first2 = TRUE;
 
                     $result = new \Buffer;
+                    $last1 = $last2 = NULL;
 
                     while (!empty($row1) OR !empty($row2)) {
 
@@ -84,6 +85,11 @@ class Accumulator extends \Channel {
                         $key2 = $next->key();
 
                         if ($key1 === $key2) {
+
+                            if ($meter) {
+                                $last1 = $row1;
+                                $last2 = $row2;
+                            }
 
                             // same timestamp, combine
                             $row1['data']        += $row2['data'];
@@ -96,25 +102,28 @@ class Accumulator extends \Channel {
                             // read both next rows
                             $row1 = $buffer->next()->current();
                             $row2 = $next->next()->current();
-                            $first1 = $first2 = FALSE;
 
                         } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                            // write $row1 only, if data set 2 is not yet started
-                            if ($first2) $result->write($row1, $key1);
+                            if ($meter) {
+                                if ($last2) $row1['data'] += $last2['data'];
+                                $last1 = $row1;
+                            }
+                            $result->write($row1, $key1);
 
                             // read only row 1
                             $row1 = $buffer->next()->current();
-                            $first1 = FALSE;
 
                         } else /* $key1 > $key2 */ {
 
-                            // write $row2 only, if data set 1 is not yet started
-                            if ($first1) $result->write($row2, $key2);
+                            if ($meter) {
+                                if ($last1) $row2['data'] += $last1['data'];
+                                $last2 = $row2;
+                            }
+                            $result->write($row2, $key2);
 
                             // read only row 2
                             $row2 = $next->next()->current();
-                            $first2 = FALSE;
 
                         }
                     }

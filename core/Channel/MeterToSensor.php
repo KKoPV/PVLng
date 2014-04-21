@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class SensorToMeter extends \Channel {
+class MeterToSensor extends \Channel {
 
     /**
      * Channel type
@@ -21,7 +21,7 @@ class SensorToMeter extends \Channel {
      * SENSOR_CHANNEL    - numeric
      * METER_CHANNEL     - numeric
      */
-    const TYPE = METER_CHANNEL;
+    const TYPE = SENSOR_CHANNEL;
 
     /**
      *
@@ -36,19 +36,21 @@ class SensorToMeter extends \Channel {
         }
 
         $buffer = $this->getChild(1)->read($request)->rewind();
-        $row = $buffer->current();
-        $last = $row['timestamp'];
+        $last = $buffer->current();
         $buffer->next();
 
         $result = new \Buffer;
 
-        $consumption = 0;
         while ($row = $buffer->current()) {
-            $row['consumption'] = ($row['timestamp'] - $last) / 3600 * $row['data'];
-            $consumption += $row['consumption'];
-            $row['data'] = $consumption;
+            $fact = 3600 / ($row['timestamp'] - $last['timestamp']);
+            // Smooth a bit by calculate average of this and last consumption
+            $row['data'] = ($row['consumption'] + $last['consumption']) / 2 * $fact;
+            $row['min']  = $row['min'] * $fact;
+            $row['max']  = $row['max'] * $fact;
+            // Remember row before adjust consumption
+            $last = $row;
+            $row['consumption'] = 0;
             $result->write($row, $buffer->key());
-            $last = $row['timestamp'];
             $buffer->next();
         }
 

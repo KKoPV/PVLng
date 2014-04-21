@@ -15,7 +15,7 @@ src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICR
 style="width:16px;height:16px" width="16" height="16" alt=""
 <!-- END DEFINE -->
 
-<div class="grid_10">
+<div class="grid_10" style="margin-top:1em">
 
 <table id="tree" class="dataTable treeTable">
     <thead>

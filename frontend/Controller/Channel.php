@@ -65,76 +65,82 @@ class Channel extends \Controller {
 
         if (($type = $this->request->post('type')) == '') return;
 
-        if (is_numeric($type)) {
-            // Type Id
-            $this->prepareFields($type);
-            foreach ($this->fields as &$data) {
-                $data['VALUE'] = $data['DEFAULT'];
-            }
+        $this->prepareFields($type);
+        foreach ($this->fields as &$data) {
+            $data['VALUE'] = $data['DEFAULT'];
+        }
 
-            $this->view->Type = $type;
+        $this->view->Type = $type;
 
-            // Preset channel unit
-            $type = new \ORM\ChannelType($type);
-            $this->fields['unit']['VALUE'] = $type->unit;
+        // Preset channel unit
+        $type = new \ORM\ChannelType($type);
+        $this->fields['unit']['VALUE'] = $type->unit;
 
-            $model = $type->ModelClass();
-            $model::beforeCreate($this->fields);
+        $model = $type->ModelClass();
+        $model::beforeCreate($this->fields);
 
-            $this->ignore_returnto = TRUE;
-            $this->app->foreward('Edit');
-        } else {
-            // Get from template
-            $channels = include $type;
-            $channels = $channels['channels'];
+        $this->ignore_returnto = TRUE;
+        $this->app->foreward('Edit');
+    }
 
-            // 1st save channels
-            $oChannel = new \ORM\Channel;
-            $oChannel->throwException();
+    /**
+     *
+     */
+    public function TemplatePOST_Action() {
 
-            try {
+        if (($template = $this->request->post('template')) == '') return;
 
-                foreach ($channels as $id=>$channel) {
-                    $oChannel->reset();
-                    foreach ($channel as $key=>$value) {
-                        $oChannel->set($key, $value);
-                    }
-                    $oChannel->insert();
-                    // Remember id for hierarchy build
-                    $channels[$id]['id'] = $oChannel->id;
-                }
-                \Messages::Success(__('ChannelsSaved', count($channels)));
+        $channels = include $template;
+        $channels = $channels['channels'];
 
-            } catch (\Exception $e) {
-                \Messages::Error($e->getMessage());
+        // 1st save channels
+        $oChannel = new \ORM\Channel;
+        $oChannel->throwException();
 
-                // Rollback in case of error
-                $oChannel->reset();
-                foreach ($channels as $id=>$channel) {
-                    if (isset($channels[$id]['id'])) {
-                        $oChannel->id = $channels[$id]['id'];
-                        $oChannel->delete();
-                    }
-                }
-
-                $this->app->redirect('/channel');
-            }
-
-            // Build hierarchy
-            $tree = \NestedSet::getInstance();
+        try {
 
             foreach ($channels as $id=>$channel) {
-                if ($id == 0) {
-                    $groupId = $tree->insertChildNode($channel['id'], 1);
-                } else {
-                    $tree->insertChildNode($channel['id'], $groupId);
+                $oChannel->reset();
+                foreach ($channel as $key=>$value) {
+                    $oChannel->set($key, $value);
+                }
+                $oChannel->insert();
+                // Remember id for hierarchy build
+                $channels[$id]['id'] = $oChannel->id;
+            }
+            \Messages::Success(__('ChannelsSaved', count($channels)));
+
+        } catch (\Exception $e) {
+            \Messages::Error($e->getMessage());
+
+            // Rollback in case of error
+            $oChannel->reset();
+            foreach ($channels as $id=>$channel) {
+                if (isset($channels[$id]['id'])) {
+                    $oChannel->id = $channels[$id]['id'];
+                    $oChannel->delete();
                 }
             }
-            $this->app->cache->delete('Tree');
-            \Messages::Success(__('HierarchyCreated', count($channels)));
 
-            $this->app->redirect('/overview');
+            $this->app->redirect('/channel');
         }
+
+        // Build hierarchy
+        $tree = \NestedSet::getInstance();
+        // Remember Grouping Id for templates without own grouping channel (index 0)
+        $groupId = $this->request->post('tree');
+
+        foreach ($channels as $id=>$channel) {
+            if ($id == 0) {
+                $groupId = $tree->insertChildNode($channel['id'], $groupId);
+            } else {
+                $tree->insertChildNode($channel['id'], $groupId);
+            }
+        }
+        $this->app->cache->delete('Tree');
+        \Messages::Success(__('HierarchyCreated', count($channels)));
+
+        $this->app->redirect('/overview');
     }
 
     /**
@@ -185,6 +191,7 @@ class Channel extends \Controller {
             }
 
             $this->view->Templates = $templates;
+            $this->AddToTree();
         }
     }
 
@@ -330,14 +337,21 @@ class Channel extends \Controller {
 
         if (!$this->view->Id) {
             // Add mode
-            $q = new \DBQuery('pvlng_tree_view');
-            $q->get('id')
-              ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
-              ->get('name')
-              ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
-              ->whereNE('childs', 0);
-            $this->view->AddTree = $this->rows2view($this->db->queryRows($q));
+            $this->AddToTree();
         }
+    }
+
+    /**
+     *
+     */
+    protected function AddToTree() {
+        $q = new \DBQuery('pvlng_tree_view');
+        $q->get('id')
+          ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
+          ->get('name')
+          ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
+          ->whereNE('childs', 0);
+        $this->view->AddTree = $this->rows2view($this->db->queryRows($q));
     }
 
     /**

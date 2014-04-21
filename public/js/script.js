@@ -35,9 +35,6 @@ $(function() {
     $.pnotify.defaults.history = false;
     $.pnotify.defaults.stack.spacing1 = 5;
     $.pnotify.defaults.stack.spacing2 = 15;
-    $.pnotify.defaults.labels.redisplay = pnotify_defaults_labels_redisplay;
-    $.pnotify.defaults.labels.all = pnotify_defaults_labels_all;
-    $.pnotify.defaults.labels.last = pnotify_defaults_labels_last;
     $.pnotify.defaults.labels.stick = pnotify_defaults_labels_stick;
     $.pnotify.defaults.labels.close = pnotify_defaults_labels_close;
 
@@ -112,6 +109,7 @@ $(function() {
 
     $('.language').click(function(e) {
         e.preventDefault();
+        /* Detect if there is already parameters in URL */
         var sep = (window.location.search == '') ? '?' : '&';
         window.location = window.location + sep + 'lang=' + $(this).data('lang');
         return false;
@@ -168,7 +166,7 @@ function _log() {
 
 /**
  *
- */
+ * /
 String.prototype.repeat = function(count) {
     if (count < 1) return '';
     var result = '', pattern = this.valueOf();
@@ -178,3 +176,4 @@ String.prototype.repeat = function(count) {
     }
     return result;
 };
+*/

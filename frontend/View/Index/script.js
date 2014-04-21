@@ -42,6 +42,12 @@ var RefreshTimeout = 300;
 
 <script>
 
+var channels = {
+    <!-- BEGIN DATA -->
+    {ID}: { id: {ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}' },
+    <!-- END -->
+};
+
 function Views() {
     this.views = {};
     this.actual = { slug: '', name: '', public: 0 };
@@ -156,7 +162,7 @@ function Views() {
  *
  */
 var
-    qs = {}, views = {}, chart = false, updateTimeout,
+    qs = {}, views = {}, chart = false, channels_chart = [], updateTimeout,
 
     chartOptions = {
         chart: {
@@ -251,7 +257,10 @@ var
             crosshairs: true,
             shared: true
         },
-        loading: { labelStyle: { top: '40%', fontSize: '150%' } }
+        loading: {
+            labelStyle: { top: '40%' },
+            style: { opacity: 0.8 }
+        }
     };
 
 /**
@@ -319,15 +328,24 @@ function SecToTimeStr( s ) {
 /**
  *
  */
-function ChartDialog( id, name ) {
+function ChartDialog( id ) {
     /* get stringified settings */
-    var p = new presentation($('#c'+id).val());
+    var p = $('#c'+id).val();
+    if (p == 'on') {
+        /* initial, no presetaion set yet */
+        p = new presentation();
+        /* suggest scatter for channels without unit */
+        if (!channels[id].unit) p.type = 'scatter';
+    } else {
+        p = new presentation(p);
+    }
 
     /* set dialog properties */
     /* find the radio button with the axis value and check it */
     $('input[name="d-axis"][value="' + p.axis + '"]').prop('checked', true);
     $('#d-type').val(p.type);
     $('#d-cons').prop('checked', p.consumption);
+    /* find the radio button with the line width and check it */
     $('input[name="d-width"][value="' + p.width + '"]').prop('checked', true);
     $('#d-min').prop('checked', p.min);
     $('#d-max').prop('checked', p.max);
@@ -351,14 +369,12 @@ function ChartDialog( id, name ) {
     $('#d-type').trigger('change');
 
     /* Set the id into the dialog for onClose to write data back */
-    $('#dialog-chart').data('id',id).dialog('option','title',name).dialog('open');
+    $('#dialog-chart').data('id', id).dialog('option', 'title', channels[id].name).dialog('open');
 }
 
 /**
  *
  */
-var channels = [];
-
 /**
  * Scale timestamps down to full minute, hour, day, week, month, quarter or year
  */
@@ -431,11 +447,12 @@ function updateChart( forceUpdate ) {
 
     /* find active channels, map and sort axis */
     $('input.channel:checked').each(function(id, el) {
-        channel = new presentation($(el).val());
-        channel.id = $(el).data('id');
-        channel.name = $('<div/>').html($(el).data('name')).text();
-        channel.guid = $(el).data('guid');
-        channel.unit = $(el).data('unit');
+        var ch = channels[$(el).data('id')],
+            channel = new presentation($(el).val());
+        channel.id = ch.id;
+        channel.name = $('<div/>').html(ch.name).text();
+        channel.guid = ch.guid;
+        channel.unit = ch.unit;
         channel.time1 = TimeStrToSec(channel.time1,  0);
         channel.time2 = TimeStrToSec(channel.time2, 24);
         /* remember channel */
@@ -512,15 +529,15 @@ function updateChart( forceUpdate ) {
     var changed = false, now = (new Date).getTime() / 1000 / 60;
 
     /* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
-    if (forceUpdate || channels_new.length != channels.length || now - lastChanged > 30) {
+    if (forceUpdate || channels_new.length != channels_chart.length || now - lastChanged > 30) {
         changed = true;
-        channels = channels_new;
+        channels_chart = channels_new;
         lastChanged = now;
     } else {
         for (var i=0, l=channels_new.length; i<l; i++) {
-            if (JSON.stringify(channels_new[i]) != JSON.stringify(channels[i])) {
+            if (JSON.stringify(channels_new[i]) != JSON.stringify(channels_chart[i])) {
                 changed = true;
-                channels = channels_new;
+                channels_chart = channels_new;
             }
         }
     }
@@ -543,13 +560,12 @@ function updateChart( forceUpdate ) {
     if (f != t) f += ' - ' + t;
     chart.setTitle({ text: $('<div/>').html(views.actual.name).text() }, { text: f });
 
-    var loading = channels.length;
-    chart.showLoading('- ' + loading + ' -');
+    chart.showLoading('<img src="/images/loading_bar.gif" width="192" height="12" />');
 
     var series = [], costs = 0, date = new Date();
 
     /* get data */
-    $(channels).each(function(id, channel) {
+    $(channels_chart).each(function(id, channel) {
 
         $('#s'+channel.id).show();
 
@@ -712,16 +728,12 @@ function updateChart( forceUpdate ) {
 
             $('#s'+channel.id).hide();
 
-            /* Force redraw */
-            chart.hideLoading();
-            chart.showLoading('- ' + (--loading) + ' -');
-
             /* check real count of elements in series array! */
             var completed = series.filter(function(a){ return a !== undefined }).length;
             _log(completed+' series completed');
 
             /* check if all getJSON() calls finished */
-            if (completed != channels.length) return;
+            if (completed != channels_chart.length) return;
 
             if ('{INDEX_NOTIFYLOADALL}') $.pnotify({
                 type: 'success',
@@ -841,7 +853,7 @@ $(function() {
      */
     qs = $.parseQueryString();
 
-    chartOptions.chart.height = qs.ChartHeight || ChartHeight;
+    chartOptions.chart.height = qs.height || ChartHeight;
 
     if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);
@@ -927,12 +939,15 @@ $(function() {
         }
     });
 
-    if (user) $('#data-table tbody tr.graph').addClass('clickable').click(function() {
-        var ckbx = $(this).find('input[type=checkbox]');
-        if (typeof ckbx !== 'undefined') {
-            ChartDialog(ckbx.data('id'), ckbx.data('name'))
-        }
-    });
+    if (user) {
+        $('.chartdialog').addClass('clickable').click(function() {
+            ChartDialog($(this).data('id'));
+        });
+
+        $('.showlist').addClass('clickable').click(function() {
+            window.location.href = '/list/' + channels[$(this).data('id')].guid;
+        });
+    }
 
     /**
      *
