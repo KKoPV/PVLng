@@ -40,8 +40,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
     <tr data-tt-id="{ID}" class="droppable<!-- IF {CHILDCOUNT} --> have-childs<!-- ENDIF -->"
         <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
         <td>
-            <span class="<!-- IF {CHILDS} -->non-<!-- ENDIF -->draggable"
-                  data-id="{ID}" data-entity="{ENTITY}">
+            <span class="draggable" data-id="{ID}">
                 <img style="vertical-align:top;margin-right:8px"
                      width="16" height="16" class="tip" title="{TYPE}"
                      src="{ICON}" alt="">
@@ -160,6 +159,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
                      style="width:16px;height:16px" width="16" height="16"
                      onclick="addChild(1)" class="tip" title="{{AddOneToManyChannels}}">
             </span>
+            <small style="margin-left:24px;color:#808080">({{DragHereForRoot}})</small>
         </td>
         <td></td>
         <td></td>

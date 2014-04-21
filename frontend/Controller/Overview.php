@@ -1,4 +1,5 @@
 <?php
+/* // AOP // */
 /**
  *
  *
@@ -44,13 +45,26 @@ class Overview extends \Controller {
     public function Index_Action() {
         $this->view->SubTitle = \I18N::_('Overview');
 
+        /// \Yryie::StartTimer('LoadTree', NULL, 'CacheDB');
         while ($this->app->cache->save('Tree', $tree)) {
             $tree = \NestedSet::getInstance()->getFullTree();
+            /// \Yryie::Info('Loaded tree from Database');
             // Skip root node
             array_shift($tree);
         }
+        /// \Yryie::StopTimer('LoadTree');
 
+        /// \Yryie::StartTimer('BuildTree');
         $parent = array( 1 => 0 );
+
+        // Buffer channels for less database access
+        $buffer = array();
+        $q = new \DBQuery('pvlng_tree_view');
+        if ($res = $this->db->query($q)) {
+            while($row = $res->fetch_assoc()) {
+                $buffer[$row['entity']] = $row;
+            }
+        }
 
         $channel = new \ORM\Tree;
 
@@ -62,33 +76,20 @@ class Overview extends \Controller {
             $node['childcount'] = $node['childs'];
 
             $id = $node['id'];
+            $entity = $node['entity'];
 
-#            while ($this->app->cache->save('ChannelView'.$node['entity'], $attr)) {
-                $attr = $channel->find('entity', $node['entity'])->getAll();
-#            }
+            $attr = $buffer[$entity];
             $guid = $node['guid'] ?: $attr['guid'];
 
             $node = array_merge($node, $attr);
             $node['id'] = $id;
             $node['guid'] = $guid;
 
-/*
-            if ($entity->find('id', $node['id'])) {
-                $node['type']         = $entity->type;
-                $node['name']         = $entity->name;
-                $node['unit']         = $entity->unit;
-                $node['description']  = $entity->description;
-                $node['guid']         = $entity->guid;
-                $node['acceptchilds'] = $entity->childs;
-                $node['read']         = $entity->read;
-                $node['write']        = $entity->write;
-                $node['public']       = $entity->public;
-                $node['icon']         = $entity->icon;
-                $node['alias']        = $entity->alias;
-            }
-*/
             $data[] = array_change_key_case($node, CASE_UPPER);
         }
+        /// \Yryie::Debug('Channel Buffer: '.count($buffer));
+        /// \Yryie::Debug('Channel count: '.count($tree));
+        /// \Yryie::StopTimer('BuildTree');
         $this->view->Data = $data;
     }
 
@@ -144,47 +145,133 @@ class Overview extends \Controller {
      * Move an entity to new parent
      */
     public function DragDropPOST_Action() {
-        if ($id = $this->request->post('id')) {
-            // Remove from old position
-            $this->Tree->DeleteNode($id);
-            $this->app->cache->delete('Tree');
-        }
+        if ($target = $this->request->post('target')) {
+            // Root dummy accept childs...
+            $targetAcceptChilds = ($target == 1 OR \ORM::forge('Tree')->find('id', $target)->childs != 0);
 
-        if ($target = $this->request->post('target') AND
-            $entity = $this->request->post('entity')) {
+            if ($entity = $this->request->post('entity')) {
+                // Add new channel
 
-            if (\ORM::forge('Tree')->find('id', $target)->childs != 0) {
-                // Add as new child
-                $this->Tree->insertChildNode($entity, $target);
-            } else {
-                // Get full path to drop target
-                $path = $this->Tree->getPathFromRoot($target);
+                if ($targetAcceptChilds) {
+                    // Add as new child
+                    $this->Tree->insertChildNode($entity, $target);
+                } else {
+                    // Get full path to drop target
+                    $path = $this->Tree->getPathFromRoot($target);
 
-                // Get parent of drop target > second to last of path
-                $target_new = array_slice($path, count($path)-2, 1);
-                $target_new = $target_new[0]['id'];
+                    // Get parent of drop target > second to last of path
+                    $target_new = array_slice($path, count($path)-2, 1);
+                    $target_new = $target_new[0]['id'];
 
-                // Search position of drop target in existing childs
-                $childs = $this->Tree->getChilds($target_new);
-                foreach ($childs as $pos=>$child) {
-                    if ($child['id'] == $target) break;
+                    // Search position of drop target in existing childs
+                    $childs = $this->Tree->getChilds($target_new);
+                    foreach ($childs as $pos=>$child) {
+                        if ($child['id'] == $target) break;
+                    }
+
+                    // 1st Add as new child
+                    $new = $this->Tree->insertChildNode($entity, $target_new);
+
+                    // 2nd Move to correct position
+                    $count = count($childs) - $pos - 1;
+                    while ($count--) {
+                        if (!$this->Tree->moveLft($new)) break;
+                    }
                 }
 
-                // 1st Add as new child
-                $new = $this->Tree->insertChildNode($entity, $target_new);
+            } elseif ($id = $this->request->post('id')) {
+                // Move channel/group
 
-                // 2nd Move to correct position
-                $count = count($childs) - $pos - 1;
-                while ($count--) {
-                    if (!$this->Tree->moveLft($new)) break;
+                $delta = 0;
+
+                if (!$targetAcceptChilds) {
+                    // Get full path to drop target
+                    $path = $this->Tree->getPathFromRoot($target);
+
+                    // Get parent of drop target > second to last of path
+                    $target_new = array_slice($path, count($path)-2, 1);
+                    $target_new = $target_new[0]['id'];
+
+                    // Search position of drop target in existing childs
+                    $childs = $this->Tree->getChilds($target_new);
+                    $holdsSelf = FALSE;
+                    foreach ($childs as $pos=>$child) {
+                        if ($child['id'] == $id) {
+                            $holdsSelf = $pos;
+                        }
+                        if ($child['id'] == $target) {
+                            $delta = count($childs) - $pos - 1;
+                        }
+                    }
+
+                    $target = $target_new;
+                    // If move inside same parrent, correct delta
+                    if ($holdsSelf !== FALSE AND $holdsSelf >= count($childs)-$delta) $delta--;
+                }
+
+                // Find target right
+                $q = new \DBQuery('pvlng_tree');
+                $q->get('rgt')->whereEQ('id', $target);
+                $rgt = $this->db->queryOne($q);
+
+                // Find left and right of channel to move
+                $q = new \DBQuery('pvlng_tree');
+                $q->whereEQ('id', $id);
+                $data = $this->db->queryRow($q);
+
+                $sql = str_replace(
+                    array(':p',    ':l',       ':r'),
+                    array($rgt, $data->lft, $data->rgt),
+                    $this->MoveSubTreeSQL
+                );
+
+                $this->db->query($sql);
+
+                while ($delta-- > 0) {
+                    if (!$this->Tree->moveLft($id)) break;
                 }
             }
+
             $this->app->cache->delete('Tree');
         }
 
         $this->redirect();
     }
 
+    /**
+     * http://www.php-resource.de/forum/blogs/amicanoctis/25-nested-set-move-subtree.html
+     *
+     * moves a subtree before the specified position
+     *   if the position is the lft of a node, the subtree will be inserted before
+     *   if the position is the rgt of a node, the subtree will be its last child
+     * @param p the position to move the subtree before
+     * @param l the lft of the subtree to move
+     * @param r the rgt of the subtree to move
+     */
+    private $MoveSubTreeSQL = '
+        update pvlng_tree
+        set
+            lft = lft + if (:p > :r,
+                if (:r < lft and lft < :p,
+                    :l - :r - 1,
+                    if (:l <= lft and lft < :r, :p - :r - 1, 0)
+                ),
+                if (:p <= lft and lft < :l,
+                    :r - :l + 1,
+                    if (:l <= lft and lft < :r, :p - :l, 0)
+                )
+            ),
+            rgt = rgt + if (:p > :r,
+                if (:r < rgt and rgt < :p,
+                    :l - :r - 1,
+                    if (:l < rgt and rgt <= :r, :p - :r - 1, 0)
+                ),
+                if (:p <= rgt and rgt < :l,
+                    :r - :l + 1,
+                    if (:l < rgt and rgt <= :r, :p - :l, 0)
+                )
+            )
+        where :r < :p or :p < :l';
     /**
      * Move an entity down in tree
      */
