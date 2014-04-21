@@ -127,10 +127,12 @@ class Channel extends \Controller {
 
         // Build hierarchy
         $tree = \NestedSet::getInstance();
+        // Remember Grouping Id for templates without own grouping channel (index 0)
+        $groupId = $this->request->post('tree');
 
         foreach ($channels as $id=>$channel) {
             if ($id == 0) {
-                $groupId = $tree->insertChildNode($channel['id'], $this->request->post('tree'));
+                $groupId = $tree->insertChildNode($channel['id'], $groupId);
             } else {
                 $tree->insertChildNode($channel['id'], $groupId);
             }

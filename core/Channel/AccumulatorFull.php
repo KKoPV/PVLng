@@ -106,14 +106,8 @@ class AccumulatorFull extends \Channel {
                         } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                             if ($meter) {
+                                if ($last2) $row1['data'] += $last2['data'];
                                 $last1 = $row1;
-                            }
-
-                            if ($meter AND $last2) {
-                                $row1['data']        += $last2['data'];
-                                $row1['min']         += $last2['min'];
-                                $row1['max']         += $last2['max'];
-                                $row1['consumption'] += $last2['consumption'];
                             }
                             $result->write($row1, $key1);
 
@@ -123,14 +117,8 @@ class AccumulatorFull extends \Channel {
                         } else /* $key1 > $key2 */ {
 
                             if ($meter) {
+                                if ($last1) $row2['data'] += $last1['data'];
                                 $last2 = $row2;
-                            }
-
-                            if ($meter AND $last1) {
-                                $row2['data']        += $last1['data'];
-                                $row2['min']         += $last1['min'];
-                                $row2['max']         += $last1['max'];
-                                $row2['consumption'] += $last1['consumption'];
                             }
                             $result->write($row2, $key2);
 
