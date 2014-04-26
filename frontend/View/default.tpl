@@ -85,8 +85,9 @@
                         <img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
                     </a>
                     <!-- ELSE -->
-                    <a class="tipbtn" title="{{Login}}" href="/login">
-                        <img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
+                    <a href="#" class="tipbtn" title="{{Login}}">
+                        <img style="width:12px;height:12px" src="/images/logout.png"
+                             alt="L" width="12" height="12" onclick="$('#login-dialog').dialog('open'); return false" />
                     </a>
                     <!-- ENDIF -->
                 </span>
@@ -176,7 +177,7 @@
         <div class="clear"></div>
 
         <div class="grid_10">
-            <!-- YRYIE -->
+            <div id="YRYIE"></div>
         </div>
     </div>
 
@@ -216,5 +217,9 @@
     </a>
 
     <!-- INCLUDE hook.body.after.tpl -->
+
+    <!-- IF !{USER} -->
+        <!-- INCLUDE Admin/login.dialog.tpl -->
+    <!-- ENDIF -->
 </body>
 </html>
