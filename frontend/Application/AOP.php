@@ -68,19 +68,20 @@ class YryieMiddleware extends Slim\Middleware {
         Yryie::Finalize();
 
         $body = $this->app->response->getBody();
+        $placeholder = '<div id="YRYIE"></div>';
 
         if ($this->app->debug == 'trace') {
 
             $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
             Yryie::$TraceDelimiter = ';';
             Yryie::Save($file);
-            $body = str_replace('<!-- YRYIE -->', '<b>Trace saved as '.$file.'</b>', $body);
+            $body = str_replace($placeholder, '<b>Trace saved as '.$file.'</b>', $body);
 
             // Trace only once, reset debug state
             Session::set('debug', NULL);
         } else {
             // Replace placeholder with debug data
-            $body = str_replace('<!-- YRYIE -->',
+            $body = str_replace($placeholder,
                                 Yryie::getCSS() . Yryie::getJS(TRUE, TRUE) . Yryie::Render(),
                                 $body);
         }

@@ -40,6 +40,8 @@ function moveChild( id, action ) {
  */
 var ForceFullDraw = false;
 
+var cancelDragging, overlay;
+
 /**
  *
  */
@@ -151,36 +153,53 @@ $(function() {
     $('.droppable').droppable({
         accept: '.draggable',
         hoverClass: 'ui-state-active',
-        drop: function( event, ui ) {
+        drop: function(event, ui) {
+            if (cancelDragging) return;
+            ui.helper.hide();
+            overlay.show();
             /* Create hidden form and submit */
-            ui.draggable.hide();
-            var f = $('<form/>', { action: '/overview/dragdrop', method: 'post' } );
-            f.append($('<input/>', { type: 'hidden', name: 'target', value: $(this).data('tt-id') }));
-            f.append($('<input/>', { type: 'hidden', name: 'id',     value: ui.draggable.data('id') }));
-            f.append($('<input/>', { type: 'hidden', name: 'entity', value: ui.draggable.data('entity') }));
-            f.appendTo('body').submit();
+            $('<form/>', { action: '/overview/dragdrop', method: 'post' } )
+            .appendTo('body')
+            .append($('<input/>', { type: 'hidden', name: 'target', value: $(this).data('tt-id') }))
+            .append($('<input/>', { type: 'hidden', name: 'id',     value: ui.helper.data('id') }))
+            .append($('<input/>', { type: 'hidden', name: 'entity', value: ui.helper.data('entity') }))
+            .append($('<input/>', { type: 'hidden', name: 'copy',   value: +(ui.helper.css('cursor') == 'copy') }))
+            .submit();
         }
     });
 
-    $('#drag-new, .draggable').draggable({
+    $('#drag-new, .draggable').mousedown(function(event) {
+        /* Can dragged object be copied? */
+        var copy = $(this).parent().parent().hasClass('channel');
+        if (!copy && event.ctrlKey) {
+            /* Cancel dragging of groups */
+            $.pnotify({ type: 'error', delay: 20000, text: "{{CantCopyGroups}}" });
+            cancelDragging = true;
+            return;
+        }
+        var cursor = (copy && event.ctrlKey) ? 'copy' : 'alias';
+        $(this).draggable('option', { helper : copy ? 'clone' : 'original' }).css({ cursor: cursor });
+        $(this).draggable('option', { helper : 'clone' }).css({ cursor: cursor });
+    }).draggable({
         distance: 5,
-        opacity: .9,
-        revert: true,
-        revertDuration: 0,
-        stack: 'span.draggable',
         addClasses: false,
+        stack: 'span.draggable',
         cursorAt: { left: 24, top: 13 },
-        refreshPositions: true,
-        scroll: true,
-        start: function() {
-            var p = $(this).parent().parent();
-            if (p.hasClass('droppable')) p.droppable('disable');
-            $(this).addClass('ui-state-hover');
+        revert: 'invalid',
+        revertDuration: 0,
+        start: function(event, ui) {
+            cancelDragging = false;
+            $('.draggable').css({ cursor: ui.helper.css('cursor') });
+            if ($(this).prop('id') != 'drag-new') $(this).parent().parent().droppable('disable');
+            ui.helper.addClass('ui-state-hover');
+        },
+        drag: function(event, ui) {
+            if (cancelDragging) return false;
         },
         stop: function() {
+            $('.draggable').css({ cursor: 'default' });
             $(this).removeClass('ui-state-hover');
-            var p = $(this).parent().parent();
-            if (p.hasClass('droppable')) p.droppable('enable');
+            if ($(this).prop('id') != 'drag-new') $(this).parent().parent().droppable('enable');
         }
     });
 
@@ -201,7 +220,11 @@ $(function() {
         width: 650,
         modal: true,
         buttons: {
-            '{{Add}}': function() { $('#form-addchild').submit() },
+            '{{Add}}': function() {
+                $(this).dialog('close');
+                overlay.show();
+                $(this).find('form').submit()
+            },
             '{{Cancel}}': function() { $(this).dialog('close'); return false }
         }
     });
@@ -212,16 +235,13 @@ $(function() {
         width: 480,
         modal: true,
         buttons: {
-            '{{Delete}}': function() { $(this).data('form').submit() },
+            '{{Delete}}': function() {
+                $(this).dialog('close');
+                overlay.show();
+                $(this).data('form').submit();
+            },
             '{{Cancel}}': function() { $(this).dialog('close'); return false }
         }
-    });
-
-    $('.guid').click(function() {
-        /* select GUID, make ready for copy */
-        $(this).select();
-    }).mouseup(function(e) {
-        e.preventDefault();
     });
 
     $('.delete-form').submit(function(){
@@ -235,7 +255,11 @@ $(function() {
         width: 480,
         modal: true,
         buttons: {
-            '{{Ok}}': function() { $('#form-movechild').submit() },
+            '{{Ok}}': function() {
+                $(this).dialog('close');
+                overlay.show();
+                $(this).find('form').submit()
+            },
             '{{Cancel}}': function() { $(this).dialog('close'); return false }
         }
     });
@@ -245,8 +269,17 @@ $(function() {
         $('#form-addchild').append(select);
     });
 
-    shortcut.add('Alt+N', function() { window.location = '/channel/add'; });
+    $('.guid').click(function() {
+        /* select GUID, make ready for copy */
+        $(this).select();
+    }).mouseup(function(e) {
+        e.preventDefault();
+    });
 
+    shortcut.add('Alt+N', function() { window.location = '/channel/add'; });
+    shortcut.add('esc', function() { cancelDragging = true; });
+
+    overlay = new Overlay();
 });
 
 </script>

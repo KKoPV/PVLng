@@ -78,7 +78,6 @@ class Yryie {
     if (isset($_SERVER['SERVER_SOFTWARE']))
       self::add($_SERVER['SERVER_SOFTWARE'], 'version');
     self::add('PHP '.PHP_VERSION, 'version');
-    self::add('Yryie '.self::VERSION, 'version');
     self::add(NULL, 'version');  // empty line
   } // function Register()
 
@@ -542,7 +541,7 @@ class Yryie {
       }
     }
     return sprintf(file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'Yryie'.DIRECTORY_SEPARATOR.'table.html'),
-                   $sTypes, implode($aRows));
+                   self::VERSION, $sTypes, implode($aRows));
   } // function Render()
 
   /**

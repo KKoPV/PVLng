@@ -41,8 +41,7 @@
         </table>
     </div>
     <div class="grid_2 c" style="margin:0 2%">
-        &nbsp;
-        <img id="loading" src="/images/loading.gif" style="width:48px;height:47px" width="48" height="47" alt="loading ..." />
+        <img id="loading" src="/images/loading_bar.gif" style="width:220px;height:19px;margin-top:5px" width="220" height="19" alt="loading ..." />
         <img id="modified" src="/images/modified.png" width="24" height="24"
              style="display:none;margin-top:6px;width:24px;height:24px" alt="[ unsaved changes ]"
              class="tip" title="{{UnsavedChanges}}" />

@@ -131,6 +131,8 @@ abstract class I18N {
             $str = '<span style="background-color:#FF9966">'.$str.'</span>';
         }
 
+        $str = str_replace(array("\r", "\n"), '', $str);
+
         return vsprintf($str, $fargs);
     }
 

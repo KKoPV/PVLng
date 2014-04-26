@@ -10,6 +10,39 @@
 
 console.time('Duration');
 
+/**
+ *
+ */
+function Overlay() {
+    /* public */
+    this.show = function() {
+        this.overlay.show();
+    };
+
+    this.hide = function() {
+        this.overlay.hide();
+    };
+
+    this.toggle = function( force ) {
+        this.overlay.toggle(force);
+    };
+
+    /* Prepare overlay */
+    this.overlay = $('<div/>')
+    .height($(document).height())
+    .css({ display: 'none', position: 'fixed', top: 0, left: 0, width: '100%', backgroundColor: 'black', opacity : .2, zIndex: 1000 })
+    .appendTo('body');
+
+    $('<img />')
+    .prop('src', '/images/loadingBig.gif')
+    .prop('height', 100).prop('width', 100)
+    .css({ position: 'fixed', top: (window.innerHeight/2-50)+'px', left: (window.innerWidth/2-50)+'px' })
+    .appendTo(this.overlay);
+}
+
+/**
+ *
+ */
 $(function() {
 
     /**
@@ -33,6 +66,7 @@ $(function() {
     $.pnotify.defaults.styling = 'jqueryui';
     $.pnotify.defaults.delay = 5000;
     $.pnotify.defaults.history = false;
+    $.pnotify.defaults.sticker = false,
     $.pnotify.defaults.stack.spacing1 = 5;
     $.pnotify.defaults.stack.spacing2 = 15;
     $.pnotify.defaults.labels.stick = pnotify_defaults_labels_stick;

@@ -46,50 +46,25 @@ class Overview extends \Controller {
         $this->view->SubTitle = \I18N::_('Overview');
 
         /// \Yryie::StartTimer('LoadTree', NULL, 'CacheDB');
-        while ($this->app->cache->save('Tree', $tree)) {
-            $tree = \NestedSet::getInstance()->getFullTree();
-            /// \Yryie::Info('Loaded tree from Database');
-            // Skip root node
-            array_shift($tree);
+        while ($this->app->cache->save('OverviewTree', $data)) {
+            /// \Yryie::Info('Reload tree from Database');
+
+            $q = new \DBQuery('pvlng_tree_view');
+            $q->whereNE('id', 1);
+            $res = $this->db->query($q);
+
+            $parent = array( 1 => '' );
+
+            while ($node = $res->fetch_assoc()) {
+
+                $parent[$node['level']] = $node['id'];
+                $node['parent'] = $parent[$node['level']-1];
+
+                $data[] = array_change_key_case($node, CASE_UPPER);
+            }
         }
         /// \Yryie::StopTimer('LoadTree');
 
-        /// \Yryie::StartTimer('BuildTree');
-        $parent = array( 1 => 0 );
-
-        // Buffer channels for less database access
-        $buffer = array();
-        $q = new \DBQuery('pvlng_tree_view');
-        if ($res = $this->db->query($q)) {
-            while($row = $res->fetch_assoc()) {
-                $buffer[$row['entity']] = $row;
-            }
-        }
-
-        $channel = new \ORM\Tree;
-
-        $data = array();
-        foreach ($tree as $i=>$node) {
-
-            $parent[$node['level']] = $node['id'];
-            $node['parent'] = $parent[$node['level']-1];
-            $node['childcount'] = $node['childs'];
-
-            $id = $node['id'];
-            $entity = $node['entity'];
-
-            $attr = $buffer[$entity];
-            $guid = $node['guid'] ?: $attr['guid'];
-
-            $node = array_merge($node, $attr);
-            $node['id'] = $id;
-            $node['guid'] = $guid;
-
-            $data[] = array_change_key_case($node, CASE_UPPER);
-        }
-        /// \Yryie::Debug('Channel Buffer: '.count($buffer));
-        /// \Yryie::Debug('Channel count: '.count($tree));
-        /// \Yryie::StopTimer('BuildTree');
         $this->view->Data = $data;
     }
 
@@ -102,7 +77,7 @@ class Overview extends \Controller {
             foreach ($childs as $child) {
                 if ($child) $this->Tree->insertChildNode($child, $parent);
             }
-            $this->app->cache->delete('Tree');
+            $this->app->cache->delete('OverviewTree');
         }
         $this->redirect();
     }
@@ -118,7 +93,7 @@ class Overview extends \Controller {
                 // Alias channel if exists will be deleted by trigger,
                 // because it is only valid for a channel in tree!
                 $this->Tree->DeleteNode($id);
-                $this->app->cache->delete('Tree');
+                $this->app->cache->delete('OverviewTree');
             }
         }
         $this->redirect();
@@ -135,104 +110,113 @@ class Overview extends \Controller {
                 // Alias channel if exists will be deleted by trigger,
                 // because it is only valid for a channel in tree!
                 $this->Tree->DeleteBranch($id);
-                $this->app->cache->delete('Tree');
+                $this->app->cache->delete('OverviewTree');
             }
         }
         $this->redirect();
     }
 
     /**
-     * Move an entity to new parent
+     *
+     */
+    protected function adjustTarget( $target, $id, &$real_target, &$offset ) {
+        $TreeTable = new \ORM\Tree($target);
+
+        $offset = 0;
+
+        if ($target == 1 OR $TreeTable->childs != 0) {
+            // Target accept childs, no change required
+            $real_target = $target;
+        } else {
+            // Target accept NO childs, so find parent and calculate offset for later move
+            // Get full path to drop target
+            $path = $this->Tree->getPathFromRoot($target);
+
+            // Get parent of drop target > second to last of path
+            $real_target = array_slice($path, count($path)-2, 1);
+            $real_target = $real_target[0]['id'];
+
+            // Search position of drop target in existing childs
+            $holdsSelf = FALSE;
+            $childs = $this->Tree->getChilds($real_target);
+            foreach ($childs as $pos=>$child) {
+                if ($child['id'] == $id) {
+                    $holdsSelf = $pos;
+                }
+                if ($child['id'] == $target) {
+                    // Move dropped BEFORE target!
+                    $offset = count($childs) - $pos;
+                }
+            }
+
+            // If move inside same parrent, correct delta
+            if ($holdsSelf !== FALSE AND $holdsSelf >= count($childs)-$offset) $offset--;
+        }
+    }
+
+    /**
+     * Move/copy an channel/group
      */
     public function DragDropPOST_Action() {
         if ($target = $this->request->post('target')) {
-            // Root dummy accept childs...
-            $targetAcceptChilds = ($target == 1 OR \ORM::forge('Tree')->find('id', $target)->childs != 0);
 
-            if ($entity = $this->request->post('entity')) {
-                // Add new channel
+            if ($id = $this->request->post('entity')) {
+                // Add new single channel
+                $this->adjustTarget($target, $id, $real_target, $offset);
 
-                if ($targetAcceptChilds) {
-                    // Add as new child
-                    $this->Tree->insertChildNode($entity, $target);
-                } else {
-                    // Get full path to drop target
-                    $path = $this->Tree->getPathFromRoot($target);
+                // Add as new child
+                $id = $this->Tree->insertChildNode($id, $real_target);
 
-                    // Get parent of drop target > second to last of path
-                    $target_new = array_slice($path, count($path)-2, 1);
-                    $target_new = $target_new[0]['id'];
-
-                    // Search position of drop target in existing childs
-                    $childs = $this->Tree->getChilds($target_new);
-                    foreach ($childs as $pos=>$child) {
-                        if ($child['id'] == $target) break;
-                    }
-
-                    // 1st Add as new child
-                    $new = $this->Tree->insertChildNode($entity, $target_new);
-
-                    // 2nd Move to correct position
-                    $count = count($childs) - $pos - 1;
-                    while ($count--) {
-                        if (!$this->Tree->moveLft($new)) break;
-                    }
+                // Correct position below new target
+                while ($offset-- > 0) {
+                    if (!$this->Tree->moveLft($id)) break;
                 }
 
             } elseif ($id = $this->request->post('id')) {
                 // Move channel/group
+                $this->adjustTarget($target, $id, $real_target, $offset);
 
-                $delta = 0;
+                if (!$this->request->post('copy')) {
+                    // MOVE
+                    // Find target right
+                    $q = new \DBQuery('pvlng_tree');
+                    $q->get('rgt')->whereEQ('id', $real_target);
+                    $rgt = $this->db->queryOne($q);
 
-                if (!$targetAcceptChilds) {
-                    // Get full path to drop target
-                    $path = $this->Tree->getPathFromRoot($target);
+                    // Find left and right of channel to move
+                    $q = new \DBQuery('pvlng_tree');
+                    $q->whereEQ('id', $id);
+                    $data = $this->db->queryRow($q);
 
-                    // Get parent of drop target > second to last of path
-                    $target_new = array_slice($path, count($path)-2, 1);
-                    $target_new = $target_new[0]['id'];
+                    $sql = str_replace(
+                        array(':p',    ':l',       ':r'),
+                        array($rgt, $data->lft, $data->rgt),
+                        $this->MoveSubTreeSQL
+                    );
 
-                    // Search position of drop target in existing childs
-                    $childs = $this->Tree->getChilds($target_new);
-                    $holdsSelf = FALSE;
-                    foreach ($childs as $pos=>$child) {
-                        if ($child['id'] == $id) {
-                            $holdsSelf = $pos;
-                        }
-                        if ($child['id'] == $target) {
-                            $delta = count($childs) - $pos - 1;
-                        }
+                    // Move group/channel
+                    $this->db->query($sql);
+
+                    // Correct position below new target
+                    while ($offset-- > 0) {
+                        if (!$this->Tree->moveLft($id)) break;
                     }
 
-                    $target = $target_new;
-                    // If move inside same parrent, correct delta
-                    if ($holdsSelf !== FALSE AND $holdsSelf >= count($childs)-$delta) $delta--;
-                }
+                } else {
+                    // COPY
+                    // Find entity for dropped id
+                    $q = new \DBQuery('pvlng_tree');
+                    $q->get('entity')->whereEQ('id', $id);
+                    $id = $this->Tree->insertChildNode($this->db->queryOne($q), $real_target);
 
-                // Find target right
-                $q = new \DBQuery('pvlng_tree');
-                $q->get('rgt')->whereEQ('id', $target);
-                $rgt = $this->db->queryOne($q);
-
-                // Find left and right of channel to move
-                $q = new \DBQuery('pvlng_tree');
-                $q->whereEQ('id', $id);
-                $data = $this->db->queryRow($q);
-
-                $sql = str_replace(
-                    array(':p',    ':l',       ':r'),
-                    array($rgt, $data->lft, $data->rgt),
-                    $this->MoveSubTreeSQL
-                );
-
-                $this->db->query($sql);
-
-                while ($delta-- > 0) {
-                    if (!$this->Tree->moveLft($id)) break;
+                    // Correct position below new target
+                    while ($offset-- > 0) {
+                        if (!$this->Tree->moveLft($id)) break;
+                    }
                 }
             }
 
-            $this->app->cache->delete('Tree');
+            $this->app->cache->delete('OverviewTree');
         }
 
         $this->redirect();
@@ -282,7 +266,7 @@ class Overview extends \Controller {
             while ($count--) {
                 if (!$this->Tree->moveLft($id)) break;
             }
-            $this->app->cache->delete('Tree');
+            $this->app->cache->delete('OverviewTree');
         }
         $this->redirect();
     }
@@ -297,7 +281,7 @@ class Overview extends \Controller {
             while ($count--) {
                 if (!$this->Tree->moveRgt($id)) break;
             }
-            $this->app->cache->delete('Tree');
+            $this->app->cache->delete('OverviewTree');
         }
         $this->redirect();
     }
@@ -308,7 +292,7 @@ class Overview extends \Controller {
     public function MoveUpPOST_Action() {
         if ($id = $this->request->post('id')) {
             $this->Tree->moveUp($id);
-            $this->app->cache->delete('Tree');
+            $this->app->cache->delete('OverviewTree');
         }
         $this->redirect();
     }
@@ -319,7 +303,7 @@ class Overview extends \Controller {
     public function MoveDownPOST_Action() {
         if ($id = $this->request->post('id')) {
             $this->Tree->moveDown($id);
-            $this->app->cache->delete('Tree');
+            $this->app->cache->delete('OverviewTree');
         }
         $this->redirect();
     }

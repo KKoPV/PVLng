@@ -8,3 +8,4 @@ tmp/*
 custom/
 description.md
 !.githold
+ladder/

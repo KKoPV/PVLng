@@ -22,7 +22,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
     <tr>
         <th style="text-align:left !important">
             <img id="treetoggle" data-expanded="1" src="/images/ico/toggle.png" class="fl tip"
-                 width="16p" height="16" tip="#tiptoggle" alt="[+]">
+                 width="16" height="16" tip="#tiptoggle" alt="[+]">
             <div class="c">{{ChannelHierarchy}}</div>
             <div id="tiptoggle" style="display:none">{{CollapseAll}}</div>
         </th>
@@ -37,7 +37,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
     <!-- BEGIN DATA -->
 
-    <tr data-tt-id="{ID}" class="droppable<!-- IF {CHILDCOUNT} --> have-childs<!-- ENDIF -->"
+    <tr data-tt-id="{ID}" class="droppable <!-- IF {CHILDS} -->group<!-- ELSE -->channel<!-- ENDIF -->"
         <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
         <td>
             <span class="draggable" data-id="{ID}">
@@ -59,28 +59,26 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
         <td style="white-space:nowrap">
             <!-- IF {CHILDS} -->
-            <a href="#" onclick="addChild({ID}); return false" class="tip"
-               title="{{AssignEntity}}">
-                <img src="/images/ico/node_insert_next.png" class="imgbar"
-                     width="16p" height="16" alt="add">
-            </a>
+            <img src="/images/ico/node_insert_next.png" class="imgbar tip"
+                 width="16" height="16" alt="add"
+                 onclick="addChild({ID}); return false" title="{{AssignEntity}}">
             <!-- ELSE -->
             <img <!-- MACRO PIX --> class="imgbar" />
             <!-- ENDIF -->
 
-            <!-- IF !{CHILDCOUNT} -->
+            <!-- IF !{HASCHILDS} -->
             <form action="/overview/delete" method="post" class="delete-form">
             <input type="hidden" name="id" value="{ID}">
             <input type="image" src="/images/ico/node_delete_next.png"
                    class="imgbar tip nb" title="{{DeleteEntity}}"
-                   style="background-color:transparent" alt="-">
+                   style="background-color:transparent" alt="--">
             </form>
             <!-- ELSE -->
             <form action="/overview/deletebranch" method="post" class="delete-form">
             <input type="hidden" name="id" value="{ID}">
             <input type="image" src="/images/ico/node_delete.png"
                    class="imgbar tip nb" title="{{DeleteBranch}}"
-                   style="background-color:transparent" alt="-!">
+                   style="background-color:transparent" alt="-+">
             </form>
             <!-- ENDIF -->
         </td>
@@ -89,7 +87,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
             <!-- IF {READ} -->
             <a href="/list/{GUID}" class="tip" title="{{ListHint}}">
                 <img src="/images/ico/document-invoice.png" class="imgbar"
-                     width="16p" height="16" alt="l">
+                     width="16" height="16" alt="l">
             </a>
             <!-- ELSE -->
             <img <!-- MACRO PIX --> class="imgbar" />
@@ -126,7 +124,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
             <a href="/overview/moveleft" title="{{MoveEntityUp}}" class="tip"
                onclick="return moveChild({ID}, 'moveleft')">
                 <img src="/images/ico/navigation_090_frame.png" class="imgbar"
-                     width="16p" height="16" alt="u">
+                     width="16" height="16" alt="u">
             </a>
             <!-- ELSE -->
             <img <!-- MACRO PIX --> class="imgbar" />
@@ -136,7 +134,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
             <a href="/overview/moveright" title="{{MoveEntityDown}}" class="tip"
                onclick="return moveChild({ID}, 'moveright')">
                 <img src="/images/ico/navigation_270_frame.png" class="imgbar"
-                     width="16p" height="16" alt="d">
+                     width="16" height="16" alt="d">
             </a>
             <!-- ELSE -->
             <img <!-- MACRO PIX --> class="imgbar" />
@@ -152,14 +150,16 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
     <!-- END -->
 
-    <tr data-tt-id="1" class="droppable">
+    <tr data-tt-id="1" class="droppable group">
         <td>
-            <span class="non-draggable">
+            <span class="non-draggable" style="margin-left:-24px;margin-right:22px">
                 <img src="/images/ico/plus_circle_frame.png" alt="add"
                      style="width:16px;height:16px" width="16" height="16"
                      onclick="addChild(1)" class="tip" title="{{AddOneToManyChannels}}">
             </span>
-            <small style="margin-left:24px;color:#808080">({{DragHereForRoot}})</small>
+            <img src="/images/ico/information_frame.png" class="tip" tip="#DragDropHelp"
+                 style="width:16px;height:16px" width="16" height="16" />
+            <div id="DragDropHelp" style="display:none">{{DragDropHelp}}</div>
         </td>
         <td></td>
         <td></td>
@@ -206,7 +206,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 <!-- Dialogs ------------------------------------------------------------- -->
 
 <div id="dialog-addchild" style="display:none" title="{{AddChild}}">
-    <form id="form-addchild" action="/overview/addchild" method="post">
+    <form action="/overview/addchild" method="post">
         <input type="hidden" id="parent" name="parent">
         <p>
             <label for="child">{{SelectEntity}}:</label>
@@ -228,7 +228,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 </div>
 
 <div id="dialog-move" style="display:none" title="{{MoveChannel}}">
-    <form id="form-movechild" action="" method="post">
+    <form method="post">
     <input type="hidden" name="id">
     <p>
         {{MoveChannelHowMuchRows}}

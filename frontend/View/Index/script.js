@@ -716,8 +716,7 @@ function updateChart( forceUpdate ) {
                 $.pnotify({
                     type: textStatus,
                     text: error + "\n" + (jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText),
-                    hide: false,
-                    sticker: false
+                    hide: false
                 });
                 /* Set pseudo channel */
                 series[id] = {};
@@ -1182,7 +1181,7 @@ $(function() {
                 $('#saveview').val('');
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
-                    type: textStatus, hide: false, sticker: false,
+                    type: textStatus, hide: false,
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
@@ -1231,7 +1230,7 @@ $(function() {
             $('#modified').hide();
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
-                type: textStatus, hide: false, sticker: false, text: jqXHR.responseText
+                type: textStatus, hide: false, text: jqXHR.responseText
             });
         }).always(function() {
             $('#chart').removeClass('wait');
@@ -1279,7 +1278,7 @@ $(function() {
                     $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     $.pnotify({
-                        type: textStatus, hide: false, sticker: false,
+                        type: textStatus, hide: false,
                         text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                     });
                 }).always(function() {
@@ -1328,10 +1327,12 @@ $(function() {
 
     shortcut.add('Alt+P', function() { changeDates(-1); });
     shortcut.add('Alt+N', function() { changeDates(1); });
-    shortcut.add('F3',    function() { $('#togglewrapper').click(); });
-    shortcut.add('F4',    function() { tree.toggle(); });
     shortcut.add('F6',    function() { updateChart(); });
     shortcut.add('F7',    function() { updateChart(true); });
+    if (user) {
+        shortcut.add('F3', function() { $('#togglewrapper').click(); });
+        shortcut.add('F4', function() { tree.toggle(); });
+    }
 });
 
 </script>
