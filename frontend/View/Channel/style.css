@@ -26,18 +26,3 @@ textarea.code {
     font-family: monospace;
     font-size: 120%;
 }
-
-#legend {
-    margin-top: .5em;
-    font-size: small;
-    line-height: 1.75;
-}
-
-#legend img {
-    vertical-align: text-bottom;
-}
-
-#legend span {
-    margin-left: 8px;
-    white-space: nowrap;
-}

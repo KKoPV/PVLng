@@ -59,12 +59,12 @@
                 <td id="costs{ID}" class="costs"></td>
                 <td class="icons">
                     <!-- IF {GRAPH} -->
-                    <img src="/images/ico/chart.png" class="tip chartdialog" title="{{ChartSettingsTip}}" alt="c">
+                    <img src="/images/ico/chart.png" class="btn chartdialog" alt="c">
                     <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
                     <!-- IF {READ} -->
-                    <img src="/images/ico/document-invoice.png" class="tip showlist" title="{{ListHint}}" alt="l">
+                    <img src="/images/ico/document-invoice.png" class="btn showlist" alt="l">
                     <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-                    <img src="/images/ico/node_design.png" class="tip editentity" title="{{EditEntity}}" alt="l">
+                    <img src="/images/ico/node_design.png" class="btn editentity" alt="l">
                     </a>
                 </td>
             </tr>
@@ -80,6 +80,13 @@
             </tr>
         </tfoot>
     </table>
+
+    <div id="legend" class="icons">
+        <strong>{{Legend}}</strong>:
+        <span><img src="/images/ico/chart.png">{{ChartSettingsTip}}</span>,
+        <span><img src="/images/ico/document-invoice.png">{{ListHint}}</span>,
+        <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>,
+    </div>
 
 </div>
 

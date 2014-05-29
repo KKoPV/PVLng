@@ -181,6 +181,21 @@ td.imgbar {
 
 /* Other
 --------------------------------------------------------------------------- */
+#legend {
+    margin-top: .5em;
+    font-size: small;
+    line-height: 1.75;
+}
+
+#legend img {
+    vertical-align: text-bottom;
+}
+
+#legend span {
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
 .wait,
 .wait * {
     cursor: wait !important;

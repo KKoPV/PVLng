@@ -57,18 +57,3 @@ table.dataTable tfoot li {
 .droppable.channel.ui-state-active td {
     border-top: 3px solid green !important;
 }
-
-#legend {
-    margin-top: .5em;
-    font-size: small;
-    line-height: 1.75;
-}
-
-#legend img {
-    vertical-align: text-bottom;
-}
-
-#legend span {
-    margin-left: 8px;
-    white-space: nowrap;
-}
