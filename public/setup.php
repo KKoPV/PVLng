@@ -16,159 +16,96 @@
 
     <meta http-equiv="Content-Style-Type" content="text/css" />
 
-    <link rel="stylesheet" href="/css/default.css" />
+    <link rel="stylesheet" href="/css/normalize.min.css" />
+    <link rel="stylesheet" href="/css/default.min.css" />
 
     <title>PVLng initial setup</title>
+
     <style>
         body { width: 60%; margin: 1em auto; }
-        tt { font-size: 130%; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<h2>PVLng initial setup</h2>
+<h2>PVLng basic setup</h2>
 
 <?php
 
+ini_set('display_errors', 1);
+error_reporting(-1);
 ini_set('display_errors', 0);
 error_reporting(0);
 
-$configFile = '../config/config.php';
+// ---------------------------------------------------------------------------
+$config = array(
 
-if (file_exists($configFile)) {
-    $config = include $configFile;
-    $db = new MySQLi($config['Database']['Host'], $config['Database']['Username'],
-                     $config['Database']['Password'], $config['Database']['Database'],
-                     +$config['Database']['Port'], $config['Database']['Socket']);
-    if (!$db->connect_error AND $config['Admin']['User']) {
-        echo '<p>Your PVLng installation is successful configured!</p>';
-        echo '<p>Please start <a href="/">here</a>.</p>';
-        exit;
-    }
-}
+    /**
+     * Minimal required PHP version
+     */
+    'PHPVersion' => array( '5.3' ),
 
-$ok = TRUE;
+    /**
+     *
+     */
+    'PHPExtensions' => array(
+        'bcmath'   => 'BCMath support',
+        'curl'     => 'cURL support',
+        'json'     => 'JSON support',
+        'mbstring' => 'Multibyte Support',
+        'mysqli'   => 'MySQLi support',
+        'pcre'     => 'PCRE Support',
+        'session'  => 'Session Support'
+    ),
 
-/**
- *
- */
-function checkExtension( $ext, $name ) {
-    global $ok;
-    echo '<p><div style="float:left;width:12em">'.$name.':</div> ';
-    if (extension_loaded($ext)) {
-        echo '<strong style="color:green">ok</strong>';
-    } else {
-        echo '<strong style="color:red">failed</strong> - please install extension <strong>'.$ext.'</strong>';
-        $ok = FALSE;
-    }
-    echo '</p>';
-}
+    /**
+     *
+     */
+    'Configuration' => array(
+        'default' => '../config/config.default.php',
+        'config'  => '../config/config.php',
+    ),
 
-/**
- *
- */
-function checkOk() {
-    global $ok;
-    if (!$ok) die('<form><input type="submit" value="Reload" /></form>');
-}
+    /**
+     *
+     */
+    'MySQLi' => array(
+        'config'   => '../config/config.php',
+        'host'     => 'Database.Host',
+        'socket'   => 'Database.Socket',
+        'port'     => 'Database.Port',
+        'user'     => 'Database.Username',
+        'pass'     => 'Database.Password',
+        'db'       => 'Database.Database'
+     ),
+//
+//     /**
+//      *
+//      */
+//     'Directories' => array(
+//     ),
+
+);
+
+// ---------------------------------------------------------------------------
+include 'setup.classes.php';
+
+if (!Setup\Setup::run($config)):
 
 ?>
-
-<h3>1. Check required extensions</h3>
-
-<?php
-
-checkExtension('bcmath', 'BCMath support');
-checkExtension('curl', 'cURL support');
-checkExtension('json', 'JSON support');
-checkExtension('mbstring', 'Multibyte Support');
-checkExtension('mysqli', 'MySQLi support');
-checkExtension('pcre', 'PCRE Support');
-checkExtension('session', 'Session Support');
-
-checkOk();
-
-?>
-
-<h3>2. Check configuration</h3>
 
 <p>
-    Configuration file <tt><strong>config/config.php</strong></tt>:
-
-<?php
-
-if (file_exists($configFile)) {
-    echo '<strong style="color:green"> exists</strong>';
-} else {
-    echo '<strong style="color:red"> missing</strong></p>';
-    echo '<p>Try to create from <tt>config/config.php.dist</tt> ...';
-    copy($configFile.'.dist', $configFile);
-    if (file_exists($configFile)) {
-        echo '<strong style="color:green"> done</strong>';
-        $config = include $configFile;
-        $db = new MySQLi($config['Database']['Host'], $config['Database']['Username'],
-                         $config['Database']['Password'], $config['Database']['Database'],
-                         +$config['Database']['Port'], $config['Database']['Socket']);
-    } else {
-        echo '<strong style="color:red"> failed</strong></p>';
-        echo '<p>Copy <tt>config/config.php.dist</tt> to <tt>config/config.php</tt>';
-        $ok = FALSE;
-    }
-}
-?>
+    <form><input type="submit" value="Reload"></form>
 </p>
 
-<?php checkOk(); ?>
+<?php else: ?>
 
-<h3>3. Check database</h3>
-
-<p>
-    Connect to database:
-
-<?php
-
-if (!$db->connect_error) {
-    echo '<strong style="color:green"> ok</strong>';
-} else {
-    echo '<strong style="color:red"> ', htmlspecialchars($db->connect_error), '</strong>';
-    echo '</p><p>';
-    echo 'Please check your database settings in <tt>config/config.php</tt> section <tt>"Database"</tt>.';
-    $ok = FALSE;
-}
-
-if ($ok):
-
-?>
-</p>
-
-<p>
-    Check database content:
-
-<?php
-
-    $db->query('SELECT count(0) FROM `pvlng_babelkit`');
-
-    if (!$db->error) {
-        echo '<strong style="color:green"> ok</strong>';
-    } else {
-        echo '<strong style="color:red"> failed</strong>';
-        echo '</p><p>';
-        echo 'Did you loaded the SQL data from <tt><strong>sql/pvlng.sql</strong></tt>?!';
-        $ok = FALSE;
-    }
-
-endif;
-
-?>
-</p>
-
-<?php checkOk(); ?>
-
-<h3>Finished</h3>
+<h2>Next</h2>
 
 <p>
     <form action="/adminpass"><input type="submit" value="Definition of your administration user" /></form>
 </p>
+
+<?php endif; ?>
 
 </body>
 </html>
