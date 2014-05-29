@@ -1,4 +1,4 @@
-<!--
+<script>
 /**
  *
  *
@@ -7,30 +7,11 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
--->
 
-<script>
+var Period = '{MOBILE_PERIOD}',
+    ChartHeight = '{MOBILE_CHARTHEIGHT}',
 
-var Period = '{MOBILE_PERIOD}';
-
-var ChartHeight = '{MOBILE_CHARTHEIGHT}';
-
-/* ------------------------------------------------------------------------ */
-</script>
-
-<script src="/js/chart.js"></script>
-
-<!-- load Highcharts scripts direct from highcharts.com
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/highcharts-more.js"></script>
--->
-
-<script src="/js/highcharts.js"></script>
-<script src="/js/highcharts-more.js"></script>
-
-<script>
-
-var views = {
+    views = {
         <!-- BEGIN VIEWS -->
         '{NAME}': { period: '{PERIOD}', data: '{DATA}' },
         <!-- END -->
@@ -88,6 +69,12 @@ var views = {
         }
     };
 
+var lock = false,
+    channels = [],
+    chart;
+
+$(function() {
+
 Highcharts.setOptions({
     global: {
         useUTC: false,
@@ -101,12 +88,12 @@ Highcharts.setOptions({
     }
 });
 
+chart = new Highcharts.Chart(options);
+
 /**
  *
  */
-var lock = false,
-    channels = [],
-    chart = new Highcharts.Chart(options);
+updateChart();
 
 $('#page-home').on('pageshow', function( event, ui ) {
     updateChart();
@@ -122,6 +109,8 @@ $('#btn-home').on('click', function(e) {
 $('#btn-refresh').on('click', function(e) {
     e.preventDefault();
     updateChart();
+});
+
 });
 
 /**

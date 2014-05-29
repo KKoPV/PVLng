@@ -7,12 +7,11 @@
  * @version    1.0.0
  */
 
-PVLng::Menu(array(
-    'position' => 10,
-    'label'    => I18N::translate('Charts'),
-    'hint'     => I18N::translate('ChartHint') . ' (Shift+F1)',
-    'route'    => '/'
-));
+PVLng::Menu(
+    'index', 10, '/',
+    I18N::translate('Charts'),
+    I18N::translate('ChartHint') . ' (Shift+F1)'
+);
 
 /**
  * Routes

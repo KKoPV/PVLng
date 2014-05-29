@@ -5,3 +5,39 @@
 .ro {
     background-color: #E0E0E0 !important;
 }
+
+td.hint {
+    font-size: 90%;
+    vertical-align: top;
+    padding-top: .5em;
+    padding-bottom: .5em;
+}
+
+#tplTable ul {
+    padding-left: 15px;
+}
+
+textarea {
+    width: 98%;
+}
+
+input.code,
+textarea.code {
+    font-family: monospace;
+    font-size: 120%;
+}
+
+#legend {
+    margin-top: .5em;
+    font-size: small;
+    line-height: 1.75;
+}
+
+#legend img {
+    vertical-align: text-bottom;
+}
+
+#legend span {
+    margin-left: 8px;
+    white-space: nowrap;
+}

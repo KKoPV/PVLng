@@ -19,12 +19,20 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
+    'numeric' => array(
+        'visible'  => FALSE,
+    ),
+
     'meter' => array(
         'visible'  => FALSE,
         'default'  => 0
     ),
 
     'cost' => array(
+        'visible'  => FALSE
+    ),
+
+    'tariff' => array(
         'visible'  => FALSE
     ),
 

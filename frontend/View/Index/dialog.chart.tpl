@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -47,6 +47,8 @@
                 <img style="margin-left:.5em;width:16px;height:16px" class="tip"
                      src="/images/ico/information_frame.png" width="16" height="16"
                      title="{{ChartTypeHint}}" />
+                <br />
+                <span id="scatter-candidate" class="s i">({{ScatterCandidate}})</span>
             </td>
             <td>
                 <select id="d-type">
@@ -166,12 +168,17 @@
                      title="{{TimeRangeHint}}" />
             </td>
             <td>
-                <input id="d-time1" type="text" class="c" style="width:5em" />
-                <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
-                <input id="d-time2" type="text" class="c" style="width:5em" />
-                <br />
-                <div id="d-time-slider" style="margin-top:.5em;margin-left:.4em;width:13em"></div>
+                <div class="fl">
+                    <input id="d-time1" type="text" class="c" style="width:5em" />
+                    <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
+                    <input id="d-time2" type="text" class="c" style="width:5em" />
+                </div>
+                <div id="d-time-slider" class="fl" style="margin-top:.5em;margin-left:1em;width:9em"></div>
             </td>
+        </tr>
+        <tr class="even">
+            <td><label for="d-legend">{{Legend}}</label></td>
+            <td><input id="d-legend" type="checkbox" class="iCheck" /></td>
         </tr>
         </tbody>
     </table>

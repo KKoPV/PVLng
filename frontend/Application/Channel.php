@@ -11,18 +11,32 @@ if (!Session::get('User')) return;
 /**
  *
  */
-PVLng::Menu(array(
-    'position' => 50,
-    'label'    => I18N::translate('Channel'),
-    'hint'     => I18N::translate('ChannelsHint') . ' (Shift+F5)',
-    'route'    => '/channel'
-));
+PVLng::Menu( 'channel', 50, '#', __('Channels') );
+
+/**
+ *
+ */
+PVLng::SubMenu(
+    'channel', 10, '/channel', __('Channels'), __('ChannelsHint') . ' (Shift+F4)'
+);
+
+PVLng::SubMenu(
+    'channel', 20, '/overview', __('Overview'), __('OverviewHint')
+);
+
+PVLng::SubMenu(
+    'channel', 30, '/tariff', __('Tariffs'), __('TariffsHint')
+);
 
 /**
  * Routes
  */
 $app->get('/channel', $checkAuth, function() use ($app) {
     $app->process('Channel');
+});
+
+$app->get('/channel/new/:type', $checkAuth, function( $type ) use ($app) {
+    $app->process('Channel', 'New', array('type' => $type));
 });
 
 $app->map('/channel/add(/:clone)', $checkAuth, function( $clone=0 ) use ($app) {

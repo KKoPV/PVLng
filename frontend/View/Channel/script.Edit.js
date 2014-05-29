@@ -1,4 +1,4 @@
-<script>
+<!--
 /**
  *
  *
@@ -7,6 +7,8 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
+-->
+<script>
 
 /**
  *
@@ -19,7 +21,8 @@ $(function() {
         bFilter: false,
         bSort: false,
         bInfo: false,
-        bJQueryUI: true
+        bJQueryUI: true,
+        bAutoWidth: false
     });
 
     $('#add2tree').on('ifChanged', function(){

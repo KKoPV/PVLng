@@ -101,11 +101,10 @@ abstract class I18N {
             } else {
                 // Analyse translation for 0, 1 ... n markers
                 $parts = array();
-                foreach (explode('|', $trans) as $part) {
-                    $part = explode(':', $part);
-                    $parts[$part[0]] = $parts[1];
+                foreach (explode('||', $trans) as $part) {
+                    $part = explode(':', trim($part));
+                    $parts[trim($part[0])] = $part[1];
                 }
-
                 if (isset($parts[$cnt])) {
                     $str = $parts[$cnt];
                 } elseif (isset($parts['n'])) {

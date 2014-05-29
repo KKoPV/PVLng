@@ -1,90 +1,141 @@
 <?php
 /**
- *
+ * Default channel field settings
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 return array(
 
     /**
      * Possible keys:
-     * - type     : (text|textarea|textextra|numeric|integer|select), default text
-     * - visible  : (TRUE|FALSE), default TRUE
-     * - required : (TRUE|FALSE), default FALSE
-     * - readonly : (TRUE|FALSE), default FALSE
-     * - default  : Default value, works also for not visible attributes
+     * - type        : (text|textarea|textextra|numeric|integer|select|sql), default text
+     * - visible     : (TRUE|FALSE), default TRUE
+     * - required    : (TRUE|FALSE), default FALSE
+     * - readonly    : (TRUE|FALSE), default FALSE
+     * - placeholder : Input placeholder, optional
+     * - default     : Default value, works also for not visible attributes
      */
 
     'name' => array(
-        'required' => TRUE
+        'position'    => 10,
+        'required'    => TRUE
     ),
 
-    'description' => array(),
+    'description' => array(
+        'position'    => 20
+    ),
 
-    'serial' => array(),
+    'serial' => array(
+        'position'    => 30
+    ),
 
-    'channel' => array(),
+    'channel' => array(
+        'position'    => 40
+    ),
 
     'resolution' => array(
-        'type'     => 'numeric',
-        'required' => TRUE,
-        'default'  => 1
+        'position'    => 50,
+        'type'        => 'numeric',
+        'placeholder' => '0'.__('TSEP').'000'.__('DSEP').'00',
+        'required'    => TRUE,
+        'default'     => 1
     ),
 
     'unit' => array(
-        'type'     => 'textsmall',
+        'position'    => 60,
+        'type'        => 'textsmall',
     ),
 
     'decimals' => array(
-        'type'     => 'integer',
-        'default'  => 2
+        'position'    => 70,
+        'type'        => 'integer',
+        'placeholder' => '0',
+        'default'     => 2
     ),
 
     'meter' => array(
-        'type'     => 'select;1:yes;0:no',
-        'default'  => 0
+        'position'    => 80,
+        'type'        => 'select;1:yes;0:no',
+        'default'     => 0
     ),
 
     'numeric' => array(
-        'type'     => 'select;1:yes;0:no',
-        'default'  => 1
+        'position'    => 90,
+        'type'        => 'select;1:yes;0:no',
+        'default'     => 1
     ),
 
     'offset' => array(
-        'type'     => 'numeric',
+        'position'    => 100,
+        'type'        => 'numeric',
+        'placeholder' => '0'.__('TSEP').'000'.__('DSEP').'00',
     ),
 
     'adjust' => array(
-        'type'     => 'select;1:yes;0:no',
-        'default'  => 0
+        'position'    => 110,
+        'type'        => 'select;1:yes;0:no',
+        'default'     => 0
     ),
 
     'cost' => array(
-        'type'     => 'numeric',
+        'position'    => 120,
+        'type'        => 'numeric',
+        'placeholder' => '0'.__('TSEP').'000'.__('DSEP').'00',
+    ),
+
+    'tariff' => array(
+        'position'    => 130,
+        'type'        => 'sql:'
+                         // Add a blank 1st option (optional)
+                       . 'X:'
+                         // The SQL MUST return
+                         // - as 1st field the key (saved as value)
+                         // - as 2nd field the text to display
+                         //
+                         // Exclude tariffs without not yet maintained
+                         // start date data sets
+                       . 'SELECT `id`, `name`'
+                       . '  FROM `pvlng_tariff`'
+                       . '  JOIN `pvlng_tariff_time` USING(`id`)'
+                       . ' GROUP BY `id` ORDER BY `name`'
     ),
 
     'threshold' => array(
-        'type'     => 'numeric',
+        'position'    => 140,
+        'type'        => 'numeric',
+        'placeholder' => '0'.__('TSEP').'000'.__('DSEP').'00',
     ),
 
     'valid_from' => array(
-        'type'     => 'numeric',
+        'position'    => 150,
+        'type'        => 'numeric',
+        'placeholder' => '0'.__('TSEP').'000'.__('DSEP').'00',
     ),
 
     'valid_to' => array(
-        'type'     => 'numeric',
+        'position'    => 160,
+        'type'        => 'numeric',
+        'placeholder' => '0'.__('TSEP').'000'.__('DSEP').'00',
+    ),
+
+    // Channels which need "extra" have to show it and give them a proper type
+    'extra' => array(
+        'position'    => 500,
+        'visible'     => FALSE,
     ),
 
     'public' => array(
-        'type'     => 'select;1:yes;0:no',
-        'default'  => 1
+        'position'    => 900,
+        'type'        => 'select;1:yes;0:no',
+        'default'     => 1
     ),
 
     'comment' => array(
-        'type'     => 'textarea',
+        'position'    => 910,
+        'type'        => 'textarea',
     ),
 
 );

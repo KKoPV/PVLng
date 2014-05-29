@@ -1,4 +1,4 @@
-<?php
+<?php /* // AOP // */
 /**
  *
  *
@@ -17,11 +17,13 @@ class Dashboard extends \Controller {
     /**
      *
      */
-    public function __construct() {
-        parent::__construct();
+    const CHANNEL_TYPE = 30; // Dashboard channel
 
-        $this->Tree = \NestedSet::getInstance();
-        $this->Channels = array();
+    /**
+     *
+     */
+    public function before() {
+        $this->view->SubTitle = __('Dashboards');
     }
 
     /**
@@ -35,68 +37,68 @@ class Dashboard extends \Controller {
     /**
      *
      */
-    public function IndexGET_Action() {
-        if ($data = $this->db->Dashboard) {
-            $this->Channels = json_decode($data);
-        }
-    }
-
-    /**
-     *
-     */
     public function IndexPOST_Action() {
-        if ($channels = $this->request->post('v')) {
-            array_walk($channels, function(&$id) { $id = +$id; });
-            $this->db->Dashboard = json_encode($channels);
-            $this->Channels = $channels;
+        $tblDashboard = new \ORM\Dashboard;
+
+        if ($this->request->post('delete') AND $id = $this->request->post('id')) {
+            $tblDashboard->filterById($id)->findOne();
+            if ($tblDashboard->getId()) $tblDashboard->delete();
+            /// foreach ($tblDashboard->queries() as $sql) \Yryie::SQL($sql);
+        } else {
+            $id = $this->request->post('save') ? $this->request->post('id') : 0;
+            $name = $this->request->post('name');
+            $channels = $this->request->post('c');
+            try {
+                if ($name == '') throw new Exception('Name is required.');
+                if (empty($channels)) throw new Exception('No channels selected.');
+
+                $tblDashboard
+                    ->filterById($id)->findOne()
+                    ->setName($name)
+                    ->setPublic($this->request->post('public'))
+                    ->setData(json_encode($channels))
+                    ->replace();
+                // Reload
+                $tblDashboard = new \ORM\Dashboard($tblDashboard->getId()); // AutoInc
+                $this->app->redirect('/dashboard/'.$tblDashboard->findOne()->getSlug());
+            } catch (Exception $e) {
+                \Messages::Error($e->getMessage());
+            }
         }
+        $this->app->redirect('/dashboard');
     }
 
     /**
      *
      */
     public function Index_Action() {
-        $this->view->SubTitle = \I18N::_('Dashboard');
 
-        $tree = $this->Tree->getFullTree();
-        array_shift($tree);
-        $parent = array( 1 => 0 );
-
-        $data = array();
-        foreach ($tree as $node) {
-
-            $parent[$node['level']] = $node['id'];
-            $node['parent'] = $parent[$node['level']-1];
-
-            if ($entity = $this->model->getEntity($node['entity'])) {
-                // remove id, don't overwrite tree->id!
-                #unset($entity->id);
-                $guid = $node['guid'] ?: $entity->guid;
-                $node = array_merge((array) $entity, $node);
-                $node['guid'] = $guid;
-                if (in_array($node['id'], $this->Channels)) {
-                    $node['checked'] = 'checked';
-                }
-            }
-
-            $data[] = array_change_key_case($node, CASE_UPPER);
+        $tblDashboard = new \ORM\Dashboard;
+        $tblDashboard->filterBySlug($this->app->params->get('slug'))->findOne();
+        if ($name = $tblDashboard->getName()) {
+            $this->view->SubTitle = $name;
+            $data = array_flip(json_decode($tblDashboard->getData(), TRUE));
+            $this->view->Id     = $tblDashboard->getId();
+            $this->view->Name   = $name;
+            $this->view->Public = $tblDashboard->getPublic();
+            $this->view->Slug   = $tblDashboard->getSlug();
+        } else {
+            $data = array();
         }
+
+        $this->view->ChannelCount = count($data);
+
+        $tree = new \ORM\Tree;
+        foreach ($tree->filterByTypeId(self::CHANNEL_TYPE)->find() as $channel) {
+            $id = $channel->getId();
+            $channel = $channel->asAssoc();
+            if (array_key_exists($id, $data)) {
+                $channel['checked'] = 'checked';
+            }
+            $data[$id] = $channel;
+        }
+
         $this->view->Data = $data;
-        $this->view->ChannelCount = count($this->Channels);
     }
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected $Tree;
-
-    /**
-     *
-     */
-    protected $Channels;
 
 }

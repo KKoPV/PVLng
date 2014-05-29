@@ -7,6 +7,25 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
+
+/**
+ * Token login
+ */
+if ($token = $app->request->get('token')) {
+    $AdminUser = $app->config->get('Admin.User');
+    if ($token == PVLng::getLoginToken()) {
+        Session::set('user', $AdminUser);
+        Messages::Success(__('Welcome', $AdminUser));
+    } else {
+        Messages::Error('Sorry, invalid login token');
+        Header('Location: /logout');
+        exit;
+    }
+}
+
+/**
+ * Routes
+ */
 $app->map('/login', function() use ($app) {
     $app->process('Admin', 'Login');
 })->via('GET', 'POST');

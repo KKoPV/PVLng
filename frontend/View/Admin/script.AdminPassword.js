@@ -94,7 +94,7 @@ $(function() {
                     _log('Map URL', url);
 
                     $('#map').prop('src', url);
-                    $('#locresult').show();
+                    $('#locresult').fadeIn();
                 }
             );
 

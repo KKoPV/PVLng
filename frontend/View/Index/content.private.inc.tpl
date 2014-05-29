@@ -3,48 +3,37 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
 
 <!-- Use this image as spacer for not available moving actions of channels -->
-<!-- DEFINE MACRO PIX -->
-src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw"
-style="width:16px;height:16px" width="16" height="16" alt=""
+<!-- DEFINE SpacerImg -->
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw" style="height:0px" alt="">
 <!-- END DEFINE -->
 
-<div class="grid_10">
-    <button id="togglewrapper" class="tip" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</button>
-</div>
+<button id="togglewrapper" class="tipbtn" title="{{ToggleChannels}} (F3)">{{ToggleChannels}} (F3)</button>
 
-<div class="clear"></div>
-
-<div id="wrapper" class="grid_10" style="padding-top:1em;display:none">
+<div id="wrapper" style="padding-top:1em;display:none">
 
     <table id="data-table" class="dataTable treeTable">
         <thead>
         <tr>
             <th>
                 <img id="treetoggle" src="/images/ico/toggle<!-- IF {VIEW} -->_expand<!-- ENDIF -->.png"
-                     style="width:16px;height:16px" width="16" height="16"
-                     class="tip" alt="[+]" tip="#tiptoggle" />
+                     class="ico tipbtn" tip="#tiptoggle" alt="[+]" />
                 <div id="tiptoggle">{{CollapseAll}} (F4)</div>
             </th>
             <th class="l">
                 <span class="indenter" style="padding-left: 0px;"></span>
                 {{Channel}}
             </th>
-            <th>
-                <img src="/images/ico/16x16.png" style="width:16px;height:16px" width="16" height="16" alt="" />
-            </th>
             <th class="r">{{Amount}}</th>
             <th class="l">{{Unit}}</th>
             <th class="r" style="white-space:nowrap">{{Earning}} / {{Cost}}</th>
-            <th>
-                <img src="/images/ico/node_design.png" style="width:16px;height:16px" width="16" height="16" alt="" />
-            </th>
+            <th></th>
         </tr>
         </thead>
 
@@ -60,38 +49,23 @@ style="width:16px;height:16px" width="16" height="16" alt=""
                     <!-- ENDIF -->
                 </td>
                 <td style="padding:0.4em 0" <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
-                    <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                         src="{ICON}" width="16" alt="" height="16" class="tip" title="{TYPE}" alt="" />
-                    <strong class="tip" title="{GUID}">{NAME}</strong>
-                    <!-- IF {DESCRIPTION} --> <small>({DESCRIPTION})</small><!-- ENDIF -->
-                    <!-- IF !{PUBLIC} -->
-                    <img src="/images/ico/lock.png" class="tip" alt="[private]"
-                         style="margin-left:8px;width:16px;height:16px"
-                         width="16" height="16" title="{{PrivateChannel}}" />
-                    <!-- ENDIF -->
+                    <!-- INCLUDE channel-details.inc.tpl -->
                 </td>
-                <td>
-                    <img id="s{ID}" src="/images/spinner.gif" width="16" height="16"
-                         style="float:right;display:none;width:16px;height:16px" alt="" />
+                <td class="icons r">
+                    <img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" alt="o" />
+                    <span id="cons{ID}" class="consumption"></span>
                 </td>
-                <td id="cons{ID}" class="consumption"></td>
                 <td>{UNIT}</td>
                 <td id="costs{ID}" class="costs"></td>
-                <td style="white-space:nowrap">
+                <td class="icons">
                     <!-- IF {GRAPH} -->
-                    <img src="/images/ico/chart.png" data-id="{ID}"
-                         class="tip imgbar chartdialog" title="{{ChartSettingsTip}}"
-                         style="width:16px;height:16px" width="16" height="16" alt="c" />
-                    <!-- ELSE -->
-                    <img <!-- MACRO PIX --> class="imgbar" />
-                    <!-- ENDIF -->
+                    <img src="/images/ico/chart.png" class="tip chartdialog" title="{{ChartSettingsTip}}" alt="c">
+                    <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
                     <!-- IF {READ} -->
-                    <img src="/images/ico/document-invoice.png" data-id="{ID}"
-                         class="tip imgbar showlist" width="16" height="16"
-                         title="{{ListHint}}" alt="l" />
-                    <!-- ELSE -->
-                    <img <!-- MACRO PIX --> class="imgbar" />
-                    <!-- ENDIF -->
+                    <img src="/images/ico/document-invoice.png" class="tip showlist" title="{{ListHint}}" alt="l">
+                    <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+                    <img src="/images/ico/node_design.png" class="tip editentity" title="{{EditEntity}}" alt="l">
+                    </a>
                 </td>
             </tr>
             <!-- END -->
@@ -99,7 +73,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
         <tfoot>
             <tr>
-                <th colspan="4">&nbsp;</th>
+                <th colspan="3">&nbsp;</th>
                 <th class="l">{{Total}}:</th>
                 <th id="costs" style="padding-right:10px" class="r"></th>
                 <th></th>
@@ -109,18 +83,14 @@ style="width:16px;height:16px" width="16" height="16" alt=""
 
 </div>
 
-<div class="clear"></div>
+<h3>{{Variants}}</h3>
 
-<h3 class="grid_10">{{Variants}}</h3>
-
-<div class="clear"></div>
-
-<div class="grid_8">
-    <select id="loaddeleteview"></select>
-    <button id="btn-load" style="margin:0 .5em" class="tip" title="{{Load}}">{{Load}}</button>
+<div class="alpha grid_8">
+    <select id="load-delete-view" data-placeholder="--- {{SelectChart}} ---"></select>
+    <button id="btn-load" style="margin:0 1em" class="tip" title="{{Load}}">{{Load}}</button>
     <button id="btn-delete" data-confirmed="0" class="tip" title="{{Delete}}">{{Delete}}</button>
     <br /><br />
-    <input class="fl" id="saveview" type="text" value="{VIEW}" size="35" />
+    <input id="saveview" type="text" class="fl" value="{VIEW}" size="35" />
 
     <select id="visibility" style="margin-left:.5em">
         <option value="0">{{PrivateChart}}</option>
@@ -132,7 +102,7 @@ style="width:16px;height:16px" width="16" height="16" alt=""
          style="margin-left:8px;width:16px;height:16px" width="16" height="16" />
     <button id="btn-save" class="tip" style="margin-left:.5em" title="{{Save}}">{{Save}}</button>
 </div>
-<div class="grid_2 r">
+<div class="r">
     <a id="btn-bookmark" href="#" class="tip" title="{{DragBookmark}}">Bookmark</a>
     <br /><br />
     <a id="btn-permanent" href="#" class="tip" title="{{DragPermanent}}">Permanent bookmark</a>

@@ -40,21 +40,35 @@ class Admin extends \Controller {
 
             $this->User = $AdminUser;
             \Session::set('user', $AdminUser);
-            \Messages::Success(\I18N::_('Welcome', $this->User));
+            \Messages::Success(__('Welcome', $this->User));
 
             if ($this->request->post('save')) self::RememberLogin();
 
             if ($r = \Session::get('returnto')) {
                 // Clear before redirect
                 \Session::set('returnto');
-                $app->redirect($r);
+                $this->app->redirect($r);
             } else {
                 $this->app->redirect('index');
             }
 
         } else {
-            \Messages::Error(\I18N::_('UnknownUser'));
+            \Messages::Error(__('UnknownUser'));
         }
+    }
+
+    /**
+     * Token login
+     */
+    public function LoginGET_Action() {
+        $AdminUser = $this->config->get('Admin.User');
+        $AdminPass = $this->config->get('Admin.Password');
+
+        if ($this->request->get('token') == md5($_SERVER['REMOTE_ADDR'].$AdminUser.$AdminPass)) {
+            \Session::set('user', $AdminUser);
+            \Messages::Success(__('Welcome', $this->User));
+        }
+        $this->app->redirect('index');
     }
 
     /**
@@ -113,7 +127,7 @@ class Admin extends \Controller {
         $this->view->SubTitle = \I18N::_('Configuration');
 
         $q = \DBQuery::forge('pvlng_config')->whereNE('type');
-        $this->view->Data = $this->rows2view($this->db->queryRows($q));
+        $this->view->Data = $this->db->queryRows($q);
     }
 
     /**

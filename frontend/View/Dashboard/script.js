@@ -9,30 +9,22 @@
  */
 </script>
 
-<script src="/js/jquery.treetable.js"></script>
-
-<!-- IF !{DEVELOPMENT} -->
-    <!-- load Highcharts scripts direct from highcharts.com -->
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="http://code.highcharts.com/highcharts-more.js"></script>
-<!-- ELSE -->
-    <!-- load local Highcharts scripts -->
-    <script src="/js/highcharts.js"></script>
-    <script src="/js/highcharts-more.js"></script>
-<!-- ENDIF -->
+<!-- load Highcharts scripts direct from highcharts.com -->
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/highcharts-more.js"></script>
 
 <script>
 
-var
-    charts = [],
-    chartsNoData = [],
+var charts = [],
     timeout,
-    TreeExpanded = true;
-
-var chartOptions = {
+    chartOptions = {
 
     plotOptions: {
-        gauge: {
+       gauge: {
+            dataLabels: {
+                y: 45,
+                useHTML: true
+            },
             dial: {
                 backgroundColor: 'gray',
                 rearLength: '25%'
@@ -83,67 +75,6 @@ var chartOptions = {
 /**
  *
  */
-function ToggleTree( force ) {
-    TreeExpanded = (force != undefined) ? force : !TreeExpanded;
-
-    $('input.channel').each(function(id, el) {
-        /* checkbox -> wrapper div -> td -> tr */
-        $(el).parent().parent().parent().toggle(TreeExpanded || $(el).is(':checked'));
-    });
-
-    $('tr.no-graph').each(function(id, el) {
-        $(el).toggle(TreeExpanded);
-    });
-
-    var css;
-
-    if (TreeExpanded) {
-        $('#treetoggle').attr('src','/images/ico/toggle.png').attr('alt','[-]');
-        $('#tiptoggle').html('{{CollapseAll}}');
-
-        $('span.indenter').each(function(id, el) {
-            el = $(el);
-            /* Restore left indent */
-            el.css('padding-left', el.data('indent'));
-        });
-    } else {
-        $('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]');
-        $('#tiptoggle').html('{{ExpandAll}}');
-
-        $('span.indenter').each(function(id, el) {
-            /* Remove left indent */
-            $(el).css('padding-left', 0);
-        });
-    }
-
-}
-
-/**
- *
- */
-function noDataChart( id, name ) {
-    return new Highcharts.Chart({
-        chart:    { renderTo: 'chart-'+id },
-        credits:  { enabled: false },
-        title:    { text: name },
-        subtitle: {
-            text: '{{NoDataAvailable}}',
-            style: { color: '#FF0000' }
-        }
-    });
-}
-
-/**
- *
- */
-function updateClock() {
-    $('#date-time').html((new Date).toLocaleString());
-    setTimeout(updateClock, 1000);
-}
-
-/**
- *
- */
 function updateCharts() {
 
     clearTimeout(timeout);
@@ -151,12 +82,12 @@ function updateCharts() {
     var date = new Date;
 
     $('input.channel:checked').each(function(chart_id, el) {
-
         chart_id++;
         el = $(el);
 
         var t, url = PVLngAPI + 'data/' + el.data('guid') + '.json';
         _log('Fetch: '+url);
+
 
         $.getJSON(
             url,
@@ -169,75 +100,90 @@ function updateCharts() {
             function(data) {
                 /* pop out 1st row with attributes */
                 var attr = data.shift();
-
+/*
                 _log('Attributes:', attr);
                 _log('Data:', data);
-
+*/
                 if (!data[0] || (date.getTime()/1000 - data[0].timestamp) > 600) {
                     /* NO data row found or data older than 10 minuts */
-                    chartsNoData[chart_id] = true;
-                    charts[chart_id] = noDataChart(chart_id, attr.name);
-                } else {
-                    if (charts[chart_id] == undefined || chartsNoData[chart_id]) {
-                        chartsNoData[chart_id] = false;
-                        $('#chart-'+chart_id).empty();
-                        var options = $.extend({}, chartOptions, {
-                            chart:    { renderTo: 'chart-'+chart_id, type: 'gauge' },
-                            title:    { text: attr.name },
-                            subtitle: { text: attr.description ? $('<div/>').html(attr.description).text() : ' ' },
-                            yAxis: {
-                                min: attr.valid_from,
-                                max: attr.valid_to,
-                                title: { text: attr.unit },
-                                plotBands: []
-                            },
-                            series: [ { name: attr.name } ]
-                        });
-
-                        if (attr.extra) {
-                            /* draw colored plot bands
-                               start > end : color
-                               > end : color
-                               start > : color
-                               missing <start> and <end> are replaced by valid_from and valid_to */
-
-                            /* split into bands */
-                            $(attr.extra.split("\n")).each(function(id, band) {
-                                /* split into from-to and color */
-                                var fromto_color = band.trim().split(':');
-
-                                /* split from and to */
-                                var fromto = fromto_color[0].trim().split('>');
-
-                                if (fromto[0] == '') {
-                                    fromto[0] = attr.valid_from;
-                                } else if (fromto[0].indexOf('%') != -1) {
-                                    fromto[0] = fromto[0].replace('%', '');
-                                    fromto[0] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[0] / 100;
+                    charts[chart_id] = undefined;
+                    $('#chart-'+chart_id)
+                        .empty()
+                        .append($('<div/>').addClass('chart-title').html(attr.name))
+                        .append($('<div/>').addClass('chart-subtitle').html(attr.description))
+                        .append($('<p />').addClass('chart-subtitle').html('{{NoDataAvailable}}'));
+                } else if (charts[chart_id] == undefined) {
+                    var options = $.extend({}, chartOptions, {
+                        chart:    { renderTo: 'chart-'+chart_id+'-chart', type: 'gauge' },
+                        title:    attr.unit, /* Suppress title */
+                        yAxis: {
+                            min: attr.valid_from,
+                            max: attr.valid_to,
+                            plotBands: []
+                        },
+                        series: [{
+                            data: [null],
+                            dataLabels: {
+                                formatter: function() {
+                                    return '<div style="text-align:center">' +
+                                           '<span style="font-size:125%">' +
+                                           Highcharts.numberFormat(this.y, attr.decimals, '{DSEP}', '{TSEP}') +
+                                           '</span><br/>' +
+                                           '<span style="font-size:110%;color:#A0A0A0">'+attr.unit+'</span>' +
+                                           '</div>';
                                 }
+                            }
+                        }]
+                    });
 
-                                if (fromto[1] == '') {
-                                    fromto[1] = attr.valid_to;
-                                } else if (fromto[1].indexOf('%') != -1) {
-                                    fromto[1] = fromto[1].replace('%', '');
-                                    fromto[1] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[1] / 100;
-                                }
+                    $('#chart-'+chart_id)
+                        .empty()
+                        .append($('<div/>').addClass('chart-title').html(attr.name))
+                        .append($('<div/>').addClass('chart-subtitle').html(attr.description))
+                        .append($('<div/>').prop('id', 'chart-'+chart_id+'-chart').addClass('chart-inner'));
 
-                                options.yAxis.plotBands.push({
-                                    from:  +fromto[0],
-                                    to:    +fromto[1],
-                                    color: fromto_color[1]
-                                });
+                    if (attr.extra) {
+                        /* draw colored plot bands
+                           start > end : color
+                           > end : color
+                           start > : color
+                           missing <start> and <end> are replaced by valid_from and valid_to
+                        */
+
+                        /* split into bands */
+                        $(attr.extra.split("\n")).each(function(id, band) {
+                            /* split into from-to and color */
+                            var fromto_color = band.trim().split(':');
+
+                            /* split from and to */
+                            var fromto = fromto_color[0].trim().split('>');
+
+                            if (fromto[0] == '') {
+                                fromto[0] = attr.valid_from;
+                            } else if (fromto[0].indexOf('%') != -1) {
+                                fromto[0] = fromto[0].replace('%', '');
+                                fromto[0] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[0] / 100;
+                            }
+
+                            if (fromto[1] == '') {
+                                fromto[1] = attr.valid_to;
+                            } else if (fromto[1].indexOf('%') != -1) {
+                                fromto[1] = fromto[1].replace('%', '');
+                                fromto[1] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[1] / 100;
+                            }
+
+                            options.yAxis.plotBands.push({
+                                from:  +fromto[0],
+                                to:    +fromto[1],
+                                color: fromto_color[1]
                             });
-                        }
-
-                        charts[chart_id] = new Highcharts.Chart(options);
+                        });
                     }
 
-                    charts[chart_id].series[0].setData([
-                        +Highcharts.numberFormat(data[0].data, attr.decimals, '.', '')
-                    ]);
+                    charts[chart_id] = new Highcharts.Chart(options);
                 }
+
+                charts[chart_id].series[0].data[0].update(data[0].data);
             }
         );
     });
@@ -245,12 +191,25 @@ function updateCharts() {
     timeout = setTimeout(updateCharts, 60 * 1000);
 }
 
+var clock;
+
 /**
  *
  */
 $(function() {
 
-    updateClock();
+    $('.chart').css({ textAlign: 'center' }).html('<small>{{JustAMoment}}</small>');
+
+    var oTable = $('#tree').dataTable({
+        aoColumns: [
+            { bVisible: false, asSorting: [ 'asc' ] },
+            { bSortable: false, sWidth: '1%' },
+            { bSortable: false },
+            { bSortable: false, sWidth: '1%' }
+        ],
+        aaSorting: [[ 0, 'asc' ]]
+    });
+    oTable.rowReordering();
 
     $.ajaxSetup({
         beforeSend: function setHeader(xhr) {
@@ -267,48 +226,54 @@ $(function() {
 
     updateCharts();
 
-    $('#tree').DataTable({
-        bPaginate: false,
-        bLengthChange: false,
-        bFilter: false,
-        bSort: false,
-        bInfo: false,
-        bJQueryUI: true
-    });
+    clock = $('#clock');
 
-    $('.treeTable').treetable({
-        initialState: 'expanded',
-        indent: 24,
-        column: 1
-    });
-
-    /* Remember left padding of indenter */
-    $('span.indenter').each(function(id, el) {
-        el = $(el);
-        el.data('indent', el.css('padding-left'));
-    });
-
-    $('input.iCheck').iCheck('update');
-
-    $('#btn-refresh').button({
-        icons: {
-            primary: 'ui-icon-refresh'
-        },
-        text: false
-    });
+    setInterval(function() {
+        clock.html((new Date).toLocaleString());
+    }, 1000);
 
     $('#togglewrapper').button({
         icons: { primary: 'ui-icon-carat-2-n-s' },
         label: '&nbsp;',
         text: false
     }).click(function() {
-        $('#wrapper').animate( { height: 'toggle', opacity: 'toggle' } );
+        $('#wrapper').animate({ height: 'toggle', opacity: 'toggle' });
     });
 
-    if ('{CHANNELCOUNT}' != 0) {
-        ToggleTree(false);
-        $('#togglewrapper').trigger('click');
-    }
+    if ({CHANNELCOUNT} > 0) $('#togglewrapper').trigger('click');
+
+    $('.with-id').button('{ID}' ? 'enable' : 'disable');
+
+    var pressedButton;
+
+    $('input[type=submit]').click(function() {
+        /* Remember pressed button */
+        pressedButton = $(this);
+    });
+
+    $('#form-dashboard').submit(function(e) {
+        if (pressedButton.attr('name') != 'delete' || pressedButton.data('confirmed')) {
+            /* Not delete button or not confirmed, proceed */
+            return;
+        }
+
+        e.preventDefault();
+
+        /* Replace text, make red and mark confirmed for next click */
+        pressedButton
+            .button({ label: '{{Sure}}?' })
+            .css({ color: 'red', fontWeight: 'bold' })
+            .data('confirmed', 1);
+
+        /* Reset after 5s */
+        setTimeout(function() {
+            pressedButton
+                .button({ label: '{{Delete}}' })
+                .css({ color: 'black', fontWeight: 'normal' })
+                .data('confirmed', null);
+        }, 5000);
+    });
+
 });
 
 </script>

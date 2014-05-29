@@ -33,10 +33,9 @@ class Info extends \Controller {
      *
      */
     public function Index_Action() {
-        $this->view->set('SubTitle', \I18N::_('Information'));
-        $this->view->set('ServerName', $_SERVER['SERVER_NAME']);
-        $q = \DBQuery::forge('pvlng_reading_statistics');
-        $this->view->set('Stats', $this->rows2view($this->db->queryRows($q)));
+        $this->view->SubTitle   = __('Information');
+        $this->view->ServerName = $_SERVER['SERVER_NAME'];
+        $this->view->Stats      = (new \ORM\ReadingStatistics)->find()->asAssoc();
     }
 
 }

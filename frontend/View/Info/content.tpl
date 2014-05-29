@@ -9,8 +9,6 @@
  */
 -->
 
-<div class="grid_10">
-
 <h3>{{SystemInformation}}</h3>
 
 <table id="table-info" class="display">
@@ -63,13 +61,15 @@
     <tbody>
     <!-- BEGIN STATS -->
     <tr class="tip" tip="#tip-{GUID}">
-        <td>
-            <img src="{ICON}" class="tip" style="width:16px;height:16px;margin-right:8px"
-                 width="16" height="16" alt="" title="{TYPE}" />
+        <td class="icons">
+            <img src="{ICON}" class="tip channel-icon" alt="" title="{TYPE}" />
             {NAME}
         </td>
         <td>{DESCRIPTION}</td>
-        <td class="r">{READINGS}</td>
+        <td class="r">
+            <span style="display:none">{raw:READINGS}</span>
+            {READINGS}
+        </td>
         <td class="r last-reading" data-guid="{GUID}">?</td>
         <td>{UNIT}</td>
     </tr>
@@ -86,13 +86,15 @@
 
 </table>
 
-</div>
-
-<div class="clear"></div>
-
 <!-- BEGIN STATS -->
 <div id="tip-{GUID}" style="display:none">
-    {{Serial}}: {SERIAL}<br />
-    {{Channel}}: {CHANNEL}
+    <table>
+    <tr>
+        <td>{{Serial}}</td><td style="padding-right:1em">:</td><td>{SERIAL}</td>
+    </tr>
+    <tr>
+        <td>{{Channel}}</td><td>:</td><td>{CHANNEL}</td>
+    </tr>
+    </table>
 </div>
 <!-- END -->

@@ -34,6 +34,30 @@ abstract class Controller {
     /**
      *
      */
+    public function beforeGET() {
+    }
+
+    /**
+     *
+     */
+    public function beforePOST() {
+    }
+
+    /**
+     *
+     */
+    public function afterGET() {
+    }
+
+    /**
+     *
+     */
+    public function afterPOST() {
+    }
+
+    /**
+     *
+     */
     public function after() {
     }
 

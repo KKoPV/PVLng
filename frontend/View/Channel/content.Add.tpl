@@ -10,11 +10,9 @@
 -->
 
 <!-- Use this image as spacer for not available actions of channels -->
-<!-- DEFINE MACRO SpacerImg -->
+<!-- DEFINE SpacerImg -->
 <img src="/images/pix.gif" class="imgbar wide" style="width:16px;height:16px" width="16" height="16" alt="" />
 <!-- END DEFINE -->
-
-<div class="grid_10">
 
 <p id="radios">
     <input id="rbtype" type="radio" name="radio" checked="checked" />
@@ -25,7 +23,7 @@
 
 <div id="type">
 
-    <h2>{{SelectEntityType}}</h2>
+    <h3>{{SelectEntityType}}</h3>
 
     <form action="/channel/add" method="post">
 
@@ -64,17 +62,8 @@
                     {CHILDS}
                 <!-- ENDIF -->
             </td>
-            <td style="white-space:nowrap">
-                <!-- IF {WRITE} -->
-                <img src="/images/ico/write.png" class="imgbar wide tip"
-                     style="width:16px;height:16px" width="16p" height="16"
-                     alt="w" title="{{WritableEntity}}" />
-                <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-                <!-- IF {READ} -->
-                <img src="/images/ico/read.png" class="tip"
-                     style="width:16px;height:16px" width="16p" height="16"
-                     alt="r" title="{{ReadableEntity}}" />
-                <!-- ENDIF -->
+            <td class="icons">
+                <!-- INCLUDE channeltype.inc.tpl -->
             </td>
             <td style="font-size:smaller">{DESCRIPTION}</td>
         </tr>
@@ -84,7 +73,16 @@
 
     </table>
 
-    <p class="r"><input type="submit" value="{{proceed}} &raquo;" /></p>
+    <div id="legend" class="icons">
+        <strong>{{Legend}}</strong>:
+        <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
+        <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
+        <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>
+    </div>
+
+    <p>
+        <input type="submit" value="{{proceed}} &raquo;" />
+    </p>
 
     </form>
 
@@ -92,7 +90,7 @@
 
 <div id="template" style="display:none">
 
-    <h2>{{SelectEntityTemplate}}</h2>
+    <h3>{{SelectEntityTemplate}}</h3>
 
     <p>{{CreateTreeWithoutReqest}}</p>
 
@@ -149,7 +147,3 @@
     </form>
 
 </div>
-
-</div>
-
-<div class="clear"></div>

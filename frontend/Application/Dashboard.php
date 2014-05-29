@@ -6,33 +6,48 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-if (!Session::get('User')) return;
 
 /**
  *
  */
-PVLng::Menu(array(
-    'position' => 20,
-    'label'    => I18N::translate('Dashboard'),
-    'hint'     => I18N::translate('DashboardHint') . ' (Shift+F2)',
-    'route'    => '/dashboard'
-));
+PVLng::Menu(
+    'dashboard', 20, '/dashboard',
+    I18N::translate('Dashboards'),
+    I18N::translate('DashboardHint') . ' (Shift+F2)'
+);
+
+/**
+ *
+ */
+$tblDashboard = new ORM\Dashboard;
+$user = Session::get('user');
+foreach ($tblDashboard->order('name')->find() as $dashboard) {
+    if ($user OR $dashboard->getPublic()) {
+        PVLng::SubMenu(
+            'dashboard', 0, '/dashboard/'.$dashboard->getSlug(), $dashboard->getName()
+        );
+    }
+}
 
 /**
  * Routes
  */
-$app->map('/dashboard', $checkAuth, function() use ($app) {
+$app->get('/dashboard(/:slug)', function( $slug=NULL ) use ($app) {
+    $app->process('Dashboard', 'Index', array('slug' => $slug));
+});
+
+$app->post('/dashboard', $checkAuth, function() use ($app) {
     $app->process('Dashboard');
-})->via('GET', 'POST');
+});
 
 /**
  * Embedded mode
  */
-$app->get('/dashboard/embed', function() use ($app) {
-    $app->process('Dashboard', 'IndexEmbedded');
-});
+$app->get('/dashboard/embed/:slug', function( $slug ) use ($app) {
+    $app->process('Dashboard', 'IndexEmbedded', array('slug' => $slug));
+})->Module = 'Dashboard';
 
 // Just a shorter alias for /dashboard/embed
-$app->get('/ed', function() use ($app) {
-    $app->redirect('/dashboard/embed', 302);
-});
+$app->get('/ed/:slug', function( $slug ) use ($app) {
+    $app->redirect('/dashboard/embed/'.$slug, 302);
+})->Module = 'Dashboard';

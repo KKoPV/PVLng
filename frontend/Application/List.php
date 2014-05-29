@@ -11,12 +11,11 @@ if (!Session::get('User')) return;
 /**
  *
  */
-PVLng::Menu(array(
-    'position' => 30,
-    'label'    => I18N::translate('List'),
-    'hint'     => I18N::translate('ListHint') . ' (Shift+F3)',
-    'route'    => '/list'
-));
+PVLng::Menu(
+    'list', 30, '/list',
+    I18N::translate('List'),
+    I18N::translate('ListHint') . ' (Shift+F3)'
+);
 
 /**
  * Routes

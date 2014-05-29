@@ -35,6 +35,7 @@ function presentation( data ) {
     this.all = false;
     this.time1 = '00:00';
     this.time2 = '24:00';
+    this.legend = true;
 
     try { $.extend(this, JSON.parse(data)); } catch(e) {}
 

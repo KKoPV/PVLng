@@ -12,12 +12,11 @@
  */
 if (!file_exists(ROOT_DIR . DS . 'description.md')) return;
 
-PVLng::Menu(array(
-    'position' => 70,
-    'label'    => I18N::translate('Description'),
-    'hint'     => I18N::translate('PlantDescriptionHint') . ' (Shift+F7)',
-    'route'    => '/description',
-));
+PVLng::Menu(
+    'description', 70, '/description',
+    I18N::translate('Description'),
+    I18N::translate('PlantDescriptionHint') . ' (Shift+F6)'
+);
 
 /**
  * Route

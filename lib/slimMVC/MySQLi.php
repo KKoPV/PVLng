@@ -268,17 +268,14 @@ class MySQLi extends \MySQLi {
             echo $this->Cli ? "\n" : '</pre>';
         }
 
-        self::$QueryCount++;
-        if (self::$DEBUG) {
-            $this->queries[] = preg_replace('~\s+~', ' ', $query);
-        }
-
         $t = microtime(TRUE);
 
         $result = parent::query($query, $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT);
         $this->error();
 
         self::$QueryTime += (microtime(TRUE) - $t) * 1000;
+        self::$QueryCount++;
+        $this->queries[] = preg_replace('~\s+~', ' ', $query);
 
         return $result;
     }
@@ -393,6 +390,16 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
+    public function multi_query( $sql ) {
+        foreach (explode(';', $sql) as $query) {
+            $this->queries[] = preg_replace('~\s+~', ' ', $query);
+        }
+        return parent::multi_query($sql);
+    }
+
+    /**
+     *
+     */
     public function __set( $key, $value ) {
         $this->set($key, $value);
     }
@@ -496,6 +503,8 @@ class MySQLi extends \MySQLi {
         // Call org. query with less overhead
         parent::query('SET NAMES "utf8"');
         parent::query('SET CHARACTER SET utf8');
+        // Avoid SQL error (1690): BIGINT UNSIGNED value is out of range
+        parent::query('SET sql_mode = NO_UNSIGNED_SUBTRACTION');
         mysqli_report(MYSQLI_REPORT_STRICT);
     }
 
