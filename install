@@ -15,7 +15,7 @@ function e { echo =========================================================
 function d { ( [ "$1" ] && echo "$1" ) || echo "$2"; }
 
 e 'Clone PVLng Github repository'
-git clone https://github.com/K-Ko/PVLng.git .
+git clone https://github.com/KKoPV/PVLng.git .
 [ $? -eq 0 ] || exit 1
 
 while [ "$ok" != Y ]; do
@@ -45,6 +45,7 @@ while [ "$ok" != Y ]; do
     done
 
     dbname=$(d "$dbname" pvlng)
+    echo "Database MUST still exist, create it now if not!"
     read -p "Database (required) [$dbname] : " input <&1
     dbname=$(d "$input" "$dbname")
 
@@ -73,7 +74,7 @@ e 'Prepare config/config.php and set database credentials'
 sed -e "s~<HOST>~$dbhost~g"     -e "s~<PORT>~$dbport~g" \
     -e "s~<SOCKET>~$dbsocket~g" -e "s~<USER>~$dbuser~g" \
     -e "s~<PASSWORD>~$dbpass~g" -e "s~<DATABASE>~$dbname~g" \
-    $PWD/config/config.php.dist >$PWD/config/config.php
+    $PWD/config/config.default.php >$PWD/config/config.php
 
 e 'All done.'
 

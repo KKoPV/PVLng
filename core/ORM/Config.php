@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-class Config extends \slimMVC\ORMTable {
+class Config extends ConfigBase {
 
     /**
      *
@@ -31,14 +31,5 @@ class Config extends \slimMVC\ORMTable {
     public function resetAPIkey() {
         return $this->app->db->query('DELETE FROM `'.$this->table.'` WHERE `key` = "APIKey" LIMIT 1');
     }
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected $table = 'pvlng_config';
 
 }
