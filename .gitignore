@@ -2,6 +2,7 @@ prepend.php
 append.php
 config.php
 *.AOP.php
+clearAOP.sh
 *.conf
 run/*
 tmp/*

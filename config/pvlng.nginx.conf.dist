@@ -1,25 +1,4 @@
-###
-### The MIT License (MIT)
-###
-### Copyright (c) 2014 - Knut Kohl <github@knutkohl.de>
-###
-### Permission is hereby granted, free of charge, to any person obtaining a copy
-### of this software and associated documentation files (the "Software"), to deal
-### in the Software without restriction, including without limitation the rights
-### to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-### copies of the Software, and to permit persons to whom the Software is
-### furnished to do so, subject to the following conditions:
-###
-### The above copyright notice and this permission notice shall be included in
-### all copies or substantial portions of the Software.
-###
-### THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-### IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-### FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-### AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-### LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-### OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-### THE SOFTWARE.
+##############################################################################
 ###
 ### @author      Knut Kohl <github@knutkohl.de>
 ### @copyright   2012-2014 Knut Kohl
@@ -38,7 +17,7 @@
 ### Make a link in /etc/nginx/sites-enabled
 ###
 
-upstream php {
+upstream php5-fpm {
     # With php5-cgi alone:
 #   server 127.0.0.1:9000;
     # With php5-fpm:
@@ -50,15 +29,26 @@ server {
     # Server name & port
     #
     server_name  example.com;
-    listen       8000;
+    listen       80;
 
     ###
     # Prepare paths by
+    #
     # $ mkdir -p /var/www/{log,public_html}
     #
     root         /var/www/public_html;
-    access_log   /var/www/log/access-nginx.log;
-    error_log    /var/www/log/error-nginx.log;
+    access_log   /var/www/log/access.log;
+    error_log    /var/www/log/error.log;
+
+    ###
+    # Enable gzip compression
+    #
+    gzip             on;
+    gzip_min_length  1100;
+    gzip_buffers     4 32k;
+    gzip_comp_level  9;
+    gzip_types       text/css application/javascript application/x-javascript application/json;
+    gzip_vary        on;
 
     ###
     # Allows file uploads up to 500 megabytes
@@ -66,27 +56,27 @@ server {
     client_max_body_size 500M;
 
     ###
-    # Rewrite calls to /css and /js to compressors
+    # Remove trailing slashes, the Slim router don't like them
     #
-    rewrite /(css|js)/(.*\.\\1)$ /public/$1/index.php?$2 last;
+    rewrite ^/(.*)/$ /$1 permanent;
 
     ###
     # Rewrite API calls
     #
-    rewrite /api/([^/]+)/(.*)$ /api/$1/index.php?$2 last;
+    rewrite /api/([^/]+)/?(.*)$ /api/$1/index.php?$2 last;
 
     ###
-    # Handle images
+    # Handle images, styles and scripts
     #
-    location ~* \.(png|jpg|jpeg|gif|ico)$ {
+    location ~* \.(?:png|jpg|jpeg|gif|ico|js|css)$ {
         try_files /public/$uri =404;
         expires 1y;
+        add_header Cache-Control public;
         log_not_found off;
-        access_log off;
     }
 
     ###
-    # Rewrite all calls to /public
+    # Rewrite all other calls to /public
     #
     location / {
         try_files /public/$uri /public/index.php?$args;
@@ -101,18 +91,19 @@ server {
         # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
 
-        # Pass to upstream
-        fastcgi_pass php;
+        # pass to upstream
+        fastcgi_pass php5-fpm;
 
         fastcgi_index index.php;
         include fastcgi_params;
     }
 
     ###
-    # Deny access to .htaccess files, if Apache's document root
+    # deny access to .htaccess files, if Apache's document root
     # concurs with nginx's one
     #
     location ~ /\. {
+        log_not_found off;
         deny all;
     }
 }
