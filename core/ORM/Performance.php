@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-class Performance extends \slimMVC\ORMTable {
+class Performance extends PerformanceBase {
 
     /**
      *
@@ -24,16 +24,10 @@ class Performance extends \slimMVC\ORMTable {
     public function __construct ( $id=NULL ) {
         parent::__construct($id);
 
-        if (self::$first) {
-            $this->app->db->query('
-                CREATE TABLE IF NOT EXISTS `pvlng_performance` (
-                  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                  `action` enum("read","write") NOT NULL,
-                  `time` int(10) unsigned NOT NULL
-                ) ENGINE=MEMORY
-            ');
-
-            self::$first = FALSE;
+        if (self::$create) {
+            $this->app->db->query(self::$create);
+            // Free some memory and use also as "done" marker...
+            self::$create = FALSE;
         }
     }
 
@@ -42,9 +36,15 @@ class Performance extends \slimMVC\ORMTable {
     // -------------------------------------------------------------------------
 
     /**
-     * First call
+     * Create table on 1st call
      */
-    protected static $first = TRUE;
+    protected static $create = '
+        CREATE TABLE IF NOT EXISTS `pvlng_performance` (
+          `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          `action`    enum("read","write") NOT NULL,
+          `time`      int(10) unsigned NOT NULL
+        ) ENGINE=MEMORY
+    ';
 
     /**
      *

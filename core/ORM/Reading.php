@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-class Reading extends \slimMVC\ORMTable {
+abstract class Reading extends ReadingBase {
 
     /**
      *

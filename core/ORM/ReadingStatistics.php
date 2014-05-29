@@ -1,6 +1,6 @@
 <?php
 /**
- * Real access class for table 'pvlng_view'
+ * Real access class for 'pvlng_reading_statistics'
  *
  * To extend the functionallity, edit here
  *
@@ -17,6 +17,6 @@ namespace ORM;
 /**
  *
  */
-class View extends ViewBase {
+class ReadingStatistics extends ReadingStatisticsBase {
 
 }
