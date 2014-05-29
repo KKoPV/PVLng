@@ -55,6 +55,7 @@ class Tariff extends \Controller {
         $tblTariffView = new \ORM\TariffView;
         $tblTariffView->filterById($id)->order('date')->find();
         $tariff = array();
+        $fmtDate = $this->config->get('Locale.Date');
         foreach ($tblTariffView as $key=>$row) {
           if ($key === 0) {
                 $this->view->Name    = $row->getName();
@@ -65,7 +66,7 @@ class Tariff extends \Controller {
 
             $tariff[] = array(
                 'id'      => $row->getId(),
-                'date'    => $row->getDate(),
+                'date'    => date($fmtDate, $row->getDateTS()),
                 'time'    => $row->getTime(),
                 'days'    => implode(', ', array_map(
                                  function($a) { return __('day2::'.($a==7?0:$a)); },
@@ -82,8 +83,9 @@ class Tariff extends \Controller {
         $tariff = array();
         $ts = time() - (date('N')-1) * 86400;
         for ($i=1; $i<=7; $i++) {
-          foreach ($tblTariff->getTariffDay($ts, \ORM\Tariff::STRING) as $row) {
-                $tariff[date('Y-m-d - D', $ts)]['DATA'][] = array(
+            $tariff[$i]['day'] = date($fmtDate.' - ', $ts) . __('day::'.($i==7?0:$i));
+            foreach ($tblTariff->getTariffDay($ts, \ORM\Tariff::STRING) as $row) {
+                $tariff[$i]['data'][] = array(
                     'start'  => $row['start'],
                     'end'    => $row['end'],
                     'tariff' => $row['cost']

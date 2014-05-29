@@ -67,7 +67,7 @@
 <!-- BEGIN TARIFFWEEK -->
 
 <tr>
-    <td>{_LOOP}</td>
+    <td>{DAY}</td>
     <td></td>
     <td></td>
     <td></td>

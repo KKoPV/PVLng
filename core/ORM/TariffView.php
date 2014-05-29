@@ -19,4 +19,12 @@ namespace ORM;
  */
 class TariffView extends TariffViewBase {
 
+    /**
+     *
+     * @return int
+     */
+    public function getDateTS() {
+        return strtotime($this->fields['date']);
+    } // getDateTS()
+
 }

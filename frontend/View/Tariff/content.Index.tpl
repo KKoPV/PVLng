@@ -35,7 +35,7 @@
         <td>
             <!-- IF {COMMENT} --><small>{COMMENT}</small><!-- ENDIF -->
         </td>
-        <td style="white-space:nowrap">
+        <td class="icons">
             <a href="/tariff/{ID}" class="tipbtn imgbar wide" title="{{Details}}">
                 <img src="/images/ico/document-invoice.png" alt="(details)" width="16" height="16" />
             </a>
@@ -44,7 +44,7 @@
                      class="imgbar wide" alt="c" width="16" alt="+" height="16" />
             </a>
         </td>
-        <td style="white-space:nowrap">
+        <td class="icons">
             <a href="/tariff/edit/{ID}" class="tipbtn imgbar wide" title="{{EditTariff}}">
                 <img src="/images/ico/node_design.png"
                      class="imgbar wide" alt="e" width="16" height="16" />
@@ -70,7 +70,7 @@
         </td>
         <td></td>
         <td></td>
-        <td>
+        <td class="icons">
             <a href="/tariff/date/edit/{_PARENT.ID}/{DATE}" class="tipbtn imgbar wide" title="{{EditTariffDate}}">
                 <img src="/images/ico/node_design.png"
                      class="imgbar wide" alt="e" width="16" height="16" />
