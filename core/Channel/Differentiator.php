@@ -12,37 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Differentiator extends \Channel {
-
-    /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = NUMERIC_CHANNEL;
-
-    /**
-     * Accept only childs of the same entity type
-     */
-    public function addChild( $guid ) {
-        $childs = $this->getChilds();
-        if (empty($childs)) {
-            // Add 1st child
-            return parent::addChild($guid);
-        }
-
-        // Check if the new child have the same type as the 1st (and any other) child
-        $first = self::byID($childs[0]['entity']);
-        $new     = self::byGUID($guid);
-        if ($first->type == $new->type) {
-            // ok, add new child
-            return parent::addChild($guid);
-        }
-
-        throw new Exception('"'.$this->name.'" accepts only childs of type "'.$first->type.'"', 400);
-    }
+class Differentiator extends Calculator {
 
     /**
      *
@@ -59,6 +29,7 @@ class Differentiator extends \Channel {
             return $this->after_read(new \Buffer);
         }
 
+        $this->meter = $childs[0]->meter;
         $buffer = $childs[0]->read($request);
 
         // only one child, return as is

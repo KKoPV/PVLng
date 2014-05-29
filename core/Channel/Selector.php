@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 namespace Channel;
@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Ratio extends Calculator {
+class Selector extends Channel {
 
     /**
      *
@@ -22,7 +22,9 @@ class Ratio extends Calculator {
 
         $childs = $this->getChilds();
 
+        // Indicator channel
         $child1 = $childs[0]->read($request);
+        // Data channel
         $child2 = $childs[1]->read($request);
 
         $row1 = $child1->rewind()->current();
@@ -35,24 +37,18 @@ class Ratio extends Calculator {
             $key1 = $child1->key();
             $key2 = $child2->key();
 
-            if ($key1 == $key2) {
+            if ($key1 === $key2) {
 
-                $row1['data'] = $row2['data'] != 0
-                              ? $row1['data'] / $row2['data']
-                              : 0;
-
-                $row1['min']  = $row2['min'] != 0
-                              ? $row1['min'] / $row2['min']
-                              : 0;
-
-                $row1['max']  = $row2['max'] != 0
-                              ? $row1['max'] / $row2['max']
-                              : 0;
+                if ($row1['data'] <= $this->threshold) {
+                    $row2['data'] = 0;
+                    $row2['min']  = 0;
+                    $row2['max']  = 0;
+                }
 
                 // Remove consumption, may be we have a meter channel
-                $row1['consumption'] = 0;
+                $row2['consumption'] = 0;
 
-                $result->write($row1, $key1);
+                $result->write($row2, $key2);
 
                 // read both next rows
                 $row1 = $child1->next()->current();
@@ -72,6 +68,9 @@ class Ratio extends Calculator {
         }
         $child1->close();
         $child2->close();
+
+        // Overrule threshold logic
+        $this->threshold = NULL;
 
         return $this->after_read($result);
     }

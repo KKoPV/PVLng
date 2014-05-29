@@ -12,16 +12,7 @@ namespace Channel;
 /**
  *
  */
-class DifferentiatorFull extends Differentiator {
-
-    /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = NUMERIC_CHANNEL;
+class DifferentiatorFull extends Calculator {
 
     /**
      *
@@ -38,6 +29,7 @@ class DifferentiatorFull extends Differentiator {
             return $this->after_read(new \Buffer);
         }
 
+        $this->meter = $childs[0]->meter;
         $buffer = $childs[0]->read($request);
 
         // only one child, return as is

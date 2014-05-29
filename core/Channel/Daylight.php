@@ -2,8 +2,8 @@
 /**
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 namespace Channel;
@@ -11,21 +11,7 @@ namespace Channel;
 /**
  *
  */
-use Channel\InternalCalc;
-
-/**
- *
- */
 class Daylight extends InternalCalc {
-
-    /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = SENSOR_CHANNEL;
 
     /**
      * Run additional code before channel edited by user
@@ -43,12 +29,12 @@ class Daylight extends InternalCalc {
      * Read latitude / longitude from extra attribute
      */
     public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
+        parent::beforeEdit($channel, $fields);
         list(
             $fields['latitude']['VALUE'],
             $fields['longitude']['VALUE'],
-            $fields['irradiation']['VALUE']
+            $fields['extra']['VALUE']
         ) = $channel->extra;
-        parent::beforeEdit($channel, $fields);
     }
 
     /**
@@ -57,22 +43,9 @@ class Daylight extends InternalCalc {
      */
     public static function checkData( Array &$fields, $add2tree ) {
         if ($ok = parent::checkData($fields, $add2tree)) {
-            $guid = &$fields['irradiation'];
-            if ($fields['resolution']['VALUE'] == 1 AND $guid['VALUE'] == '') {
-                $fields['irradiation']['ERROR'][] = __('channel::ParamIsRequired');
-                $ok = false;
-            }
-            if ($guid['VALUE']) {
-                if (!preg_match('~^([0-9a-z]{4}-){7}[0-9a-z]{4}$~', $guid['VALUE'])) {
-                    $guid['ERROR'][] = __('channel::NoValidGUID');
-                    $ok = FALSE;
-                } else {
-                    $channel = new \ORM\Tree;
-                    if ($channel->findByGUID($guid['VALUE'])->id == '') {
-                        $guid['ERROR'][] = __('channel::NoChannelForGUID');
-                        $ok = FALSE;
-                    }
-                }
+            if ($fields['resolution']['VALUE'] == 1 AND $fields['extra']['VALUE'] == '') {
+                $fields['extra']['ERROR'][] = __('model::Daylight_IrradiationIsRequired');
+                $ok = FALSE;
             }
         }
         return $ok;
@@ -87,7 +60,7 @@ class Daylight extends InternalCalc {
         $channel->extra = array(
             +$fields['latitude']['VALUE'],
             +$fields['longitude']['VALUE'],
-            $fields['irradiation']['VALUE']
+            $fields['extra']['VALUE']
         );
     }
 
@@ -108,22 +81,17 @@ class Daylight extends InternalCalc {
     /**
      *
      */
-    protected $irradiation;
-
-    /**
-     *
-     */
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
 
-        list($this->latitude, $this->longitude, $this->irradiation) = $this->extra;
+        list($this->latitude, $this->longitude, $this->extra) = $this->extra;
 
         // Switch data table
         if ($this->resolution == 0) {
             $this->numeric = 0;
             $this->data = new \ORM\ReadingStrMemory;
             $this->data->id = $this->entity;
-            /* Clean up */
+            // Clean up
             $this->data->deleteById($this->entity);
         }
     }
@@ -135,14 +103,25 @@ class Daylight extends InternalCalc {
 
         parent::before_read($request);
 
-        if ($this->numeric AND $this->irradiation) {
+        if ($this->numeric AND $this->extra) {
             // Fetch average of last x days of irradiation channel to buid curve
-            $channel = \Channel::byGUID($this->irradiation);
+            $channel = \Channel::byGUID($this->extra);
+
             $q = new \DBQuery('pvlng_reading_num');
+
             $q->get($q->MAX('data'), 'data')
-              ->whereEQ('id', $channel->entity)
-              ->whereGE('timestamp', $this->start - 5*24*60*60)
-              ->whereLT('timestamp', $this->start);
+              ->filter('id', $channel->entity)
+              ->filter('timestamp', array(
+                    'bt' => array(
+                        $this->start - $this->config->get('Model.Daylight.CurveDays')*24*60*60,
+                        $this->start-1
+                    )
+                ))
+              ->group('`timestamp` DIV 86400');
+
+            // Select average of inner select
+            $q = 'SELECT '.$q->AVG('data').' FROM ('.$q->SQL().') t';
+
             $this->resolution = $this->db->queryOne($q);
         }
 
@@ -156,9 +135,9 @@ class Daylight extends InternalCalc {
 
             if (!$this->numeric) {
 
-                // Static sunrise / sunset marker
-                $this->saveValue($sunrise, 'Sunrise');
-                $this->saveValue($sunset,  'Sunset');
+                // Static sunrise / sunset marker without label
+                $this->saveValue($sunrise, '|/images/sunrise.png');
+                $this->saveValue($sunset,  '|/images/sunset.png');
 
             } else {
 

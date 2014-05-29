@@ -15,15 +15,6 @@ namespace Channel;
 class Fix extends InternalCalc {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = SENSOR_CHANNEL;
-
-    /**
      *
      */
     protected function before_read( $request ) {

@@ -1,26 +1,6 @@
 <?php
 /**
- * The MIT License (MIT)
  *
- * Copyright (c) 2014 - Knut Kohl <github@knutkohl.de>
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2014 Knut Kohl
@@ -38,12 +18,8 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
-    'resolution' => array(
-        'type'     => 'select;0:Marker;1:Curve',
-        'required' => FALSE
-    ),
     'unit' => array(
-        'visible'  => FALSE
+        'default'  => 'W/m²'
     ),
     'decimals' => array(
         'visible'  => FALSE,
@@ -55,16 +31,38 @@ return array(
     'valid_to' => array(
         'visible'  => FALSE
     ),
-    'latitude' => array(
-        'type'     => 'numeric',
-        'required' => TRUE
-    ),
+
     'longitude' => array(
-        'type'     => 'numeric',
-        'required' => TRUE
+        'position'    => 400,
+        'type'        => 'numeric',
+        'required'    => TRUE,
+        'placeholder' => '-180 .. 180'
     ),
-    'irradiation' => array(
-        'type'     => 'guid'
+    'latitude' => array(
+        'position'    => 410,
+        'type'        => 'numeric',
+        'required'    => TRUE,
+        'placeholder' => '-90 .. 90'
+    ),
+
+    'resolution' => array(
+        'position' => 420,
+        'type'     => 'select;0:Marker;1:Curve',
+        'required' => FALSE
+    ),
+
+    'extra' => array(
+        'visible'  => TRUE,
+        'type'     => 'sql:X:'
+                     .'SELECT'
+                     .'  `guid`,'
+                     .'  CONCAT('
+                     .'    `name`,'
+                     .'    IF(`description`<>"", CONCAT(" (", `description`, ")"), ""),'
+                     .'    IF(`channel`<>"", CONCAT(" [", `channel`, "]"), "")'
+                     .'  )'
+                     .' FROM `pvlng_channel`'
+                     .'WHERE `type` = 64'
     ),
 
 );

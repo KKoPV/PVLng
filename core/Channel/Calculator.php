@@ -12,16 +12,41 @@ namespace Channel;
 /**
  *
  */
-class Calculator extends \Channel {
+class Calculator extends Channel {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
+     * Accept only childs of the same meter attribute and unit
      */
-    const TYPE = NUMERIC_CHANNEL;
+    public function addChild( $channel ) {
+        $childs = $this->getChilds();
+        if (empty($childs)) {
+            // Add 1st child
+            $child = parent::addChild($channel);
+            // Adopt icon
+            $self = new \ORM\Channel($this->entity);
+            $new  = new \ORM\Channel($channel);
+            if ($new->getType() == 0) {
+                // Is an alias, get real channel
+                $guid = $new->getChannel();
+                $new = new \ORM\Tree;
+                $new->filterByGuid($guid)->findOne();
+            }
+            $self->setMeter($new->getMeter())->setIcon($new->getIcon())->update();
+        } else {
+            // Check if the new child have the same type as the 1st (and any other) child
+            $first = new \ORM\ChannelView($childs[0]->entity);
+            $next  = new \ORM\ChannelView($channel);
+            if ($first->getMeter() == $next->getMeter() AND $first->getUnit() == $next->getUnit()) {
+                // ok, add new child
+                $child = parent::addChild($channel);
+            } else {
+                $meter = $first->getMeter() ? 'meter' : 'sensor';
+                \Messages::Error('"'.$this->name.'" accepts only '.meter.' channels with unit '.$first->getUnit(), 400);
+                return;
+            }
+        }
+        return $child;
+    }
 
     /**
      * Run additional code before data saved to database

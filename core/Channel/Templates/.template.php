@@ -1,8 +1,8 @@
 <?php
 /**
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     2.0.0
  *
  * 2.0.0
@@ -35,6 +35,9 @@ return array(
         ),
 
         // Real channels
+        // If you don't need grouping channel and create just a buch of channels,
+        // start with index = 1
+        # 1 => array(
         array(
             'type'        => 0,
             'name'        => '',

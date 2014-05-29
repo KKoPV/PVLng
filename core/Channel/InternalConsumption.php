@@ -15,15 +15,6 @@ namespace Channel;
 class InternalConsumption extends InternalCalc {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = NUMERIC_CHANNEL;
-
-    /**
      * Accept only childs of the same entity type
      */
     public function addChild( $guid ) {

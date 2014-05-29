@@ -1,12 +1,9 @@
 <?php
 /**
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     2.0.0
- *
- * 2.0.0
- * - 1st channel is always the grouping channel
+ * @copyright   2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
  *
  * 1.0.0
  * - Inital creation

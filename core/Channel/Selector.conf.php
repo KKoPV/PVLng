@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 return array(
@@ -19,9 +19,14 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
-    'unit' => array(
-        'readonly' => TRUE,
-        'default'  => '%',
-    )
+    'threshold' => array(
+        'visible'  => TRUE,
+        'required' => TRUE,
+        'default'  => 0,
+    ),
+
+    'valid_from' => array(
+        'visible' => FALSE,
+    ),
 
 );

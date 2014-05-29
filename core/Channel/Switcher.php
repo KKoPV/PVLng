@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Switcher extends \Channel {
+class Switcher extends Channel {
 
     /**
      *

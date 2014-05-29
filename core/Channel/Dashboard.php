@@ -21,22 +21,6 @@ namespace Channel;
 class Dashboard extends Calculator {
 
     /**
-     * Run additional code before data saved to database
-     * Read latitude / longitude from extra attribute
-     */
-    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
-        $fields['colors']['VALUE'] = $channel->extra;
-    }
-
-    /**
-     * Run additional code before data saved to database
-     * Save latitude / longitude to extra attribute
-     */
-    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
-        $channel->extra = $fields['colors']['VALUE'];
-    }
-
-    /**
      *
      */
     public function read( $request ) {
@@ -46,10 +30,9 @@ class Dashboard extends Calculator {
         // Get some properties from child
         $this->meter = $channel->meter;
 
-        // Set some properties of child
         // If valid range is smaller than dashbord should display,
         // extend to at least dashboard range
-        // e.g. performance ratio for graphs 95 .. 100, but dashboard 50 .. 100
+        // e.g. Performance ratio for graphs 95 .. 100, but dashboard 50 .. 100
         if (!is_null($channel->valid_from) AND $channel->valid_from > $this->valid_from) {
             $channel->valid_from = $this->valid_from;
         }
@@ -57,7 +40,6 @@ class Dashboard extends Calculator {
             $channel->valid_to = $this->valid_to;
         }
 
-        // Simply pass-through
         return $this->after_read($channel->read($request));
     }
 

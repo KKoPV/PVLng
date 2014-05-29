@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Counter extends Sensor {
+class Counter extends Channel {
 
     /**
      *

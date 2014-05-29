@@ -15,37 +15,15 @@ namespace Channel;
 class Estimate extends InternalCalc {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = SENSOR_CHANNEL;
-
-    /**
-     * Run additional code before data saved to database
-     * Read latitude / longitude from extra attribute
-     */
-    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
-        $fields['estimates']['VALUE'] = $channel->extra;
-    }
-
-    /**
-     * Run additional code before data saved to database
-     * Save latitude / longitude to extra attribute
-     */
-    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
-        $channel->extra = $fields['estimates']['VALUE'];
-    }
-
-    /**
      *
      */
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
         // Fake as counter to get the sum of estiamtes for periods greater than day
         $this->counter = TRUE;
+        if ($marker = $this->config->get('Model.Estimate.Marker')) {
+            $this->attributes['marker'] = $marker;
+        }
     }
 
     /**
