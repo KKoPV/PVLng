@@ -33,13 +33,13 @@ return array(
     ),
 
     'longitude' => array(
-        'position'    => 400,
+        'position'    => 300,
         'type'        => 'numeric',
         'required'    => TRUE,
         'placeholder' => '-180 .. 180'
     ),
     'latitude' => array(
-        'position'    => 410,
+        'position'    => 310,
         'type'        => 'numeric',
         'required'    => TRUE,
         'placeholder' => '-90 .. 90'
@@ -47,7 +47,7 @@ return array(
 
     'resolution' => array(
         'position' => 420,
-        'type'     => 'select;0:Marker;1:Curve',
+        'type'     => 'boolean;0:Marker;1:Curve',
         'required' => FALSE
     ),
 

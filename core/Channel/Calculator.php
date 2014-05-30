@@ -49,14 +49,6 @@ class Calculator extends Channel {
     }
 
     /**
-     * Run additional code before data saved to database
-     * Read latitude / longitude from extra attribute
-     */
-    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
-        $fields['cost']['VISIBLE'] = $channel->meter;
-    }
-
-    /**
      *
      */
     public function read( $request ) {

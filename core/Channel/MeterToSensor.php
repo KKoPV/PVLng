@@ -50,21 +50,33 @@ class MeterToSensor extends Channel {
         }
 
         $buffer = $this->getChild(1)->read($request)->rewind();
-        $last = $buffer->current();
+        $last1 = $buffer->current();
+        $buffer->next();
+        $last2 = $buffer->current();
+        $key = $buffer->key();
         $buffer->next();
 
         $result = new \Buffer;
 
         while ($row = $buffer->current()) {
-            $fact = 3600 / ($row['timestamp'] - $last['timestamp']);
+            $fact = 3600 / ($row['timestamp'] - $last2['timestamp']);
+
             // Smooth a bit by calculate average of this and last consumption
-            $row['data'] = ($row['consumption'] + $last['consumption']) / 2 * $fact;
+            $row['data'] = ($last1['consumption'] + $last2['consumption'] + $row['consumption']) / 3 * $fact;
             $row['min']  = $row['min'] * $fact;
             $row['max']  = $row['max'] * $fact;
+
             // Remember row before adjust consumption
-            $last = $row;
+            $last1 = $last2;
+            $last2 = $row;
+
+            // Set timestamp to last timestamp, which is now in $last1
+            $row['timestamp'] = $last1['timestamp'];
+            $row['datetime']  = $last1['datetime'];
             $row['consumption'] = 0;
-            $result->write($row, $buffer->key());
+            $result->write($row, $key);
+
+            $key = $buffer->key();
             $buffer->next();
         }
 
