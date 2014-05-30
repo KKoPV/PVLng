@@ -237,7 +237,10 @@ $(function() {
         label: '&nbsp;',
         text: false
     }).click(function() {
-        $('#wrapper').animate({ height: 'toggle', opacity: 'toggle' });
+        var wrapper = $('#wrapper');
+        if (wrapper.animate({ height: 'toggle', opacity: 'toggle' }).is(':visible')) {
+            $('html, body').animate({ scrollTop: wrapper.offset().top-3 }, 'slow');
+        }
     });
 
     if ({CHANNELCOUNT} > 0) $('#togglewrapper').trigger('click');
