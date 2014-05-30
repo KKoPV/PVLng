@@ -12,6 +12,7 @@
 <div id="public-select" style="margin-bottom:1em;display:none">
     <label for="load-delete-view" style="margin-right:20px">{{VariantsPublic}}:</label>
     <select id="load-delete-view" style="margin:0 .5em" data-placeholder="--- {{SelectChart}} ---"></select>
+    <button id="btn-load" style="margin:0 1em" class="tip" title="{{Load}}">{{Load}}</button>
 </div>
 
 <div id="wrapper" style="display:none">
@@ -35,10 +36,8 @@
                        data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
                 <!-- INCLUDE channel-details.inc.tpl -->
             </td>
-            <td class="r">
-                <img id="s{ID}" src="/images/spinner.gif"
-                     style="float:right;width:16px;height:16px;display:none"
-                     width="16" height="16" />
+            <td class="icons r">
+                <img id="s{ID}" src="/images/spinner.gif" style="display:none" />
                 <span id="cons{ID}" class="consumption"></span>
             </td>
             <td id="u{ID}">{UNIT}</td>

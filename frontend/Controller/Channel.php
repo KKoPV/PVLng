@@ -38,7 +38,6 @@ class Channel extends \Controller {
                 'VALUE'       => ''
             ), array_change_key_case($field, CASE_UPPER));
         }
-
         $this->view->Id = $this->app->params->get('id');
     }
 
@@ -429,14 +428,19 @@ class Channel extends \Controller {
             $this->app->redirect('/channel');
         }
 
-        $this->applyFieldSettings($type->getType());
+        if (is_null($entity)) {
+            $this->applyFieldSettings($type->getType());
+        } else {
+            $entity = new \ORM\Channel($entity);
+            $this->applyFieldSettings($entity->getMeter() ? 'meter' : 'sensor');
+        }
 
-        if ($type->write AND $type->read) {
+        if ($type->getWrite() AND $type->getRead()) {
             // No specials for writable AND readable channels
-        } elseif ($type->write) {
+        } elseif ($type->getWrite()) {
             // Write only
            $this->applyFieldSettings('write');
-        } elseif ($type->read) {
+        } elseif ($type->getRead()) {
             // Read only
            $this->applyFieldSettings('read');
         } else {
@@ -445,7 +449,7 @@ class Channel extends \Controller {
         }
 
         // Last apply model specific settings
-        $this->applyFieldSettings(str_replace('\\', DS, $type->model));
+        $this->applyFieldSettings(str_replace('\\', DS, $type->getModel()));
 
         foreach ($this->fields as $key=>&$data) {
             $data = array_merge(
@@ -473,7 +477,17 @@ class Channel extends \Controller {
                 $data['VALUE'] = trim($data['DEFAULT']);
             }
 
-            if (strpos($data['TYPE'], 'select') === 0) {
+            if (strpos($data['TYPE'], 'bool') === 0) {
+                preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
+                foreach ($matches as $option) {
+                    $data['OPTIONS'][] = array(
+                        'VALUE'   => trim($option[1]),
+                        'TEXT'    => __(trim($option[2])),
+                        'CHECKED' => (trim($option[1]) == $data['VALUE'])
+                    );
+                }
+                $data['TYPE'] = 'bool';
+            } elseif (strpos($data['TYPE'], 'select') === 0) {
                 preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
                 foreach ($matches as $option) {
                     $data['OPTIONS'][] = array(
@@ -503,7 +517,7 @@ class Channel extends \Controller {
 
         $this->view->Type = $type->id;
         $this->view->TypeName = $type->name;
-        if ($type->unit) $this->view->TypeName .= ' (' . $type->unit . ')';
+        if ($type->unit) $this->view->TypeName .= ' [' . $type->unit . ']';
         $this->view->Icon = $type->icon;
 
         $h = $type->description.'Help';

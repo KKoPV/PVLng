@@ -1,4 +1,4 @@
-<?php
+<?php /* // AOP // */
 /**
  *
  *
@@ -19,17 +19,6 @@ class Controller extends slimMVC\Controller {
         $this->db = $this->app->db;
         $this->config = $this->app->config;
         $this->request = $this->app->request;
-
-        $model = str_replace('Controller', 'Model', get_class($this));
-
-        if (class_exists($model)) {
-            // Controler has its own model
-            $this->model = new $model;
-        } else {
-            // General model
-            $this->model = new Model;
-        }
-
         $this->view = $this->app->view;
 
         $this->view->Helper->translate = function() {
@@ -137,7 +126,7 @@ class Controller extends slimMVC\Controller {
         $this->view->VersionDate = PVLNG_VERSION_DATE;
 
         $this->view->PHPVersion = PHP_VERSION;
-        $this->view->MySQLVersion = $this->model->getDatabaseVersion();
+        $this->view->MySQLVersion = $this->db->queryOne('SELECT version()');
         $this->view->ServerName = $_SERVER['HTTP_HOST'];
         $this->view->ServerVersion = $_SERVER['SERVER_SOFTWARE'];
 

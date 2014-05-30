@@ -67,6 +67,22 @@
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                 />
+            <!-- ELSEIF {TYPE} == "bool-radio" -->
+                <span class="toolbar">
+                <!-- BEGIN OPTIONS -->
+                <input id="radio{_LOOP_ID}{_PARENT.FIELD}" type="radio" name="c[{_PARENT.FIELD}]" value="{VALUE}"
+                       <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF -->>
+                <label for="radio{_LOOP_ID}{_PARENT.FIELD}">{TEXT}</label>
+                <!-- END -->
+                </span>
+            <!-- ELSEIF {TYPE} == "bool" -->
+                <select id="{FIELD}" name="c[{FIELD}]" <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
+                        data-placeholder="<!-- IF {PLACEHOLDER} -->{PLACEHOLDER}<!-- ELSE -->--- {{Select}} ---<!-- ENDIF -->"
+                    >
+                    <!-- BEGIN OPTIONS -->
+                    <option value="{VALUE}" <!-- IF {CHECKED} -->selected="selected"<!-- ENDIF -->>{TEXT}</option>
+                    <!-- END -->
+                </select>
             <!-- ELSEIF {TYPE} == "select" -->
                 <select id="{FIELD}" name="c[{FIELD}]" <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                         data-placeholder="<!-- IF {PLACEHOLDER} -->{PLACEHOLDER}<!-- ELSE -->--- {{Select}} ---<!-- ENDIF -->"

@@ -131,11 +131,11 @@
                        value="{ID}" <!-- IF {CHECKED} -->checked="checked"<!-- ENDIF --> />
             </td>
             <td class="drag">
-                <img src="{ICON}" class="channel-icon" width="16" height="16" alt="" />
+                <img src="{ICON}" class="channel-icon" alt="" />
                 <strong>{NAME}</strong>
                 <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
             </td>
-            <td>
+            <td class="icons">
                 <a href="/channel/edit/{ENTITY}?returnto=/dashboard<!-- IF {__SLUG} -->/{__SLUG}<!-- ENDIF -->" class="tip" title="{{EditEntity}}">
                     <img src="/images/ico/node_design.png" class="imgbar" width="16" height="16" alt="e">
                 </a>

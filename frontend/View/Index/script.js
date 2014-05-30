@@ -504,7 +504,6 @@ function updateChart( forceUpdate ) {
     if (f != t) f += ' - ' + t;
     chart.setTitle({ text: $('<div/>').html(views.actual.name).text() }, { text: f });
 
-/*    chart.showLoading('<img src="/images/loading_bar.gif" width="220" height="19" />'); */
     chart.showLoading('<img src="/images/loading_dots.gif" width="64" height="21" />');
 
     var series = [], costs = 0, date = new Date();
@@ -845,16 +844,6 @@ $(function() {
         }
     });
 
-    if (user) {
-        var aoColumnDefs = [
-            { sWidth: '1%', aTargets: [ 0, 2, 3, 4, 5, 6 ] }
-        ];
-    } else {
-        var aoColumnDefs = [
-            { sWidth: '1%', aTargets: [ 1, 2, 3 ] }
-        ];
-    }
-
     /**
      *
      */
@@ -865,18 +854,15 @@ $(function() {
         bAutoWidth: false,
         aoColumnDefs: user
             ? [ { sWidth: '1%', aTargets: [ 0, 2, 3, 4, 5 ] } ]
-            : [ { sWidth: '1%', aTargets: [ 1, 2 ] } ],
-        fnInitComplete: function() {
-            /* Init treetable AFTER databale is ready */
-            $('.treeTable').treetable({
-                initialState: 'expanded',
-                indent: 24,
-                column: 1
-            });
-        }
+            : [ { sWidth: '1%', aTargets: [ 1, 2 ] } ]
     });
 
     if (user) {
+        $('.treeTable').treetable({
+            initialState: 'expanded',
+            indent: 24,
+            column: 1
+        });
         $('.chartdialog').addClass('clickable').click(function() {
             ChartDialog($(this).parents('tr').data('tt-id'));
         });
@@ -1035,13 +1021,6 @@ $(function() {
         $('#wrapper').animate({ height: 'toggle', opacity: 'toggle' });
     });
 
-    if (!user) {
-        /* Load selected view direct on change */
-        $('#load-delete-view').change(function() {
-            views.load($('#load-delete-view option:selected').val(), true);
-        });
-    }
-
     $('#btn-load').button({
         icons: { primary: 'ui-icon-folder-open' },
         label: '&nbsp;',
@@ -1148,6 +1127,7 @@ $(function() {
             $('#top-select').show();
         } else {
             $('#public-select').show();
+            $('#wrapper').show();
         }
         /* Chart slug provided by URL?, load and collapse tree */
         views.load(qs.chart, true);

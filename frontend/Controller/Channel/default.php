@@ -58,13 +58,13 @@ return array(
 
     'meter' => array(
         'position'    => 80,
-        'type'        => 'select;1:yes;0:no',
+        'type'        => 'boolean;1:yes;0:no',
         'default'     => 0
     ),
 
     'numeric' => array(
         'position'    => 90,
-        'type'        => 'select;1:yes;0:no',
+        'type'        => 'boolean;1:yes;0:no',
         'default'     => 1
     ),
 
@@ -76,7 +76,7 @@ return array(
 
     'adjust' => array(
         'position'    => 110,
-        'type'        => 'select;1:yes;0:no',
+        'type'        => 'boolean;1:yes;0:no',
         'default'     => 0
     ),
 
@@ -129,7 +129,7 @@ return array(
 
     'public' => array(
         'position'    => 900,
-        'type'        => 'select;1:yes;0:no',
+        'type'        => 'boolean;1:yes;0:no',
         'default'     => 1
     ),
 

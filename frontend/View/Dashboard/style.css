@@ -12,13 +12,12 @@
     text-align: center;
 }
 
-td.drag {
-    cursor: ns-resize;
+tr:hover {
+    background-color: #C0FFC0 !important;
 }
 
-#d-table td {
-    padding: .5em .5em;
-    vertical-align: top;
+.drag {
+    cursor: ns-resize;
 }
 
 .chart {
