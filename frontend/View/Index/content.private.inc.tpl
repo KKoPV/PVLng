@@ -83,9 +83,10 @@
 
     <div id="legend" class="icons">
         <strong>{{Legend}}</strong>:
+        <span><img src="/images/ico/lock.png">{{PrivateChannel}}</span>,
         <span><img src="/images/ico/chart.png">{{ChartSettingsTip}}</span>,
         <span><img src="/images/ico/document-invoice.png">{{ListHint}}</span>,
-        <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>,
+        <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>
     </div>
 
 </div>

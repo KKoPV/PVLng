@@ -18,6 +18,5 @@
 <!-- ENDIF -->
 
 <!-- IF !{PUBLIC} -->
-    <img src="/images/ico/lock.png" class="tip" alt="[private]" title="{{PrivateChannel}}"
-         style="margin-left:1em;width:16px;height:16px" width="16" height="16" />
+    <img src="/images/ico/lock.png" alt="[private]" style="margin-left:1em" />
 <!-- ENDIF -->
