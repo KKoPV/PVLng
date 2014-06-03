@@ -50,7 +50,7 @@
     background-color: rgb(192,192,192);
 }
 
-#Yryie table tbody tr.hide {
+#Yryie table .hide {
     display: none;
 }
 

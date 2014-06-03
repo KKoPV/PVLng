@@ -8,7 +8,7 @@
 #Yryie table tbody tr.timer{color:#840}
 #Yryie table tbody tr.odd{background-color:#e0e0e0}
 #Yryie table tbody tr.even{background-color:silver}
-#Yryie table tr.hide{display:none}
+#Yryie table .hide{display:none}
 #Yryie table tbody tr.handler td.msg{font-weight:700}
 #Yryie table tbody tr.debug td.msg,#Yryie table tbody tr.trace td.msg,#Yryie table tbody tr.version td.msg,#Yryie table tbody tr.call td.msg{font-family:monospace;font-size:110%;white-space:pre}
 #Yryie table thead th{text-align:left;background:#909090;border:1px solid #FFF;padding:3px 5px}
