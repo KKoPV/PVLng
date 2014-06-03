@@ -33,6 +33,7 @@ class Daylight extends InternalCalc {
         list(
             $fields['latitude']['VALUE'],
             $fields['longitude']['VALUE'],
+            $fields['times']['VALUE'],
             $fields['extra']['VALUE']
         ) = $channel->extra;
     }
@@ -60,6 +61,7 @@ class Daylight extends InternalCalc {
         $channel->extra = array(
             +$fields['latitude']['VALUE'],
             +$fields['longitude']['VALUE'],
+            +$fields['times']['VALUE'],
             $fields['extra']['VALUE']
         );
     }
@@ -84,7 +86,7 @@ class Daylight extends InternalCalc {
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
 
-        list($this->latitude, $this->longitude, $this->extra) = $this->extra;
+        list($this->latitude, $this->longitude, $this->times, $this->extra) = $this->extra;
 
         // Switch data table
         if ($this->resolution == 0) {
@@ -135,9 +137,12 @@ class Daylight extends InternalCalc {
 
             if (!$this->numeric) {
 
-                // Static sunrise / sunset marker without label
-                $this->saveValue($sunrise, '|/images/sunrise.png');
-                $this->saveValue($sunset,  '|/images/sunset.png');
+                // Static sunrise / sunset marker with time label depending of "times" attribute
+                $label = '';
+                if ($this->times) $label = date('H:i', $sunrise);
+                $this->saveValue($sunrise, $label . '|/images/sunrise.png');
+                if ($this->times) $label = date('H:i', $sunset);
+                $this->saveValue($sunset,  $label . '|/images/sunset.png');
 
             } else {
 

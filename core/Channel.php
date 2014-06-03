@@ -404,21 +404,6 @@ abstract class Channel {
                   ->group('g');
             }
 
-//             if ($this->period[1] != self::ALL) {
-//                 // Time is only relevant for period != ALL
-//                 if ($this->start) {
-//                     if (!$this->meter) {
-//                         $q->filter('timestamp', array('min'=>$this->start));
-//                     } else {
-//                         // Fetch also period before start for correct consumption calculation!
-//                         $q->filter('timestamp', array('min'=>$this->start-$this->TimestampMeterOffset[$this->period[1]]));
-//                     }
-//                 }
-//                 if ($this->end < time()) {
-//                     $q->filter('timestamp', array('max'=>$this->end-1));
-//                 }
-//             }
-
             $this->filterReadTimestamp($q);
             $q->filter('id', $this->entity)->order('timestamp');
 
@@ -760,6 +745,7 @@ abstract class Channel {
             }
             $this->start = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
         } else {
+            if ($request['start'] == '') $request['start'] = 0;
             $this->start = is_numeric($request['start'])
                          ? $request['start']
                          : strtotime($request['start']);
