@@ -3,13 +3,15 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
 
-{TOC}
+<div class="toolbar toc">
+    {TOC}
+</div>
 
 <p>
     <a href="http://pvlng.com">

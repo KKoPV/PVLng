@@ -589,11 +589,12 @@ function updateChart( forceUpdate ) {
                         }
                     };
                     if (attr.unit.trim() == '') {
-                        /* mostly non-numeric channels */
+                        /* Mostly non-numeric channels */
                         serie.dataLabels.align = 'left';
                         serie.dataLabels.rotation = 270;
                         serie.dataLabels.x = 3;
-                        serie.dataLabels.y = -8;
+                        /* Move a bit up */
+                        serie.dataLabels.y = -10;
                     }
                 } else if (channel.type != 'bar') {
                     serie.dashStyle = channel.style;

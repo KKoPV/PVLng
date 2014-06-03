@@ -22,7 +22,7 @@ class Lists extends \Controller {
 
         $q = \DBQuery::forge('pvlng_tree_view')
              ->get('guid')->get('name')->get('description')
-             ->get('type')->get('unit')->get('graph', 'available')
+             ->get('type')->get('unit')->get('graph', 'available')->get('icon')
              ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&nbsp;&bull;","&rarr;"), "&nbsp;")', 'indent')
              ->filter('`id` <> 1 AND `alias_of` IS NULL');
 

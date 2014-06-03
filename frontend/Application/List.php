@@ -22,12 +22,8 @@ PVLng::Menu(
  */
 $app->get('/list(/:id)', $checkAuth, function( $id=NULL ) use ($app) {
     $app->process('Lists', 'Index', array('id' => $id));
-})->conditions(array(
-    'id' => '\d+'
-));
+});
 
-$app->get('/list(/:guid)', $checkAuth, function( $guid=NULL ) use ($app) {
+$app->get('/list/:guid', $checkAuth, function( $guid ) use ($app) {
     $app->process('Lists', 'Index', array('guid' => $guid));
-})->conditions(array(
-    'guid' => '(\w{4}-){7}\w{4}'
-));
+});

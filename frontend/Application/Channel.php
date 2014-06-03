@@ -51,6 +51,10 @@ $app->get('/channel/edit/:id', $checkAuth, function( $id ) use ($app) {
     $app->process('Channel', 'Edit', array('id' => $id));
 });
 
+$app->get('/channel/edit/:guid', $checkAuth, function( $guid ) use ($app) {
+    $app->process('Channel', 'Edit', array('guid' => $guid));
+});
+
 $app->post('/channel/alias', $checkAuth, function() use ($app) {
     $app->process('Channel', 'Alias');
 });

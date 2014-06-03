@@ -12,7 +12,7 @@
 <input type="hidden" id="fromdate" name="fromdate" />
 <input type="hidden" id="todate" name="todate" />
 
-<div>
+<div class="icons">
     <select id="channel" data-placeholder="--- {{SelectChannel}} ---">
         <option></option>
         <!-- BEGIN CHANNELS -->
@@ -23,17 +23,17 @@
                 disabled="disabled"
             <!-- ENDIF -->
         >
-            <span style="font-size:120%">{INDENT}</span>{NAME}
+            <span style="font-size:120%">{INDENT}</span>
+            {NAME}
             <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
             <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
         </option>
         <!-- END -->
     </select>
-    <img id="icon" src="/images/pix.gif" class="tip" data-none="/images/pix.gif" alt=""
-         style="margin:0 8px;width:16px;height:16px" width="16" height="16" />
+    <img id="icon" src="/images/pix.gif" class="tip" data-none="/images/pix.gif" alt="">
     <img id="icon-private" src="/images/ico/lock.png" class="tip" alt="[private]"
-         style="width:16px;height:16px;display:none"
-         width="16" height="16" title="{{PrivateChannel}}"/>
+         style="display:none" title="{{PrivateChannel}}"/>
+    <img id="editentity" src="/images/ico/node_design.png" class="btn" alt="e">
 
 </div>
 

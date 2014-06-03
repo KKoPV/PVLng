@@ -245,6 +245,15 @@ $app->notFound(function() use ($app) {
     $app->redirect('/');
 });
 
+/**
+ *
+ */
+Slim\Route::setDefaultConditions(array(
+    'guid' => '(\w{4}-){7}\w{4}',
+    'id'   => '\d+',
+    'slug' => '[@\w\d-]+'
+));
+
 // ---------------------------------------------------------------------------
 // Modules: Menu and route definitions
 // ---------------------------------------------------------------------------

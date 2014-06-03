@@ -38,7 +38,14 @@ class Channel extends \Controller {
                 'VALUE'       => ''
             ), array_change_key_case($field, CASE_UPPER));
         }
-        $this->view->Id = $this->app->params->get('id');
+
+        if ($guid = $this->app->params->get('guid')) {
+            // Call with GUID to edit, find channel
+            $tree = new \ORM\Tree;
+            $this->view->Id = $tree->filterByGUID($guid)->findOne()->getEntity();
+        } else {
+            $this->view->Id = $this->app->params->get('id');
+        }
     }
 
     /**

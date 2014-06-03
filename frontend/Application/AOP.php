@@ -89,7 +89,7 @@ class YryieMiddleware extends Slim\Middleware {
             $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
             Yryie::$TraceDelimiter = ';';
             Yryie::Save($file);
-          $body = str_replace($placeholder, '<p><b>Trace saved as <tt>'.$file.'</tt></b></p>', $body);
+            $body = str_replace($placeholder, '<p><b>Trace saved as <tt>'.$file.'</tt></b></p>', $body);
 
             // Trace only once, reset debug state
             Session::set('debug');

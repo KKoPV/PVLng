@@ -33,7 +33,7 @@ class Overview extends \Controller {
 //                     \Messages::Error($value);
 //             }
 //         }
-//
+
         $this->app->redirect('/overview');
     }
 
@@ -131,7 +131,6 @@ class Overview extends \Controller {
                     array($rgt, $data->lft, $data->rgt),
                     $this->MoveSubTreeSQL
                 );
-
                 // Move group/channel
                 $this->db->query($sql);
             } else {

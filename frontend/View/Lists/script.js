@@ -23,6 +23,7 @@ function updateList() {
         var icon = $('#icon');
         icon.prop('src', icon.data('none'));
         $('#icon-private').hide();
+        $('#editentity').hide();
         listTable.fnClearTable();
         $('.export').button('option', 'disabled', true);
         return;
@@ -56,6 +57,7 @@ function updateList() {
 */
             $('#icon').prop('src', channel.icon).prop('title', channel.type).tipTip();
             $('#icon-private').toggle(!channel.public);
+            $('#editentity').data('guid',channel.guid).show();
             $('.export').button( 'option', 'disabled', data.length == 0);
 
             $(data).each(function(id, row) {
@@ -118,8 +120,10 @@ $(function() {
         }
     });
 
-    if (language != 'en') {
+    if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);
+    } else {
+        $.datepicker.setDefaults($.datepicker.regional['']);
     }
 
     var d = new Date();
@@ -201,7 +205,6 @@ $(function() {
                        '- {{Reading}} : ' + $(this).data('value');
 
         if (confirm(question)) {
-            listTable.fnProcessingIndicator();
             $(document.body).addClass('wait');
 
             var url = PVLngAPI + 'data/' + channel.guid + '/' + ts + '.json',
@@ -220,7 +223,6 @@ $(function() {
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
-                listTable.fnProcessingIndicator(false);
                 $(document.body).removeClass('wait');
             });
         }
@@ -236,6 +238,10 @@ $(function() {
         updateList();
     });
 
+    $('#editentity').click(function() {
+        window.location.href = '/channel/edit/' + $(this).data('guid') + '?returnto=/list/' + $(this).data('guid');
+    });
+
     $('#btn-refresh').button({
         icons: { primary: 'ui-icon-refresh' },
         text: false
@@ -246,7 +252,6 @@ $(function() {
 
     $('.export').click(function(event) {
         event.preventDefault();
-        listTable.fnProcessingIndicator();
 
         var separator = $(this).data('separator'),
             mime = $(this).data('mime'),
@@ -289,9 +294,7 @@ $(function() {
             function(jqXHR) {
                 alert(jqXHR.responseText);
             }
-        ).always(function() {
-            listTable.fnProcessingIndicator(false);
-        });
+        );
     });
 
     shortcut.add('Alt+P', function() { pvlng.changeDates(-1); });

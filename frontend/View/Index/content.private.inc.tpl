@@ -64,7 +64,7 @@
                     <!-- IF {READ} -->
                     <img src="/images/ico/document-invoice.png" class="btn showlist" alt="l">
                     <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-                    <img src="/images/ico/node_design.png" class="btn editentity" alt="l">
+                    <img src="/images/ico/node_design.png" class="btn editentity" alt="e">
                     </a>
                 </td>
             </tr>
