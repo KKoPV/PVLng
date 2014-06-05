@@ -260,7 +260,7 @@ UPDATE `pvlng_channel` c
 
 ALTER TABLE `pvlng_type` ADD `type` enum('group','general','numeric','sensor','meter') NOT NULL AFTER `unit`;
 
-TRPLACE INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`, `childs`, `read`, `write`, `graph`, `icon`) VALUES
+REPLACE INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`, `childs`, `read`, `write`, `graph`, `icon`) VALUES
 (0, 'Alias', 'model::Alias', 'Channel', '', 'general', 0, 0, 0, 0, ''),
 (1, 'Power plant', 'model::PowerPlant', 'Channel', '', 'group', -1, 0, 0, 0, '/images/ico/building.png'),
 (2, 'Inverter', 'model::Inverter', 'Channel', '', 'group', -1, 0, 0, 0, '/images/ico/exclamation_frame.png'),
@@ -318,7 +318,7 @@ TRPLACE INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`,
 (73, 'Rainfall meter', 'model::RainfallMeter', 'Channel', 'mm', 'meter', 0, 1, 1, 1, '/images/ico/umbrella.png'),
 (90, 'Power sensor counter', 'model::PowerCounter', 'Counter', 'W', 'sensor', 0, 1, 1, 1, '/images/ico/plug.png'),
 (91, 'Switch', 'model::Switch', 'Switcher', '', 'general', 0, 1, 1, 1, '/images/ico/ui_check_boxes.png'),
-(99, 'Database usage', 'Database usage', 'DatabaseUsage', '', 'group', 0, 1, 0, 1, '/images/ico/database.png'),
+(99, 'Database usage', 'Database usage', 'DatabaseUsage', 'rows', 'sensor', 0, 1, 0, 1, '/images/ico/database.png'),
 (100, 'PV-Log Plant', 'model::PVLogPlant', 'PVLog\\Plant', '', 'group', -1, 1, 0, 0, '/images/ico/pv_log_sum.png'),
 (101, 'PV-Log Inverter', 'model::PVLogInverter', 'PVLog\\Inverter', '', 'group', -1, 1, 0, 0, '/images/ico/pv_log.png'),
 (102, 'PV-Log Plant (r2)', 'model::PVLogPlant2', 'PVLog2\\Plant', '', 'group', -1, 1, 0, 0, '/images/ico/pv_log_sum.png'),
