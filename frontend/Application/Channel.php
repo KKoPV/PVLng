@@ -17,15 +17,19 @@ PVLng::Menu( 'channel', 50, '#', __('Channels') );
  *
  */
 PVLng::SubMenu(
-    'channel', 10, '/channel', __('Channels'), __('ChannelsHint') . ' (Shift+F4)'
+    'channel', 10, '/type', __('ChannelTypes')
 );
 
 PVLng::SubMenu(
-    'channel', 20, '/overview', __('Overview'), __('OverviewHint')
+    'channel', 20, '/channel', __('Channels'), __('ChannelsHint') . ' (Shift+F4)'
 );
 
 PVLng::SubMenu(
-    'channel', 30, '/tariff', __('Tariffs'), __('TariffsHint')
+    'channel', 30, '/overview', __('Overview'), __('OverviewHint')
+);
+
+PVLng::SubMenu(
+    'channel', 40, '/tariff', __('Tariffs'), __('TariffsHint')
 );
 
 /**

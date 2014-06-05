@@ -760,7 +760,7 @@ abstract class Channel {
             }
             $this->start = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
         } else {
-            $this->start = is_numeric($request['start'])
+            $this->start = ($request['start'] == '' OR is_numeric($request['start']))
                          ? $request['start']
                          : strtotime($request['start']);
         }

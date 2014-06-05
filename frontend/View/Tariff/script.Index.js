@@ -10,7 +10,7 @@
 
 $(function() {
 
-    $('#table-tariff').DataTable({
+    $('#table-tariff').dataTable({
         bSort: false,
         aoColumnDefs: [
             /* Adjust columns with icons */

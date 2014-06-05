@@ -198,7 +198,7 @@ var clock;
  */
 $(function() {
 
-    $('.chart').css({ textAlign: 'center' }).html('<small>{{JustAMoment}}</small>');
+    $('.chart, .chart-big').css({ textAlign: 'center' }).html('<small>{{JustAMoment}}</small>');
 
     var oTable = $('#tree').dataTable({
         aoColumns: [
