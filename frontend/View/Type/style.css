@@ -1,0 +1,29 @@
+/**
+ *
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
+ */
+
+.dataTable tr:hover {
+    background-color: #C0FFC0 !important;
+}
+
+span.sort {
+    display: none;
+}
+
+td.details-control {
+    background: url('/images/ico/plus_circle_frame.png') no-repeat center center;
+    cursor: pointer;
+}
+
+tr.shown td.details-control {
+    background: url('/images/ico/minus_circle_frame.png') no-repeat center center;
+}
+
+td.description {
+    background-color: #E0E0FF;
+}

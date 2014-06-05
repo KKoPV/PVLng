@@ -21,8 +21,18 @@ return array(
     'meter' => array(
         'default'  => 1
     ),
+    'resolution' => array(
+        'visible'  => FALSE
+    ),
     'decimals' => array(
+        'visible'  => FALSE,
         'default'  => 0
+    ),
+    'valid_from' => array(
+        'visible'  => FALSE
+    ),
+    'valid_to' => array(
+        'visible'  => FALSE
     ),
     'public' => array(
         'default'  => 0,

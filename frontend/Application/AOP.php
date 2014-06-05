@@ -64,13 +64,14 @@ class YryieMiddleware extends Slim\Middleware {
         // Run inner middleware and application
         $this->next->call();
 
+        Yryie::SQL(slimMVC\MySQLi::getInstance()->queries);
+
         Yryie::Debug(
             '%d Queries in %.0f ms / %.1f ms each',
             slimMVC\MySQLi::$QueryCount,
             slimMVC\MySQLi::$QueryTime,
             slimMVC\MySQLi::$QueryTime / slimMVC\MySQLi::$QueryCount
         );
-        Yryie::SQL(slimMVC\MySQLi::getInstance()->queries);
 
         if ($this->app->response->headers['Location']) {
             // Redirection

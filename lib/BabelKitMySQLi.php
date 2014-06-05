@@ -48,7 +48,7 @@ class BabelKitMySQLi extends BabelKit {
      * DON't call parent::__construct() to overcome the "new" database type!
      *
      */
-    function __construct( $dbh, $param=array()) {
+    public function __construct( $dbh, $param=array()) {
 
         $this->dbh = $dbh;
 
@@ -61,14 +61,86 @@ class BabelKitMySQLi extends BabelKit {
     }
 
     /**
-     * Get a raw code_desc, *not* safe for html display.
+     * Get a raw code_desc, *not* safe for html display
      *
      * Buffer request results
      */
-    function data($code_set, $code_lang, $code_code) {
-        $key = $code_set . '.' . $code_lang . '.' . $code_code;
+    public function data($code_set, $code_lang, $code_code) {
+        $key = 'BabelKit.' . $code_set . '.' . $code_lang . '.' . $code_code;
         while (self::$cache->save($key, $data)) {
-            $data = parent::data($code_set, $code_lang, $code_code);
+            $result = $this->_query("
+                select  code_desc
+                from    $this->table
+                where   code_set  = '$code_set'
+                and     code_lang = '$code_lang'
+                and     code_code = '$code_code'
+                limit 1
+            ");
+            $data = isset($result[0][0]) ? $result[0][0] : '';
+        }
+        return $data;
+    }
+
+    /**
+     * Get code desc, order, and flag
+     *
+     * Buffer request results
+     */
+    public function get($code_set, $code_lang, $code_code) {
+        $key = 'BabelKit.full.' . $code_set . '.' . $code_lang . '.' . $code_code;
+        while (self::$cache->save($key, $data)) {
+            $result = $this->_query("
+                select  code_desc,
+                        code_order,
+                        code_flag
+                from    $this->table
+                where   code_set  = '$code_set'
+                and     code_lang = '$code_lang'
+                and     code_code = '$code_code'
+                limit 1
+            ");
+            $data = isset($result[0]) ? $result[0] : '';
+        }
+        return $data;
+    }
+
+    /**
+     * Get a language set array
+     *
+     * Buffer request results
+     */
+    public function lang_set($code_set, $code_lang) {
+        $key = 'BabelKit.' . $code_set . '.' . $code_lang;
+        while (self::$cache->save($key, $data)) {
+            $data = $this->_query("
+                select  code_code,
+                        code_desc,
+                        code_order,
+                        code_flag
+                from    $this->table
+                where   code_set = '$code_set'
+                and     code_lang = '$code_lang'
+                order by code_order, code_code
+            ");
+        }
+        return $data;
+    }
+
+    /**
+     * Find the native language
+     *
+     * Buffer request results
+     */
+    public function _find_native() {
+        $key = 'BabelKit.native';
+        while (self::$cache->save($key, $data)) {
+            $result = $this->_query("
+                select  code_lang
+                from    $this->table
+                where   code_set  = 'code_admin'
+                and     code_code = 'code_admin'
+            ");
+            $data = isset($result[0][0]) ? $result[0][0] : '';
         }
         return $data;
     }
@@ -76,7 +148,7 @@ class BabelKitMySQLi extends BabelKit {
     /**
      * Implement only MySQLi query
      */
-    function _query($query) {
+    public function _query($query) {
         $result = array();
 
         $dbh = $this->dbh;

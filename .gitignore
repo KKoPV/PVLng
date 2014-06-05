@@ -1,6 +1,7 @@
 prepend.php
 append.php
 config.php
+*.conf.php
 *.AOP.php
 clearAOP.sh
 *.conf

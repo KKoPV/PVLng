@@ -429,7 +429,7 @@ class MySQLi extends \MySQLi {
      *
      */
     public function get( $key ) {
-        $query = sprintf('SELECT `%s` FROM `%s` WHERE `%s` = LOWER("{1}")',
+        $query = sprintf('SELECT `%s` FROM `%s` WHERE `%s` = LOWER("{1}") LIMIT 1',
                          self::$SETTINGS_VALUE_FIELD, self::$SETTINGS_TABLE,
                          self::$SETTINGS_KEY_FIELD);
 
