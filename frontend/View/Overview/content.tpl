@@ -108,11 +108,19 @@
             </a>
             <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
+            <!-- IF {TYPE_ID} != "0" -->
             <a href="/channel/edit/{ENTITY}?returnto=/overview">
                 <img src="/images/ico/node_design.png" alt="e">
             </a>
+            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
-            <!-- IF {CHILDS} AND {GUID} AND !{ALIAS} -->
+            <!-- IF {TYPE_ID} != "0" -->
+            <a href="/channel/add/{ENTITY}?returnto=/overview">
+                <img src="/images/ico/node_select_child.png" alt="e">
+            </a>
+            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+
+            <!-- IF {CHILDS} AND {GUID} AND {TYPE_ID} != "30" AND !{ALIAS} -->
             <form action="/channel/alias" method="post">
             <input type="hidden" name="id" value="{ENTITY}">
             <input type="image" src="/images/ico/arrow-split.png"
@@ -170,6 +178,7 @@
     <span><img src="/images/ico/navigation_270_frame.png">{{MoveEntityDown}}</span>,
     <span><img src="/images/ico/document-invoice.png">{{ListHint}}</span>,
     <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>,
+    <span><img src="/images/ico/node_select_child.png">{{CloneEntity}}</span>,
     <span><img src="/images/ico/arrow-split.png">{{AliasEntity}}</span>,
     <span><img src="/images/ico/license-key.png">{{ShowGUID}}</span>
 </div>

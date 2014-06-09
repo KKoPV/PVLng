@@ -45,7 +45,20 @@
     </tbody>
 </table>
 
-<h3>{{Statistics}}</h3>
+<h3>{{Database}}</h3>
+
+<table>
+    <tr>
+        <td>{{DatabaseSize}}</td><td>:</td>
+        <td class="r" style="width:8em">{numf:DATABASESIZE,"1"} MB</td>
+    </tr>
+    <tr>
+        <td>{{DatabaseFree}}</td><td>:</td>
+        <td class="r">{numf:DATABASEFREE,"1"} MB</td>
+    </tr>
+</table>
+
+<h3>{{Channels}}</h3>
 
 <table id="table-stats" class="display">
     <thead>

@@ -42,7 +42,7 @@ $app->map('/_config', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Config');
 })->via('GET', 'POST');
 
-$app->get('/clearcache', $checkAuth, function() use ($app) {
+$app->get('/cc', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Clearcache');
 });
 

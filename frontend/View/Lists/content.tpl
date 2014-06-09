@@ -30,10 +30,10 @@
         </option>
         <!-- END -->
     </select>
-    <img id="icon" src="/images/pix.gif" class="tip" data-none="/images/pix.gif" alt="">
+    <img id="icon" src="/images/pix.gif" class="tip" style="margin-left:16px" data-none="/images/pix.gif" alt="">
     <img id="icon-private" src="/images/ico/lock.png" class="tip" alt="[private]"
          style="display:none" title="{{PrivateChannel}}"/>
-    <img id="editentity" src="/images/ico/node_design.png" class="btn" alt="e">
+    <img id="editentity" src="/images/ico/node_design.png" class="tipbtn" title="{{EditEntity}}" alt="e">
 
 </div>
 

@@ -153,7 +153,7 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
 $api->delete('/data/:guid/:timestamp', $APIkeyRequired, function($guid, $timestamp) use ($api) {
     $channel = Channel::byGUID($guid);
     $tbl = $channel->numeric ? new \ORM\ReadingNum : new \ORM\ReadingStr;
-    if ($tbl->filterById($channel->entity)->filterByTimestamp($timestamp)->findOne()->getId()) {
+    if ($tbl->filterByIdTimestamp($channel->entity, $timestamp)->findOne()->getId()) {
         $tbl->delete();
         $api->halt(204);
     } else {

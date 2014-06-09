@@ -260,6 +260,8 @@ UPDATE `pvlng_channel` c
 
 ALTER TABLE `pvlng_type` ADD `type` enum('group','general','numeric','sensor','meter') NOT NULL AFTER `unit`;
 
+SET foreign_key_checks = 0;
+
 REPLACE INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`, `childs`, `read`, `write`, `graph`, `icon`) VALUES
 (0, 'Alias', 'model::Alias', 'Channel', '', 'general', 0, 0, 0, 0, ''),
 (1, 'Power plant', 'model::PowerPlant', 'Channel', '', 'group', -1, 0, 0, 0, '/images/ico/building.png'),
@@ -324,6 +326,8 @@ REPLACE INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`,
 (102, 'PV-Log Plant (r2)', 'model::PVLogPlant2', 'PVLog2\\Plant', '', 'group', -1, 1, 0, 0, '/images/ico/pv_log_sum.png'),
 (103, 'PV-Log Inverter (r2)', 'model::PVLogInverter2', 'PVLog2\\Inverter', '', 'group', -1, 0, 0, 0, '/images/ico/pv_log.png'),
 (110, 'Sonnenertrag JSON', 'model::SonnenertragJSON', 'Sonnenertrag\\JSON', '', 'group', -1, 1, 0, 0, '/images/ico/sonnenertrag.png');
+
+SET foreign_key_checks = 1;
 
 UPDATE pvlng_channel c1, pvlng_channel c2, pvlng_tree t1, pvlng_tree t2, pvlng_type tt1, pvlng_type tt2
   SET c1.icon = tt2.icon

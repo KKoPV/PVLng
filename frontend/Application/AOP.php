@@ -20,9 +20,15 @@ require_once LIB_DIR . DS . 'Yryie.php';
  */
 Loader::registerCallback(function( $filename ) {
     // Insert .AOP before file extension, so .../file.php becomes .../file.AOP.php
-    $parts = explode('.', $filename);
+    $parts = explode('.', realpath($filename));
     array_splice($parts, -1, 0, 'AOP');
     $filenameAOP = implode('.', $parts);
+
+    // Strip root directory and replace directory separators with ~ to get unique names
+    $filenameAOP = str_replace(ROOT_DIR, '', $filenameAOP);
+    $filenameAOP = str_replace(DS, '~', $filenameAOP);
+    $filenameAOP = trim($filenameAOP, '~');
+    $filenameAOP = TEMP_DIR . DS . $filenameAOP;
 
     if (!file_exists($filenameAOP) OR filemtime($filenameAOP) < filemtime($filename)) {
         // (Re-)Create AOP file

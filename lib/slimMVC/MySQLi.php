@@ -349,6 +349,28 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
+    public function queryRowArray( $query ) {
+        $args = func_get_args();
+        $query = array_shift($args);
+
+        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+
+        $this->Buffered = TRUE;
+        $row = NULL;
+        if ($result = $this->query($query, $args)) {
+            /// $t = microtime(TRUE);
+            $row = $result->fetch_assoc();
+            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
+            $result->close();
+        }
+        $this->Buffered = FALSE;
+
+        return $row;
+    }
+
+    /**
+     *
+     */
     public function queryOne( $query ) {
         $args = func_get_args();
         $query = array_shift($args);

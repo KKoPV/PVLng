@@ -21,12 +21,12 @@ class Channel extends \Controller {
         parent::before();
 
         $tblChannel = new \ORM\ChannelView;
-        $tblChannel->filterByTypeId(array('min'=>1))->find();
+        $tblChannel->filter('type_id', array('min'=>1))->find();
         $this->view->Entities = $tblChannel->asAssoc();
 
         $this->fields = array();
 
-        foreach (include __DIR__ . DS . 'Channel' . DS . 'default.php' as $key=>$field) {
+        foreach (include APP_DIR . DS . 'Controller' . DS . 'Channel' . DS . 'default.php' as $key=>$field) {
             $this->fields[$key] = array_merge(array(
                 'FIELD'       => $key,
                 'TYPE'        => 'text',
@@ -192,8 +192,6 @@ class Channel extends \Controller {
                     if (array_key_exists($key, $this->fields)) $this->fields[$key]['VALUE'] = $value;
                 }
                 $this->prepareFields($channel->getType(), $channel->getId());
-                $this->fields['id']['VALUE']   = '';
-                $this->fields['guid']['VALUE'] = '';
                 $this->fields['name']['VALUE'] = __('CopyOf') . ' ' . $this->fields['name']['VALUE'];
 
                 $type = new \ORM\ChannelType($channel->getType());
@@ -207,7 +205,7 @@ class Channel extends \Controller {
 
             // Get all channel types
             $tblTypes = new \ORM\ChannelType;
-            $tblTypes->filterById(array('min'=>1))->find();
+            $tblTypes->filter('id', array('min'=>1))->find();
 
             foreach ($tblTypes->asAssoc() as $type) {
                 $type['description'] = __($type['description']);
@@ -298,6 +296,8 @@ class Channel extends \Controller {
 
                     // CAN'T simply replace because of the foreign key in the tree!
                     if (!$entity->getId()) {
+                        // Init icon with type icon
+                        $entity->setIcon($type->getIcon());
                         $entity->insert();
                         if ($this->request->post('add2tree') AND $addTo = $this->request->post('tree')) {
                             $tree = \NestedSet::getInstance()->insertChildNode($entity->getId(), $addTo);
@@ -384,8 +384,8 @@ class Channel extends \Controller {
           ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
           ->get('name')
           ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
-          ->whereNE('childs', 0);
-        $this->view->AddTree = $this->db->queryRows($q);
+          ->filter('childs', array('ne' => 0));
+        $this->view->AddTree = $this->db->queryRowsArray($q);
     }
 
     /**
@@ -538,7 +538,7 @@ class Channel extends \Controller {
      */
     protected function applyFieldSettings( $conf ) {
         // 1st try general config
-        $config = __DIR__ . DS . 'Channel' . DS . $conf . '.php';
+        $config = APP_DIR . DS . 'Controller' . DS . 'Channel' . DS . $conf . '.php';
         if (!file_exists($config)) {
             // 2nd try model specific config
             $config = CORE_DIR . DS . 'Channel' . DS . $conf . '.conf.php';

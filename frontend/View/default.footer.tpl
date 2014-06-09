@@ -13,7 +13,8 @@
 
     <div class="fl xs icons">
         &copy; 2012-{raw:YEAR} by
-        <a href="http://pvlng.com/PVLng:About" class="tip" title="Knut Kohl PhotoVoltaics"
+        <a href="http://pvlng.com/PhotoVoltaic_Logger_new_generation:About"
+           class="tip" title="Knut Kohl PhotoVoltaics"
            tip="<strong>K</strong>nut <strong>Ko</strong>hl <strong>P</strong>hoto<strong>V</strong>oltaics">
             <strong>KKoPV</strong>
         </a>

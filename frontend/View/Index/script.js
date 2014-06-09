@@ -207,9 +207,6 @@ function Views() {
         if (typeof this.views[slug] == 'undefined') return;
         if (typeof collapse == 'undefined') collapse = false;
 
-        /* Scroll to navigation as top most visible element */
-        $('html, body').animate({ scrollTop: $("#nav").offset().top-3 }, 2000);
-
         $('#chart').addClass('wait');
 
         var expanded = tree.expanded, preset;
@@ -231,6 +228,9 @@ function Views() {
 
         /* Re-arrange channels in collapsed tree */
         if (collapse || !expanded) tree.toggle(false);
+
+        /* Scroll to navigation as top most visible element */
+        $('html, body').animate({ scrollTop: $("#nav").offset().top-3 }, 2000);
 
         $('#preset').val(preset).trigger('change'); /* Realods chart */
 
@@ -594,7 +594,7 @@ function updateChart( forceUpdate ) {
                         serie.dataLabels.rotation = 270;
                         serie.dataLabels.x = 3;
                         /* Move a bit up */
-                        serie.dataLabels.y = -10;
+                        serie.dataLabels.y = -8;
                     }
                 } else if (channel.type != 'bar') {
                     serie.dashStyle = channel.style;
@@ -1200,7 +1200,14 @@ $(function() {
                 /* The page is in foreground and visible */
                 windowVisible = true;
                 /* Was longer in background, so the updateTimeout was cleared */
-                if (!updateTimeout) setTimeout(updateChart, 1000);
+                if (!updateTimeout) {
+                    setTimeout(function() {
+                        /* Scroll to navigation as top most visible element */
+                        $('html, body').animate({ scrollTop: $("#nav").offset().top-3 }, 2000);
+                        updateChart();
+                    },
+                    1000);
+                }
             } else {
                 windowVisible = false;
             }
