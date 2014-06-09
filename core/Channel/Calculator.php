@@ -18,7 +18,7 @@ class Calculator extends Channel {
      * Accept only childs of the same meter attribute and unit
      */
     public function addChild( $channel ) {
-        $childs = $this->getChilds();
+        $childs = $this->getChilds(TRUE);
         if (empty($childs)) {
             // Add 1st child
             $child = parent::addChild($channel);
@@ -41,7 +41,7 @@ class Calculator extends Channel {
                 $child = parent::addChild($channel);
             } else {
                 $meter = $first->getMeter() ? 'meter' : 'sensor';
-                \Messages::Error('"'.$this->name.'" accepts only '.meter.' channels with unit '.$first->getUnit(), 400);
+                \Messages::Error('"'.$this->name.'" accepts only '.$meter.' channels with unit '.$first->getUnit(), 400);
                 return;
             }
         }

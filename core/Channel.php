@@ -150,7 +150,7 @@ abstract class Channel {
      *
      */
     public function addChild( $channel ) {
-        $childs = $this->getChilds();
+        $childs = $this->getChilds(TRUE);
 
         // Root node (id == 1) accept always childs
         if ($this->id == 1 OR
@@ -627,8 +627,8 @@ abstract class Channel {
     /**
      * Lazy load childs on request
      */
-    protected function getChilds() {
-        if (is_null($this->_childs)) {
+    protected function getChilds( $refresh=FALSE ) {
+        if ($refresh OR is_null($this->_childs)) {
             $this->_childs = array();
             foreach (NestedSet::getInstance()->getChilds($this->id) as $child) {
                 $child = self::byID($child['id']);
