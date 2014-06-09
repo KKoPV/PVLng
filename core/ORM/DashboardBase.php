@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_dashboard"
+ * Abstract base class for table 'pvlng_dashboard'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "Dashboard.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -22,21 +26,12 @@ abstract class DashboardBase extends \slimMVC\ORM {
     // PUBLIC
     // -----------------------------------------------------------------------
 
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id ) {
-        return new static(array($id));
-    } // forge()
-
     // -----------------------------------------------------------------------
     // Setter methods
     // -----------------------------------------------------------------------
 
     /**
-     * "id" is AutoInc, no setter
+     * 'id' is AutoInc, no setter
      */
 
     /**
@@ -48,7 +43,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
     public function setName( $name ) {
         $this->fields['name'] = $name;
         return $this;
-    } // setName()
+    }   // setName()
 
     /**
      * Basic setter for field 'data'
@@ -59,7 +54,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
     public function setData( $data ) {
         $this->fields['data'] = $data;
         return $this;
-    } // setData()
+    }   // setData()
 
     /**
      * Basic setter for field 'public'
@@ -70,7 +65,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
     public function setPublic( $public ) {
         $this->fields['public'] = $public;
         return $this;
-    } // setPublic()
+    }   // setPublic()
 
     /**
      * Basic setter for field 'slug'
@@ -81,7 +76,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
     public function setSlug( $slug ) {
         $this->fields['slug'] = $slug;
         return $this;
-    } // setSlug()
+    }   // setSlug()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -94,7 +89,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    } // getId()
+    }   // getId()
 
     /**
      * Basic getter for field 'name'
@@ -103,7 +98,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
      */
     public function getName() {
         return $this->fields['name'];
-    } // getName()
+    }   // getName()
 
     /**
      * Basic getter for field 'data'
@@ -112,7 +107,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
      */
     public function getData() {
         return $this->fields['data'];
-    } // getData()
+    }   // getData()
 
     /**
      * Basic getter for field 'public'
@@ -121,7 +116,7 @@ abstract class DashboardBase extends \slimMVC\ORM {
      */
     public function getPublic() {
         return $this->fields['public'];
-    } // getPublic()
+    }   // getPublic()
 
     /**
      * Basic getter for field 'slug'
@@ -130,56 +125,66 @@ abstract class DashboardBase extends \slimMVC\ORM {
      */
     public function getSlug() {
         return $this->fields['slug'];
-    } // getSlug()
+    }   // getSlug()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field slug
+     * Filter for field 'id'
      *
-     * @param mixed Field value
-     */
-    public function filterBySlug( $slug ) {
-        return $this->filter('slug', $slug);
-    } // filterBySlug()
-
-    /**
-     * Filter for field name
-     *
-     * @param mixed Field value
-     */
-    public function filterByName( $name ) {
-        return $this->filter('name', $name);
-    } // filterByName()
-
-    /**
-     * Filter for field id
-     *
-     * @param mixed Field value
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
      */
     public function filterById( $id ) {
-        return $this->filter('id', $id);
-    } // filterById()
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
 
     /**
-     * Filter for field data
+     * Filter for field 'slug'
      *
-     * @param mixed Field value
+     * @param  mixed    $slug Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterBySlug( $slug ) {
+        $this->filter[] = '`slug` = "'.$this->quote($slug).'"';
+        return $this;
+    }   // filterBySlug()
+
+    /**
+     * Filter for field 'name'
+     *
+     * @param  mixed    $name Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByName( $name ) {
+        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+        return $this;
+    }   // filterByName()
+
+    /**
+     * Filter for field 'data'
+     *
+     * @param  mixed    $data Filter value
+     * @return Instance For fluid interface
      */
     public function filterByData( $data ) {
-        return $this->filter('data', $data);
-    } // filterByData()
+        $this->filter[] = '`data` = "'.$this->quote($data).'"';
+        return $this;
+    }   // filterByData()
 
     /**
-     * Filter for field public
+     * Filter for field 'public'
      *
-     * @param mixed Field value
+     * @param  mixed    $public Filter value
+     * @return Instance For fluid interface
      */
     public function filterByPublic( $public ) {
-        return $this->filter('public', $public);
-    } // filterByPublic()
+        $this->filter[] = '`public` = "'.$this->quote($public).'"';
+        return $this;
+    }   // filterByPublic()
 
     // -----------------------------------------------------------------------
     // PROTECTED

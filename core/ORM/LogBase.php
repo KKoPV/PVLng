@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_log"
+ * Abstract base class for table 'pvlng_log'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "Log.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -22,21 +26,12 @@ abstract class LogBase extends \slimMVC\ORM {
     // PUBLIC
     // -----------------------------------------------------------------------
 
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id ) {
-        return new static(array($id));
-    } // forge()
-
     // -----------------------------------------------------------------------
     // Setter methods
     // -----------------------------------------------------------------------
 
     /**
-     * "id" is AutoInc, no setter
+     * 'id' is AutoInc, no setter
      */
 
     /**
@@ -48,7 +43,7 @@ abstract class LogBase extends \slimMVC\ORM {
     public function setTimestamp( $timestamp ) {
         $this->fields['timestamp'] = $timestamp;
         return $this;
-    } // setTimestamp()
+    }   // setTimestamp()
 
     /**
      * Basic setter for field 'scope'
@@ -59,7 +54,7 @@ abstract class LogBase extends \slimMVC\ORM {
     public function setScope( $scope ) {
         $this->fields['scope'] = $scope;
         return $this;
-    } // setScope()
+    }   // setScope()
 
     /**
      * Basic setter for field 'data'
@@ -70,7 +65,7 @@ abstract class LogBase extends \slimMVC\ORM {
     public function setData( $data ) {
         $this->fields['data'] = $data;
         return $this;
-    } // setData()
+    }   // setData()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -83,7 +78,7 @@ abstract class LogBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    } // getId()
+    }   // getId()
 
     /**
      * Basic getter for field 'timestamp'
@@ -92,7 +87,7 @@ abstract class LogBase extends \slimMVC\ORM {
      */
     public function getTimestamp() {
         return $this->fields['timestamp'];
-    } // getTimestamp()
+    }   // getTimestamp()
 
     /**
      * Basic getter for field 'scope'
@@ -101,7 +96,7 @@ abstract class LogBase extends \slimMVC\ORM {
      */
     public function getScope() {
         return $this->fields['scope'];
-    } // getScope()
+    }   // getScope()
 
     /**
      * Basic getter for field 'data'
@@ -110,47 +105,55 @@ abstract class LogBase extends \slimMVC\ORM {
      */
     public function getData() {
         return $this->fields['data'];
-    } // getData()
+    }   // getData()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field id
+     * Filter for field 'id'
      *
-     * @param mixed Field value
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
      */
     public function filterById( $id ) {
-        return $this->filter('id', $id);
-    } // filterById()
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
 
     /**
-     * Filter for field timestamp
+     * Filter for field 'timestamp'
      *
-     * @param mixed Field value
+     * @param  mixed    $timestamp Filter value
+     * @return Instance For fluid interface
      */
     public function filterByTimestamp( $timestamp ) {
-        return $this->filter('timestamp', $timestamp);
-    } // filterByTimestamp()
+        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
+        return $this;
+    }   // filterByTimestamp()
 
     /**
-     * Filter for field scope
+     * Filter for field 'scope'
      *
-     * @param mixed Field value
+     * @param  mixed    $scope Filter value
+     * @return Instance For fluid interface
      */
     public function filterByScope( $scope ) {
-        return $this->filter('scope', $scope);
-    } // filterByScope()
+        $this->filter[] = '`scope` = "'.$this->quote($scope).'"';
+        return $this;
+    }   // filterByScope()
 
     /**
-     * Filter for field data
+     * Filter for field 'data'
      *
-     * @param mixed Field value
+     * @param  mixed    $data Filter value
+     * @return Instance For fluid interface
      */
     public function filterByData( $data ) {
-        return $this->filter('data', $data);
-    } // filterByData()
+        $this->filter[] = '`data` = "'.$this->quote($data).'"';
+        return $this;
+    }   // filterByData()
 
     // -----------------------------------------------------------------------
     // PROTECTED

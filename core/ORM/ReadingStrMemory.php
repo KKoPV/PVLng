@@ -27,11 +27,11 @@ class ReadingStrMemory extends ReadingMemory {
         if (self::$first) {
             \slimMVC\App::getInstance()->db->query('
                 CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
-                    `id` smallint(5) unsigned NOT NULL,
-                    `timestamp` int(11) NOT NULL,
-                    `data` varchar(50) NOT NULL,
+                    `id`        smallint unsigned NOT NULL,
+                    `timestamp` int               NOT NULL,
+                    `data`      varchar(50)       NOT NULL,
                     PRIMARY KEY (`id`, `timestamp`)
-                ) ENGINE=MEMORY
+                ) ENGINE=Memory PARTITION BY LINEAR KEY(`id`) PARTITIONS 10
             ');
 
             self::$first = FALSE;

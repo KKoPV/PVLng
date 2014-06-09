@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_performance"
+ * Abstract base class for table 'pvlng_performance'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "Performance.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -35,7 +39,7 @@ abstract class PerformanceBase extends \slimMVC\ORM {
     public function setTimestamp( $timestamp ) {
         $this->fields['timestamp'] = $timestamp;
         return $this;
-    } // setTimestamp()
+    }   // setTimestamp()
 
     /**
      * Basic setter for field 'action'
@@ -46,7 +50,7 @@ abstract class PerformanceBase extends \slimMVC\ORM {
     public function setAction( $action ) {
         $this->fields['action'] = $action;
         return $this;
-    } // setAction()
+    }   // setAction()
 
     /**
      * Basic setter for field 'time'
@@ -57,7 +61,7 @@ abstract class PerformanceBase extends \slimMVC\ORM {
     public function setTime( $time ) {
         $this->fields['time'] = $time;
         return $this;
-    } // setTime()
+    }   // setTime()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -70,7 +74,7 @@ abstract class PerformanceBase extends \slimMVC\ORM {
      */
     public function getTimestamp() {
         return $this->fields['timestamp'];
-    } // getTimestamp()
+    }   // getTimestamp()
 
     /**
      * Basic getter for field 'action'
@@ -79,7 +83,7 @@ abstract class PerformanceBase extends \slimMVC\ORM {
      */
     public function getAction() {
         return $this->fields['action'];
-    } // getAction()
+    }   // getAction()
 
     /**
      * Basic getter for field 'time'
@@ -88,38 +92,44 @@ abstract class PerformanceBase extends \slimMVC\ORM {
      */
     public function getTime() {
         return $this->fields['time'];
-    } // getTime()
+    }   // getTime()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field timestamp
+     * Filter for field 'timestamp'
      *
-     * @param mixed Field value
+     * @param  mixed    $timestamp Filter value
+     * @return Instance For fluid interface
      */
     public function filterByTimestamp( $timestamp ) {
-        return $this->filter('timestamp', $timestamp);
-    } // filterByTimestamp()
+        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
+        return $this;
+    }   // filterByTimestamp()
 
     /**
-     * Filter for field action
+     * Filter for field 'action'
      *
-     * @param mixed Field value
+     * @param  mixed    $action Filter value
+     * @return Instance For fluid interface
      */
     public function filterByAction( $action ) {
-        return $this->filter('action', $action);
-    } // filterByAction()
+        $this->filter[] = '`action` = "'.$this->quote($action).'"';
+        return $this;
+    }   // filterByAction()
 
     /**
-     * Filter for field time
+     * Filter for field 'time'
      *
-     * @param mixed Field value
+     * @param  mixed    $time Filter value
+     * @return Instance For fluid interface
      */
     public function filterByTime( $time ) {
-        return $this->filter('time', $time);
-    } // filterByTime()
+        $this->filter[] = '`time` = "'.$this->quote($time).'"';
+        return $this;
+    }   // filterByTime()
 
     // -----------------------------------------------------------------------
     // PROTECTED

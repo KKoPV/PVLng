@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_tariff"
+ * Abstract base class for table 'pvlng_tariff'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "Tariff.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -22,21 +26,12 @@ abstract class TariffBase extends \slimMVC\ORM {
     // PUBLIC
     // -----------------------------------------------------------------------
 
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id ) {
-        return new static(array($id));
-    } // forge()
-
     // -----------------------------------------------------------------------
     // Setter methods
     // -----------------------------------------------------------------------
 
     /**
-     * "id" is AutoInc, no setter
+     * 'id' is AutoInc, no setter
      */
 
     /**
@@ -48,7 +43,7 @@ abstract class TariffBase extends \slimMVC\ORM {
     public function setName( $name ) {
         $this->fields['name'] = $name;
         return $this;
-    } // setName()
+    }   // setName()
 
     /**
      * Basic setter for field 'comment'
@@ -59,7 +54,7 @@ abstract class TariffBase extends \slimMVC\ORM {
     public function setComment( $comment ) {
         $this->fields['comment'] = $comment;
         return $this;
-    } // setComment()
+    }   // setComment()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -72,7 +67,7 @@ abstract class TariffBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    } // getId()
+    }   // getId()
 
     /**
      * Basic getter for field 'name'
@@ -81,7 +76,7 @@ abstract class TariffBase extends \slimMVC\ORM {
      */
     public function getName() {
         return $this->fields['name'];
-    } // getName()
+    }   // getName()
 
     /**
      * Basic getter for field 'comment'
@@ -90,38 +85,44 @@ abstract class TariffBase extends \slimMVC\ORM {
      */
     public function getComment() {
         return $this->fields['comment'];
-    } // getComment()
+    }   // getComment()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field name
+     * Filter for field 'id'
      *
-     * @param mixed Field value
-     */
-    public function filterByName( $name ) {
-        return $this->filter('name', $name);
-    } // filterByName()
-
-    /**
-     * Filter for field id
-     *
-     * @param mixed Field value
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
      */
     public function filterById( $id ) {
-        return $this->filter('id', $id);
-    } // filterById()
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
 
     /**
-     * Filter for field comment
+     * Filter for field 'name'
      *
-     * @param mixed Field value
+     * @param  mixed    $name Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByName( $name ) {
+        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+        return $this;
+    }   // filterByName()
+
+    /**
+     * Filter for field 'comment'
+     *
+     * @param  mixed    $comment Filter value
+     * @return Instance For fluid interface
      */
     public function filterByComment( $comment ) {
-        return $this->filter('comment', $comment);
-    } // filterByComment()
+        $this->filter[] = '`comment` = "'.$this->quote($comment).'"';
+        return $this;
+    }   // filterByComment()
 
     // -----------------------------------------------------------------------
     // PROTECTED

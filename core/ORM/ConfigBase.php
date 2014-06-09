@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_config"
+ * Abstract base class for table 'pvlng_config'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "Config.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -21,15 +25,6 @@ abstract class ConfigBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
     // PUBLIC
     // -----------------------------------------------------------------------
-
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $key ) {
-        return new static(array($key));
-    } // forge()
 
     // -----------------------------------------------------------------------
     // Setter methods
@@ -44,7 +39,7 @@ abstract class ConfigBase extends \slimMVC\ORM {
     public function setKey( $key ) {
         $this->fields['key'] = $key;
         return $this;
-    } // setKey()
+    }   // setKey()
 
     /**
      * Basic setter for field 'value'
@@ -55,7 +50,7 @@ abstract class ConfigBase extends \slimMVC\ORM {
     public function setValue( $value ) {
         $this->fields['value'] = $value;
         return $this;
-    } // setValue()
+    }   // setValue()
 
     /**
      * Basic setter for field 'comment'
@@ -66,7 +61,7 @@ abstract class ConfigBase extends \slimMVC\ORM {
     public function setComment( $comment ) {
         $this->fields['comment'] = $comment;
         return $this;
-    } // setComment()
+    }   // setComment()
 
     /**
      * Basic setter for field 'type'
@@ -77,7 +72,7 @@ abstract class ConfigBase extends \slimMVC\ORM {
     public function setType( $type ) {
         $this->fields['type'] = $type;
         return $this;
-    } // setType()
+    }   // setType()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -90,7 +85,7 @@ abstract class ConfigBase extends \slimMVC\ORM {
      */
     public function getKey() {
         return $this->fields['key'];
-    } // getKey()
+    }   // getKey()
 
     /**
      * Basic getter for field 'value'
@@ -99,7 +94,7 @@ abstract class ConfigBase extends \slimMVC\ORM {
      */
     public function getValue() {
         return $this->fields['value'];
-    } // getValue()
+    }   // getValue()
 
     /**
      * Basic getter for field 'comment'
@@ -108,7 +103,7 @@ abstract class ConfigBase extends \slimMVC\ORM {
      */
     public function getComment() {
         return $this->fields['comment'];
-    } // getComment()
+    }   // getComment()
 
     /**
      * Basic getter for field 'type'
@@ -117,47 +112,55 @@ abstract class ConfigBase extends \slimMVC\ORM {
      */
     public function getType() {
         return $this->fields['type'];
-    } // getType()
+    }   // getType()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field key
+     * Filter for field 'key'
      *
-     * @param mixed Field value
+     * @param  mixed    $key Filter value
+     * @return Instance For fluid interface
      */
     public function filterByKey( $key ) {
-        return $this->filter('key', $key);
-    } // filterByKey()
+        $this->filter[] = '`key` = "'.$this->quote($key).'"';
+        return $this;
+    }   // filterByKey()
 
     /**
-     * Filter for field value
+     * Filter for field 'value'
      *
-     * @param mixed Field value
+     * @param  mixed    $value Filter value
+     * @return Instance For fluid interface
      */
     public function filterByValue( $value ) {
-        return $this->filter('value', $value);
-    } // filterByValue()
+        $this->filter[] = '`value` = "'.$this->quote($value).'"';
+        return $this;
+    }   // filterByValue()
 
     /**
-     * Filter for field comment
+     * Filter for field 'comment'
      *
-     * @param mixed Field value
+     * @param  mixed    $comment Filter value
+     * @return Instance For fluid interface
      */
     public function filterByComment( $comment ) {
-        return $this->filter('comment', $comment);
-    } // filterByComment()
+        $this->filter[] = '`comment` = "'.$this->quote($comment).'"';
+        return $this;
+    }   // filterByComment()
 
     /**
-     * Filter for field type
+     * Filter for field 'type'
      *
-     * @param mixed Field value
+     * @param  mixed    $type Filter value
+     * @return Instance For fluid interface
      */
     public function filterByType( $type ) {
-        return $this->filter('type', $type);
-    } // filterByType()
+        $this->filter[] = '`type` = "'.$this->quote($type).'"';
+        return $this;
+    }   // filterByType()
 
     // -----------------------------------------------------------------------
     // PROTECTED

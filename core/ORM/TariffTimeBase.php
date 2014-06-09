@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_tariff_time"
+ * Abstract base class for table 'pvlng_tariff_time'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "TariffTime.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -21,15 +25,6 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
     // PUBLIC
     // -----------------------------------------------------------------------
-
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id, $date, $time, $days ) {
-        return new static(array($id, $date, $time, $days));
-    } // forge()
 
     // -----------------------------------------------------------------------
     // Setter methods
@@ -44,7 +39,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
     public function setId( $id ) {
         $this->fields['id'] = $id;
         return $this;
-    } // setId()
+    }   // setId()
 
     /**
      * Basic setter for field 'date'
@@ -55,7 +50,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
     public function setDate( $date ) {
         $this->fields['date'] = $date;
         return $this;
-    } // setDate()
+    }   // setDate()
 
     /**
      * Basic setter for field 'time'
@@ -66,7 +61,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
     public function setTime( $time ) {
         $this->fields['time'] = $time;
         return $this;
-    } // setTime()
+    }   // setTime()
 
     /**
      * Basic setter for field 'days'
@@ -77,7 +72,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
     public function setDays( $days ) {
         $this->fields['days'] = $days;
         return $this;
-    } // setDays()
+    }   // setDays()
 
     /**
      * Basic setter for field 'tariff'
@@ -88,7 +83,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
     public function setTariff( $tariff ) {
         $this->fields['tariff'] = $tariff;
         return $this;
-    } // setTariff()
+    }   // setTariff()
 
     /**
      * Basic setter for field 'comment'
@@ -99,7 +94,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
     public function setComment( $comment ) {
         $this->fields['comment'] = $comment;
         return $this;
-    } // setComment()
+    }   // setComment()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -112,7 +107,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    } // getId()
+    }   // getId()
 
     /**
      * Basic getter for field 'date'
@@ -121,7 +116,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
      */
     public function getDate() {
         return $this->fields['date'];
-    } // getDate()
+    }   // getDate()
 
     /**
      * Basic getter for field 'time'
@@ -130,7 +125,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
      */
     public function getTime() {
         return $this->fields['time'];
-    } // getTime()
+    }   // getTime()
 
     /**
      * Basic getter for field 'days'
@@ -139,7 +134,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
      */
     public function getDays() {
         return $this->fields['days'];
-    } // getDays()
+    }   // getDays()
 
     /**
      * Basic getter for field 'tariff'
@@ -148,7 +143,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
      */
     public function getTariff() {
         return $this->fields['tariff'];
-    } // getTariff()
+    }   // getTariff()
 
     /**
      * Basic getter for field 'comment'
@@ -157,65 +152,91 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
      */
     public function getComment() {
         return $this->fields['comment'];
-    } // getComment()
+    }   // getComment()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field id
+     * Filter for unique fields 'id', 'date', 'time', 'days'
      *
-     * @param mixed Field value
+     * @param  mixed    $id, $date, $time, $days Filter values
+     * @return Instance For fluid interface
      */
-    public function filterById( $id ) {
-        return $this->filter('id', $id);
-    } // filterById()
+    public function filterByIdDateTimeDays( $id, $date, $time, $days ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        $this->filter[] = '`date` = "'.$this->quote($date).'"';
+        $this->filter[] = '`time` = "'.$this->quote($time).'"';
+        $this->filter[] = '`days` = "'.$this->quote($days).'"';
+        return $this;
+    }   // filterByIdDateTimeDays()
 
     /**
-     * Filter for field date
+     * Filter for field 'days'
      *
-     * @param mixed Field value
-     */
-    public function filterByDate( $date ) {
-        return $this->filter('date', $date);
-    } // filterByDate()
-
-    /**
-     * Filter for field time
-     *
-     * @param mixed Field value
-     */
-    public function filterByTime( $time ) {
-        return $this->filter('time', $time);
-    } // filterByTime()
-
-    /**
-     * Filter for field days
-     *
-     * @param mixed Field value
+     * @param  mixed    $days Filter value
+     * @return Instance For fluid interface
      */
     public function filterByDays( $days ) {
-        return $this->filter('days', $days);
-    } // filterByDays()
+        $this->filter[] = '`days` = "'.$this->quote($days).'"';
+        return $this;
+    }   // filterByDays()
 
     /**
-     * Filter for field tariff
+     * Filter for field 'date'
      *
-     * @param mixed Field value
+     * @param  mixed    $date Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByDate( $date ) {
+        $this->filter[] = '`date` = "'.$this->quote($date).'"';
+        return $this;
+    }   // filterByDate()
+
+    /**
+     * Filter for field 'time'
+     *
+     * @param  mixed    $time Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByTime( $time ) {
+        $this->filter[] = '`time` = "'.$this->quote($time).'"';
+        return $this;
+    }   // filterByTime()
+
+    /**
+     * Filter for field 'id'
+     *
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterById( $id ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
+
+    /**
+     * Filter for field 'tariff'
+     *
+     * @param  mixed    $tariff Filter value
+     * @return Instance For fluid interface
      */
     public function filterByTariff( $tariff ) {
-        return $this->filter('tariff', $tariff);
-    } // filterByTariff()
+        $this->filter[] = '`tariff` = "'.$this->quote($tariff).'"';
+        return $this;
+    }   // filterByTariff()
 
     /**
-     * Filter for field comment
+     * Filter for field 'comment'
      *
-     * @param mixed Field value
+     * @param  mixed    $comment Filter value
+     * @return Instance For fluid interface
      */
     public function filterByComment( $comment ) {
-        return $this->filter('comment', $comment);
-    } // filterByComment()
+        $this->filter[] = '`comment` = "'.$this->quote($comment).'"';
+        return $this;
+    }   // filterByComment()
 
     // -----------------------------------------------------------------------
     // PROTECTED

@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_channel"
+ * Abstract base class for table 'pvlng_channel'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "Channel.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -22,21 +26,12 @@ abstract class ChannelBase extends \slimMVC\ORM {
     // PUBLIC
     // -----------------------------------------------------------------------
 
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id ) {
-        return new static(array($id));
-    } // forge()
-
     // -----------------------------------------------------------------------
     // Setter methods
     // -----------------------------------------------------------------------
 
     /**
-     * "id" is AutoInc, no setter
+     * 'id' is AutoInc, no setter
      */
 
     /**
@@ -48,7 +43,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setGuid( $guid ) {
         $this->fields['guid'] = $guid;
         return $this;
-    } // setGuid()
+    }   // setGuid()
 
     /**
      * Basic setter for field 'name'
@@ -59,7 +54,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setName( $name ) {
         $this->fields['name'] = $name;
         return $this;
-    } // setName()
+    }   // setName()
 
     /**
      * Basic setter for field 'description'
@@ -70,7 +65,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setDescription( $description ) {
         $this->fields['description'] = $description;
         return $this;
-    } // setDescription()
+    }   // setDescription()
 
     /**
      * Basic setter for field 'serial'
@@ -81,7 +76,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setSerial( $serial ) {
         $this->fields['serial'] = $serial;
         return $this;
-    } // setSerial()
+    }   // setSerial()
 
     /**
      * Basic setter for field 'channel'
@@ -92,7 +87,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setChannel( $channel ) {
         $this->fields['channel'] = $channel;
         return $this;
-    } // setChannel()
+    }   // setChannel()
 
     /**
      * Basic setter for field 'type'
@@ -103,7 +98,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setType( $type ) {
         $this->fields['type'] = $type;
         return $this;
-    } // setType()
+    }   // setType()
 
     /**
      * Basic setter for field 'resolution'
@@ -114,7 +109,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setResolution( $resolution ) {
         $this->fields['resolution'] = $resolution;
         return $this;
-    } // setResolution()
+    }   // setResolution()
 
     /**
      * Basic setter for field 'unit'
@@ -125,7 +120,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setUnit( $unit ) {
         $this->fields['unit'] = $unit;
         return $this;
-    } // setUnit()
+    }   // setUnit()
 
     /**
      * Basic setter for field 'decimals'
@@ -136,7 +131,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setDecimals( $decimals ) {
         $this->fields['decimals'] = $decimals;
         return $this;
-    } // setDecimals()
+    }   // setDecimals()
 
     /**
      * Basic setter for field 'meter'
@@ -147,7 +142,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setMeter( $meter ) {
         $this->fields['meter'] = $meter;
         return $this;
-    } // setMeter()
+    }   // setMeter()
 
     /**
      * Basic setter for field 'numeric'
@@ -158,7 +153,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setNumeric( $numeric ) {
         $this->fields['numeric'] = $numeric;
         return $this;
-    } // setNumeric()
+    }   // setNumeric()
 
     /**
      * Basic setter for field 'offset'
@@ -169,7 +164,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setOffset( $offset ) {
         $this->fields['offset'] = $offset;
         return $this;
-    } // setOffset()
+    }   // setOffset()
 
     /**
      * Basic setter for field 'adjust'
@@ -180,7 +175,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setAdjust( $adjust ) {
         $this->fields['adjust'] = $adjust;
         return $this;
-    } // setAdjust()
+    }   // setAdjust()
 
     /**
      * Basic setter for field 'cost'
@@ -191,7 +186,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setCost( $cost ) {
         $this->fields['cost'] = $cost;
         return $this;
-    } // setCost()
+    }   // setCost()
 
     /**
      * Basic setter for field 'tariff'
@@ -202,7 +197,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setTariff( $tariff ) {
         $this->fields['tariff'] = $tariff;
         return $this;
-    } // setTariff()
+    }   // setTariff()
 
     /**
      * Basic setter for field 'threshold'
@@ -213,7 +208,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setThreshold( $threshold ) {
         $this->fields['threshold'] = $threshold;
         return $this;
-    } // setThreshold()
+    }   // setThreshold()
 
     /**
      * Basic setter for field 'valid_from'
@@ -224,7 +219,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setValidFrom( $valid_from ) {
         $this->fields['valid_from'] = $valid_from;
         return $this;
-    } // setValidFrom()
+    }   // setValidFrom()
 
     /**
      * Basic setter for field 'valid_to'
@@ -235,7 +230,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setValidTo( $valid_to ) {
         $this->fields['valid_to'] = $valid_to;
         return $this;
-    } // setValidTo()
+    }   // setValidTo()
 
     /**
      * Basic setter for field 'public'
@@ -246,7 +241,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setPublic( $public ) {
         $this->fields['public'] = $public;
         return $this;
-    } // setPublic()
+    }   // setPublic()
 
     /**
      * Basic setter for field 'extra'
@@ -257,7 +252,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setExtra( $extra ) {
         $this->fields['extra'] = $extra;
         return $this;
-    } // setExtra()
+    }   // setExtra()
 
     /**
      * Basic setter for field 'comment'
@@ -268,7 +263,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setComment( $comment ) {
         $this->fields['comment'] = $comment;
         return $this;
-    } // setComment()
+    }   // setComment()
 
     /**
      * Basic setter for field 'icon'
@@ -279,7 +274,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function setIcon( $icon ) {
         $this->fields['icon'] = $icon;
         return $this;
-    } // setIcon()
+    }   // setIcon()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -292,7 +287,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    } // getId()
+    }   // getId()
 
     /**
      * Basic getter for field 'guid'
@@ -301,7 +296,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getGuid() {
         return $this->fields['guid'];
-    } // getGuid()
+    }   // getGuid()
 
     /**
      * Basic getter for field 'name'
@@ -310,7 +305,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getName() {
         return $this->fields['name'];
-    } // getName()
+    }   // getName()
 
     /**
      * Basic getter for field 'description'
@@ -319,7 +314,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getDescription() {
         return $this->fields['description'];
-    } // getDescription()
+    }   // getDescription()
 
     /**
      * Basic getter for field 'serial'
@@ -328,7 +323,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getSerial() {
         return $this->fields['serial'];
-    } // getSerial()
+    }   // getSerial()
 
     /**
      * Basic getter for field 'channel'
@@ -337,7 +332,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getChannel() {
         return $this->fields['channel'];
-    } // getChannel()
+    }   // getChannel()
 
     /**
      * Basic getter for field 'type'
@@ -346,7 +341,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getType() {
         return $this->fields['type'];
-    } // getType()
+    }   // getType()
 
     /**
      * Basic getter for field 'resolution'
@@ -355,7 +350,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getResolution() {
         return $this->fields['resolution'];
-    } // getResolution()
+    }   // getResolution()
 
     /**
      * Basic getter for field 'unit'
@@ -364,7 +359,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getUnit() {
         return $this->fields['unit'];
-    } // getUnit()
+    }   // getUnit()
 
     /**
      * Basic getter for field 'decimals'
@@ -373,7 +368,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getDecimals() {
         return $this->fields['decimals'];
-    } // getDecimals()
+    }   // getDecimals()
 
     /**
      * Basic getter for field 'meter'
@@ -382,7 +377,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getMeter() {
         return $this->fields['meter'];
-    } // getMeter()
+    }   // getMeter()
 
     /**
      * Basic getter for field 'numeric'
@@ -391,7 +386,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getNumeric() {
         return $this->fields['numeric'];
-    } // getNumeric()
+    }   // getNumeric()
 
     /**
      * Basic getter for field 'offset'
@@ -400,7 +395,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getOffset() {
         return $this->fields['offset'];
-    } // getOffset()
+    }   // getOffset()
 
     /**
      * Basic getter for field 'adjust'
@@ -409,7 +404,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getAdjust() {
         return $this->fields['adjust'];
-    } // getAdjust()
+    }   // getAdjust()
 
     /**
      * Basic getter for field 'cost'
@@ -418,7 +413,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getCost() {
         return $this->fields['cost'];
-    } // getCost()
+    }   // getCost()
 
     /**
      * Basic getter for field 'tariff'
@@ -427,7 +422,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getTariff() {
         return $this->fields['tariff'];
-    } // getTariff()
+    }   // getTariff()
 
     /**
      * Basic getter for field 'threshold'
@@ -436,7 +431,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getThreshold() {
         return $this->fields['threshold'];
-    } // getThreshold()
+    }   // getThreshold()
 
     /**
      * Basic getter for field 'valid_from'
@@ -445,7 +440,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getValidFrom() {
         return $this->fields['valid_from'];
-    } // getValidFrom()
+    }   // getValidFrom()
 
     /**
      * Basic getter for field 'valid_to'
@@ -454,7 +449,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getValidTo() {
         return $this->fields['valid_to'];
-    } // getValidTo()
+    }   // getValidTo()
 
     /**
      * Basic getter for field 'public'
@@ -463,7 +458,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getPublic() {
         return $this->fields['public'];
-    } // getPublic()
+    }   // getPublic()
 
     /**
      * Basic getter for field 'extra'
@@ -472,7 +467,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getExtra() {
         return $this->fields['extra'];
-    } // getExtra()
+    }   // getExtra()
 
     /**
      * Basic getter for field 'comment'
@@ -481,7 +476,7 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getComment() {
         return $this->fields['comment'];
-    } // getComment()
+    }   // getComment()
 
     /**
      * Basic getter for field 'icon'
@@ -490,218 +485,264 @@ abstract class ChannelBase extends \slimMVC\ORM {
      */
     public function getIcon() {
         return $this->fields['icon'];
-    } // getIcon()
+    }   // getIcon()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field guid
+     * Filter for field 'id'
      *
-     * @param mixed Field value
-     */
-    public function filterByGuid( $guid ) {
-        return $this->filter('guid', $guid);
-    } // filterByGuid()
-
-    /**
-     * Filter for field id
-     *
-     * @param mixed Field value
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
      */
     public function filterById( $id ) {
-        return $this->filter('id', $id);
-    } // filterById()
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
 
     /**
-     * Filter for field name
+     * Filter for field 'guid'
      *
-     * @param mixed Field value
+     * @param  mixed    $guid Filter value
+     * @return Instance For fluid interface
      */
-    public function filterByName( $name ) {
-        return $this->filter('name', $name);
-    } // filterByName()
+    public function filterByGuid( $guid ) {
+        $this->filter[] = '`guid` = "'.$this->quote($guid).'"';
+        return $this;
+    }   // filterByGuid()
 
     /**
-     * Filter for field description
+     * Filter for field 'type'
      *
-     * @param mixed Field value
-     */
-    public function filterByDescription( $description ) {
-        return $this->filter('description', $description);
-    } // filterByDescription()
-
-    /**
-     * Filter for field serial
-     *
-     * @param mixed Field value
-     */
-    public function filterBySerial( $serial ) {
-        return $this->filter('serial', $serial);
-    } // filterBySerial()
-
-    /**
-     * Filter for field channel
-     *
-     * @param mixed Field value
-     */
-    public function filterByChannel( $channel ) {
-        return $this->filter('channel', $channel);
-    } // filterByChannel()
-
-    /**
-     * Filter for field type
-     *
-     * @param mixed Field value
+     * @param  mixed    $type Filter value
+     * @return Instance For fluid interface
      */
     public function filterByType( $type ) {
-        return $this->filter('type', $type);
-    } // filterByType()
+        $this->filter[] = '`type` = "'.$this->quote($type).'"';
+        return $this;
+    }   // filterByType()
 
     /**
-     * Filter for field resolution
+     * Filter for field 'tariff'
      *
-     * @param mixed Field value
-     */
-    public function filterByResolution( $resolution ) {
-        return $this->filter('resolution', $resolution);
-    } // filterByResolution()
-
-    /**
-     * Filter for field unit
-     *
-     * @param mixed Field value
-     */
-    public function filterByUnit( $unit ) {
-        return $this->filter('unit', $unit);
-    } // filterByUnit()
-
-    /**
-     * Filter for field decimals
-     *
-     * @param mixed Field value
-     */
-    public function filterByDecimals( $decimals ) {
-        return $this->filter('decimals', $decimals);
-    } // filterByDecimals()
-
-    /**
-     * Filter for field meter
-     *
-     * @param mixed Field value
-     */
-    public function filterByMeter( $meter ) {
-        return $this->filter('meter', $meter);
-    } // filterByMeter()
-
-    /**
-     * Filter for field numeric
-     *
-     * @param mixed Field value
-     */
-    public function filterByNumeric( $numeric ) {
-        return $this->filter('numeric', $numeric);
-    } // filterByNumeric()
-
-    /**
-     * Filter for field offset
-     *
-     * @param mixed Field value
-     */
-    public function filterByOffset( $offset ) {
-        return $this->filter('offset', $offset);
-    } // filterByOffset()
-
-    /**
-     * Filter for field adjust
-     *
-     * @param mixed Field value
-     */
-    public function filterByAdjust( $adjust ) {
-        return $this->filter('adjust', $adjust);
-    } // filterByAdjust()
-
-    /**
-     * Filter for field cost
-     *
-     * @param mixed Field value
-     */
-    public function filterByCost( $cost ) {
-        return $this->filter('cost', $cost);
-    } // filterByCost()
-
-    /**
-     * Filter for field tariff
-     *
-     * @param mixed Field value
+     * @param  mixed    $tariff Filter value
+     * @return Instance For fluid interface
      */
     public function filterByTariff( $tariff ) {
-        return $this->filter('tariff', $tariff);
-    } // filterByTariff()
+        $this->filter[] = '`tariff` = "'.$this->quote($tariff).'"';
+        return $this;
+    }   // filterByTariff()
 
     /**
-     * Filter for field threshold
+     * Filter for field 'name'
      *
-     * @param mixed Field value
+     * @param  mixed    $name Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByName( $name ) {
+        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+        return $this;
+    }   // filterByName()
+
+    /**
+     * Filter for field 'description'
+     *
+     * @param  mixed    $description Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByDescription( $description ) {
+        $this->filter[] = '`description` = "'.$this->quote($description).'"';
+        return $this;
+    }   // filterByDescription()
+
+    /**
+     * Filter for field 'serial'
+     *
+     * @param  mixed    $serial Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterBySerial( $serial ) {
+        $this->filter[] = '`serial` = "'.$this->quote($serial).'"';
+        return $this;
+    }   // filterBySerial()
+
+    /**
+     * Filter for field 'channel'
+     *
+     * @param  mixed    $channel Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByChannel( $channel ) {
+        $this->filter[] = '`channel` = "'.$this->quote($channel).'"';
+        return $this;
+    }   // filterByChannel()
+
+    /**
+     * Filter for field 'resolution'
+     *
+     * @param  mixed    $resolution Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByResolution( $resolution ) {
+        $this->filter[] = '`resolution` = "'.$this->quote($resolution).'"';
+        return $this;
+    }   // filterByResolution()
+
+    /**
+     * Filter for field 'unit'
+     *
+     * @param  mixed    $unit Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByUnit( $unit ) {
+        $this->filter[] = '`unit` = "'.$this->quote($unit).'"';
+        return $this;
+    }   // filterByUnit()
+
+    /**
+     * Filter for field 'decimals'
+     *
+     * @param  mixed    $decimals Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByDecimals( $decimals ) {
+        $this->filter[] = '`decimals` = "'.$this->quote($decimals).'"';
+        return $this;
+    }   // filterByDecimals()
+
+    /**
+     * Filter for field 'meter'
+     *
+     * @param  mixed    $meter Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByMeter( $meter ) {
+        $this->filter[] = '`meter` = "'.$this->quote($meter).'"';
+        return $this;
+    }   // filterByMeter()
+
+    /**
+     * Filter for field 'numeric'
+     *
+     * @param  mixed    $numeric Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByNumeric( $numeric ) {
+        $this->filter[] = '`numeric` = "'.$this->quote($numeric).'"';
+        return $this;
+    }   // filterByNumeric()
+
+    /**
+     * Filter for field 'offset'
+     *
+     * @param  mixed    $offset Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByOffset( $offset ) {
+        $this->filter[] = '`offset` = "'.$this->quote($offset).'"';
+        return $this;
+    }   // filterByOffset()
+
+    /**
+     * Filter for field 'adjust'
+     *
+     * @param  mixed    $adjust Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByAdjust( $adjust ) {
+        $this->filter[] = '`adjust` = "'.$this->quote($adjust).'"';
+        return $this;
+    }   // filterByAdjust()
+
+    /**
+     * Filter for field 'cost'
+     *
+     * @param  mixed    $cost Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByCost( $cost ) {
+        $this->filter[] = '`cost` = "'.$this->quote($cost).'"';
+        return $this;
+    }   // filterByCost()
+
+    /**
+     * Filter for field 'threshold'
+     *
+     * @param  mixed    $threshold Filter value
+     * @return Instance For fluid interface
      */
     public function filterByThreshold( $threshold ) {
-        return $this->filter('threshold', $threshold);
-    } // filterByThreshold()
+        $this->filter[] = '`threshold` = "'.$this->quote($threshold).'"';
+        return $this;
+    }   // filterByThreshold()
 
     /**
-     * Filter for field valid_from
+     * Filter for field 'valid_from'
      *
-     * @param mixed Field value
+     * @param  mixed    $valid_from Filter value
+     * @return Instance For fluid interface
      */
     public function filterByValidFrom( $valid_from ) {
-        return $this->filter('valid_from', $valid_from);
-    } // filterByValidFrom()
+        $this->filter[] = '`valid_from` = "'.$this->quote($valid_from).'"';
+        return $this;
+    }   // filterByValidFrom()
 
     /**
-     * Filter for field valid_to
+     * Filter for field 'valid_to'
      *
-     * @param mixed Field value
+     * @param  mixed    $valid_to Filter value
+     * @return Instance For fluid interface
      */
     public function filterByValidTo( $valid_to ) {
-        return $this->filter('valid_to', $valid_to);
-    } // filterByValidTo()
+        $this->filter[] = '`valid_to` = "'.$this->quote($valid_to).'"';
+        return $this;
+    }   // filterByValidTo()
 
     /**
-     * Filter for field public
+     * Filter for field 'public'
      *
-     * @param mixed Field value
+     * @param  mixed    $public Filter value
+     * @return Instance For fluid interface
      */
     public function filterByPublic( $public ) {
-        return $this->filter('public', $public);
-    } // filterByPublic()
+        $this->filter[] = '`public` = "'.$this->quote($public).'"';
+        return $this;
+    }   // filterByPublic()
 
     /**
-     * Filter for field extra
+     * Filter for field 'extra'
      *
-     * @param mixed Field value
+     * @param  mixed    $extra Filter value
+     * @return Instance For fluid interface
      */
     public function filterByExtra( $extra ) {
-        return $this->filter('extra', $extra);
-    } // filterByExtra()
+        $this->filter[] = '`extra` = "'.$this->quote($extra).'"';
+        return $this;
+    }   // filterByExtra()
 
     /**
-     * Filter for field comment
+     * Filter for field 'comment'
      *
-     * @param mixed Field value
+     * @param  mixed    $comment Filter value
+     * @return Instance For fluid interface
      */
     public function filterByComment( $comment ) {
-        return $this->filter('comment', $comment);
-    } // filterByComment()
+        $this->filter[] = '`comment` = "'.$this->quote($comment).'"';
+        return $this;
+    }   // filterByComment()
 
     /**
-     * Filter for field icon
+     * Filter for field 'icon'
      *
-     * @param mixed Field value
+     * @param  mixed    $icon Filter value
+     * @return Instance For fluid interface
      */
     public function filterByIcon( $icon ) {
-        return $this->filter('icon', $icon);
-    } // filterByIcon()
+        $this->filter[] = '`icon` = "'.$this->quote($icon).'"';
+        return $this;
+    }   // filterByIcon()
 
     // -----------------------------------------------------------------------
     // PROTECTED

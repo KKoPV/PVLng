@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_reading_num"
+ * Abstract base class for table 'pvlng_reading_num'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "Reading.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -21,15 +25,6 @@ abstract class ReadingBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
     // PUBLIC
     // -----------------------------------------------------------------------
-
-    /**
-     * Forge method for key field(s) id, $timestamp
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id, $timestamp ) {
-        return new static(array($id, $timestamp));
-    }
 
     // -----------------------------------------------------------------------
     // Setter methods
@@ -44,7 +39,7 @@ abstract class ReadingBase extends \slimMVC\ORM {
     public function setId( $id ) {
         $this->fields['id'] = $id;
         return $this;
-    }
+    }   // setId()
 
     /**
      * Basic setter for field 'timestamp'
@@ -55,7 +50,7 @@ abstract class ReadingBase extends \slimMVC\ORM {
     public function setTimestamp( $timestamp ) {
         $this->fields['timestamp'] = $timestamp;
         return $this;
-    }
+    }   // setTimestamp()
 
     /**
      * Basic setter for field 'data'
@@ -66,7 +61,7 @@ abstract class ReadingBase extends \slimMVC\ORM {
     public function setData( $data ) {
         $this->fields['data'] = $data;
         return $this;
-    }
+    }   // setData()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -79,7 +74,7 @@ abstract class ReadingBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    }
+    }   // getId()
 
     /**
      * Basic getter for field 'timestamp'
@@ -88,7 +83,7 @@ abstract class ReadingBase extends \slimMVC\ORM {
      */
     public function getTimestamp() {
         return $this->fields['timestamp'];
-    }
+    }   // getTimestamp()
 
     /**
      * Basic getter for field 'data'
@@ -97,37 +92,55 @@ abstract class ReadingBase extends \slimMVC\ORM {
      */
     public function getData() {
         return $this->fields['data'];
-    }
+    }   // getData()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field id
+     * Filter for unique fields 'id', 'timestamp'
      *
-     * @param mixed Field value
+     * @param  mixed    $id, $timestamp Filter values
+     * @return Instance For fluid interface
+     */
+    public function filterByIdTimestamp( $id, $timestamp ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
+        return $this;
+    }   // filterByIdTimestamp()
+
+    /**
+     * Filter for field 'id'
+     *
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
      */
     public function filterById( $id ) {
-        return $this->filter('id', $id);
-    }
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
 
     /**
-     * Filter for field timestamp
+     * Filter for field 'timestamp'
      *
-     * @param mixed Field value
+     * @param  mixed    $timestamp Filter value
+     * @return Instance For fluid interface
      */
     public function filterByTimestamp( $timestamp ) {
-        return $this->filter('timestamp', $timestamp);
-    }
+        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
+        return $this;
+    }   // filterByTimestamp()
 
     /**
-     * Filter for field data
+     * Filter for field 'data'
      *
-     * @param mixed Field value
+     * @param  mixed    $data Filter value
+     * @return Instance For fluid interface
      */
     public function filterByData( $data ) {
-        return $this->filter('data', $data);
-    }
+        $this->filter[] = '`data` = "'.$this->quote($data).'"';
+        return $this;
+    }   // filterByData()
 
 }

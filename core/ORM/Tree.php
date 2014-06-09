@@ -50,7 +50,7 @@ class Tree extends TreeBase {
         $nodes = array();
 
         // Without root node
-        $rows = $this->reset()->filterById(array('min'=>2))->find()->asAssoc();
+        $rows = $this->reset()->filter('id', array('min'=>2))->find()->asAssoc();
 
         foreach ($rows as $row) {
             $parent[$row['level']] = $row['id'];

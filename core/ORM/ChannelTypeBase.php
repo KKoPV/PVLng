@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_type"
+ * Abstract base class for table 'pvlng_type'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "ChannelType.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -21,15 +25,6 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
     // PUBLIC
     // -----------------------------------------------------------------------
-
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id ) {
-        return new static(array($id));
-    } // forge()
 
     // -----------------------------------------------------------------------
     // Setter methods
@@ -44,7 +39,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setId( $id ) {
         $this->fields['id'] = $id;
         return $this;
-    } // setId()
+    }   // setId()
 
     /**
      * Basic setter for field 'name'
@@ -55,7 +50,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setName( $name ) {
         $this->fields['name'] = $name;
         return $this;
-    } // setName()
+    }   // setName()
 
     /**
      * Basic setter for field 'description'
@@ -66,7 +61,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setDescription( $description ) {
         $this->fields['description'] = $description;
         return $this;
-    } // setDescription()
+    }   // setDescription()
 
     /**
      * Basic setter for field 'model'
@@ -77,7 +72,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setModel( $model ) {
         $this->fields['model'] = $model;
         return $this;
-    } // setModel()
+    }   // setModel()
 
     /**
      * Basic setter for field 'unit'
@@ -88,7 +83,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setUnit( $unit ) {
         $this->fields['unit'] = $unit;
         return $this;
-    } // setUnit()
+    }   // setUnit()
 
     /**
      * Basic setter for field 'type'
@@ -99,7 +94,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setType( $type ) {
         $this->fields['type'] = $type;
         return $this;
-    } // setType()
+    }   // setType()
 
     /**
      * Basic setter for field 'childs'
@@ -110,7 +105,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setChilds( $childs ) {
         $this->fields['childs'] = $childs;
         return $this;
-    } // setChilds()
+    }   // setChilds()
 
     /**
      * Basic setter for field 'read'
@@ -121,7 +116,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setRead( $read ) {
         $this->fields['read'] = $read;
         return $this;
-    } // setRead()
+    }   // setRead()
 
     /**
      * Basic setter for field 'write'
@@ -132,7 +127,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setWrite( $write ) {
         $this->fields['write'] = $write;
         return $this;
-    } // setWrite()
+    }   // setWrite()
 
     /**
      * Basic setter for field 'graph'
@@ -143,7 +138,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setGraph( $graph ) {
         $this->fields['graph'] = $graph;
         return $this;
-    } // setGraph()
+    }   // setGraph()
 
     /**
      * Basic setter for field 'icon'
@@ -154,7 +149,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
     public function setIcon( $icon ) {
         $this->fields['icon'] = $icon;
         return $this;
-    } // setIcon()
+    }   // setIcon()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -167,7 +162,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    } // getId()
+    }   // getId()
 
     /**
      * Basic getter for field 'name'
@@ -176,7 +171,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getName() {
         return $this->fields['name'];
-    } // getName()
+    }   // getName()
 
     /**
      * Basic getter for field 'description'
@@ -185,7 +180,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getDescription() {
         return $this->fields['description'];
-    } // getDescription()
+    }   // getDescription()
 
     /**
      * Basic getter for field 'model'
@@ -194,7 +189,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getModel() {
         return $this->fields['model'];
-    } // getModel()
+    }   // getModel()
 
     /**
      * Basic getter for field 'unit'
@@ -203,7 +198,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getUnit() {
         return $this->fields['unit'];
-    } // getUnit()
+    }   // getUnit()
 
     /**
      * Basic getter for field 'type'
@@ -212,7 +207,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getType() {
         return $this->fields['type'];
-    } // getType()
+    }   // getType()
 
     /**
      * Basic getter for field 'childs'
@@ -221,7 +216,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getChilds() {
         return $this->fields['childs'];
-    } // getChilds()
+    }   // getChilds()
 
     /**
      * Basic getter for field 'read'
@@ -230,7 +225,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getRead() {
         return $this->fields['read'];
-    } // getRead()
+    }   // getRead()
 
     /**
      * Basic getter for field 'write'
@@ -239,7 +234,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getWrite() {
         return $this->fields['write'];
-    } // getWrite()
+    }   // getWrite()
 
     /**
      * Basic getter for field 'graph'
@@ -248,7 +243,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getGraph() {
         return $this->fields['graph'];
-    } // getGraph()
+    }   // getGraph()
 
     /**
      * Basic getter for field 'icon'
@@ -257,110 +252,132 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      */
     public function getIcon() {
         return $this->fields['icon'];
-    } // getIcon()
+    }   // getIcon()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field name
+     * Filter for field 'id'
      *
-     * @param mixed Field value
-     */
-    public function filterByName( $name ) {
-        return $this->filter('name', $name);
-    } // filterByName()
-
-    /**
-     * Filter for field id
-     *
-     * @param mixed Field value
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
      */
     public function filterById( $id ) {
-        return $this->filter('id', $id);
-    } // filterById()
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
 
     /**
-     * Filter for field description
+     * Filter for field 'name'
      *
-     * @param mixed Field value
+     * @param  mixed    $name Filter value
+     * @return Instance For fluid interface
      */
-    public function filterByDescription( $description ) {
-        return $this->filter('description', $description);
-    } // filterByDescription()
+    public function filterByName( $name ) {
+        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+        return $this;
+    }   // filterByName()
 
     /**
-     * Filter for field model
+     * Filter for field 'childs'
      *
-     * @param mixed Field value
-     */
-    public function filterByModel( $model ) {
-        return $this->filter('model', $model);
-    } // filterByModel()
-
-    /**
-     * Filter for field unit
-     *
-     * @param mixed Field value
-     */
-    public function filterByUnit( $unit ) {
-        return $this->filter('unit', $unit);
-    } // filterByUnit()
-
-    /**
-     * Filter for field type
-     *
-     * @param mixed Field value
-     */
-    public function filterByType( $type ) {
-        return $this->filter('type', $type);
-    } // filterByType()
-
-    /**
-     * Filter for field childs
-     *
-     * @param mixed Field value
+     * @param  mixed    $childs Filter value
+     * @return Instance For fluid interface
      */
     public function filterByChilds( $childs ) {
-        return $this->filter('childs', $childs);
-    } // filterByChilds()
+        $this->filter[] = '`childs` = "'.$this->quote($childs).'"';
+        return $this;
+    }   // filterByChilds()
 
     /**
-     * Filter for field read
+     * Filter for field 'read'
      *
-     * @param mixed Field value
+     * @param  mixed    $read Filter value
+     * @return Instance For fluid interface
      */
     public function filterByRead( $read ) {
-        return $this->filter('read', $read);
-    } // filterByRead()
+        $this->filter[] = '`read` = "'.$this->quote($read).'"';
+        return $this;
+    }   // filterByRead()
 
     /**
-     * Filter for field write
+     * Filter for field 'write'
      *
-     * @param mixed Field value
+     * @param  mixed    $write Filter value
+     * @return Instance For fluid interface
      */
     public function filterByWrite( $write ) {
-        return $this->filter('write', $write);
-    } // filterByWrite()
+        $this->filter[] = '`write` = "'.$this->quote($write).'"';
+        return $this;
+    }   // filterByWrite()
 
     /**
-     * Filter for field graph
+     * Filter for field 'description'
      *
-     * @param mixed Field value
+     * @param  mixed    $description Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByDescription( $description ) {
+        $this->filter[] = '`description` = "'.$this->quote($description).'"';
+        return $this;
+    }   // filterByDescription()
+
+    /**
+     * Filter for field 'model'
+     *
+     * @param  mixed    $model Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByModel( $model ) {
+        $this->filter[] = '`model` = "'.$this->quote($model).'"';
+        return $this;
+    }   // filterByModel()
+
+    /**
+     * Filter for field 'unit'
+     *
+     * @param  mixed    $unit Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByUnit( $unit ) {
+        $this->filter[] = '`unit` = "'.$this->quote($unit).'"';
+        return $this;
+    }   // filterByUnit()
+
+    /**
+     * Filter for field 'type'
+     *
+     * @param  mixed    $type Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByType( $type ) {
+        $this->filter[] = '`type` = "'.$this->quote($type).'"';
+        return $this;
+    }   // filterByType()
+
+    /**
+     * Filter for field 'graph'
+     *
+     * @param  mixed    $graph Filter value
+     * @return Instance For fluid interface
      */
     public function filterByGraph( $graph ) {
-        return $this->filter('graph', $graph);
-    } // filterByGraph()
+        $this->filter[] = '`graph` = "'.$this->quote($graph).'"';
+        return $this;
+    }   // filterByGraph()
 
     /**
-     * Filter for field icon
+     * Filter for field 'icon'
      *
-     * @param mixed Field value
+     * @param  mixed    $icon Filter value
+     * @return Instance For fluid interface
      */
     public function filterByIcon( $icon ) {
-        return $this->filter('icon', $icon);
-    } // filterByIcon()
+        $this->filter[] = '`icon` = "'.$this->quote($icon).'"';
+        return $this;
+    }   // filterByIcon()
 
     // -----------------------------------------------------------------------
     // PROTECTED

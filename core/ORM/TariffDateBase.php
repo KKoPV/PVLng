@@ -1,15 +1,19 @@
 <?php
 /**
- * Base access class for "pvlng_tariff_date"
+ * Abstract base class for table 'pvlng_tariff_date'
  *
- * NEVER EVER EDIT THIS FILE
+ * *** NEVER EVER EDIT THIS FILE! ***
  *
  * To extend the functionallity, edit "TariffDate.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
  * @author     PVLng ORM class builder
- * @version    1.0.0
+ * @version    1.1.0 / 2014-06-04
  */
 namespace ORM;
 
@@ -21,15 +25,6 @@ abstract class TariffDateBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
     // PUBLIC
     // -----------------------------------------------------------------------
-
-    /**
-     * Forge method for key field(s)
-     *
-     * @param mixed Field value
-     */
-    public static function forge( $id, $date ) {
-        return new static(array($id, $date));
-    } // forge()
 
     // -----------------------------------------------------------------------
     // Setter methods
@@ -44,7 +39,7 @@ abstract class TariffDateBase extends \slimMVC\ORM {
     public function setId( $id ) {
         $this->fields['id'] = $id;
         return $this;
-    } // setId()
+    }   // setId()
 
     /**
      * Basic setter for field 'date'
@@ -55,7 +50,7 @@ abstract class TariffDateBase extends \slimMVC\ORM {
     public function setDate( $date ) {
         $this->fields['date'] = $date;
         return $this;
-    } // setDate()
+    }   // setDate()
 
     /**
      * Basic setter for field 'cost'
@@ -66,7 +61,7 @@ abstract class TariffDateBase extends \slimMVC\ORM {
     public function setCost( $cost ) {
         $this->fields['cost'] = $cost;
         return $this;
-    } // setCost()
+    }   // setCost()
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -79,7 +74,7 @@ abstract class TariffDateBase extends \slimMVC\ORM {
      */
     public function getId() {
         return $this->fields['id'];
-    } // getId()
+    }   // getId()
 
     /**
      * Basic getter for field 'date'
@@ -88,7 +83,7 @@ abstract class TariffDateBase extends \slimMVC\ORM {
      */
     public function getDate() {
         return $this->fields['date'];
-    } // getDate()
+    }   // getDate()
 
     /**
      * Basic getter for field 'cost'
@@ -97,38 +92,56 @@ abstract class TariffDateBase extends \slimMVC\ORM {
      */
     public function getCost() {
         return $this->fields['cost'];
-    } // getCost()
+    }   // getCost()
 
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field id
+     * Filter for unique fields 'id', 'date'
      *
-     * @param mixed Field value
+     * @param  mixed    $id, $date Filter values
+     * @return Instance For fluid interface
      */
-    public function filterById( $id ) {
-        return $this->filter('id', $id);
-    } // filterById()
+    public function filterByIdDate( $id, $date ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        $this->filter[] = '`date` = "'.$this->quote($date).'"';
+        return $this;
+    }   // filterByIdDate()
 
     /**
-     * Filter for field date
+     * Filter for field 'date'
      *
-     * @param mixed Field value
+     * @param  mixed    $date Filter value
+     * @return Instance For fluid interface
      */
     public function filterByDate( $date ) {
-        return $this->filter('date', $date);
-    } // filterByDate()
+        $this->filter[] = '`date` = "'.$this->quote($date).'"';
+        return $this;
+    }   // filterByDate()
 
     /**
-     * Filter for field cost
+     * Filter for field 'id'
      *
-     * @param mixed Field value
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterById( $id ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
+
+    /**
+     * Filter for field 'cost'
+     *
+     * @param  mixed    $cost Filter value
+     * @return Instance For fluid interface
      */
     public function filterByCost( $cost ) {
-        return $this->filter('cost', $cost);
-    } // filterByCost()
+        $this->filter[] = '`cost` = "'.$this->quote($cost).'"';
+        return $this;
+    }   // filterByCost()
 
     // -----------------------------------------------------------------------
     // PROTECTED
