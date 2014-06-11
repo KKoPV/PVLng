@@ -153,6 +153,8 @@
     <script src="/js/sprintf.js"></script>
     <script src="/js/lscache.js"></script>
     <script src="/js/trmix.min.js"></script>
+    <script src="/js/Blob.min.js"></script>
+    <script src="/js/FileSaver.min.js"></script>
     <!-- ELSE -->
     <script src="/js/min.js"></script>
     <!-- ENDIF -->

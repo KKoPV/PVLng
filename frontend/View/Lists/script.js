@@ -261,8 +261,8 @@ $(function() {
                  'Consumption', '"Row count"'].join(separator) + "\n"
             ],
             d = new Date(),
-            name = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate() + '-' +
-                   (d.getHours()+1) + ':' + d.getMinutes() + ':' + d.getSeconds() + '-' +
+            name = d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2) + '-' +
+                   ('0'+d.getHours()).slice(-2) + ('0'+d.getMinutes()).slice(-2) + '-' +
                    channel.name;
 
         if (channel.description) name += '-' + channel.description;

@@ -32,28 +32,15 @@ return array(
         'visible'  => FALSE
     ),
 
-    'latitude' => array(
-        'position'    => 300,
-        'type'        => 'numeric',
-        'required'    => TRUE,
-        'placeholder' => '-90 .. 90'
-    ),
-    'longitude' => array(
-        'position'    => 310,
-        'type'        => 'numeric',
-        'required'    => TRUE,
-        'placeholder' => '-180 .. 180'
-    ),
-
     'resolution' => array(
         'position' => 420,
-        'type'     => 'boolean;0:Marker;1:Curve',
+        'type'     => 'bool;0:Marker;1:Curve',
         'required' => FALSE
     ),
 
     'times' => array(
-        'position'    => 430,
-        'type'        => 'bool;0:no;1:yes',
+        'position' => 430,
+        'type'     => 'bool;0:no;1:yes',
     ),
 
     'extra' => array(

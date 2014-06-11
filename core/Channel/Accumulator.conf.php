@@ -25,4 +25,11 @@ return array(
         'visible' => FALSE
     ),
 
+    // Strict mode
+    'extra' => array(
+        'visible' => TURE,
+        'type'    => 'bool;0:no;1:yes',
+        'default' => 0
+    ),
+
 );

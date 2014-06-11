@@ -37,6 +37,7 @@ class Accumulator extends Calculator {
 
             default:
                 $this->meter = $childs[0]->meter;
+                $lazy = !$this->extra;
                 $buffer = $childs[0]->read($request);
 
                 // Combine all data for same timestamp
@@ -72,8 +73,8 @@ class Accumulator extends Calculator {
 
                         } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                            // write $row1 only, if data set 2 is not yet started
-                            if ($first2) $result->write($row1, $key1);
+                            // write $row1 only, if not in strict mode and data set 2 is not yet started
+                            if ($first2 AND $lazy) $result->write($row1, $key1);
 
                             // read only row 1
                             $row1 = $buffer->next()->current();
@@ -81,8 +82,8 @@ class Accumulator extends Calculator {
 
                         } else /* $key1 > $key2 */ {
 
-                            // write $row2 only, if data set 1 is not yet started
-                            if ($first1) $result->write($row2, $key2);
+                            // write $row2 only, if not in stric mode and data set 1 is not yet started
+                            if ($first1 AND $lazy) $result->write($row2, $key2);
 
                             // read only row 2
                             $row2 = $next->next()->current();

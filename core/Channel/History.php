@@ -54,6 +54,8 @@ class History extends InternalCalc {
         if ($this->valid_to == 0) {
             // Last x days, move request start backwards
             $request['start'] = $this->start + $this->valid_from * 86400;
+            // Move request end backwards to 00:00
+            $request['end'] = strtotime('today');
             // Save data into temp. table
             $this->saveValues($child->read($request));
         } else {

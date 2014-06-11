@@ -14,28 +14,12 @@ namespace Channel;
 class Daylight extends InternalCalc {
 
     /**
-     * Run additional code before channel edited by user
-     * Read latitude / longitude from extra config
-     */
-    public static function beforeCreate( Array &$fields ) {
-        parent::beforeCreate($fields);
-        $config = \slimMVC\Config::getInstance();
-        $fields['latitude']['VALUE']  = $config->get('Location.Latitude');
-        $fields['longitude']['VALUE'] = $config->get('Location.Longitude');
-    }
-
-    /**
      * Run additional code before data saved to database
      * Read latitude / longitude from extra attribute
      */
     public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
         parent::beforeEdit($channel, $fields);
-        list(
-            $fields['latitude']['VALUE'],
-            $fields['longitude']['VALUE'],
-            $fields['times']['VALUE'],
-            $fields['extra']['VALUE']
-        ) = $channel->extra;
+        list($fields['times']['VALUE'], $fields['extra']['VALUE']) = $channel->extra;
     }
 
     /**
@@ -58,12 +42,7 @@ class Daylight extends InternalCalc {
      */
     public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
         parent::beforeSave($fields, $channel);
-        $channel->extra = array(
-            +$fields['latitude']['VALUE'],
-            +$fields['longitude']['VALUE'],
-            +$fields['times']['VALUE'],
-            $fields['extra']['VALUE']
-        );
+        $channel->extra = array(+$fields['times']['VALUE'], $fields['extra']['VALUE']);
     }
 
     // -----------------------------------------------------------------------
@@ -73,12 +52,7 @@ class Daylight extends InternalCalc {
     /**
      *
      */
-    protected $latitude;
-
-    /**
-     *
-     */
-    protected $longitude;
+    protected $times;
 
     /**
      *
@@ -86,7 +60,7 @@ class Daylight extends InternalCalc {
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
 
-        list($this->latitude, $this->longitude, $this->times, $this->extra) = $this->extra;
+        list($this->times, $this->extra) = $this->extra;
 
         // Switch data table
         if ($this->resolution == 0) {
@@ -132,8 +106,8 @@ class Daylight extends InternalCalc {
         #if ($this->period[1] == self::HOUR) $this->period[0] = 0.5;
 
         do {
-            $sunrise = date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, +$this->latitude, +$this->longitude, 90, date('Z')/3600);
-            $sunset  = date_sunset($day, SUNFUNCS_RET_TIMESTAMP, +$this->latitude, +$this->longitude, 90, date('Z')/3600);
+            $sunrise = $this->config->getSunrise($day);
+            $sunset  = $this->config->getSunset($day);
 
             if (!$this->numeric) {
 

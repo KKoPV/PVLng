@@ -17,5 +17,5 @@
     <tt style="font-size:120%;font-weight:bold">user</tt> cache
 </p>
 <p>
-    <a href="/clearcache" class="button">Clear cache again</a>
+    <a href="/cc" class="button">Clear cache again</a>
 </p>

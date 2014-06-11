@@ -118,6 +118,13 @@ return array(
          'Estimate' => array(
              'Marker' => '/images/energy.png'
          ),
+
+         'SolarEstimate' => array(
+             /**
+              * Take data from last 10 days for curve calculation
+              */
+             'Days' => 10,
+         ),
     ),
 
     /**

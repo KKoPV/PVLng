@@ -92,7 +92,7 @@ class Admin extends \Controller {
         }
 
         if ($this->request->post('p1') != $this->request->post('p2')) {
-            \Messages::Error(\I18N::_('PasswordsNotEqual'), TRUE);
+            \Messages::Error(__('PasswordsNotEqual'), TRUE);
             return;
         }
 
@@ -105,7 +105,11 @@ class Admin extends \Controller {
      *
      */
     public function AdminPassword_Action() {
-        $this->view->SubTitle = \I18N::_('GenerateAdminHash');
+        if ($this->config->get('Admin.User') != '') {
+            \Messages::Error('Admin credentials still defined! You can\'t change them for security reasons without clearing the "Admin > User" entry in config/config.php');
+            $this->app->redirect('index');
+        }
+        $this->view->SubTitle = __('GenerateAdminHash');
     }
 
     /**
@@ -117,7 +121,7 @@ class Admin extends \Controller {
                  ->set('value', $value)->whereEQ('key', $key)->limit(1);
             $this->db->query($q);
         }
-        \Messages::success(\I18N::_('DataSaved'));
+        \Messages::success(__('DataSaved'));
     }
 
     /**
