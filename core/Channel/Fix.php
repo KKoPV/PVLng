@@ -23,7 +23,7 @@ class Fix extends InternalCalc {
 
         $ts = $this->start;
 
-        // Show pseudo reading at each considation range point or at least each hour
+        // Show pseudo reading at each consolidation range point or at least each hour
         $delta = $this->TimestampMeterOffset[$this->period[1]];
         $delta = $delta ?: 3600; // 1hr
 

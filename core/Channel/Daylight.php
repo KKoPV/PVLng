@@ -101,25 +101,22 @@ class Daylight extends InternalCalc {
             $this->resolution = $this->db->queryOne($q);
         }
 
-        $day = $this->start;
+        // Get marker icons to $Icon_sunrise, $Icon_zenit, $Icon_sunset
+        extract($this->config->get('Model.Daylight.Icons'), EXTR_PREFIX_ALL, 'Icon');
 
-        #if ($this->period[1] == self::HOUR) $this->period[0] = 0.5;
+        $day = $this->start;
 
         do {
             $sunrise = $this->config->getSunrise($day);
             $sunset  = $this->config->getSunset($day);
 
             if (!$this->numeric) {
-
                 // Static sunrise / sunset marker with time label depending of "times" attribute
-                $label = '';
-                if ($this->times) $label = date('H:i', $sunrise);
-                $this->saveValue($sunrise, $label . '|/images/sunrise.png');
-                if ($this->times) $label = date('H:i', $sunset);
-                $this->saveValue($sunset,  $label . '|/images/sunset.png');
+                $this->setMarker($sunrise,             $Icon_sunrise);
+                $this->setMarker(($sunrise+$sunset)/2, $Icon_zenit);
+                $this->setMarker($sunset,              $Icon_sunset);
 
             } else {
-
                 // Daylight curve
                 $daylight = $sunset - $sunrise;
 
@@ -134,7 +131,7 @@ class Daylight extends InternalCalc {
                 }
 
                 do {
-                    $this->saveValue( $sunrise, sin(($sunset-$sunrise) * M_PI / $daylight) );
+                    $this->saveValue($sunrise, sin(($sunset-$sunrise) * M_PI / $daylight));
                     $sunrise += $step;
                 } while ($sunrise <= $sunset+1);
             }
@@ -145,4 +142,14 @@ class Daylight extends InternalCalc {
         // Fake period to read pre-calculated data as they are
         $this->period = array(1, self::NO);
     }
+
+    /**
+     *
+     */
+    protected function setMarker( $time, $icon ) {
+        if ($icon) $this->saveValue($time, ($this->times ? date('H:i', $time) : '') . '|' . $icon);
+    }
+
+
+
 }

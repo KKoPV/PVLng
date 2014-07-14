@@ -29,6 +29,9 @@ return array(
     'meter' => array(
         'visible'  => FALSE
     ),
+    'threshold' => array(
+        'visible'  => TRUE
+    ),
     'valid_from' => array(
         'required' => TRUE
     ),

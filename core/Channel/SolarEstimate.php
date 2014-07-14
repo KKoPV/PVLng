@@ -24,6 +24,7 @@ class SolarEstimate extends InternalCalc {
 
         parent::before_read($request);
 
+        // Only for today possible, not backwards
         if ($this->end < strtotime('00:00')) return;
 
         $childs = $this->getChilds();
@@ -31,19 +32,42 @@ class SolarEstimate extends InternalCalc {
 
         if ($childCnt == 0) return;
 
-        $days = $this->config->get('Model.SolarEstimate.Days');
+        $days = $this->extra;
 
         // Get todays production, set field names to 0 and 1 for list(...)
-        $sql = 'SELECT MAX(`data`) - MIN(`data`) AS `0`
-                     , MAX(`timestamp`) AS `1`
+        $sql = 'SELECT MIN(`data`) AS `0`
+                     , MAX(`data`) AS `1`
+                     , MAX(`timestamp`) AS `2`
                   FROM `pvlng_reading_num`
                  WHERE `id` = {1}
                     -- Align to today 00:00
-                   AND `timestamp` >= UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"));
-                ';
-        list($production, $last) = $this->db->queryRowArray($sql, $childs[0]->entity);
+                   AND `timestamp` >= UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))';
 
-        // Start average value
+        list($Production1st,
+             $ProductionLast,
+             $lastTimestampToday) = $this->db->queryRowArray($sql, $childs[0]->entity);
+
+        // Do we have still data today?
+        if (!$lastTimestampToday) return;
+
+        $ProductionToday = $ProductionLast - $Production1st;
+
+        // Base average value
+        $sql = 'SELECT MIN(`data`)
+                  FROM (SELECT ABS(AVG(`data`)) AS `data`
+                          FROM `pvlng_reading_num`
+                         WHERE `id` = {1}
+                            -- Align to ? days back 00:00
+                           AND `timestamp` > UNIX_TIMESTAMP(DATE_FORMAT(NOW() - INTERVAL {2} DAY, "%Y-%m-%d"))
+                            -- Align to today 00:00
+                           AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
+                         GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
+                        HAVING count(*) = {2}
+                        ) t';
+
+        $AverageBase = $this->db->queryOne($sql, $childs[0]->entity, $days);
+
+        // Start average value to align data
         $sql = 'SELECT MIN(`data`)
                   FROM (SELECT ABS(AVG(`data`)) AS `data`
                           FROM `pvlng_reading_num`
@@ -55,47 +79,75 @@ class SolarEstimate extends InternalCalc {
                            AND UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {3}
                          GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
                         HAVING count(*) = {2}
-                        ) t
-                ';
-        $start = $this->db->queryOne($sql, $childs[0]->entity, $days, $last);
+                        ) t';
+
+        $Average1st = $this->db->queryOne($sql, $childs[0]->entity, $days, $lastTimestampToday);
 
         // Estimated production from now
         $sql = 'SELECT UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) AS `timestamp`
-                     , ABS(AVG(`data`)) - {3} + {4} AS `data`
+                     , (ABS(AVG(`data`)) - {3}) * {4} + {5} AS `data`
                   FROM `pvlng_reading_num`
                  WHERE `id` = {1}
                     -- Align to ? days back 00:00
                    AND `timestamp` > UNIX_TIMESTAMP(DATE_FORMAT(NOW() - INTERVAL {2} DAY, "%Y-%m-%d"))
                     -- Align to today 00:00
                    AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
-                   AND UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {5}
+                   AND UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {6}
                  GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
-                HAVING count(*) = {2}
-                ';
-        $res = $this->db->query($sql, $childs[0]->entity, $days, $start, $production, $last);
+                HAVING count(*) = {2}';
 
-        // Aplly child resolution here!
-        $factor = $childs[0]->resolution;
+        $res = $this->db->query($sql, $childs[0]->entity, $days, $Average1st, $ProductionToday/($Average1st-$AverageBase), $ProductionToday, $lastTimestampToday);
 
-        while ($row = $res->fetch_object()) {
-            if ($last) {
-                // Save 1st row to last reading timestamp from child channel
-                $this->saveValue($last, $row->data*$factor);
-                $last = FALSE;
-            } else {
-                $this->saveValue($row->timestamp, $row->data*$factor);
+        // Apply child resolution here
+        $Scale = $childs[0]->resolution;
+
+        if ($res) {
+            while ($row = $res->fetch_object()) {
+                $row->data = round($row->data * $Scale, $this->decimals);
+                if ($lastTimestampToday) {
+                    // Save 1st row to last reading timestamp from child channel
+                    $this->saveValue($lastTimestampToday, $row->data);
+                    // Unset timestamp as marker
+                    $lastTimestampToday = FALSE;
+                } else {
+                    $this->saveValue($row->timestamp, $row->data);
+                }
+                $lastrow = $row;
             }
-            $lastrow = $row;
         }
 
         $sunset = $this->config->getSunset($this->start);
+
         if (isset($lastrow)) {
             // Add a last value at sunset
-            $this->saveValue($sunset, $lastrow->data*$factor);
+            $this->saveValue($sunset, $lastrow->data);
         } elseif (time() < $sunset) {
             // Fill space at end with actual production
-            $this->saveValue($last, $production*$factor);
-            $this->saveValue($sunset, $production*$factor);
+            $value = round($ProductionToday * $Scale, $this->decimals);
+            $this->saveValue($lastTimestampToday, $value);
+            $this->saveValue($sunset, $value);
         }
+    }
+
+    /**
+     *
+     */
+    protected function after_read( \Buffer $buffer ) {
+
+        $datafile = new \Buffer;
+        $last = 0;
+
+        // Fake consumption
+        foreach (parent::after_read($buffer) as $id=>$row) {
+            $row['consumption'] = $row['data'] - $last;
+            $last = $row['data'];
+
+            $datafile->write($row, $id);
+        }
+
+        // Now set to meter
+        $this->meter = TRUE;
+
+        return $datafile;
     }
 }

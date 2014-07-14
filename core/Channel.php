@@ -170,7 +170,7 @@ abstract class Channel {
         // Remember parent node
         $parent = $tree->getParent($this->id);
 
-        $tree->DeleteBranch($this->id);
+        if (!$tree->DeleteBranch($this->id)) return FALSE;
 
         if ($tree->getChildCount($parent['id']) == 0) {
             // Reset parent channel icon

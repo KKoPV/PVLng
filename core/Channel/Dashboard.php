@@ -30,17 +30,24 @@ class Dashboard extends Calculator {
         // Get some properties from child
         $this->meter = $channel->meter;
 
-        // If valid range is smaller than dashbord should display,
-        // extend to at least dashboard range
-        // e.g. Performance ratio for graphs 95 .. 100, but dashboard 50 .. 100
-        if (!is_null($channel->valid_from) AND $channel->valid_from > $this->valid_from) {
-            $channel->valid_from = $this->valid_from;
-        }
-        if (!is_null($channel->valid_to) AND $channel->valid_to < $this->valid_to) {
-            $channel->valid_to = $this->valid_to;
-        }
+        /**
+         * Read all data, regardsless of valid ranges, gauge will handle values outside
+         * valid range via "overshoot" property
+         */
 
-        return $this->after_read($channel->read($request));
+        // Save this valid range
+        $f = $this->valid_from;
+        $t = $this->valid_to;
+
+        $channel->valid_from = $channel->vaild_to = $this->valid_from = $this->valid_to = NULL;
+
+        $result = $this->after_read($channel->read($request));
+
+        // Reset this valid range, required for gauge axis limits
+        $this->valid_from = $f;
+        $this->valid_to = $t;
+
+        return $result;
     }
 
 }
