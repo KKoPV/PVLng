@@ -37,7 +37,7 @@
                 <!-- INCLUDE channel-details.inc.tpl -->
             </td>
             <td class="icons r">
-                <img id="s{ID}" src="/images/spinner.gif" style="display:none" />
+                <img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" alt="o">
                 <span id="cons{ID}" class="consumption"></span>
             </td>
             <td id="u{ID}">{UNIT}</td>

@@ -1,4 +1,4 @@
-<!--
+<script>
 /**
  *
  *
@@ -7,8 +7,6 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
--->
-<script>
 
 /**
  *

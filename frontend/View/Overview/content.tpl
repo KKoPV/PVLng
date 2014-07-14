@@ -69,16 +69,15 @@
             <img src="/images/ico/node_insert_next.png" class="btn" onclick="addChild({ID}); return false" alt="+">
             <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
+            <!-- IF {HASCHILDS} -->
             <form action="/overview/delete" method="post" class="delete-form">
             <input type="hidden" name="id" value="{ID}">
             <input type="image" style="background-color:transparent"
-                <!-- IF !{HASCHILDS} -->
-                   src="/images/ico/node_delete_next.png" alt="--"
-                <!-- ELSE -->
-                   src="/images/ico/node_delete.png" alt="-+"
-                <!-- ENDIF -->
-            >
+                   src="/images/ico/node_delete.png" alt="-+">
             </form>
+            <!-- ELSE -->
+            <img src="/images/ico/node_delete_next.png" class="btn delete-node" alt="--">
+            <!-- ENDIF -->
 
             <!-- IF {LEVEL} > 2 -->
             <form action="/overview/moveup" method="post">

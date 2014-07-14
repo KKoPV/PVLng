@@ -21,8 +21,9 @@ var Period = '{MOBILE_PERIOD}',
         chart: {
             renderTo: 'chart',
             height: ChartHeight,
-            spacingRight: 15,
-            spacingTop: 15,
+            spacingLeft: 5,
+            spacingRight: 5,
+            spacingTop: 5,
             spacingBottom: 5,
             alignTicks: false
         },
@@ -149,7 +150,7 @@ function updateChart() {
         channel, buffer = [],
         channel_clone;
 
-    /* find active channels, map and sort axis */
+    /* Find active channels, map and sort axis */
     $(view).each(function(id, view) {
         /* Ignore private channels */
         if (!view.public) return;
@@ -157,10 +158,15 @@ function updateChart() {
         channel.id = view.id;
         channel.guid = view.guid;
         channel.unit = view.unit;
-        /* remember channel */
+        /* Remember channel */
         buffer.push(channel);
-        /* still mapped? */
+        /* Channel axis still registered? */
         if (yAxisMap.indexOf(channel.axis) == -1) yAxisMap.push(channel.axis);
+    });
+
+    /* Sort channels */
+    buffer.sort(function(a, b) {
+        return (a.position - b.position) /* Causes an array to be sorted numerically and ascending */
     });
 
     /* sort axis to make correct order for Highcharts */
@@ -182,8 +188,8 @@ function updateChart() {
         /* prepare axis */
         if (!yAxis[channel.axis]) {
             yAxis[channel.axis] = {
-                title: false /* { text: channel.unit } */,
-                lineColor:channel.color,
+                title: null, /*{ text: channel.unit },*/
+                lineColor: channel.color,
                 showEmpty: false,
                 minPadding: 0,
                 maxPadding: 0,
@@ -200,7 +206,7 @@ function updateChart() {
         /* Hide axes & labels when more than 1 axis is defined */
         $.each(yAxis, function(i) {
             /* yAxis[i].title = false; */
-            yAxis[i].labels = false;
+            yAxis[i].labels = { enabled: false };
             yAxis[i].lineWidth = 0;
         });
     }
@@ -268,16 +274,19 @@ function updateChart() {
                     tr, td;
 
                 $(data).each(function(id, row) {
-                    var ts = Math.round(row[1] / 60) * 60 * 1000;
+                    var point = { x: Math.round(row[1] / 60) * 60 * 1000 };
                     if ($.isNumeric(row[2])) {
                         if (channel.type == 'areasplinerange') {
-                            serie.data.push([ ts, row[3], row[4] ]);
+                            point.low  = row[3];
+                            point.high = row[4];
                         } else {
-                            serie.data.push([ ts, row[2] ]);
+                            point.y = row[2];
                         }
                     } else {
-                        serie.data.push({ x: ts, y: 0, name: row[2] });
+                        point.y = 0;
+                        point.name = row[2];
                     }
+                    serie.data.push(point);
                 });
 
                 if (attr.consumption) {
@@ -304,7 +313,7 @@ function updateChart() {
                 }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
-                if (attr.unit) serie.tooltip = { valueSuffix: attr.unit };
+                /* if (attr.unit) serie.tooltip = { valueSuffix: attr.unit }; */
 
                 if (channel.type == 'scatter') {
                     serie.dataLabels = {
@@ -317,11 +326,11 @@ function updateChart() {
                         formatter: function() { return this.point.name }
                     };
                 } else if (channel.type != 'bar') {
-                    serie.dashStyle = channel.style;
+                    if (channel.style != 'Solid') serie.dashStyle = channel.style;
                     serie.lineWidth = channel.width;
                 }
 
-                if (channel.type != 'areasplinerange' && (channel.min || channel.max)) {
+                if (channel.type != 'areasplinerange' && (channel.min || channel.max || channel.last)) {
                     serie = setMinMax(serie, channel);
                 }
 

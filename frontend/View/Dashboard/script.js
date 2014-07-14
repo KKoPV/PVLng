@@ -7,70 +7,75 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
-</script>
 
-<!-- load Highcharts scripts direct from highcharts.com -->
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/highcharts-more.js"></script>
+var defaults = {
+        refresh: 30, // seconds
+        color: {
+            belowThreshold: 'red',
+            aboveThreshold: 'green'
+        },
+        overshoot: 10
+    },
 
-<script>
-
-var charts = [],
-    timeout,
     chartOptions = {
-
-    plotOptions: {
-       gauge: {
-            dataLabels: {
-                y: 45,
-                useHTML: true
-            },
-            dial: {
-                backgroundColor: 'gray',
-                rearLength: '25%'
-            },
-            pivot: {
-                radius: 10,
-                borderWidth: 1,
-                borderColor: 'gray',
-                backgroundColor: {
-                    linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
-                    stops: [ [0, 'white'], [1, 'gray'] ]
+        exporting: false,
+        plotOptions: {
+           gauge: {
+                dataLabels: {
+                    borderWidth: 0,
+                    y: 45,
+                    useHTML: true
+                },
+                dial: {
+                    backgroundColor: 'gray',
+                    rearLength: '25%'
+                },
+                overshoot: defaults.overshoot,
+                pivot: {
+                    radius: 10,
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    backgroundColor: {
+                        linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+                        stops: [ [0, 'white'], [1, 'gray'] ]
+                    }
                 }
             }
-        }
+        },
+
+        pane: {
+            startAngle: -135,
+            endAngle: 135,
+            background: [{
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [ [0, '#FFF'], [1, '#333'] ]
+                },
+                borderWidth: 0,
+                outerRadius: '109%'
+            }, {
+                backgroundColor: {
+                    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                    stops: [ [0, '#333'], [1, '#FFF'] ]
+                },
+                borderWidth: 1,
+                outerRadius: '107%'
+            }, {
+                /* default background */
+            }, {
+                backgroundColor: '#DDD',
+                borderWidth: 0,
+                outerRadius: '105%',
+                innerRadius: '103%'
+            }]
+        },
+
+        tooltip: { enabled: false },
+        credits: { enabled: false }
     },
 
-    pane: {
-        startAngle: -135,
-        endAngle: 135,
-        background: [{
-            backgroundColor: {
-                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-                stops: [ [0, '#FFF'], [1, '#333'] ]
-            },
-            borderWidth: 0,
-            outerRadius: '109%'
-        }, {
-            backgroundColor: {
-                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-                stops: [ [0, '#333'], [1, '#FFF'] ]
-            },
-            borderWidth: 1,
-            outerRadius: '107%'
-        }, {
-            /* default background */
-        }, {
-            backgroundColor: '#DDD',
-            borderWidth: 0,
-            outerRadius: '105%',
-            innerRadius: '103%'
-        }]
-    },
-
-    tooltip: { enabled: false },
-    credits: { enabled: false }
-};
+    charts = [],
+    timeout;
 
 /**
  *
@@ -125,14 +130,18 @@ function updateCharts() {
                             data: [null],
                             dataLabels: {
                                 formatter: function() {
+                                    var color = this.series.options.threshold !== ''
+                                        ? 'color:' + (this.y < this.series.options.threshold ? defaults.color.belowThreshold : defaults.color.aboveThreshold)
+                                        : '';
                                     return '<div style="text-align:center">' +
-                                           '<span style="font-size:125%">' +
+                                           '<span style="font-size:125%;'+color+'">' +
                                            Highcharts.numberFormat(this.y, attr.decimals, '{DSEP}', '{TSEP}') +
                                            '</span><br/>' +
                                            '<span style="font-size:110%;color:#A0A0A0">'+attr.unit+'</span>' +
                                            '</div>';
                                 }
-                            }
+                            },
+                            threshold: attr.threshold /* Store threshold into options for formatter */
                         }]
                     });
 
@@ -188,7 +197,7 @@ function updateCharts() {
         );
     });
 
-    timeout = setTimeout(updateCharts, 60 * 1000);
+    timeout = setTimeout(updateCharts, defaults.refresh * 1000);
 }
 
 var clock;

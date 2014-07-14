@@ -1,4 +1,4 @@
-<script>
+<!--
 /**
  *
  *
@@ -7,18 +7,13 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
+-->
+<script>
 
 /**
  *
  */
 $(function() {
-
-    $("#radios").buttonset();
-
-    $("#radios input").change(function() {
-        $('#template').toggle();
-        $('#type').toggle();
-    });
 
     $('#typeTable').DataTable({
         bLengthChange: true,

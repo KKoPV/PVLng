@@ -25,7 +25,7 @@
     <table id="d-table">
         <tbody>
         <tr class="odd">
-            <td style="width:40%">{{Axis}}</td>
+            <td style="max-width:35%">{{Axis}}</td>
             <td id="td-axis">
                 <input class="iCheck" type="radio" name="d-axis" value="9" />
                 <input class="iCheck" type="radio" name="d-axis" value="7" />
@@ -44,9 +44,8 @@
         <tr class="even">
             <td>
                 <label for="d-type">{{SeriesType}}</label>
-                <img style="margin-left:.5em;width:16px;height:16px" class="tip"
-                     src="/images/ico/information_frame.png" width="16" height="16"
-                     title="{{ChartTypeHint}}" />
+                <img src="/images/ico/information_frame.png" class="ico tip"
+                     style="margin-left:.5em" title="{{ChartTypeHint}}" />
                 <br />
                 <span id="scatter-candidate" class="s i">({{ScatterCandidate}})</span>
             </td>
@@ -128,9 +127,8 @@
         <tr class="even">
             <td>
                 <label for="d-cons">{{Presentation}}</label>
-                <img style="margin-left:.5em;width:16px;height:16px" class="tip"
-                     src="/images/ico/information_frame.png" width="16" height="16"
-                     title="{{ShowConsumptionHint}}" />
+                <img src="/images/ico/information_frame.png" class="ico tip"
+                     style="margin-left:.5em" title="{{ShowConsumptionHint}}" />
             </td>
             <td>
                 <div class="fl not-scatter">
@@ -144,18 +142,26 @@
             <td><input id="d-color" type="color" class="spectrum" /></td>
         </tr>
         <tr class="even">
-            <td><label for="d-color-use-neg">{{UseNegativeColor}}</label></td>
+            <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
             <td>
                 <!-- Align controls correct using a table ... -->
                 <table><tr>
                 <td style="padding-left:0">
-                    <input id="d-color-use-neg" type="checkbox" class="not-scatter iCheck" />
-                    {{below}}
+                    <input id="d-color-use-diff" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="0" checked="checked">
+                    <label for="d-color-use-diff">{{no}}</label>
                 </td>
                 <td>
-                    <input id="d-threshold" type="number" style="width:6em" class="tip" title="{{Threshold}}" />
+                    <input id="d-color-pos" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="1">
+                    <label for="d-color-pos">{{above}}</label>
+                </td>
+                <td>
+                    <input id="d-color-neg" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="-1">
+                    <label for="d-color-neg">{{below}}</label>
+                </td>
+                <td>
+                    <input id="d-color-threshold" type="number" style="width:4em" class="not-scatter tip" title="{{Threshold}}">
                     &nbsp;
-                    <input id="d-color-neg" type="color" class="spectrum" />
+                    <input id="d-color-diff" type="color" class="not-scatter spectrum" />
                 </td>
                 </tr></table>
             </td>
@@ -163,9 +169,8 @@
         <tr class="odd">
             <td>
                 <label for="d-time1">{{TimeRange}}</label>
-                <img style="margin-left:.5em;width:16px;height:16px" class="tip"
-                     src="/images/ico/information_frame.png" width="16" height="16"
-                     title="{{TimeRangeHint}}" />
+                <img src="/images/ico/information_frame.png" class="ico tip"
+                     style="margin-left:.5em" title="{{TimeRangeHint}}" />
             </td>
             <td>
                 <div class="fl">
@@ -179,6 +184,28 @@
         <tr class="even">
             <td><label for="d-legend">{{Legend}}</label></td>
             <td><input id="d-legend" type="checkbox" class="iCheck" /></td>
+        </tr>
+        <tr class="odd">
+            <td>
+                <label for="d-position">{{ChartPosition}}</label>
+                <img src="/images/ico/information_frame.png" class="ico tip"
+                     style="margin-left:.5em" title="{{ChartPositionHint}}" />
+            </td>
+            <td>
+                <table id="table-pos">
+                <tr>
+                    <td class="xs" style="width:16px">
+                        <img src="/images/layers-stack-arrange-back.png" class="tip" title="{{MoreIntoBackground}}" alt="<<">
+                    </td>
+                    <td style="padding-left:1.4em;padding-right:1.4em">
+                        <div id="d-position-slider" style="margin-top:5px"></div>
+                    </td>
+                    <td class="xs r" style="width:16px">
+                        <img src="/images/layers-stack-arrange.png" class="tip" title="{{MoreIntoForeground}}" alt=">>">
+                    </td>
+                </tr>
+                </table>
+            </td>
         </tr>
         </tbody>
     </table>

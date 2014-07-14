@@ -12,7 +12,7 @@
 <div id="header">
     <div class="grid_2 s">
         <a class="fl" href="/">
-            <img style="width:100px;height:60px" src="/images/logo.png" width="100" height="60" />
+            <img style="width:100px;height:60px" src="/images/logo.png">
         </a>
         <div class="b" style="margin-left:120px">
             <!-- IF {USER} AND {DEVELOPMENT} -->

@@ -9,14 +9,14 @@
  */
 -->
 
-<small><img src="{ICON}" class="channel-icon tip" title="{TYPE}" alt="({TYPE})" /></small>
+<small><img src="{ICON}" class="channel-icon tip" title="{TYPE}" alt="({TYPE})"></small>
 
 <strong class="tip" title="{GUID}">{NAME}</strong>
 
 <!-- IF {DESCRIPTION} -->
-    <small style="margin-left:1em">({DESCRIPTION})</small>
+    <small style="margin-left:.3em"> ({DESCRIPTION})</small>
 <!-- ENDIF -->
 
 <!-- IF !{PUBLIC} -->
-    <img src="/images/ico/lock.png" alt="[private]" style="margin-left:1em" />
+    <small style="margin-left:1em"><img src="/images/ico/lock.png" class="ico" alt="[private]"></small>
 <!-- ENDIF -->

@@ -32,13 +32,14 @@
 <div class="clear"></div>
 
 <div id="chart">
-    <div id="top-select" class="push_2 grid_6" style="position:relative;display:none">
-        <p class="b"><label for="top-load-view">{{NoChannelsSelectedYet}}</label></p>
-        <!-- <select id="top-load-view" data-placeholder="--- {{SelectChart}} ---"></select> -->
-    </div>
+    <div id="top-select">{{NoChannelsSelectedYet}}</div>
 </div>
 
 <div class="clear"></div>
+
+<!-- IF !{EMBEDDED} -->
+<div id="zoom-hint">{{ClickDragShiftPan}}</div>
+<!-- ENDIF -->
 
 <div <!-- IF {EMBEDDED} == "2" -->style="display:none<!-- ENDIF -->">
 

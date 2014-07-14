@@ -14,136 +14,121 @@
 <img src="/images/pix.gif" class="imgbar wide" style="width:16px;height:16px" width="16" height="16" alt="" />
 <!-- END DEFINE -->
 
-<p id="radios">
-    <input id="rbtype" type="radio" name="radio" checked="checked" />
-    <label for="rbtype">{{SelectEntityType}}</label>
-    <input id="rbtemplate" type="radio" name="radio" />
-    <label for="rbtemplate">{{SelectEntityTemplate}}</label>
-</p>
+<div class="ui-tabs">
 
-<div id="type">
+    <ul>
+        <li><a href="#type">{{SelectEntityType}}</a></li>
+        <li><a href="#template">{{SelectEntityTemplate}}</a></li>
+    </ul>
 
-    <h3>{{SelectEntityType}}</h3>
+    <div id="type">
 
-    <form action="/channel/add" method="post">
+        <form action="/channel/add" method="post">
 
-    <table id="typeTable" class="dataTable">
-        <thead>
-        <tr>
-            <th style="width:1%"></th>
-            <th>{{EntityType}}</th>
-            <th style="white-space:nowrap">{{ExampleUnit}}</th>
-            <th style="white-space:nowrap">{{Childs}}</th>
-            <th style="width:1%"></th>
-            <th>{{Description}}</th>
-        </tr>
-        </thead>
-        <tbody>
+        <table id="typeTable" class="dataTable">
+            <thead>
+            <tr>
+                <th style="width:1%"></th>
+                <th>{{EntityType}}</th>
+                <th style="white-space:nowrap">{{ExampleUnit}}</th>
+                <th style="white-space:nowrap">{{Childs}}</th>
+                <th style="width:1%"></th>
+                <th>{{Description}}</th>
+            </tr>
+            </thead>
+            <tbody>
 
-        <!-- BEGIN ENTITYTYPES -->
-        <tr>
-            <td>
-                <input type="radio" id="type-{ID}" name="type" value="{ID}" class="iCheck" />
-            </td>
-            <td style="white-space:nowrap;font-weight:bold">
-                <label for="type-{ID}">
-                    <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                         src="{ICON}" width="16" height="16" alt="" />
-                    {NAME}
-                </label>
-            </td>
-            <td>{UNIT}</td>
-            <td class="c">
-                <!-- IF {CHILDS} == 0 -->
-                    {{no}}
-                <!-- ELSEIF {CHILDS} == -1 -->
-                    {{unlimited}}
-                <!-- ELSE -->
-                    {CHILDS}
-                <!-- ENDIF -->
-            </td>
-            <td class="icons">
-                <!-- INCLUDE channeltype.inc.tpl -->
-            </td>
-            <td style="font-size:smaller">{DESCRIPTION}</td>
-        </tr>
-        <!-- END -->
+            <!-- BEGIN ENTITYTYPES -->
+            <tr>
+                <td>
+                    <input type="radio" id="type-{ID}" name="type" value="{ID}" class="iCheck" />
+                </td>
+                <td style="white-space:nowrap;font-weight:bold">
+                    <label for="type-{ID}">
+                        <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
+                             src="{ICON}" width="16" height="16" alt="" />
+                        {NAME}
+                    </label>
+                </td>
+                <td>{UNIT}</td>
+                <td class="c">
+                    <!-- IF {CHILDS} == 0 -->
+                        {{no}}
+                    <!-- ELSEIF {CHILDS} == -1 -->
+                        {{unlimited}}
+                    <!-- ELSE -->
+                        {CHILDS}
+                    <!-- ENDIF -->
+                </td>
+                <td class="icons">
+                    <!-- INCLUDE channeltype.inc.tpl -->
+                </td>
+                <td style="font-size:smaller">{DESCRIPTION}</td>
+            </tr>
+            <!-- END -->
 
-        </tbody>
+            </tbody>
 
-    </table>
+        </table>
 
-    <div id="legend" class="icons">
-        <strong>{{Legend}}</strong>:
-        <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
-        <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
-        <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>
+        <div id="legend" class="icons">
+            <strong>{{Legend}}</strong>:
+            <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
+            <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
+            <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>
+        </div>
+
+        <br />
+        <input type="submit" value="{{proceed}} &raquo;" />
+
+        </form>
+
     </div>
 
-    <p>
+    <div id="template">
+
+        <form action="/channel/template" method="post">
+
+        <table id="tplTable" class="dataTable">
+            <thead>
+            <tr>
+                <th style="width:1%"></th>
+                <th>{{Name}}</th>
+                <th>{{Description}}</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <!-- BEGIN TEMPLATES -->
+            <tr>
+                <td><input type="radio" id="{FILE}" name="template" value="{FILE}" class="iCheck" /></td>
+                <td style="white-space:nowrap;font-weight:bold">
+                    <label for="{FILE}">
+                        <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
+                             src="{ICON}" width="16" height="16" alt="" />
+                        {NAME}
+                    </label>
+                </td>
+                <td style="font-size:smaller">{DESCRIPTION}</td>
+            </tr>
+            <!-- END -->
+
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <th></th>
+                <th class="l i" colspan="2">{{AdjustTemplateAfterwards}}</th>
+            </tr>
+            </tfoot>
+
+        </table>
+
+        <br />
         <input type="submit" value="{{proceed}} &raquo;" />
-    </p>
 
-    </form>
+        </form>
 
-</div>
-
-<div id="template" style="display:none">
-
-    <h3>{{SelectEntityTemplate}}</h3>
-
-    <p>{{CreateTreeWithoutReqest}}</p>
-
-    <form action="/channel/template" method="post">
-
-    <table id="tplTable" class="dataTable">
-        <thead>
-        <tr>
-            <th style="width:1%"></th>
-            <th>{{Name}}</th>
-            <th>{{Description}}</th>
-        </tr>
-        </thead>
-        <tbody>
-
-        <!-- BEGIN TEMPLATES -->
-        <tr>
-            <td><input type="radio" id="{FILE}" name="template" value="{FILE}" class="iCheck" /></td>
-            <td style="white-space:nowrap;font-weight:bold">
-                <label for="{FILE}">
-                    <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                         src="{ICON}" width="16" height="16" alt="" />
-                    {NAME}
-                </label>
-            </td>
-            <td style="font-size:smaller">{DESCRIPTION}</td>
-        </tr>
-        <!-- END -->
-
-        </tbody>
-
-        <tfoot>
-        <tr>
-            <th></th>
-            <th class="l i" colspan="2">{{AdjustTemplateAfterwards}}</th>
-        </tr>
-        </tfoot>
-
-    </table>
-
-    <p>
-        <select id="tree" name="tree">
-            <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
-            <option value="0" disabled="disabled">{{AsChild}}</option>
-                <!-- BEGIN ADDTREE -->
-                <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
-                <!-- END -->
-            </optgroup>
-        </select>
-        &nbsp;
-        <input type="submit" value="{{Create}}" />
-    </p>
-
-    </form>
+    </div>
 
 </div>

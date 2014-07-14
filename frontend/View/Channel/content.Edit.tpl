@@ -49,12 +49,9 @@
     <tr <!-- IF {ERROR} -->style="background-color:#FFE0E0;border-top:solid 1px white;border-bottom:solid 1px white"<!-- ENDIF -->>
         <td style="vertical-align:top;padding-top:.75em">
             <label for="{FIELD}">{NAME}</label>
-            <!-- IF {REQUIRED} -->
-                <img style="width:16px;height:16px" width="16" height="16"
-                    src="/images/required.gif" alt="*" />
-            <!-- ENDIF -->
         </td>
         <td style="vertical-align:top;padding-top:.5em;padding-bottom:.5em">
+            <div style="white-space:nowrap">
             <!-- IF {TYPE} == "numeric" -->
                 <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="10"
                        placeholder="{PLACEHOLDER}"
@@ -110,6 +107,10 @@
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
             <!-- ENDIF -->
+            <!-- IF {REQUIRED} -->
+                <img class="ico" src="/images/required.gif" alt="*">
+            <!-- ENDIF -->
+            </div>
             <span style="color:red" class="xs">
                 <!-- BEGIN ERROR --><br class="clear" />{ERROR}<!-- END -->
             </span>
@@ -172,11 +173,12 @@
 
     <tfoot>
     <tr>
-        <th class="l" colspan="3">
-            <img style="width:16px;height:16px" width="16" height="16"
-                 src="/images/required.gif" alt="*" />
+        <th></th>
+        <th class="l">
+            <img class="ico" src="/images/required.gif" alt="*" />
             <small>{{required}}</small>
         </th>
+        <th></th>
     </tr>
     </tfoot>
 

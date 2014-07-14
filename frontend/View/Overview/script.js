@@ -37,6 +37,12 @@ var oTable, cancelDragging;
  */
 $(function() {
 
+    $.ajaxSetup({
+        beforeSend: function setHeader(XHR) {
+            XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
+        }
+    });
+
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
             return !$(oTable.fnGetNodes()[iDataIndex]).hasClass('hidden');
@@ -242,6 +248,34 @@ $(function() {
     $('.delete-form').submit(function(){
         $('#dialog-confirm').data('form', this).dialog('open');
         return false;
+    });
+
+    /* Bind click listener to all delete node images */
+    $('#tree tbody').on('click', '.delete-node', function() {
+
+        var node = $(this.parentNode.parentNode).data('tt-id'),
+            pos = oTable.fnGetPosition(this.parentNode.parentNode),
+            url = PVLngAPI + 'tree/' + node + '.json';
+
+        if (confirm('{{ConfirmDeleteTreeNode}}')) {
+            $(document.body).addClass('wait');
+
+            $.ajax({
+                type: 'DELETE',
+                url: url,
+                dataType: 'json',
+            }).done(function(data, textStatus, jqXHR) {
+                oTable.fnDeleteRow(pos);
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $.pnotify({
+                    type: textStatus, hide: false, sticker: false,
+                    text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+                });
+            }).always(function() {
+                $(document.body).removeClass('wait');
+            });
+        }
+
     });
 
     $('#dialog-move').dialog({

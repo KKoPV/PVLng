@@ -50,9 +50,14 @@ $(function() {
         resizable: false,
         width: '25em',
         modal: true,
+        open: function( event, ui ) {
+            $('#user').val(pvlng.cookie.get('PVLng.User'));
+        },
         buttons: {
-            '{{Login}}':  function() { $(this).find('form').submit(); },
-            '{{Cancel}}': function() { $(this).dialog('close'); }
+            '{{Login}}':  function() {
+                pvlng.cookie.set('PVLng.User', $('#user').val(), 365);
+                $(this).find('form').submit();
+            }
         }
     });
 });

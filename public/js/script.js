@@ -50,22 +50,6 @@ var lastModule, hideMenuTimer;
 
 /**
  *
- * /
-function setMenuHideTimer() {
-    if (!hideMenuTimer) {
-        /* console.log('Set MenuTimer'); * /
-        hideMenuTimer = setTimeout(function() { $('#submenu').parent().hide() }, 3000 );
-    }
-}
-
-function unsetMenuHideTimer() {
-    /* console.log('Unset MenuTimer'); */
-    /* Unset also hideMenuTimer variable ... * /
-    hideMenuTimer = clearTimeout(hideMenuTimer);
-}
-
-/**
- *
  */
 $(function() {
 

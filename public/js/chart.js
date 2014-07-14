@@ -19,15 +19,22 @@ var defaults = {
  *
  */
 function presentation( data ) {
-    /* set defaults */
+    /* Set defaults */
+    this.v = 2;
     this.axis = 1;
     this.type = defaults.line.type;
     this.consumption = false;
     this.style = 'Solid';
     this.width = defaults.line.width;
     this.color = defaults.line.color;
+    /* Removed in v2
     this.coloruseneg = false;
     this.colorneg = defaults.line.color;
+    */
+    /* Added in v2 */
+    this.colorusediff = 0;
+    this.colordiff = defaults.line.color;
+    /* --- */
     this.threshold = 0;
     this.min = false;
     this.max = false;
@@ -36,8 +43,23 @@ function presentation( data ) {
     this.time1 = '00:00';
     this.time2 = '24:00';
     this.legend = true;
+    this.position = 0;
 
-    try { $.extend(this, JSON.parse(data)); } catch(e) {}
+    try {
+        data = JSON.parse(data);
+        if (typeof data.v == 'undefined') {
+            /* prior v3.0.0 */
+            if (data.coloruseneg === '1') {
+                data.colorusediff = -1;
+            } else if (data.coloruseneg === '0') {
+                data.colorusediff = 0;
+            }
+            data.colordiff = data.colorneg;
+        }
+        delete data.coloruseneg;
+        delete data.colorneg;
+        $.extend(this, data);
+    } catch(e) {}
 
     this.toString = function() { return JSON.stringify(this) }
 }
@@ -117,7 +139,9 @@ function setMinMax( serie, channel ) {
     var
         ts  = { min: Number.MAX_VALUE, max: -Number.MAX_VALUE },
         min = { id: null, x: null, y:  Number.MAX_VALUE },
-        max = { id: null, x: null, y: -Number.MAX_VALUE };
+        max = { id: null, x: null, y: -Number.MAX_VALUE },
+        /* Use negativeColor as "original" color if serie shows data above threshold different */
+        color = (serie.colorDiff == 1) ? serie.negativeColor : serie.color;
 
     /* search min. and max. values */
     $.each(serie.data, function(i, point) {
@@ -132,14 +156,14 @@ function setMinMax( serie, channel ) {
         serie.data[min.id].marker = {
             enabled: true,
             symbol: 'triangle-down',
-            fillColor: serie.color
+            fillColor: color
         };
         serie.data[min.id].dataLabels = {
             enabled: true,
             formatter: function() {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
-            color: serie.color,
+            color: color,
             style: { fontWeight: 'bold' },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
@@ -157,14 +181,14 @@ function setMinMax( serie, channel ) {
         serie.data[max.id].marker = {
             enabled: true,
             symbol: 'triangle',
-            fillColor: serie.color
+            fillColor: color
         };
         serie.data[max.id].dataLabels = {
             enabled: true,
             formatter: function() {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
-            color: serie.color,
+            color: color,
             style: { fontWeight: 'bold' },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
@@ -185,20 +209,22 @@ function setMinMax( serie, channel ) {
         serie.data[last].marker = {
             enabled: true,
             symbol: 'circle',
-            fillColor: serie.color
+            fillColor: color
         };
         serie.data[last].dataLabels = {
             enabled: true,
             formatter: function() {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
-            color: serie.color,
+            color: color,
             style: { fontWeight: 'bold' },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,
             borderColor: '#AAA',
-            align: 'right',
+            align: 'left',
+            overflow: true,
+            crop: false,
             y: -7
         };
     }

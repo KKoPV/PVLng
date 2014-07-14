@@ -9,11 +9,6 @@
  */
 </script>
 
-<!-- load Highcharts scripts direct from highcharts.com -->
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/highcharts-more.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
-
 <!--
 <script src="/js/palettes.js"></script>
 -->
@@ -22,11 +17,12 @@
 
 var ChartHeight = {INDEX_CHARTHEIGHT},
     RefreshTimeout = {INDEX_REFRESH},
+    chartLabelsCSS = { color: 'gray', fontSize: '9px' },
     qs = {},
-    views = {},
     chart = false,
     channels_chart = [],
     updateTimeout,
+    updateActive = false,
     windowVisible = true,
     browserPrefix = null,
     lastChanged = (new Date).getTime() / 1000 / 60,
@@ -49,37 +45,67 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
         q: 60 * 60 * 24 * 90,
         y: 60 * 60 * 24 * 360
     },
+
     chartOptions = {
         chart: {
             renderTo: 'chart',
             paddingRight: 15,
             alignTicks: false,
             zoomType: 'x',
-            resetZoomButton: { position: { x: 0, y: -50 } },
+            resetZoomButton: {
+                relativeTo: 'chart',
+                position: { x: -40 }
+            },
+            panning: true,
+            panKey: 'shift',
             events: {
+                load: function () {
+                    /* Show generator once on load */
+                    this.renderer
+                        .label(
+                            'PVLng v'+PVLngVersion,
+                            this.spacingBox.x+this.spacingBox.width-10, /* right*/
+                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
+                         )
+                        .attr({ rotation: -90 })
+                        .css(chartLabelsCSS)
+                        .add();
+                },
+                redraw: function () {
+                    /* Show time on each redraw, fill solid white for correct overwrite */
+                    this.renderer
+                        .label(
+                            (new Date()).toLocaleTimeString(),
+                            0, /* left*/
+                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
+                         )
+                        .attr({ fill: 'white', rotation: -90 })
+                        .css(chartLabelsCSS)
+                        .add();
+                },
                 selection: function(event) { setTimeout(setExtremes, 100); }
             }
         },
         title: { text: '' },
         legend: { borderRadius: 5, borderWidth: 1 },
-        credits: { enabled: false },
+        credits: false,
         plotOptions: {
             series: {
                 point: {
                     events: {
                         click: function() {
                             if (!PVLngAPIkey) return;
-                            if (!this.series.userOptions.raw) {
+                            if (!this.series.options.raw) {
                                 alert('Can\'t delete from consolidated data.');
                                 return;
                             }
 
                             $('#reading-serie').html(this.series.name);
                             $('#reading-timestamp').html((new Date(this.x)).toLocaleString());
-                            $('#reading-value').html(this.y + ' ' + this.series.userOptions.unit);
+                            $('#reading-value').html(this.y + ' ' + this.series.options.unit);
 
                             $('#dialog-reading')
-                                .data('guid', this.series.userOptions.guid)
+                                .data('guid', this.series.options.guid)
                                 .data('timestamp', (this.x/1000).toFixed(0))
                                 .data('point', this)
                                 .dialog('open');
@@ -153,7 +179,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
 /**
  *
  */
-function Views() {
+var views = new function Views() {
     this.views = {};
     this.actual = { slug: '', name: '', public: 0 };
 
@@ -164,10 +190,11 @@ function Views() {
             PVLngAPI + '/views.json',
             { sort_by_visibilty: true },
             function(data) {
-                var i = 0, l = data.length;
-                for (; i<l; i++) {
+                var l = data.length;
+                for (var i = 0; i<l; i++) {
                     that.views[data[i].slug] = data[i];
                 }
+                if (l) $('.ui-tabs').tabs('option', 'active', 1) /* Tabs are zero based */
             }
         ).always(function() {
             if (typeof callback != 'undefined') callback(that);
@@ -230,7 +257,7 @@ function Views() {
         if (collapse || !expanded) tree.toggle(false);
 
         /* Scroll to navigation as top most visible element */
-        $('html, body').animate({ scrollTop: $("#nav").offset().top-3 }, 2000);
+        pvlng.scroll('#nav');
 
         $('#preset').val(preset).trigger('change'); /* Realods chart */
 
@@ -243,14 +270,14 @@ function Views() {
 
         $('#chart').removeClass('wait');
     };
-}
+};
 
 /**
  *
  */
-function Tree( expanded ) {
+var tree = new function Tree() {
 
-    this.expanded = expanded;
+    this.expanded = true;
 
     this.toggle = function( force ) {
         this.expanded = (typeof force != 'undefined') ? force : !this.expanded;
@@ -267,9 +294,9 @@ function Tree( expanded ) {
             $('#tiptoggle').html('{{ExpandAll}} (F4)');
         }
     }
-}
+};
 
-tree = new Tree(!!user);
+tree.expanded = !!user;
 
 /**
  *
@@ -318,16 +345,18 @@ function ChartDialog( id ) {
     $('#d-all').prop('checked', p.all);
     $('#d-style').val(p.style);
     $('#d-color').val(p.color).spectrum('set', p.color);
-    $('#d-color-use-neg').prop('checked', p.coloruseneg);
-    $('#d-color-neg').val(p.colorneg).spectrum('set', p.colorneg);
-    $('#d-color-neg').spectrum($('#d-color-use-neg').is(':checked') ? 'enable' : 'disable');
-    $('#d-threshold').val(p.threshold)
-                     .prop('disabled', !$('#d-color-use-neg').is(':checked'))
-                     .spinner('option', 'disabled', !$('#d-color-use-neg').is(':checked'));
+    /* Different colors above/below threshold */
+    $('input:radio[name="color-pos-neg"][value="'+p.colorusediff+'"]').prop('checked', true);
+    $('#d-color-diff').val(p.colordiff).spectrum('set', p.colordiff);
+    $('#d-color-threshold').val(p.threshold);
+    $('#d-color-use-diff').trigger('ifToggled');
+    /* Display times in chart */
     $('#d-time1').val(p.time1);
     $('#d-time2').val(p.time2);
     $('#d-time-slider').slider('values', [ TimeStrToSec(p.time1), TimeStrToSec(p.time2) ]);
     $('#d-legend').prop('checked', p.legend);
+    $('#d-position').text(p.position);
+    $('#d-position-slider').slider('value', p.position);
 
     /* Update only in context of dialog chart */
     $('input', '#dialog-chart').iCheck('update');
@@ -345,7 +374,9 @@ function updateChart( forceUpdate ) {
     clearTimeout(updateTimeout);
     updateTimeout = null;
 
-    if (!windowVisible) return;
+    if (updateActive || !windowVisible) return;
+
+    updateActive = true;
 
     var fromDate = $('#fromdate').val(), toDate = $('#todate').val();
 
@@ -400,16 +431,21 @@ function updateChart( forceUpdate ) {
         channel.unit = ch.unit;
         channel.time1 = TimeStrToSec(channel.time1,  0);
         channel.time2 = TimeStrToSec(channel.time2, 24);
-        /* remember channel */
+        /* Remember channel in correct order */
         buffer.push(channel);
-        /* still mapped? */
+        /* Channel axis still registered? */
         if (yAxisMap.indexOf(channel.axis) == -1) yAxisMap.push(channel.axis);
     });
 
-    /* sort axis to make correct order for Highcharts */
+    /* Sort channels */
+    buffer.sort(function(a, b) {
+        return (a.position - b.position) /* Causes an array to be sorted numerically and ascending */
+    });
+
+    /* Sort axis to make correct order for Highcharts */
     yAxisMap.sort();
 
-    /* build channels */
+    /* Build channels */
     $(buffer).each(function(id, channel) {
         /* axis on right side */
         var is_right = !(channel.axis % 2);
@@ -436,21 +472,24 @@ function updateChart( forceUpdate ) {
             channels_new.push(channel);
         }
 
-        /* prepare axis */
+        /* Prepare axis */
         if (!yAxis[channel.axis]) {
             yAxis[channel.axis] = {
-                /* unit as axis title */
-                title: { text: channel.unit },
                 lineColor: channel.color,
                 showEmpty: false,
                 minPadding: 0,
                 maxPadding: 0,
                 opposite: is_right
             };
-            /* only 1st left axis shows grid lines */
+            /* Only 1st left axis shows grid lines */
             if (channel.axis != 0) {
                 yAxis[channel.axis].gridLineWidth = 0;
             }
+        }
+
+        /* Use 1st non-empty channel unit as axis title */
+        if (!yAxis[channel.axis].title && channel.unit) {
+            yAxis[channel.axis].title = { text: channel.unit };
         }
     });
 
@@ -498,6 +537,8 @@ function updateChart( forceUpdate ) {
         chart = new Highcharts.Chart(chartOptions);
         /* Help chart with fluid layout to find its correct size... */
         chart.reflow();
+        /* Show zoom and pan help */
+        $('#zoom-hint').show();
     }
 
     var f = $('#from').val(), t = $('#to').val();
@@ -553,25 +594,38 @@ function updateChart( forceUpdate ) {
                     $('#costs'+channel.id).html(Highcharts.numberFormat(attr.costs, {CURRENCYDECIMALS}));
                 }
 
-                t = (attr.description) ? ' (' + attr.description + ')' : '';
+                /* Add channel description if chart name NOT still contains it */
+                t = (String(views.actual.name).toLowerCase().indexOf(String(attr.description).toLowerCase()) == -1)
+                  ? ' (' + attr.description + ')'
+                  : '';
 
                 var serie = { /* HTML decode channel name */
+                    data: [],
+                    color: channel.color,
+                    id: channel.id,
                     name: $('<div/>').html(attr.name + t).text(),
                     showInLegend: channel.legend,
-                    guid: channel.guid,
-                    id: channel.id,
-                    decimals: attr.decimals,
-                    unit: attr.unit,
-                    color: channel.color,
                     type: channel.type,
                     yAxis: channel.axis,
-                    raw: (period == ''),
-                    data: []
+                    /* Own properties */
+                    colorDiff: channel.colorusediff,
+                    decimals: attr.decimals,
+                    guid: channel.guid,
+                    legendColor: channel.color, /* Force legend color */
+                    unit: attr.unit,
+                    raw: (period == '')
                 };
 
-                if (channel.coloruseneg) {
+                if (channel.colorusediff !== 0) {
+                    if (channel.colorusediff === 1) {
+                        /* Other color for values above threshold > switch colors! */
+                        serie.color         = channel.colordiff;
+                        serie.negativeColor = channel.color;
+                    } else {
+                        /* Other color for values below threshold */
+                        serie.negativeColor = channel.colordiff;
+                    }
                     serie.threshold = channel.threshold;
-                    serie.negativeColor = channel.colorneg;
                 }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
@@ -597,10 +651,9 @@ function updateChart( forceUpdate ) {
                         serie.dataLabels.y = -8;
                     }
                 } else if (channel.type != 'bar') {
-                    serie.dashStyle = channel.style;
+                    if (channel.style != 'Solid') serie.dashStyle = channel.style;
                     serie.lineWidth = channel.width;
                 }
-
 
                 $(data).each(function(id, row) {
                     var time;
@@ -709,14 +762,12 @@ function updateChart( forceUpdate ) {
                 });
             } else {
                 /* replace series data */
-                var sid = 0;
                 $.each(series, function(i, serie) {
                     if (serie.id) {
                         /* Valid channel with id */
-                        chart.series[sid].setData(serie.data, false);
+                        chart.get(serie.id).setData(serie.data, false);
                         /* Do we have raw data? Only then deletion of reading value is possible */
-                        chart.series[sid].userOptions.raw = serie.raw;
-                        sid++;
+                        chart.get(serie.id).options.raw = serie.raw;
                     }
                 });
             }
@@ -732,6 +783,7 @@ function updateChart( forceUpdate ) {
                 updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
             }
 
+            updateActive = false;
         });
     });
 }
@@ -770,6 +822,8 @@ $.ajaxQ = (function() {
  *
  */
 function updateOutput() {
+    aborted = true;
+    updateActive = false;
     updateChart();
 }
 
@@ -777,6 +831,30 @@ function updateOutput() {
  *
  */
 $(function() {
+
+    pvlng.onFinished.add( function() {
+        $('#tabs').on('tabsactivate', function(e, ui) {
+            /* Scroll to tabs as top most visible element */
+            if (ui.newPanel.length && ui.newPanel.prop('id') == 'tabs-1') pvlng.scroll('#tabs');
+        });
+    });
+
+    /**
+     * Modify legend color for pos./neg. splitted seires
+     * Idea from
+     * http://highcharts.uservoice.com/forums/55896-general/suggestions/4575779-make-the-legend-icon-colors-modifiable
+     * http://jsfiddle.net/stephanevanraes/CZSzT/
+     */
+    Highcharts.wrap(Highcharts.Legend.prototype, 'colorizeItem', function (item) {
+        /**
+         * Switch color for a legend item
+         * Digg into Highcharts code, you can find the property "legendColor" is used BEFORE "color",
+         * but never defined by Highcharts itself before...
+         */
+        arguments[1].legendColor = arguments[1].options.legendColor;
+        /* Render legend item via wrapped function */
+        item.apply(this, [].slice.call(arguments, 1));
+    });
 
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
@@ -874,7 +952,7 @@ $(function() {
 
         $('.editentity').addClass('clickable').click(function() {
             window.location.href = '/channel/edit/' + channels[$(this).parents('tr').data('tt-id')].entity +
-                                   '?returnto=/chart/' + qs.chart;
+                                   '?returnto=' + (views.actual.slug ? '/chart/' + views.actual.slug : '/');
         });
     }
 
@@ -902,10 +980,11 @@ $(function() {
                 p.last = $('#d-last').is(':checked');
                 p.all = $('#d-all').is(':checked');
                 p.color = $('#d-color').spectrum('get').toHexString();
-                p.coloruseneg = $('#d-color-use-neg').is(':checked');
-                p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
-                p.threshold = +$('#d-threshold').val().replace(',', '.');
+                p.colorusediff = +$('input:radio[name="color-pos-neg"]:checked').val();
+                p.colordiff = $('#d-color-diff').spectrum('get').toHexString();
+                p.threshold = +$('#d-color-threshold').val().replace(',', '.');
                 p.legend = $('#d-legend').is(':checked');
+                p.position = +$('#d-position').text();
 
                 p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
                 p.time2 = SecToTimeStr(TimeStrToSec($('#d-time2').val(), 24));
@@ -960,17 +1039,17 @@ $(function() {
             notBar.addClass('disabled');
             notBar.find('input, select').prop('disabled', true);
         } else if (this.value == 'scatter') {
-            $('#d-color-use-neg').iCheck('uncheck').trigger('ifToggled');
             notScatter.addClass('disabled');
             notScatter.find('input, select').prop('disabled', true);
+            $('#d-color-use-diff').iCheck('uncheck').trigger('ifToggled');
         }
         $('input').iCheck('update');
     });
 
-    $('#d-color-use-neg').on('ifToggled', function(e) {
+    $('#d-color-use-diff').on('ifToggled', function(e) {
         var checked = $(this).is(':checked');
-        $('#d-threshold').prop('disabled', !checked).spinner('option', 'disabled', !checked );
-        $('#d-color-neg').spectrum(checked ? 'enable' : 'disable');
+        $('#d-color-threshold').prop('disabled', checked).spinner('option', 'disabled', checked);
+        $('#d-color-diff').spectrum(checked ? 'disable' : 'enable');
     });
 
     $('#d-time-slider').slider({
@@ -986,6 +1065,19 @@ $(function() {
         }
     });
 
+    $('#d-position-slider').slider({
+        min: -100, max: 100,
+        slide: function( e, ui ) {
+            $('#d-position').text(ui.value);
+        }
+    });
+
+    $('#d-position-slider .ui-slider-handle')
+        /* Style slider handle to acceppt position text */
+        .css({ width: '2em', marginLeft: '-1em', textDecoration: 'none', textAlign: 'center' })
+        /* Insert separate span to style text */
+      .append($('<span/>').prop('id', 'd-position').css({ fontSize: 'xx-small', color: 'gray' }));
+
     $('input').iCheck('update');
 
     $('input.channel').on('ifToggled', function() {
@@ -995,7 +1087,6 @@ $(function() {
 
     $('#btn-refresh').button({
         icons: { primary: 'ui-icon-refresh' },
-        label: '&nbsp;',
         text: false
     }).click(function(event) {
         event.preventDefault();
@@ -1014,20 +1105,8 @@ $(function() {
 
     $('#treetoggle').click(function() { tree.toggle() });
 
-    $('#togglewrapper').button({
-        icons: { primary: 'ui-icon-carat-2-n-s' },
-        label: '&nbsp;',
-        text: false
-    }).click(function() {
-        var wrapper = $('#wrapper');
-        if (wrapper.animate({ height: 'toggle', opacity: 'toggle' }).is(':visible')) {
-            $('html, body').animate({ scrollTop: wrapper.offset().top-3 }, 'slow');
-        }
-    });
-
     $('#btn-load').button({
         icons: { primary: 'ui-icon-folder-open' },
-        label: '&nbsp;',
         text: false
     }).click(function(event) {
         views.load($('#load-delete-view option:selected').val(), true);
@@ -1035,7 +1114,6 @@ $(function() {
 
     $('#btn-delete').button({
         icons: { primary: 'ui-icon-trash' },
-        label: '&nbsp;',
         text: false
     }).click(function(event) {
         var option = $('#load-delete-view option:selected'), btn = $(this);
@@ -1078,7 +1156,6 @@ $(function() {
 
     $('#btn-save').button({
         icons: { primary: 'ui-icon-disk' },
-        label: '&nbsp;',
         text: false
     }).click(function() {
         $(this).button('disable');
@@ -1122,8 +1199,6 @@ $(function() {
             $(btn).button('enable');
         });
     });
-
-    views = new Views();
 
     views.fetch(function(views) {
         views.buildSelect('#load-delete-view');
@@ -1181,13 +1256,13 @@ $(function() {
      * http://www.sitepoint.com/introduction-to-page-visibility-api/
      * http://www.w3.org/TR/page-visibility
      */
-    if (document.hidden !== undefined) {
+    if (typeof document.hidden != 'undefined') {
         browserPrefix = '';
     } else {
-        var browserPrefixes = ['webkit', 'moz', 'ms', 'o'];
+        var browserPrefixes = ['webkit', 'moz', 'ms', 'o'], l = browserPrefixes.length;
         /* Test all vendor prefixes */
-        for (var i=0; i<browserPrefixes.length; i++) {
-            if (document[browserPrefixes[i] + 'Hidden'] != undefined) {
+        for (var i=0; i<l; i++) {
+            if (typeof document[browserPrefixes[i] + 'Hidden'] != 'undefined') {
                 browserPrefix = browserPrefixes[i];
                 break;
             }
@@ -1199,11 +1274,11 @@ $(function() {
             if (document.hidden === false || document[browserPrefix + 'Hidden'] === false) {
                 /* The page is in foreground and visible */
                 windowVisible = true;
-                /* Was longer in background, so the updateTimeout was cleared */
+                /* Was longer in background, so the updateTimeout is not set anymore */
                 if (!updateTimeout) {
                     setTimeout(function() {
                         /* Scroll to navigation as top most visible element */
-                        $('html, body').animate({ scrollTop: $("#nav").offset().top-3 }, 2000);
+                        pvlng.scroll('#nav');
                         updateChart();
                     },
                     1000);
@@ -1221,7 +1296,6 @@ $(function() {
     shortcut.add('F7',    function() { updateChart(true); });
 
     if (user) {
-        shortcut.add('F3', function() { $('#togglewrapper').click(); });
         shortcut.add('F4', function() { tree.toggle(); });
     }
 });

@@ -20,6 +20,53 @@ window.alert = function( msg, title ) {
 
 var pvlng = new function() {
 
+    /**
+     * Cookie handling with pure JS
+     *
+     * http://stackoverflow.com/a/1460174
+     */
+    this.cookie = new function() {
+
+        this.set = function (name, value, days) {
+            var expires = '';
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = '; expires=' + date.toGMTString();
+            }
+            document.cookie = escape(name) + '=' + escape(value) + expires + '; path=/';
+        },
+
+        this.get = function (name) {
+            var nameEQ = escape(name) + '=';
+            var ca = document.cookie.split(';');
+            for (var i=0; i<ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+            }
+            return null;
+        },
+
+        this.remove = function(name) {
+            this.set(name, '', -1);
+        }
+    },
+
+    /* Add functions to stack to execute after all other scripts finished */
+    this.onFinished = new function() {
+        var stack = [];
+
+        this.add = function() {
+            $.each(arguments, function(i, func) { stack.push(func) });
+        }
+
+        /* Run all buffered functions */
+        this.run = function( func ) {
+            $.each(stack, function(i, func) { func() });
+        }
+    },
+
     this.menu = new function() {
         var that = this;
         this.Timer = null;
@@ -44,6 +91,13 @@ var pvlng = new function() {
             that.Timer = clearTimeout(that.Timer);
         };
 
+    }
+
+    /**
+     * Scroll to #top as top most visible element
+     */
+    this.scroll = function( top ) {
+        $('html, body').animate({ scrollTop: $(top).offset().top-3 }, 2000);
     }
 
     /**

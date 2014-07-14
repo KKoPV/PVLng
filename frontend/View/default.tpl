@@ -114,9 +114,14 @@
     </div>
 
     <script src="//code.jquery.com/jquery-2.0.0.js"></script>
+    <!-- load Highcharts scripts direct from highcharts.com -->
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
     <script>
-        var PVLngAPI = 'http://{SERVERNAME}/api/r4/',
+        var PVLngVersion = '{VERSION}',
+            PVLngAPI = 'http://{SERVERNAME}/api/r4/',
             PVLngAPIkey = '{APIKEY}',
 
             /* Inititilize Pines Notify labels here with I18N */
@@ -126,6 +131,7 @@
             DecimalSeparator = '{DSEP}',
             ThousandSeparator = '{TSEP}',
 
+            verbose = '{VERBOSE',
             language = '{LANGUAGE}',
             user = '{USER}';
     </script>
@@ -164,7 +170,7 @@
     <!-- ENDIF -->
 
     <script>
-        if ('{VERBOSE}') pvlng.verbose = true;
+        if (verbose) pvlng.verbose = true;
         <!-- INCLUDE hook.script.js -->
     </script>
 
@@ -172,34 +178,42 @@
 
     <a href="#" class="back-to-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
        style="border-right:0" title="{{BackToTop}}">
-        <img src="/images/ico/arrow-stop-090.png" style="width:16px;height:16px" width="16" height="16" />
+        <img src="/images/ico/arrow-stop-090.png" class="ico">
     </a>
 
     <script>
 
         var overlay;
+
         $(function($) {
-            overlay = new pvlng.Overlay();
-
-            $('#pageload').remove();
-            $('#container').show();
-
-            $('label.autowidth').autoWidth();
-
-            var ta = $('textarea');
-            if (ta.length) {
-                ta.autosize();
-                document.body.offsetWidth; /* force a reflow before the class gets applied */
-                ta.addClass('textarea-transition');
-            }
-
             $.extend($.fn.select2.defaults, {
                 minimumResultsForSearch: 10,
                 allowClear: true,
                 dropdownAutoWidth: true
             });
 
+            overlay = new pvlng.Overlay();
+
+            /* Library versions */
+            $('#highcharts-version').text(Highcharts.version);
+            $('#jquery-version').text(jQuery.fn.jquery);
+            $('#datatables-version').text(jQuery.fn.dataTable.version);
+
+            $('#pageload').remove();
+            $('#container').show();
+
             $('select').select2();
+            $(".ui-tabs").tabs();
+            $('label.autowidth').autoWidth();
+
+            var ta = $('textarea');
+            if (ta.length) {
+                ta.autosize();
+                document.body.offsetWidth; /* Force a reflow before the class gets applied */
+                ta.addClass('textarea-transition');
+            }
+
+            pvlng.onFinished.run();
         });
     </script>
 

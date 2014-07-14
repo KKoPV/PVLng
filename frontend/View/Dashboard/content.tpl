@@ -9,7 +9,7 @@
  */
 -->
 
-<!-- IF {EMBEDDED} -->
+<!-- IF {EMBEDDED} == "1" -->
     <!-- INCLUDE embedded.header.tpl -->
 <!-- ENDIF -->
 
@@ -67,7 +67,7 @@
     <input class="channel" type="checkbox" value="{ID}" checked="checked" data-guid="{GUID}" style="display:none"/>
     <!-- ENDIF --><!-- END -->
 
-    <!-- IF {EMBEDDED} -->
+    <!-- IF {EMBEDDED} == "1" -->
         <!-- INCLUDE embedded.footer.tpl -->
     <!-- ENDIF -->
 

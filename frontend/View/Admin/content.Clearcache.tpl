@@ -9,13 +9,25 @@
  */
 -->
 
+<form method="post">
+
 <p>
-    - Cleared cached templates from <tt style="font-size:120%;font-weight:bold">{TEMPDIR}</tt>
+    <div class="fl"><input id="cb-tpl" type="checkbox" name="tpl" class="iCheck"></div>
+    <label for="cb-tpl" style="margin-left:.5em">
+        Clear cached templates from <tt style="font-size:120%;font-weight:bold">{TEMPDIR}</tt>
+    </label>
 </p>
+
 <p>
-    - Cleared <tt style="font-size:120%;font-weight:bold">OpCode</tt> and
-    <tt style="font-size:120%;font-weight:bold">user</tt> cache
+    <div class="fl"><input id="cb-cache" type="checkbox" name="cache" class="iCheck"></div>
+    <label for="cb-cache" style="margin-left:.5em">
+        Clear <tt style="font-size:140%;font-weight:bold">OpCode</tt> and
+        <tt style="font-size:140%;font-weight:bold">user</tt> cache
+    </label>
 </p>
+
 <p>
-    <a href="/cc" class="button">Clear cache again</a>
+    <input type="submit" value="Clear cache(s)">
 </p>
+
+</form>
