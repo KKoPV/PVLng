@@ -1,3 +1,49 @@
+ v2.10.0
+=========
+
+FIXED
+
+ - Fix some layout and script errors ~ Knut Kohl <github@knutkohl.de>
+ - Fix private table channel legend ~ Knut Kohl <github@knutkohl.de>
+ - Fix endless loop in public view ~ Knut Kohl <github@knutkohl.de>
+ - Fix History model ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust application routes ~ Knut Kohl <github@knutkohl.de>
+ - Adjust Yryie output ~ Knut Kohl <github@knutkohl.de>
+ - Adjust info page to API r4 ~ Knut Kohl <github@knutkohl.de>
+ - Adjust tariff view ~ Knut Kohl <github@knutkohl.de>
+ - Change Setup logic ~ Knut Kohl <github@knutkohl.de>
+ - Adjust configuration handling ~ Knut Kohl <github@knutkohl.de>
+ - Update some frontend controllers ~ Knut Kohl <github@knutkohl.de>
+ - Update some models ~ Knut Kohl <github@knutkohl.de>
+ - Update model configration defaults ~ Knut Kohl <github@knutkohl.de>
+ - Update API r4 ~ Knut Kohl <github@knutkohl.de>
+ - Update .gitignore ~ Knut Kohl <github@knutkohl.de>
+ - Update generated table access classes ~ Knut Kohl <github@knutkohl.de>
+ - Refractor setup script ~ Knut Kohl <github@knutkohl.de>
+ - Raise timeout to allow complex API queries ~ Knut Kohl <github@knutkohl.de>
+ - Make login as modal dialog ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Add script to add images into Memcache ~ Knut Kohl <github@knutkohl.de>
+ - Add routes for hierarchy manipulation to API ~ Knut Kohl <github@knutkohl.de>
+ - Add dialog for selecting and adjusting predefined channels from templates ~ Knut Kohl <github@knutkohl.de>
+ - Add compressed styles and scripts ~ Knut Kohl <github@knutkohl.de>
+ - Add cache usage methods ~ Knut Kohl <github@knutkohl.de>
+ - Add new models for Average line and Kostal Piko inverters ~ Knut Kohl <github@knutkohl.de>
+ - Add missing .gitignore for custom routes ~ Knut Kohl <github@knutkohl.de>
+ - Add new model Multiplier ~ Knut Kohl <github@knutkohl.de>
+ - Add frontend module Type for Channel types overview ~ Knut Kohl <github@knutkohl.de>
+ - Add script for database compression ~ Knut Kohl <github@knutkohl.de>
+ - Add times attribute to Daylight model ~ Knut Kohl <github@knutkohl.de>
+ - Add legend to index view ~ Knut Kohl <github@knutkohl.de>
+ - Add API r4 ~ Knut Kohl <github@knutkohl.de>
+ - Add real ORM with generated base classes ~ Knut Kohl <github@knutkohl.de>
+ - Add copy of channels in overview ~ Knut Kohl <github@knutkohl.de>
+
  v2.9.0
 ========
 
