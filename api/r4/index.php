@@ -79,6 +79,8 @@ $config = slimMVC\Config::getInstance()
         ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
         ->load('config.php', FALSE);
 
+$config->set('develop', file_exists(ROOT_DIR . DS . '.develop'));
+
 if ($config->get('develop')) {
     ini_set('display_startup_errors', 1);
     ini_set('display_errors', 1);

@@ -26,7 +26,7 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
     'since'       => 'r2',
     'description' => 'Save a reading value',
     'apikey'      => TRUE,
-    'payload'     => '{"<data>":"<value>"}',
+    'payload'     => array('{"data":"<value>"}' => 'JSON encoded value'),
 );
 
 /**

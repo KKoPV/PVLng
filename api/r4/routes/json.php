@@ -28,6 +28,15 @@ $api->post('/json/:path+', function($path) use ($api) {
 );
 
 /**
+ *
+ */
+$api->post('/jsonencode', function() use ($api) {
+    // Set the response header to JSON
+    $api->contentType('application/json');
+    $api->render($api->request->getBody());
+})->name('Encode posted data to JSON');
+
+/**
  * Helper function
  */
 function JSONxPath( $api, $path, $json ) {

@@ -38,6 +38,9 @@ class View extends Slim\View {
             case 'text/plain':
                 $this->asTXT($result);
                 break;
+            case 'text/html':
+                $this->asHTML($result);
+                break;
             default:
                 $this->asJSON($result);
                 break;
@@ -135,6 +138,24 @@ class View extends Slim\View {
                 echo $value;
             }
         }
+    }
+
+    /**
+     *
+     */
+    protected function asHTML( $result ) {
+        echo '<html>
+<head>
+    <title>'.$result['title'].'</title>
+    <style>
+        body { font-family: Verdana,Arial,sans-serif }
+        tt { font-size: 120% }
+    </style>
+</head>
+<body>
+';
+        echo $result['body'];
+        echo '</body></html>';
     }
 
     /**
