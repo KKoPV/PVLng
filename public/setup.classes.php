@@ -12,20 +12,9 @@ abstract class Setup {
     /**
      *
      */
-    abstract public function getTitle();
-
-    /**
-     * Prepare result array
-     */
-    abstract public function process( $params, &$messages );
-
-    /**
-     *
-     */
     public static function run( Array $config ) {
 
         $i = 1;
-        self::$ok = TRUE;
 
         foreach ($config as $class=>$params) {
 
@@ -37,36 +26,16 @@ abstract class Setup {
             $messages = array();
             $class->process($params, $messages);
 
-            echo '<ul', ($ok !== FALSE ? '>' : ' style="color:red">');
-            foreach($messages as $msg) {
+            echo '<ul>';
+            foreach ($class->getMessages() as $msg) {
                 echo '<li>', $msg, '</li>';
             }
             echo '</ul>';
 
-            if (self::$ok === FALSE) return FALSE;
+            if ($class->isError()) return FALSE;
         }
 
         return TRUE;
-    }
-
-    /**
-     *
-     */
-    protected static $ok;
-
-    /**
-     *
-     */
-    protected static function success() {
-        return '<span style="color:green">' . implode(' ', func_get_args()) . '</span>';
-    }
-
-    /**
-     *
-     */
-    protected static function error() {
-        self::$ok = FALSE;
-        return '<span style="color:red">' . implode(' ', func_get_args()) . '</span>';
     }
 
 }
@@ -74,7 +43,82 @@ abstract class Setup {
 /**
  *
  */
-class PHPVersion extends Setup {
+abstract class SetupTask {
+
+    /**
+     *
+     */
+    abstract public function getTitle();
+
+    /**
+     * Prepare result array
+     */
+    abstract public function process( $params, &$messages );
+
+    /**
+     *
+     */
+    public function isError() {
+        return ($this->error === TRUE);
+    }
+
+    /**
+     *
+     */
+    public function getMessages() {
+        return $this->messages;
+    }
+
+    /**
+     *
+     */
+    protected $error;
+
+    /**
+     *
+     */
+    protected $messages = array();
+
+    /**
+     *
+     */
+    protected function info() {
+        $this->messages[] = implode(' ', func_get_args());
+    }
+
+    /**
+     *
+     */
+    protected function success() {
+        $this->messages[] = '<span style="color:green">' . implode(' ', func_get_args()) . ' - OK</span>';
+    }
+
+    /**
+     *
+     */
+    protected function error() {
+        $this->error = TRUE;
+        $this->messages[] = '<span style="color:red">' . implode(' ', func_get_args()) . ' - FAILED</span>';
+    }
+
+    /**
+     *
+     */
+    protected function arrayPath2Key( $array, $key ) {
+        $p = &$array;
+        $path = explode('.', $key);
+        while ($key = array_shift($path)) {
+            $p = &$p[$key];
+        }
+        return $p;
+    }
+
+}
+
+/**
+ *
+ */
+class PHPVersion extends SetupTask {
 
     /**
      *
@@ -87,10 +131,11 @@ class PHPVersion extends Setup {
      *
      */
     public function process( $params, &$messages ) {
+        $this->info('Require at least PHP '.$params[0]);
         if (version_compare(PHP_VERSION, $params[0], 'ge')) {
-            $messages[] = self::success('Require PHP', $params[0], '- OK : PHP', PHP_VERSION);
+            $this->success('PHP', PHP_VERSION);
         } else {
-            $messages[] = self::error('Require PHP', $params[0], '- FAILED : PHP', PHP_VERSION);
+            $this->error('PHP', PHP_VERSION);
         }
     }
 
@@ -99,7 +144,7 @@ class PHPVersion extends Setup {
 /**
  *
  */
-class PHPExtensions extends Setup {
+class PHPExtensions extends SetupTask {
 
     /**
      *
@@ -114,9 +159,9 @@ class PHPExtensions extends Setup {
     public function process( $params, &$messages ) {
         foreach ($params as $ext=>$name) {
             if (extension_loaded($ext)) {
-                $messages[] = self::success($name, '- OK');
+                $this->success($name);
             } else {
-                $messages[] = self::error($name, '- FAILED : Please install extension:', $ext);
+                $this->error($name, ': Please install extension:', $ext);
             }
         }
     }
@@ -126,7 +171,34 @@ class PHPExtensions extends Setup {
 /**
  *
  */
-class Configuration extends Setup {
+class Permissions extends SetupTask {
+
+    /**
+     *
+     */
+    public function getTitle() {
+        return 'Check file/directory permissions';
+    }
+
+    /**
+     *
+     */
+    public function process( $params, &$messages ) {
+        foreach ($params as $test=>$func) {
+            if ($func($test)) {
+                $this->success(str_replace('_', ' ', $func), '<tt>', $test, '</tt>');
+            } else {
+                $this->error(str_replace('_', ' ', $func), '<tt>', $test, '</tt>');
+            }
+        }
+    }
+
+}
+
+/**
+ *
+ */
+class Configuration extends SetupTask {
 
     /**
      *
@@ -140,18 +212,19 @@ class Configuration extends Setup {
      */
     public function process( $params, &$messages ) {
         if (!file_exists($params['config'])) {
-            $messages[] = '<tt>' . $params['config'] . '</tt> missing';
-            $messages[] = 'Try to create from <tt>' . $params['default'] . '</tt>';
+            $this->info('<tt>', $params['config'], '</tt> missing');
+            $this->info('Try to create from <tt>', $params['default'], '</tt>');
             copy($params['default'], $params['config']);
         }
 
         if (file_exists($params['config'])) {
-            $messages[] = self::success('<tt>' . basename($params['config']) . '</tt> exists');
+            $this->success('<tt>', basename($params['config']), '</tt> exists');
         } else {
-            $messages[] = self::error('Can\'t create <tt>' . basename($params['config']) . '</tt>');
-            $messages[] = self::error('Please copy <tt>'
-                                    . basename($params['default']) . '</tt> to <tt>'
-                                    . basename($params['config']) . '</tt>');
+            $this->error('Can\'t create <tt>', basename($params['config']), '</tt>');
+            $this->error('Please copy <tt>',
+                        basename($params['default']),
+                        '</tt> to <tt>',
+                        basename($params['config']), '</tt>');
         }
     }
 
@@ -160,7 +233,7 @@ class Configuration extends Setup {
 /**
  *
  */
-class MySQLi extends Setup {
+class MySQLi extends SetupTask {
 
     /**
      *
@@ -187,24 +260,12 @@ class MySQLi extends Setup {
         if (!$db->connect_error) {
             $res = $db->query('SELECT version()');
             $row = $res->fetch_array();
-            $messages[] = self::success('Connection OK: MySQL', $row[0]);
+            $this->success('MySQL', $row[0]);
         } else {
-            $messages[] = self::error(htmlspecialchars($db->connect_error));
-            $messages[] = self::error('Please check your database settings');
+            $this->error(htmlspecialchars($db->connect_error));
+            $this->info('Please check your database settings');
         }
 
-    }
-
-    /**
-     *
-     */
-    protected function arrayPath2Key( $array, $key ) {
-        $p = &$array;
-        $path = explode('.', $key);
-        while ($key = array_shift($path)) {
-            $p = &$p[$key];
-        }
-        return $p;
     }
 
 }

@@ -61,6 +61,8 @@ $config = slimMVC\Config::getInstance()
         ->load(CONF_DIR . DS . 'config.default.php')
         ->load(CONF_DIR . DS . 'config.php');
 
+$config->set('develop', file_exists(ROOT_DIR . DS . '.develop'));
+
 /**
  * Check Admin config
  */

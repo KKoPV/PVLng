@@ -22,7 +22,8 @@
     <title>PVLng initial setup</title>
 
     <style>
-        body { width: 60%; margin: 1em auto; }
+        body { width: 60%; margin: 1em auto }
+        tt { font-size: 140% }
     </style>
 </head>
 <body>
@@ -53,8 +54,15 @@ $config = array(
         'json'     => 'JSON support',
         'mbstring' => 'Multibyte Support',
         'mysqli'   => 'MySQLi support',
-        'pcre'     => 'PCRE Support',
-        'session'  => 'Session Support'
+        'pcre'     => 'PCRE support',
+        'session'  => 'Session support'
+    ),
+
+    /**
+     *
+     */
+    'Permissions' => array(
+        '../tmp' => 'is_writable'
     ),
 
     /**
@@ -77,19 +85,13 @@ $config = array(
         'pass'     => 'Database.Password',
         'db'       => 'Database.Database'
      ),
-//
-//     /**
-//      *
-//      */
-//     'Directories' => array(
-//     ),
 
 );
 
 // ---------------------------------------------------------------------------
 include 'setup.classes.php';
 
-if (!Setup\Setup::run($config)):
+if (Setup\Setup::run($config) === FALSE):
 
 ?>
 
