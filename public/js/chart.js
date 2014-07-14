@@ -222,7 +222,7 @@ function setMinMax( serie, channel ) {
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,
             borderColor: '#AAA',
-            align: 'left',
+            align: 'right',
             overflow: true,
             crop: false,
             y: -7
