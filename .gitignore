@@ -1,3 +1,4 @@
+.develop
 prepend.php
 append.php
 config.php
@@ -10,4 +11,3 @@ tmp/*
 custom/
 description.md
 !.githold
-ladder/
