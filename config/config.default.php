@@ -102,6 +102,16 @@ return array(
              * Average of last ? days
              */
             'CurveDays' => 5,
+            /**
+             * Icons
+             */
+            'Icons' => array(
+                'Sunrise' => '/images/sunrise.png',
+                'Sunset'  => '/images/sunset.png',
+                'Zenit'   => '/images/zenit.png',
+                // To disable zenit icon, set to NULL
+                #'Zenit'   => NULL,
+            )
         ),
 
         /**
@@ -117,13 +127,6 @@ return array(
 
          'Estimate' => array(
              'Marker' => '/images/energy.png'
-         ),
-
-         'SolarEstimate' => array(
-             /**
-              * Take data from last 10 days for curve calculation
-              */
-             'Days' => 10,
          ),
     ),
 
