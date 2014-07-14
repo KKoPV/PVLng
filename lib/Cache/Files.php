@@ -45,7 +45,10 @@ class Files extends AbstractFile {
      * @return string
      */
     public function fetch( $key ) {
-        if (!array_key_exists($key, $this->data)) {
+        if (array_key_exists($key, $this->data)) {
+            $this->hits++;
+        } else {
+            $this->misses++;
             // Buffer for more reads in this session
             $this->data[$key] = $this->ReadFile($this->FileName($key, '.single.cache'));
         }
@@ -82,8 +85,18 @@ class Files extends AbstractFile {
      */
     public function info() {
         $info = parent::info();
-        $info['Buffered'] = count($this->data);
+        $info['buffered'] = count($this->data);
         return $info;
     }
 
+    public function getHits() {
+        return $this->hits;
+    }
+
+    public function getMisses() {
+        return $this->misses;
+    }
+
+    protected $hits   = 0;
+    protected $misses = 0;
 }

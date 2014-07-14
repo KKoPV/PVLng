@@ -112,6 +112,16 @@ class APC extends \Cache {
         return array_merge($return, apc_sma_info());
     } // function info()
 
+    public function getHits() {
+        $stats = apc_cache_info();
+        return $stats['num_hits'];
+    }
+
+    public function getMisses() {
+        $stats = apc_cache_info();
+        return $stats['num_misses'];
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
