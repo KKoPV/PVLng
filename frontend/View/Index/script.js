@@ -17,7 +17,7 @@
 
 var ChartHeight = {INDEX_CHARTHEIGHT},
     RefreshTimeout = {INDEX_REFRESH},
-    chartLabelsCSS = { color: 'gray', fontSize: '9px' },
+    chartLabelsCSS = { color: 'lightgray', fontSize: '9px' },
     qs = {},
     chart = false,
     channels_chart = [],
@@ -49,7 +49,6 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
     chartOptions = {
         chart: {
             renderTo: 'chart',
-            paddingRight: 15,
             alignTicks: false,
             zoomType: 'x',
             resetZoomButton: {
@@ -59,35 +58,21 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             panning: true,
             panKey: 'shift',
             events: {
-                load: function () {
-                    /* Show generator once on load */
-                    this.renderer
-                        .label(
-                            'PVLng v'+PVLngVersion,
-                            this.spacingBox.x+this.spacingBox.width-10, /* right*/
-                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
-                         )
-                        .attr({ rotation: -90 })
-                        .css(chartLabelsCSS)
-                        .add();
-                },
                 redraw: function () {
-                    /* Show time on each redraw, fill solid white for correct overwrite */
+                    /* Show generator and time not only once on load, on browser zoom the chart will be re-drawn */
                     this.renderer
                         .label(
-                            (new Date()).toLocaleTimeString(),
-                            0, /* left*/
-                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
+                            /* Just into upper left corner */
+                            'PVLng v'+PVLngVersion + '<br />'+(new Date()).toLocaleTimeString()
                          )
-                        .attr({ fill: 'white', rotation: -90 })
+                        .attr({ fill: 'white' })
                         .css(chartLabelsCSS)
                         .add();
-                },
-                selection: function(event) { setTimeout(setExtremes, 100); }
+                }
             }
         },
         title: { text: '' },
-        legend: { borderRadius: 5, borderWidth: 1 },
+        /* legend: { borderRadius: 5, borderWidth: 1 }, */
         credits: false,
         plotOptions: {
             series: {
