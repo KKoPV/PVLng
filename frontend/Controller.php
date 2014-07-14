@@ -17,6 +17,7 @@ class Controller extends slimMVC\Controller {
 
         // Shortcuts
         $this->db = $this->app->db;
+        $this->cache = $this->app->cache;
         $this->config = $this->app->config;
         $this->request = $this->app->request;
         $this->view = $this->app->view;
@@ -64,7 +65,10 @@ class Controller extends slimMVC\Controller {
             if ($this->config->get('TokenLogin')) {
                 $this->view->Token = \PVLng::getLoginToken();
             }
-            $this->view->APIkey = (new \ORM\Config)->getAPIkey();
+            while ($this->cache->save('APIkey', $APIkey)) {
+                $APIkey = (new \ORM\Config)->getAPIkey();
+            }
+            $this->view->APIkey = $APIkey;
         }
         parent::after();
     }
@@ -172,6 +176,11 @@ class Controller extends slimMVC\Controller {
      *
      */
     protected $db;
+
+    /**
+     *
+     */
+    protected $cache;
 
     /**
      *

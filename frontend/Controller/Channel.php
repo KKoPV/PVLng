@@ -120,33 +120,60 @@ class Channel extends \Controller {
 
         if (($template = $this->request->post('template')) == '') return;
 
+        if (!$this->request->post('p')) {
+            $this->view->Template = $template;
+            $this->app->foreward('TemplateEdit');
+            return;
+        }
+
         $channels = include $template;
         $channels = $channels['channels'];
+
+        foreach ($this->request->post('p') as $id=>$data) {
+            $channels[$id] = array_merge($channels[$id], $data);
+        }
 
         // 1st save channels
         $oChannel = new \ORM\Channel;
         $oChannel->setThrowException();
+        $oChannelType = new \ORM\ChannelType;
+
+        $add = $this->request->post('a');
 
         /// \Yryie::StartTimer('template', 'Create template', 'db');
         try {
 
+            $aSubChannels = array();
+            $cnt = 0;
+
             foreach ($channels as $id=>$channel) {
-                $oChannel->reset();
-                foreach ($channel as $key=>$value) {
-                    $oChannel->set($key, $value);
+                if ($id == 0 OR isset($add[$id])) { // Add root channel always if defined
+                    $oChannel->reset();
+                    foreach ($channel as $key=>$value) {
+                        if ($key == '_') {
+                            // Act as grouping channel, e.g. accumulate string powers
+                            $aSubChannels[] = $id;
+                        } else {
+                            $oChannel->set($key, $value);
+                        }
+                    }
+                    $oChannel->setIcon($oChannelType->reset()->filterById($channel['type'])->findOne()->getIcon());
+                    $oChannel->insert();
+                    // Remember id for hierarchy build
+                    $channels[$id]['id'] = $oChannel->getId();
+                    $cnt++;
+                } else {
+                    $channels[$id]['id'] = 0;
                 }
-                $oChannel->insert();
-                // Remember id for hierarchy build
-                $channels[$id]['id'] = $oChannel->getId();
             }
-            \Messages::Success(__('ChannelsSaved', count($channels)));
+            \Messages::Success(__('ChannelsSaved', $cnt));
 
         } catch (\Exception $e) {
             \Messages::Error($e->getMessage());
 
             // Rollback in case of error
             foreach ($channels as $id=>$channel) {
-                if (isset($channels[$id]['id'])) {
+                if ($channels[$id]['id']) {
                     $oChannel->reset()->filterById($channels[$id]['id'])->findOne();
                     if ($oChannel->getId()) $oChannel->delete();
                 }
@@ -161,13 +188,27 @@ class Channel extends \Controller {
         $tree = \NestedSet::getInstance();
 
         // Remember Grouping Id for templates without own grouping channel (index 0)
-        $groupId = $this->request->post('tree');
+        $groupId = $this->request->post('tree') ?: 1;
 
         foreach ($channels as $id=>$channel) {
             if ($id == 0) {
                 $groupId = $tree->insertChildNode($channel['id'], $groupId);
+            } elseif ($channel['id']) {
+                // Remember tree position
+                $channels[$id]['tree'] = $tree->insertChildNode($channel['id'], $groupId);
             } else {
-                $tree->insertChildNode($channel['id'], $groupId);
+                $channels[$id]['tree'] = 0;
+            }
+        }
+
+        // Any grouping channel with defined sub-channels
+        foreach ($aSubChannels as $id1) {
+            // Loop childs and ...
+            foreach ($channels[$id1]['_'] as $id2) {
+                if ($channels[$id1]['tree'] AND $channels[$id2]['id']) {
+                    // ... append just created channel AS child to grouping channel
+                    \Channel::ById($channels[$id1]['tree'])->addChild($channels[$id2]['id']);
+                }
             }
         }
         /// \Yryie::StopTimer('hierarchy');
@@ -175,6 +216,30 @@ class Channel extends \Controller {
         \Messages::Success(__('HierarchyCreated', count($channels)));
 
         $this->app->redirect('/overview');
+    }
+
+    /**
+     *
+     */
+    public function TemplateEdit_Action() {
+        $this->view->SubTitle = __('AdjustTemplate');
+
+        $channels = include $this->request->post('template');
+
+        $channels = $channels['channels'];
+        unset($channels[0]);
+
+        $type = new \ORM\ChannelType;
+        foreach ($channels as &$channel) {
+            $type->reset()->filterById($channel['type'])->findOne();
+            $channel['_type'] = $type->getName();
+            $channel['_icon'] = $type->getIcon();
+        }
+
+        $this->view->Channels = $channels;
+        $this->AddToTree();
+
+        $this->ignore_returnto = TRUE;
     }
 
     /**
@@ -228,7 +293,6 @@ class Channel extends \Controller {
             }
 
             $this->view->Templates = $templates;
-            $this->AddToTree();
         }
     }
 
@@ -334,9 +398,17 @@ class Channel extends \Controller {
         } else {
             $channel = new \ORM\Channel($this->view->Id);
 
+            // Try to edit an alias channel?
             if ($channel->getType() == 0) {
-                \Messages::Error('You can\'t edit an alias!');
-                $this->app->redirect('/channel');
+                \Messages::Info(__('EditSwitchAliasWithOriginal'));
+                // Search orignal channel by GUID from alias in hierarchy
+                $t = (new \ORM\Tree)->filterByGUID($channel->getChannel())->findOne();
+                // Find now original channel by entity from hierarchy
+                # $channel->reset()->filterById($t->getEntity())->findOne();
+                $channel = new \ORM\Channel($t->getEntity());
+                unset($t);
+                // Set channel Id for edit form to new Id!
+                $this->view->Id = $channel->getId();
             }
 
             $type = new \ORM\ChannelType($channel->getType());
@@ -435,28 +507,40 @@ class Channel extends \Controller {
             $this->app->redirect('/channel');
         }
 
-        if (is_null($entity)) {
-            $this->applyFieldSettings($type->getType());
-        } else {
+        // Get general field settings from channel type itself
+        $fieldSettings = array($type->getType());
+
+        if (!is_null($entity)) {
             $entity = new \ORM\Channel($entity);
-            $this->applyFieldSettings($entity->getMeter() ? 'meter' : 'sensor');
+            if ($entity->getNumeric()) {
+                $fieldSettings[] = 'numeric';
+                $fieldSettings[] = $entity->getMeter() ? 'meter' : 'sensor';
+            } else {
+                $fieldSettings[] = 'non-numeric';
+                $fieldSettings[] = 'sensor'; // There can't be non-numeric meters ...
+            }
         }
 
         if ($type->getWrite() AND $type->getRead()) {
             // No specials for writable AND readable channels
         } elseif ($type->getWrite()) {
             // Write only
-           $this->applyFieldSettings('write');
+            $fieldSettings[] = 'write';
         } elseif ($type->getRead()) {
             // Read only
-           $this->applyFieldSettings('read');
+            $fieldSettings[] = 'read';
         } else {
             // A grouping channel, not write, not read
-            $this->applyFieldSettings('group');
+            $fieldSettings[] = 'group';
         }
 
         // Last apply model specific settings
-        $this->applyFieldSettings(str_replace('\\', DS, $type->getModel()));
+        $fieldSettings[] = str_replace('\\', DS, $type->getModel());
+
+        // Apply settings only once
+        foreach (array_unique($fieldSettings) as $conf) {
+            $this->applyFieldSettings($conf);
+        }
 
         foreach ($this->fields as $key=>&$data) {
             $data = array_merge(
@@ -504,6 +588,16 @@ class Channel extends \Controller {
                     );
                 }
                 $data['TYPE'] = 'select';
+            } elseif (strpos($data['TYPE'], 'range') === 0) {
+                list(, $start, $end, $step) = explode(';', $data['TYPE'].';1', 4); // step of 1 as default
+                for ($i=$start; $i<=$end; $i+=$step) {
+                    $data['OPTIONS'][] = array(
+                        'VALUE'    => $i,
+                        'TEXT'     => $i,
+                        'SELECTED' => ($i == $data['VALUE'])
+                    );
+                }
+              $data['TYPE'] = 'select';
             } elseif (preg_match('~^sql:(.?):(.*?)$~i', $data['TYPE'], $matches)) {
                 // Tranform into select options
                 if ($matches[1] != '') {

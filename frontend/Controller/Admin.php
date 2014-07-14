@@ -128,7 +128,7 @@ class Admin extends \Controller {
      *
      */
     public function Config_Action() {
-        $this->view->SubTitle = \I18N::_('Configuration');
+        $this->view->SubTitle = __('Configuration');
 
         $q = \DBQuery::forge('pvlng_config')->whereNE('type');
         $this->view->Data = $this->db->queryRows($q);
@@ -137,13 +137,28 @@ class Admin extends \Controller {
     /**
      *
      */
-    public function Clearcache_Action() {
-        foreach (glob(TEMP_DIR.DS.'*') as $file) {
-            // Ignore .githold
-            if (strpos($file, '.') !== 0) unlink($file);
+    public function ClearcachePOST_Action() {
+        if ($this->request->post('tpl')) {
+            $i = 0;
+            foreach (glob(TEMP_DIR.DS.'*') as $i=>$file) {
+                // Don't delete .githold ...
+                if (strpos($file, '.githold') === FALSE) $i += (int) unlink($file); // Success == TRUE => 1
+            }
+            \Messages::Success(sprintf('Cleared %d files from %s', $i, TEMP_DIR));
         }
-        $this->app->cache->flush();
+        if ($this->request->post('cache')) {
+            $this->app->cache->flush();
+            $info = $this->app->cache->info();
+            \Messages::Success('Cleared caches of '.addslashes($info['class']));
+        }
+        $this->app->redirect('/cc');
+    }
 
+    /**
+     *
+     */
+    public function Clearcache_Action() {
+        $this->view->SubTitle = 'Clear caches';
         $this->view->TempDir = TEMP_DIR;
     }
 

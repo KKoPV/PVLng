@@ -47,6 +47,10 @@ class Info extends \Controller {
         ');
 
         $this->view->Stats = (new \ORM\ReadingStatistics)->find()->asAssoc();
+
+        $this->view->CacheInfo   = $this->app->cache->info();
+        $this->view->CacheHits   = $this->app->cache->getHits();
+        $this->view->CacheMisses = $this->app->cache->getMisses();
     }
 
 }

@@ -42,9 +42,9 @@ $app->map('/_config', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Config');
 })->via('GET', 'POST');
 
-$app->get('/cc', $checkAuth, function() use ($app) {
+$app->map('/cc', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Clearcache');
-});
+})->via('GET', 'POST');
 
 $app->get('/bk', function() {
     Header('Location: /public/bk/index.php');
