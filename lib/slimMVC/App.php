@@ -58,7 +58,7 @@ class App extends \Slim\Slim {
         $controller->before();
 
         $method = 'before' . $reqMethod;
-        if (method_exists($controller, $method)) $controller->$method();
+        $controller->$method();
 
         $this->action = $action;
 
@@ -76,7 +76,7 @@ class App extends \Slim\Slim {
         } while ($action != $this->action);
 
         $method = 'after' . $reqMethod;
-        if (method_exists($controller, $method)) $controller->$method();
+        $controller->$method();
 
         $controller->after();
 

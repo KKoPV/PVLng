@@ -87,6 +87,14 @@ class DBQuery {
     /**
      *
      */
+    public function distinct() {
+        $this->distinct = TRUE;
+        return $this;
+    }
+
+    /**
+     *
+     */
     public function get( $field, $as='' ) {
         if (is_array($field)) {
             foreach ($field as $f) $this->get($f);
@@ -134,6 +142,75 @@ class DBQuery {
         }
 
         $this->join[] = $join;
+        return $this;
+    }
+
+    /**
+     *
+     */
+    protected static $conditions = array(
+        'eq'      => '%1$s =  "%2$s"',
+        'ne'      => '%1$s <> "%2$s"',
+        'gt'      => '%1$s >  "%2$s"',
+        'ge'      => '%1$s >= "%2$s"',
+        'min'     => '%1$s >= "%2$s"',
+        'max'     => '%1$s <= "%2$s"',
+        'le'      => '%1$s <= "%2$s"',
+        'lt'      => '%1$s <  "%2$s"',
+        'bt'      => '%1$s BETWEEN "%2$s" AND "%3$s"',
+        'notbt'   => 'NOT %1$s BETWEEN "%2$s" AND "%3$s"',
+        'like'    => '%1$s LIKE "%2$s"',
+        'notlike' => 'NOT %1$s LIKE "%2$s"',
+        'null'    => '%1$s IS NULL',
+        'notnull' => 'NOT %1$s IS NULL',
+    );
+
+    /**
+     *
+     */
+    public function filter( $field, $value=NULL ) {
+        if (!is_array($field)) {
+            if (func_num_args() == 1) {
+                // Raw condition
+                $this->where[] = $field;
+            } else {
+                $field = $this->field($field);
+                if (!is_array($value)) {
+                    // Simple equal condition
+                    $this->where[] = $field.' = "'.$this->quote($value).'"';
+                } else {
+                    // Complex conditions
+                    foreach ($value as $k=>$v) {
+                        $kl = strtolower($k);
+                        if (array_key_exists($kl, self::$conditions)) {
+                            if (!is_array($v)) {
+                                $v = array($field, $v);
+                            } else {
+                                array_unshift($v, $field);
+                            }
+                            $this->where[] = vsprintf(self::$conditions[$kl], $v);
+                            unset($value[$k]);
+                        } else {
+                            throw new Exception("Unknown condition: $k > $v");
+                        }
+                    }
+                }
+            }
+        } else {
+            if (func_num_args() == 1) {
+                // Array with key=>value pairs
+                foreach ($field as $key=>$value) {
+                    $this->where[] = $this->field($key).' = "'.$this->quote($value).'"';
+                }
+            } else {
+                if (!is_array($value)) $value = array($value);
+                foreach ($field as $key=>$f) {
+                    if (array_key_exists($key, $value))
+                        $this->where[] = $this->field($f).' = "'.$this->quote($value[$key]).'"';
+                }
+            }
+        }
+
         return $this;
     }
 
@@ -297,8 +374,16 @@ class DBQuery {
     /**
      *
      */
-    public function order( $field ) {
-        $this->order[] = $this->field($field);
+    public function orderBy( $field, $desc=FALSE ) {
+        $this->order[] = $this->field($field) . ($desc ? ' DESC' : '');
+        return $this;
+    }
+
+    /**
+     *
+     */
+    public function order( $field, $desc=FALSE ) {
+        $this->order[] = $this->field($field) . ($desc ? ' DESC' : '');
         return $this;
     }
 
@@ -306,8 +391,7 @@ class DBQuery {
      *
      */
     public function orderDescending( $field ) {
-        $this->order[] = $field . ' DESC';
-        return $this;
+        return $this->order($field, TRUE);
     }
 
     /**
@@ -339,7 +423,11 @@ class DBQuery {
      * $this->ROUND('field', 4) => ROUND(`field`, 4)
      */
     public function __call( $method, $params ) {
-        return $method . '(' . implode(', ', $params) . ')';
+        if (stripos($method, 'filterby') === 0) {
+            return $this->filter(substr($method, 8), $params[0]);
+        } else {
+            return $method . '(' . implode(', ', $params) . ')';
+        }
     }
 
     /**
@@ -365,6 +453,22 @@ class DBQuery {
         return $this->SQL() . ';';
     }
 
+    /**
+     *
+     */
+    public function reset() {
+        $this->sql      = '';
+        $this->distinct = FALSE;
+        $this->get      = array();
+        $this->set      = array();
+        $this->where    = array();
+        $this->group    = array();
+        $this->having   = array();
+        $this->order    = array();
+        $this->limit    = 0;
+        return $this;
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
@@ -373,6 +477,11 @@ class DBQuery {
      *
      */
     protected $table;
+
+    /**
+     *
+     */
+    protected $distinct;
 
     /**
      *
@@ -418,20 +527,6 @@ class DBQuery {
      *
      */
     protected $limit = 0;
-
-    /**
-     *
-     */
-    protected function reset() {
-        $this->sql    = '';
-        $this->get    = array();
-        $this->set    = array();
-        $this->where  = array();
-        $this->group  = array();
-        $this->having = array();
-        $this->order  = array();
-        $this->limit  = 0;
-    }
 
     /**
      *
@@ -508,7 +603,8 @@ class DBQuery {
      *
      */
     protected function _get() {
-        $s = implode("\n".'      ,', $this->get);
+        $s = ($this->distinct ? 'DISTINCT ' : '')
+           . implode("\n".'      ,', $this->get);
         return $s ?: '*';
     }
 

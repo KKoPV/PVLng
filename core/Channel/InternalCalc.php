@@ -2,26 +2,17 @@
 /**
  *
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 namespace Channel;
 
 /**
  *
  */
-abstract class InternalCalc extends \Channel {
-
-    /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = NUMERIC_CHANNEL;
+abstract class InternalCalc extends Channel {
 
     /**
      *
@@ -31,10 +22,11 @@ abstract class InternalCalc extends \Channel {
 
         $this->data = $this->numeric ? new \ORM\ReadingNumMemory :  new \ORM\ReadingStrMemory;
 
-        // If the same channel is used in one chart multiple times (also as Alias),
-        // we have a race condition and the instances deletes the data of the others ...
+        // If the same channel is used in one chart multiple times (also as
+        // Alias), we have a race condition and the instances deletes the data
+        // of the others ...
         // So save for each instance its own data set
-        $this->entity = rand(60000, 65535);
+        $this->entity = rand(64000, 65535);
 
         // Clean up
         $this->data->deleteById($this->entity);
@@ -87,7 +79,7 @@ abstract class InternalCalc extends \Channel {
      *
      */
     protected function after_read( \Buffer $buffer ) {
-        /* Clean up */
+        // Clean up
         $this->data->deleteById($this->entity);
         return parent::after_read($buffer);
     }

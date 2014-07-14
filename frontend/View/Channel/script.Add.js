@@ -1,4 +1,4 @@
-<script>
+<!--
 /**
  *
  *
@@ -7,52 +7,49 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
+-->
+<script>
 
 /**
  *
  */
 $(function() {
 
-    $("#radios").buttonset();
-
-    $("#radios input").change(function() {
-        $('#type').toggle($("#rbtype").checked);
-        $('#template').toggle($("#rbtemplate").checked);
-    });
-
     $('#typeTable').DataTable({
-        bSort: true,
-        bLengthChange: false,
+        bLengthChange: true,
+        aLengthMenu: [ [20, 50, 100, -1], [20, 50, 100, '{{All}}'] ],
+        iDisplayLength: 20,
         bFilter: true,
-        bInfo: false,
-        bPaginate: false,
-        bJQueryUI: true,
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
+        bInfo: true,
+        bPaginate: true,
+        sPaginationType: 'full_numbers',
         aoColumns: [
-            { 'asSorting': false },
+            { bSortable: false, sWidth: '1%' },
             null,
             null,
-            { 'asSorting': false },
-            { 'asSorting': false },
-            { 'asSorting': false }
+            null,
+            null,
+            { bSortable: false }
         ],
-        aaSorting: [[ 1, "asc" ]]
+        aaSorting: [[ 1, "asc" ]],
+        fnInitComplete: function() {
+            pvlng.addClearSearchButton('typeTable', '{{ClearSearch}}');
+            $('select', '#typeTable_wrapper').select2();
+        }
     });
 
     $('#tplTable').DataTable({
-        bSort: true,
-        bLengthChange: false,
-        bFilter: false,
-        bInfo: false,
-        bPaginate: false,
-        bJQueryUI: true,
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
+        bFilter: true,
+        bInfo: true,
         aoColumns: [
-            { 'asSorting': false },
+            { asSorting: false, sWidth: '1%' },
             null,
-            { 'asSorting': false }
+            { asSorting: false, sClass: 'p50' }
         ],
-        aaSorting: [[ 1, "asc" ]]
+        aaSorting: [[ 1, "asc" ]],
+        fnInitComplete: function() {
+            pvlng.addClearSearchButton('tplTable', '{{ClearSearch}}');
+        }
     });
 
 });

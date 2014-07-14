@@ -23,8 +23,10 @@ class Info extends \Controller {
      */
     public function IndexPost_Action() {
         if ($this->request->post('regenerate')) {
-            $this->model->resetAPIkey();
-            \Messages::Success(\I18N::_('APIkeyRegenerated'));
+            $this->db->query(
+                'UPDATE `pvlng_config` SET `value` = UUID() WHERE `key` = "APIKey"'
+            );
+            \Messages::Success(__('APIkeyRegenerated'));
         }
         $this->app->redirect('info');
     }
@@ -33,10 +35,22 @@ class Info extends \Controller {
      *
      */
     public function Index_Action() {
-        $this->view->set('SubTitle', \I18N::_('Information'));
-        $this->view->set('ServerName', $_SERVER['SERVER_NAME']);
-        $q = \DBQuery::forge('pvlng_reading_statistics');
-        $this->view->set('Stats', $this->rows2view($this->db->queryRows($q)));
+        $this->view->SubTitle   = __('Information');
+        $this->view->ServerName = $_SERVER['SERVER_NAME'];
+
+        list($this->view->DatabaseSize, $this->view->DatabaseFree) =
+        $this->db->queryRowArray('
+            SELECT SUM(`data_length`+`index_length`)/1024/1024 AS "0"
+                 , SUM(`data_free`)/1024/1024 AS "1"
+              FROM `information_schema`.`tables`
+             WHERE `table_schema` = "'.$this->config->get('Database.Database').'"
+        ');
+
+        $this->view->Stats = (new \ORM\ReadingStatistics)->find()->asAssoc();
+
+        $this->view->CacheInfo   = $this->app->cache->info();
+        $this->view->CacheHits   = $this->app->cache->getHits();
+        $this->view->CacheMisses = $this->app->cache->getMisses();
     }
 
 }

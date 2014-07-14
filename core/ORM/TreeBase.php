@@ -1,0 +1,756 @@
+<?php
+/**
+ * Abstract base class for table 'pvlng_tree_view'
+ *
+ * *** NEVER EVER EDIT THIS FILE! ***
+ *
+ * To extend the functionallity, edit "Tree.php"
+ *
+ * If you make changes here, they will be lost on next upgrade PVLng!
+ *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
+ * @author     PVLng ORM class builder
+ * @version    1.1.0 / 2014-06-04
+ */
+namespace ORM;
+
+/**
+ *
+ */
+abstract class TreeBase extends \slimMVC\ORM {
+
+    // -----------------------------------------------------------------------
+    // PUBLIC
+    // -----------------------------------------------------------------------
+
+    // -----------------------------------------------------------------------
+    // Setter methods
+    // -----------------------------------------------------------------------
+
+    /**
+     * 'pvlng_tree_view' is a view, no setters
+     */
+
+    // -----------------------------------------------------------------------
+    // Getter methods
+    // -----------------------------------------------------------------------
+
+    /**
+     * Basic getter for field 'id'
+     *
+     * @return mixed Id value
+     */
+    public function getId() {
+        return $this->fields['id'];
+    }   // getId()
+
+    /**
+     * Basic getter for field 'entity'
+     *
+     * @return mixed Entity value
+     */
+    public function getEntity() {
+        return $this->fields['entity'];
+    }   // getEntity()
+
+    /**
+     * Basic getter for field 'guid'
+     *
+     * @return mixed Guid value
+     */
+    public function getGuid() {
+        return $this->fields['guid'];
+    }   // getGuid()
+
+    /**
+     * Basic getter for field 'name'
+     *
+     * @return mixed Name value
+     */
+    public function getName() {
+        return $this->fields['name'];
+    }   // getName()
+
+    /**
+     * Basic getter for field 'serial'
+     *
+     * @return mixed Serial value
+     */
+    public function getSerial() {
+        return $this->fields['serial'];
+    }   // getSerial()
+
+    /**
+     * Basic getter for field 'channel'
+     *
+     * @return mixed Channel value
+     */
+    public function getChannel() {
+        return $this->fields['channel'];
+    }   // getChannel()
+
+    /**
+     * Basic getter for field 'description'
+     *
+     * @return mixed Description value
+     */
+    public function getDescription() {
+        return $this->fields['description'];
+    }   // getDescription()
+
+    /**
+     * Basic getter for field 'resolution'
+     *
+     * @return mixed Resolution value
+     */
+    public function getResolution() {
+        return $this->fields['resolution'];
+    }   // getResolution()
+
+    /**
+     * Basic getter for field 'cost'
+     *
+     * @return mixed Cost value
+     */
+    public function getCost() {
+        return $this->fields['cost'];
+    }   // getCost()
+
+    /**
+     * Basic getter for field 'meter'
+     *
+     * @return mixed Meter value
+     */
+    public function getMeter() {
+        return $this->fields['meter'];
+    }   // getMeter()
+
+    /**
+     * Basic getter for field 'numeric'
+     *
+     * @return mixed Numeric value
+     */
+    public function getNumeric() {
+        return $this->fields['numeric'];
+    }   // getNumeric()
+
+    /**
+     * Basic getter for field 'offset'
+     *
+     * @return mixed Offset value
+     */
+    public function getOffset() {
+        return $this->fields['offset'];
+    }   // getOffset()
+
+    /**
+     * Basic getter for field 'adjust'
+     *
+     * @return mixed Adjust value
+     */
+    public function getAdjust() {
+        return $this->fields['adjust'];
+    }   // getAdjust()
+
+    /**
+     * Basic getter for field 'unit'
+     *
+     * @return mixed Unit value
+     */
+    public function getUnit() {
+        return $this->fields['unit'];
+    }   // getUnit()
+
+    /**
+     * Basic getter for field 'decimals'
+     *
+     * @return mixed Decimals value
+     */
+    public function getDecimals() {
+        return $this->fields['decimals'];
+    }   // getDecimals()
+
+    /**
+     * Basic getter for field 'threshold'
+     *
+     * @return mixed Threshold value
+     */
+    public function getThreshold() {
+        return $this->fields['threshold'];
+    }   // getThreshold()
+
+    /**
+     * Basic getter for field 'valid_from'
+     *
+     * @return mixed ValidFrom value
+     */
+    public function getValidFrom() {
+        return $this->fields['valid_from'];
+    }   // getValidFrom()
+
+    /**
+     * Basic getter for field 'valid_to'
+     *
+     * @return mixed ValidTo value
+     */
+    public function getValidTo() {
+        return $this->fields['valid_to'];
+    }   // getValidTo()
+
+    /**
+     * Basic getter for field 'public'
+     *
+     * @return mixed Public value
+     */
+    public function getPublic() {
+        return $this->fields['public'];
+    }   // getPublic()
+
+    /**
+     * Basic getter for field 'extra'
+     *
+     * @return mixed Extra value
+     */
+    public function getExtra() {
+        return $this->fields['extra'];
+    }   // getExtra()
+
+    /**
+     * Basic getter for field 'comment'
+     *
+     * @return mixed Comment value
+     */
+    public function getComment() {
+        return $this->fields['comment'];
+    }   // getComment()
+
+    /**
+     * Basic getter for field 'type_id'
+     *
+     * @return mixed TypeId value
+     */
+    public function getTypeId() {
+        return $this->fields['type_id'];
+    }   // getTypeId()
+
+    /**
+     * Basic getter for field 'type'
+     *
+     * @return mixed Type value
+     */
+    public function getType() {
+        return $this->fields['type'];
+    }   // getType()
+
+    /**
+     * Basic getter for field 'model'
+     *
+     * @return mixed Model value
+     */
+    public function getModel() {
+        return $this->fields['model'];
+    }   // getModel()
+
+    /**
+     * Basic getter for field 'childs'
+     *
+     * @return mixed Childs value
+     */
+    public function getChilds() {
+        return $this->fields['childs'];
+    }   // getChilds()
+
+    /**
+     * Basic getter for field 'read'
+     *
+     * @return mixed Read value
+     */
+    public function getRead() {
+        return $this->fields['read'];
+    }   // getRead()
+
+    /**
+     * Basic getter for field 'write'
+     *
+     * @return mixed Write value
+     */
+    public function getWrite() {
+        return $this->fields['write'];
+    }   // getWrite()
+
+    /**
+     * Basic getter for field 'graph'
+     *
+     * @return mixed Graph value
+     */
+    public function getGraph() {
+        return $this->fields['graph'];
+    }   // getGraph()
+
+    /**
+     * Basic getter for field 'icon'
+     *
+     * @return mixed Icon value
+     */
+    public function getIcon() {
+        return $this->fields['icon'];
+    }   // getIcon()
+
+    /**
+     * Basic getter for field 'alias'
+     *
+     * @return mixed Alias value
+     */
+    public function getAlias() {
+        return $this->fields['alias'];
+    }   // getAlias()
+
+    /**
+     * Basic getter for field 'alias_of'
+     *
+     * @return mixed AliasOf value
+     */
+    public function getAliasOf() {
+        return $this->fields['alias_of'];
+    }   // getAliasOf()
+
+    /**
+     * Basic getter for field 'level'
+     *
+     * @return mixed Level value
+     */
+    public function getLevel() {
+        return $this->fields['level'];
+    }   // getLevel()
+
+    /**
+     * Basic getter for field 'haschilds'
+     *
+     * @return mixed Haschilds value
+     */
+    public function getHaschilds() {
+        return $this->fields['haschilds'];
+    }   // getHaschilds()
+
+    /**
+     * Basic getter for field 'lower'
+     *
+     * @return mixed Lower value
+     */
+    public function getLower() {
+        return $this->fields['lower'];
+    }   // getLower()
+
+    /**
+     * Basic getter for field 'upper'
+     *
+     * @return mixed Upper value
+     */
+    public function getUpper() {
+        return $this->fields['upper'];
+    }   // getUpper()
+
+    // -----------------------------------------------------------------------
+    // Filter methods
+    // -----------------------------------------------------------------------
+
+    /**
+     * Filter for field 'id'
+     *
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterById( $id ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
+
+    /**
+     * Filter for field 'entity'
+     *
+     * @param  mixed    $entity Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByEntity( $entity ) {
+        $this->filter[] = '`entity` = "'.$this->quote($entity).'"';
+        return $this;
+    }   // filterByEntity()
+
+    /**
+     * Filter for field 'guid'
+     *
+     * @param  mixed    $guid Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByGuid( $guid ) {
+        $this->filter[] = '`guid` = "'.$this->quote($guid).'"';
+        return $this;
+    }   // filterByGuid()
+
+    /**
+     * Filter for field 'name'
+     *
+     * @param  mixed    $name Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByName( $name ) {
+        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+        return $this;
+    }   // filterByName()
+
+    /**
+     * Filter for field 'serial'
+     *
+     * @param  mixed    $serial Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterBySerial( $serial ) {
+        $this->filter[] = '`serial` = "'.$this->quote($serial).'"';
+        return $this;
+    }   // filterBySerial()
+
+    /**
+     * Filter for field 'channel'
+     *
+     * @param  mixed    $channel Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByChannel( $channel ) {
+        $this->filter[] = '`channel` = "'.$this->quote($channel).'"';
+        return $this;
+    }   // filterByChannel()
+
+    /**
+     * Filter for field 'description'
+     *
+     * @param  mixed    $description Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByDescription( $description ) {
+        $this->filter[] = '`description` = "'.$this->quote($description).'"';
+        return $this;
+    }   // filterByDescription()
+
+    /**
+     * Filter for field 'resolution'
+     *
+     * @param  mixed    $resolution Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByResolution( $resolution ) {
+        $this->filter[] = '`resolution` = "'.$this->quote($resolution).'"';
+        return $this;
+    }   // filterByResolution()
+
+    /**
+     * Filter for field 'cost'
+     *
+     * @param  mixed    $cost Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByCost( $cost ) {
+        $this->filter[] = '`cost` = "'.$this->quote($cost).'"';
+        return $this;
+    }   // filterByCost()
+
+    /**
+     * Filter for field 'meter'
+     *
+     * @param  mixed    $meter Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByMeter( $meter ) {
+        $this->filter[] = '`meter` = "'.$this->quote($meter).'"';
+        return $this;
+    }   // filterByMeter()
+
+    /**
+     * Filter for field 'numeric'
+     *
+     * @param  mixed    $numeric Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByNumeric( $numeric ) {
+        $this->filter[] = '`numeric` = "'.$this->quote($numeric).'"';
+        return $this;
+    }   // filterByNumeric()
+
+    /**
+     * Filter for field 'offset'
+     *
+     * @param  mixed    $offset Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByOffset( $offset ) {
+        $this->filter[] = '`offset` = "'.$this->quote($offset).'"';
+        return $this;
+    }   // filterByOffset()
+
+    /**
+     * Filter for field 'adjust'
+     *
+     * @param  mixed    $adjust Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByAdjust( $adjust ) {
+        $this->filter[] = '`adjust` = "'.$this->quote($adjust).'"';
+        return $this;
+    }   // filterByAdjust()
+
+    /**
+     * Filter for field 'unit'
+     *
+     * @param  mixed    $unit Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByUnit( $unit ) {
+        $this->filter[] = '`unit` = "'.$this->quote($unit).'"';
+        return $this;
+    }   // filterByUnit()
+
+    /**
+     * Filter for field 'decimals'
+     *
+     * @param  mixed    $decimals Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByDecimals( $decimals ) {
+        $this->filter[] = '`decimals` = "'.$this->quote($decimals).'"';
+        return $this;
+    }   // filterByDecimals()
+
+    /**
+     * Filter for field 'threshold'
+     *
+     * @param  mixed    $threshold Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByThreshold( $threshold ) {
+        $this->filter[] = '`threshold` = "'.$this->quote($threshold).'"';
+        return $this;
+    }   // filterByThreshold()
+
+    /**
+     * Filter for field 'valid_from'
+     *
+     * @param  mixed    $valid_from Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByValidFrom( $valid_from ) {
+        $this->filter[] = '`valid_from` = "'.$this->quote($valid_from).'"';
+        return $this;
+    }   // filterByValidFrom()
+
+    /**
+     * Filter for field 'valid_to'
+     *
+     * @param  mixed    $valid_to Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByValidTo( $valid_to ) {
+        $this->filter[] = '`valid_to` = "'.$this->quote($valid_to).'"';
+        return $this;
+    }   // filterByValidTo()
+
+    /**
+     * Filter for field 'public'
+     *
+     * @param  mixed    $public Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByPublic( $public ) {
+        $this->filter[] = '`public` = "'.$this->quote($public).'"';
+        return $this;
+    }   // filterByPublic()
+
+    /**
+     * Filter for field 'extra'
+     *
+     * @param  mixed    $extra Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByExtra( $extra ) {
+        $this->filter[] = '`extra` = "'.$this->quote($extra).'"';
+        return $this;
+    }   // filterByExtra()
+
+    /**
+     * Filter for field 'comment'
+     *
+     * @param  mixed    $comment Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByComment( $comment ) {
+        $this->filter[] = '`comment` = "'.$this->quote($comment).'"';
+        return $this;
+    }   // filterByComment()
+
+    /**
+     * Filter for field 'type_id'
+     *
+     * @param  mixed    $type_id Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByTypeId( $type_id ) {
+        $this->filter[] = '`type_id` = "'.$this->quote($type_id).'"';
+        return $this;
+    }   // filterByTypeId()
+
+    /**
+     * Filter for field 'type'
+     *
+     * @param  mixed    $type Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByType( $type ) {
+        $this->filter[] = '`type` = "'.$this->quote($type).'"';
+        return $this;
+    }   // filterByType()
+
+    /**
+     * Filter for field 'model'
+     *
+     * @param  mixed    $model Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByModel( $model ) {
+        $this->filter[] = '`model` = "'.$this->quote($model).'"';
+        return $this;
+    }   // filterByModel()
+
+    /**
+     * Filter for field 'childs'
+     *
+     * @param  mixed    $childs Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByChilds( $childs ) {
+        $this->filter[] = '`childs` = "'.$this->quote($childs).'"';
+        return $this;
+    }   // filterByChilds()
+
+    /**
+     * Filter for field 'read'
+     *
+     * @param  mixed    $read Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByRead( $read ) {
+        $this->filter[] = '`read` = "'.$this->quote($read).'"';
+        return $this;
+    }   // filterByRead()
+
+    /**
+     * Filter for field 'write'
+     *
+     * @param  mixed    $write Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByWrite( $write ) {
+        $this->filter[] = '`write` = "'.$this->quote($write).'"';
+        return $this;
+    }   // filterByWrite()
+
+    /**
+     * Filter for field 'graph'
+     *
+     * @param  mixed    $graph Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByGraph( $graph ) {
+        $this->filter[] = '`graph` = "'.$this->quote($graph).'"';
+        return $this;
+    }   // filterByGraph()
+
+    /**
+     * Filter for field 'icon'
+     *
+     * @param  mixed    $icon Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByIcon( $icon ) {
+        $this->filter[] = '`icon` = "'.$this->quote($icon).'"';
+        return $this;
+    }   // filterByIcon()
+
+    /**
+     * Filter for field 'alias'
+     *
+     * @param  mixed    $alias Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByAlias( $alias ) {
+        $this->filter[] = '`alias` = "'.$this->quote($alias).'"';
+        return $this;
+    }   // filterByAlias()
+
+    /**
+     * Filter for field 'alias_of'
+     *
+     * @param  mixed    $alias_of Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByAliasOf( $alias_of ) {
+        $this->filter[] = '`alias_of` = "'.$this->quote($alias_of).'"';
+        return $this;
+    }   // filterByAliasOf()
+
+    /**
+     * Filter for field 'level'
+     *
+     * @param  mixed    $level Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByLevel( $level ) {
+        $this->filter[] = '`level` = "'.$this->quote($level).'"';
+        return $this;
+    }   // filterByLevel()
+
+    /**
+     * Filter for field 'haschilds'
+     *
+     * @param  mixed    $haschilds Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByHaschilds( $haschilds ) {
+        $this->filter[] = '`haschilds` = "'.$this->quote($haschilds).'"';
+        return $this;
+    }   // filterByHaschilds()
+
+    /**
+     * Filter for field 'lower'
+     *
+     * @param  mixed    $lower Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByLower( $lower ) {
+        $this->filter[] = '`lower` = "'.$this->quote($lower).'"';
+        return $this;
+    }   // filterByLower()
+
+    /**
+     * Filter for field 'upper'
+     *
+     * @param  mixed    $upper Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByUpper( $upper ) {
+        $this->filter[] = '`upper` = "'.$this->quote($upper).'"';
+        return $this;
+    }   // filterByUpper()
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_tree_view';
+
+}

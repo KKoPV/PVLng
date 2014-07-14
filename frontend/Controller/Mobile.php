@@ -35,7 +35,7 @@ class Mobile extends \Controller {
                 if ($id == 'p') continue;
 
                 // Get entity attributes
-                $tree->find('id', $id);
+                $tree->reset()->filterById($id)->findOne();
                 $new_data[] = array(
                     'id'           => +$tree->id,
                     'guid'         => $tree->guid,
@@ -46,9 +46,9 @@ class Mobile extends \Controller {
             }
 
             $views[] = array(
-                'NAME'    => $row->name,
-                'PERIOD'  => $data->p,
-                'DATA'    => json_encode($new_data)
+                'name'   => $row->name,
+                'period' => $data->p,
+                'data'   => json_encode($new_data)
             );
 
             if ($this->view->View1st == '') $this->view->View1st = $row->name;

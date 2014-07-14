@@ -12,16 +12,30 @@ namespace Channel;
 /**
  *
  */
-class MeterToSensor extends \Channel {
+class MeterToSensor extends Channel {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
+     * Accept only childs with meter attribute set
      */
-    const TYPE = SENSOR_CHANNEL;
+    public function addChild( $channel ) {
+        $childs = $this->getChilds();
+        if (empty($childs)) {
+            $new  = new \ORM\Channel($channel);
+            if ($new->getType() == 0) {
+                // Is an alias, get real channel
+                $guid = $new->getChannel();
+                $new = new \ORM\Tree;
+                $new->filterByGuid($guid)->findOne();
+            }
+
+            if ($new->getMeter() == 0) {
+                throw new \Exception('"SensorToMeter" accept only a meter channel as child!');
+            }
+
+        }
+        // Add child or throw exception about only 1 child...
+        return parent::addChild($channel);
+    }
 
     /**
      *
@@ -36,21 +50,33 @@ class MeterToSensor extends \Channel {
         }
 
         $buffer = $this->getChild(1)->read($request)->rewind();
-        $last = $buffer->current();
+        $last1 = $buffer->current();
+        $buffer->next();
+        $last2 = $buffer->current();
+        $key = $buffer->key();
         $buffer->next();
 
         $result = new \Buffer;
 
         while ($row = $buffer->current()) {
-            $fact = 3600 / ($row['timestamp'] - $last['timestamp']);
+            $fact = 3600 / ($row['timestamp'] - $last2['timestamp']);
+
             // Smooth a bit by calculate average of this and last consumption
-            $row['data'] = ($row['consumption'] + $last['consumption']) / 2 * $fact;
+            $row['data'] = ($last1['consumption'] + $last2['consumption'] + $row['consumption']) / 3 * $fact;
             $row['min']  = $row['min'] * $fact;
             $row['max']  = $row['max'] * $fact;
+
             // Remember row before adjust consumption
-            $last = $row;
+            $last1 = $last2;
+            $last2 = $row;
+
+            // Set timestamp to last timestamp, which is now in $last1
+            $row['timestamp'] = $last1['timestamp'];
+            $row['datetime']  = $last1['datetime'];
             $row['consumption'] = 0;
-            $result->write($row, $buffer->key());
+            $result->write($row, $key);
+
+            $key = $buffer->key();
             $buffer->next();
         }
 

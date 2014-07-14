@@ -1,5 +1,20 @@
-#tree tr:hover {
+/**
+ *
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
+ */
+
+#tree tr:hover td {
     background-color: #C0FFC0;
+    border-top: 3px solid #C0FFC0;
+}
+
+/* Chosen */
+table.dataTable tfoot li {
+    font-weight: normal;
 }
 
 .draggable,
@@ -9,33 +24,45 @@
 }
 
 .draggable {
-    cursor: move;
-    border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
+    cursor: default;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
 }
 
 .draggable:hover {
     border: 1px dashed black;
 }
 
-#drag-new,
+#drag-new.ui-state-hover,
 .draggable.ui-state-hover {
     border: 1px solid black;
 }
 
 .droppable.odd {
     border-left: 4px solid white;
-    border-top: 1px solid #EEE;
-    border-bottom: 1px solid #EEE;
+}
+
+.droppable.odd td {
+    border-top: 3px solid white;
 }
 
 .droppable.even {
     border-left: 4px solid white;
-    border-top: 1px solid white;
-    border-bottom: 1px solid white;
 }
 
-.droppable.ui-state-active {
+.droppable.even td {
+    border-top: 3px solid #EEE;
+}
+
+.droppable.group.ui-state-active {
     border-left: 4px solid green;
+}
+
+.droppable.group.ui-state-active td {
+    border-top: 3px solid white;
+}
+
+.droppable.channel.ui-state-active td {
+    border-top: 3px solid green !important;
 }

@@ -49,6 +49,9 @@ return array(
     'cost' => array(
         'visible' => FALSE,
     ),
+    'tariff' => array(
+        'visible'  => FALSE
+    ),
     'threshold' => array(
         'visible' => FALSE,
     ),

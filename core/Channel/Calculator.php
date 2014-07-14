@@ -12,23 +12,34 @@ namespace Channel;
 /**
  *
  */
-class Calculator extends \Channel {
+class Calculator extends Channel {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
+     * Accept only childs of the same meter attribute and unit
      */
-    const TYPE = NUMERIC_CHANNEL;
-
-    /**
-     * Run additional code before data saved to database
-     * Read latitude / longitude from extra attribute
-     */
-    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
-        $fields['cost']['VISIBLE'] = $channel->meter;
+    public function addChild( $channel ) {
+        $childs = $this->getChilds(TRUE);
+        if (empty($childs)) {
+            // Add 1st child
+            $child = parent::addChild($channel);
+            // Adopt meter and icon
+            $self = new \ORM\Channel($this->entity);
+            $new  = $this->getRealChannel($channel);
+            $self->setMeter($new->getMeter())->setIcon($new->getIcon())->update();
+        } else {
+            // Check if the new child have the same type and unit as the 1st (and any other) child
+            $first = $childs[0];
+            $next  = $this->getRealChannel($channel);
+            if ($first->meter == $next->getMeter() AND $first->unit == $next->getUnit()) {
+                // ok, add new child
+                $child = parent::addChild($channel);
+            } else {
+                $meter = $first->meter ? 'meter' : 'sensor';
+                \Messages::Error('"'.$this->name.'" accepts only '.$meter.' channels with unit '.$first->unit, 400);
+                return;
+            }
+        }
+        return $child;
     }
 
     /**
@@ -47,4 +58,21 @@ class Calculator extends \Channel {
         return $this->after_read($child->read($request));
     }
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected function getRealChannel( $channel ) {
+        $channel = new \ORM\Channel($channel);
+        if ($channel->getType() == 0) {
+            // Is an alias, get real channel
+            $guid = $channel->getChannel();
+            $channel = new \ORM\Tree;
+            $channel->filterByGuid($guid)->findOne();
+        }
+        return $channel;
+    }
 }

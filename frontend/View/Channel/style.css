@@ -5,3 +5,24 @@
 .ro {
     background-color: #E0E0E0 !important;
 }
+
+td.hint {
+    font-size: 90%;
+    vertical-align: top;
+    padding-top: .5em;
+    padding-bottom: .5em;
+}
+
+#tplTable ul {
+    padding-left: 15px;
+}
+
+textarea {
+    width: 98%;
+}
+
+input.code,
+textarea.code {
+    font-family: monospace;
+    font-size: 120%;
+}

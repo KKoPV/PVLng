@@ -29,7 +29,7 @@
     <meta http-equiv="Content-Script-Type" content="text/javascript">
 
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
-    <link rel="stylesheet" href="/css/mobile.css" />
+    <link rel="stylesheet" href="/css/mobile.min.css" />
 
     {HEAD}
 
@@ -41,14 +41,25 @@
 
     {CONTENT}
 
-    <script src="/js/trmix.js"></script>
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>
+
+    <!-- IF {DEVELOPMENT} -->
     <script src="/js/mobile.js"></script>
+    <script src="/js/chart.js"></script>
+    <!-- ELSE -->
+    <script src="/js/mobile.min.js"></script>
+    <script src="/js/chart.min.js"></script>
+    <!-- ENDIF -->
+    <script src="/js/trmix.min.js"></script>
+
+    <!-- load Highcharts scripts direct from highcharts.com -->
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
 
     <script>
-    var PVLngAPI = 'http://{SERVERNAME}/api/r3/';
+    var PVLngAPI = 'http://{SERVERNAME}/api/r4/';
     </script>
 
     {SCRIPTS}

@@ -10,16 +10,6 @@
 abstract class Channel {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     * GROUP_CHANNEL     - generic group
-     */
-    const TYPE = UNDEFINED_CHANNEL;
-
-    /**
      * Mark that a channel is used as sub channel for readout
      */
     public $isChild = FALSE;
@@ -27,41 +17,45 @@ abstract class Channel {
     /**
      * Helper function to build an instance
      */
-    public static function byId( $id ) {
+    public static function byId( $id, $alias=TRUE ) {
         $channel = new ORM\Tree($id);
 
-        if ($channel->alias_of) {
-            // Is an alias channel, switch direct to the original channel
-            return self::byId($channel->alias_of);
-        } elseif ($channel->model) {
-            $model = $channel->ModelClass();
-            return new $model($channel);
+        if (!$channel->getId()) {
+            throw new Exception('No channel found for Id: '.$id, 400);
         }
 
-        throw new Exception('No channel found for Id: '.$id, 400);
+        if ($channel->getAliasOf() AND $alias) {
+            // Is an alias channel, switch direct to the original channel
+            return self::byId($channel->getAliasOf());
+        }
+
+        $model = $channel->ModelClass();
+        return new $model($channel);
     }
 
     /**
      * Helper function to build an instance
      */
-    public static function byGUID( $guid ) {
+    public static function byGUID( $guid, $alias=TRUE ) {
         $channel = new ORM\Tree;
+        $channel->filterByGuid($guid)->findOne();
 
-        if ($channel->findByGUID($guid)->alias_of) {
+        if ($channel->getAliasOf() AND $alias) {
             // Is an alias channel, switch direct to the original channel
-            return self::byId($channel->alias_of);
-        } elseif ($channel->model) {
+            return self::byId($channel->getAliasOf());
+        } elseif ($channel->getModel()) {
             // Channel is in tree
             $model = $channel->ModelClass();
             return new $model($channel);
         } else {
             // NOT in tree, may be a real writable channel?! "Fake" a tree entry
             $c = new ORM\ChannelView;
-            $c->find('guid', $guid);
-            if ($c->id AND $c->write) {
-                foreach ($c->getAll() as $key=>$value) $channel->set($key, $value);
-                $channel->id = 0;
-                $channel->entity = $c->id;
+            $c->filterByGuid($guid)->findOne();
+            if ($c->getId() AND $c->getWrite()) {
+                $data = $c->asAssoc();
+                $data['id'] = 0;
+                $data['entity'] = $c->getId();
+                $channel->set($data);
                 $model = $c->ModelClass();
                 return new $model($channel);
             }
@@ -73,11 +67,11 @@ abstract class Channel {
     /**
      * Helper function to build an instance
      */
-    public static function byChannel( $id ) {
+    public static function byChannel( $id, $alias=TRUE ) {
         $channel = new ORM\ChannelView($id);
 
-        if ($channel->guid) {
-            return self::byGUID($channel->guid);
+        if ($channel->getGuid()) {
+            return self::byGUID($channel->getGuid(), $alias);
         }
 
         throw new Exception('No channel found for ID: '.$id, 400);
@@ -142,7 +136,7 @@ abstract class Channel {
      */
     public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
         foreach ($fields as $name=>$data) {
-            $channel->$name = $data['VALUE'];
+            $channel->set($name, $data['VALUE']);
         }
     }
 
@@ -155,16 +149,39 @@ abstract class Channel {
     /**
      *
      */
-    public function addChild( $guid ) {
-        $childs = $this->getChilds();
+    public function addChild( $channel ) {
+        $childs = $this->getChilds(TRUE);
 
-        if (count($this->getChilds()) == $this->childs) {
-            throw new \Exception($this->name.' accepts only '
-                                .$this->childs . ' child(s) at all', 400);
+        // Root node (id == 1) accept always childs
+        if ($this->id == 1 OR
+            $this->childs == -1 OR count($this->getChilds()) < $this->childs) {
+            return NestedSet::getInstance()->insertChildNode($channel, $this->id);
         }
 
-        $new = self::byGUID($guid);
-        return NestedSet::getInstance()->insertChildNode($new->entity, $this->id);
+        Messages::Error(__('AcceptChild', $this->childs, $this->name), 400);
+    }
+
+    /**
+     *
+     */
+    public function removeFromTree() {
+        $tree = NestedSet::getInstance();
+
+        // Remember parent node
+        $parent = $tree->getParent($this->id);
+
+        if (!$tree->DeleteBranch($this->id)) return FALSE;
+
+        if ($tree->getChildCount($parent['id']) == 0) {
+            // Reset parent channel icon
+            $this->db->query(
+                'UPDATE `pvlng_channel` AS c,
+                        `pvlng_type` AS t
+                    SET c.`icon` = t.`icon`
+                  WHERE c.`id` = {1} AND c.`type` = t.`id`',
+                $parent['entity']
+            );
+        }
     }
 
     /**
@@ -190,7 +207,8 @@ abstract class Channel {
                     'end'         => $this->end,
                     'consumption' => 0,
                     'costs'       => 0
-                )
+                ),
+                $this->attributes
             );
         }
     }
@@ -267,13 +285,13 @@ abstract class Channel {
 
         // Write performance only for "real" savings if the program flow
         // can to here and not returned earlier
-        $this->performance->action = 'write';
+        $this->performance->setAction('write');
 
-        $reading->id        = $this->entity;
-        $reading->timestamp = $timestamp;
-        $reading->data      = $this->value;
-
-        $rc = $reading->insert();
+        $rc = $reading
+              ->setId($this->entity)
+              ->setTimestamp($timestamp)
+              ->setData($this->value)
+              ->insert();
 
         if ($rc) Hook::process('data.save.after', $this);
 
@@ -287,7 +305,7 @@ abstract class Channel {
 
         $logSQL = slimMVC\Config::getInstance()->get('Log.SQL');
 
-        $this->performance->action = 'read';
+        $this->performance->setAction('read');
 
         $this->before_read($request);
 
@@ -313,24 +331,37 @@ abstract class Channel {
               ->get(0, 'count')
               ->get(0, 'timediff')
               ->get($this->meter ? 'data' : 0, 'consumption')
-              ->whereEQ('id', $this->entity)
-              ->orderDescending('timestamp')
+              ->filter('id', $this->entity)
+              ->order('timestamp', TRUE)
               ->limit(1);
-            $row = $this->db->queryRow($q);
+
+            if ($this->period[1] != self::READLAST) {
+                $this->filterReadTimestamp($q);
+            }
+
+            $row = (array) $this->db->queryRow($q);
 
             if (!$row) return $this->after_read($buffer);
 
-            if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
+            $row = (array) $row;
 
-            // Reset query and read add. data
-            $q->select($this->table[$this->numeric])
-              ->get($q->MIN('data'), 'min')
-              ->get($q->MAX('data'), 'max')
-              ->get($q->COUNT('id'), 'count')
-              ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
-              ->whereEQ('id', $this->entity)
-              ->limit(1);
-            $buffer->write(array_merge((array) $row, (array) $this->db->queryRow($q)));
+            if ($this->period[1] != self::READLAST) {
+                if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
+                $this->SQLHeader($request, $q);
+
+                // Reset query and read add. data
+                $q->select($this->table[$this->numeric])
+                  ->get($q->MIN('data'), 'min')
+                  ->get($q->MAX('data'), 'max')
+                  ->get($q->COUNT('id'), 'count')
+                  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
+                  ->filter('id', $this->entity)
+                  ->limit(1);
+                $this->filterReadTimestamp($q);
+                $row = array_merge($row, (array) $this->db->queryRow($q));
+            }
+
+            $buffer->write($row);
 
         } else {
 
@@ -373,22 +404,8 @@ abstract class Channel {
                   ->group('g');
             }
 
-            if ($this->period[1] != self::ALL) {
-                // Time is only relevant for period != ALL
-                if ($this->start) {
-                    if (!$this->meter) {
-                        $q->whereGE('timestamp', $this->start);
-                    } else {
-                        // Fetch also period before start for correct consumption calculation!
-                        $q->whereGE('timestamp', $this->start-$this->TimestampMeterOffset[$this->period[1]]);
-                    }
-                }
-                if ($this->end < time()) {
-                    $q->whereLT('timestamp', $this->end);
-                }
-            }
-
-            $q->whereEQ('id', $this->entity)->order('timestamp');
+            $this->filterReadTimestamp($q);
+            $q->filter('id', $this->entity)->order('timestamp');
 
             // Use bufferd result set
             $this->db->Buffered = TRUE;
@@ -440,13 +457,40 @@ abstract class Channel {
 
         if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
 
-        if (array_key_exists('sql', $request) AND $request['sql']) {
-            $sql = $this->name;
-            if ($this->description) $sql .= ' (' . $this->description . ')';
-            Header('X-SQL-'.substr(md5($sql), 8) . ': ' . $sql . ': ' . $q);
-        }
+        $this->SQLHeader($request, $q);
 
         return $this->after_read($buffer);
+    }
+
+    /**
+     *
+     */
+    protected function filterReadTimestamp( &$q ) {
+        if ($this->period[1] != self::ALL) {
+            // Time is only relevant for period != ALL
+            if ($this->start) {
+                if (!$this->meter) {
+                    $q->filter('timestamp', array('min'=>$this->start));
+                } else {
+                    // Fetch also period before start for correct consumption calculation!
+                    $q->filter('timestamp', array('min'=>$this->start-$this->TimestampMeterOffset[$this->period[1]]));
+                }
+            }
+            if ($this->end < time()) {
+                $q->filter('timestamp', array('max'=>$this->end-1));
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    protected function SQLHeader( $request, $q ) {
+        if (!array_key_exists('sql', $request) OR !$request['sql']) return;
+
+        $sql = $this->name;
+        if ($this->description) $sql .= ' (' . $this->description . ')';
+        Header('X-SQL-' . uniqid() . ': ' . $sql . ': ' . $q);
     }
 
     /**
@@ -458,11 +502,9 @@ abstract class Channel {
         Header(sprintf('X-Query-Time: %d ms', $time));
 
         // Check for real action to log
-        if ($this->performance->action == '') return;
-
-        $this->performance->entity = $this->entity;
-        $this->performance->time = $time;
-        $this->performance->insert();
+        if ($this->performance->getAction()) {
+            $this->performance->setTime($time)->insert();
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -508,6 +550,11 @@ abstract class Channel {
     protected $time;
 
     /**
+     * Extra attributes
+     */
+    protected $attributes = array();
+
+    /**
      * Grouping
      */
     const NO        =  0;
@@ -545,14 +592,13 @@ abstract class Channel {
      *
      */
     protected function __construct( ORM\Tree $channel ) {
-        $this->time = microtime(TRUE);
-        $this->db = slimMVC\MySQLi::getInstance();
+        $this->time   = microtime(TRUE);
+        $this->db     = slimMVC\MySQLi::getInstance();
         $this->config = slimMVC\Config::getInstance();
 
-        foreach ($channel->getAll() as $key=>$value) {
+        foreach ($channel->asAssoc() as $key=>$value) {
             $this->$key = $value;
         }
-        $this->extra = json_decode($this->extra);
 
         $this->performance = new ORM\Performance;
     }
@@ -581,8 +627,8 @@ abstract class Channel {
     /**
      * Lazy load childs on request
      */
-    protected function getChilds() {
-        if (is_null($this->_childs)) {
+    protected function getChilds( $refresh=FALSE ) {
+        if ($refresh OR is_null($this->_childs)) {
             $this->_childs = array();
             foreach (NestedSet::getInstance()->getChilds($this->id) as $child) {
                 $child = self::byID($child['id']);
@@ -699,7 +745,7 @@ abstract class Channel {
             }
             $this->start = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
         } else {
-            $this->start = is_numeric($request['start'])
+            $this->start = ($request['start'] == '' OR is_numeric($request['start']))
                          ? $request['start']
                          : strtotime($request['start']);
         }
@@ -827,12 +873,3 @@ abstract class Channel {
     private $_childs;
 
 }
-
-/**
- *
- */
-define('UNDEFINED_CHANNEL', 0);
-define('NUMERIC_CHANNEL',   1);
-define('SENSOR_CHANNEL',    2);
-define('METER_CHANNEL',     3);
-define('GROUP_CHANNEL',     4);

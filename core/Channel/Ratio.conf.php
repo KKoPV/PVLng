@@ -21,7 +21,7 @@ return array(
 
     'unit' => array(
         'readonly' => TRUE,
-        'default' => '%',
+        'default'  => '%',
     )
 
 );

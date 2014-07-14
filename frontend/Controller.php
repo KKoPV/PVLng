@@ -1,4 +1,4 @@
-<?php
+<?php /* // AOP // */
 /**
  *
  *
@@ -17,31 +17,16 @@ class Controller extends slimMVC\Controller {
 
         // Shortcuts
         $this->db = $this->app->db;
+        $this->cache = $this->app->cache;
         $this->config = $this->app->config;
         $this->request = $this->app->request;
-
-        $model = str_replace('Controller', 'Model', get_class($this));
-
-        if (class_exists($model)) {
-            // Controler has its own model
-            $this->model = new $model;
-        } else {
-            // General model
-            $this->model = new Model;
-        }
-
         $this->view = $this->app->view;
+
+        $this->view->Helper->translate = function() {
+            return call_user_func_array('I18N::translate', func_get_args());
+        };
+
         $this->Layout = 'default';
-
-        $controller = str_replace('Controller\\', '', get_class($this));
-
-        $this->config->loadNamespace('Controller.'.$controller,
-                                     APP_DIR . DS . 'Controller' . DS . $controller . '.default.php',
-                                     FALSE);
-
-        $this->config->loadNamespace('Controller.'.$controller,
-                                     APP_DIR . DS . 'Controller' . DS . $controller . '.config.php',
-                                     FALSE);
 
         if ($returnto = $this->app->request->get('returnto')) {
             Session::set('returnto', $returnto);
@@ -52,19 +37,21 @@ class Controller extends slimMVC\Controller {
             $this->User = Session::get('user');
         }
 
-        $this->view->Module = strtolower($controller);
+        $this->controller = str_replace('Controller\\', '', get_class($this));
+
+        $this->view->Module = strtolower($this->controller);
         $this->view->User = $this->User;
         $this->view->Embedded = $this->app->request->get('embedded');
-        $controller = str_replace('Controller\\', '', get_class($this));
 
         $this->view->BaseDir = array(
-            APP_DIR . DS . 'View' . DS . $controller . DS . 'custom',
-            APP_DIR . DS . 'View' . DS . $controller,
+            APP_DIR . DS . 'View' . DS . $this->controller . DS . 'custom',
+            APP_DIR . DS . 'View' . DS . $this->controller,
             APP_DIR . DS . 'View' . DS . 'custom',
             APP_DIR . DS . 'View'
         );
 
         $this->view->Menu = PVLng::getMenu();
+        $this->view->SubMenus = json_encode(PVLng::getSubMenu());
         $this->view->Languages = PVLng::getLanguages();
     }
 
@@ -74,7 +61,15 @@ class Controller extends slimMVC\Controller {
     public function after() {
         /* For Logout */
         $this->view->User = $this->User;
-        if ($this->User) $this->view->APIkey = (new \ORM\Config)->getAPIkey();
+        if ($this->User) {
+            if ($this->config->get('TokenLogin')) {
+                $this->view->Token = \PVLng::getLoginToken();
+            }
+            while ($this->cache->save('APIkey', $APIkey)) {
+                $APIkey = (new \ORM\Config)->getAPIkey();
+            }
+            $this->view->APIkey = $APIkey;
+        }
         parent::after();
     }
 
@@ -92,33 +87,30 @@ class Controller extends slimMVC\Controller {
      *
      */
     public function finalize( $action ) {
-        $bk = BabelKitMySQLi::getInstance();
-
-        $this->view->DateTimeFormat      = $bk->render('locale', LANGUAGE, 'DateTime');
-        $this->view->DateTimeFormatShort = $bk->render('locale', LANGUAGE, 'DateTimeShort');
-        $this->view->DateFormat          = $bk->render('locale', LANGUAGE, 'Date');
-        $this->view->DateFormatShort     = $bk->render('locale', LANGUAGE, 'DateShort');
-        $this->view->TimeFormat          = $bk->render('locale', LANGUAGE, 'Time');
-        $this->view->TimeFormatShort     = $bk->render('locale', LANGUAGE, 'TimeShort');
-        $this->view->MonthFormat         = $bk->render('locale', LANGUAGE, 'MonthDefault');
-        $this->view->TSep                = $bk->render('locale', LANGUAGE, 'ThousandSeparator');
-        $this->view->DSep                = $bk->render('locale', LANGUAGE, 'DecimalPoint');
-        $this->view->DateFormatJS        = $bk->render('locale', LANGUAGE, 'DateJS');
+        $this->view->DateTimeFormat      = $this->config->get('Locale.DateTime');
+        $this->view->DateTimeFormatShort = $this->config->get('Locale.DateTimeShort');
+        $this->view->DateFormat          = $this->config->get('Locale.Date');
+        $this->view->DateFormatShort     = $this->config->get('Locale.DateShort');
+        $this->view->TimeFormat          = $this->config->get('Locale.Time');
+        $this->view->TimeFormatShort     = $this->config->get('Locale.TimeShort');
+        $this->view->MonthFormat         = $this->config->get('Locale.MonthDefault');
+        $this->view->TSep                = $this->config->get('Locale.ThousandSeparator');
+        $this->view->DSep                = $this->config->get('Locale.DecimalPoint');
+        $this->view->DateFormatJS        = $this->config->get('Locale.DateJS');
         $this->view->Year                = date('Y');
 
         if ($this->config->get('develop')) {
             $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
             $this->view->Development = TRUE;
+            $this->config->set('View.Verbose', TRUE);
         }
-        $this->view->Language = LANGUAGE;
 
+        $this->view->Language = $this->app->Language;
         $this->view->CurrencyISO = $this->config->get('Currency.ISO');
         $this->view->CurrencySymbol = $this->config->get('Currency.Symbol');
         $this->view->CurrencyDecimals = $this->config->get('Currency.Decimals');
 
-        $this->view->Title = $this->config['Title'];
-
-        $controller = str_replace('Controller\\', '', get_class($this));
+        $this->view->Title = $this->config->get('Title');
 
         $messages = array();
         foreach (Messages::getRaw() as $message) {
@@ -138,14 +130,14 @@ class Controller extends slimMVC\Controller {
         $this->view->VersionDate = PVLNG_VERSION_DATE;
 
         $this->view->PHPVersion = PHP_VERSION;
-        $this->view->MySQLVersion = $this->model->getDatabaseVersion();
+        $this->view->MySQLVersion = $this->db->queryOne('SELECT version()');
         $this->view->ServerName = $_SERVER['HTTP_HOST'];
         $this->view->ServerVersion = $_SERVER['SERVER_SOFTWARE'];
 
         // Put all controller specific config also into view
-        if ($cfg = $this->config->get('Controller.'.$controller)) {
+        if ($cfg = $this->config->get('Controller.'.$this->controller)) {
             foreach ($cfg as $key=>$value) {
-                $this->view->set($controller.'_'.$key, $value);
+                $this->view->set($this->controller.'_'.$key, $value);
             }
         }
 
@@ -155,47 +147,25 @@ class Controller extends slimMVC\Controller {
             $this->db->VersionNew = isset($version[0]) ? $version[0] : FALSE;
             Session::set('VersionCheck', time());
         }
-        $v = $this->db->VersionNew;
-        if ($v AND $v != PVLNG_VERSION) $this->view->VersionNew = $v;
+        $this->view->VersionNew = ($this->db->VersionNew > PVLNG_VERSION) ? $this->db->VersionNew : NULL;
 
         // Missing files are ok
-        $this->view->append('Head', $this->view->fetch('head.tpl'));
+        // Head append
         $this->view->append('Head', $this->view->fetch('head.'.$action.'.tpl'));
 
         // Styles
-        $file = APP_DIR . DS . 'View' . DS . $controller . DS . 'style.css';
-        if (file_exists($file)) {
-            $this->view->append('Styles', $this->view->fetch($file));
-        }
+        $this->view->append('Styles', $this->view->fetch(APP_DIR . DS . 'View' . DS . $this->controller . DS . 'style.css'));
+        $this->view->append('Styles', $this->view->fetch(APP_DIR . DS . 'View' . DS . $this->controller . DS . 'style.' . $action . '.css'));
 
-        $file = APP_DIR . DS . 'View' . DS . $controller . DS . 'style.' . $action . '.css';
-        if (file_exists($file)) {
-            $this->view->append('Styles', $this->view->fetch($file));
-        }
-
-        // Missing files are ok
+        // Content
         $this->view->assign('Content', 'content.'.$action.'.tpl');
         $this->view->assign('Content', 'content.tpl');
 
-        // Missing files are ok
+        // Scripts
         $this->view->append('Scripts', $this->view->fetch('script.js'));
         $this->view->append('Scripts', $this->view->fetch('script.'.$action.'.js'));
 
         $this->view->display($this->Layout.'.tpl');
-    }
-
-    /**
-     * Helper function to convert array of db result rows into well formed
-     * array for a view
-     *
-     * @param array $rows
-     */
-    public function rows2view( $rows ) {
-        $data = array();
-        foreach ($rows as $row) {
-            $data[] = array_change_key_case((array) $row, CASE_UPPER);
-        }
-        return $data;
     }
 
     // -------------------------------------------------------------------------
@@ -206,6 +176,11 @@ class Controller extends slimMVC\Controller {
      *
      */
     protected $db;
+
+    /**
+     *
+     */
+    protected $cache;
 
     /**
      *
@@ -225,6 +200,11 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
+    protected $controller;
+
+    /**
+     *
+     */
     protected $view;
 
     /**
@@ -240,8 +220,32 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
+    protected function PresetAndPeriod() {
+
+        $bk = \BabelKitMySQLi::getInstance();
+
+        /// \Yryie::StartTimer('LoadPreset', NULL, 'CacheDB');
+        while ($this->app->cache->save('preset/'.$this->app->Language, $preset)) {
+            /// \Yryie::Info('Load preset from Database');
+            $preset = $bk->select('preset', $this->app->Language);
+        }
+        /// \Yryie::StopTimer('LoadPreset');
+        $this->view->PresetSelect = $preset;
+
+        /// \Yryie::StartTimer('LoadPeriod', NULL, 'CacheDB');
+        while ($this->app->cache->save('period/'.$this->app->Language, $period)) {
+            /// \Yryie::Info('Load period from Database');
+            $period = $bk->select('period', $this->app->Language);
+        }
+        /// \Yryie::StopTimer('LoadPeriod');
+        $this->view->PeriodSelect = $period;
+    }
+
+    /**
+     *
+     */
     protected function checkVersion() {
-        $url = "https://raw.github.com/KKoPV/PVLng/master/.version";
+        $url = 'https://raw.github.com/KKoPV/PVLng/master/.version';
 
         $ch = curl_init($url);
 
@@ -250,11 +254,11 @@ class Controller extends slimMVC\Controller {
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 
-        $version = explode("\n", curl_exec($ch));
+        $version = curl_exec($ch);
 
         curl_close($ch);
 
-        return $version;
+        return explode("\n", $version);
     }
 
 }

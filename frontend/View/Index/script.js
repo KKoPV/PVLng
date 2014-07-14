@@ -3,166 +3,48 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
-
-/**
-Chart canvas height
-Width is 940px,
-- Ratio  5 x  4 : 752
-- Ratio  4 x  3 : 705
-- Ratio 16 x 10 : 587
-- Ratio 10 x  6 : 564
-- Ratio 16 x  9 : 528
- */
-
-var ChartHeight = 528;
-
-/* refresh timeout in sec., set 0 for no automatic refresh */
-var RefreshTimeout = 300;
-
-/* ------------------------------------------------------------------------ */
 </script>
 
-<script src="/js/chart.js+jquery.treetable.js+spectrum.js"></script>
 <!--
 <script src="/js/palettes.js"></script>
 -->
 
-<!-- load Highcharts scripts direct from highcharts.com -- >
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/highcharts-more.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
--->
-<script src="/js/highcharts.js"></script>
-<script src="/js/highcharts-more.js"></script>
-<script src="/js/highcharts-exporting.js"></script>
-
 <script>
 
-var channels = {
-    <!-- BEGIN DATA -->
-    {ID}: { id: {ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}' },
-    <!-- END -->
-};
-
-function Views() {
-    this.views = {};
-    this.actual = { slug: '', name: '', public: 0 };
-
-    this.fetch = function( callback ) {
-        this.views = {};
-        var that = this;
-        $.getJSON(
-            PVLngAPI + '/views/'+language+'.json',
-            { select: true },
-            function(data) {
-                $(data).each(function(id, view) {
-                    that.views[view.slug] = view;
-                });
-            }
-        ).always(function() {
-            if (typeof callback != 'undefined') callback(that);
-        });
-    };
-
-    this.buildSelect = function(el, selected) {
-        var option, optgroups = [ [], [], [] ];
-
-        el = $(el).empty();
-
-        /* Build optgroups */
-        $.each(this.views, function(id, view) {
-            if (view.slug) {
-                if (user) {
-                    optgroups[view.public].push(view);
-                } else if (view.public == 1) {
-                    /* Only public views */
-                    optgroups[1].push(view);
-                }
-            } else {
-                /* --- Select --- append direct */
-                $('<option/>').text(view.name).val('').appendTo(el);
-            }
-        });
-
-        $.each(optgroups, function(id, optgroup) {
-            if (optgroup.length == 0) return;
-
-            var o = $('<optgroup/>');
-
-            if (id == 0) {
-                o.prop('label', '{{private}}');
-            } else if (id == 1) {
-                o.prop('label', '{{public}}');
-            } else if (id == 2) {
-                o.prop('label', '{{mobile}}');
-            }
-
-            $.each(optgroup, function(id, view) {
-               $('<option/>').text(view.name).val(view.slug).appendTo(o);
-            });
-
-            o.appendTo(el);
-        });
-
-        el.val(selected);
-    };
-
-    this.load = function( slug, collapse, callback ) {
-        if (typeof this.views[slug] == 'undefined') {
-            $('#wrapper').show();
-            return;
-        }
-
-        if (typeof collapse == 'undefined') collapse = false;
-
-        $('#chart').addClass('wait');
-        oTable.fnProcessingIndicator(true);
-
-        var expanded = tree.expanded, preset;
-        if (!expanded) tree.toggle(true);
-
-        this.actual = this.views[slug];
-
-        /* Uncheck all channels and ... */
-        $('input.channel').iCheck('uncheck').val('');
-        $('tr.channel').removeClass('checked');
-        /* ... re-check all channels in view */
-        $.each(JSON.parse(this.actual.data), function (id, p) {
-            if (id == 'p') {
-                preset = p;
-            } else {
-                $('#c'+id).val(p).iCheck('check');
-            }
-        });
-        $('#modified').hide();
-
-        /* Re-arrange channels in collapsed tree */
-        if (collapse || !expanded) tree.toggle(false);
-
-        $('#wrapper').show();
-        $('#preset').val(preset).trigger('change');
-
-        $('#loaddeleteview').val(this.actual.slug);
-        $('#saveview').val(this.actual.name);
-        $('#public').prop('checked', this.actual.public).iCheck('update');
-        $('#visibility').val(this.actual.public);
-
-        if (typeof callback != 'undefined') callback(this.actual);
-
-        $('#chart').removeClass('wait');
-        oTable.fnProcessingIndicator(false);
-    };
-}
-
-/**
- *
- */
-var
-    qs = {}, views = {}, chart = false, channels_chart = [], updateTimeout,
+var ChartHeight = {INDEX_CHARTHEIGHT},
+    RefreshTimeout = {INDEX_REFRESH},
+    chartLabelsCSS = { color: 'gray', fontSize: '9px' },
+    qs = {},
+    chart = false,
+    channels_chart = [],
+    updateTimeout,
+    updateActive = false,
+    windowVisible = true,
+    browserPrefix = null,
+    lastChanged = (new Date).getTime() / 1000 / 60,
+    oTable,
+    xhrPool = [],
+    channels = {
+        <!-- BEGIN DATA -->
+        {ID}: { id: {ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}', entity: {ENTITY} },
+        <!-- END -->
+    },
+    /**
+     * Scale timestamps down to full minute, hour, day, week, month, quarter or year
+     */
+    xResolution = {
+        i: 60,
+        h: 60 * 60,
+        d: 60 * 60 * 24,
+        w: 60 * 60 * 24 * 7,
+        m: 60 * 60 * 24 * 30,
+        q: 60 * 60 * 24 * 90,
+        y: 60 * 60 * 24 * 360
+    },
 
     chartOptions = {
         chart: {
@@ -170,29 +52,60 @@ var
             paddingRight: 15,
             alignTicks: false,
             zoomType: 'x',
-            resetZoomButton: { position: { x: 0, y: -50 } },
+            resetZoomButton: {
+                relativeTo: 'chart',
+                position: { x: -40 }
+            },
+            panning: true,
+            panKey: 'shift',
             events: {
+                load: function () {
+                    /* Show generator once on load */
+                    this.renderer
+                        .label(
+                            'PVLng v'+PVLngVersion,
+                            this.spacingBox.x+this.spacingBox.width-10, /* right*/
+                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
+                         )
+                        .attr({ rotation: -90 })
+                        .css(chartLabelsCSS)
+                        .add();
+                },
+                redraw: function () {
+                    /* Show time on each redraw, fill solid white for correct overwrite */
+                    this.renderer
+                        .label(
+                            (new Date()).toLocaleTimeString(),
+                            0, /* left*/
+                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
+                         )
+                        .attr({ fill: 'white', rotation: -90 })
+                        .css(chartLabelsCSS)
+                        .add();
+                },
                 selection: function(event) { setTimeout(setExtremes, 100); }
             }
         },
         title: { text: '' },
+        legend: { borderRadius: 5, borderWidth: 1 },
+        credits: false,
         plotOptions: {
             series: {
                 point: {
                     events: {
                         click: function() {
                             if (!PVLngAPIkey) return;
-                            if (!this.series.userOptions.raw) {
+                            if (!this.series.options.raw) {
                                 alert('Can\'t delete from consolidated data.');
                                 return;
                             }
 
                             $('#reading-serie').html(this.series.name);
                             $('#reading-timestamp').html((new Date(this.x)).toLocaleString());
-                            $('#reading-value').html(this.y + ' ' + this.series.userOptions.unit);
+                            $('#reading-value').html(this.y + ' ' + this.series.options.unit);
 
                             $('#dialog-reading')
-                                .data('guid', this.series.userOptions.guid)
+                                .data('guid', this.series.options.guid)
                                 .data('timestamp', (this.x/1000).toFixed(0))
                                 .data('point', this)
                                 .dialog('open');
@@ -266,29 +179,105 @@ var
 /**
  *
  */
-function changeDates( dir ) {
-    dir *= 24*60*60*1000;
+var views = new function Views() {
+    this.views = {};
+    this.actual = { slug: '', name: '', public: 0 };
 
-    var from = new Date(Date.parse($('#from').datepicker('getDate')) + dir),
-        to = new Date(Date.parse($('#to').datepicker('getDate')) + dir);
+    this.fetch = function( callback ) {
+        this.views = {};
+        var that = this;
+        $.getJSON(
+            PVLngAPI + '/views.json',
+            { sort_by_visibilty: true },
+            function(data) {
+                var l = data.length;
+                for (var i = 0; i<l; i++) {
+                    that.views[data[i].slug] = data[i];
+                }
+                if (l) $('.ui-tabs').tabs('option', 'active', 1) /* Tabs are zero based */
+            }
+        ).always(function() {
+            if (typeof callback != 'undefined') callback(that);
+        });
+    };
 
-    if (to > new Date) {
-        $.pnotify({ type: 'info', text: "Can't go beyond today." });
-        return;
-    }
+    this.buildSelect = function(el, selected) {
+        var optgroups = [ [], [], [] ],
+            labels    = [ '{{private}}', '{{public}}', '{{mobile}}' ],
+            l, i, j;
 
-    $('#from').datepicker('option', 'maxDate', to).datepicker('setDate', from);
-    $('#to').datepicker('option', 'minDate', from).datepicker('setDate', to);
+        el = $(el).empty();
 
-    updateChart();
-}
+        /* Build optgroups */
+        $.each(this.views, function(id, view) {
+            /* Collect in groups */
+            optgroups[view.public].push(view);
+        });
+
+        $('<option/>').appendTo(el);
+
+        for (i=0; i<=2; i++) {
+            l = optgroups[i].length;
+            if (!l) continue;
+
+            var o = $('<optgroup/>').prop('label', labels[i]);
+            for (j=0; j<l; j++) {
+               $('<option/>').text(optgroups[i][j].name).val(optgroups[i][j].slug).appendTo(o);
+            }
+            o.appendTo(el);
+        }
+        if (selected) el.val(selected);
+        el.trigger('change');
+    };
+
+    this.load = function( slug, collapse, callback ) {
+        if (typeof this.views[slug] == 'undefined') return;
+        if (typeof collapse == 'undefined') collapse = false;
+
+        $('#chart').addClass('wait');
+
+        var expanded = tree.expanded, preset;
+        if (!expanded) tree.toggle(true);
+
+        this.actual = this.views[slug];
+
+        /* Uncheck all channels and ... */
+        $('input.channel').iCheck('uncheck').val('');
+        $('tr.channel').removeClass('checked');
+        /* ... re-check all channels in view */
+        $.each(JSON.parse(this.actual.data), function (id, p) {
+            if (id == 'p') {
+                preset = p;
+            } else {
+                $('#c'+id).val(p).iCheck('check');
+            }
+        });
+
+        /* Re-arrange channels in collapsed tree */
+        if (collapse || !expanded) tree.toggle(false);
+
+        /* Scroll to navigation as top most visible element */
+        pvlng.scroll('#nav');
+
+        $('#preset').val(preset).trigger('change'); /* Realods chart */
+
+        $('#load-delete-view').val(this.actual.slug).trigger('change');
+        $('#saveview').val(this.actual.name);
+        $('#visibility').val(this.actual.public).trigger('change');
+        $('#modified').hide();
+
+        if (typeof callback != 'undefined') callback(this.actual);
+
+        $('#chart').removeClass('wait');
+    };
+};
 
 /**
  *
  */
-function Tree( expanded ) {
+var tree = new function Tree() {
 
-    this.expanded = expanded;
+    this.expanded = true;
 
     this.toggle = function( force ) {
         this.expanded = (typeof force != 'undefined') ? force : !this.expanded;
@@ -305,9 +294,9 @@ function Tree( expanded ) {
             $('#tiptoggle').html('{{ExpandAll}} (F4)');
         }
     }
-}
+};
 
-tree = new Tree(!!user);
+tree.expanded = !!user;
 
 /**
  *
@@ -329,68 +318,53 @@ function SecToTimeStr( s ) {
  *
  */
 function ChartDialog( id ) {
-    /* get stringified settings */
+    $('#scatter-candidate').hide();
+
+    /* Get stringified settings */
     var p = $('#c'+id).val();
+
     if (p == 'on') {
-        /* initial, no presetaion set yet */
+        /* Initial, no presetaion set yet */
         p = new presentation();
-        /* suggest scatter for channels without unit */
-        if (!channels[id].unit) p.type = 'scatter';
+        /* Suggest scatter for channels without unit */
+        if (!channels[id].unit) $('#scatter-candidate').show();
     } else {
         p = new presentation(p);
     }
 
-    /* set dialog properties */
-    /* find the radio button with the axis value and check it */
+    /* Set dialog properties */
+    /* Find the radio button with the axis value and check it */
     $('input[name="d-axis"][value="' + p.axis + '"]').prop('checked', true);
     $('#d-type').val(p.type);
     $('#d-cons').prop('checked', p.consumption);
-    /* find the radio button with the line width and check it */
+    /* Find the radio button with the line width and check it */
     $('input[name="d-width"][value="' + p.width + '"]').prop('checked', true);
     $('#d-min').prop('checked', p.min);
     $('#d-max').prop('checked', p.max);
     $('#d-last').prop('checked', p.last);
     $('#d-all').prop('checked', p.all);
     $('#d-style').val(p.style);
-    $('#d-color').val(p.color);
-    $('#d-color').spectrum('set', p.color);
-    $('#d-color-use-neg').prop('checked', p.coloruseneg);
-    $('#d-color-neg').val(p.colorneg);
-    $('#d-color-neg').spectrum('set', p.colorneg);
-    $('#d-color-neg').spectrum($('#d-color-use-neg').is(':checked') ? 'enable' : 'disable');
-    $('#d-threshold').val(p.threshold);
-    $('#d-threshold').prop('disabled', !$('#d-color-use-neg').is(':checked'))
-                     .spinner('option', 'disabled', !$('#d-color-use-neg').is(':checked'));
+    $('#d-color').val(p.color).spectrum('set', p.color);
+    /* Different colors above/below threshold */
+    $('input:radio[name="color-pos-neg"][value="'+p.colorusediff+'"]').prop('checked', true);
+    $('#d-color-diff').val(p.colordiff).spectrum('set', p.colordiff);
+    $('#d-color-threshold').val(p.threshold);
+    $('#d-color-use-diff').trigger('ifToggled');
+    /* Display times in chart */
     $('#d-time1').val(p.time1);
     $('#d-time2').val(p.time2);
     $('#d-time-slider').slider('values', [ TimeStrToSec(p.time1), TimeStrToSec(p.time2) ]);
+    $('#d-legend').prop('checked', p.legend);
+    $('#d-position').text(p.position);
+    $('#d-position-slider').slider('value', p.position);
 
-    $('input').iCheck('update');
-    $('#d-type').trigger('change');
+    /* Update only in context of dialog chart */
+    $('input', '#dialog-chart').iCheck('update');
+    $('select', '#dialog-chart').trigger('change');
 
     /* Set the id into the dialog for onClose to write data back */
     $('#dialog-chart').data('id', id).dialog('option', 'title', channels[id].name).dialog('open');
 }
-
-/**
- *
- */
-/**
- * Scale timestamps down to full minute, hour, day, week, month, quarter or year
- */
-var xResolution = {
-    i: 60,
-    h: 60 * 60,
-    d: 60 * 60 * 24,
-    w: 60 * 60 * 24 * 7,
-    m: 60 * 60 * 24 * 30,
-    q: 60 * 60 * 24 * 90,
-    y: 60 * 60 * 24 * 360
-};
-
-var windowVisible = true,
-    browserPrefix = null,
-    lastChanged = (new Date).getTime() / 1000 / 60;
 
 /**
  *
@@ -400,14 +374,16 @@ function updateChart( forceUpdate ) {
     clearTimeout(updateTimeout);
     updateTimeout = null;
 
-    if (!windowVisible) return;
+    if (updateActive || !windowVisible) return;
+
+    updateActive = true;
 
     var fromDate = $('#fromdate').val(), toDate = $('#todate').val();
 
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
     if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
 
-    if (views.actual) {
+    if (user && views.actual) {
         /* Provide permanent link only for logged in user and not embedded view level 2 */
         var from = $('#from').val(), to = $('#to').val(),
             date = (from == to)
@@ -455,16 +431,21 @@ function updateChart( forceUpdate ) {
         channel.unit = ch.unit;
         channel.time1 = TimeStrToSec(channel.time1,  0);
         channel.time2 = TimeStrToSec(channel.time2, 24);
-        /* remember channel */
+        /* Remember channel in correct order */
         buffer.push(channel);
-        /* still mapped? */
+        /* Channel axis still registered? */
         if (yAxisMap.indexOf(channel.axis) == -1) yAxisMap.push(channel.axis);
     });
 
-    /* sort axis to make correct order for Highcharts */
+    /* Sort channels */
+    buffer.sort(function(a, b) {
+        return (a.position - b.position) /* Causes an array to be sorted numerically and ascending */
+    });
+
+    /* Sort axis to make correct order for Highcharts */
     yAxisMap.sort();
 
-    /* build channels */
+    /* Build channels */
     $(buffer).each(function(id, channel) {
         /* axis on right side */
         var is_right = !(channel.axis % 2);
@@ -491,21 +472,24 @@ function updateChart( forceUpdate ) {
             channels_new.push(channel);
         }
 
-        /* prepare axis */
+        /* Prepare axis */
         if (!yAxis[channel.axis]) {
             yAxis[channel.axis] = {
-                /* unit as axis title */
-                title: { text: channel.unit },
                 lineColor: channel.color,
                 showEmpty: false,
                 minPadding: 0,
                 maxPadding: 0,
                 opposite: is_right
             };
-            /* only 1st left axis shows grid lines */
+            /* Only 1st left axis shows grid lines */
             if (channel.axis != 0) {
                 yAxis[channel.axis].gridLineWidth = 0;
             }
+        }
+
+        /* Use 1st non-empty channel unit as axis title */
+        if (!yAxis[channel.axis].title && channel.unit) {
+            yAxis[channel.axis].title = { text: channel.unit };
         }
     });
 
@@ -520,7 +504,6 @@ function updateChart( forceUpdate ) {
     if (channels_new.length == 0) return;
 
     $('#chart').addClass('wait');
-    oTable.fnProcessingIndicator(true);
 
     _log('Channels:', channels_new);
     _log('yAxis:', yAxis);
@@ -554,13 +537,15 @@ function updateChart( forceUpdate ) {
         chart = new Highcharts.Chart(chartOptions);
         /* Help chart with fluid layout to find its correct size... */
         chart.reflow();
+        /* Show zoom and pan help */
+        $('#zoom-hint').show();
     }
 
     var f = $('#from').val(), t = $('#to').val();
     if (f != t) f += ' - ' + t;
     chart.setTitle({ text: $('<div/>').html(views.actual.name).text() }, { text: f });
 
-    chart.showLoading('<img src="/images/loading_bar.gif" width="192" height="12" />');
+    chart.showLoading('<img src="/images/loading_dots.gif" width="64" height="21" />');
 
     var series = [], costs = 0, date = new Date();
 
@@ -584,6 +569,9 @@ function updateChart( forceUpdate ) {
                 _ts:        date.getTime()
             },
             function(data) {
+
+                if (aborted) return;
+
                 try {
                     /* pop out 1st row with attributes */
                     attr = data.shift();
@@ -606,51 +594,66 @@ function updateChart( forceUpdate ) {
                     $('#costs'+channel.id).html(Highcharts.numberFormat(attr.costs, {CURRENCYDECIMALS}));
                 }
 
-                t = (attr.description) ? ' (' + attr.description + ')' : '';
+                /* Add channel description if chart name NOT still contains it */
+                t = (String(views.actual.name).toLowerCase().indexOf(String(attr.description).toLowerCase()) == -1)
+                  ? ' (' + attr.description + ')'
+                  : '';
 
                 var serie = { /* HTML decode channel name */
-                    name: $('<div/>').html(attr.name + t).text(),
-                    guid: channel.guid,
-                    id: channel.id,
-                    decimals: attr.decimals,
-                    unit: attr.unit,
+                    data: [],
                     color: channel.color,
+                    id: channel.id,
+                    name: $('<div/>').html(attr.name + t).text(),
+                    showInLegend: channel.legend,
                     type: channel.type,
                     yAxis: channel.axis,
-                    raw: (period == ''),
-                    data: []
+                    /* Own properties */
+                    colorDiff: channel.colorusediff,
+                    decimals: attr.decimals,
+                    guid: channel.guid,
+                    legendColor: channel.color, /* Force legend color */
+                    unit: attr.unit,
+                    raw: (period == '')
                 };
 
-                if (channel.coloruseneg) {
+                if (channel.colorusediff !== 0) {
+                    if (channel.colorusediff === 1) {
+                        /* Other color for values above threshold > switch colors! */
+                        serie.color         = channel.colordiff;
+                        serie.negativeColor = channel.color;
+                    } else {
+                        /* Other color for values below threshold */
+                        serie.negativeColor = channel.colordiff;
+                    }
                     serie.threshold = channel.threshold;
-                    serie.negativeColor = channel.colorneg;
                 }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
                 serie.tooltip = { valueSuffix: attr.unit ? attr.unit : '' };
 
                 if (channel.type == 'scatter') {
+                    if (attr.marker) serie.marker = { symbol: 'url('+attr.marker+')' };
                     serie.dataLabels = {
                         enabled: true,
                         formatter: function() {
                             /* Switch for non-numeric / numeric channels */
-                            return this.point.name
+                            return typeof this.point.name != 'undefined'
                                  ? this.point.name
                                  : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
                         }
                     };
                     if (attr.unit.trim() == '') {
-                        /* mostly non-numeric channels */
+                        /* Mostly non-numeric channels */
                         serie.dataLabels.align = 'left';
                         serie.dataLabels.rotation = 270;
                         serie.dataLabels.x = 3;
+                        /* Move a bit up */
                         serie.dataLabels.y = -8;
                     }
                 } else if (channel.type != 'bar') {
-                    serie.dashStyle = channel.style;
+                    if (channel.style != 'Solid') serie.dashStyle = channel.style;
                     serie.lineWidth = channel.width;
                 }
-
 
                 $(data).each(function(id, row) {
                     var time;
@@ -688,7 +691,9 @@ function updateChart( forceUpdate ) {
                         }
                     } else {
                         point.y = 0;
-                        point.name = row.data;
+                        var n = (row.data+'|').split('|');
+                        point.name = n[0];
+                        if (n[1]) point.marker = { symbol: 'url('+n[1]+')' };
                     }
 
                     serie.data.push(point);
@@ -709,15 +714,14 @@ function updateChart( forceUpdate ) {
                 });
             }
         ).fail(function(jqXHR, textStatus, error) {
-            if (textStatus == 'abort') {
+            if (textStatus == 'abort' || (jqXHR.status == 404 && textStatus == 'error')) {
                 /* Aborted during loading */
                 aborted = true;
             } else {
                 $.pnotify({
                     type: textStatus,
                     text: error + "\n" + (jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText),
-                    hide: false,
-                    sticker: false
+                    hide: false
                 });
                 /* Set pseudo channel */
                 series[id] = {};
@@ -737,7 +741,7 @@ function updateChart( forceUpdate ) {
 
             if ('{INDEX_NOTIFYLOADALL}') $.pnotify({
                 type: 'success',
-                text: completed + ' channels loaded ' +
+                text: completed + ' {{ChannelsLoaded}} ' +
                       '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
             });
             $('#costs').html(costs ? Highcharts.numberFormat(costs, {CURRENCYDECIMALS}) : '');
@@ -758,14 +762,12 @@ function updateChart( forceUpdate ) {
                 });
             } else {
                 /* replace series data */
-                var sid = 0;
                 $.each(series, function(i, serie) {
                     if (serie.id) {
                         /* Valid channel with id */
-                        chart.series[sid].setData(serie.data, false);
+                        chart.get(serie.id).setData(serie.data, false);
                         /* Do we have raw data? Only then deletion of reading value is possible */
-                        chart.series[sid].userOptions.raw = serie.raw;
-                        sid++;
+                        chart.get(serie.id).options.raw = serie.raw;
                     }
                 });
             }
@@ -776,20 +778,15 @@ function updateChart( forceUpdate ) {
             setExtremes();
 
             $('#chart').removeClass('wait');
-            oTable.fnProcessingIndicator(false);
 
             if (RefreshTimeout > 0) {
                 updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
             }
 
+            updateActive = false;
         });
     });
 }
-
-/**
- *
- */
-var oTable, xhrPool = [];
 
 /**
  * Idea from http://stackoverflow.com/a/11612641
@@ -809,6 +806,7 @@ $.ajaxQ = (function() {
 
     return {
         abortAll: function() {
+            aborted = true;
             var cnt = 0;
             $.each(queue, function(i, jqXHR) {
                 jqXHR.abort();
@@ -823,8 +821,10 @@ $.ajaxQ = (function() {
 /**
  *
  */
-function resetDeleteButton() {
-    $('#btn-delete').button({ label: '&nbsp;', text: false }).data('confirmed', 0);
+function updateOutput() {
+    aborted = true;
+    updateActive = false;
+    updateChart();
 }
 
 /**
@@ -832,15 +832,35 @@ function resetDeleteButton() {
  */
 $(function() {
 
+    pvlng.onFinished.add( function() {
+        $('#tabs').on('tabsactivate', function(e, ui) {
+            /* Scroll to tabs as top most visible element */
+            if (ui.newPanel.length && ui.newPanel.prop('id') == 'tabs-1') pvlng.scroll('#tabs');
+        });
+    });
+
+    /**
+     * Modify legend color for pos./neg. splitted seires
+     * Idea from
+     * http://highcharts.uservoice.com/forums/55896-general/suggestions/4575779-make-the-legend-icon-colors-modifiable
+     * http://jsfiddle.net/stephanevanraes/CZSzT/
+     */
+    Highcharts.wrap(Highcharts.Legend.prototype, 'colorizeItem', function (item) {
+        /**
+         * Switch color for a legend item
+         * Digg into Highcharts code, you can find the property "legendColor" is used BEFORE "color",
+         * but never defined by Highcharts itself before...
+         */
+        arguments[1].legendColor = arguments[1].options.legendColor;
+        /* Render legend item via wrapped function */
+        item.apply(this, [].slice.call(arguments, 1));
+    });
+
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
             return tree.expanded ? true : $(oTable.fnGetNodes()[iDataIndex]).hasClass('checked');
         }
     );
-
-    $.fn.dataTableExt.oApi.fnProcessingIndicator = function( oSettings, onoff ) {
-        this.oApi._fnProcessingDisplay( oSettings, onoff );
-    };
 
     $.ajaxSetup({
         beforeSend: function setHeader(xhr) {
@@ -903,80 +923,38 @@ $(function() {
         }
     });
 
-    if (user) {
-        var aoColumnDefs = [
-            { sWidth: '1%', aTargets: [ 0, 2, 3, 4, 5, 6 ] }
-        ];
-    } else {
-        var aoColumnDefs = [
-            { sWidth: '1%', aTargets: [ 1, 2, 3 ] }
-        ];
-    }
-
     /**
      *
      */
     oTable = $('#data-table').DataTable({
         bSort: false,
-        bInfo: false,
-        bLengthChange: false,
-        bPaginate: false,
-        bProcessing: true,
+        bFilter: true,        /* Allow filter by coding, but   */
+        sDom: '<"H"r>t<"F">', /* remove filter input from DOM. */
         bAutoWidth: false,
-        bJQueryUI: true,
-        sDom: '<"H"r>t<"F">',
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
         aoColumnDefs: user
-            ? [ { sWidth: '1%', aTargets: [ 0, 2, 3, 4, 5, 6 ] } ]
-            : [ { sWidth: '1%', aTargets: [ 1, 2, 3 ] } ],
-        fnInitComplete: function() {
-            /* Init treetable AFTER databale is ready */
-            $('.treeTable').treetable({
-                initialState: 'expanded',
-                indent: 24,
-                column: 1
-            });
-        }
+            ? [ { sWidth: '1%', aTargets: [ 0, 2, 3, 4, 5 ] } ]
+            : [ { sWidth: '1%', aTargets: [ 1, 2 ] } ]
     });
 
     if (user) {
+        $('.treeTable').treetable({
+            initialState: 'expanded',
+            indent: 24,
+            column: 1
+        });
         $('.chartdialog').addClass('clickable').click(function() {
-            ChartDialog($(this).data('id'));
+            ChartDialog($(this).parents('tr').data('tt-id'));
         });
 
         $('.showlist').addClass('clickable').click(function() {
-            window.location.href = '/list/' + channels[$(this).data('id')].guid;
+            window.location.href = '/list/' + channels[$(this).parents('tr').data('tt-id')].guid;
+        });
+
+        $('.editentity').addClass('clickable').click(function() {
+            window.location.href = '/channel/edit/' + channels[$(this).parents('tr').data('tt-id')].entity +
+                                   '?returnto=' + (views.actual.slug ? '/chart/' + views.actual.slug : '/');
         });
     }
-
-    /**
-     *
-     */
-    $('#preset').change(function() {
-        var preset = ($('#preset').val() || '').match(/(\d+)(\w+)/),
-            pcount = $('#periodcnt'), period = $('#period'),
-            before = pcount.val() + period.val();
-
-        if (!preset) {
-            pcount.val(1);
-            period.val('');
-        } else {
-            var from = new Date($("#from").datepicker('getDate'));
-            switch (preset[2]) {
-                case 'd': /* day, week - set start to 1st day of month */
-                case 'w':
-                    from.setDate(1);  break;
-                case 'm': /* month, quarter - set start to 1st day of year */
-                case 'q':
-                    from.setDate(1);  from.setMonth(0);  break;
-            }
-            $("#from").datepicker('setDate', from);
-            pcount.val(preset[1]);
-            period.val(preset[2]);
-        }
-        /* Force chart reload */
-        updateChart();
-    });
 
     /**
      *
@@ -989,7 +967,8 @@ $(function() {
         buttons: {
             '{{Ok}}': function() {
                 $(this).dialog('close');
-                var chk = $('#c'+$(this).data('id')), old = chk.val(),
+                var chk = $('#c'+$(this).data('id')),
+                    old = chk.val(),
                     p = new presentation();
                 p.axis = +$('input[name="d-axis"]:checked').val();
                 p.type = $('#d-type').val();
@@ -1001,9 +980,11 @@ $(function() {
                 p.last = $('#d-last').is(':checked');
                 p.all = $('#d-all').is(':checked');
                 p.color = $('#d-color').spectrum('get').toHexString();
-                p.coloruseneg = $('#d-color-use-neg').is(':checked');
-                p.colorneg = $('#d-color-neg').spectrum('get').toHexString();
-                p.threshold = +$('#d-threshold').val().replace(',', '.');
+                p.colorusediff = +$('input:radio[name="color-pos-neg"]:checked').val();
+                p.colordiff = $('#d-color-diff').spectrum('get').toHexString();
+                p.threshold = +$('#d-color-threshold').val().replace(',', '.');
+                p.legend = $('#d-legend').is(':checked');
+                p.position = +$('#d-position').text();
 
                 p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
                 p.time2 = SecToTimeStr(TimeStrToSec($('#d-time2').val(), 24));
@@ -1058,17 +1039,17 @@ $(function() {
             notBar.addClass('disabled');
             notBar.find('input, select').prop('disabled', true);
         } else if (this.value == 'scatter') {
-            $('#d-color-use-neg').iCheck('uncheck').trigger('ifToggled');
             notScatter.addClass('disabled');
             notScatter.find('input, select').prop('disabled', true);
+            $('#d-color-use-diff').iCheck('uncheck').trigger('ifToggled');
         }
         $('input').iCheck('update');
     });
 
-    $('#d-color-use-neg').on('ifToggled', function(e) {
+    $('#d-color-use-diff').on('ifToggled', function(e) {
         var checked = $(this).is(':checked');
-        $('#d-threshold').prop('disabled', !checked).spinner('option', 'disabled', !checked );
-        $('#d-color-neg').spectrum(checked ? 'enable' : 'disable');
+        $('#d-color-threshold').prop('disabled', checked).spinner('option', 'disabled', checked);
+        $('#d-color-diff').spectrum(checked ? 'disable' : 'enable');
     });
 
     $('#d-time-slider').slider({
@@ -1084,6 +1065,19 @@ $(function() {
         }
     });
 
+    $('#d-position-slider').slider({
+        min: -100, max: 100,
+        slide: function( e, ui ) {
+            $('#d-position').text(ui.value);
+        }
+    });
+
+    $('#d-position-slider .ui-slider-handle')
+        /* Style slider handle to acceppt position text */
+        .css({ width: '2em', marginLeft: '-1em', textDecoration: 'none', textAlign: 'center' })
+        /* Insert separate span to style text */
+      .append($('<span/>').prop('id', 'd-position').css({ fontSize: 'xx-small', color: 'gray' }));
+
     $('input').iCheck('update');
 
     $('input.channel').on('ifToggled', function() {
@@ -1091,25 +1085,8 @@ $(function() {
         $('#modified').show();
     });
 
-    $('#btn-reset').button({
-        icons: { primary: 'ui-icon-calendar' },
-        label: '&nbsp;',
-        text: false
-    }).click(function(event) {
-        event.preventDefault();
-        var d = new Date;
-        /* Set date ranges */
-        $('#from').datepicker('option', 'maxDate', d);
-        $('#to').datepicker('option', 'minDate', d);
-        /* Set date today */
-        $('#from').datepicker('setDate', d);
-        $('#to').datepicker('setDate', d);
-        updateChart();
-    });
-
     $('#btn-refresh').button({
         icons: { primary: 'ui-icon-refresh' },
-        label: '&nbsp;',
         text: false
     }).click(function(event) {
         event.preventDefault();
@@ -1128,35 +1105,18 @@ $(function() {
 
     $('#treetoggle').click(function() { tree.toggle() });
 
-    $('#togglewrapper').button({
-        icons: { primary: 'ui-icon-carat-2-n-s' },
-        label: '&nbsp;',
-        text: false
-    }).click(function() {
-        $('#wrapper').animate( { height: 'toggle', opacity: 'toggle' } );
-    });
-
-    $('#top-load-view').change(function() {
-        views.load($('#top-load-view option:selected').val(), true, function(view) {
-            $('#loaddeleteview').val(view.slug);
-            $('#saveview').val(view.name);
-        });
-    });
-
     $('#btn-load').button({
         icons: { primary: 'ui-icon-folder-open' },
-        label: '&nbsp;',
         text: false
     }).click(function(event) {
-        views.load($('#loaddeleteview option:selected').val(), true);
+        views.load($('#load-delete-view option:selected').val(), true);
     });
 
     $('#btn-delete').button({
         icons: { primary: 'ui-icon-trash' },
-        label: '&nbsp;',
         text: false
     }).click(function(event) {
-        var option = $('#loaddeleteview option:selected'), btn = $(this);
+        var option = $('#load-delete-view option:selected'), btn = $(this);
 
         if (option.val() == '') return;
 
@@ -1165,10 +1125,11 @@ $(function() {
             btn.button({ label: '{{Sure}}?', text: true }).data('confirmed', 1)
                .find('.ui-button-text').css('color', 'red');
             /* Reset after 5s */
-            setTimeout(resetDeleteButton, 5000);
+            setTimeout(function() {
+                $('#btn-delete').button({ label: '&nbsp;', text: false }).data('confirmed', 0);
+            }, 5000);
         } else {
-            resetDeleteButton();
-            btn.button('disable');
+            btn.button({ label: '&nbsp;', text: false, }).button('disable').data('confirmed', 0);
             $('#chart').addClass('wait');
 
             $.ajax({
@@ -1179,10 +1140,11 @@ $(function() {
                 $.pnotify({ type: 'success', text: option.text() + ' {{deleted}}' });
                 /* Just delete selected option and clear save name input */
                 option.remove();
+                $('#load-delete-view').val('').trigger('change');
                 $('#saveview').val('');
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
-                    type: textStatus, hide: false, sticker: false,
+                    type: textStatus, hide: false,
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
@@ -1194,7 +1156,6 @@ $(function() {
 
     $('#btn-save').button({
         icons: { primary: 'ui-icon-disk' },
-        label: '&nbsp;',
         text: false
     }).click(function() {
         $(this).button('disable');
@@ -1223,7 +1184,7 @@ $(function() {
             $.pnotify({ type: textStatus, text: data.name + ' saved' });
             views.fetch(function(views) {
                 /* Rebuild select */
-                views.buildSelect('#loaddeleteview', data.slug);
+                views.buildSelect('#load-delete-view', data.slug);
                 views.load(data.slug);
                 /* Adjust chart title */
                 if (chart) chart.setTitle(views.actual.name);
@@ -1231,7 +1192,7 @@ $(function() {
             $('#modified').hide();
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
-                type: textStatus, hide: false, sticker: false, text: jqXHR.responseText
+                type: textStatus, hide: false, text: jqXHR.responseText
             });
         }).always(function() {
             $('#chart').removeClass('wait');
@@ -1239,20 +1200,15 @@ $(function() {
         });
     });
 
-    views = new Views();
-
     views.fetch(function(views) {
+        views.buildSelect('#load-delete-view');
         if (user) {
-            views.buildSelect('#top-load-view');
             $('#top-select').show();
-            $('#top-load-view').children('option').clone().appendTo('#loaddeleteview');
-            $('#top-load-view').children('optgroup').clone().appendTo('#loaddeleteview');
         } else {
-            views.buildSelect('#loaddeleteview');
             $('#public-select').show();
+            $('#wrapper').show();
         }
-        $('#loading').hide();
-        /* Chart slug provided by URL, load and collapse tree */
+        /* Chart slug provided by URL?, load and collapse tree */
         views.load(qs.chart, true);
     });
 
@@ -1279,7 +1235,7 @@ $(function() {
                     $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     $.pnotify({
-                        type: textStatus, hide: false, sticker: false,
+                        type: textStatus, hide: false,
                         text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                     });
                 }).always(function() {
@@ -1300,13 +1256,13 @@ $(function() {
      * http://www.sitepoint.com/introduction-to-page-visibility-api/
      * http://www.w3.org/TR/page-visibility
      */
-    if (document.hidden !== undefined) {
+    if (typeof document.hidden != 'undefined') {
         browserPrefix = '';
     } else {
-        var browserPrefixes = ['webkit', 'moz', 'ms', 'o'];
+        var browserPrefixes = ['webkit', 'moz', 'ms', 'o'], l = browserPrefixes.length;
         /* Test all vendor prefixes */
-        for (var i=0; i<browserPrefixes.length; i++) {
-            if (document[browserPrefixes[i] + 'Hidden'] != undefined) {
+        for (var i=0; i<l; i++) {
+            if (typeof document[browserPrefixes[i] + 'Hidden'] != 'undefined') {
                 browserPrefix = browserPrefixes[i];
                 break;
             }
@@ -1318,20 +1274,30 @@ $(function() {
             if (document.hidden === false || document[browserPrefix + 'Hidden'] === false) {
                 /* The page is in foreground and visible */
                 windowVisible = true;
-                /* Was longer in background, so the updateTimeout was cleared */
-                if (!updateTimeout) setTimeout(updateChart, 1000);
+                /* Was longer in background, so the updateTimeout is not set anymore */
+                if (!updateTimeout) {
+                    setTimeout(function() {
+                        /* Scroll to navigation as top most visible element */
+                        pvlng.scroll('#nav');
+                        updateChart();
+                    },
+                    1000);
+                }
             } else {
                 windowVisible = false;
             }
+            return false;
         });
     }
 
-    shortcut.add('Alt+P', function() { changeDates(-1); });
-    shortcut.add('Alt+N', function() { changeDates(1); });
-    shortcut.add('F3',    function() { $('#togglewrapper').click(); });
-    shortcut.add('F4',    function() { tree.toggle(); });
+    shortcut.add('Alt+P', function() { pvlng.changeDates(-1); });
+    shortcut.add('Alt+N', function() { pvlng.changeDates(1); });
     shortcut.add('F6',    function() { updateChart(); });
     shortcut.add('F7',    function() { updateChart(true); });
+
+    if (user) {
+        shortcut.add('F4', function() { tree.toggle(); });
+    }
 });
 
 </script>

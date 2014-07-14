@@ -537,6 +537,26 @@ class NestedSet {
   }
 
   /**
+   * Get count of direct childs
+   *
+   * @return   int
+   */
+  public function getChildCount( $id ) {
+    return count($this->getChilds($id));
+  }
+
+  /**
+   * Get count of direct childs
+   *
+   * @return   int
+   */
+  public function getParent( $id ) {
+    $path = $this->getPathFromRoot($id);
+    $parent = array_splice($path, -2, 1);
+    return $parent[0];
+  }
+
+  /**
    * Get a full NestedSet Tree as Array
    *
    * @return   mixed    Multidimensional Array with Tree data or boolean FALSE

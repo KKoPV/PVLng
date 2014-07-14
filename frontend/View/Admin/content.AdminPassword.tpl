@@ -51,7 +51,7 @@
 
 <!-- ELSE -->
 
-<div class="push_2 grid_6">
+<div class="push_1 grid_8">
 
 <h2>Admin user</h2>
 
@@ -61,11 +61,14 @@
     with
 </p>
 
-<textarea class="pre" readonly="readonly">
+<!-- MUST be pre to avoid compression -->
+<pre>
     'Admin' => array(
         'User'     => '{ADMINUSER}',
         'Password' => '{ADMINPASS}'
-    ),</textarea>
+    ),
+
+</pre>
 
 <h2>Location</h2>
 
@@ -90,16 +93,7 @@
     with
 </p>
 
-<textarea id="location" class="pre" readonly="readonly"></textarea>
-
-<!-- MUST be pre to avoid compression -->
-<pre id="pre" style="display:none">
-    'Location' => array(
-        'Latitude'  => $lat,
-        'Longitude' => $lon
-    ),</pre>
-
-<br /><br />
+<pre id="location"></pre>
 
 <iframe id="map" class="map" width="100%" height="350" frameborder="0"
         scrolling="no" marginheight="0" marginwidth="0"></iframe>
@@ -111,3 +105,12 @@
 <!-- ENDIF -->
 
 </div>
+
+<!-- MUST be pre to avoid compression -->
+<pre id="pre" style="display:none">
+    'Location' => array(
+        'Latitude'  => $lat,
+        'Longitude' => $lon
+    ),
+
+</pre>

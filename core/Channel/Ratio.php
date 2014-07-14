@@ -12,7 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Ratio extends Sensor {
+class Ratio extends Calculator {
 
     /**
      *

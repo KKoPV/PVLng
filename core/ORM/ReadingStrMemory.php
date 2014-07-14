@@ -2,10 +2,10 @@
 /**
  *
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 
 /**
@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-class ReadingStrMemory extends \slimMVC\ORMTable {
+class ReadingStrMemory extends ReadingMemory {
 
     /**
      *
@@ -24,31 +24,20 @@ class ReadingStrMemory extends \slimMVC\ORMTable {
      *                  with more than field, provide an array
      */
     public function __construct ( $id=NULL ) {
-        /* Build WITHOUT $id lookup, must be done later, if table not exists yet */
-        parent::__construct();
-
         if (self::$first) {
-            $this->app->db->query('
+            \slimMVC\App::getInstance()->db->query('
                 CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
-                    `id` smallint(5) unsigned NOT NULL,
-                    `timestamp` int(11) NOT NULL,
-                    `data` varchar(50) NOT NULL,
-                    PRIMARY KEY (`id`,`timestamp`)
-                ) ENGINE=MEMORY
+                    `id`        smallint unsigned NOT NULL,
+                    `timestamp` int               NOT NULL,
+                    `data`      varchar(50)       NOT NULL,
+                    PRIMARY KEY (`id`, `timestamp`)
+                ) ENGINE=Memory PARTITION BY LINEAR KEY(`id`) PARTITIONS 10
             ');
 
             self::$first = FALSE;
         }
 
-        if (isset($id)) $this->findPrimary($id);
-    }
-
-    /**
-     *
-     */
-    public function deleteById( $id ) {
-        $this->app->db->query('DELETE FROM `pvlng_reading_str_tmp` WHERE `id` = {1}', $id);
-        return $this->app->db->affected_rows;
+        parent::__construct($id);
     }
 
     // -------------------------------------------------------------------------
@@ -64,28 +53,5 @@ class ReadingStrMemory extends \slimMVC\ORMTable {
      *
      */
     protected $table = 'pvlng_reading_str_tmp';
-
-    /**
-     *
-     */
-    protected $fields = array (
-        'id'        => '',
-        'timestamp' => '',
-        'data'      => '',
-    );
-
-    /**
-     *
-     */
-    protected $nullable = array (
-        'id'        => false,
-        'timestamp' => false,
-        'data'      => false,
-    );
-
-    /**
-     *
-     */
-    protected $primary = array( 'id', 'timestamp' );
 
 }

@@ -95,6 +95,26 @@ class Config extends \Slim\Helper\Set {
         return $this->get(str_replace('_', self::$NamespaceSeparator, $key));
     }
 
+    /**
+     *
+     */
+    public function getSunrise( $day ) {
+        return date_sunrise($day, SUNFUNCS_RET_TIMESTAMP,
+                           +$this->get('Location.Latitude'),
+                           +$this->get('Location.Longitude'),
+                           90, date('Z')/3600);
+    }
+
+    /**
+     *
+     */
+    public function getSunset( $day ) {
+        return date_sunset($day, SUNFUNCS_RET_TIMESTAMP,
+                           +$this->get('Location.Latitude'),
+                           +$this->get('Location.Longitude'),
+                           90, date('Z')/3600);
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------

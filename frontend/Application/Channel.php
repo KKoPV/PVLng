@@ -11,18 +11,36 @@ if (!Session::get('User')) return;
 /**
  *
  */
-PVLng::Menu(array(
-    'position' => 50,
-    'label'    => I18N::translate('Channel'),
-    'hint'     => I18N::translate('ChannelsHint') . ' (Shift+F5)',
-    'route'    => '/channel'
-));
+PVLng::Menu( 'channel', 50, '#', __('Channels') );
+
+/**
+ *
+ */
+PVLng::SubMenu(
+    'channel', 10, '/type', __('ChannelTypes')
+);
+
+PVLng::SubMenu(
+    'channel', 20, '/channel', __('Channels'), __('ChannelsHint') . ' (Shift+F4)'
+);
+
+PVLng::SubMenu(
+    'channel', 30, '/overview', __('Overview'), __('OverviewHint')
+);
+
+PVLng::SubMenu(
+    'channel', 40, '/tariff', __('Tariffs'), __('TariffsHint')
+);
 
 /**
  * Routes
  */
 $app->get('/channel', $checkAuth, function() use ($app) {
     $app->process('Channel');
+});
+
+$app->get('/channel/new/:type', $checkAuth, function( $type ) use ($app) {
+    $app->process('Channel', 'New', array('type' => $type));
 });
 
 $app->map('/channel/add(/:clone)', $checkAuth, function( $clone=0 ) use ($app) {
@@ -35,6 +53,10 @@ $app->map('/channel/template', $checkAuth, function() use ($app) {
 
 $app->get('/channel/edit/:id', $checkAuth, function( $id ) use ($app) {
     $app->process('Channel', 'Edit', array('id' => $id));
+});
+
+$app->get('/channel/edit/:guid', $checkAuth, function( $guid ) use ($app) {
+    $app->process('Channel', 'Edit', array('guid' => $guid));
 });
 
 $app->post('/channel/alias', $checkAuth, function() use ($app) {

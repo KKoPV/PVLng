@@ -95,6 +95,16 @@ class MemCache extends \Cache {
      * Use MemCache own functions
      * @{
      */
+    public function getHits() {
+        $stats = $this->memcache->getStats();
+        return $stats['get_hits'];
+    }
+
+    public function getMisses() {
+        $stats = $this->memcache->getStats();
+        return $stats['get_misses'];
+    }
+
     public function inc( $key, $step=1 ) {
         return $this->memcache->increment($this->key($key), $step);
     } // function inc()

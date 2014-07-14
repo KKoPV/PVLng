@@ -1,8 +1,8 @@
 <?php
 /**
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  *
  * 1.0.0
@@ -10,7 +10,7 @@
  */
 return array(
 
-    'name' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a> weather data',
+    'name' => '<a href="http://openweathermap.org/" target="_blank">OpenWeatherMap</a> weather data',
 
     'description' => '
         Pre-configured sensors:
@@ -33,7 +33,7 @@ return array(
         array(
             'type'        => 45, // OpenWeatherMap
             'name'        => 'OpenWeatherMap',
-            'description' => '<a href="http://openweathermap.org/" targe="_blank">OpenWeatherMap</a> weather data',
+            'description' => 'Weather data',
         ),
 
         // Real channels

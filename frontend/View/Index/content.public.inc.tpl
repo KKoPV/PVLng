@@ -3,29 +3,24 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
 
-<div id="public-select" class="grid_10" style="margin-bottom:1em;display:none">
-    <label for="loaddeleteview">{{VariantsPublic}}:</label>
-    <select id="loaddeleteview" style="margin:0 .5em"></select>
-    <button id="btn-load" class="tip" title="{{Load}}">{{Load}}</button>
+<div id="public-select" style="margin-bottom:1em;display:none">
+    <label for="load-delete-view" style="margin-right:20px">{{VariantsPublic}}:</label>
+    <select id="load-delete-view" style="margin:0 .5em" data-placeholder="--- {{SelectChart}} ---"></select>
+    <button id="btn-load" style="margin:0 1em" class="tip" title="{{Load}}">{{Load}}</button>
 </div>
 
-<div class="clear"></div>
-
-<div id="wrapper" class="grid_10" style="display:none">
+<div id="wrapper" style="display:none">
 
     <table id="data-table" class="dataTable">
         <thead>
         <tr>
             <th class="l">{{Channel}}</th>
-            <th>
-                <img src="/images/ico/16x16.png" style="width:16px;height:16px" width="16" height="16" alt="" />
-            </th>
             <th class="r">{{Amount}}</th>
             <th class="l">{{Unit}}</th>
         </tr>
@@ -39,17 +34,12 @@
             <td>
                 <input id="c{ID}" class="channel" type="checkbox" style="display:none"
                        data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
-                <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                     src="{ICON}" width="16" height="16" alt="" class="tip" title="{TYPE}" />
-                <strong class="tip" title="{GUID}">{NAME}</strong>
-                <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+                <!-- INCLUDE channel-details.inc.tpl -->
             </td>
-            <td>
-                <img id="s{ID}" src="/images/spinner.gif"
-                     style="float:right;width:16px;height:16px;display:none"
-                     width="16" height="16" />
+            <td class="icons r">
+                <img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" alt="o">
+                <span id="cons{ID}" class="consumption"></span>
             </td>
-            <td id="cons{ID}" class="consumption r"></td>
             <td id="u{ID}">{UNIT}</td>
         </tr>
         <!-- ENDIF -->
@@ -59,5 +49,3 @@
     </table>
 
 </div>
-
-<div class="clear"></div>

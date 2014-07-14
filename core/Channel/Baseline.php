@@ -18,15 +18,6 @@ namespace Channel;
 class Baseline extends InternalCalc {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = SENSOR_CHANNEL;
-
-    /**
      *
      */
     public function before_read( $request ) {

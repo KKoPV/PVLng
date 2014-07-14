@@ -10,33 +10,66 @@
 
 console.time('Duration');
 
-$(function() {
+/**
+ * Idea from http://pastebin.com/jYqm9ZcQ
+ */
+$.fn.autoWidth = function(options) {
+    var settings = {
+        marginRight: 20 /* Extra margin right pixels */
+    };
+    if (options) $.extend(settings, options);
 
-    /**
-     * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
-     */
-    jQuery.extend({
-        parseQueryString: function() {
-            var qs = window.location.search.replace('?', '');
-            if (qs == '') return {};
-            result = {};
-            $.each(qs.split('&'), function(i, v){
-                var pair = v.split('=');
-                /* decodeURI doesn't work for the date strings :-( */
-                result[pair[0]] = (pair.length > 1) ? pair[1].replace(/%2F/g, '/') : '';
-            });
-            return result;
-        }
+    var maxWidth = 0;
+    this.each(function() {
+        maxWidth = Math.max($(this).width(), maxWidth);
     });
+    this.css('display', 'inline-block').width(maxWidth + settings.marginRight);
+};
+
+/**
+ * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+ */
+$.extend({
+    parseQueryString: function() {
+        var qs = window.location.search.replace('?', '');
+        if (qs == '') return {};
+        result = {};
+        $.each(qs.split('&'), function(i, v){
+            var pair = v.split('=');
+            /* decodeURI doesn't work for the date strings :-( */
+            result[pair[0]] = (pair.length > 1) ? pair[1].replace(/%2F/g, '/') : '';
+        });
+        return result;
+    }
+});
+
+/**
+ *
+ */
+var lastModule, hideMenuTimer;
+
+/**
+ *
+ */
+$(function() {
 
     /* Inititilize Pines Notify */
     $.pnotify.defaults.styling = 'jqueryui';
     $.pnotify.defaults.delay = 5000;
     $.pnotify.defaults.history = false;
+    $.pnotify.defaults.sticker = false;
     $.pnotify.defaults.stack.spacing1 = 5;
     $.pnotify.defaults.stack.spacing2 = 15;
     $.pnotify.defaults.labels.stick = pnotify_defaults_labels_stick;
     $.pnotify.defaults.labels.close = pnotify_defaults_labels_close;
+
+    $(messages).each(function(id, msg) {
+        if (msg.type == 'error') {
+            msg.history = true;
+            msg.hide = false;
+        }
+        $.pnotify(msg);
+    });
 
     /* Inititilize Tooltips */
     $('.tip, .tipbtn').tipTip({
@@ -55,20 +88,16 @@ $(function() {
         if (el.data('secondary')) {
             options.icons.secondary = el.data('secondary');
         }
+        if (!el.data('text')) {
+            options.text = false;
+        }
         el.button(options);
+        el.prop('title', '');
     });
 
     $('.toolbar').buttonset();
 
     $('input[type=text], input[type=number], input[type=password], select, textarea').addClass('ui-corner-all');
-
-    $(messages).each(function(id, msg) {
-        if (msg.type == 'error') {
-            msg.history = true;
-            msg.hide = false;
-        }
-        $.pnotify(msg);
-    });
 
     $('.numbersOnly').keyup(function () {
             if (this.value != this.value.replace(/[^0-9\.]/g, '')) {
@@ -124,10 +153,9 @@ $(function() {
     shortcut.add('Shift+F1', function() { window.location = '/'; });
     shortcut.add('Shift+F2', function() { window.location = '/dashboard'; });
     shortcut.add('Shift+F3', function() { window.location = '/list'; });
-    shortcut.add('Shift+F4', function() { window.location = '/overview'; });
-    shortcut.add('Shift+F5', function() { window.location = '/channel'; });
-    shortcut.add('Shift+F6', function() { window.location = '/info'; });
-    shortcut.add('Shift+F7', function() { window.location = '/description'; });
+    shortcut.add('Shift+F4', function() { window.location = '/channel'; });
+    shortcut.add('Shift+F5', function() { window.location = '/info'; });
+    shortcut.add('Shift+F6', function() { window.location = '/description'; });
     shortcut.add('Alt+L',    function() { window.location = '/logout'; });
 
 });

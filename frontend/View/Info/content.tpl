@@ -9,90 +9,139 @@
  */
 -->
 
-<div class="grid_10">
+<div id="info-tabs" class="ui-tabs">
 
-<h3>{{SystemInformation}}</h3>
+    <ul>
+        <li><a href="#tabs-1">{{SystemInformation}}</a></li>
+        <li><a href="#tabs-2">{{Channels}}</a></li>
+        <li><a href="#tabs-3">{{Database}}</a></li>
+        <li><a href="#tabs-4">{{Cache}}</a></li>
+    </ul>
 
-<table id="table-info" class="display">
-    <thead>
-    <tr>
-        <th></th>
-        <th></th>
-    </tr>
-    </thead>
+    <div id="tabs-1">
 
-    <tbody>
-    <tr>
-        <td style="vertical-align:top">{{APIURL}}</td>
-        <td>
-            <code class="b">
-                http://{SERVERNAME}/api/r3/
-            </code>
-            <br /><br />
-            {{SeeAPIReference}}
-        </td>
-    </tr>
-    <tr>
-        <td style="vertical-align:top">{{YourAPIcode}}</td>
-        <td>
-            <form method="post" style="float:right">
-                <input type="hidden" name="regenerate" value="1" />
-                <input id="regenerate" type="submit" value="{{Regenerate}}" />
-            </form>
-            <code class="b">X-PVLng-Key: {APIKEY}</code>
-            <br /><br />
-            {{DontForgetUpdateAPIKey}}
-        </td>
-    </tr>
-    </tbody>
-</table>
+        <table id="table-info">
+            <thead>
+            <tr>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
 
-<h3>{{Statistics}}</h3>
+            <tbody>
+            <tr>
+                <td style="vertical-align:top">{{APIURL}}</td>
+                <td>
+                    <code class="b">
+                        http://{SERVERNAME}/api/r4/
+                    </code>
+                    <br /><br />
+                    {{SeeAPIReference}}
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align:top">{{YourAPIcode}}</td>
+                <td>
+                    <form method="post" style="float:right">
+                        <input type="hidden" name="regenerate" value="1" />
+                        <input id="regenerate" type="submit" value="{{Regenerate}}" />
+                    </form>
+                    <code class="b">X-PVLng-Key: {APIKEY}</code>
+                    <br /><br />
+                    {{DontForgetUpdateAPIKey}}
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-<table id="table-stats" class="display">
-    <thead>
-    <tr>
-        <th class="l">{{ChannelName}}</th>
-        <th class="l">{{Description}}</th>
-        <th class="r">{{Readings}}</th>
-        <th class="r">{{LastReading}}</th>
-        <th class="l">{{Unit}}</th>
-    </tr>
-    </thead>
+    </div>
 
-    <tbody>
-    <!-- BEGIN STATS -->
-    <tr class="tip" tip="#tip-{GUID}">
-        <td>
-            <img src="{ICON}" class="tip" style="width:16px;height:16px;margin-right:8px"
-                 width="16" height="16" alt="" title="{TYPE}" />
-            {NAME}
-        </td>
-        <td>{DESCRIPTION}</td>
-        <td class="r">{READINGS}</td>
-        <td class="r last-reading" data-guid="{GUID}">?</td>
-        <td>{UNIT}</td>
-    </tr>
-    <!-- END -->
-    </tbody>
+    <div id="tabs-2">
 
-    <tfoot>
-    <tr>
-        <th class="l" colspan="2"></th>
-        <th class="r"></th>
-        <th class="l" colspan="2"></th>
-    </tr>
-    </tfoot>
+        <div id="stats-chart"></div>
 
-</table>
+        <table id="table-stats">
+            <thead>
+            <tr>
+                <th class="l">{{ChannelName}}</th>
+                <th class="l">{{Description}}</th>
+                <th class="r">{{Readings}}</th>
+                <th class="r">{{LastReading}}</th>
+                <th class="l">{{Unit}}</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- BEGIN STATS -->
+            <tr class="tip" tip="#tip-{GUID}">
+                <td class="icons">
+                    <img src="{ICON}" class="tip channel-icon" alt="" title="{TYPE}" />
+                    {NAME}
+                </td>
+                <td>{DESCRIPTION}</td>
+                <td class="r">
+                    <span style="display:none">{raw:READINGS}</span>
+                    {READINGS}
+                </td>
+                <td class="r last-reading" data-guid="{GUID}">?</td>
+                <td>{UNIT}</td>
+            </tr>
+            <!-- END -->
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <th class="l" colspan="2"></th>
+                <th class="r"></th>
+                <th class="l" colspan="2"></th>
+            </tr>
+            </tfoot>
+
+        </table>
+
+    </div>
+
+    <div id="tabs-3">
+
+        <div id="db-chart" style="height:250px"></div>
+
+    </div>
+
+    <div id="tabs-4">
+
+        <div id="cache-chart" style="height:250px" style="display:none"></div>
+
+        <table id="table-cache">
+            <thead>
+            <tr>
+                <th class="l">{{Key}}</th>
+                <th class="l">{{Value}}</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- BEGIN CACHEINFO -->
+            <tr>
+                <td>{strtolower:_LOOP}</td>
+                <td>{CACHEINFO}</td>
+            </tr>
+            <!-- END -->
+            </tbody>
+        </table>
+
+    </div>
 
 </div>
 
-<div class="clear"></div>
-
 <!-- BEGIN STATS -->
 <div id="tip-{GUID}" style="display:none">
-    {{Serial}}: {SERIAL}<br />
-    {{Channel}}: {CHANNEL}
+    <table>
+    <tr>
+        <td>{{Serial}}</td><td style="padding-right:1em">:</td><td>{SERIAL}</td>
+    </tr>
+    <tr>
+        <td>{{Channel}}</td><td>:</td><td>{CHANNEL}</td>
+    </tr>
+    </table>
 </div>
 <!-- END -->

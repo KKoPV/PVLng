@@ -11,33 +11,38 @@
 if (!($app->debug = Session::checkRequest('debug'))) return;
 
 /**
+ * Preload Yryie
+ */
+require_once LIB_DIR . DS . 'Yryie.php';
+
+/**
  * Define Loader callback to manipulate file content to include
  */
 Loader::registerCallback(function( $filename ) {
     // Insert .AOP before file extension, so .../file.php becomes .../file.AOP.php
-    $parts = explode('.', $filename);
+    $parts = explode('.', realpath($filename));
     array_splice($parts, -1, 0, 'AOP');
     $filenameAOP = implode('.', $parts);
+
+    // Strip root directory and replace directory separators with ~ to get unique names
+    $filenameAOP = str_replace(ROOT_DIR, '', $filenameAOP);
+    $filenameAOP = str_replace(DS, '~', $filenameAOP);
+    $filenameAOP = trim($filenameAOP, '~');
+    $filenameAOP = TEMP_DIR . DS . $filenameAOP;
 
     if (!file_exists($filenameAOP) OR filemtime($filenameAOP) < filemtime($filename)) {
         // (Re-)Create AOP file
         $code = file_get_contents($filename);
 
+        // Only files marked as AOP relevant will be analysed
         if (strpos($code, '/* // AOP // */') !== FALSE) {
-            // Only files marked as AOP relevant will be analysed
 
             // Build file content hash to check if AOP relevant code was found
-            $hash = sha1($code, TRUE);
+            $hash = md5($code);
 
-            // Single line comments: /// PHP code...
-            $code = preg_replace('~^(\s*)///\s+([^*]*?)$~m', '$1$2 /// AOP', $code);
+            Yryie::transformCode($code);
 
-            // Multi line comments start: /* ///
-            $code = preg_replace('~^(\s*)/\*\s+///(.*?)$~m', '$1/// >>> AOP$2', $code);
-            // Multi line comments end: /// */
-            $code = preg_replace('~^(\s*)///\s+\*/$~m', '$1/// <<< AOP', $code);
-
-            if ($hash != sha1($code, TRUE) AND file_put_contents($filenameAOP, $code)) {
+            if ($hash != md5($code) AND file_put_contents($filenameAOP, $code)) {
                 // File content was changed and AOP file could created
                 $filename = $filenameAOP;
             }
@@ -60,30 +65,48 @@ class YryieMiddleware extends Slim\Middleware {
      */
     public function call() {
         // Put versions infos on top
-        Yryie::Versions();
+        if (!Yryie::loadFromSession()) Yryie::Versions();
 
         // Run inner middleware and application
         $this->next->call();
 
-        Yryie::Finalize();
+        Yryie::SQL(slimMVC\MySQLi::getInstance()->queries);
+
+        Yryie::Debug(
+            '%d Queries in %.0f ms / %.1f ms each',
+            slimMVC\MySQLi::$QueryCount,
+            slimMVC\MySQLi::$QueryTime,
+            slimMVC\MySQLi::$QueryTime / slimMVC\MySQLi::$QueryCount
+        );
+
+        if ($this->app->response->headers['Location']) {
+            // Redirection
+            Yryie::finalizeTimers();
+            Yryie::saveToSession();
+            return;
+        }
+
+        Yryie::finalize();
 
         $body = $this->app->response->getBody();
+        $placeholder = '<div id="YRYIE"></div>';
 
         if ($this->app->debug == 'trace') {
 
             $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
             Yryie::$TraceDelimiter = ';';
             Yryie::Save($file);
-            $body = str_replace('<!-- YRYIE -->', '<b>Trace saved as '.$file.'</b>', $body);
+            $body = str_replace($placeholder, '<p><b>Trace saved as <tt>'.$file.'</tt></b></p>', $body);
 
             // Trace only once, reset debug state
-            Session::set('debug', NULL);
+            Session::set('debug');
         } else {
             // Replace placeholder with debug data
-            $body = str_replace('<!-- YRYIE -->',
+            $body = str_replace($placeholder,
                                 Yryie::getCSS() . Yryie::getJS(TRUE, TRUE) . Yryie::Render(),
                                 $body);
         }
+        Yryie::reset();
 
         $this->app->response->setBody($body);
     }

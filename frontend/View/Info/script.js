@@ -1,4 +1,4 @@
-<!--
+<script>
 /**
  *
  *
@@ -7,9 +7,17 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
--->
 
-<script>
+var ChartOptions = {
+    chart: { type: 'pie' },
+    title: false,
+    exporting: false,
+    credits: false,
+    tooltip: false,
+    plotOptions: { pie: { dataLabels: { enabled: true } } },
+    /* Init empty dataset */
+    series: [{ data: null }]
+};
 
 $(function() {
 
@@ -19,14 +27,8 @@ $(function() {
         }
     });
 
-    $('#table-info').DataTable({
-        bSort: false,
-        bLengthChange: false,
-        bFilter: false,
-        bInfo: false,
-        bPaginate: false,
-        bJQueryUI: true,
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' }
+    $('#table-info, #table-cache').DataTable({
+        bSort: false
     });
 
     $('#regenerate').click(function() {
@@ -35,24 +37,37 @@ $(function() {
         return false;
     });
 
+    $.extend( jQuery.fn.dataTableExt.oSort, {
+        "numeric-span-pre": function ( a ) {
+            return +a.match(/>(.*?)</)[1];
+        },
+
+        "numeric-span-asc": function( a, b ) {
+            return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+        },
+
+        "numeric-span-desc": function(a,b) {
+            return ((a < b) ? 1 : ((a > b) ? -1 : 0));
+        }
+    });
+
     $('#table-stats').DataTable({
-        bSort: true,
         bLengthChange: false,
         bFilter: false,
         bInfo: false,
         bPaginate: false,
-        bAutoWidth: false,
-        bJQueryUI: true,
-        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
-        aoColumnDefs: [
-            { bSortable: false, aTargets: [ 3 ] },
-            { sWidth: '1%', aTargets: [ 2, 4 ] }
+        aoColumns: [
+            null,
+            null,
+            { sType: 'numeric-span', sWidth: '1%' },
+            { bSortable: false },
+            { sWidth: '1%' }
         ],
+
         fnFooterCallback: function( nFoot, aData, iStart, iEnd, aiDisplay ) {
-            var th = nFoot.getElementsByTagName('th');
-            var len = aData.length, re = new RegExp('['+ThousandSeparator+']', 'g'), cnt = 0;
+            var th = nFoot.getElementsByTagName('th'), len = aData.length, cnt = 0;
             th[0].innerHTML = len + " {{Channels}}";
-            while (len--) cnt += parseInt(aData[len][2].replace(re, ''));
+            while (len--) cnt += +aData[len][2].match(/>(.*?)</)[1];
             th[1].innerHTML = $.number(cnt, 0, '', ThousandSeparator);
         },
         fnInitComplete: function() {
@@ -79,5 +94,65 @@ $(function() {
             });
         }
     });
+
+    pvlng.onFinished.add(
+        function() {
+            var options = ChartOptions;
+            options.series[0].data = [
+                <!-- BEGIN STATS --><!-- IF {READINGS} -->
+                ['{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->', {raw:READINGS}],
+                <!-- ENDIF --><!-- END -->
+            ];
+            options.plotOptions.pie.dataLabels.formatter = function() {
+                return '<b>'+this.point.name+'</b>: '
+                     + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
+                     + ' ('
+                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                     + ' %)'
+            };
+
+            /* Use width of 1st visible tab container (#tab-1) to set chart width */
+            $('#stats-chart').width($('#tabs-1').width()).highcharts(options);
+        },
+        function() {
+            var options = ChartOptions;
+            options.series[0].data = [
+                ['{{DatabaseSize}}', {DATABASESIZE}],
+                ['{{DatabaseFree}}', {DATABASEFREE}]
+            ];
+            options.plotOptions.pie.dataLabels.formatter = function() {
+                return '<b>'+this.point.name+'</b>: '
+                     + Highcharts.numberFormat(this.point.y, 1, DecimalSeparator, ThousandSeparator)
+                     + ' MB ('
+                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                     + ' %)'
+            };
+
+            /* Use width of 1st visible tab container (#tab-1) to set chart width */
+            $('#db-chart').width($('#tabs-1').width()).highcharts(options);
+        },
+        function() {
+            var hits = {raw:CACHEHITS}, misses = {raw:CACHEMISSES};
+
+            if (!hits || !misses) return;
+
+            var options = ChartOptions;
+            options.series[0].data = [
+                ['{{CacheHits}}',   hits],
+                ['{{CacheMisses}}', misses]
+            ];
+            options.plotOptions.pie.dataLabels.formatter = function() {
+                return '<b>'+this.point.name+'</b>: '
+                     + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
+                     + ' ('
+                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                     + ' %)'
+            };
+
+            /* Use width of 1st visible tab container (#tab-1) to set chart width */
+            $('#cache-chart').width($('#tabs-1').width()).show().highcharts(options);
+        }
+    );
+
 });
 </script>

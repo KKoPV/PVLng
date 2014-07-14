@@ -11,24 +11,19 @@ if (!Session::get('User')) return;
 /**
  *
  */
-PVLng::Menu(array(
-    'position' => 30,
-    'label'    => I18N::translate('List'),
-    'hint'     => I18N::translate('ListHint') . ' (Shift+F3)',
-    'route'    => '/list'
-));
+PVLng::Menu(
+    'list', 30, '/list',
+    I18N::translate('List'),
+    I18N::translate('ListHint') . ' (Shift+F3)'
+);
 
 /**
  * Routes
  */
 $app->get('/list(/:id)', $checkAuth, function( $id=NULL ) use ($app) {
     $app->process('Lists', 'Index', array('id' => $id));
-})->conditions(array(
-    'id' => '\d+'
-));
+});
 
-$app->get('/list(/:guid)', $checkAuth, function( $guid=NULL ) use ($app) {
+$app->get('/list/:guid', $checkAuth, function( $guid ) use ($app) {
     $app->process('Lists', 'Index', array('guid' => $guid));
-})->conditions(array(
-    'guid' => '(\w{4}-){7}\w{4}'
-));
+});

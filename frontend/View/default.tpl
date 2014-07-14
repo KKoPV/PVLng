@@ -4,7 +4,7 @@
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -33,168 +33,95 @@
         <!-- END -->
     ];
 
+    var submenus = {SUBMENUS};
+
     </script>
 
     <meta http-equiv="Content-Style-Type" content="text/css" />
-    <link rel="stylesheet" href="/css/normalize.css+default.css+grid.css" />
+
+    <!-- IF {DEVELOPMENT} -->
+    <link rel="stylesheet" href="/css/normalize.css" />
     <link rel="stylesheet" href="/css/jquery-ui.min.css" />
-    <link rel="stylesheet" href="/css/jquery.dataTables.css+jquery.dataTables_themeroller.css+jquery.pnotify.default.css+superfish.css+tipTip.css" />
+    <link rel="stylesheet" href="/css/default.css" />
+    <link rel="stylesheet" href="/css/grid.css" />
+    <link rel="stylesheet" href="/css/jquery.dataTables.css" />
+    <link rel="stylesheet" href="/css/jquery.dataTables_themeroller.css" />
+    <link rel="stylesheet" href="/css/jquery.treetable.css" />
+    <link rel="stylesheet" href="/css/jquery.pnotify.default.css" />
+    <link rel="stylesheet" href="/css/default.jquery.css" />
+    <link rel="stylesheet" href="/css/superfish.css" />
+    <link rel="stylesheet" href="/css/tipTip.css" />
+    <link rel="stylesheet" href="/css/select2.css">
+    <link rel="stylesheet" href="/css/spectrum.css">
     <!-- With background images -->
     <link rel="stylesheet" href="/css/iCheck/flat.css" />
     <link rel="stylesheet" href="/css/iCheck/line.css" />
+    <!-- ELSE -->
+    <link rel="stylesheet" href="/css/min.css" />
+    <!-- With background images -->
+    <link rel="stylesheet" href="/css/iCheck/flat.min.css" />
+    <link rel="stylesheet" href="/css/iCheck/line.min.css" />
+    <!-- ENDIF -->
 
     {HEAD}
 
-    <style>{STYLES}</style>
+    <style>
+        {STYLES}
+        <!-- INCLUDE hook.style.css -->
+    </style>
 
+    <!-- INCLUDE head.tpl -->
     <!-- INCLUDE hook.head.tpl -->
 
 </head>
 
 <body>
-    <!-- INCLUDE hook.body.before.tpl -->
 
-    <div id="container" class="container_10">
+    <img id="pageload" src="/images/loading_dots.gif"
+         style="position:fixed;top:50%;left:50%;width:64px;height:21px;margin-left:-32px;margin-top:-15px">
+
+    <div id="container" class="container_10" style="display:none">
+
+        <!-- INCLUDE hook.body.before.tpl -->
 
         <!-- IF !{EMBEDDED} -->
         <!-- INCLUDE default.header.tpl -->
-
         <div class="clear"></div>
-
-        <div class="grid_10 hr"></div>
-
-        <div class="clear"></div>
-
-        <div class="grid_10">
-            <div class="fl">
-                <span class="toolbar menu">
-                    <!-- BEGIN MENU -->
-                    <a class="tipbtn" title="{HINT}" href="{ROUTE}">{LABEL}</a>
-                    <!-- END -->
-                </span>
-            </div>
-            <div class="r">
-                <span class="toolbar menu">
-                    <!-- BEGIN LANGUAGES -->
-                    <a class="tipbtn language" title="{LABEL}" data-lang="{CODE}" href="?lang={CODE}">
-                        <img style="width:20px;height:12px" src="/images/{CODE}.png" alt="{CODE}" width="20" height="12" />
-                    </a>
-                    <!-- END -->
-                    <!-- IF {USER} -->
-                    <a class="tipbtn" title="{{Logout}} (Alt+L)" href="/logout">
-                        <img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
-                    </a>
-                    <!-- ELSE -->
-                    <a class="tipbtn" title="{{Login}}" href="/login">
-                        <img style="width:12px;height:12px" src="/images/logout.png" alt="L" width="12" height="12" />
-                    </a>
-                    <!-- ENDIF -->
-                </span>
-            </div>
-        </div>
-
+        <!-- INCLUDE default.menu.tpl -->
         <div class="clear"></div>
         <!-- ENDIF -->
 
         <!-- INCLUDE hook.content.before.tpl -->
 
-        <div id="content" role="main">
+        <div id="content" role="main" class="grid_10">
             {CONTENT}
-        <div>
+        </div>
 
         <div class="clear"></div>
 
         <!-- INCLUDE hook.content.after.tpl -->
 
         <!-- IF !{EMBEDDED} -->
-        <div class="grid_10 hr"></div>
+        <!-- INCLUDE default.footer.tpl -->
         <div class="clear"></div>
-
-        <div id="footer">
-
-            <div class="grid_4 xs">
-                <a href="http://pvlng.com" class="fl tip" title="PVLng Homepage">
-                    <img src="/images/logo.png" style="width:50px;height:30px" width="50" height="30" alt="[PVLng]">
-                </a>
-                <div class="fl" style="margin-left:10px">
-                    Version {VERSION} / {VERSIONDATE}
-                    <a href="https://github.com/KKoPV/PVLng/releases/tag/v{VERSION}" class="tip" title="Changelog">
-                        <img src="/images/Octocat.png" style="width:16px;height:16px;margin-left:.5em" width="16" height="16" />
-                    </a>
-
-                    <br />
-                    &copy; 2012-{YEAR} by
-                    <a href="http://pvlng.com/PVLng:About" class="tip" title="Knut Kohl PhotoVoltaics"
-                       tip="<strong>K</strong>nut <strong>Ko</strong>hl <strong>P</strong>hoto<strong>V</strong>oltaics">
-                        <strong>KKoPV</strong>
-                    </a>
-                </div>
-            </div>
-
-            <div id="powered" class="grid_6 s r">
-
-                <a href="http://php.net" target="_blank">
-                    <img style="width:80px;height:15px" class="tip"
-                         src="/images/php5-power-micro.png" width="80" height="15"
-                         title="PHP {PHPVERSION}" alt="PHP {PHPVERSION}">
-                </a>
-                <a href="http://mysql.com" target="_blank">
-                    <img style="width:80px;height:15px" class="tip"
-                         src="/images/mysql.gif" width="80" height="15"
-                         title="MySQL {MYSQLVERSION}" alt="PHP {MYSQLVERSION}">
-                </a>
-                <a href="http://www.jquery.com" target="_blank">
-                    <img style="width:80px;height:15px" class="tip"
-                         src="/images/jquery.gif" width="80" height="15"
-                         title="jQuery: The Write Less, Do More, JavaScript Library"
-                         alt="jQuery">
-                </a>
-                <a href="http://www.highcharts.com/products/highcharts" target="_blank">
-                    <img style="width:80px;height:15px" class="tip"
-                         src="/images/Highcharts.png" width="80" height="15"
-                         title="A charting library written in pure JavaScript, offering an easy way of adding interactive charts to your web site or web application."
-                         alt="Highcharts">
-                </a>
-                <a href="http://datatables.net/" target="_blank">
-                    <img style="width:80px;height:15px" class="tip"
-                         src="/images/DataTables.png" width="80" height="15"
-                         title="DataTables is a plug-in for the jQuery Javascript library"
-                         alt="DataTables">
-                </a>
-                <a href="https://github.com/drewwilson/TipTip" target="_blank">
-                    <img style="width:80px;height:15px" class="tip"
-                         src="/images/tiptip.gif" width="80" height="15"
-                         title="TipTip is a very lightweight and intelligent custom tooltip jQuery plugin."
-                         alt="tipTip">
-                </a>
-
-            </div>
-
+        <div class="grid_10">
+            <div id="YRYIE"></div>
         </div>
         <!-- ENDIF -->
 
-        <div class="clear"></div>
+        <!-- INCLUDE hook.body.after.tpl -->
 
-        <div class="grid_10">
-            <!-- YRYIE -->
-        </div>
     </div>
 
-
     <script src="//code.jquery.com/jquery-2.0.0.js"></script>
-    <script>
-        window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>');
-    </script>
-    <script src="/js/jquery-ui.min.js"></script>
-    <script src="/js/jquery-ui-i18n.min.js"></script>
-    <script src="/js/jquery.dataTables.min.js"></script>
-    <script src="/js/jquery.number.min.js"></script>
-    <script src="/js/jquery.tipTip.js+jquery.icheck.js+jquery.pnotify.js+dataTables.js+shortcut.js+script.js"></script>
-    <script src="/js/trmix.min.js"></script>
-    <script src="/js/hoverIntent.js+superfish.js+supersubs.js+sprintf.js+lscache.js"></script>
+    <!-- load Highcharts scripts direct from highcharts.com -->
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
     <script>
-        var PVLngAPI = 'http://{SERVERNAME}/api/r3/',
+        var PVLngVersion = '{VERSION}',
+            PVLngAPI = 'http://{SERVERNAME}/api/r4/',
             PVLngAPIkey = '{APIKEY}',
 
             /* Inititilize Pines Notify labels here with I18N */
@@ -204,17 +131,94 @@
             DecimalSeparator = '{DSEP}',
             ThousandSeparator = '{TSEP}',
 
+            verbose = '{VERBOSE',
             language = '{LANGUAGE}',
             user = '{USER}';
+    </script>
+
+    <!-- IF {DEVELOPMENT} -->
+    <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/jquery-ui-i18n.min.js"></script>
+    <script src="/js/jquery.dataTables.min.js"></script>
+    <script src="/js/jquery.dataTables.rowReordering.js"></script>
+    <script src="/js/jquery.treetable.min.js"></script>
+    <script src="/js/jquery.number.min.js"></script>
+    <script src="/js/jquery.tipTip.js"></script>
+    <script src="/js/jquery.icheck.js"></script>
+    <script src="/js/jquery.pnotify.js"></script>
+    <script src="/js/dataTables.js"></script>
+    <script src="/js/select2.min.js"></script>
+    <script src="/js/shortcut.js"></script>
+    <script src="/js/script.js"></script>
+    <script src="/js/pvlng.js"></script>
+    <script src="/js/chart.js"></script>
+    <script src="/js/hoverIntent.js"></script>
+    <script src="/js/spectrum.js"></script>
+    <script src="/js/superfish.js"></script>
+    <script src="/js/supersubs.js"></script>
+    <script src="/js/sprintf.js"></script>
+    <script src="/js/lscache.js"></script>
+    <script src="/js/trmix.min.js"></script>
+    <script src="/js/Blob.min.js"></script>
+    <script src="/js/FileSaver.min.js"></script>
+    <!-- ELSE -->
+    <script src="/js/min.js"></script>
+    <!-- ENDIF -->
+
+    <!-- IF {LANGUAGE} != "en" -->
+    <script src="/js/select2_locale_{LANGUAGE}.min.js"></script>
+    <!-- ENDIF -->
+
+    <script>
+        if (verbose) pvlng.verbose = true;
+        <!-- INCLUDE hook.script.js -->
     </script>
 
     {SCRIPTS}
 
     <a href="#" class="back-to-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
        style="border-right:0" title="{{BackToTop}}">
-        <img src="/images/ico/arrow-stop-090.png" style="width:16px;height:16px" width="16" height="16" />
+        <img src="/images/ico/arrow-stop-090.png" class="ico">
     </a>
 
-    <!-- INCLUDE hook.body.after.tpl -->
+    <script>
+
+        var overlay;
+
+        $(function($) {
+            $.extend($.fn.select2.defaults, {
+                minimumResultsForSearch: 10,
+                allowClear: true,
+                dropdownAutoWidth: true
+            });
+
+            overlay = new pvlng.Overlay();
+
+            /* Library versions */
+            $('#highcharts-version').text(Highcharts.version);
+            $('#jquery-version').text(jQuery.fn.jquery);
+            $('#datatables-version').text(jQuery.fn.dataTable.version);
+
+            $('#pageload').remove();
+            $('#container').show();
+
+            $('select').select2();
+            $(".ui-tabs").tabs();
+            $('label.autowidth').autoWidth();
+
+            var ta = $('textarea');
+            if (ta.length) {
+                ta.autosize();
+                document.body.offsetWidth; /* Force a reflow before the class gets applied */
+                ta.addClass('textarea-transition');
+            }
+
+            pvlng.onFinished.run();
+        });
+    </script>
+
+    <!-- IF !{USER} -->
+        <!-- INCLUDE Admin/login.dialog.tpl -->
+    <!-- ENDIF -->
 </body>
 </html>

@@ -22,8 +22,9 @@ return array(
     'valid_to' => array(
         'visible'  => FALSE
     ),
-    'estimates' => array(
-        'type'     => 'textextra',
+    'extra' => array(
+        'visible'  => TRUE,
+        'type'     => 'textarea',
         'required' => TRUE
     ),
 

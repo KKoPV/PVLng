@@ -9,16 +9,6 @@
 if (!Session::get('User')) return;
 
 /**
- *
- */
-PVLng::Menu(array(
-    'position' => 40,
-    'label'    => I18N::translate('Overview'),
-    'hint'     => I18N::translate('OverviewHint') . ' (Shift+F4)',
-    'route'    => '/overview'
-));
-
-/**
  * Routes
  */
 $app->get('/overview', $checkAuth, function() use ($app) {

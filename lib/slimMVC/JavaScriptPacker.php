@@ -4,8 +4,10 @@
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
+ *
+ * Allow creation once and pack multiple scripts with ->pack($script)
  */
-namespace yMVC;
+namespace slimMVC;
 
 /* 9 April 2008. version 1.1
  *
@@ -91,9 +93,7 @@ class JavaScriptPacker {
     'High ASCII' => 95
   );
 
-  public function __construct($_script, $_encoding = 62, $_fastDecode = true, $_specialChars = false)
-  {
-    $this->_script = $_script . "\n";
+  public function __construct($_encoding = 62, $_fastDecode = true, $_specialChars = false) {
     if (array_key_exists($_encoding, $this->LITERAL_ENCODING))
       $_encoding = $this->LITERAL_ENCODING[$_encoding];
     $this->_encoding = min((int)$_encoding, 95);
@@ -101,15 +101,16 @@ class JavaScriptPacker {
     $this->_specialChars = $_specialChars;
   }
 
-  public function pack() {
+  public function pack($script) {
+    $this->_parsers = array();
+    $this->_count = array();
+    $this->buffer = NULL;
     $this->_addParser('_basicCompression');
-    if ($this->_specialChars)
-      $this->_addParser('_encodeSpecialChars');
-    if ($this->_encoding)
-      $this->_addParser('_encodeKeywords');
+    if ($this->_specialChars) $this->_addParser('_encodeSpecialChars');
+    if ($this->_encoding)     $this->_addParser('_encodeKeywords');
 
     // go!
-    return $this->_pack($this->_script);
+    return $this->_pack($script . "\n");
   }
 
   // apply all parsing routines

@@ -50,13 +50,18 @@
     background-color: rgb(192,192,192);
 }
 
+#Yryie table .hide {
+    display: none;
+}
+
 #Yryie table tbody tr.handler td.msg {
     font-weight: bold;
 }
 
 #Yryie table tbody tr.debug td.msg,
 #Yryie table tbody tr.trace td.msg,
-#Yryie table tbody tr.version td.msg {
+#Yryie table tbody tr.version td.msg,
+#Yryie table tbody tr.call td.msg {
     font-family: monospace;
     font-size: 110%;
     white-space: pre;
@@ -67,6 +72,10 @@
     text-align: left;
     background: #909090;
     border: 1px solid white;
+}
+
+#Yryie table thead th.toggle {
+    cursor: hand;
 }
 
 #Yryie table thead th.time,

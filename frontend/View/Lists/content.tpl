@@ -4,7 +4,7 @@
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -12,77 +12,41 @@
 <input type="hidden" id="fromdate" name="fromdate" />
 <input type="hidden" id="todate" name="todate" />
 
-<div id="nav" class="grid_10" style="margin-top:1em">
+<div class="icons">
+    <select id="channel" data-placeholder="--- {{SelectChannel}} ---">
+        <option></option>
+        <!-- BEGIN CHANNELS -->
+        <option value="{GUID}"
+            <!-- IF {AVAILABLE} -->
+                <!-- IF {GUID} AND {GUID} == {__GUID} --> selected="selected"<!-- ENDIF -->
+            <!-- ELSE -->
+                disabled="disabled"
+            <!-- ENDIF -->
+        >
+            <span style="font-size:120%">{INDENT}</span>
+            {NAME}
+            <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
+            <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
+        </option>
+        <!-- END -->
+    </select>
+    <img id="icon" src="/images/pix.gif" class="tip" style="margin-left:16px" data-none="/images/pix.gif" alt="">
+    <img id="icon-private" src="/images/ico/lock.png" class="tip" alt="[private]"
+         style="display:none" title="{{PrivateChannel}}"/>
+    <img id="editentity" src="/images/ico/node_design.png" class="tipbtn" title="{{EditEntity}}" alt="e">
 
-    <table style="width:100%">
-    <tr>
-        <td class="l" style="width:1%;white-space:nowrap">
-            <select id="channel">
-                <option value="">--- {{SelectChannel}} ---</option>
-                <!-- BEGIN CHANNELS -->
-                <option value="{GUID}"
-                    <!-- IF {AVAILABLE} -->
-                        <!-- IF {GUID} == {__GUID} --> selected="selected"<!-- ENDIF -->
-                    <!-- ELSE -->
-                        disabled="disabled"
-                    <!-- ENDIF -->
-                >
-                    <span style="font-size:120%">{INDENT}</span>{NAME}
-                    <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
-                    <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
-                </option>
-                <!-- END -->
-            </select>
-            <img id="icon" src="/images/pix.gif" class="tip" data-none="/images/pix.gif" alt=""
-                 style="margin:0 16px;width:16px;height:16px" width="16" height="16" />
-            <img id="icon-private" src="/images/ico/lock.png" class="tip" alt="[private]"
-                 style="width:16px;height:16px;display:none"
-                 width="16" height="16" title="{{PrivateChannel}}"/>
-        </td>
-        <td class="c">
-            <table><tr>
-            <td>
-                <span class="ui-icon ui-icon-triangle-1-w tip"
-                      title="{{PrevDay}} (Alt+P)" onclick="changeDates(-1)"></span>
-            </td>
-            <td>
-                <input class="c" type="text" id="from" name="from" size="10" />
-            </td>
-            <td style="padding:0 .5em;font-weight:bold">
-                &mdash;
-            </td>
-            <td>
-                <input class="c" type="text" id="to" name="to" size="10" />
-            </td>
-            <td>
-                <span class="ui-icon ui-icon-triangle-1-e tip"
-                      title="{{NextDay}} (Alt+N)" onclick="changeDates(1)"></span>
-            </td>
-            <td style="padding-left:.5em">
-                <button id="btn-reset">{{Today}}</button>
-            </td>
-            </tr></table>
-        </td>
-        <td class="r" style="width:1%;white-space:nowrap">
-            <img src="/images/ico/arrow-switch.png" style="margin-right:.5em"
-                 onclick="$('.p-select').toggle();" class="tip" tip="{{UseOwnConsolidation}}" />
-            <span class="p-select">{PRESETSELECT}</span>
-            <span class="p-select" style="display:none">
-                <input class="numbersOnly r" style="margin-right:.5em" type="text"
-                       id="periodcnt" name="periodcnt" value="1" size="2" />
-                {PERIODSELECT}
-            </span>
-            <span style="margin-left:.5em">
-                <button id="btn-refresh" class="tip" title="{{ListRefreshHint}}">{{Refresh}}</button>
-            </span>
-        </td>
-    </tr>
-    </table>
+</div>
+
+<div id="nav" class="ui-widget-header ui-corner-all" style="padding:4px;height:34px;margin:.5em 0">
+    <div class="fl">
+        <!-- INCLUDE dateselect.inc.tpl -->
+    </div>
+    <div class="fr r">
+        <!-- INCLUDE preset.inc.tpl -->
+    </div>
 </div>
 
 <div class="clear"></div>
-
-<div class="grid_10" style="margin-top:1em;margin-bottom:.5em">
 
 <table id="list" class="dataTable">
     <thead>
@@ -109,8 +73,6 @@
     </tr>
     </tfoot>
 </table>
-
-</div>
 
 <div style="display:none">
     <!-- Extra content for dataTable sDom -->

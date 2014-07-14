@@ -26,7 +26,7 @@ class View extends \Slim\View {
     /**
      *
      */
-    public $RegexVar = '\{([A-Z_][A-Z_0-9]*)\}';
+    public $RegexVar = '\{([A-Z_][A-Z0-9_.]*)\}';
 
     /**
      *
@@ -50,6 +50,9 @@ class View extends \Slim\View {
         $this->Helper = new ViewHelper;
         $this->Helper->numf = function( $number, $decimals=0 ) {
             return number_format($number, $decimals, \I18N::translate('DSEP'), \I18N::translate('TSEP'));
+        };
+        $this->Helper->raw = function( $value ) {
+            return $value;
         };
     }
 
@@ -79,27 +82,17 @@ class View extends \Slim\View {
         $TplCompiled = trim($TplCompiled, '~');
         $TplCompiled = TEMP_DIR . DS . $TplCompiled . '.php';
 
-        $reuse = $this->app->config->get('View.ReuseCode');
-
-        if (!$reuse OR !file_exists($TplCompiled) OR
-            filemtime($TplCompiled) < filemtime($TplFile)) {
+        if (!file_exists($TplCompiled) OR filemtime($TplCompiled) < filemtime($TplFile)) {
             $html = php_strip_whitespace($TplFile);
             $this->compile($html);
+            file_put_contents($TplCompiled, $html);
         }
-
-        if (isset($html) AND $reuse) file_put_contents($TplCompiled, $html);
 
         // save data
         $this->dataStack[] =& $this->data;
 
         ob_start();
-
-        if ($reuse) {
-            include $TplCompiled;
-        } else {
-            eval('?'.'>'.$html);
-        }
-
+        include $TplCompiled;
         return ob_get_clean();
     }
 
@@ -132,10 +125,10 @@ class View extends \Slim\View {
      *
      */
     public function set( $name, $value=NULL ) {
+        $this->arrayChangeKeysUpperCase($value);
+
         if (is_array($name)) {
-            foreach ($name as $key=>$value) {
-                $this->set($key, $value);
-            }
+            foreach ($name as $key=>$value) $this->set($key, $value);
         } else {
             $this->dataPointer[strtoupper($name)] = $value;
         }
@@ -156,10 +149,20 @@ class View extends \Slim\View {
         if (substr($name, 0, 2) == '__') {
             // Top level variable
             $name = substr($name, 2);
-            return isset($this->data[$name]) ? $this->data[$name] : '';
+            $dataPointer = &$this->data;
         } else {
-            return isset($this->dataPointer[$name]) ? $this->dataPointer[$name] : '';
+            $parent = 0;
+            while (strpos($name, '_PARENT.') === 0) {
+                $parent++;
+                $name = substr($name, 8);
+            }
+            if ($parent) {
+                 $dataPointer = &$this->dataStack[count($this->dataStack)-$parent];
+            } else {
+                 $dataPointer = &$this->dataPointer;
+            }
         }
+        return isset($dataPointer[$name]) ? $dataPointer[$name] : NULL;
     }
 
     /**
@@ -167,6 +170,13 @@ class View extends \Slim\View {
      */
     public function __get( $name ) {
         return $this->get($name);
+    }
+
+    /**
+     *
+     */
+    public function setRenderValueCallback( callable $callback ) {
+        $this->renderValueCallback = $callback;
     }
 
     // -------------------------------------------------------------------------
@@ -196,18 +206,32 @@ class View extends \Slim\View {
     /**
      *
      */
+    protected $JavaScriptPacker;
+
+    /**
+     *
+     */
+    protected $renderValueCallback;
+
+    /**
+     *
+     */
     protected function compile( &$html ) {
         if (strpos($html, '<!-- COMPILE OFF -->') === FALSE) {
 
             // <!-- INCLUDE template.tpl -->
             if (preg_match_all('~<!-- INCLUDE (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $inc) {
-                    $html = str_replace($inc[0], '<?php $this->display(\''.$inc[1].'\'); ?'.'>', $html);
+                    $html = str_replace(
+                        $inc[0],
+                        '<?php /* INCLUDE */ $this->display("'.$inc[1].'"); ?'.'>',
+                        $html
+                    );
                 }
             }
 
-            // <!-- DEFINE MACRO name -->...<!-- END DEFINE -->
-            if (preg_match_all('~<!-- DEFINE MACRO (.+?) -->\s*(.+?)\s*<!-- END DEFINE -->~s', $html, $args, PREG_SET_ORDER)) {
+            // <!-- DEFINE name -->...<!-- END DEFINE -->
+            if (preg_match_all('~<!-- DEFINE (.+?) -->\s*(.+?)\s*<!-- END DEFINE -->~s', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $macro) {
                     // Remove macro definition
                     $html = str_replace($macro[0], '', $html);
@@ -219,29 +243,25 @@ class View extends \Slim\View {
             // Mask masked delimiters
             $html = str_replace(array('\{', '\}'), array("\x01", "\x02"), $html);
 
-            // Translations
-            if (preg_match_all('~\{\{([^}]+?)\}\}~', $html, $args, PREG_SET_ORDER)) {
-                foreach ($args as $data) {
-                    $html = str_replace(
-                        $data[0],
-                        '<?php echo I18N::translate(\''.$data[1].'\'); ?'.'>',
-                        $html
-                    );
-                }
-            }
-
             // <!-- (ELSE)?IF ... -->...<!-- ELSE -->...<!-- ENDIF -->
             if (preg_match_all('~<!-- (ELSE)?IF (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $if) {
                     if (preg_match_all('~'.$this->RegexVar.'~', $if[2], $matches, PREG_SET_ORDER)) {
                         foreach ($matches as $match) {
-                            $if[2] = str_replace($match[0], '$this->__get(\''.$match[1].'\')', $if[2]);
+                            $if[2] = str_replace($match[0], '$this->renderValue(\''.$match[1].'\')', $if[2]);
                         }
                     }
                     $html = str_replace($if[0], '<?php '.$if[1].'IF ('.$if[2].'): ?'.'>', $html);
                 }
                 $html = str_replace('<!-- ELSE -->', '<?php ELSE: ?'.'>', $html);
                 $html = str_replace('<!-- ENDIF -->', '<?php ENDIF; ?'.'>', $html);
+            }
+
+            // Translations {{...}} are shortcuts to helper function "translate", which have to be defined!
+            if (preg_match_all('~\{\{([^}]+?)\}\}~', $html, $args, PREG_SET_ORDER)) {
+                foreach ($args as $data) {
+                    $html = str_replace($data[0], '{translate:"'.$data[1].'"}', $html);
+                }
             }
 
             // Functions
@@ -265,7 +285,7 @@ class View extends \Slim\View {
                                 // escaped value == constant
                               ? '\''.trim($param[2],'"').'\''
                                 // OR template variable
-                              : '$this->__get(\''.$param[2].'\')'
+                              : '$this->get(\''.$param[2].'\')'
                             );
                         }
                     }
@@ -281,36 +301,19 @@ class View extends \Slim\View {
             }
 
             // Loops
-            if (preg_match_all('~<!-- BEGIN (\w[\w\d_]*) -->~', $html, $args, PREG_SET_ORDER)) {
+            if (preg_match_all('~<!-- BEGIN ([A-Z][A-Z0-9_]*) -->~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $match) {
                     $id = rand(100, 999);
-                    $html = str_replace(
-                        $match[0],
-                        '<?php if ($_'.$id.' = $this->__get(\''.$match[1].'\')): '
-                       .'array_push($this->dataStack, $this->dataPointer); '
-                       .'foreach ($_'.$id.' as $__key=>&$this->dataPointer): '
-                       .'if (!is_array($this->dataPointer)) {'
-                       .'  $this->dataPointer = array("\x00"=>$this->dataPointer, \'KEY\'=>$__key, \''.$match[1].'\'=>$this->dataPointer); '
-                       .'} ?'.'>',
-                        $html
-                    );
+                    $html = str_replace($match[0], sprintf($this->LoopStart, $id, $match[1]), $html);
                 }
             }
 
-            $html = preg_replace(
-                '~<!-- END .*?-->~',
-                '<?php '
-               .'if (array_key_exists("\x00", $this->dataPointer)) $this->dataPointer = $this->dataPointer["\x00"]; '
-               .'endforeach; '
-               .'$this->dataPointer = array_pop($this->dataStack); '
-               .'endif; ?'.'>',
-                $html
-            );
+            $html = preg_replace('~<!-- END .*?-->~', $this->LoopEnd, $html);
 
             // Variables
             $html = preg_replace_callback(
                 '~'.$this->RegexVar.'~',
-                function($m) { return '<?php echo $this->__get(\''.$m[1].'\'); ?'.'>'; },
+                function($m) { return '<?php echo $this->renderValue(\''.$m[1].'\'); ?'.'>'; },
                 $html
             );
 
@@ -329,6 +332,7 @@ class View extends \Slim\View {
      */
     protected function compressCode( &$html ) {
         if (!$this->app->config->get('View.Verbose')) {
+
             $pre = array();
             // mask <pre>, <code> and <tt> sequences
             if (preg_match_all('~<(pre|code|tt).*?</\\1>~is', $html, $matches, PREG_SET_ORDER)) {
@@ -336,6 +340,30 @@ class View extends \Slim\View {
                     $hash = md5($match[0]);
                     $pre[$hash] = $match[0];
                     $html = str_replace($match[0], $hash, $html);
+                }
+            }
+
+            // Compress inline CSS
+            if (preg_match_all('~<style>.*?</style>~is', $html, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $html = str_replace($match[0], preg_replace(array(
+                        /* remove multiline comments */
+                        '~/\*.*?\*/~s',
+                        /* remove tabs, spaces, newlines, etc. */
+                        '~\r|\n|\t|\s\s+~',
+                        /* remove whitespace on both sides of colons : , and ; */
+                        '~\s?([,:;])\s?~',
+                        /* remove whitespace on both sides of curly brackets {} */
+                        '~;?\s?([{}])\s?~',
+                    ), array('', '', '$1', '$1'), $match[0]), $html);
+                }
+            }
+
+            // Compress inline JS
+            if (preg_match_all('~<script>.*?</script>~is', $html, $matches, PREG_SET_ORDER)) {
+                if (!$this->JavaScriptPacker) $this->JavaScriptPacker = new JavaScriptPacker(0);
+                foreach ($matches as $match) {
+                    $html = str_replace($match[0], $this->JavaScriptPacker->pack($match[0]), $html);
                 }
             }
 
@@ -348,7 +376,7 @@ class View extends \Slim\View {
             // Remove whitespaces between tags
             $html = preg_replace('~>\s+<~s', '><', $html);
 
-            /* remove pairs of ?><?php */
+            // remove pairs of ?><?php
             $html = preg_replace('~\s*\?'.'><\?php\s*~', ' ', $html);
 
             // Restore <pre>...</pre> sections
@@ -371,5 +399,65 @@ class View extends \Slim\View {
 
         $html = trim($html);
     }
+
+    /**
+     * Called from render()
+     */
+    protected function renderValue( $name ) {
+        // Raw value requested, independent from locale etc.
+        if (preg_match('~^(.*?)_RAW$~', $name, $args)) {
+            $value = $this->get($args[1]);
+        } else {
+            $value = $this->get($name);
+            if ($this->renderValueCallback) {
+                $value = call_user_func($this->renderValueCallback, $value);
+            }
+        }
+        return $value;
+    }
+
+    /**
+     *
+     */
+    protected function arrayChangeKeysUpperCase( &$array ) {
+        if (!is_array($array)) return;
+        $array = array_change_key_case($array, CASE_UPPER);
+        foreach ($array as $key => $value) {
+            if (is_array($value)) $this->arrayChangeKeysUpperCase($array[$key]);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // PRIVATE
+    // -------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    private $LoopStart = '<?php
+        if ($_%1$d = $this->__get("%2$s")):
+          array_push($this->dataStack, $this->dataPointer);
+          $_f%1$d = TRUE; $_c%1$d = count($_%1$d); $_i%1$d = 1;
+          foreach ($_%1$d as $_k%1$d => &$this->dataPointer):
+            if (!is_array($this->dataPointer)):
+              $this->dataPointer = array("\x00" => $this->dataPointer, "%2$s" => $this->dataPointer);
+            endif;
+            $this->dataPointer["_LOOP"] = $_k%1$d;
+            $this->dataPointer["_LOOP_FIRST"] = $_f%1$d; $_f%1$d = FALSE;
+            $this->dataPointer["_LOOP_LAST"] = ($_i%1$d == $_c%1$d);
+            $this->dataPointer["_LOOP_ID"] = $_i%1$d++; ?>';
+
+    /**
+     *
+     */
+    private $LoopEnd = '<?php
+           if (isset($this->dataPointer["\x00"])):
+             $this->dataPointer = $this->dataPointer["\x00"];
+           else:
+             unset($this->dataPointer["_LOOP"], $this->dataPointer["_LOOP_FIRST"], $this->dataPointer["_LOOP_LAST"], $this->dataPointer["_LOOP_ID"]);
+           endif;
+         endforeach;
+         $this->dataPointer = array_pop($this->dataStack);
+       endif; ?>';
 
 }

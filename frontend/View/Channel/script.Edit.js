@@ -19,7 +19,8 @@ $(function() {
         bFilter: false,
         bSort: false,
         bInfo: false,
-        bJQueryUI: true
+        bJQueryUI: true,
+        bAutoWidth: false
     });
 
     $('#add2tree').on('ifChanged', function(){

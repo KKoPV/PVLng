@@ -8,27 +8,44 @@
  */
 
 #chart-placeholder {
-    padding: 1em;
     margin-bottom: 1em;
-    font-weight: bold;
     text-align: center;
 }
 
-#d-table td {
-    padding: .5em .5em;
-    vertical-align: top;
+tr:hover {
+    background-color: #C0FFC0 !important;
+}
+
+.drag {
+    cursor: ns-resize;
 }
 
 .chart {
     float: left;
     width:  235px;
-    height: 270px;
+    height: 290px;
+}
+
+.chart .chart-inner {
+    width:  235px;
+    height: 235px;
+}
+
+.chart-big {
+    float: left;
+    width:  353px;
+    height: 408px;
+}
+
+.chart-big .chart-inner {
+    width:  353px;
+    height: 353px;
 }
 
 .chart img {
     position: relative;
     left: 93px;
-    top: 140px;
+    top: 93px;
 }
 
 .chart.push-0_5 {
@@ -41,4 +58,24 @@
 
 .chart.push-1_5 {
     margin-left: 353px;
+}
+
+.chart-big.push-0_5 {
+    margin-left: 118px;
+}
+
+.chart-title {
+    text-align: center;
+    font-weight: bold;
+    height: 1.1em;
+}
+
+.chart-subtitle {
+    text-align: center;
+    font-size: 80%;
+    height: 3em;
+}
+
+.position {
+    text-align: right;
 }

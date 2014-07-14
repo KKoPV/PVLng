@@ -2,10 +2,10 @@
 /**
  *
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 namespace Channel;
 
@@ -39,45 +39,49 @@ class History extends InternalCalc {
 
         $this->before_read($request);
 
-        $this->child = $this->getChild(1);
+        $child = $this->getChild(1);
 
-        if (!$this->child) return $this->after_read(new \Buffer);
+        $result = new \Buffer;
+
+        if (!$child) return $this->after_read($result);
 
         // Inherit properties from child
-        $this->meter = $this->child->meter;
+        $this->meter = $child->meter;
 
         // Fetch all data, compress later
         unset($request['period']);
 
         if ($this->valid_to == 0) {
             // Last x days, move request start backwards
-            $request['start'] = $this->start + $this->valid_from * 60*60*24;
+            $request['start'] = $this->start + $this->valid_from * 86400;
+            // Move request end backwards to 00:00
+            $request['end'] = strtotime('today');
             // Save data into temp. table
-            $this->saveValues($this->child->read($request));
+            $this->saveValues($child->read($request));
         } else {
             // Find earliest data
             $q = new \DBQuery('pvlng_reading_num');
-            $q->get($q->FROM_UNIXTIME($q->MIN('timestamp'), '%Y'));
+            $q->get($q->FROM_UNIXTIME($q->MIN('timestamp'), '"%Y"'));
 
             for ($i=$this->db->queryOne($q)-date('Y'); $i<=0; $i++) {
-                $request['start'] = strtotime(date('Y-m-d ', $this->start + $this->valid_from * 60*60*24).$i.'years');
-                $request['end']   = strtotime(date('Y-m-d ', $this->end + $this->valid_to * 60*60*24).$i.'years');
+                $request['start'] = strtotime(date('Y-m-d ', $this->start + $this->valid_from * 86400).$i.'years');
+                $request['end']   = strtotime(date('Y-m-d ', $this->end + $this->valid_to * 86400).$i.'years');
                 // Save data into temp. table
-                $this->saveValues($this->child->read($request));
+                $this->saveValues($child->read($request));
             }
         }
 
-        if ($this->period[1] == self::NO) {
-            // Smooth result at least 5 minutes
-            $this->period = array(5/60, self::HOUR);
+        if ($this->period[0] * $this->TimestampMeterOffset[$this->period[1]] < 600) {
+            // Smooth result at least 10 minutes
+            $this->period = array(10, self::MINUTE);
         } elseif ($this->threshold AND $this->period[1] == self::MINUTE) {
             // Smooth result by cut period by "threshold", only for minutes
             $this->period[0] *= $this->threshold;
         }
 
         $q = new \DBQuery('pvlng_reading_num_tmp');
-        $q->get($q->FROM_UNIXTIME('timestamp', '%H'), 'hour')
-          ->get($q->FROM_UNIXTIME('timestamp', '%i'), 'minute');
+        $q->get($q->FROM_UNIXTIME('timestamp', '"%H"'), 'hour')
+          ->get($q->FROM_UNIXTIME('timestamp', '"%i"'), 'minute');
 
         if ($this->meter) {
             $q->get($q->MAX('data'), 'data');
@@ -91,7 +95,7 @@ class History extends InternalCalc {
                     $q->get($q->AVG('data'), 'data');
                     break;
                 case 1:
-                    // harm. avg.: count(val) / sum(1/val) as hmean
+                    // harm. avg.: count(val) / sum(1/val)
                     $q->get($q->COUNT('data').'/'.$q->SUM('1/`data`'), 'data');
                     break;
                 case 2:
@@ -105,16 +109,14 @@ class History extends InternalCalc {
           ->get($q->MAX('data'), 'max')
           ->get($q->COUNT(0), 'count')
           ->get($this->periodGrouping(), 'g')
-          ->whereEQ('id', $this->entity)
+          ->filter('id', $this->entity)
           ->groupBy('g');
         $inner = $q->SQL();
-        $q->select("\n(\n".$inner."\n) t")
+        $q->select('('.$inner.') t')
           ->groupBy('hour')
           ->groupBy('minute');
 
 #echo $q;
-
-        $result = new \Buffer;
 
         $day   = date('d', ($this->start+$this->end)/2);
         $month = date('m', ($this->start+$this->end)/2);
@@ -141,14 +143,5 @@ class History extends InternalCalc {
 
         return $this->after_read($result);
     }
-
-    // -----------------------------------------------------------------------
-    // PROTECTED
-    // -----------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected $child;
 
 }

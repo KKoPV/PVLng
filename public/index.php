@@ -61,6 +61,8 @@ $config = slimMVC\Config::getInstance()
         ->load(CONF_DIR . DS . 'config.default.php')
         ->load(CONF_DIR . DS . 'config.php');
 
+$config->set('develop', file_exists(ROOT_DIR . DS . '.develop'));
+
 /**
  * Check Admin config
  */
@@ -156,7 +158,7 @@ if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
 }
 
 // 3rd check the request parameters
-define('LANGUAGE', Session::checkRequest('lang', $lang) ?: 'en');
+$app->Language = Session::checkRequest('lang', $lang) ?: 'en';
 
 /**
  * BBCode parser
@@ -197,7 +199,7 @@ try {
        .'into your database?!</p>');
 }
 
-I18N::setLanguage(LANGUAGE);
+I18N::setLanguage($app->Language);
 I18N::setCodeSet('app');
 I18N::setAddMissing($config->get('I18N.Add'));
 if ($config->get('I18N.Mark')) {
@@ -207,8 +209,8 @@ if ($config->get('I18N.Mark')) {
 /**
  * Some defines
  */
-define('PVLNG', 'PhotoVoltaic Logger new generation');
 $version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
+define('PVLNG',              'PhotoVoltaic Logger new generation');
 define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
@@ -232,10 +234,9 @@ $app->showStats = TRUE;
 // Authenticate user if required
 // ---------------------------------------------------------------------------
 $checkAuth = function( Slim\Route $route ) use ($app) {
-    // Check valid logged in user
+    // Check logged in user
     if (Session::get('user') !== $app->config->get('Admin.User')) {
-        Session::set('returnto', $route->getPattern());
-        $app->redirect('/login');
+        $app->redirect('/');
     }
 };
 
@@ -245,6 +246,15 @@ $checkAuth = function( Slim\Route $route ) use ($app) {
 $app->notFound(function() use ($app) {
     $app->redirect('/');
 });
+
+/**
+ *
+ */
+Slim\Route::setDefaultConditions(array(
+    'guid' => '(\w{4}-){7}\w{4}',
+    'id'   => '\d+',
+    'slug' => '[@\w\d-]+'
+));
 
 // ---------------------------------------------------------------------------
 // Modules: Menu and route definitions

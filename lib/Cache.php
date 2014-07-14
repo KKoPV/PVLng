@@ -115,6 +115,24 @@ abstract class Cache {
     }
 
     /**
+     * Amount of cache hits absolute, overwrite for concrete class!
+     *
+     * @return int
+     */
+    public function getHits() {
+        return 0;
+    }
+
+    /**
+     * Amount of cache misses absolute, overwrite for concrete class!
+     *
+     * @return int
+     */
+    public function getMisses() {
+        return 0;
+    }
+
+    /**
      * Get data from cache, if not yet exists, save to cache
      *
      * Nested calls of save() will be handled correctly.

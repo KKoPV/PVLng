@@ -15,15 +15,6 @@ namespace Channel;
 class Fix extends InternalCalc {
 
     /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = SENSOR_CHANNEL;
-
-    /**
      *
      */
     protected function before_read( $request ) {
@@ -32,7 +23,7 @@ class Fix extends InternalCalc {
 
         $ts = $this->start;
 
-        // Show pseudo reading at each considation range point or at least each hour
+        // Show pseudo reading at each consolidation range point or at least each hour
         $delta = $this->TimestampMeterOffset[$this->period[1]];
         $delta = $delta ?: 3600; // 1hr
 

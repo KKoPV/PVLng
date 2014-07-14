@@ -12,37 +12,7 @@ namespace Channel;
 /**
  *
  */
-class Accumulator extends \Channel {
-
-    /**
-     * Channel type
-     * UNDEFINED_CHANNEL - concrete channel decides
-     * NUMERIC_CHANNEL   - concrete channel decides if sensor or meter
-     * SENSOR_CHANNEL    - numeric
-     * METER_CHANNEL     - numeric
-     */
-    const TYPE = NUMERIC_CHANNEL;
-
-    /**
-     * Accept only childs of the same entity type
-     */
-    public function addChild( $guid ) {
-        $childs = $this->getChilds();
-        if (empty($childs)) {
-            // Add 1st child
-            return parent::addChild($guid);
-        }
-
-        // Check if the new child have the same type as the 1st (and any other) child
-        $first = self::byID($childs[0]['entity']);
-        $new   = self::byGUID($guid);
-        if ($first->type == $new->type) {
-            // ok, add new child
-            return parent::addChild($guid);
-        }
-
-        throw new Exception('"'.$this->name.'" accepts only childs of type "'.$first->type.'"', 400);
-    }
+class Accumulator extends Calculator {
 
     /**
      *
@@ -61,10 +31,13 @@ class Accumulator extends \Channel {
                 break;
 
             case 1: // Only one child, return as is
+                $this->meter = $childs[0]->meter;
                 $result = $childs[0]->read($request);
                 break;
 
             default:
+                $this->meter = $childs[0]->meter;
+                $lazy = !$this->extra;
                 $buffer = $childs[0]->read($request);
 
                 // Combine all data for same timestamp
@@ -100,8 +73,8 @@ class Accumulator extends \Channel {
 
                         } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                            // write $row1 only, if data set 2 is not yet started
-                            if ($first2) $result->write($row1, $key1);
+                            // write $row1 only, if not in strict mode and data set 2 is not yet started
+                            if ($first2 AND $lazy) $result->write($row1, $key1);
 
                             // read only row 1
                             $row1 = $buffer->next()->current();
@@ -109,8 +82,8 @@ class Accumulator extends \Channel {
 
                         } else /* $key1 > $key2 */ {
 
-                            // write $row2 only, if data set 1 is not yet started
-                            if ($first1) $result->write($row2, $key2);
+                            // write $row2 only, if not in stric mode and data set 1 is not yet started
+                            if ($first1 AND $lazy) $result->write($row2, $key2);
 
                             // read only row 2
                             $row2 = $next->next()->current();

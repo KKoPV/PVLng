@@ -21,17 +21,12 @@ class Lists extends \Controller {
         $this->view->SubTitle = \I18N::_('List');
 
         $q = \DBQuery::forge('pvlng_tree_view')
-             ->get('guid')
-             ->get('name')
-             ->get('type')
-             ->get('description')
-             ->get('unit')
-             ->get('graph', 'available')
-             ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
-             ->whereNE('id', 1)
-             ->whereNULL('alias_of');
+             ->get('guid')->get('name')->get('description')
+             ->get('type')->get('unit')->get('graph', 'available')->get('icon')
+             ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&nbsp;&bull;","&rarr;"), "&nbsp;")', 'indent')
+             ->filter('`id` <> 1 AND `alias_of` IS NULL');
 
-        $this->view->Channels = $this->rows2view($this->db->queryRows($q));
+        $this->view->Channels = $this->db->queryRowsArray($q);
 
         try {
             if ($id = $this->app->params['id']) {
@@ -42,19 +37,9 @@ class Lists extends \Controller {
                 $this->view->GUID = $channel->guid;
             }
         } catch(Exception $e) {
-            Messages::Info('Unknown channel');
+            \Messages::Info('Unknown channel');
         }
 
-        $bk = \BabelKitMySQLi::getInstance();
-
-        while ($this->app->cache->save('preset/'.LANGUAGE, $preset)) {
-            $preset = $bk->select('preset', LANGUAGE);
-        }
-        $this->view->PresetSelect = $preset;
-
-        while ($this->app->cache->save('period/'.LANGUAGE, $period)) {
-            $period = $bk->select('period', LANGUAGE);
-        }
-        $this->view->PeriodSelect = $period;
+        $this->PresetAndPeriod();
     }
 }

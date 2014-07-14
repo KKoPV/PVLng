@@ -7,23 +7,17 @@
  * @version       1.0.0
  */
 
-/**
- *
- */
-function zebra( table ) {
-    $(table+' tbody tr:visible').each(function(id, el) {
-        el = $(el);
-        if (!(id & 1)) {
-            /* Set to odd if needed */
-            if (el.hasClass('even')) el.removeClass('even').addClass('odd');
-        } else {
-            /* Set to even if needed */
-            if (el.hasClass('odd')) el.removeClass('odd').addClass('even');
-        }
-    });
-}
-
 $(function() {
+
+    $.extend( $.fn.dataTable.defaults, {
+        bLengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        bPaginate: false,
+        bJQueryUI: true,
+        bProcessing: true,
+        oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
+    });
 
     /* dataTables sorting functions */
 
@@ -46,17 +40,17 @@ $(function() {
 
     /* Numerics with comma! as dec. separator */
     $.fn.dataTableExt.oSort['numeric-comma-asc'] = function(a, b) {
-        var x = (a == '-') ? 0 : a.replace(/\./, "").replace(/,/, ".");
+        var x = (a == '-') ? 0 : a.replace(/\./, '').replace(/,/, '.');
         x = parseFloat( x );
-        var y = (b == '-') ? 0 : b.replace(/\./, "").replace(/,/, ".");
+        var y = (b == '-') ? 0 : b.replace(/\./, '').replace(/,/, '.');
         y = parseFloat( y );
         return ((x < y) ? -1 : ((x > y) ?    1 : 0));
     };
 
     $.fn.dataTableExt.oSort['numeric-comma-desc'] = function(a, b) {
-        var x = (a == '-') ? 0 : a.replace(/\./, "").replace(/,/, ".");
+        var x = (a == '-') ? 0 : a.replace(/\./, '').replace(/,/, '.');
         x = parseFloat( x );
-        var y = (b == '-') ? 0 : b.replace(/\./, "").replace(/,/, ".");
+        var y = (b == '-') ? 0 : b.replace(/\./, '').replace(/,/, '.');
         y = parseFloat( y );
         return ((x < y) ?    1 : ((x > y) ? -1 : 0));
     };
