@@ -88,6 +88,11 @@ img.tip {
     padding: .5em 1em;
 }
 
+.select2-results {
+    /* Show about 12 rows below search input */
+    max-height: 20em;
+}
+
 /* Chart-Tooltips
 --------------------------------------------------------------------------- */
 .chart-tooltips {
