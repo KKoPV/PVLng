@@ -824,7 +824,7 @@ $(function() {
     });
 
     /**
-     * Modify legend color for pos./neg. splitted seires
+     * Modify legend color for pos./neg. splitted series
      * Idea from
      * http://highcharts.uservoice.com/forums/55896-general/suggestions/4575779-make-the-legend-icon-colors-modifiable
      * http://jsfiddle.net/stephanevanraes/CZSzT/
@@ -1260,12 +1260,19 @@ $(function() {
                 windowVisible = true;
                 /* Was longer in background, so the updateTimeout is not set anymore */
                 if (!updateTimeout) {
-                    setTimeout(function() {
-                        /* Scroll to navigation as top most visible element */
-                        pvlng.scroll('#nav');
-                        updateChart();
-                    },
-                    1000);
+                    /* Check if toDate in chart is today and not in the past */
+                    var d = new Date(),
+                        today = ('0'+(d.getMonth()+1)).slice(-2) + '/' +
+                                ('0'+d.getDate()).slice(-2) + '/' +
+                                d.getFullYear();
+                    if ($('#todate').val() == today) {
+                        setTimeout(function() {
+                            /* Scroll to navigation as top most visible element */
+                            pvlng.scroll('#nav');
+                            updateChart();
+                        },
+                        1000);
+                    }
                 }
             } else {
                 windowVisible = false;
