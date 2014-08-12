@@ -1,23 +1,6 @@
 /**
  *
  */
-
-window.alert = function( msg, title ) {
-    if (arguments.length == 1) title = '';
-
-    $("<div/>").dialog({
-        title: title,
-        resizable: false,
-        modal: true,
-        width: 480,
-        buttons: {
-            'Ok': function() { $(this).dialog('close') }
-        },
-        close: function() { $(this).remove() },
-    })
-    .html(msg);
-};
-
 var pvlng = new function() {
 
     /**
@@ -260,6 +243,57 @@ var pvlng = new function() {
 };
 
 $(function() {
+
+    $.extend({
+        alert: function( msg, title ) {
+            if (arguments.length == 1) title = '';
+
+            $('<div/>').dialog({
+                modal: true,
+                resizable: false,
+                title: title,
+                width: 480,
+                open: function() { $('.ui-dialog-titlebar-close').hide() },
+                buttons: {
+                    'Ok': function() { $(this).dialog('close') }
+                },
+                close: function() { $(this).remove() },
+            })
+            .html(msg);
+        },
+
+        confirm: function( msg, title, OkText, CancelText ) {
+            if (!title) title = 'Confirm';
+            if (!OkText) OkText = 'Ok';
+            if (!CancelText) CancelText = 'Cancel';
+
+            var d = $.Deferred();
+            var options = {
+                modal: true,
+                resizable: false,
+                title: title,
+                width: 480,
+                open: function() { $('.ui-dialog-titlebar-close').hide() },
+                buttons: {},
+                close: function() { $(this).remove() }
+            };
+            /* Use given texts for buttons */
+            options.buttons[OkText] = function () {
+                $(this).dialog('close');
+                d.resolve(true);
+                return true;
+            };
+            options.buttons[CancelText] = function () {
+                $(this).dialog('close');
+                d.resolve(false);
+                return false;
+            };
+
+            $('<div/>').html(msg).dialog(options);
+
+            return d.promise();
+        }
+    });
 
     /**
      *

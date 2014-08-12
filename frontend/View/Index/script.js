@@ -17,7 +17,7 @@
 
 var ChartHeight = {INDEX_CHARTHEIGHT},
     RefreshTimeout = {INDEX_REFRESH},
-    chartLabelsCSS = { color: 'gray', fontSize: '9px' },
+    chartLabelsCSS = { color: 'lightgray', fontSize: '9px' },
     qs = {},
     chart = false,
     channels_chart = [],
@@ -49,7 +49,6 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
     chartOptions = {
         chart: {
             renderTo: 'chart',
-            paddingRight: 15,
             alignTicks: false,
             zoomType: 'x',
             resetZoomButton: {
@@ -59,35 +58,21 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             panning: true,
             panKey: 'shift',
             events: {
-                load: function () {
-                    /* Show generator once on load */
-                    this.renderer
-                        .label(
-                            'PVLng v'+PVLngVersion,
-                            this.spacingBox.x+this.spacingBox.width-10, /* right*/
-                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
-                         )
-                        .attr({ rotation: -90 })
-                        .css(chartLabelsCSS)
-                        .add();
-                },
                 redraw: function () {
-                    /* Show time on each redraw, fill solid white for correct overwrite */
+                    /* Show generator and time not only once on load, on browser zoom the chart will be re-drawn */
                     this.renderer
                         .label(
-                            (new Date()).toLocaleTimeString(),
-                            0, /* left*/
-                            this.spacingBox.y+this.spacingBox.height+3 /* bottom */
+                            /* Just into upper left corner */
+                            'PVLng v'+PVLngVersion + '<br />'+(new Date()).toLocaleTimeString()
                          )
-                        .attr({ fill: 'white', rotation: -90 })
+                        .attr({ fill: 'white' })
                         .css(chartLabelsCSS)
                         .add();
-                },
-                selection: function(event) { setTimeout(setExtremes, 100); }
+                }
             }
         },
         title: { text: '' },
-        legend: { borderRadius: 5, borderWidth: 1 },
+        /* legend: { borderRadius: 5, borderWidth: 1 }, */
         credits: false,
         plotOptions: {
             series: {
@@ -378,7 +363,19 @@ function updateChart( forceUpdate ) {
 
     updateActive = true;
 
-    var fromDate = $('#fromdate').val(), toDate = $('#todate').val();
+    $('.spinner').hide();
+
+    var fromDate = $('#fromdate').val(),
+        toDate = $('#todate').val(),
+        period_count = +$('#periodcnt').val(),
+        period = $('#period').val(),
+        ts = (new Date).getTime(),
+        channels_new = [], yAxisMap = [], yAxis = [],
+        channel, channel_clone, buffer = [],
+        aborted = false,
+        res = xResolution[period] ? xResolution[period] : 1,
+        expanded = tree.expanded;
+
 
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
     if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
@@ -401,22 +398,11 @@ function updateChart( forceUpdate ) {
         }).prop('href', '/chart/' + views.actual.slug);
     }
 
-    var ts = (new Date).getTime(),
-        channels_new = [], yAxisMap = [], yAxis = [],
-        channel, channel_clone, buffer = [],
-        aborted = false,
-        period_count = +$('#periodcnt').val(),
-        period = $('#period').val(),
-        res = xResolution[period] ? xResolution[period] : 1,
-        expanded = tree.expanded;
-
     /* Show all rows to reset consumption and cost columns */
     if (!expanded) tree.toggle(true);
 
     /* Reset consumption and costs data */
-    $('.minmax, .consumption, .costs, #costs').each(function(id, el) {
-        $(el).html('');
-    });
+    $('.minmax, .consumption, .costs, #costs').html('');
 
     /* Re-collapse if needed */
     if (!expanded) tree.toggle(false);
@@ -526,14 +512,14 @@ function updateChart( forceUpdate ) {
     }
 
     if (changed) {
-        /* use UTC for timestamps with a period >= day to avoid wrong hours in hint */
+        /* Use UTC for timestamps with a period >= day to avoid wrong hours in hint */
         Highcharts.setOptions({ global: { useUTC: (res > xResolution.h) } });
 
-        /* happens also on 1st call! */
+        /* Happens also on 1st call! */
         chartOptions.yAxis = yAxis;
         chartOptions.exporting = { filename: views.actual.slug };
 
-        /* (re)create chart */
+        /* (Re)Create chart */
         chart = new Highcharts.Chart(chartOptions);
         /* Help chart with fluid layout to find its correct size... */
         chart.reflow();
@@ -705,7 +691,17 @@ function updateChart( forceUpdate ) {
 
                 _log('Serie', serie);
 
-                series[id] = serie;
+                if (!changed) {
+                    var s = chart.get(serie.id);
+                    /* Replce data direct in existing chart data */
+                    s.setData(serie.data, false);
+                    /* Do we have raw data? Only then deletion of reading value is possible */
+                    s.options.raw = (period == '');
+                    /* Add dummy serie for completed check */
+                    series[id] = {};
+                } else {
+                    series[id] = serie;
+                }
 
                 if ('{INDEX_NOTIFYLOADEACH}') $.pnotify({
                     type: 'success',
@@ -732,11 +728,11 @@ function updateChart( forceUpdate ) {
 
             $('#s'+channel.id).hide();
 
-            /* check real count of elements in series array! */
+            /* Check real count of elements in series array! */
             var completed = series.filter(function(a){ return a !== undefined }).length;
             _log(completed+' series completed');
 
-            /* check if all getJSON() calls finished */
+            /* Check if all getJSON() calls finished */
             if (completed != channels_chart.length) return;
 
             if ('{INDEX_NOTIFYLOADALL}') $.pnotify({
@@ -749,40 +745,28 @@ function updateChart( forceUpdate ) {
             _log('Apply series');
 
             if (changed) {
-                /* remove all existing series */
-                while (chart.series.length) {
-                    chart.series[0].remove();
+                /* Remove all existing series */
+                for (var i=chart.series.length-1; i>=0; i--) {
+                    chart.series[i].remove(false);
                 }
-                /* add new series */
+                /* Add new series */
                 $.each(series, function(i, serie) {
-                    if (serie.id) {
-                        /* Valid channel with id */
-                        chart.addSeries(serie, false);
-                    }
-                });
-            } else {
-                /* replace series data */
-                $.each(series, function(i, serie) {
-                    if (serie.id) {
-                        /* Valid channel with id */
-                        chart.get(serie.id).setData(serie.data, false);
-                        /* Do we have raw data? Only then deletion of reading value is possible */
-                        chart.get(serie.id).options.raw = serie.raw;
-                    }
+                    /* Valid channel with id */
+                    if (serie.id) chart.addSeries(serie, false);
                 });
             }
-
-            chart.hideLoading();
-            chart.redraw();
-
-            setExtremes();
-
-            $('#chart').removeClass('wait');
 
             if (RefreshTimeout > 0) {
                 updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
             }
 
+            /* Redraw independent from other DOM changes via setTimeout */
+            setTimeout(function() {
+                chart.hideLoading();
+                chart.redraw();
+            }, 0);
+
+            $('#chart').removeClass('wait');
             updateActive = false;
         });
     });
@@ -1223,7 +1207,7 @@ $(function() {
                 var self = $(this);
 
                 self.dialog('close');
-                chart.showLoading('{{JustAMoment}}');
+                chart.showLoading('<img src="/images/loading_dots.gif" width="64" height="21" />');
                 $('#chart').addClass('wait');
 
                 var url = PVLngAPI + 'data/' + self.data('guid') + '/' + self.data('timestamp') + '.json';

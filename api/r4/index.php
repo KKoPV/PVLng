@@ -38,25 +38,25 @@ Loader::register(
 class API extends Slim\Slim {
 
     /**
-     *
+     * Get named parameter as string
      */
-    public function strParam( $name, $default ) {
+    public function strParam( $name, $default='' ) {
         $value = trim($this->request->params($name));
         return !is_null($value) ? $value : $default;
     }
 
     /**
-     *
+     * Get named parameter as integer
      */
-    public function intParam( $name, $default ) {
+    public function intParam( $name, $default=0 ) {
         $value = trim($this->request->params($name));
         return $value != '' ? (int) $value : (int) $default;
     }
 
     /**
-     *
+     * Get named parameter as boolean, all of (true|on|yes|1) interpreted as TRUE
      */
-    public function boolParam( $name, $default ) {
+    public function boolParam( $name, $default=FALSE ) {
         $value = strtolower(trim($this->request->params($name)));
         return $value != ''
              ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
@@ -92,7 +92,7 @@ require 'View.php';
 $api = new API(array(
     'mode'      => 'production',
     'log.level' => Slim\Log::ALERT,
-    'debug'     => FALSE,
+    'debug'     => FALSE, // No debug mode at all
     'view'      => new View
 ));
 
@@ -193,11 +193,115 @@ $api->response->headers->set('X-Version', PVLNG_VERSION);
 $api->response->headers->set('X-API', $api->version);
 
 // ---------------------------------------------------------------------------
-// The helper functions and routes
+// The helper functions
 // ---------------------------------------------------------------------------
-include 'functions.php';
+Slim\Route::setDefaultConditions(array(
+    'guid' => '(\w{4}-){7}\w{4}',
+    'id'   => '\d+',
+    'slug' => '[@\w\d-]+'
+));
+
+/**
+ * - Detect requested content type by file extension, correct PATH_INFO value
+ *   without extension and set Response content header
+ * - Analyse X-PVLng-Key header
+ */
+$api->hook('slim.before', function() use ($api) {
+    $PathInfo = $api->environment['PATH_INFO'];
+    if ($dot = strrpos($PathInfo, '.')) {
+        // File extension
+        $ext = substr($PathInfo, $dot+1);
+        // Correct PATH_INFO, remove extension
+        $api->environment['PATH_INFO'] = substr($PathInfo, 0, $dot);
+        // All supported content types
+        switch ($ext) {
+            case 'csv':   $type = 'application/csv';   break;
+            case 'tsv':   $type = 'application/tsv';   break;
+            case 'txt':   $type = 'text/plain';        break;
+            case 'xml':   $type = 'application/xml';   break;
+            case 'json':  $type = 'application/json';  break;
+            default:
+                $api->contentType('text/plain');
+                $api->halt(400, 'Unknown Accept content type: '.$ext);
+        }
+    } else {
+        // Defaults to JSON
+        $type = 'application/json';
+    }
+    // Set the response header, used also by View to build proper response body
+    $api->contentType($type);
+
+    // Analyse X-PVLng-Key header
+    $APIKey = $api->request->headers->get('X-PVLng-Key');
+
+    if ($APIKey == '') {
+        // Key was not given
+        $api->APIKeyValid = FALSE;
+    } elseif ($APIKey == $api->db->queryOne('SELECT getAPIKey()')) {
+        // Key is given and valid
+        $api->APIKeyValid = TRUE;
+    } else {
+        // Key is invalid
+        $api->stopAPI('Invalid API key given.', 403);
+    }
+});
+
+/**
+ *
+ */
+$api->error(function($e) use ($api) {
+    if ($api->request->headers->get('X-PVLng-Trace')) {
+        echo $e;
+    } else {
+        $api->stopAPI($e->getMessage(), $e->getCode());
+    }
+});
+
+/**
+ *
+ */
+$api->notFound(function() use ($api) {
+    // Catch also /
+    $api->redirect($api->request()->getRootUri() . '/help');
+});
+
+/**
+ *
+ */
+$APIkeyRequired = function() use ($api) {
+    $api->APIKeyValid || $api->stopAPI('Access only with valid API key!', 403);
+};
+
+/**
+ *
+ */
+$accessibleChannel = function(Slim\Route $route) use ($api) {
+    // API key correct, access all channels
+    if ($api->APIKeyValid) return;
+
+    // No API key given, check channel is public
+    if (!Channel::byGUID($route->getParam('guid'))->public) {
+        $api->stopAPI('Access to private channel only with valid API key!', 403);
+    }
+};
+
+/**
+ *
+ */
+$checkLocation = function() use ($api) {
+    $api->Latitude  = $api->config->get('Location.Latitude');
+    $api->Longitude = $api->config->get('Location.Longitude');
+
+    if ($api->Latitude == '' OR $api->Longitude == '') {
+        $api->stopAPI('No valid location defined in configuration', 404);
+    }
+};
+
+// ---------------------------------------------------------------------------
+// The routes
+// ---------------------------------------------------------------------------
 foreach (glob('routes'.DS.'*.php') as $routes) include $routes;
-file_exists('route.custom.php') && include 'route.custom.php';
+file_exists('routes'.DS.'custom.php') && include 'routes'.DS.'custom.php';
 
 /**
  * Let's go

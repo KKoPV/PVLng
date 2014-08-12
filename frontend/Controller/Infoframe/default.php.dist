@@ -1,0 +1,65 @@
+<?php
+/**
+ *
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
+ */
+return array(
+
+    array(
+        'guid'    => '',
+        'font'    => 5,
+        'label'   => 'Pdc1: %5.0f W',
+        'x'       => 30,
+        'y'       => 110
+    ),
+    array(
+        'guid'    => '',
+        'font'    => 5,
+        'label'   => 'Pdc2: %5.0f W',
+        'x'       => 30,
+        'y'       => 130
+    ),
+
+    array(
+        'guid'    => '',
+        'font'    => 5,
+        'label'   => 'Pac: %5.0f W',
+        'x'       => 30,
+        'y'       => 280
+    ),
+    array(
+        'guid'    => '',
+        'start'   => 'midnight',
+        'font'    => 5,
+        'label'   => 'Today: %4.1f kWh',
+        'x'       => 17,
+        'y'       => 300,
+    ),
+
+    array(
+        'guid'    => '',
+        'font'    => 5,
+        'label'   => 'P: %6.0f W',
+        'x'       => 285,
+        'y'       => 130
+    ),
+
+    array(
+        'guid'    => '',
+        'font'    => 5,
+        'label'   => 'P: %5.0f W',
+        'x'       => 535,
+        'y'       => 130
+    ),
+
+    array(
+        'font'    => 5,
+        'label'   => '{DATETIME}',
+        'x'       => 235,
+        'y'       => 410
+    ),
+);

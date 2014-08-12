@@ -3,12 +3,12 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 
-var Period = '{MOBILE_PERIOD}',
+var Period      = '{MOBILE_PERIOD}',
     ChartHeight = '{MOBILE_CHARTHEIGHT}',
 
     views = {
@@ -30,12 +30,8 @@ var Period = '{MOBILE_PERIOD}',
         credits: { enabled: false },
         title: { text: '' },
         plotOptions: {
-            line: {
-                marker: { enabled: false }
-            },
-            spline: {
-                marker: { enabled: false }
-            },
+            line:   { marker: { enabled: false } },
+            spline: { marker: { enabled: false } },
             areaspline: {
                 marker: { enabled: false },
                 shadow: false,
@@ -50,69 +46,19 @@ var Period = '{MOBILE_PERIOD}',
                 groupPadding: 0.1
             }
         },
-        xAxis : {
-            type: 'datetime'
-        },
-        legend: {
-            enabled: false
-        },
-        tooltip: {
-            enabled: false
-        },
+        xAxis :  { type: 'datetime' },
+        legend:  { enabled: false },
+        tooltip: { enabled: false },
         loading: {
             hideDuration: 0,
             showDuration: 0,
-            labelStyle: {
-                top: '40%',
-                fontSize: '150%',
-                color: 'black'
-            }
+            labelStyle: { top: '40%', fontSize: '150%', color: 'black' }
         }
-    };
+    },
 
-var lock = false,
+    lock = false,
     channels = [],
     chart;
-
-$(function() {
-
-Highcharts.setOptions({
-    global: {
-        useUTC: false,
-        alignTicks: false
-    },
-    lang: {
-        thousandsSep: '{TSEP}',
-        decimalPoint: '{DSEP}',
-        resetZoom: '{{resetZoom}}',
-        resetZoomTitle: '{{resetZoomTitle}}'
-    }
-});
-
-chart = new Highcharts.Chart(options);
-
-/**
- *
- */
-updateChart();
-
-$('#page-home').on('pageshow', function( event, ui ) {
-    updateChart();
-});
-
-$('#btn-home').on('click', function(e) {
-    e.preventDefault();
-    for (var v in views) if (views.hasOwnProperty(v)) break;
-    $('#page-home').data('view', v);
-    updateChart();
-});
-
-$('#btn-refresh').on('click', function(e) {
-    e.preventDefault();
-    updateChart();
-});
-
-});
 
 /**
  *
@@ -122,8 +68,7 @@ function updateChart() {
     if (lock) return;
     lock = true;
 
-    var view = $('#page-home').data('view'),
-        period = views[view].period;
+    var view = $('#page-home').data('view'), period = views[view].period;
 
     $('#view').html(view);
 
@@ -147,15 +92,14 @@ function updateChart() {
     $('#table-cons tbody tr').remove();
 
     var channels_new = [], yAxisMap = [], yAxis = [],
-        channel, buffer = [],
-        channel_clone;
+        channel, buffer = [], channel_clone;
 
     /* Find active channels, map and sort axis */
     $(view).each(function(id, view) {
         /* Ignore private channels */
         if (!view.public) return;
         channel = new presentation(view.presentation);
-        channel.id = view.id;
+        channel.id   = view.id;
         channel.guid = view.guid;
         channel.unit = view.unit;
         /* Remember channel */
@@ -169,15 +113,15 @@ function updateChart() {
         return (a.position - b.position) /* Causes an array to be sorted numerically and ascending */
     });
 
-    /* sort axis to make correct order for Highcharts */
+    /* Sort axis to make correct order for Highcharts */
     yAxisMap.sort();
 
-    /* build channels */
+    /* Build channels */
     $(buffer).each(function(id, channel) {
-        /* axis on right side */
+        /* Axis on right side */
         var is_right = !(channel.axis % 2);
 
-        /* axis from chart point of view */
+        /* Axis from chart point of view */
         channel.axis = yAxisMap.indexOf(channel.axis);
 
         if (channel.type == 'areasplinerange') {
@@ -185,7 +129,7 @@ function updateChart() {
         }
         channels_new.push(channel);
 
-        /* prepare axis */
+        /* Prepare axis */
         if (!yAxis[channel.axis]) {
             yAxis[channel.axis] = {
                 title: null, /*{ text: channel.unit },*/
@@ -195,10 +139,8 @@ function updateChart() {
                 maxPadding: 0,
                 opposite: is_right
             };
-            /* only 1st left axis shows grid lines */
-            if (channel.axis != 0) {
-                yAxis[channel.axis].gridLineWidth = 0;
-            }
+            /* Only 1st left axis shows grid lines */
+            if (channel.axis != 0) yAxis[channel.axis].gridLineWidth = 0;
         }
     });
 
@@ -214,7 +156,7 @@ function updateChart() {
     _log('Channels:', channels_new);
     _log('yAxis:', yAxis);
 
-    /* check for changed channels */
+    /* Check for changed channels */
     var changed = false;
 
     if (channels_new.length != channels.length) {
@@ -230,20 +172,19 @@ function updateChart() {
     }
 
     if (changed) {
-        /* happens also on 1st call! */
+        /* Happens also on 1st call! */
         options.yAxis = yAxis;
-        /* (re)create chart */
+        /* (Re)Create chart */
         chart = new Highcharts.Chart(options);
     }
 
     var series = [], costs = 0;
     $('#table-cons').hide();
 
-    /* get data */
+    /* Get data */
     $(channels).each(function(id, channel) {
 
-        var table = false,
-            url = PVLngAPI + 'data/' + channel.guid + '.json';
+        var url = PVLngAPI + 'data/' + channel.guid + '.json';
         _log('Fetch: ' + url);
 
         $.getJSON(
@@ -257,9 +198,10 @@ function updateChart() {
                 _ts:        (new Date).getTime() /* force reload */
             },
             function(data) {
-                var t, attr = data.shift();
+                var attr = data.shift(), t;
+/*
                 _log('Attributes:', attr);
-/*                _log('Data:', data);
+                _log('Data:', data);
 */
                 var serie = {     /* A trick to HTML-decode channel name */
                         name:     $('<div/>').html(attr.name).text(),
@@ -297,23 +239,19 @@ function updateChart() {
                         .addClass('r')
                         .html(Highcharts.numberFormat(attr.consumption, attr.decimals) + ' ' + attr.unit)
                         .appendTo(tr);
-                }
 
-                if (attr.costs) {
-                    costs += +attr.costs.toFixed(2);
-                    $('<td/>')
-                        .addClass('cost')
-                        .html(Highcharts.numberFormat(attr.costs, 2))
-                        .appendTo(tr);
-                }
-
-                if (tr) {
+                    td = $('<td/>');
+                    if (attr.costs) {
+                        costs += +attr.costs.toFixed(2);
+                        td.addClass('cost')
+                          .html(Highcharts.numberFormat(attr.costs, 2))
+                          .appendTo(tr);
+                    }
+                    td.appendTo(tr);
                     tr.appendTo('#table-cons tbody');
-                    table = true;
                 }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
-                /* if (attr.unit) serie.tooltip = { valueSuffix: attr.unit }; */
 
                 if (channel.type == 'scatter') {
                     serie.dataLabels = {
@@ -341,57 +279,81 @@ function updateChart() {
         ).always(function() {
             /* Force redraw */
             chart.hideLoading();
-            if (--loading) chart.showLoading('- ' + (loading) + ' -');
+            if (--loading > 0) chart.showLoading('- ' + (loading) + ' -');
 
-            /* check real count of elements in series array! */
+            /* Check real count of elements in series array! */
             var completed = series.filter(function(a){ return a !== undefined }).length;
             _log(completed + ' completed');
 
-            /* check if all getJSON() calls finished */
-            if (completed == channels.length) {
-                costs = costs ? Highcharts.numberFormat(costs, 2) : false;
-                if (costs) {
-                    tr = $('<tr/>');
-                    $('<td colspan="5" />')
-                        .addClass('costs')
-                        .html(costs)
-                        .appendTo(tr);
-                    tr.appendTo('#table-cons tbody');
-                    $('#table-cons').show();
-                }
+            /* Check if all getJSON() calls finished, exit if not */
+            if (completed !== channels.length) return;
 
-                /*
-                var t = $('#from').val();
-                var s = $('#to').val();
-                if (t != s) t += ' - ' + s;
-                chart.setTitle({ text: t }, { text: $('#view-choice').val() });
-                */
-
-                _log('Apply series');
-
-                if (changed) {
-                    /* remove all existing series */
-                    while (chart.series.length) {
-                        chart.series[0].remove();
-                    }
-                    /* add new series */
-                    $.each(series, function(i, serie) {
-                        chart.addSeries(serie, false);
-                    });
-                } else {
-                    /* replace series data */
-                    $.each(series, function(i, serie) {
-                        chart.series[i].setData(serie.data, false);
-                    });
-                }
-
-                chart.redraw();
-                chart.hideLoading();
-                if (yAxis.length > 1) setTimeout(setExtremes, channels.length*100);
-                lock = false;
+            if (changed) {
+                /* Remove all existing series */
+                for (var i=chart.series.length-1; i>=0; i--) chart.series[i].remove();
+                /* Add new series */
+                $.each(series, function(i, serie) { chart.addSeries(serie, false) });
+            } else {
+                /* Replace series data */
+                $.each(series, function(i, serie) { chart.series[i].setData(serie.data, false) });
             }
+
+            chart.redraw();
+
+            if (costs) {
+                $('<tr/>').append(
+                    $('<td/>')
+                        .attr('colspan', 3)
+                        .addClass('costs')
+                        .html(Highcharts.numberFormat(costs, 2))
+                ).appendTo('#table-cons tbody');
+            }
+            $('#table-cons').toggle(!!$('#table-cons tbody').children().length);
+
+            /* Release as last the redraw lock */
+            lock = false;
         });
     });
 }
+
+/**
+ *
+ */
+$(function() {
+
+    Highcharts.setOptions({
+        global: {
+            useUTC: false,
+            alignTicks: false
+        },
+        lang: {
+            thousandsSep: '{TSEP}',
+            decimalPoint: '{DSEP}',
+            resetZoom: '{{resetZoom}}',
+            resetZoomTitle: '{{resetZoomTitle}}'
+        }
+    });
+
+    $('#page-home').on('pageshow', function( event, ui ) {
+        updateChart();
+    });
+
+    $('#btn-home').on('click', function(e) {
+        e.preventDefault();
+        for (var v in views) if (views.hasOwnProperty(v)) break;
+        $('#page-home').data('view', v);
+        updateChart();
+    });
+
+    $('#btn-refresh').on('click', function(e) {
+        e.preventDefault();
+        updateChart();
+    });
+
+    chart = new Highcharts.Chart(options);
+
+    updateChart();
+
+});
 
 </script>

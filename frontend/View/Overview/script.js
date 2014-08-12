@@ -227,45 +227,76 @@ $(function() {
         }
     });
 
-    $('#dialog-confirm').dialog({
-        autoOpen: false,
-        resizable: false,
-        width: 480,
-        modal: true,
-        buttons: {
-            '{{Delete}}': function() {
-                $(this).dialog('close');
-                overlay.show();
-                $(this).data('form').submit();
-            },
-            '{{Cancel}}': function() {
-                $(this).dialog('close');
-                return false;
-            }
-        }
+    /* Bind click listener to all GUID images */
+    $('#tree tbody').on('click', '.guid', function() {
+        $.alert(
+            $('<p/>').append(
+                $('<input/>')
+                    .css({ fontFamily: 'monospace', fontSize: '150%', width: '100%', border: 0, outline: 0 })
+                    .prop('readonly', 'readonly')
+                    .val($(this).data('guid'))
+                    /* Prepare to copy into clipboard ... */
+                    .on('click', function() { this.select() })
+            ),
+            '{{Channel}} GUID'
+        );
     });
 
-    $('.delete-form').submit(function(){
-        $('#dialog-confirm').data('form', this).dialog('open');
-        return false;
+    /* Bind click listener to all create alias images */
+    $('#tree tbody').on('click', '.create-alias', function() {
+
+        $(document.body).addClass('wait');
+
+        /* Get tree table Id from parent <tr> */
+        var node = $(this.parentNode.parentNode).data('tt-id'),
+            that = this;
+
+        $.ajax({
+            type: 'PUT',
+            url: PVLngAPI + 'tree/alias/' + node + '.json',
+            dataType: 'json',
+        }).done(function(data, textStatus, jqXHR) {
+            $.pnotify({
+                type: textStatus,
+                text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+            });
+            $(that).prop('src', '/images/pix.gif').removeClass('btn');
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            $.pnotify({
+                type: textStatus, hide: false, sticker: false, text: errorThrown
+            });
+        }).always(function() {
+            $(document.body).removeClass('wait');
+        });
     });
 
     /* Bind click listener to all delete node images */
     $('#tree tbody').on('click', '.delete-node', function() {
 
-        var node = $(this.parentNode.parentNode).data('tt-id'),
-            pos = oTable.fnGetPosition(this.parentNode.parentNode),
-            url = PVLngAPI + 'tree/' + node + '.json';
+        /* Get tree table Id from parent <tr> */
+        var tr = this.parentNode.parentNode,
+            node = $(tr).data('tt-id'),
+            msg = $(tr).hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
 
-        if (confirm('{{ConfirmDeleteTreeNode}}')) {
+        $.confirm($('<p/>').html(msg), '{{Confirm}}', '{{Yes}}', '{{No}}')
+        .then(function(ok) {
+            if (!ok) return;
+
             $(document.body).addClass('wait');
 
             $.ajax({
                 type: 'DELETE',
-                url: url,
+                url: PVLngAPI + 'tree/' + node + '.json',
                 dataType: 'json',
             }).done(function(data, textStatus, jqXHR) {
-                oTable.fnDeleteRow(pos);
+                /* Loop all rows and delete also rows with tt-parent-id = node if any */
+                oTable.$('tr').each(function(i, tr) {
+                    if ($(tr).data('tt-id') == node || $(tr).data('tt-parent-id') == node) {
+                        /* Get row position and delete without redraw */
+                        oTable.fnDeleteRow(oTable.fnGetPosition(tr), null, false);
+                    }
+                });
+                oTable.fnDraw();
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
                     type: textStatus, hide: false, sticker: false,
@@ -274,7 +305,7 @@ $(function() {
             }).always(function() {
                 $(document.body).removeClass('wait');
             });
-        }
+        });
 
     });
 

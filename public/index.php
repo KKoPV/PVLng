@@ -86,7 +86,9 @@ $cache = Cache::factory(
 /**
  * Check mobile client
  */
-if (isset($_SERVER['REQUEST_URI']) AND substr($_SERVER['REQUEST_URI'],0,2) != '/m' AND
+if (isset($_SERVER['REQUEST_URI']) AND
+    substr($_SERVER['REQUEST_URI'], 0,  2) != '/m' AND
+    substr($_SERVER['REQUEST_URI'], 0, 10) != '/infoframe' AND
     isset($_SERVER['HTTP_USER_AGENT']) AND $useragent = $_SERVER['HTTP_USER_AGENT']) {
 
     // Remember User Agent and make not for every call the preg_match()...

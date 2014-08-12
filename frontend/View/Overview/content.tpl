@@ -18,7 +18,7 @@
     <option></option>
     <!-- BEGIN CHANNELS -->
     <optgroup label="{TYPE}">
-        <!-- BEGIN MEMBER -->
+        <!-- BEGIN MEMBERS -->
         <option value="{ID}">
             {NAME}
             <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
@@ -28,7 +28,6 @@
     </optgroup>
     <!-- END -->
 <!-- END DEFINE -->
-
 
 <p><a href="/channel/add" class="button tip" title="Alt-N">{{CreateChannel}}</a></p>
 
@@ -70,11 +69,7 @@
             <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
             <!-- IF {HASCHILDS} -->
-            <form action="/overview/delete" method="post" class="delete-form">
-            <input type="hidden" name="id" value="{ID}">
-            <input type="image" style="background-color:transparent"
-                   src="/images/ico/node_delete.png" alt="-+">
-            </form>
+            <img src="/images/ico/node_delete.png" class="btn delete-node" alt="--">
             <!-- ELSE -->
             <img src="/images/ico/node_delete_next.png" class="btn delete-node" alt="--">
             <!-- ENDIF -->
@@ -120,15 +115,11 @@
             <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
             <!-- IF {CHILDS} AND {GUID} AND {TYPE_ID} != "30" AND !{ALIAS} -->
-            <form action="/channel/alias" method="post">
-            <input type="hidden" name="id" value="{ENTITY}">
-            <input type="image" src="/images/ico/arrow-split.png"
-                   style="background-color:transparent" alt="a">
-            </form>
+            <img src="/images/ico/arrow-split.png" class="btn create-alias" alt="a">
             <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
 
             <!-- IF {GUID} -->
-            <img src="/images/ico/license-key.png" class="btn" onclick="alert('{GUID}', 'GUID'); return false" alt="G">
+            <img src="/images/ico/license-key.png" class="btn guid" data-guid="{GUID}" alt="G">
             <!-- ENDIF -->
         </td>
     </tr>
@@ -219,9 +210,4 @@
     </p>
 
     </form>
-</div>
-
-<div id="dialog-confirm" style="display:none" title="{{DeleteEntity}}">
-    <span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 20px 0;"></span>
-    {{ConfirmDeleteTreeItems}}
 </div>

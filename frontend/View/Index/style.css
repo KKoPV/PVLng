@@ -91,6 +91,11 @@
     background-color: #606060;
 }
 
+.spinner {
+    float: right;
+    display: none;
+}
+
 .disabled {
     color: #C0C0C0;
 }

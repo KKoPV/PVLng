@@ -54,9 +54,6 @@ class JSON extends Channel {
             }
             if (!$found) continue;
 
-            // Interpret empty numeric value as invalid
-            if ($child->numeric AND $value == '') continue;
-
             try { //                 Simulate $request['data']
                 $ok += $child->write(array('data' => $value), $timestamp);
             } catch (\Exception $e) {
