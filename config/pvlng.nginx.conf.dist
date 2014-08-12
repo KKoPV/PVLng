@@ -66,12 +66,33 @@ server {
     rewrite /api/([^/]+)/?(.*)$ /api/$1/index.php?$2 last;
 
     ###
-    # Handle images, styles and scripts
+    # Handle images via MemCache, if installed
     #
-    location ~* \.(?:png|jpg|jpeg|gif|ico|js|css)$ {
+    location ~* \.(?:png|gif|jpg|jpeg|ico)$ {
+        access_log off;
+        expires max;
+        add_header Last-Modified "Sat, 1 Jan 2000 00:0:00 GMT";
+        set $memcached_key $uri;
+        ### Adjust for your MemCache server
+        memcached_pass 127.0.0.1:11211;
+        error_page 404 = @mc_miss;
+    }
+
+    ###
+    # Fall back for not chached files
+    #
+    location @mc_miss {
+        access_log off;
         try_files /public/$uri =404;
-        expires 1y;
-        add_header Cache-Control public;
+    }
+
+    ###
+    # Handle styles and scripts
+    #
+    location ~* /public/*/\.(?:js|css)$ {
+        try_files     /public/$uri =404;
+        expires       max;
+        add_header    Cache-Control public;
         log_not_found off;
     }
 
