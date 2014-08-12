@@ -53,8 +53,7 @@ class DifferentiatorFull extends Calculator {
                 $key1 = $buffer->key();
                 $key2 = $next->key();
 
-
-                if ($key1 == $key2) {
+                if ($key1 === $key2) {
 
                     // Remember original row
                     $last = $row1;

@@ -13,7 +13,7 @@ return array(
     'name' => 'Fronius inverter',
 
     'description' => '
-        Fronius solar inverter with:
+        Fronius solar inverter based on SolarNet API v1 with:
         <ul>
             <li>E-Total lifetime, readings in kWh, output in Wh</li>
             <li>Pac (W)</li>
@@ -24,7 +24,6 @@ return array(
             <li>Error (string)</li>
             <li>Mains frequency (Hz)</li>
         </ul>
-        Don\'t forget to adjust inverters <strong>DeviceId</strong> afterwards!
     ',
 
 
@@ -49,7 +48,7 @@ return array(
         array(
             'type'        => 50, // Energy meter, absolute
             'name'        => 'E-Total',
-            'channel'     => 'Body->Data->TOTAL_ENERGY',
+            'channel'     => 'Body->Data->TOTAL_ENERGY->Value',
             'unit'        => 'Wh',
             'decimals'    => 0,
             'meter'       => 1,
@@ -58,7 +57,7 @@ return array(
         array(
             'type'        => 51, // Power sensor
             'name'        => 'Pac',
-            'channel'     => 'Body->Data->PAC',
+            'channel'     => 'Body->Data->PAC->Value',
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 1,
@@ -67,7 +66,7 @@ return array(
         array(
             'type'        => 51, // Power sensor
             'name'        => 'Sac (Reactive power)',
-            'channel'     => 'Body->Data->SAC',
+            'channel'     => 'Body->Data->SAC->Value',
             'resolution'  => 1,
             'unit'        => 'VA',
             'decimals'    => 0,
@@ -77,7 +76,7 @@ return array(
         array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac',
-            'channel'     => 'Body->Data->UAC',
+            'channel'     => 'Body->Data->UAC->Value',
             'unit'        => 'V',
             'decimals'    => 0,
             'valid_from'  => 1,
@@ -86,7 +85,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac',
-            'channel'     => 'Body->Data->IAC',
+            'channel'     => 'Body->Data->IAC->Value',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -95,7 +94,7 @@ return array(
         array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Udc',
-            'channel'     => 'Body->Data->UDC',
+            'channel'     => 'Body->Data->UDC->Value',
             'unit'        => 'V',
             'decimals'    => 0,
             'valid_from'  => 1,
@@ -104,7 +103,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Idc',
-            'channel'     => 'Body->Data->IDC',
+            'channel'     => 'Body->Data->IDC->Value',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -115,7 +114,6 @@ return array(
             'name'        => 'State',
             'channel'     => 'Body->Data->DeviceStatus->StatusCode',
             'numeric'     => 0,
-            'decimals'    => 0,
             'comment'     => 'The following JSON map object will translate the numeric reading value during write to textual representation (ALL IN ONE LINE).'."\n\n"
                             .'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"Startup","5":"Startup","6":"Startup","7":"Running","8":"Standby","9":"Boot loading","19":"Error"}'
         ),
@@ -129,7 +127,7 @@ return array(
         array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Mains frequency',
-            'channel'     => 'Body->Data->FAC',
+            'channel'     => 'Body->Data->FAC->Value',
             'unit'        => 'Hz',
             'decimals'    => 1,
             'valid_from'  => 40,

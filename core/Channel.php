@@ -675,6 +675,9 @@ abstract class Channel {
             // Remove all non-numeric characters
             $this->value = preg_replace('~[^0-9.eE-]~', '', $this->value);
 
+            // Interpret empty numeric value as invalid and ignore them
+            if ($this->value == '') throw new Exception(NULL, 200);
+
             $this->value = +$this->value;
 
             if ($this->meter) {

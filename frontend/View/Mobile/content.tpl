@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -45,18 +45,14 @@ PAGE 1
                 <th>{{Cost}}</th>
             </tr>
             </thead>
-            <tbody />
+            <tbody>
+            </tbody>
         </table>
 
-        <a href="#page-select" data-role="button" data-icon="arrow-r" data-iconpos="right">
-            {{SelectView}}
-        </a>
+        <a href="#page-select" data-role="button">{{SelectView}}</a>
     </div>
 
-    <!-- Footer -->
-    <div data-role="footer" data-id="footer">
-        <h1>{strip_tags:TITLE}</h1>
-    </div>
+    <!-- INCLUDE footer.inc.tpl -->
 
 </div>
 
@@ -81,18 +77,13 @@ PAGE 2
     <div data-role="content" class="ui-title">
         <div data-role="controlgroup">
             <!-- BEGIN VIEWS -->
-            <a href="#page-home" data-role="button" data-icon="arrow-l"
-               onclick="$('#page-home').data('view', '{NAME}')">
+            <a href="#page-home" data-role="button" onclick="$('#page-home').data('view', '{NAME}')">
                 {NAME}
             </a>
             <!-- END -->
         </div>
     </div>
 
-    <!-- Footer -->
-    <div data-role="footer" data-id="footer" data-position="fixed">
-        <h1>{strip_tags:TITLE}</h1>
-    </div>
-
+    <!-- INCLUDE footer.inc.tpl -->
 
 </div>

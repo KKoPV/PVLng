@@ -58,6 +58,16 @@ function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $la
         .add();
     });
 
+    var link = document.createElement('a');
+    link.setAttribute('href', 'http://pvlng.com');
+    link.appendChild(document.createTextNode('powered by PVLng.com'));
+    link.style.fontFamily = 'helvetica';
+    link.style.fontSize = '10px';
+    link.style.textDecoration = 'none';
+    link.style.color = 'gray';
+  /*  var l = '<a href="http://pvlng.com" style="font-family:helvetica;font-size:10px;text-decoration:none;color:gray">PVLng.com</a>'; */
+    document.getElementById($chart).appendChild(link);
+
 }
 
 /* code.stephenmorley.org - use Highcharts without jQuery and DOMContentLoaded without JQuery */

@@ -34,10 +34,10 @@
             <td>
                 <input id="c{ID}" class="channel" type="checkbox" style="display:none"
                        data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
+                <img id="s{ID}" src="/images/spinner.gif" class="spinner" alt="o">
                 <!-- INCLUDE channel-details.inc.tpl -->
             </td>
             <td class="icons r">
-                <img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" alt="o">
                 <span id="cons{ID}" class="consumption"></span>
             </td>
             <td id="u{ID}">{UNIT}</td>

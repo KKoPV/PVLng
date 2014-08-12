@@ -53,7 +53,7 @@
                         <!-- ENDIF -->
                     </td>
                     <td style="padding:0.4em 0" <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
-                        <img id="s{ID}" src="/images/spinner.gif" style="float:right;display:none" alt="o" />
+                        <img id="s{ID}" src="/images/spinner.gif" class="spinner" alt="o" />
                         <!-- INCLUDE channel-details.inc.tpl -->
                     </td>
                     <td class="icons r">
