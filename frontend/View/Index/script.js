@@ -853,23 +853,33 @@ $(function() {
     });
 
     /**
-     *
+     * If a chart height is provided as URL parameter "height", remember in cookie
      */
     qs = $.parseQueryString();
 
-    chartOptions.chart.height = qs.height || ChartHeight;
+    if (qs.height) {
+        /* A value of 0 will reset height and remove cookie */
+        if (qs.height > 0) {
+            pvlng.cookie.set('ChartHeight', ChartHeight = qs.height);
+        } else {
+            pvlng.cookie.remove('ChartHeight');
+        }
+    } else {
+        var h = pvlng.cookie.get('ChartHeight');
+        if (h) ChartHeight = h;
+    }
+    chartOptions.chart.height = ChartHeight;
 
+    /**
+     * Configure date picker elements
+     */
     if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);
     } else {
         $.datepicker.setDefaults($.datepicker.regional['']);
     }
 
-    if (qs.date) {
-        var d = new Date(qs.date);
-    } else {
-        var d = new Date();
-    }
+    var d = qs.date ? new Date(qs.date) : new Date();
 
     $("#from").datepicker({
         altField: '#fromdate',
