@@ -25,14 +25,14 @@ class SolarEstimate extends InternalCalc {
         parent::before_read($request);
 
         // Only for today possible, not backwards
-        if ($this->end < strtotime('00:00')) return;
+        if ($this->end < strtotime('midnight')) return;
 
-        $childs = $this->getChilds();
-        $childCnt = count($childs);
+        // Only during daylight times today
+        $sunset = $this->config->getSunset($this->start);
+        if ($sunset < time()) return;
 
-        if ($childCnt == 0) return;
-
-        $days = $this->extra;
+        $child = $this->getChild(1);
+        $days  = $this->extra;
 
         // Get todays production, set field names to 0 and 1 for list(...)
         $sql = 'SELECT MIN(`data`) AS `0`
@@ -45,7 +45,7 @@ class SolarEstimate extends InternalCalc {
 
         list($Production1st,
              $ProductionLast,
-             $lastTimestampToday) = $this->db->queryRowArray($sql, $childs[0]->entity);
+             $lastTimestampToday) = $this->db->queryRowArray($sql, $child->entity);
 
         // Do we have still data today?
         if (!$lastTimestampToday) return;
@@ -65,7 +65,7 @@ class SolarEstimate extends InternalCalc {
                         HAVING count(*) = {2}
                         ) t';
 
-        $AverageBase = $this->db->queryOne($sql, $childs[0]->entity, $days);
+        $AverageBase = $this->db->queryOne($sql, $child->entity, $days);
 
         // Start average value to align data
         $sql = 'SELECT MIN(`data`)
@@ -81,7 +81,7 @@ class SolarEstimate extends InternalCalc {
                         HAVING count(*) = {2}
                         ) t';
 
-        $Average1st = $this->db->queryOne($sql, $childs[0]->entity, $days, $lastTimestampToday);
+        $Average1st = $this->db->queryOne($sql, $child->entity, $days, $lastTimestampToday);
 
         // Estimated production from now
         $sql = 'SELECT UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) AS `timestamp`
@@ -96,10 +96,10 @@ class SolarEstimate extends InternalCalc {
                  GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
                 HAVING count(*) = {2}';
 
-        $res = $this->db->query($sql, $childs[0]->entity, $days, $Average1st, $ProductionToday/($Average1st-$AverageBase), $ProductionToday, $lastTimestampToday);
+        $res = $this->db->query($sql, $child->entity, $days, $Average1st, $ProductionToday/($Average1st-$AverageBase), $ProductionToday, $lastTimestampToday);
 
         // Apply child resolution here
-        $Scale = $childs[0]->resolution;
+        $Scale = $child->resolution;
 
         if ($res) {
             while ($row = $res->fetch_object()) {
@@ -116,12 +116,10 @@ class SolarEstimate extends InternalCalc {
             }
         }
 
-        $sunset = $this->config->getSunset($this->start);
-
         if (isset($lastrow)) {
             // Add a last value at sunset
             $this->saveValue($sunset, $lastrow->data);
-        } elseif (time() < $sunset) {
+        } else {
             // Fill space at end with actual production
             $value = round($ProductionToday * $Scale, $this->decimals);
             $this->saveValue($lastTimestampToday, $value);
