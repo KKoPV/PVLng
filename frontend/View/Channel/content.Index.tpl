@@ -21,7 +21,20 @@
         <th class="l">{{Type}}</th>
         <th class="l">{{Serial}}</th>
         <th></th>
-        <th></th>
+        <th>
+            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
+            <div id="IconLegend">
+            <div class="icons legendtip">
+                <img src="/images/ico/read-write.png">{{ReadWritableEntity}}<br />
+                <img src="/images/ico/write.png">{{WritableEntity}}<br />
+                <img src="/images/ico/read.png">{{ReadableEntity}}<br />
+                <img src="/images/ico/node_design.png">{{EditEntity}}<br />
+                <img src="/images/ico/node_select_child.png">{{CloneEntity}}<br />
+                <img src="/images/ico/node_delete.png">{{DeleteEntity}}<br />
+                <img src="/images/ico/license-key.png">{{ShowGUID}}
+            </div>
+            </div>
+        </th>
     </tr>
     </thead>
 
@@ -59,27 +72,27 @@
                        style="background-color:transparent" alt="-">
             </form>
             <!-- IF {GUID} -->
-            <img src="/images/ico/license-key.png" class="btn" onclick="alert('{GUID}', 'GUID'); return false" alt="G">
+            <img src="/images/ico/license-key.png" class="btn" onclick="$.alert('{GUID}', 'GUID'); return false" alt="G">
             <!-- ENDIF -->
         </td>
-
     </tr>
 
     <!-- END -->
 
     </tbody>
-</table>
 
-<div id="legend" class="icons">
-    <strong>{{Legend}}</strong>:
-    <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
-    <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
-    <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>,
-    <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>,
-    <span><img src="/images/ico/node_select_child.png">{{CloneEntity}}</span>,
-    <span><img src="/images/ico/node_delete.png">{{DeleteEntity}}</span>,
-    <span><img src="/images/ico/license-key.png">{{ShowGUID}}</span>
-</div>
+    <tfoot>
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>
+    </tfoot>
+</table>
 
 <!-- Dialogs -->
 
