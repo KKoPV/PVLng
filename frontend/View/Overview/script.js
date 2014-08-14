@@ -245,7 +245,7 @@ $(function() {
     /* Bind click listener to all create alias images */
     $('#tree tbody').on('click', '.create-alias', function() {
 
-        $(document.body).addClass('wait');
+        overlay.show();
 
         /* Get tree table Id from parent <tr> */
         var node = $(this.parentNode.parentNode).data('tt-id'),
@@ -260,13 +260,14 @@ $(function() {
                 type: textStatus,
                 text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
             });
-            $(that).prop('src', '/images/pix.gif').removeClass('btn');
+            /* Remove icon, unbind handler and reset cursor */
+            $(that).prop('src', '/images/pix.gif').removeClass('create-alias').removeClass('btn');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
                 type: textStatus, hide: false, sticker: false, text: errorThrown
             });
         }).always(function() {
-            $(document.body).removeClass('wait');
+            overlay.hide();
         });
     });
 
@@ -274,15 +275,15 @@ $(function() {
     $('#tree tbody').on('click', '.delete-node', function() {
 
         /* Get tree table Id from parent <tr> */
-        var tr = this.parentNode.parentNode,
+        var tr   = this.parentNode.parentNode,
             node = $(tr).data('tt-id'),
-            msg = $(tr).hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
+            msg  = $(tr).hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
 
         $.confirm($('<p/>').html(msg), '{{Confirm}}', '{{Yes}}', '{{No}}')
         .then(function(ok) {
             if (!ok) return;
 
-            $(document.body).addClass('wait');
+            overlay.show();
 
             $.ajax({
                 type: 'DELETE',
@@ -303,10 +304,9 @@ $(function() {
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
-                $(document.body).removeClass('wait');
+                overlay.hide();
             });
         });
-
     });
 
     $('#dialog-move').dialog({
@@ -343,13 +343,6 @@ $(function() {
         )
         // enable Select2 on the select elements
         .children('select').select2();
-    });
-
-    $('.guid').click(function() {
-        /* select GUID, make ready for copy */
-        $(this).select();
-    }).mouseup(function(e) {
-        e.preventDefault();
     });
 
     shortcut.add('ESC', function() { cancelDragging = true; });

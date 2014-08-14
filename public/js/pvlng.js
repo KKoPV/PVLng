@@ -131,6 +131,7 @@ var pvlng = new function() {
                 left: 0,
                 width: '100%',
                 backgroundColor: '#FFF',
+                opacity: 0.8,
                 zIndex: 1000
             })
             .append(
