@@ -19,7 +19,7 @@ class Infoframe extends \Controller {
      */
     public function Index_Action() {
 
-        $dir   = APP_DIR . DS . 'Controller' . DS . 'Infoframe';
+        $dir   = APP_DIR . DS . 'View' . DS . 'Infoframe';
         $frame = $this->app->params->get('frame');
 
         $config = $dir . DS . $frame . '.php';
