@@ -301,7 +301,6 @@ $checkLocation = function() use ($api) {
 // The routes
 // ---------------------------------------------------------------------------
 foreach (glob('routes'.DS.'*.php') as $routes) include $routes;
-file_exists('routes'.DS.'custom.php') && include 'routes'.DS.'custom.php';
 
 /**
  * Let's go
