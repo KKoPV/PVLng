@@ -16,6 +16,9 @@
 ###
 ### Make a link in /etc/nginx/sites-enabled
 ###
+### To use the expires header, install nginx-extras package
+### $ sudo apt-get install nginx-extras
+###
 
 upstream php5-fpm {
     # With php5-cgi alone:
@@ -33,7 +36,6 @@ server {
 
     ###
     # Prepare paths by
-    #
     # $ mkdir -p /var/www/{log,public_html}
     #
     root         /var/www/public_html;
@@ -49,6 +51,7 @@ server {
     gzip_comp_level  9;
     gzip_types       text/css application/javascript application/x-javascript application/json;
     gzip_vary        on;
+    gzip_static      on;
 
     ###
     # Allows file uploads up to 500 megabytes
