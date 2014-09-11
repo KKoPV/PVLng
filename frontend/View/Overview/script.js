@@ -37,12 +37,6 @@ var oTable, cancelDragging;
  */
 $(function() {
 
-    $.ajaxSetup({
-        beforeSend: function setHeader(XHR) {
-            XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
-        }
-    });
-
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
             return !$(oTable.fnGetNodes()[iDataIndex]).hasClass('hidden');
@@ -279,11 +273,23 @@ $(function() {
             node = $(tr).data('tt-id'),
             msg  = $(tr).hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
 
+        oTable.$('tr').each(function(i, tr) {
+            var tr = $(tr);
+            if (tr.data('tt-id') == node || tr.data('tt-parent-id') == node) {
+                tr.animate({ backgroundColor: '#FFCCCC' }).addClass('marked-for-deletion');
+            }
+        });
+
         $.confirm($('<p/>').html(msg), '{{Confirm}}', '{{Yes}}', '{{No}}')
         .then(function(ok) {
-            if (!ok) return;
+            var rows = $('.marked-for-deletion');
 
-            overlay.show();
+            if (!ok) {
+                rows.removeClass('.marked-for-deletion').css({ backgroundColor: '' });
+                return;
+            }
+
+            oTable.addClass('wait');
 
             $.ajax({
                 type: 'DELETE',
@@ -291,20 +297,21 @@ $(function() {
                 dataType: 'json',
             }).done(function(data, textStatus, jqXHR) {
                 /* Loop all rows and delete also rows with tt-parent-id = node if any */
-                oTable.$('tr').each(function(i, tr) {
-                    if ($(tr).data('tt-id') == node || $(tr).data('tt-parent-id') == node) {
+                rows.animate({ backgroundColor: '#CCFFCC' }, 'slow', function() {
+                    rows.each(function(i, tr) {
                         /* Get row position and delete without redraw */
                         oTable.fnDeleteRow(oTable.fnGetPosition(tr), null, false);
-                    }
+                    });
+                    oTable.fnDraw();
                 });
-                oTable.fnDraw();
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
                     type: textStatus, hide: false, sticker: false,
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
-                overlay.hide();
+                rows.removeClass('.marked-for-deletion').css({ backgroundColor: '' });
+                oTable.removeClass('wait');
             });
         });
     });

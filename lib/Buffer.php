@@ -139,6 +139,17 @@ class Buffer implements Iterator, Countable {
     /**
      *
      */
+    public function asArray() {
+        $result = array();
+        foreach ($this as $id=>$row) {
+            $result[$id] = $row;
+        }
+        return $result;
+    }
+
+    /**
+     *
+     */
     public function close() {
         fclose($this->fh);
         unset($this);

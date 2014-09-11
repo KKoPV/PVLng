@@ -31,3 +31,36 @@
     padding-top: 0.2em;
     padding-bottom: 0.2em;
 }
+
+#weather-chart {
+    height: 100px;
+    margin-bottom: 1em;
+    background-color: white;
+}
+
+#weather-wait {
+    color: black;
+    padding-top: 40px;
+    display: none;
+}
+
+#weather {
+    display: table; /* Needed to center */
+    margin: 0 auto;
+}
+
+#weather div {
+    margin: 7px;
+    float: left;
+    height: 70px;
+}
+
+#weather div img {
+    width: 50px;
+    height: 50px;
+}
+
+#weather div.mark {
+    font-weight: bold;
+    color: cyan;
+}

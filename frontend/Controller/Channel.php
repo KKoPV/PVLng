@@ -130,6 +130,7 @@ class Channel extends \Controller {
         $channels = $channels['channels'];
 
         foreach ($this->request->post('p') as $id=>$data) {
+            $data['public'] = $_=&$data['public'] ?: 1;
             $channels[$id] = array_merge($channels[$id], $data);
         }
 
@@ -147,8 +148,9 @@ class Channel extends \Controller {
             $cnt = 0;
 
             foreach ($channels as $id=>$channel) {
-                if ($id == 0 OR isset($add[$id])) { // Add root channel always if defined
-                    $oChannel->reset();
+                if (isset($add[$id])) {
+                    $oChannel->reset()
+                             ->setIcon($oChannelType->reset()->filterById($channel['type'])->findOne()->getIcon());
                     foreach ($channel as $key=>$value) {
                         if ($key == '_') {
                             // Act as grouping channel, e.g. accumulate string powers
@@ -157,7 +159,6 @@ class Channel extends \Controller {
                             $oChannel->set($key, $value);
                         }
                     }
-                    $oChannel->setIcon($oChannelType->reset()->filterById($channel['type'])->findOne()->getIcon());
                     $oChannel->insert();
                     // Remember id for hierarchy build
                     $channels[$id]['id'] = $oChannel->getId();
@@ -225,15 +226,25 @@ class Channel extends \Controller {
         $this->view->SubTitle = __('AdjustTemplate');
 
         $channels = include $this->request->post('template');
-
         $channels = $channels['channels'];
-        unset($channels[0]);
 
         $type = new \ORM\ChannelType;
+
+        if (isset($channels[0])) {
+            $type->filterById($channels[0]['type'])->findOne();
+            $this->view->GroupType = $type->getName();
+            $this->view->GroupIcon = isset($channels[0]['icon']) ? $channels[0]['icon'] : $type->getIcon();
+        }
+
         foreach ($channels as &$channel) {
             $type->reset()->filterById($channel['type'])->findOne();
-            $channel['_type'] = $type->getName();
-            $channel['_icon'] = $type->getIcon();
+            $channel = array_merge(array(
+                '_type'      => $type->getName(),
+                'icon'       => $type->getIcon(),
+                'numeric'    => 1,
+                'resolution' => 1,
+                'public'     => 1,
+            ), $channel);
         }
 
         $this->view->Channels = $channels;

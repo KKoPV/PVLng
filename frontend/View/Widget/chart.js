@@ -7,8 +7,8 @@
  * @version     1.0.0
  */
 
-document.write('<div id="pvlng-{GUID}" style="width:{WIDTH}px;height:{HEIGHT}px"></div>');
+document.write('<div id="pvlng-widget-{GUID}" style="width:{WIDTH}px;height:{HEIGHT}px"></div>');
 
 runOnLoad(function() {
-    _pvlng_chart('pvlng-{GUID}', {WIDTH}, {HEIGHT}, {DATA}, '{MAX}'+' '+'{UNIT}', '{AREA}', '{COLOR}', '{LABELS}', '{TIME1}', '{TIME2}');
+    _pvlng_chart('pvlng-widget-{GUID}', {WIDTH}, {HEIGHT}, {DATA}, '{MAX}'+' '+'{UNIT}', '{AREA}', '{COLOR}', '{LABELS}', '{TIME1}', '{TIME2}');
 });

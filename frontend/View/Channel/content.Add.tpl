@@ -23,26 +23,21 @@
 
     <div id="type">
 
-        <form action="/channel/add" method="post">
-
         <table id="typeTable" class="dataTable">
             <thead>
             <tr>
-                <th style="width:1%"></th>
                 <th>{{EntityType}}</th>
                 <th style="white-space:nowrap">{{ExampleUnit}}</th>
                 <th style="white-space:nowrap">{{Childs}}</th>
                 <th style="width:1%"></th>
                 <th>{{Description}}</th>
+                <th>{{Select}}</th>
             </tr>
             </thead>
             <tbody>
 
             <!-- BEGIN ENTITYTYPES -->
             <tr>
-                <td>
-                    <input type="radio" id="type-{ID}" name="type" value="{ID}" class="iCheck" />
-                </td>
                 <td style="white-space:nowrap;font-weight:bold">
                     <label for="type-{ID}">
                         <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
@@ -64,6 +59,12 @@
                     <!-- INCLUDE channeltype.inc.tpl -->
                 </td>
                 <td style="font-size:smaller">{DESCRIPTION}</td>
+                <td>
+                    <form action="/channel/add" method="post">
+                    <input type="hidden" name="type" value="{ID}" />
+                    <input type="submit" value="&raquo;" />
+                    </form>
+                </td>
             </tr>
             <!-- END -->
 
@@ -78,30 +79,22 @@
             <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>
         </div>
 
-        <br />
-        <input type="submit" value="{{proceed}} &raquo;" />
-
-        </form>
-
     </div>
 
     <div id="template">
 
-        <form action="/channel/template" method="post">
-
         <table id="tplTable" class="dataTable">
             <thead>
             <tr>
-                <th style="width:1%"></th>
                 <th>{{Name}}</th>
                 <th>{{Description}}</th>
+                <th>{{Select}}</th>
             </tr>
             </thead>
             <tbody>
 
             <!-- BEGIN TEMPLATES -->
             <tr>
-                <td><input type="radio" id="{FILE}" name="template" value="{FILE}" class="iCheck" /></td>
                 <td style="white-space:nowrap;font-weight:bold">
                     <label for="{FILE}">
                         <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
@@ -110,6 +103,12 @@
                     </label>
                 </td>
                 <td style="font-size:smaller">{DESCRIPTION}</td>
+                <td>
+                    <form action="/channel/template" method="post">
+                    <input type="hidden" name="template" value="{FILE}" />
+                    <input type="submit" value="&raquo;" />
+                    </form>
+                </td>
             </tr>
             <!-- END -->
 
@@ -117,17 +116,11 @@
 
             <tfoot>
             <tr>
-                <th></th>
-                <th class="l i" colspan="2">{{AdjustTemplateAfterwards}}</th>
+                <th class="l i" colspan="3">{{AdjustTemplateAfterwards}}</th>
             </tr>
             </tfoot>
 
         </table>
-
-        <br />
-        <input type="submit" value="{{proceed}} &raquo;" />
-
-        </form>
 
     </div>
 

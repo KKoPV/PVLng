@@ -80,6 +80,6 @@
     <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
     <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>,
     <span><img src="/images/ico/chart.png">{{UsableInCharts}}</span>,
-    <span><img src="/images/ico/document--plus.png">{{AddChannel}}</span>,
+    <span><img src="/images/ico/document--plus.png">{{CreateChannel}}</span>,
     <span><img src="/images/ico/plus_circle_frame.png">{{ShowDescription}}</span>
 </div>

@@ -52,7 +52,7 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function( oSettings, iColumn ) {
 }}(jQuery));
 
 function fnCreateSelect( aData ) {
-    var r='<select><option value=""></option>', i, iLen=aData.length;
+  var r='<select><option value="">{{Filter}}?</option>', i, iLen=aData.length;
     for ( i=0 ; i<iLen ; i++ ) {
         r += '<option value="'+aData[i]+'">'+aData[i]+'</option>';
     }
@@ -73,9 +73,12 @@ $(function() {
         bPaginate: true,
         sPaginationType: 'full_numbers',
         aoColumnDefs: [
+            { sClass: 'icons b', aTargets: [ 0 ] },
+            { sClass: 'c', aTargets: [ 5 ] },
             /* Adjust columns with icons */
-            { bSortable: false, aTargets: [ 6 ] },
-            { sWidth: "1%", aTargets: [ 5, 6 ] }
+            { bSortable: false, aTargets: [ 7 ] },
+            { sWidth: "1%", aTargets: [ 6, 7 ] },
+            { sClass: 'icons', aTargets: [ 7 ] }
         ],
         aaSorting: [[ 0, 'asc' ]],
         fnInitComplete: function() {
@@ -104,6 +107,42 @@ $(function() {
             '{{Cancel}}': function() { $(this).dialog('close'); }
         }
     });
+
+    /* Bind click listener to all delete channel images */
+    $('.delete-channel', '#entities tbody').addClass('btn').on('click', function() {
+
+        /* Get tree table Id from parent <tr> */
+        var tr = $(this).parents('tr');
+
+        tr.animate({ backgroundColor: '#FFCCCC' }, 'slow');
+
+        $.confirm($('<p/>').html('{{ConfirmDeleteEntity}}'), '{{Confirm}}', '{{Yes}}', '{{No}}')
+        .then(function(ok) {
+            if (!ok) { tr.css({ backgroundColor: '' }); return }
+
+            $(oTable).addClass('wait');
+
+            $.ajax({
+                type: 'DELETE',
+                url: PVLngAPI + 'channel/' + tr.data('id') + '.json',
+                dataType: 'json',
+            }).done(function(data, textStatus, jqXHR) {
+                tr.animate({ backgroundColor: '#CCFFCC' }, 'slow', function() {
+                    /* Get row position and delete */
+                    oTable.fnDeleteRow(oTable.fnGetPosition(tr.get()[0]));
+                });
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $.pnotify({
+                    type: textStatus, hide: false, sticker: false,
+                    text: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText
+                });
+            }).always(function() {
+                tr.css({ backgroundColor: '' });
+                $(oTable).removeClass('wait');
+            });
+        });
+    });
+
 
     $('.delete-form').submit(function(){
         currentForm = this;

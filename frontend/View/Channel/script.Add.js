@@ -24,14 +24,14 @@ $(function() {
         bPaginate: true,
         sPaginationType: 'full_numbers',
         aoColumns: [
-            { bSortable: false, sWidth: '1%' },
             null,
             null,
             null,
-            null,
-            { bSortable: false }
+            { sWidth: '1%' },
+            { bSortable: false },
+            { bSortable: false, sWidth: '1%', sClass: 'c' }
         ],
-        aaSorting: [[ 1, "asc" ]],
+        aaSorting: [[ 0, "asc" ]],
         fnInitComplete: function() {
             pvlng.addClearSearchButton('typeTable', '{{ClearSearch}}');
             $('select', '#typeTable_wrapper').select2();
@@ -40,13 +40,12 @@ $(function() {
 
     $('#tplTable').DataTable({
         bFilter: true,
-        bInfo: true,
         aoColumns: [
-            { asSorting: false, sWidth: '1%' },
             null,
-            { asSorting: false, sClass: 'p50' }
+            { asSorting: false, sClass: 'p50' },
+            { asSorting: false, sWidth: '1%', sClass: 'c' }
         ],
-        aaSorting: [[ 1, "asc" ]],
+        aaSorting: [[ 0, "asc" ]],
         fnInitComplete: function() {
             pvlng.addClearSearchButton('tplTable', '{{ClearSearch}}');
         }

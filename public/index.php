@@ -76,7 +76,6 @@ if ($config->get('Admin.User') == '' AND
  */
 $cache = Cache::factory(
     array(
-        'Token'     => 'PVLng',
         'Directory' => TEMP_DIR,
         'TTL'       => 86400
     ),

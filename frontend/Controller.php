@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 class Controller extends slimMVC\Controller {
@@ -110,6 +110,9 @@ class Controller extends slimMVC\Controller {
         $this->view->CurrencySymbol = $this->config->get('Currency.Symbol');
         $this->view->CurrencyDecimals = $this->config->get('Currency.Decimals');
 
+        $this->view->Latitude = $this->config->get('Location.Latitude');
+        $this->view->Longitude = $this->config->get('Location.Longitude');
+
         $this->view->Title = $this->config->get('Title');
 
         $messages = array();
@@ -134,11 +137,9 @@ class Controller extends slimMVC\Controller {
         $this->view->ServerName = $_SERVER['HTTP_HOST'];
         $this->view->ServerVersion = $_SERVER['SERVER_SOFTWARE'];
 
-        // Put all controller specific config also into view
-        if ($cfg = $this->config->get('Controller.'.$this->controller)) {
-            foreach ($cfg as $key=>$value) {
-                $this->view->set($this->controller.'_'.$key, $value);
-            }
+        // Put all controller configurations into view
+        foreach ($this->config->Controller as $c=>$cfg) {
+            foreach ($cfg as $key=>$value) $this->view->set($c.'_'.$key, $value);
         }
 
         // Check for new version once a hour

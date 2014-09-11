@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -41,7 +41,7 @@
 
     {CONTENT}
 
-    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//code.jquery.com/jquery-2.0.0.js"></script>
     <script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>
 
@@ -59,7 +59,7 @@
     <script src="http://code.highcharts.com/highcharts-more.js"></script>
 
     <script>
-    var PVLngAPI = 'http://{SERVERNAME}/api/r4/';
+        <!-- INCLUDE script.var.js -->
     </script>
 
     {SCRIPTS}

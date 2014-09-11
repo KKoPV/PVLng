@@ -46,27 +46,36 @@ function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $la
     }, function(chart) {
         /* Start time on left */
         var box = chart.renderer
-        .text($time1, chart.plotLeft, chart.chartHeight-2)
-        .attr({ zIndex: 5 })
-        .add()
-        .getBBox();
+                       .text($time1, chart.plotLeft, chart.chartHeight-2)
+                       .attr({ zIndex: 5 })
+                       .add()
+                       .getBBox();
 
         /* End time on right */
         chart.renderer
-        .text($time2, chart.chartWidth - box.width, chart.chartHeight-2)
-        .attr({ zIndex: 5 })
-        .add();
+             .text($time2, chart.chartWidth - box.width, chart.chartHeight-2)
+             .attr({ zIndex: 5 })
+             .add();
     });
 
-    var link = document.createElement('a');
-    link.setAttribute('href', 'http://pvlng.com');
-    link.appendChild(document.createTextNode('powered by PVLng.com'));
-    link.style.fontFamily = 'helvetica';
-    link.style.fontSize = '10px';
-    link.style.textDecoration = 'none';
-    link.style.color = 'gray';
-  /*  var l = '<a href="http://pvlng.com" style="font-family:helvetica;font-size:10px;text-decoration:none;color:gray">PVLng.com</a>'; */
-    document.getElementById($chart).appendChild(link);
+    /* Wrapper with text right aligned */
+    var div = document.createElement('div');
+    div.style.textAlign = 'right';
+    div.style.width = $width+'px';
+
+    /* powered by link */
+    var a = document.createElement('a');
+    a.setAttribute('href', 'http://pvlng.com');
+    a.appendChild(document.createTextNode('powered by PVLng.com'));
+    a.style.fontFamily = 'helvetica';
+    a.style.fontSize = '10px';
+    a.style.textDecoration = 'none';
+    a.style.color = 'lightgray';
+    div.appendChild(a);
+
+    /* Insert AFTER chart */
+    var chart = document.getElementById($chart);
+    chart.parentNode.insertBefore(div, chart.nextSibling);
 
 }
 

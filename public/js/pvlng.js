@@ -80,7 +80,7 @@ var pvlng = new function() {
      * Scroll to #top as top most visible element
      */
     this.scroll = function( top ) {
-        $('html, body').animate({ scrollTop: $(top).offset().top-3 }, 2000);
+        $('html, body').animate({ scrollTop: $(top).offset().top-3 }, 'fast');
     }
 
     /**
@@ -338,6 +338,8 @@ $(function() {
         $('#from').datepicker('setDate', d);
         $('#to').datepicker('setDate', d);
         updateOutput();
+        /* Reset zoom */
+        if (chart) chart.zoomOut();
     });
 
     $('#preset').change(function() {
