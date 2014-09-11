@@ -8,18 +8,19 @@
  * @version    1.0.0
  */
 
-file_exists('prepend.php') && include 'prepend.php';
-
 setlocale(LC_NUMERIC, 'C');
 
 /**
  * Directories
  */
 define('DS',       DIRECTORY_SEPARATOR);
+define('API_DIR',  dirname(__FILE__));
 define('ROOT_DIR', dirname(dirname(dirname(__FILE__))));
 define('CORE_DIR', ROOT_DIR . DS . 'core');
 define('LIB_DIR',  ROOT_DIR . DS . 'lib');
 define('TEMP_DIR', ROOT_DIR . DS . 'tmp');
+
+file_exists(API_DIR.DS.'prepend.php') && include API_DIR.DS.'prepend.php';
 
 /**
  * Initialize Loader
@@ -135,7 +136,6 @@ $api->db = slimMVC\MySQLi::getInstance();
 
 $api->cache = Cache::factory(
     array(
-        'Token'     => 'PVLng',
         'Directory' => TEMP_DIR,
         'TTL'       => 86400
     ),
@@ -288,9 +288,9 @@ $accessibleChannel = function(Slim\Route $route) use ($api) {
 /**
  *
  */
-$checkLocation = function() use ($api) {
-    $api->Latitude  = $api->config->get('Location.Latitude');
-    $api->Longitude = $api->config->get('Location.Longitude');
+$checkLocation = function() use ($api, $config) {
+    $api->Latitude  = $config->get('Location.Latitude');
+    $api->Longitude = $config->get('Location.Longitude');
 
     if ($api->Latitude == '' OR $api->Longitude == '') {
         $api->stopAPI('No valid location defined in configuration', 404);
@@ -300,11 +300,11 @@ $checkLocation = function() use ($api) {
 // ---------------------------------------------------------------------------
 // The routes
 // ---------------------------------------------------------------------------
-foreach (glob('routes'.DS.'*.php') as $routes) include $routes;
+foreach (glob(API_DIR.DS.'routes'.DS.'*.php') as $routes) include $routes;
 
 /**
  * Let's go
  */
 $api->run();
 
-file_exists('append.php') && include 'append.php';
+file_exists(API_DIR.DS.'append.php') && include API_DIR.DS.'append.php';

@@ -18,7 +18,7 @@ $api->get('/channels', function() use ($api) {
     }
     ksort($channels);
     $api->render($channels);
-})->name('channels')->help = array(
+})->name('GET /channels')->help = array(
     'since'       => 'r3',
     'description' => 'Fetch all channels',
 );
@@ -30,7 +30,7 @@ $api->get('/channel/:guid', $accessibleChannel, function($guid) use ($api) {
     $api->render(Channel::byGUID($guid)->getAttributes());
 })->conditions(array(
     'attribute' => '\w+'
-))->name('channel GUID')->help = array(
+))->name('GET /channel/:guid')->help = array(
     'since'       => 'r3',
     'description' => 'Fetch single channel attribute',
 );
@@ -42,7 +42,28 @@ $api->get('/channel/:guid/:attribute', $accessibleChannel, function($guid, $attr
     $api->render(Channel::byGUID($guid)->getAttributes($attribute));
 })->conditions(array(
     'attribute' => '\w+'
-))->name('channel GUID attribute')->help = array(
+))->name('GET /channel/:guid/:attribute')->help = array(
     'since'       => 'r3',
     'description' => 'Fetch all channel attributes or specific channel attribute',
+);
+
+/**
+ *
+ */
+$api->delete('/channel/:id', $APIkeyRequired, function($id) use ($api) {
+    $channel = new ORM\Channel($id);
+
+    if ($channel->getId()) {
+        $channel->delete();
+        if (!$channel->isError()) {
+            $api->status(204);
+        } else {
+            $api->stopAPI(__($channel->Error(), $channel->getName()), 400);
+        }
+    } else {
+        $api->stopAPI('No channel found for Id '.$id, 404);
+    }
+})->name('DELETE /channel/:id')->help = array(
+    'since'       => 'r4',
+    'description' => 'Delete channel and its readings',
 );

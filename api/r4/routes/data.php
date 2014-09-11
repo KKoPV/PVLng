@@ -56,14 +56,14 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
     if ($api->boolParam('attributes', FALSE)) {
         $attr = $channel->getAttributes();
 
-        if ($full) {
+        if ($full AND $channel->meter) {
             // Calculate overall consumption and costs
-            foreach($buffer as $row) {
-                $attr['consumption'] += $row['consumption'];
-            }
-            $attr['consumption'] = round($attr['consumption'], $attr['decimals']);
+            $cons = 0;
+            // Loop all rows to get value from last row if exists
+            foreach ($buffer as $row) $cons = $row['data'];
+            $attr['consumption'] = round($cons, $attr['decimals']);
             $attr['costs'] = round(
-                $attr['consumption'] * $attr['cost'],
+                $cons * $attr['cost'],
                 \slimMVC\Config::getInstance()->Currency_Decimals
             );
 
@@ -71,7 +71,7 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
         $result->write($attr);
     }
 
-    // optimized flow...
+    // optimized flow 1st "if" then "loop"...
     if ($full and $short) {
         // passthrough all values as numeric based array
         foreach ($buffer as $row) {
