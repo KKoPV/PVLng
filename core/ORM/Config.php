@@ -29,7 +29,9 @@ class Config extends ConfigBase {
      *
      */
     public function resetAPIkey() {
-        return $this->app->db->query('DELETE FROM `'.$this->table.'` WHERE `key` = "APIKey" LIMIT 1');
+        $this->app->db->query(
+            'UPDATE `'.$this->table.'` SET `value` = UUID() WHERE `key` = "APIKey" LIMIT 1'
+        );
     }
 
 }

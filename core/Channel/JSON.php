@@ -35,26 +35,26 @@ class JSON extends Channel {
             // Find only writable channels with filled "channel" attribute
             if (!$child->write OR $child->channel == '') continue;
 
-            $path = explode(self::SEPARATOR, $child->channel);
+            // Check all keys in lowercase
+            $path = explode(self::SEPARATOR, strtolower($child->channel));
 
             // Root pointer
             $value = &$request;
-            $found = TRUE; // optimistic search :-)
 
             // To handle [0] array keys use all as strings and array_key_exists
             while (($key = array_shift($path)) != '') {
+                // Check all keys in lowercase
+                $value = array_change_key_case($value);
                 if (array_key_exists($key, $value)) {
+                    // Key found, move pointer to next level
                     $value = &$value[$key];
-                    #print_r($value);
-                    #echo ' - ';
                 } else {
-                    $found = FALSE;
-                    break;
+                    // Requested key not found in delivered data, skip child
+                    continue 2;
                 }
             }
-            if (!$found) continue;
 
-            try { //                 Simulate $request['data']
+            try {                    // Simulate $request['data']
                 $ok += $child->write(array('data' => $value), $timestamp);
             } catch (\Exception $e) {
                 $code = $e->getCode();

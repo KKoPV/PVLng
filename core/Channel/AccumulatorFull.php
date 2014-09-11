@@ -78,8 +78,8 @@ class AccumulatorFull extends Calculator {
                         } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                             if ($meter) {
-                                if ($last2) $row1['data'] += $last2['data'];
                                 $last1 = $row1;
+                                if ($last2) $row1['data'] += $last2['data'];
                             }
                             $result->write($row1, $key1);
 
@@ -89,8 +89,8 @@ class AccumulatorFull extends Calculator {
                         } else /* $key1 > $key2 */ {
 
                             if ($meter) {
-                                if ($last1) $row2['data'] += $last1['data'];
                                 $last2 = $row2;
+                                if ($last1) $row2['data'] += $last1['data'];
                             }
                             $result->write($row2, $key2);
 

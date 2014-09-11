@@ -28,6 +28,7 @@ return array(
             'name'     => 'Power three Phases',
             'unit'     => 'W',
             'decimals' => 0,
+            'icon'     => '/images/ico/plug.png',
         ),
 
         // Real channels

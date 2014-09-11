@@ -272,6 +272,15 @@ abstract class ChannelViewBase extends \slimMVC\ORM {
         return $this->fields['icon'];
     }   // getIcon()
 
+    /**
+     * Basic getter for field 'tree'
+     *
+     * @return mixed Tree value
+     */
+    public function getTree() {
+        return $this->fields['tree'];
+    }   // getTree()
+
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
@@ -561,6 +570,17 @@ abstract class ChannelViewBase extends \slimMVC\ORM {
         $this->filter[] = '`icon` = "'.$this->quote($icon).'"';
         return $this;
     }   // filterByIcon()
+
+    /**
+     * Filter for field 'tree'
+     *
+     * @param  mixed    $tree Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByTree( $tree ) {
+        $this->filter[] = '`tree` = "'.$this->quote($tree).'"';
+        return $this;
+    }   // filterByTree()
 
     // -----------------------------------------------------------------------
     // PROTECTED

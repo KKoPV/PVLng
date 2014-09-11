@@ -12,16 +12,6 @@ return array(
     'serial' => array(
         'visible'  => TRUE,
         'required' => TRUE,
-    ),
-    'channel' => array( // used for device type
-        'visible'  => TRUE,
-                   // select;<key>:<text>[;<key>:<text>]...
-        'type'     => 'select;1:Inverter;2:SensorBox',
-        'default'  => 1
-    ),
-    'resolution' => array(
-        'visible'  => TRUE,
-        'required' => TRUE,
     )
 
 );

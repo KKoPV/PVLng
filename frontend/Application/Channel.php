@@ -25,6 +25,10 @@ PVLng::SubMenu(
 );
 
 PVLng::SubMenu(
+    'channel', 21, '/channel/add', __('CreateChannel')
+);
+
+PVLng::SubMenu(
     'channel', 30, '/overview', __('Overview'), __('OverviewHint')
 );
 
@@ -47,9 +51,13 @@ $app->map('/channel/add(/:clone)', $checkAuth, function( $clone=0 ) use ($app) {
     $app->process('Channel', 'Add', array('clone' => $clone));
 })->via('GET', 'POST');
 
-$app->map('/channel/template', $checkAuth, function() use ($app) {
+$app->get('/channel/template', $checkAuth, function() use ($app) {
+    $app->redirect('/channel/add#template');
+});
+
+$app->post('/channel/template', $checkAuth, function() use ($app) {
     $app->process('Channel', 'Template');
-})->via('POST');
+});
 
 $app->get('/channel/edit/:id', $checkAuth, function( $id ) use ($app) {
     $app->process('Channel', 'Edit', array('id' => $id));

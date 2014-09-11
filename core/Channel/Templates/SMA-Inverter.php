@@ -10,19 +10,19 @@
  */
 return array(
 
-    'name' => 'Solar Inverter',
+    'name' => 'SMA Sunnboy/Tripower inverter',
 
     'description' => '
-        Generic solar inverter with up to 3 strings:
+        <a href="http://www.sma.de/en/products/solarinverters">SMA Sunny Boy or Tripower inverter</a>
+        connected to a SMA&nbsp;Webbox with up to 6 strings (A1...A5, B):
         <ul>
             <li>E-Total lifetime, readings in kWh, output in Wh</li>
             <li>Pac (W)</li>
-            <li>Pdc1, Pdc2, Pdc3 (W)</li>
-            <li>Udc1, Udc2, Udc3 (V)</li>
-            <li>Idc1, Idc2, Idc3 (A)</li>
+            <li>Pdc A, Pdc B (W)</li>
+            <li>Udc A, Udc B (V)</li>
+            <li>Idc A, Idc A1, Idc A2, Idc A3, Idc A4, Idc A5,<br />Idc B, Idc B1 (A)</li>
             <li>Mode (string)</li>
             <li>Error (string)</li>
-            <li>Temperature (°C)</li>
             <li>Mains frequency (Hz)</li>
         </ul>
     ',
@@ -31,8 +31,8 @@ return array(
 
         // Grouping channel
         array(
-            'type'        => 2, // Inverter
-            'name'        => 'Inverter',
+            'type'        => 41, // SMA Inverter
+            'name'        => 'SMA Inverter',
         ),
 
         // Real channels
@@ -40,6 +40,7 @@ return array(
             'type'        => 50, // Energy meter, absolute
             'name'        => 'E-Total',
             'description' => 'Energy production',
+            'channel'     => 'E-Total',
             'resolution'  => 1000,
             'unit'        => 'Wh',
             'decimals'    => 0,
@@ -50,6 +51,7 @@ return array(
             'type'        => 51, // Power sensor
             'name'        => 'Pac',
             'description' => 'AC Power',
+            'channel'     => 'Pac',
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 0.001,
@@ -57,8 +59,9 @@ return array(
 
         array(
             'type'        => 51, // Power sensor
-            'name'        => 'Pdc1',
-            'description' => 'DC Power string 1',
+            'name'        => 'Pdc A',
+            'description' => 'DC Power string A',
+            'channel'     => 'A.Ms.Watt',
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 0.001,
@@ -66,8 +69,9 @@ return array(
 
         array(
             'type'        => 52, // Voltage sensor
-            'name'        => 'Udc1',
-            'description' => 'DC Voltage string 1',
+            'name'        => 'Udc A',
+            'description' => 'DC Voltage string A',
+            'channel'     => 'A.Ms.Vol',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -75,8 +79,59 @@ return array(
 
         array(
             'type'        => 53, // Current sensor
-            'name'        => 'Idc1',
-            'description' => 'DC Current string 1',
+            'name'        => 'Idc A',
+            'description' => 'DC Current string A',
+            'channel'     => 'A.Ms.Amp',
+            'unit'        => 'A',
+            'decimals'    => 1,
+            'valid_from'  => 0.001,
+        ),
+
+        array(
+            'type'        => 53, // Current sensor
+            'name'        => 'Idc A1',
+            'description' => 'DC Current string A1',
+            'channel'     => 'A1.Ms.Amp',
+            'unit'        => 'A',
+            'decimals'    => 1,
+            'valid_from'  => 0.001,
+        ),
+
+        array(
+            'type'        => 53, // Current sensor
+            'name'        => 'Idc A2',
+            'description' => 'DC Current string A2',
+            'channel'     => 'A2.Ms.Amp',
+            'unit'        => 'A',
+            'decimals'    => 1,
+            'valid_from'  => 0.001,
+        ),
+
+        array(
+            'type'        => 53, // Current sensor
+            'name'        => 'Idc A3',
+            'description' => 'DC Current string A3',
+            'channel'     => 'A3.Ms.Amp',
+            'unit'        => 'A',
+            'decimals'    => 1,
+            'valid_from'  => 0.001,
+        ),
+
+        array(
+            'type'        => 53, // Current sensor
+            'name'        => 'Idc A4',
+            'description' => 'DC Current string A4',
+            'channel'     => 'A4.Ms.Amp',
+            'unit'        => 'A',
+            'decimals'    => 1,
+            'valid_from'  => 0.001,
+        ),
+
+        array(
+            'type'        => 53, // Current sensor
+            'name'        => 'Idc A5',
+            'description' => 'DC Current string A5',
+            'channel'     => 'A5.Ms.Amp',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -84,8 +139,9 @@ return array(
 
         array(
             'type'        => 51, // Power sensor
-            'name'        => 'Pdc2',
-            'description' => 'DC Power string 2',
+            'name'        => 'Pdc B',
+            'description' => 'DC Power string B',
+            'channel'     => 'B.Ms.Watt',
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 0.001,
@@ -93,8 +149,9 @@ return array(
 
         array(
             'type'        => 52, // Voltage sensor
-            'name'        => 'Udc2',
-            'description' => 'DC Voltage string 2',
+            'name'        => 'Udc B',
+            'description' => 'DC Voltage string B',
+            'channel'     => 'B.Ms.Vol',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -102,35 +159,19 @@ return array(
 
         array(
             'type'        => 53, // Current sensor
-            'name'        => 'Idc2',
-            'description' => 'DC Current string 2',
+            'name'        => 'Idc B',
+            'description' => 'DC Current string B',
+            'channel'     => 'B.Ms.Amp',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
         ),
 
         array(
-            'type'        => 51, // Power sensor
-            'name'        => 'Pdc3',
-            'description' => 'DC Power string 3',
-            'unit'        => 'W',
-            'decimals'    => 0,
-            'valid_from'  => 0.001,
-        ),
-
-        array(
-            'type'        => 52, // Voltage sensor
-            'name'        => 'Udc3',
-            'description' => 'DC Voltage string 3',
-            'unit'        => 'V',
-            'decimals'    => 1,
-            'valid_from'  => 0.001,
-        ),
-
-        array(
             'type'        => 53, // Current sensor
-            'name'        => 'Idc3',
-            'description' => 'DC Current string 3',
+            'name'        => 'Idc B1',
+            'description' => 'DC Current string B1',
+            'channel'     => 'B1.Ms.Amp',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -140,6 +181,7 @@ return array(
             'type'        => 91, // Switch
             'name'        => 'Inverter mode',
             'description' => 'Switch for state changes',
+            'channel'     => 'Mode',
             'numeric'     => 0,
         ),
 
@@ -147,19 +189,14 @@ return array(
             'type'        => 91, // Switch
             'name'        => 'Inverter error',
             'description' => 'Switch for state changes',
+            'channel'     => 'Error',
             'numeric'     => 0,
-        ),
-
-        array(
-            'type'        => 60, // Temperature sensor
-            'name'        => 'Inverter temperature',
-            'unit'        => '°C',
-            'decimals'    => 1,
         ),
 
         array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Mains frequency',
+            'channel'     => 'GridMs.Hz',
             'unit'        => 'Hz',
             'decimals'    => 2,
             'valid_from'  => 40,

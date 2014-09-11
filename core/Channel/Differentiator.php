@@ -37,6 +37,8 @@ class Differentiator extends Calculator {
             return $this->after_read($buffer);
         }
 
+        $lastRow = FALSE;
+
         // combine all data for same timestamp
         for ($i=1; $i<$childCnt; $i++) {
 
@@ -58,9 +60,10 @@ class Differentiator extends Calculator {
                     $row1['data']        -= $row2['data'];
                     $row1['min']         -= $row2['min'];
                     $row1['max']         -= $row2['max'];
-                    $row1['consumption'] -= $row2['consumption'];
+                    $row1['consumption']  = $lastRow ? $row1['data'] - $lastRow['data'] : 0;
 
                     $result->write($row1, $key1);
+                    $lastRow = $row1;
 
                     // read both next rows
                     $row1 = $buffer->next()->current();
@@ -69,7 +72,10 @@ class Differentiator extends Calculator {
                 } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
                     // write $row1 only, if not yet another row was written
-                    if (count($result) == 0) $result->write($row1, $key1);
+                    if (count($result) == 0) {
+                        $result->write($row1, $key1);
+                        $lastRow = $row1;
+                    }
 
                     // read only row 1
                     $row1 = $buffer->next()->current();
