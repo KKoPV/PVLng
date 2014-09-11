@@ -36,11 +36,14 @@ class Config extends \Slim\Helper\Set {
     /**
      *
      */
-    public function load( $file, $required=TRUE ) {
+    public function load( $file, $required=TRUE, $namespace='' ) {
         if (isset($file) AND (file_exists($file) OR $required)) {
             $data = include $file;
             $data = $this->array_change_key_case_deep($data);
-            $this->data = $this->array_replace_deep($this->data, $data);
+            $p =& $this->data;
+            $key = explode(self::$NamespaceSeparator, mb_strtolower($namespace));
+            while ($k = array_shift($key)) $p =& $p[$k];
+            $p = $this->array_replace_deep($p, $data);
         }
         return $this;
     }
