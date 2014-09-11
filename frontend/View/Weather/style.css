@@ -1,0 +1,8 @@
+#weather {
+    margin: 0 auto;
+}
+
+#weather td {
+    padding: 5px 10px;
+    font-size: smaller;
+}
