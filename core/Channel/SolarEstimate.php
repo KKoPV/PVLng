@@ -53,7 +53,10 @@ class SolarEstimate extends InternalCalc {
         $ProductionToday = $ProductionLast - $Production1st;
 
         // Start average value to align data
-        $sql = 'SELECT MIN(`data`) FROM (
+        $sql = 'SELECT MIN(`data`) as `0`
+                       -- Average production
+                     , MAX(`data`) - MIN(`data`) as `1`
+                  FROM (
                     SELECT * FROM (
                             -- If there is more than one reading for a minute, consolidate to one!
                         SELECT `timestamp`, AVG(`data`) AS `data`
@@ -70,7 +73,10 @@ class SolarEstimate extends InternalCalc {
                 HAVING count(*) = {2} ) t2';
 
         $sql = $this->db->sql($sql, $child->entity, $days, $lastTimestampToday);
-        $Average1st = $this->db->queryOne($sql);
+        list($Average1st, $Average) = $this->db->queryRowArray($sql);
+
+        // Scale todays production to average production last days
+        $scale = $ProductionToday / $Average;
 
         // Estimated production from now
         $sql = 'SELECT UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "),
@@ -78,7 +84,7 @@ class SolarEstimate extends InternalCalc {
                        ) AS `timestamp`
                      , `data`
                   FROM ( -- If there is more than one reading for a minute, consolidate to one!
-                         SELECT `timestamp`, (AVG(`data`) - {3}) + {4} AS `data`
+                         SELECT `timestamp`, (AVG(`data`) - {3}) * {4} + {5} AS `data`
                            FROM `pvlng_reading_num`
                           WHERE `id` = {1}
                              -- Align to ? days back 00:00
@@ -87,12 +93,11 @@ class SolarEstimate extends InternalCalc {
                             AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
                           GROUP BY `timestamp` DIV 60
                        ) t
-                 WHERE UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {5}
+                 WHERE UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {6}
               GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
                 HAVING count(*) = {2}';
 
-        $sql = $this->db->sql($sql, $child->entity, $days, $Average1st,
-                              $ProductionToday, $lastTimestampToday);
+        $sql = $this->db->sql($sql, $child->entity, $days, $Average1st, $scale, $ProductionToday, $lastTimestampToday);
         $res = $this->db->query($sql);
 
         // Apply child resolution here
