@@ -148,7 +148,7 @@ class Channel extends \Controller {
             $cnt = 0;
 
             foreach ($channels as $id=>$channel) {
-                if (isset($add[$id])) {
+                if ($id == 0 OR isset($add[$id])) {
                     $oChannel->reset()
                              ->setIcon($oChannelType->reset()->filterById($channel['type'])->findOne()->getIcon());
                     foreach ($channel as $key=>$value) {
