@@ -13,17 +13,13 @@ return array(
     'name' => 'Solar Edge Inverter',
 
     'description' => '
-        Solar inverter with up to 3 strings:
         <ul>
-            <li>E-Total lifetime, readings in kWh, output in Wh</li>
+            <li>E-Total lifetime (Wh)</li>
             <li>Pac (W)</li>
-            <li>Pdc1, Pdc2, Pdc3 (W)</li>
-            <li>Udc1, Udc2, Udc3 (V)</li>
-            <li>Idc1, Idc2, Idc3 (A)</li>
-            <li>Mode (string)</li>
-            <li>Error (string)</li>
-            <li>Temperature (°C)</li>
-            <li>Mains frequency (Hz)</li>
+            <li>Udc (V)</li>
+            <li>Uac1, Uac2, Uac3 (V)</li>
+            <li>Iac1, Iac2, Iac3 (A)</li>
+            <li>Mains frequency 3 phases (Hz)</li>
         </ul>
     ',
 
@@ -33,6 +29,7 @@ return array(
         array(
             'type'        => 48, // Solar Edge Inverter
             'name'        => 'Solar Edge Inverter',
+            'description' => 'FILL THE \'SERIAL NUMBER\' WITH YOURS',
         ),
 
         // Real channels
@@ -40,7 +37,7 @@ return array(
             'type'        => 50, // Energy meter, absolute
             'name'        => 'E-Total',
             'description' => 'Energy production',
-            'channel'     => 'overview->lifeTimeData->energy',
+            'channel'     => 'lifeTimeData->energy',
             'resolution'  => 1,
             'unit'        => 'Wh',
             'decimals'    => 0,
@@ -51,7 +48,7 @@ return array(
             'type'        => 51, // Power sensor
             'name'        => 'Pac',
             'description' => 'AC Power',
-            'channel'     => 'overview->currentPower->power',
+            'channel'     => 'currentPower->power',
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 0.001,
@@ -61,7 +58,7 @@ return array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Udc',
             'description' => 'DC Voltage',
-            'channel'     => 'data->telemetries[]->totalActivePower||data->telemetries[]->date',
+            'channel'     => 'totalActivePower',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -71,7 +68,7 @@ return array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac1',
             'description' => 'DC Current string 1',
-            'channel'     => 'data->telemetries[]->L1Data->acCurrent||data->telemetries[]->date',
+            'channel'     => 'L1Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -81,7 +78,7 @@ return array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac1',
             'description' => 'AC Voltage',
-            'channel'     => 'data->telemetries[]->L1Data->acVoltage||data->telemetries[]->date',
+            'channel'     => 'L1Data->acVoltage',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -91,7 +88,7 @@ return array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Freq1',
             'description' => 'Mains frequency 1',
-            'channel'     => 'data->telemetries[]->L1Data->acFrequency||data->telemetries[]->date',
+            'channel'     => 'L1Data->acFrequency',
             'unit'        => 'Hz',
             'decimals'    => 2,
             'valid_from'  => 40,
@@ -102,7 +99,7 @@ return array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac2',
             'description' => 'DC Current string 2',
-            'channel'     => 'data->telemetries[]->L2Data->acCurrent||data->telemetries[]->date',
+            'channel'     => 'L2Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -112,7 +109,7 @@ return array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac2',
             'description' => 'AC Voltage 2',
-            'channel'     => 'data->telemetries[]->L2Data->acVoltage||data->telemetries[]->date',
+            'channel'     => 'L2Data->acVoltage',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -122,7 +119,7 @@ return array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Freq2',
             'description' => 'Mains frequency 2',
-            'channel'     => 'data->telemetries[]->L2Data->acFrequency||data->telemetries[]->date',
+            'channel'     => 'L2Data->acFrequency',
             'unit'        => 'Hz',
             'decimals'    => 2,
             'valid_from'  => 40,
@@ -133,7 +130,7 @@ return array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac3',
             'description' => 'DC Current string 3',
-            'channel'     => 'data->telemetries[]->L3Data->acCurrent||data->telemetries[]->date',
+            'channel'     => 'L3Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -143,7 +140,7 @@ return array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac3',
             'description' => 'AC Voltage 3',
-            'channel'     => 'data->telemetries[]->L3Data->acVoltage||data->telemetries[]->date',
+            'channel'     => 'L3Data->acVoltage',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -153,7 +150,7 @@ return array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Freq3',
             'description' => 'Mains frequency 3',
-            'channel'     => 'data->telemetries[]->L3Data->acFrequency||data->telemetries[]->date',
+            'channel'     => 'L3Data->acFrequency',
             'unit'        => 'Hz',
             'decimals'    => 2,
             'valid_from'  => 40,
@@ -163,7 +160,7 @@ return array(
         array(
             'type'        => 60, // Temperature sensor
             'name'        => 'Inverter temperature',
-            'channel'     => 'data->telemetries[]->temperature||data->telemetries[]->date',
+            'channel'     => 'temperature',
             'unit'        => '°C',
             'decimals'    => 1,
         ),
