@@ -63,7 +63,7 @@ class Accumulator extends Calculator {
                             $row1['data']        += $row2['data'];
                             $row1['min']         += $row2['min'];
                             $row1['max']         += $row2['max'];
-                            $row1['consumption']  = $lastRow ? $row1['data'] - $lastRow['data'] : 0;
+                            $row1['consumption']  = $lastRow ? $row1['data'] - $lastRow['data'] : $row1['data'];
 
                             $result->write($row1, $key1);
                             $lastRow = $row1;
