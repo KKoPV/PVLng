@@ -48,10 +48,10 @@
             <!-- ENDIF -->
         </td>
         <td>
-            <input type="text" name="p[{_LOOP}][name]" value="{NAME}" size="30">
+            <input type="text" name="p[{_LOOP}][name]" value="{NAME}" size="25">
         </td>
         <td>
-            <input type="text" name="p[{_LOOP}][description]" value="{DESCRIPTION}" size="30">
+            <input type="text" name="p[{_LOOP}][description]" value="{DESCRIPTION}" size="35">
         </td>
         <td>
             <!-- IF {NUMERIC} -->

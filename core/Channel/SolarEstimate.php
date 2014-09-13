@@ -76,7 +76,7 @@ class SolarEstimate extends InternalCalc {
         list($Average1st, $Average) = $this->db->queryRowArray($sql);
 
         // Scale todays production to average production last days
-        $scale = $ProductionToday / $Average;
+        $scale = $ProductionToday / $Average / 2;
 
         // Estimated production from now
         $sql = 'SELECT UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "),
