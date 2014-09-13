@@ -11,9 +11,20 @@
 /**
  *
  */
-$api->any('/help', function() use ($api) {
-    $content = array();
+function getLatestAPIVersion() {
+    // Search version directories
+    $version = glob(API_DIR.DS.'..'.DS.'r*', GLOB_ONLYDIR);
+    // Get last one ...
+    $version = array_pop($version);
+    // and split
+    $version = explode(DIRECTORY_SEPARATOR, $version);
+    return array_pop($version);
+}
 
+/**
+ *
+ */
+$api->any('/help', function() use ($api) {
     foreach ($api->router()->getNamedRoutes() as $route) {
         $help = array(
             'methods'     => implode(', ', $route->getHttpMethods()),
@@ -33,6 +44,11 @@ $api->any('/help', function() use ($api) {
     }
 
     ksort($content);
+
+    // Preprend version
+    $content = array_reverse($content);
+    $content['version'] = getLatestAPIVersion();
+    $content = array_reverse($content);
 
     $api->response->headers->set('Content-Type', 'application/json');
     $api->render($content);
@@ -75,7 +91,8 @@ $api->any('/helphtml', function() use ($api) {
         $body .= '<a href="#'.urlencode($route).'">'.$route.'</a><br />';
     }
     $body .= '</div>'
-          . '<h2>Routes for '.$api->request()->getRootUri().'</h2>';
+           . '<h1>Version ' . getLatestAPIVersion() . '</h1>'
+           . '<h2>Routes for '.$api->request()->getRootUri().'</h2>';
 
     foreach($content as $route=>$help) {
         $body .= '<a name="'.urlencode($route).'"></a><h3>'.$help['methods'].' '.$route.'</h3>'

@@ -37,12 +37,6 @@ var oTable, cancelDragging;
  */
 $(function() {
 
-    $.ajaxSetup({
-        beforeSend: function setHeader(XHR) {
-            XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
-        }
-    });
-
     $.fn.dataTableExt.afnFiltering.push(
         function( oSettings, aData, iDataIndex ) {
             return !$(oTable.fnGetNodes()[iDataIndex]).hasClass('hidden');
@@ -245,7 +239,7 @@ $(function() {
     /* Bind click listener to all create alias images */
     $('#tree tbody').on('click', '.create-alias', function() {
 
-        $(document.body).addClass('wait');
+        overlay.show();
 
         /* Get tree table Id from parent <tr> */
         var node = $(this.parentNode.parentNode).data('tt-id'),
@@ -260,13 +254,14 @@ $(function() {
                 type: textStatus,
                 text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
             });
-            $(that).prop('src', '/images/pix.gif').removeClass('btn');
+            /* Remove icon, unbind handler and reset cursor */
+            $(that).prop('src', '/images/pix.gif').removeClass('create-alias').removeClass('btn');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
                 type: textStatus, hide: false, sticker: false, text: errorThrown
             });
         }).always(function() {
-            $(document.body).removeClass('wait');
+            overlay.hide();
         });
     });
 
@@ -274,15 +269,27 @@ $(function() {
     $('#tree tbody').on('click', '.delete-node', function() {
 
         /* Get tree table Id from parent <tr> */
-        var tr = this.parentNode.parentNode,
+        var tr   = this.parentNode.parentNode,
             node = $(tr).data('tt-id'),
-            msg = $(tr).hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
+            msg  = $(tr).hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
+
+        oTable.$('tr').each(function(i, tr) {
+            var tr = $(tr);
+            if (tr.data('tt-id') == node || tr.data('tt-parent-id') == node) {
+                tr.animate({ backgroundColor: '#FFCCCC' }).addClass('marked-for-deletion');
+            }
+        });
 
         $.confirm($('<p/>').html(msg), '{{Confirm}}', '{{Yes}}', '{{No}}')
         .then(function(ok) {
-            if (!ok) return;
+            var rows = $('.marked-for-deletion');
 
-            $(document.body).addClass('wait');
+            if (!ok) {
+                rows.removeClass('.marked-for-deletion').css({ backgroundColor: '' });
+                return;
+            }
+
+            oTable.addClass('wait');
 
             $.ajax({
                 type: 'DELETE',
@@ -290,23 +297,23 @@ $(function() {
                 dataType: 'json',
             }).done(function(data, textStatus, jqXHR) {
                 /* Loop all rows and delete also rows with tt-parent-id = node if any */
-                oTable.$('tr').each(function(i, tr) {
-                    if ($(tr).data('tt-id') == node || $(tr).data('tt-parent-id') == node) {
+                rows.animate({ backgroundColor: '#CCFFCC' }, 'slow', function() {
+                    rows.each(function(i, tr) {
                         /* Get row position and delete without redraw */
                         oTable.fnDeleteRow(oTable.fnGetPosition(tr), null, false);
-                    }
+                    });
+                    oTable.fnDraw();
                 });
-                oTable.fnDraw();
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
                     type: textStatus, hide: false, sticker: false,
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
-                $(document.body).removeClass('wait');
+                rows.removeClass('.marked-for-deletion').css({ backgroundColor: '' });
+                oTable.removeClass('wait');
             });
         });
-
     });
 
     $('#dialog-move').dialog({
@@ -343,13 +350,6 @@ $(function() {
         )
         // enable Select2 on the select elements
         .children('select').select2();
-    });
-
-    $('.guid').click(function() {
-        /* select GUID, make ready for copy */
-        $(this).select();
-    }).mouseup(function(e) {
-        e.preventDefault();
     });
 
     shortcut.add('ESC', function() { cancelDragging = true; });

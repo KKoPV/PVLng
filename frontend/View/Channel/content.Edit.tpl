@@ -49,6 +49,9 @@
     <tr <!-- IF {ERROR} -->style="background-color:#FFE0E0;border-top:solid 1px white;border-bottom:solid 1px white"<!-- ENDIF -->>
         <td style="vertical-align:top;padding-top:.75em">
             <label for="{FIELD}">{NAME}</label>
+            <!-- IF {REQUIRED} -->
+                <img class="ico" src="/images/required.gif" alt="*">
+            <!-- ENDIF -->
         </td>
         <td style="vertical-align:top;padding-top:.5em;padding-bottom:.5em">
             <div style="white-space:nowrap">
@@ -106,9 +109,6 @@
                        <!-- IF {CODE} --> class="code"<!-- ENDIF -->
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
-            <!-- ENDIF -->
-            <!-- IF {REQUIRED} -->
-                <img class="ico" src="/images/required.gif" alt="*">
             <!-- ENDIF -->
             </div>
             <span style="color:red" class="xs">
@@ -173,12 +173,10 @@
 
     <tfoot>
     <tr>
-        <th></th>
-        <th class="l">
+        <th class="l" colspan="3">
             <img class="ico" src="/images/required.gif" alt="*" />
             <small>{{required}}</small>
         </th>
-        <th></th>
     </tr>
     </tfoot>
 

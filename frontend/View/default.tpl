@@ -3,7 +3,7 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
+ * @copyright   2012-2014 Knut Kohl
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
@@ -120,20 +120,9 @@
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
     <script>
-        var PVLngVersion = '{VERSION}',
-            PVLngAPI = 'http://{SERVERNAME}/api/r4/',
-            PVLngAPIkey = '{APIKEY}',
-
-            /* Inititilize Pines Notify labels here with I18N */
-            pnotify_defaults_labels_stick = '{{Stick}}',
-            pnotify_defaults_labels_close = '{{Close}}',
-
-            DecimalSeparator = '{DSEP}',
-            ThousandSeparator = '{TSEP}',
-
-            verbose = '{VERBOSE',
-            language = '{LANGUAGE}',
-            user = '{USER}';
+        <!-- INCLUDE config.default.js -->
+        <!-- INCLUDE config.js -->
+        <!-- INCLUDE script.var.js -->
     </script>
 
     <!-- IF {DEVELOPMENT} -->
@@ -186,6 +175,10 @@
         var overlay;
 
         $(function($) {
+            if (user) $.ajaxSetup({
+                beforeSend: function setHeader(XHR) { XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey) }
+            });
+
             $.extend($.fn.select2.defaults, {
                 minimumResultsForSearch: 10,
                 allowClear: true,
@@ -218,7 +211,7 @@
     </script>
 
     <!-- IF !{USER} -->
-        <!-- INCLUDE Admin/login.dialog.tpl -->
+        <!-- INCLUDE login.dialog.tpl -->
     <!-- ENDIF -->
 </body>
 </html>

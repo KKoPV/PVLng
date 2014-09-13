@@ -1,0 +1,36 @@
+<?php
+/**
+ * cron configuration file
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
+ *
+ * After placing here a template for cron runs, test your configuration with
+ *
+ * # /path/to/your/public_html/cron.php -tv
+ *
+ * If all is fine, add a line to your crontab
+ *
+ * # crontab -e
+ *
+ * Add: * * * * * /path/to/your/public_html/cron.php
+ *
+ * If you add later more sections, which have to test before the will go live,
+ * comment the 'enabled' line out until your tested successfully!
+ *
+ *   // 'enabled' => TRUE,
+ *
+ * This will process the section only in test mode (-t)
+ *
+ */
+
+return array(
+
+    /**
+     * For handler templates to insert as sections here, see cron/<handler>.config.php
+     */
+
+
+);

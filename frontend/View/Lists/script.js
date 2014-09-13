@@ -199,16 +199,21 @@ $(function() {
 
     /* Bind click listener to all delete buttons */
     $('#list tbody').on('click', '.delete-reading', function() {
-        var ts = $(this).data('timestamp'),
-            question = '{{ConfirmDeleteReading}}\n\n' +
-                       '- ' + (new Date(ts*1000)).toLocaleString() + '\n' +
-                       '- {{Reading}} : ' + $(this).data('value');
+        var tr = this.parentNode.parentNode,
+            ts = $(this).data('timestamp'),
+            msg = $('<p/>').html('{{DeleteReadingConfirm}}')
+                  .append($('<ul/>')
+                      .append($('<li/>').html((new Date(ts*1000)).toLocaleString()))
+                      .append($('<li/>').html('{{Reading}} : ' + $(this).data('value')))
+                  );
 
-        if (confirm(question)) {
+        $.confirm(msg, '{{Confirm}}', '{{Yes}}', '{{No}}').then(function(ok) {
+            if (!ok) return;
+
             $(document.body).addClass('wait');
 
             var url = PVLngAPI + 'data/' + channel.guid + '/' + ts + '.json',
-                pos = listTable.fnGetPosition(this.parentNode.parentNode);
+                pos = listTable.fnGetPosition(tr);
 
             $.ajax({
                 type: 'DELETE',
@@ -225,7 +230,7 @@ $(function() {
             }).always(function() {
                 $(document.body).removeClass('wait');
             });
-        }
+        });
     });
 
     $(window).bind('resize', function() {

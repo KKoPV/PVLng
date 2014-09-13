@@ -319,6 +319,83 @@ function updateChart() {
 /**
  *
  */
+function updateWeather() {
+    var chart = $('#weather-chart').html($('#weather-wait').clone().show()),
+        container = $('#weather').empty(),
+        temperatures = [],
+        l = { en: 'EN', de: 'DL' }[language];;
+
+    $.ajax({
+        url: 'http://api.wunderground.com/api/'+APIkey+'/hourly/forecast/lang:' + l +
+             '/q/' + latitude + ',' + longitude + '.json',
+        dataType: 'jsonp',
+        success: function(response) {
+            /* Show only this and next day */
+            var day = 1;
+            container.empty();
+            $.each(response.hourly_forecast, function(id, data) {
+                if (data.FCTTIME.hour == 0) day++;
+                if (day > 2) return;
+
+                if (data.FCTTIME.hour == 0) {
+                    $('<div/>')
+                    .html(data.FCTTIME.weekday_name_abbrev.split('').join('<br />'))
+                    .addClass('mark')
+                    .appendTo(container);
+                }
+                var div = $('<div/>')
+                          .append($('<img/>').prop('src', 'http://icons.wxug.com/i/c/h/'+data.icon+'.gif'))
+                          .append('<br />' + data.FCTTIME.hour + '<small>:'+data.FCTTIME.min+'</small>');
+                container.append(div);
+                /* Mark each 6 hours (6, 12 18) */
+                if (data.FCTTIME.hour > 0 && data.FCTTIME.hour % 6 == 0) div.addClass('mark');
+                /* Make timestamp and temperature numeric */
+                temperatures.push({ x: +data.FCTTIME.epoch*1000, y: +data.temp.metric });
+            });
+            $.each(response.forecast.simpleforecast.forecastday.slice(-2), function(id, data) {
+                $('<div/>')
+                .append($('<img/>').prop('src', 'http://icons.wxug.com/i/c/h/'+data.icon+'.gif'))
+                .append('<br />' + data.date.weekday_short)
+                .appendTo(container);
+            });
+
+            /* Mark temperature Min/Max value */
+            ts  = { min: temperatures[0].x, max: temperatures[temperatures.length-1].x },
+            min = { id: null, x: null, y:  100 },
+            max = { id: null, x: null, y: -100 },
+
+            $.each(temperatures, function(i, point) {
+                if (point.y < min.y) min = { id: i, x: point.x, y: point.y };
+                if (point.y > max.y) max = { id: i, x: point.x, y: point.y };
+            });
+
+            temperatures[min.id].marker     = { enabled: true };
+            temperatures[max.id].marker     = { enabled: true };
+            temperatures[min.id].dataLabels = { enabled: true };
+            temperatures[max.id].dataLabels = { enabled: true };
+
+            /* Create temperatures chart */
+            chart.highcharts({
+                chart: { type: 'spline', margin: [ 5, 5, 25, 5 ] },
+                title: false,
+                exporting: { enabled: false },
+                credits: { enabled: false },
+                /*tooltip: { enabled: false },*/
+                legend: { enabled: false },
+                plotOptions: { spline: { marker: { enabled: false } } },
+                xAxis: [ { type: 'datetime', title: false } ],
+                yAxis : [ { title: false, labels: { enabled: false } } ],
+                series: [ { name: '{{Temperature}}', data: temperatures } ]
+            });
+        }
+    });
+}
+
+var APIkey = '{WEATHER_APIKEY}';
+
+/**
+ *
+ */
 $(function() {
 
     Highcharts.setOptions({
@@ -334,6 +411,10 @@ $(function() {
         }
     });
 
+    chart = new Highcharts.Chart(options);
+
+    updateChart();
+
     $('#page-home').on('pageshow', function( event, ui ) {
         updateChart();
     });
@@ -345,15 +426,24 @@ $(function() {
         updateChart();
     });
 
-    $('#btn-refresh').on('click', function(e) {
+    $('#btn-chart-refresh').on('click', function(e) {
         e.preventDefault();
         updateChart();
     });
 
-    chart = new Highcharts.Chart(options);
+    if (!APIkey) {
+        $('#btn-weather').hide();
+    } else {
+        $('#page-weather').on('pageshow', function( event, ui ) {
+            updateWeather();
+        });
 
-    updateChart();
+        $('#btn-weather-refresh').on('click', function(e) {
+            e.preventDefault();
+            updateWeather();
+        });
 
+    }
 });
 
 </script>

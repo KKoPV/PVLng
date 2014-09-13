@@ -65,8 +65,8 @@ params="-h $dbhost -P $dbport -u $dbuser"
 [ "$dbsocket" ] && params="$params -S $dbsocket"
 [ "$dbpass" ]   && params="$params -p$dbpass"
 
-e 'Import SQL definitions'
-echo "mysql $params $dbname <$PWD/sql/pvlng.sql"
+e 'Import SQL definitions from sql/pvlng.sql ...'
+#echo "mysql $params $dbname <$PWD/sql/pvlng.sql"
 mysql $params $dbname <$PWD/sql/pvlng.sql
 
 e 'Prepare config/config.php and set database credentials'

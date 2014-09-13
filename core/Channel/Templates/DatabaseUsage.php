@@ -30,7 +30,8 @@ return array(
             'name'        => 'Database reading rows',
             'decimals'    => 0,
             'unit'        => 'rows',
-            'public'      => 0 // private by default
+            'public'      => 0, // private by default
+            'icon'        => '/images/ico/database.png'
         ),
 
         // Real channels

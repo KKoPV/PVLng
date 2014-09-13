@@ -16,6 +16,8 @@ $(function() {
         bPaginate: false,
         bJQueryUI: true,
         bProcessing: true,
+        bStateSave: DatatablesStateSave,
+        iCookieDuration: 365*24*60*60,
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
     });
 

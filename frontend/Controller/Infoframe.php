@@ -19,21 +19,30 @@ class Infoframe extends \Controller {
      */
     public function Index_Action() {
 
-        $dir   = APP_DIR . DS . 'Controller' . DS . 'Infoframe';
+        $dir   = APP_DIR . DS . 'View' . DS . 'Infoframe';
         $frame = $this->app->params->get('frame');
 
         $config = $dir . DS . $frame . '.php';
-        if (!file_exists($config)) $this->app->halt(400, 'Missing settings in '.$config);
+        if (!file_exists($config)) {
+            \Messages::Error('Missing settings in '.$frame.'.php');
+            $this->app->redirect('/');
+        }
 
         foreach (array('png', 'jpg', 'jpeg', 'gif') as $ext) {
             $file = $dir . DS . $frame . '.' . $ext;
             if (file_exists($file)) break;
             $file = NULL;
         }
-        if (!$file) $this->app->halt(400, 'Missing image: '.$frame.'.(png|jpg|jpeg|gif)');
+        if (!$file) {
+            \Messages::Error('Missing image: '.$frame.'.(png|jpg|jpeg|gif)');
+            $this->app->redirect('/');
+        }
 
         $im = imagecreatefromstring(file_get_contents($file));
-        if (!$im) $this->app->halt(400, 'Can\'t read image from '.$file);
+        if (!$im) {
+            \Messages::Error('Can\'t read image from '.$file);
+            $this->app->redirect('/');
+        }
 
         $white = imagecolorallocate($im, 255, 255, 255);
         $black = imagecolorallocate($im, 0, 0, 0);

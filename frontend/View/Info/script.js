@@ -69,9 +69,39 @@ $(function() {
             th[0].innerHTML = len + " {{Channels}}";
             while (len--) cnt += +aData[len][2].match(/>(.*?)</)[1];
             th[1].innerHTML = $.number(cnt, 0, '', ThousandSeparator);
-        },
-        fnInitComplete: function() {
-            $('.last-reading').each(function(id, el) {
+        }
+    });
+
+    /* Load charts on Tab activation, not before */
+    var tabs2 = tabs3 = tabs4 = false;
+
+    $('.ui-tabs').on('tabsactivate', function(e, ui) {
+        if (ui.newPanel.selector == '#tabs-2' && !tabs2) {
+            tabs2 = true;
+            var options = ChartOptions;
+            options.series[0].data = [
+                <!-- BEGIN STATS --><!-- IF {READINGS} -->
+                ['{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->', {raw:READINGS}],
+                <!-- ENDIF --><!-- END -->
+            ];
+
+            if (options.series[0].data.length == 0) {
+                $('#stats-chart').hide();
+                return;
+            }
+
+            options.plotOptions.pie.dataLabels.formatter = function() {
+                return '<b>'+this.point.name+'</b>: '
+                     + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
+                     + ' ('
+                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                     + ' %)'
+            };
+
+            /* Use width of 1st visible tab container (#tab-1) to set chart width */
+            $('#stats-chart').width($('#tabs-1').width()).highcharts(options);
+
+            $('.last-reading', '#table-stats').each(function(id, el) {
                 $.getJSON(
                     PVLngAPI + 'data/' + $(el).data('guid') + '.json',
                     {
@@ -92,29 +122,8 @@ $(function() {
                     $(el).html('<small>'+jqXHR.responseJSON.message+'</small>').addClass('fail');
                 });
             });
-        }
-    });
-
-    pvlng.onFinished.add(
-        function() {
-            var options = ChartOptions;
-            options.series[0].data = [
-                <!-- BEGIN STATS --><!-- IF {READINGS} -->
-                ['{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->', {raw:READINGS}],
-                <!-- ENDIF --><!-- END -->
-            ];
-            options.plotOptions.pie.dataLabels.formatter = function() {
-                return '<b>'+this.point.name+'</b>: '
-                     + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
-                     + ' ('
-                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
-                     + ' %)'
-            };
-
-            /* Use width of 1st visible tab container (#tab-1) to set chart width */
-            $('#stats-chart').width($('#tabs-1').width()).highcharts(options);
-        },
-        function() {
+        } else if (ui.newPanel.selector == '#tabs-3' && !tabs3) {
+            tabs3 = true;
             var options = ChartOptions;
             options.series[0].data = [
                 ['{{DatabaseSize}}', {DATABASESIZE}],
@@ -130,11 +139,14 @@ $(function() {
 
             /* Use width of 1st visible tab container (#tab-1) to set chart width */
             $('#db-chart').width($('#tabs-1').width()).highcharts(options);
-        },
-        function() {
+        } else if (ui.newPanel.selector == '#tabs-4' && !tabs4) {
+            tabs4 = true;
             var hits = {raw:CACHEHITS}, misses = {raw:CACHEMISSES};
 
-            if (!hits || !misses) return;
+            if (!hits || !misses) {
+                $('#cache-chart').hide();
+                return;
+            }
 
             var options = ChartOptions;
             options.series[0].data = [
@@ -152,7 +164,6 @@ $(function() {
             /* Use width of 1st visible tab container (#tab-1) to set chart width */
             $('#cache-chart').width($('#tabs-1').width()).show().highcharts(options);
         }
-    );
-
+    });
 });
 </script>

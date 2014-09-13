@@ -22,6 +22,14 @@ return array(
     'unit' => array(
         'readonly' => TRUE,
         'default'  => '%',
-    )
+    ),
+
+    'valid_from' => array(
+        'default'  => '0',
+    ),
+
+    'valid_to' => array(
+        'default'  => '100',
+    ),
 
 );

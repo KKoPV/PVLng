@@ -205,6 +205,13 @@ td.imgbar {
     white-space: nowrap;
 }
 
+.legendtip img {
+    padding: 2px;
+    margin-right: 8px;
+    margin-bottom: 2px;
+    background-color: white;
+}
+
 .wait,
 .wait * {
     cursor: wait !important;

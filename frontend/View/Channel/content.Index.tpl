@@ -20,8 +20,15 @@
         <th class="l">{{Unit}}</th>
         <th class="l">{{Type}}</th>
         <th class="l">{{Serial}}</th>
-        <th></th>
-        <th></th>
+        <th class="icons">
+            <img src="/images/ico/node_select_all.png" class="tip" title="Used # times in channel hierarchy" alt="#">
+        </th>
+        <th>
+            <img src="/images/ico/drive.png" alt="?">
+        </th>
+        <th class="icons">
+            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
+        </th>
     </tr>
     </thead>
 
@@ -29,8 +36,8 @@
 
     <!-- BEGIN ENTITIES -->
 
-    <tr>
-        <td class="icons b">
+    <tr data-id="{ID}">
+        <td>
             <a href="/channel/edit/{ID}" class="tip" title="{{EditEntity}}">
                 <img src="{ICON}" class="channel-icon" title="" alt="({TYPE})">
             </a>
@@ -43,42 +50,60 @@
         <td>{UNIT}</td>
         <td>{TYPE}</td>
         <td>{SERIAL}</td>
+        <td>{TREE}</td>
         <td class="icons">
             <!-- INCLUDE channeltype.inc.tpl -->
         </td>
-        <td class="icons">
+        <td>
             <a href="/channel/edit/{ID}">
                 <img src="/images/ico/node_design.png" alt="e">
             </a>
             <a href="/channel/add/{ID}">
                 <img src="/images/ico/node_select_child.png" alt="c">
             </a>
-            <form id="df{ID}" action="/channel/delete" method="post" class="delete-form">
-                <input type="hidden" name="id" value="{ID}">
-                <input type="image" src="/images/ico/node_delete.png"
-                       style="background-color:transparent" alt="-">
-            </form>
+            <!-- IF {TREE} -->
+            <!-- Can't delete channels assigned in channel hierarchy -->
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw" style="height:0px" alt="" />
+            <!-- ELSE -->
+            <img class="delete-channel" src="/images/ico/node_delete.png" alt="-">
+            <!-- ENDIF -->
             <!-- IF {GUID} -->
-            <img src="/images/ico/license-key.png" class="btn" onclick="alert('{GUID}', 'GUID'); return false" alt="G">
+            <img src="/images/ico/license-key.png" class="btn" onclick="$.alert('{GUID}', 'GUID'); return false" alt="G">
             <!-- ENDIF -->
         </td>
-
     </tr>
 
     <!-- END -->
 
     </tbody>
+
+    <tfoot>
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th class="icons" colspan="2">
+            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
+        </th>
+    </tr>
+    </tfoot>
 </table>
 
-<div id="legend" class="icons">
-    <strong>{{Legend}}</strong>:
-    <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
-    <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
-    <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>,
-    <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>,
-    <span><img src="/images/ico/node_select_child.png">{{CloneEntity}}</span>,
-    <span><img src="/images/ico/node_delete.png">{{DeleteEntity}}</span>,
-    <span><img src="/images/ico/license-key.png">{{ShowGUID}}</span>
+<!-- Legend -->
+
+<div id="IconLegend">
+    <div class="icons legendtip">
+        <img src="/images/ico/read-write.png">{{ReadWritableEntity}}<br />
+        <img src="/images/ico/write.png">{{WritableEntity}}<br />
+        <img src="/images/ico/read.png">{{ReadableEntity}}<br />
+        <img src="/images/ico/node_design.png">{{EditEntity}}<br />
+        <img src="/images/ico/node_select_child.png">{{CloneEntity}}<br />
+        <img src="/images/ico/node_delete.png">{{DeleteEntityHint}}<br />
+        <img src="/images/ico/license-key.png">{{ShowGUID}}
+    </div>
 </div>
 
 <!-- Dialogs -->

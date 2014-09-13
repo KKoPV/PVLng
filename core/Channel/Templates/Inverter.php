@@ -13,7 +13,7 @@ return array(
     'name' => 'Solar Inverter',
 
     'description' => '
-        Solar inverter with up to 3 strings:
+        Generic solar inverter with up to 3 strings:
         <ul>
             <li>E-Total lifetime, readings in kWh, output in Wh</li>
             <li>Pac (W)</li>

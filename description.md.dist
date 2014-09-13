@@ -1,6 +1,4 @@
 
-[![http://pvlng.com](http://pvlng.com/images/banner.gif)](http://pvlng.com)
-
 Add here some public description of your environment, if you like :-)
 
 # Overview ...
@@ -39,9 +37,9 @@ Horizontal rule:
 
 - - -
 
-    This is a code block. (indent every line of the block by at least 4 spaces...)
+    This is a code block, indent every line of the block by at least 4 spaces ...
 
-    This is another code block. (... or 1 tab)
+	This is another code block, indented with a tab
 
 This is [an example](http://example.com/ "Title") inline link.
 

@@ -41,7 +41,26 @@
             <div class="c">{{ChannelHierarchy}}</div>
         </th>
         <th></th>
-        <th></th>
+        <th>
+            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
+            <div id="IconLegend">
+            <div class="icons legendtip">
+                <img src="/images/ico/lock.png">{{PrivateChannel}}<br />
+                <img src="/images/ico/plus_circle_frame.png">{{AddOneToManyChannels}}<br />
+                <img src="/images/ico/node_insert_next.png">{{AssignEntity}}<br />
+                <img src="/images/ico/node_delete_next.png">{{DeleteEntity}}<br />
+                <img src="/images/ico/node_delete.png">{{DeleteBranch}}<br />
+                <img src="/images/ico/navigation_180_frame.png">{{MoveEntityLeft}}<br />
+                <img src="/images/ico/navigation_090_frame.png">{{MoveEntityUp}}<br />
+                <img src="/images/ico/navigation_270_frame.png">{{MoveEntityDown}}<br />
+                <img src="/images/ico/document-invoice.png">{{ListHint}}<br />
+                <img src="/images/ico/node_design.png">{{EditEntity}}<br />
+                <img src="/images/ico/node_select_child.png">{{CloneEntity}}<br />
+                <img src="/images/ico/arrow-split.png">{{AliasEntity}}<br />
+                <img src="/images/ico/license-key.png">{{ShowGUID}}
+            </div>
+            </div>
+        </th>
     </tr>
     </thead>
 
@@ -130,7 +149,7 @@
         <td class="icons">
             <img src="/images/ico/plus_circle_frame.png" class="btn" alt="+"
                  style="margin-left:8px;margin-right:6px" onclick="addChild(1)">
-            <img src="/images/ico/information_frame.png" class="tip" tip="#DragDropHelp" ali="?">
+            <img src="/images/ico/information_frame.png" class="tip" tip="#DragDropHelp" alt="?">
             <div id="DragDropHelp" style="display:none">{{DragDropHelp}}</div>
         </td>
         <td></td>
@@ -155,23 +174,6 @@
     </tr>
     <tfoot>
 </table>
-
-<div id="legend" class="icons">
-    <strong>{{Legend}}</strong>:
-    <span><img src="/images/ico/lock.png">{{PrivateChannel}}</span>,
-    <span><img src="/images/ico/plus_circle_frame.png">{{AddOneToManyChannels}}</span>,
-    <span><img src="/images/ico/node_insert_next.png">{{AssignEntity}}</span>,
-    <span><img src="/images/ico/node_delete_next.png">{{DeleteEntity}}</span>,
-    <span><img src="/images/ico/node_delete.png">{{DeleteBranch}}</span>,
-    <span><img src="/images/ico/navigation_180_frame.png">{{MoveEntityLeft}}</span>,
-    <span><img src="/images/ico/navigation_090_frame.png">{{MoveEntityUp}}</span>,
-    <span><img src="/images/ico/navigation_270_frame.png">{{MoveEntityDown}}</span>,
-    <span><img src="/images/ico/document-invoice.png">{{ListHint}}</span>,
-    <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>,
-    <span><img src="/images/ico/node_select_child.png">{{CloneEntity}}</span>,
-    <span><img src="/images/ico/arrow-split.png">{{AliasEntity}}</span>,
-    <span><img src="/images/ico/license-key.png">{{ShowGUID}}</span>
-</div>
 
 <!-- Dialogs ------------------------------------------------------------- -->
 

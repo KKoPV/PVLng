@@ -9,18 +9,6 @@
  */
 -->
 
-<div id="dialog-reading" style="display:none" title="{{DeleteReading}}">
-    <p>
-        <span class="ui-icon ui-icon-alert" style="float:left;margin:0 7px 20px 0"></span>
-        {{DeleteReadingConfirm}}
-    </p>
-    <ul>
-        <li id="reading-serie"></li>
-        <li id="reading-timestamp"></li>
-        <li>{{Reading}} : <span id="reading-value"></span></li>
-    </ul>
-</div>
-
 <div id="dialog-chart" style="display:none" title="{{ChartSettings}}">
     <table id="d-table">
         <tbody>
@@ -106,11 +94,11 @@
         <tr class="odd">
             <td>{{MarkExtremes}}</td>
             <td>
-                <div class="fl not-bar not-scatter not-meter" style="margin-right:1em">
+                <div class="fl not-bar not-scatter not-meter" style="margin-right:1em">
                     <input id="d-min" type="checkbox" class="iCheck" />
                     <label for="d-min">{{MarkMin}}</label>
                 </div>
-                <div class="fl not-scatter not-meter" style="margin-right:1em">
+                <div class="fl not-scatter not-meter" style="margin-right:1em">
                     <input id="d-max" type="checkbox" class="iCheck" />
                     <label for="d-max">{{MarkMax}}</label>
                 </div>

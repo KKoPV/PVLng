@@ -23,9 +23,9 @@ class Info extends \Controller {
      */
     public function IndexPost_Action() {
         if ($this->request->post('regenerate')) {
-            $this->db->query(
-                'UPDATE `pvlng_config` SET `value` = UUID() WHERE `key` = "APIKey"'
-            );
+            (new \ORM\Config)->resetAPIkey();
+            // Delete key from cache!
+            $this->cache->delete('APIkey');
             \Messages::Success(__('APIkeyRegenerated'));
         }
         $this->app->redirect('info');

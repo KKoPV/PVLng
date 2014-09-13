@@ -17,9 +17,9 @@
 
 var ChartHeight = {INDEX_CHARTHEIGHT},
     RefreshTimeout = {INDEX_REFRESH},
-    chartLabelsCSS = { color: 'lightgray', fontSize: '9px' },
     qs = {},
     chart = false,
+    chartLoading = '<img src="/images/loading_dots.gif" width="64" height="21" />',
     channels_chart = [],
     updateTimeout,
     updateActive = false,
@@ -58,15 +58,18 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             panning: true,
             panKey: 'shift',
             events: {
-                redraw: function () {
-                    /* Show generator and time not only once on load, on browser zoom the chart will be re-drawn */
+                load: function () {
                     this.renderer
-                        .label(
-                            /* Just into upper left corner */
-                            'PVLng v'+PVLngVersion + '<br />'+(new Date()).toLocaleTimeString()
-                         )
-                        .attr({ fill: 'white' })
-                        .css(chartLabelsCSS)
+                        .label('PVLng v'+PVLngVersion)
+                        .attr({ padding: 1 })
+                        .css({ color: 'lightgray', fontSize: '11px' })
+                        .add();
+                },
+                redraw: function () {
+                    this.renderer
+                        .label((new Date).toLocaleString(), 0, 16)
+                        .attr({ fill: 'white', padding: 1 })
+                        .css({ color: 'lightgray', fontSize: '9px' })
                         .add();
                 }
             }
@@ -76,28 +79,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
         credits: false,
         plotOptions: {
             series: {
-                point: {
-                    events: {
-                        click: function() {
-                            if (!PVLngAPIkey) return;
-                            if (!this.series.options.raw) {
-                                alert('Can\'t delete from consolidated data.');
-                                return;
-                            }
-
-                            $('#reading-serie').html(this.series.name);
-                            $('#reading-timestamp').html((new Date(this.x)).toLocaleString());
-                            $('#reading-value').html(this.y + ' ' + this.series.options.unit);
-
-                            $('#dialog-reading')
-                                .data('guid', this.series.options.guid)
-                                .data('timestamp', (this.x/1000).toFixed(0))
-                                .data('point', this)
-                                .dialog('open');
-
-                        }
-                    }
-                },
+                point: { events: { click: PVLngAPIkey ? deleteReading : null } },
                 turboThreshold: 0
             },
             line: { marker: { enabled: false } },
@@ -354,7 +336,7 @@ function ChartDialog( id ) {
 /**
  *
  */
-function updateChart( forceUpdate ) {
+function updateChart( forceUpdate, scroll ) {
 
     clearTimeout(updateTimeout);
     updateTimeout = null;
@@ -531,7 +513,7 @@ function updateChart( forceUpdate ) {
     if (f != t) f += ' - ' + t;
     chart.setTitle({ text: $('<div/>').html(views.actual.name).text() }, { text: f });
 
-    chart.showLoading('<img src="/images/loading_dots.gif" width="64" height="21" />');
+    chart.showLoading(chartLoading);
 
     var series = [], costs = 0, date = new Date();
 
@@ -814,6 +796,43 @@ function updateOutput() {
 /**
  *
  */
+function deleteReading() {
+    if (!this.series.options.raw) return $.alert('Can\'t delete from consolidated data.', 'Error');
+
+    var point = this, /* Remember point to remove afterwards from chart */
+        url = PVLngAPI + 'data/' + this.series.options.guid + '/' + (this.x/1000).toFixed(0) + '.json',
+        msg = $('<p/>').html('{{DeleteReadingConfirm}}'),
+        ul = $('<ul/>')
+             .append($('<li/>').html(this.series.name))
+             .append($('<li/>').html((new Date(this.x)).toLocaleString()))
+             .append($('<li/>').html('{{Reading}} : ' + this.y + ' ' + this.series.options.unit));
+
+    $.confirm($('<p/>').append(msg).append(ul), '{{DeleteReading}}', '{{Yes}}', '{{No}}')
+    .then(function(ok) {
+        if (!ok) return;
+
+        chart.showLoading(chartLoading);
+        $('#chart').addClass('wait');
+
+        $.ajax(
+            { type: 'DELETE', url: url, dataType: 'json' }
+        ).done(function(data, textStatus, jqXHR) {
+            point.remove();
+            $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            $.pnotify({
+                type: textStatus, hide: false,
+                text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+            });
+        }).always(function() {
+            chart.hideLoading();
+            $('#chart').removeClass('wait');
+        });
+    })
+}
+/**
+ *
+ */
 $(function() {
 
     pvlng.onFinished.add( function() {
@@ -824,7 +843,7 @@ $(function() {
     });
 
     /**
-     * Modify legend color for pos./neg. splitted seires
+     * Modify legend color for pos./neg. splitted series
      * Idea from
      * http://highcharts.uservoice.com/forums/55896-general/suggestions/4575779-make-the-legend-icon-colors-modifiable
      * http://jsfiddle.net/stephanevanraes/CZSzT/
@@ -853,23 +872,33 @@ $(function() {
     });
 
     /**
-     *
+     * If a chart height is provided as URL parameter "height", remember in cookie
      */
     qs = $.parseQueryString();
 
-    chartOptions.chart.height = qs.height || ChartHeight;
+    if (qs.height) {
+        /* A value of 0 will reset height and remove cookie */
+        if (qs.height > 0) {
+            pvlng.cookie.set('ChartHeight', ChartHeight = qs.height);
+        } else {
+            pvlng.cookie.remove('ChartHeight');
+        }
+    } else {
+        var h = pvlng.cookie.get('ChartHeight');
+        if (h) ChartHeight = h;
+    }
+    chartOptions.chart.height = ChartHeight;
 
+    /**
+     * Configure date picker elements
+     */
     if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);
     } else {
         $.datepicker.setDefaults($.datepicker.regional['']);
     }
 
-    if (qs.date) {
-        var d = new Date(qs.date);
-    } else {
-        var d = new Date();
-    }
+    var d = qs.date ? new Date(qs.date) : new Date();
 
     $("#from").datepicker({
         altField: '#fromdate',
@@ -930,11 +959,19 @@ $(function() {
             ChartDialog($(this).parents('tr').data('tt-id'));
         });
 
-        $('.showlist').addClass('clickable').click(function() {
-            window.location.href = '/list/' + channels[$(this).parents('tr').data('tt-id')].guid;
+        $('.showlist').each(function() {
+            $(this).wrap('<a></a>').parent()
+            .prop('href', '/list/' + channels[$(this).parents('tr').data('tt-id')].guid);
         });
 
-        $('.editentity').addClass('clickable').click(function() {
+        $('.editentity')
+        .each(function() {
+            /* For "Open link in new tab" ... */
+            $(this).wrap('<a></a>').parent()
+            .prop('href', '/channel/edit/' + channels[$(this).parents('tr').data('tt-id')].entity);
+        })
+        .click(function(e) {
+            e.preventDefault();
             window.location.href = '/channel/edit/' + channels[$(this).parents('tr').data('tt-id')].entity +
                                    '?returnto=' + (views.actual.slug ? '/chart/' + views.actual.slug : '/');
         });
@@ -1093,6 +1130,8 @@ $(function() {
         icons: { primary: 'ui-icon-folder-open' },
         text: false
     }).click(function(event) {
+        /* Shift-Click sets display date to today */
+        if (event.shiftKey) $('#btn-reset').trigger('click');
         views.load($('#load-delete-view option:selected').val(), true);
     });
 
@@ -1196,44 +1235,6 @@ $(function() {
         views.load(qs.chart, true);
     });
 
-    $("#dialog-reading").dialog({
-        modal: true,
-        resizable: false,
-        bgiframe: true,
-        width: 500,
-        autoOpen: false,
-        buttons: {
-            '{{Yes}}': function() {
-                var self = $(this);
-
-                self.dialog('close');
-                chart.showLoading('<img src="/images/loading_dots.gif" width="64" height="21" />');
-                $('#chart').addClass('wait');
-
-                var url = PVLngAPI + 'data/' + self.data('guid') + '/' + self.data('timestamp') + '.json';
-
-                $.ajax(
-                    { type: 'DELETE', url: url, dataType: 'json' }
-                ).done(function(data, textStatus, jqXHR) {
-                    self.data('point').remove();
-                    $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    $.pnotify({
-                        type: textStatus, hide: false,
-                        text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
-                    });
-                }).always(function() {
-                    chart.hideLoading();
-                    $('#chart').removeClass('wait');
-                });
-
-            },
-            '{{No}}': function() {
-                $(this).dialog('close');
-            }
-        }
-    });
-
     /**
      * HTML5 Page Visibility API
      *
@@ -1260,12 +1261,19 @@ $(function() {
                 windowVisible = true;
                 /* Was longer in background, so the updateTimeout is not set anymore */
                 if (!updateTimeout) {
-                    setTimeout(function() {
-                        /* Scroll to navigation as top most visible element */
-                        pvlng.scroll('#nav');
-                        updateChart();
-                    },
-                    1000);
+                    /* Check if toDate in chart is today and not in the past */
+                    var d = new Date(),
+                        today = ('0'+(d.getMonth()+1)).slice(-2) + '/' +
+                                ('0'+d.getDate()).slice(-2) + '/' +
+                                d.getFullYear();
+                    if ($('#todate').val() == today) {
+                        setTimeout(function() {
+                            /* Scroll to navigation as top most visible element */
+                            if (chart) pvlng.scroll('#nav');
+                            updateChart();
+                        },
+                        1000);
+                    }
                 }
             } else {
                 windowVisible = false;
@@ -1274,13 +1282,13 @@ $(function() {
         });
     }
 
-    shortcut.add('Alt+P', function() { pvlng.changeDates(-1); });
-    shortcut.add('Alt+N', function() { pvlng.changeDates(1); });
-    shortcut.add('F6',    function() { updateChart(); });
-    shortcut.add('F7',    function() { updateChart(true); });
+    shortcut.add('Alt+P', function() { pvlng.changeDates(-1) });
+    shortcut.add('Alt+N', function() { pvlng.changeDates(1) });
+    shortcut.add('F6',    function() { updateChart() });
+    shortcut.add('F7',    function() { updateChart(true) });
 
     if (user) {
-        shortcut.add('F4', function() { tree.toggle(); });
+        shortcut.add('F4', function() { tree.toggle() });
     }
 });
 

@@ -55,21 +55,24 @@ class Base extends Channel {
     $childs = $this->getChilds();
 
     if (count($childs) < 2) {
-      throw new \Exception('"'.$this->name.'" needs at least 2 childs, Total and Pac!', 400);
+        throw new \Exception('"'.$this->name.'" needs at least 2 childs, Total and Pac!', 400);
     }
 
     // transform request date into start - end
     $this->date = !empty($request['p1']) ? $request['p1'] : date('Y-m-d');
 
-    $request['start'] = $this->date;
-    $request['end']   = $this->date . '+1day';
+    $request['start']  = $this->date;
+    $request['end']    = $this->date . '+1day';
+    $request['period'] = '5min';
 
+    $consumption = 0;
     // 1st child: total production
     $child = array_shift($childs);
-    // get only attributes line
-    $row = $child->read($request, TRUE)->rewind()->current();
-
-    $inverter->setCurrentTotalWattHours($row['consumption']);
+    // Calculate overall consumption
+    foreach($child->read($request) as $row) {
+        $consumption += $row['consumption'];
+    }
+    $inverter->setCurrentTotalWattHours($consumption);
 
     // 2nd child: Pac power
     $child = array_shift($childs);
@@ -77,11 +80,11 @@ class Base extends Channel {
 
     // other childs: must be the Strings Pdc
     if ($this->useStrings) {
-      foreach ($childs as $id=>$child) {
-          $string = new \YieldString;
-        $this->calcTimesAndPowers($child->read($request), $string);
-        $inverter->addString($string);
-      }
+        foreach ($childs as $id=>$child) {
+            $string = new \YieldString;
+            $this->calcTimesAndPowers($child->read($request), $string);
+            $inverter->addString($string);
+        }
     }
 
     return $inverter;

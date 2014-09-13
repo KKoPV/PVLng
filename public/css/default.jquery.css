@@ -69,3 +69,7 @@
 .ui-pnotify-text {
     margin-left: 25px;
 }
+
+th.ui-state-default {
+    font-weight: bold !important;
+}

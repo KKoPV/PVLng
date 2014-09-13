@@ -138,17 +138,21 @@ class Admin extends \Controller {
      *
      */
     public function ClearcachePOST_Action() {
+        $info = $this->app->cache->info();
         if ($this->request->post('tpl')) {
             $i = 0;
             foreach (glob(TEMP_DIR.DS.'*') as $i=>$file) {
                 // Don't delete .githold ...
                 if (strpos($file, '.githold') === FALSE) $i += (int) unlink($file); // Success == TRUE => 1
             }
-            \Messages::Success(sprintf('Cleared %d files from %s', $i, TEMP_DIR));
+            \Messages::Success(sprintf('Removed %d files', $i));
+            if ($info['class'] != 'Cache\APC' AND extension_loaded('apc') AND ini_get('apc.enabled')) {
+                apc_clear_cache();
+                \Messages::Success('Cleared also APC files cache');
+            }
         }
         if ($this->request->post('cache')) {
             $this->app->cache->flush();
-            $info = $this->app->cache->info();
             \Messages::Success('Cleared caches of '.addslashes($info['class']));
         }
         $this->app->redirect('/cc');

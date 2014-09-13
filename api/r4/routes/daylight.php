@@ -11,7 +11,7 @@
 /**
  *
  */
-$api->get('/sunrise/(/:date)', $checkLocation, function($date=NULL) use ($api) {
+$api->get('/sunrise(/:date)', $checkLocation, function($date=NULL) use ($api) {
     $date = isset($date) ? strtotime($date) : time();
     $api->render(array(
         'sunrise' =>
@@ -45,7 +45,7 @@ $api->get('/sunrise/:latitude/:longitude(/:date)', function($latitude, $longitud
 /**
  *
  */
-$api->get('/sunset/(/:date)', $checkLocation, function($date=NULL) use ($api) {
+$api->get('/sunset(/:date)', $checkLocation, function($date=NULL) use ($api) {
     $date = isset($date) ? strtotime($date) : time();
     $api->render(array(
         'sunrise' =>
@@ -79,7 +79,7 @@ $api->get('/sunset/:latitude/:longitude(/:date)', function($latitude, $longitude
 /**
  *
  */
-$api->get('/daylight/(/:offset)', $checkLocation, function($offset=0) use ($api) {
+$api->get('/daylight(/:offset)', $checkLocation, function($offset=0) use ($api) {
     $offset *= 60; // Minutes to seconds
     $now     = time();
     $sunrise = date_sunrise($now, SUNFUNCS_RET_TIMESTAMP, $api->Latitude, $api->Longitude, 90, date('Z')/3600);

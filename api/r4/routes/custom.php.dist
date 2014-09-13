@@ -18,11 +18,11 @@
  *    http://wiki.volkszaehler.org/development/api/reference
  *
  */
-// $app->post('/data/vz/:guid', function($guid) use ($app) {
+// $api->post('/data/vz/:guid', function($guid) use ($api) {
 //     Channel::byGUID($guid)->write(
 //         array( 'data' => $app->request->post('value') ),
-//         $app->request->post('ts')
-//     ) && $app->halt(201);
+//         $api->request->post('ts')
+//     ) && $api->halt(201);
 // })->name('POST /data/vz/:guid')->help = array(
 //     'description' => 'Save a reading value from vzlogger (http://wiki.volkszaehler.org/software/controller/vzlogger)',
 //     'payload'     => '?ts=<timestamp>&value=<value>'

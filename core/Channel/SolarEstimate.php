@@ -25,14 +25,14 @@ class SolarEstimate extends InternalCalc {
         parent::before_read($request);
 
         // Only for today possible, not backwards
-        if ($this->end < strtotime('00:00')) return;
+        if ($this->end < strtotime('midnight')) return;
 
-        $childs = $this->getChilds();
-        $childCnt = count($childs);
+        // Only during daylight times today
+        $sunset = $this->config->getSunset($this->start);
+        if ($sunset < time()) return;
 
-        if ($childCnt == 0) return;
-
-        $days = $this->extra;
+        $child = $this->getChild(1);
+        $days  = $this->extra;
 
         // Get todays production, set field names to 0 and 1 for list(...)
         $sql = 'SELECT MIN(`data`) AS `0`
@@ -45,31 +45,21 @@ class SolarEstimate extends InternalCalc {
 
         list($Production1st,
              $ProductionLast,
-             $lastTimestampToday) = $this->db->queryRowArray($sql, $childs[0]->entity);
+             $lastTimestampToday) = $this->db->queryRowArray($sql, $child->entity);
 
         // Do we have still data today?
         if (!$lastTimestampToday) return;
 
         $ProductionToday = $ProductionLast - $Production1st;
 
-        // Base average value
-        $sql = 'SELECT MIN(`data`)
-                  FROM (SELECT ABS(AVG(`data`)) AS `data`
-                          FROM `pvlng_reading_num`
-                         WHERE `id` = {1}
-                            -- Align to ? days back 00:00
-                           AND `timestamp` > UNIX_TIMESTAMP(DATE_FORMAT(NOW() - INTERVAL {2} DAY, "%Y-%m-%d"))
-                            -- Align to today 00:00
-                           AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
-                         GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
-                        HAVING count(*) = {2}
-                        ) t';
-
-        $AverageBase = $this->db->queryOne($sql, $childs[0]->entity, $days);
-
         // Start average value to align data
-        $sql = 'SELECT MIN(`data`)
-                  FROM (SELECT ABS(AVG(`data`)) AS `data`
+        $sql = 'SELECT MIN(`data`) as `0`
+                       -- Average production
+                     , MAX(`data`) - MIN(`data`) as `1`
+                  FROM (
+                    SELECT * FROM (
+                            -- If there is more than one reading for a minute, consolidate to one!
+                        SELECT `timestamp`, AVG(`data`) AS `data`
                           FROM `pvlng_reading_num`
                          WHERE `id` = {1}
                             -- Align to ? days back 00:00
@@ -77,29 +67,41 @@ class SolarEstimate extends InternalCalc {
                             -- Align to today 00:00
                            AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
                            AND UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {3}
-                         GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
-                        HAVING count(*) = {2}
-                        ) t';
+                         GROUP BY `timestamp` DIV 60
+                    ) t1
+                 GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
+                HAVING count(*) = {2} ) t2';
 
-        $Average1st = $this->db->queryOne($sql, $childs[0]->entity, $days, $lastTimestampToday);
+        $sql = $this->db->sql($sql, $child->entity, $days, $lastTimestampToday);
+        list($Average1st, $Average) = $this->db->queryRowArray($sql);
+
+        // Scale todays production to average production last days
+        $scale = $ProductionToday / $Average / 2;
 
         // Estimated production from now
-        $sql = 'SELECT UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) AS `timestamp`
-                     , (ABS(AVG(`data`)) - {3}) * {4} + {5} AS `data`
-                  FROM `pvlng_reading_num`
-                 WHERE `id` = {1}
-                    -- Align to ? days back 00:00
-                   AND `timestamp` > UNIX_TIMESTAMP(DATE_FORMAT(NOW() - INTERVAL {2} DAY, "%Y-%m-%d"))
-                    -- Align to today 00:00
-                   AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
-                   AND UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {6}
-                 GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
+        $sql = 'SELECT UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "),
+                                             DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))
+                       ) AS `timestamp`
+                     , `data`
+                  FROM ( -- If there is more than one reading for a minute, consolidate to one!
+                         SELECT `timestamp`, (AVG(`data`) - {3}) * {4} + {5} AS `data`
+                           FROM `pvlng_reading_num`
+                          WHERE `id` = {1}
+                             -- Align to ? days back 00:00
+                            AND `timestamp` > UNIX_TIMESTAMP(DATE_FORMAT(NOW() - INTERVAL {2} DAY, "%Y-%m-%d"))
+                             -- Align to today 00:00
+                            AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
+                          GROUP BY `timestamp` DIV 60
+                       ) t
+                 WHERE UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {6}
+              GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
                 HAVING count(*) = {2}';
 
-        $res = $this->db->query($sql, $childs[0]->entity, $days, $Average1st, $ProductionToday/($Average1st-$AverageBase), $ProductionToday, $lastTimestampToday);
+        $sql = $this->db->sql($sql, $child->entity, $days, $Average1st, $scale, $ProductionToday, $lastTimestampToday);
+        $res = $this->db->query($sql);
 
         // Apply child resolution here
-        $Scale = $childs[0]->resolution;
+        $Scale = $child->resolution;
 
         if ($res) {
             while ($row = $res->fetch_object()) {
@@ -116,12 +118,10 @@ class SolarEstimate extends InternalCalc {
             }
         }
 
-        $sunset = $this->config->getSunset($this->start);
-
         if (isset($lastrow)) {
             // Add a last value at sunset
             $this->saveValue($sunset, $lastrow->data);
-        } elseif (time() < $sunset) {
+        } else {
             // Fill space at end with actual production
             $value = round($ProductionToday * $Scale, $this->decimals);
             $this->saveValue($lastTimestampToday, $value);
@@ -135,14 +135,13 @@ class SolarEstimate extends InternalCalc {
     protected function after_read( \Buffer $buffer ) {
 
         $datafile = new \Buffer;
-        $last = 0;
+        $last = FALSE;
 
         // Fake consumption
         foreach (parent::after_read($buffer) as $id=>$row) {
-            $row['consumption'] = $row['data'] - $last;
-            $last = $row['data'];
-
+            $row['consumption'] = $last ? $row['data'] - $last : 0;
             $datafile->write($row, $id);
+            $last = $row['data'];
         }
 
         // Now set to meter

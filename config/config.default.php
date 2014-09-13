@@ -184,6 +184,14 @@ return array(
             'ChartHeight' => 320,
         ),
 
+        'Weather' => array(
+            /**
+             * Wunderground API key
+             * http://www.wunderground.com/weather/api/
+             */
+            'APIkey' => ''
+        ),
+
     ),
 
     /**

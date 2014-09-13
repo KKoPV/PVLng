@@ -33,7 +33,7 @@
                 <td style="vertical-align:top">{{APIURL}}</td>
                 <td>
                     <code class="b">
-                        http://{SERVERNAME}/api/r4/
+                        http://{SERVERNAME}/api/latest/
                     </code>
                     <br /><br />
                     {{SeeAPIReference}}

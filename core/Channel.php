@@ -153,8 +153,7 @@ abstract class Channel {
         $childs = $this->getChilds(TRUE);
 
         // Root node (id == 1) accept always childs
-        if ($this->id == 1 OR
-            $this->childs == -1 OR count($this->getChilds()) < $this->childs) {
+        if ($this->id == 1 OR $this->childs == -1 OR count($childs) < $this->childs) {
             return NestedSet::getInstance()->insertChildNode($channel, $this->id);
         }
 
@@ -270,9 +269,10 @@ abstract class Channel {
             }
 
             $lastReading = $reading->getLastReading($this->entity, $timestamp);
-
-            // Check that new reading value is inside the threshold range
-            if ($this->threshold > 0 AND abs($this->value-$lastReading) > $this->threshold) {
+            // Check that new reading value is inside the threshold range,
+            // except 1st reading at all ($lastreading == NULL)
+            if ($this->threshold > 0 AND !is_null($lastReading) AND
+                abs($this->value-$lastReading) > $this->threshold) {
                 // Throw away invalid reading value
                 return 0;
             }
@@ -386,8 +386,9 @@ abstract class Channel {
                         // Raw data for non-numeric channels
                         $q->get('data');  break;
                     case $this->meter:
-                        // Max. value for meters
-                        $q->get($q->MAX('data'), 'data');  break;
+                        // Max./Min. value for meters
+                        $d = ($this->resolution > 0) ? $q->MAX('data') : $q->MIN('data');
+                        $q->get($d, 'data');  break;
                     case $this->counter:
                         // Summarize counter ticks
                         $q->get($q->SUM('data'), 'data');  break;
@@ -486,11 +487,11 @@ abstract class Channel {
      *
      */
     protected function SQLHeader( $request, $q ) {
-        if (!array_key_exists('sql', $request) OR !$request['sql']) return;
+        if (headers_sent() OR !array_key_exists('sql', $request) OR !$request['sql']) return;
 
         $sql = $this->name;
         if ($this->description) $sql .= ' (' . $this->description . ')';
-        Header('X-SQL-' . uniqid() . ': ' . $sql . ': ' . $q);
+        Header('X-SQL-' . uniqid() . ': ' . $sql . ': ' . preg_replace('~\n+~', ' ', $q));
     }
 
     /**
@@ -499,7 +500,7 @@ abstract class Channel {
     public function __destruct() {
         $time = (microtime(TRUE) - $this->time) * 1000;
 
-        Header(sprintf('X-Query-Time: %d ms', $time));
+        if (!headers_sent()) Header(sprintf('X-Query-Time: %d ms', $time));
 
         // Check for real action to log
         if ($this->performance->getAction()) {
@@ -658,7 +659,7 @@ abstract class Channel {
         }
 
         if (!isset($request['data']) OR !is_scalar($request['data'])) {
-            throw new Exception('Missing data value', 400);
+            throw new Exception($this->guid.' - Missing data value', 400);
         }
 
         // Check if a WRITEMAP::{...} exists to rewrite e.g. from numeric to non-numeric
@@ -809,8 +810,7 @@ abstract class Channel {
 
             if ($this->meter) {
                 /* check meter values raising */
-                if ($this->resolution > 0 AND $row['data'] < $last OR
-                    $this->resolution < 0 AND $row['data'] > $last) {
+                if ($this->resolution > 0 AND $row['data'] < $last) {
                     $row['data'] = $last;
                 }
                 $last = $row['data'];

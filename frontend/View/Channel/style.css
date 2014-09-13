@@ -8,7 +8,6 @@
 
 td.hint {
     font-size: 90%;
-    vertical-align: top;
     padding-top: .5em;
     padding-bottom: .5em;
 }
@@ -25,4 +24,30 @@ input.code,
 textarea.code {
     font-family: monospace;
     font-size: 120%;
+}
+
+.details {
+    background-color: #DDFFDD;
+    padding: .5em 1em !important;
+}
+
+.details div.attr {
+    float: left;
+    margin-right: 2em;
+    margin-bottom: .5em;
+}
+
+.details label {
+    display: block;
+    margin-bottom: .25em;
+    font-weight: bold;
+}
+
+td.details-control {
+    background: url('/images/ico/plus_circle_frame.png') no-repeat center center;
+    cursor: pointer;
+}
+
+tr.shown td.details-control {
+    background: url('/images/ico/minus_circle_frame.png') no-repeat center center;
 }
