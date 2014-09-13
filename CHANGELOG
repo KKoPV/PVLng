@@ -1,3 +1,35 @@
+ v2.12.0
+=========
+
+FIXED
+
+ - Fix calulation of 1st consumption value in Accumulator ~ Knut Kohl <github@knutkohl.de>
+ - Fix not creating grouping channel from template ~ Knut Kohl <github@knutkohl.de>
+ - Fix Solar estimate calculation, missing scale for better/worse days than average ~ Knut Kohl <github@knutkohl.de>
+ - Fix double load of routes/custom.php ~ Knut Kohl <github@knutkohl.de>
+ - Remove estimated output for diplay times after sunset ~ Knut Kohl <github@knutkohl.de>
+
+CHANGED
+
+ - Adjust Solar Edge handlers ~ Knut Kohl <github@knutkohl.de>
+ - Update Nginx config template for MemCache handling ~ Knut Kohl <github@knutkohl.de>
+ - Change icon legends from static below table to mouseover hint ~ Knut Kohl <github@knutkohl.de>
+ - Change processing indicator for "delete node" and "create alias" in Overview ~ Knut Kohl <github@knutkohl.de>
+ - Some updates in frontend ~ Knut Kohl <github@knutkohl.de>
+ - Some updates in channel classes ~ Knut Kohl <github@knutkohl.de>
+
+NEW
+
+ - Add additional namespace handling for config loads from file ~ Knut Kohl <github@knutkohl.de>
+ - Add central cron handler script for PVOutput export and Wunderground fetch ~ Knut Kohl <github@knutkohl.de>
+ - Add Weather module ~ Knut Kohl <github@knutkohl.de>
+ - Add filter channels by dropdown ~ Knut Kohl <github@knutkohl.de>
+ - Drafts for Solar Edge inverter & optimizer handling ~ Knut Kohl <github@knutkohl.de>
+ - Extend API with a "version" and "latest" route ~ Knut Kohl <github@knutkohl.de>
+ - Move Infoframe support files below View folder ~ Knut Kohl <github@knutkohl.de>
+ - Store chart height from URL parameter in cookie ~ Knut Kohl <github@knutkohl.de>
+ - Auto refresh chart on page comes to active only if date display range is not in the past ~ Knut Kohl <github@knutkohl.de>
+
  v2.11.0
 =========
 
