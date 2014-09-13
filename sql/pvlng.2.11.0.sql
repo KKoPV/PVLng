@@ -1,5 +1,5 @@
 --
--- For development branch only!
+-- v2.10.* > v2.11.0
 --
 
 DELIMITER ;;
