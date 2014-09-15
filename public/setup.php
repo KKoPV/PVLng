@@ -51,6 +51,7 @@ $config = array(
     'PHPExtensions' => array(
         'bcmath'   => 'BCMath support',
         'curl'     => 'cURL support',
+        'gd'       => 'Image processing',
         'json'     => 'JSON support',
         'mbstring' => 'Multibyte Support',
         'mysqli'   => 'MySQLi support',

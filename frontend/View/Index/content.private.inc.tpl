@@ -24,21 +24,23 @@
     <div id="tabs-1">
         <table id="data-table" class="dataTable treeTable">
             <thead>
-            <tr>
-                <th>
-                    <img id="treetoggle" src="/images/ico/toggle<!-- IF {VIEW} -->_expand<!-- ENDIF -->.png"
-                         class="ico tipbtn" tip="#tiptoggle" alt="[+]" />
-                    <div id="tiptoggle">{{CollapseAll}} (F4)</div>
-                </th>
-                <th class="l">
-                    <span class="indenter" style="padding-left: 0px;"></span>
-                    {{Channel}}
-                </th>
-                <th class="r">{{Amount}}</th>
-                <th class="l">{{Unit}}</th>
-                <th class="r" style="white-space:nowrap">{{Earning}} / {{Cost}}</th>
-                <th></th>
-            </tr>
+                <tr>
+                    <th>
+                        <img id="treetoggle" src="/images/ico/toggle<!-- IF {VIEW} -->_expand<!-- ENDIF -->.png"
+                             class="ico tipbtn" tip="#tiptoggle" alt="[+]" />
+                        <div id="tiptoggle">{{CollapseAll}} (F4)</div>
+                    </th>
+                    <th class="l">
+                        <span class="indenter" style="padding-left: 0px;"></span>
+                        {{Channel}}
+                    </th>
+                    <th class="r">{{Amount}}</th>
+                    <th class="l">{{Unit}}</th>
+                    <th class="r" style="white-space:nowrap">{{Earning}} / {{Cost}}</th>
+                    <th>
+                        <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
+                    </th>
+                </tr>
             </thead>
 
             <tbody>
@@ -80,18 +82,12 @@
                     <th colspan="3">&nbsp;</th>
                     <th class="l">{{Total}}:</th>
                     <th id="costs" style="padding-right:10px" class="r"></th>
-                    <th></th>
+                    <th>
+                        <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
+                    </th>
                 </tr>
             </tfoot>
         </table>
-
-        <div id="legend" class="icons">
-            <strong>{{Legend}}</strong>:
-            <span><img src="/images/ico/lock.png">{{PrivateChannel}}</span>,
-            <span><img src="/images/ico/chart.png">{{ChartSettingsTip}}</span>,
-            <span><img src="/images/ico/document-invoice.png">{{ListHint}}</span>,
-            <span><img src="/images/ico/node_design.png">{{EditEntity}}</span>
-        </div>
     </div>
 
     <div id="tabs-2">
@@ -121,4 +117,13 @@
         <div class="clear"></div>
     </div>
 
+</div>
+
+<div id="IconLegend">
+    <div class="icons legendtip">
+        <img src="/images/ico/lock.png">{{PrivateChannel}}<br />
+        <img src="/images/ico/chart.png">{{ChartSettingsTip}}<br />
+        <img src="/images/ico/document-invoice.png">{{ListHint}}<br />
+        <img src="/images/ico/node_design.png">{{EditEntity}}
+    </div>
 </div>

@@ -51,8 +51,8 @@
     <link rel="stylesheet" href="/css/default.jquery.css" />
     <link rel="stylesheet" href="/css/superfish.css" />
     <link rel="stylesheet" href="/css/tipTip.css" />
-    <link rel="stylesheet" href="/css/select2.css">
-    <link rel="stylesheet" href="/css/spectrum.css">
+    <link rel="stylesheet" href="/css/select2.css" />
+    <link rel="stylesheet" href="/css/spectrum.css" />
     <!-- With background images -->
     <link rel="stylesheet" href="/css/iCheck/flat.css" />
     <link rel="stylesheet" href="/css/iCheck/line.css" />
