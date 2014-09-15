@@ -32,6 +32,18 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
 /**
  *
  */
+$api->put('/data/raw/:guid', $APIkeyRequired, function($guid) use ($api) {
+    // Channel handles raw data
+    Channel::byGUID($guid)->write($api->request->getBody()) && $api->halt(201);
+})->name('put raw data')->help = array(
+    'since'       => 'r4',
+    'description' => 'Save raw data, channel decide what to do',
+    'apikey'      => TRUE
+);
+
+/**
+ *
+ */
 $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='', $p2='') use ($api) {
 
     $request = $api->request->get();
