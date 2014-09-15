@@ -220,12 +220,6 @@ $(function() {
     });
     oTable.rowReordering();
 
-    $.ajaxSetup({
-        beforeSend: function setHeader(xhr) {
-            xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
-        }
-    });
-
     Highcharts.setOptions({
         lang: {
             thousandsSep: '{TSEP}',

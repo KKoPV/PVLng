@@ -865,12 +865,6 @@ $(function() {
         }
     );
 
-    $.ajaxSetup({
-        beforeSend: function setHeader(xhr) {
-            xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
-        }
-    });
-
     /**
      * If a chart height is provided as URL parameter "height", remember in cookie
      */

@@ -21,12 +21,6 @@ var ChartOptions = {
 
 $(function() {
 
-    $.ajaxSetup({
-        beforeSend: function setHeader(xhr) {
-            xhr.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
-        }
-    });
-
     $('#table-info, #table-cache').DataTable({
         bSort: false
     });
@@ -81,7 +75,7 @@ $(function() {
             var options = ChartOptions;
             options.series[0].data = [
                 <!-- BEGIN STATS --><!-- IF {READINGS} -->
-                ['{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->', {raw:READINGS}],
+                ["{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->", {raw:READINGS}],
                 <!-- ENDIF --><!-- END -->
             ];
 

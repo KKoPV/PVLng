@@ -114,12 +114,6 @@ var listTable;
  */
 $(function() {
 
-    $.ajaxSetup({
-        beforeSend: function setHeader(XHR) {
-            XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey);
-        }
-    });
-
     if ($.datepicker.regional[language]) {
         $.datepicker.setDefaults($.datepicker.regional[language]);
     } else {

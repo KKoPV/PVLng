@@ -43,12 +43,12 @@ $(function() {
         }
     );
 
-    lscache.setBucket('Overview');
+    var sHN = 'Overview-HiddenNodes', sHNC = 'Overview-HiddenNodes-Collapsed';
 
-    var hiddenNodes = lscache.get('HiddenNodes') || [];
+    var hiddenNodes = lscache.get(sHN) || [];
     var pauseRedraw = false;
 
-    if (lscache.get('HiddenNodesCollapsed')) {
+    if (lscache.get(sHNC)) {
         $('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]').data('expanded', 0);
         $('#treetoggletip').html('{{ExpandAll}}');
     }
@@ -83,14 +83,14 @@ $(function() {
                 if (idx == -1) hiddenNodes.push(id);
             } else {
                 if (idx != -1) hiddenNodes.splice(idx, 1);
-                lscache.set('HiddenNodesCollapsed', false);
+                lscache.set(sHNC, false);
             }
-            lscache.set('HiddenNodes', hiddenNodes);
+            lscache.set(sHN, hiddenNodes);
         },
 
         onNodeInitialized: function() {
             /* check if the node is marked as collapsed */
-            if (lscache.get('HiddenNodesCollapsed') || this.settings.isCollapsed(this.id)) this.collapse();
+            if (lscache.get(sHNC) || this.settings.isCollapsed(this.id)) this.collapse();
         },
         onInitialized: function() {
             /* set callbacks here AFTER stripes are initialized */
@@ -123,14 +123,14 @@ $(function() {
                 oTable.treetable('collapseAll');
                 toggler.attr('src','/images/ico/toggle_expand.png').attr('alt','[+]').data('expanded', 0);
                 $('#treetoggletip').html('{{ExpandAll}}');
-                lscache.set('HiddenNodesCollapsed', true);
+                lscache.set(sHNC, true);
             } else {
                 hiddenNodes = [];
-                lscache.set('HiddenNodes', hiddenNodes);
+                lscache.set(sHN, hiddenNodes);
                 oTable.treetable('expandAll');
                 toggler.attr('src','/images/ico/toggle.png').attr('alt','[-]').data('expanded', 1);
                 $('#treetoggletip').html('{{CollapseAll}}');
-                lscache.set('HiddenNodesCollapsed', false);
+                lscache.set(sHNC, false);
             }
             pauseRedraw = false;
             oTable.fnDraw();
