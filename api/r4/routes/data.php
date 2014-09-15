@@ -21,7 +21,8 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
                  : strtotime($request['timestamp'])
                  )
                : NULL;
-    Channel::byGUID($guid)->write($request, $timestamp) && $api->halt(201);
+    $cnt = Channel::byGUID($guid)->write($request, $timestamp);
+    if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
 })->name('put data')->help = array(
     'since'       => 'r2',
     'description' => 'Save a reading value',
@@ -34,10 +35,11 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
  */
 $api->put('/data/raw/:guid', $APIkeyRequired, function($guid) use ($api) {
     // Channel handles raw data
-    Channel::byGUID($guid)->write($api->request->getBody()) && $api->halt(201);
+    $cnt = Channel::byGUID($guid)->write($api->request->getBody());
+    if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
 })->name('put raw data')->help = array(
     'since'       => 'r4',
-    'description' => 'Save raw data, channel decide what to do',
+    'description' => 'Save raw data, channel decide what to do with them',
     'apikey'      => TRUE
 );
 
