@@ -21,5 +21,13 @@ var PVLngVersion = '{VERSION}',
     latitude = {raw:LATITUDE},
     longitude = {raw:LONGITUDE},
 
-    verbose = '{VERBOSE',
+    verbose = '{VERBOSE}',
     user = '{USER}';
+
+if (user) {
+    $(function($) {
+        $.ajaxSetup({
+            beforeSend: function setHeader(XHR) { XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey) }
+        });
+    });
+}

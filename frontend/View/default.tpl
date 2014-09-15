@@ -175,10 +175,6 @@
         var overlay;
 
         $(function($) {
-            if (user) $.ajaxSetup({
-                beforeSend: function setHeader(XHR) { XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey) }
-            });
-
             $.extend($.fn.select2.defaults, {
                 minimumResultsForSearch: 10,
                 allowClear: true,
