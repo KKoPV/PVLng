@@ -35,7 +35,7 @@ return array(
             'type'        => 50, // Energy meter, absolute
             'name'        => 'E-Total',
             'description' => 'Energy production - ADJUST THE \'CHANNEL\' WITH REAL VALUES',
-            'channel'     => 'P<Inverter>.<String>.<Optimizer> E',
+            'channel'     => 'P<Inverter>.<String>.<Optimizer> E (Wh)',
             'resolution'  => 1,
             'unit'        => 'Wh',
             'decimals'    => 0,
@@ -47,7 +47,7 @@ return array(
             'type'        => 51, // Power sensor
             'name'        => 'Pdc',
             'description' => 'DC Power - ADJUST THE \'CHANNEL\' WITH REAL VALUES',
-            'channel'     => 'P<Inverter>.<String>.<Optimizer> P',
+            'channel'     => 'P<Inverter>.<String>.<Optimizer> P (W)',
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 0.001,
@@ -57,7 +57,7 @@ return array(
             'type'        => 53, // Current sensor
             'name'        => 'Idc',
             'description' => 'DC Current - ADJUST THE \'CHANNEL\' WITH REAL VALUES',
-            'channel'     => 'P<Inverter>.<String>.<Optimizer> I',
+            'channel'     => 'P<Inverter>.<String>.<Optimizer> I (A)',
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -67,7 +67,7 @@ return array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Udc1',
             'description' => 'DC Voltage panel - ADJUST THE \'CHANNEL\' WITH REAL VALUES',
-            'channel'     => 'P<Inverter>.<String>.<Optimizer> V',
+            'channel'     => 'P<Inverter>.<String>.<Optimizer> V (V)',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
@@ -77,7 +77,7 @@ return array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Udc2',
             'description' => 'DC Voltage optimizer - ADJUST THE \'CHANNEL\' WITH REAL VALUES',
-            'channel'     => 'OP<Inverter>.<String>.<Optimizer> V',
+            'channel'     => 'OP<Inverter>.<String>.<Optimizer> V (V)',
             'unit'        => 'V',
             'decimals'    => 1,
             'valid_from'  => 0.001,
