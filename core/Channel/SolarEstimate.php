@@ -55,7 +55,7 @@ class SolarEstimate extends InternalCalc {
         // Start average value to align data
         $sql = 'SELECT MIN(`data`) as `0`
                        -- Average production
-                     , MAX(`data`) - MIN(`data`) as `1`
+                     , (MAX(`data`) - MIN(`data`))*2 as `1`
                   FROM (
                     SELECT * FROM (
                             -- If there is more than one reading for a minute, consolidate to one!
@@ -75,8 +75,9 @@ class SolarEstimate extends InternalCalc {
         $sql = $this->db->sql($sql, $child->entity, $days, $lastTimestampToday);
         list($Average1st, $Average) = $this->db->queryRowArray($sql);
 
-        // Scale todays production to average production last days
-        $scale = $ProductionToday / $Average / 2;
+        // Scale todays production to average production last days,
+        // set to 1 if average == 0
+        $scale = $Average ? $ProductionToday / $Average : 1;
 
         // Estimated production from now
         $sql = 'SELECT UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "),
