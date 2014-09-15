@@ -29,7 +29,7 @@ return array(
         array(
             'type'        => 48, // Solar Edge Inverter
             'name'        => 'Solar Edge Inverter',
-            'description' => 'FILL THE \'SERIAL NUMBER\' WITH YOURS',
+            'description' => 'FILL THE SERIAL NUMBER WITH YOURS',
         ),
 
         // Real channels
@@ -67,7 +67,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac1',
-            'description' => 'DC Current string 1',
+            'description' => 'AC Current string 1',
             'channel'     => 'L1Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
@@ -98,7 +98,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac2',
-            'description' => 'DC Current string 2',
+            'description' => 'AC Current string 2',
             'channel'     => 'L2Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
@@ -129,7 +129,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac3',
-            'description' => 'DC Current string 3',
+            'description' => 'AC Current string 3',
             'channel'     => 'L3Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
