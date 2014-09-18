@@ -22,11 +22,11 @@ $(function() {
         bJQueryUI: true,
         bAutoWidth: false,
         aoColumns: [
-            { sWidth: '1%' },
-            { sWidth: '1%' },
             null,
             null,
             null,
+            null,
+            { sWidth: '99%' },
             null,
             null,
             { sWidth: '1%', sClass: 'details-control' }

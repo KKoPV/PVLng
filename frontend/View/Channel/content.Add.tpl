@@ -29,7 +29,9 @@
                 <th>{{EntityType}}</th>
                 <th style="white-space:nowrap">{{ExampleUnit}}</th>
                 <th style="white-space:nowrap">{{Childs}}</th>
-                <th style="width:1%"></th>
+                <th class="icons">
+                    <img src="/images/ico/information_frame.png" style="margin-right:-5px" class="tip" tip="#IconLegend" alt="?">
+                </th>
                 <th>{{Description}}</th>
                 <th>{{Select}}</th>
             </tr>
@@ -38,10 +40,9 @@
 
             <!-- BEGIN ENTITYTYPES -->
             <tr>
-                <td style="white-space:nowrap;font-weight:bold">
+                <td class="icons" style="white-space:nowrap;font-weight:bold">
                     <label for="type-{ID}">
-                        <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                             src="{ICON}" width="16" height="16" alt="" />
+                        <img style="vertical-align:middle;margin-right:8px" src="{ICON}" alt="" />
                         {NAME}
                     </label>
                 </td>
@@ -72,13 +73,6 @@
 
         </table>
 
-        <div id="legend" class="icons">
-            <strong>{{Legend}}</strong>:
-            <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
-            <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
-            <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>
-        </div>
-
     </div>
 
     <div id="template">
@@ -95,10 +89,9 @@
 
             <!-- BEGIN TEMPLATES -->
             <tr>
-                <td style="white-space:nowrap;font-weight:bold">
+                <td class="icons" style="white-space:nowrap;font-weight:bold">
                     <label for="{FILE}">
-                        <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                             src="{ICON}" width="16" height="16" alt="" />
+                        <img style="vertical-align:middle;margin-right:8px" src="{ICON}" alt="" />
                         {NAME}
                     </label>
                 </td>
@@ -124,4 +117,14 @@
 
     </div>
 
+</div>
+
+<!-- Legend -->
+
+<div id="IconLegend">
+    <div class="icons legendtip">
+        <img src="/images/ico/read-write.png">{{ReadWritableEntity}}<br />
+        <img src="/images/ico/write.png">{{WritableEntity}}<br />
+        <img src="/images/ico/read.png">{{ReadableEntity}}
+    </div>
 </div>

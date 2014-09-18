@@ -26,18 +26,30 @@ textarea.code {
     font-size: 120%;
 }
 
-.details {
-    background-color: #DDFFDD;
-    padding: .5em 1em !important;
+/* Borders for opened details row */
+tr.shown {
+    border-left:  dashed gray 1px;
+    border-top:   dashed gray 1px;
+    border-right: dashed gray 1px;
+    background-color: #E8E8E8 !important;
 }
 
-.details div.attr {
+td.details {
+    border-left:   dashed gray 1px;
+    border-right:  dashed gray 1px;
+    border-bottom: dashed gray 1px;
+    padding: .5em 1em !important;
+    padding-left: 120px !important;
+    background-color: #E8E8E8;
+}
+
+td.details div.attr {
     float: left;
     margin-right: 2em;
     margin-bottom: .5em;
 }
 
-.details label {
+td.details label {
     display: block;
     margin-bottom: .25em;
     font-weight: bold;

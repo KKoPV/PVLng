@@ -10,7 +10,7 @@
 -->
 
 <h3>
-    <img src="{ICON}" class="channel-icon" style="width:24px;height:24px" alt="" />
+    <img src="{ICON}" class="channel-icon-large" alt="">
     <strong>{TYPENAME}</strong>
 </h3>
 

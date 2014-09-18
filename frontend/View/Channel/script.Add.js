@@ -15,7 +15,7 @@
  */
 $(function() {
 
-    $('#typeTable').DataTable({
+    $('#typeTable').dataTable({
         bLengthChange: true,
         aLengthMenu: [ [20, 50, 100, -1], [20, 50, 100, '{{All}}'] ],
         iDisplayLength: 20,
@@ -27,7 +27,7 @@ $(function() {
             null,
             null,
             null,
-            { sWidth: '1%' },
+            { sWidth: '1%', sClass: 'c' },
             { bSortable: false },
             { bSortable: false, sWidth: '1%', sClass: 'c' }
         ],
@@ -38,8 +38,12 @@ $(function() {
         }
     });
 
-    $('#tplTable').DataTable({
+    $('#tplTable').dataTable({
+        bLengthChange: true,
         bFilter: true,
+        bInfo: true,
+        bPaginate: true,
+        sPaginationType: 'full_numbers',
         aoColumns: [
             null,
             { asSorting: false, sClass: 'p50' },

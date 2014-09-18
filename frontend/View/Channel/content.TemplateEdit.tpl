@@ -1,5 +1,8 @@
-<!-- IF {GROUPICON} -->
-<h3><img src="{GROUPICON}"> &nbsp; {GROUPTYPE}</h3>
+<!-- IF {GROUPTYPE} -->
+<h3>
+    <img src="{GROUPICON}" class="channel-icon-large" alt="">
+    {GROUPTYPE}
+</h3>
 <!-- ENDIF -->
 
 <form method="post">
@@ -10,8 +13,8 @@
 
     <thead>
     <tr>
-        <th></th>
-        <th></th>
+        <th style="width:40px !important"></th>
+        <th style="width:70px !important"></th>
         <th class="l">{{Name}}</th>
         <th class="l">{{Channel::Description}}</th>
         <th class="l">{{Channel::Resolution}}</th>
@@ -26,12 +29,13 @@
     <!-- BEGIN CHANNELS -->
 
     <tr>
-        <td>
-            <input type="checkbox" name="a[{_LOOP}]" class="iCheck" checked="checked"
-                   <!-- IF {_LOOP} == "0" --> disabled="disabled"<!-- ENDIF -->
+        <td class="tip" title="{{Create}}">
+            <input type="checkbox" name="a[{_LOOP}]" class="iCheck tip" checked="checked"
+                   <!-- IF {_LOOP} == "0" --> disabled="disabled"<!-- ENDIF --> >
         </td>
-        <td style="white-space:nowrap">
+        <td style="white-space:nowrap;font-weight:bold">
             <input type="hidden" name="p[{_LOOP}][icon]" value="{ICON}">
+            <!-- IF {__GROUPTYPE} -->
             <!-- IF {_LOOP} == "0" -->
             <br />
             <img src="{ICON}" class="ico tip" title="{_TYPE}"><br />
@@ -45,6 +49,9 @@
                     &nbsp;<tt>'&mdash;</tt>&nbsp; <img src="{ICON}" class="ico tip" title="{_TYPE}"><br />
                     &nbsp;
                 <!-- ENDIF -->
+            <!-- ENDIF -->
+            <!-- ELSE -->
+            <img src="{ICON}" class="ico tip" title="{_TYPE}">
             <!-- ENDIF -->
         </td>
         <td>
@@ -68,7 +75,7 @@
                    <!-- IF !{PUBLIC} -->checked="checked"<!-- ENDIF -->>
         </td>
         <td class="tip" title="More attributes">
-            <span style="display:none">
+            <span style="margin-left:110px;display:none">
 
                 <div class="attr">
                     <label for="p{_LOOP}serial">{{Channel::Serial}}</label>
@@ -114,19 +121,23 @@
     </tbody>
 </table>
 
-<br />
-{{Overview}}: &nbsp;
-<select name="tree">
-    <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
-    <option value="0" disabled="disabled">{{AsChild}}</option>
-    <!-- BEGIN ADDTREE -->
-        <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>
-            {INDENT}{NAME}
-        </option>
-    <!-- END -->
-</select>
+<p>
+    <!-- IF {GROUPTYPE} -->
+    {{Overview}}: &nbsp;
+    <select name="tree">
+        <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
+        <option value="0" disabled="disabled">{{AsChild}}</option>
+        <!-- BEGIN ADDTREE -->
+            <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>
+                {INDENT}{NAME}
+            </option>
+        <!-- END -->
+    </select>
 
-&nbsp;
-<input type="submit" value="{{Create}}" />
+    &nbsp;
+    <!-- ENDIF -->
+
+    <input type="submit" value="{{Create}}" />
+</p>
 
 </form>

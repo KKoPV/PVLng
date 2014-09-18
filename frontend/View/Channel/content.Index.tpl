@@ -27,7 +27,7 @@
             <img src="/images/ico/drive.png" alt="?">
         </th>
         <th class="icons">
-            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
+            <img src="/images/ico/information_frame.png" style="margin-left:10px" class="tip" tip="#IconLegend" alt="?">
         </th>
     </tr>
     </thead>
