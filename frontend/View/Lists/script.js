@@ -50,17 +50,24 @@ function updateList() {
         },
         function(data) {
             /* pop out 1st row with attributes */
-            channel = data.shift();
-/*
-            _log('Attributes', channel);
-            _log('Data', data);
-*/
+            var channel = data.shift();
+
+            /* Only real channels allow deletion for readings */
+            if (channel.childs == 0 && channel.write == 1) {
+                /* Prepare delete icon */
+                var icon = '<img src="/images/ico/minus_circle.png" class="delete-reading btn tip" title="{{DeleteReading}}" ';
+            }
+
             $('#icon').prop('src', channel.icon).prop('title', channel.type).tipTip();
             $('#icon-private').toggle(!channel.public);
             $('#editentity').data('guid',channel.guid).show();
-            $('.export').button( 'option', 'disabled', data.length == 0);
+            $('.export').button('option', 'disabled', data.length == 0);
 
             $(data).each(function(id, row) {
+                var delbtn=null;
+                if (icon) {
+                    delbtn = icon + 'data-timestamp="' + row.timestamp + '" data-value="' + row.data + '">';
+                }
                 listTable.fnAddData(
                     [
                         row.datetime.substr(0, dtLen[period]),
@@ -70,7 +77,7 @@ function updateList() {
                         channel.numeric ? +row.max.toFixed(channel.decimals) : null,
                         channel.numeric ? +row.consumption.toFixed(channel.decimals) : null,
                         row.count,
-                        period ? '' : '<img class="delete-reading" class="tip" title="{{DeleteReading}}" src="/images/ico/minus_circle.png" data-timestamp="'+row.timestamp+'" data-value="'+row.data+'" />'
+                        delbtn
                     ],
                     false
                 );
@@ -114,12 +121,6 @@ var listTable;
  */
 $(function() {
 
-    if ($.datepicker.regional[language]) {
-        $.datepicker.setDefaults($.datepicker.regional[language]);
-    } else {
-        $.datepicker.setDefaults($.datepicker.regional['']);
-    }
-
     var d = new Date();
 
     $('#from').datepicker({
@@ -148,7 +149,7 @@ $(function() {
         }
     }).datepicker('setDate', d);
 
-    listTable = $('#list').DataTable({
+    listTable = $('#list').dataTable({
         bDeferRender: true,
         bProcessing: true,
         bLengthChange: true,
@@ -166,7 +167,7 @@ $(function() {
             { sClass: 'r' },
             { sClass: 'r' },
             { sClass: 'r' },
-            { sWidth: '1%', bSortable: false }
+            { sClass: 'c', sWidth: '1%', bSortable: false }
         ],
         aaSorting: [[ 0, 'desc' ]],
         fnInitComplete: function(oSettings, json) {
@@ -187,7 +188,7 @@ $(function() {
             $('#tf-consumption').html(consumption.toFixed(channel.decimals));
         },
         fnDrawCallback: function(oSettings) {
-            $('img.delete-reading').button();
+            $('img.delete-reading').button().tipTip();
         }
     });
 

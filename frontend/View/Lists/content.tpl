@@ -57,7 +57,7 @@
         <th class="r">{{Maximum}}</th>
         <th class="r">{{Production}} / {{Consumption}}</th>
         <th class="r tip" title="{{RowCountHint}}">{{RowCount}}</th>
-        <th><img src="/images/ico/minus_circle.png" /></th>
+        <th><img src="/images/ico/minus_circle.png" style="margin-right:-10px"></th>
     </tr>
     </thead>
 

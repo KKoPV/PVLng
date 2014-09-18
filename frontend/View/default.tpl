@@ -175,6 +175,7 @@
         var overlay;
 
         $(function($) {
+
             $.extend($.fn.select2.defaults, {
                 minimumResultsForSearch: 10,
                 allowClear: true,
@@ -192,7 +193,10 @@
             $('#container').show();
 
             $('select').select2();
-            $(".ui-tabs").tabs();
+            $('.ui-tabs').tabs({
+                /* Selects on hidden tabs must recreated on tab activation */
+                activate: function( event, ui ) { $('select', this).select2() }
+            });
             $('label.autowidth').autoWidth();
 
             var ta = $('textarea');

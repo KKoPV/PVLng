@@ -184,6 +184,14 @@ img.channel-icon {
     margin-right: 8px !important;
 }
 
+img.channel-icon-large {
+    width: 24px;
+    height: 24px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    margin-right: 12px !important;
+}
+
 td.imgbar {
     white-space: nowrap;
 }

@@ -181,6 +181,7 @@ abstract class Channel {
                 $parent['entity']
             );
         }
+        return TRUE;
     }
 
     /**

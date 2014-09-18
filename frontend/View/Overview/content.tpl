@@ -42,24 +42,7 @@
         </th>
         <th></th>
         <th>
-            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
-            <div id="IconLegend">
-            <div class="icons legendtip">
-                <img src="/images/ico/lock.png">{{PrivateChannel}}<br />
-                <img src="/images/ico/plus_circle_frame.png">{{AddOneToManyChannels}}<br />
-                <img src="/images/ico/node_insert_next.png">{{AssignEntity}}<br />
-                <img src="/images/ico/node_delete_next.png">{{DeleteEntity}}<br />
-                <img src="/images/ico/node_delete.png">{{DeleteBranch}}<br />
-                <img src="/images/ico/navigation_180_frame.png">{{MoveEntityLeft}}<br />
-                <img src="/images/ico/navigation_090_frame.png">{{MoveEntityUp}}<br />
-                <img src="/images/ico/navigation_270_frame.png">{{MoveEntityDown}}<br />
-                <img src="/images/ico/document-invoice.png">{{ListHint}}<br />
-                <img src="/images/ico/node_design.png">{{EditEntity}}<br />
-                <img src="/images/ico/node_select_child.png">{{CloneEntity}}<br />
-                <img src="/images/ico/arrow-split.png">{{AliasEntity}}<br />
-                <img src="/images/ico/license-key.png">{{ShowGUID}}
-            </div>
-            </div>
+            <img src="/images/ico/information_frame.png" style="margin-left:10px" class="tip" tip="#IconLegend" alt="?">
         </th>
     </tr>
     </thead>
@@ -175,7 +158,27 @@
     <tfoot>
 </table>
 
-<!-- Dialogs ------------------------------------------------------------- -->
+<!-- Legend -->
+
+<div id="IconLegend">
+    <div class="icons legendtip">
+        <img src="/images/ico/lock.png">{{PrivateChannel}}<br />
+        <img src="/images/ico/plus_circle_frame.png">{{AddOneToManyChannels}}<br />
+        <img src="/images/ico/node_insert_next.png">{{AssignEntity}}<br />
+        <img src="/images/ico/node_delete_next.png">{{DeleteEntity}}<br />
+        <img src="/images/ico/node_delete.png">{{DeleteBranch}}<br />
+        <img src="/images/ico/navigation_180_frame.png">{{MoveEntityLeft}}<br />
+        <img src="/images/ico/navigation_090_frame.png">{{MoveEntityUp}}<br />
+        <img src="/images/ico/navigation_270_frame.png">{{MoveEntityDown}}<br />
+        <img src="/images/ico/document-invoice.png">{{ListHint}}<br />
+        <img src="/images/ico/node_design.png">{{EditEntity}}<br />
+        <img src="/images/ico/node_select_child.png">{{CloneEntity}}<br />
+        <img src="/images/ico/arrow-split.png">{{AliasEntity}}<br />
+        <img src="/images/ico/license-key.png">{{ShowGUID}}
+    </div>
+</div>
+
+<!-- Dialogs -->
 
 <div id="dialog-addchild" style="display:none" title="{{AddChild}}">
     <p>

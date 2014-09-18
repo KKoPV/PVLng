@@ -53,6 +53,8 @@ var lastModule, hideMenuTimer;
  */
 $(function() {
 
+    $.datepicker.setDefaults($.datepicker.regional[$.datepicker.regional[language] ? language : '']);
+
     /* Inititilize Pines Notify */
     $.pnotify.defaults.styling = 'jqueryui';
     $.pnotify.defaults.delay = 5000;

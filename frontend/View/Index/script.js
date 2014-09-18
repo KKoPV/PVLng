@@ -883,15 +883,6 @@ $(function() {
     }
     chartOptions.chart.height = ChartHeight;
 
-    /**
-     * Configure date picker elements
-     */
-    if ($.datepicker.regional[language]) {
-        $.datepicker.setDefaults($.datepicker.regional[language]);
-    } else {
-        $.datepicker.setDefaults($.datepicker.regional['']);
-    }
-
     var d = qs.date ? new Date(qs.date) : new Date();
 
     $("#from").datepicker({

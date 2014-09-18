@@ -131,7 +131,7 @@
         </tr>
         <tr class="even">
             <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
-            <td>
+            <td class="not-bar">
                 <!-- Align controls correct using a table ... -->
                 <table><tr>
                 <td style="padding-left:0">
