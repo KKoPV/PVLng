@@ -33,10 +33,10 @@ $api->put('/tree/alias/:id', $APIkeyRequired, function($id) use ($api) {
  * Remove a node from channel tree
  */
 $api->delete('/tree/:id', $APIkeyRequired, function($id) use ($api) {
-    if (Channel::ById($id)->removeFromTree()) {
+    if (Channel::ById($id, FALSE)->removeFromTree()) {
         $api->halt(204);
     } else {
-        $api->stopAPI('Unable to delete node '.$node);
+        $api->stopAPI('Unable to delete node '.$id);
     }
 })->name('DELETE /tree/:id')->help = array(
     'since'       => 'r4',
