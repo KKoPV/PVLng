@@ -199,12 +199,12 @@ var pvlng = new function() {
 
         var from = new Date(Date.parse($('#from').datepicker('getDate')) + dir),
             to = new Date(Date.parse($('#to').datepicker('getDate')) + dir);
-
+/*
         if (to > new Date) {
             $.pnotify({ type: 'info', text: "Can't go beyond today." });
             return;
         }
-
+*/
         $('#from').datepicker('option', 'maxDate', to).datepicker('setDate', from);
         $('#to').datepicker('option', 'minDate', from).datepicker('setDate', to);
 
