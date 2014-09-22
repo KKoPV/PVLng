@@ -14,7 +14,7 @@
 $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
     $request = json_decode($api->request->getBody(), TRUE);
     // Check request for 'timestamp' attribute, take as is if numeric,
-    // otherwise try to convert datetime to timestamp
+    // otherwise convert datetime to timestamp
     $timestamp = isset($request['timestamp'])
                ? ( is_numeric($request['timestamp'])
                  ? $request['timestamp']
@@ -23,11 +23,33 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
                : NULL;
     $cnt = Channel::byGUID($guid)->write($request, $timestamp);
     if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
-})->name('put data')->help = array(
+})->name('PUT /data/:guid')->help = array(
     'since'       => 'r2',
     'description' => 'Save a reading value',
     'apikey'      => TRUE,
     'payload'     => array('{"data":"<value>"}' => 'JSON encoded value'),
+);
+
+/**
+ *
+ */
+$api->post('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
+    $request = json_decode($api->request->getBody(), TRUE);
+    // Check request for 'timestamp' attribute, take as is if numeric,
+    // otherwise convert datetime to timestamp
+    $timestamp = isset($request['timestamp'])
+               ? ( is_numeric($request['timestamp'])
+                 ? $request['timestamp']
+                 : strtotime($request['timestamp'])
+                 )
+               : FALSE;
+    if (!$timestamp) $api->stopAPI('Timestamp required for data update', 400);
+    Channel::byGUID($guid)->write($request, $timestamp, TRUE);
+})->name('POST /data/:guid')->help = array(
+    'since'       => 'r4',
+    'description' => 'Update a reading value, timestamp is required here',
+    'apikey'      => TRUE,
+    'payload'     => array('{"data":"<value>","timestamp":"<timestamp>"}' => 'JSON encoded value'),
 );
 
 /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * Detect latest API version and run it
+ * Run latest API version
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012-2014 Knut Kohl
@@ -8,12 +8,6 @@
  * @version    1.0.0
  */
 
-// Search version directories
-$version = glob('..'.DIRECTORY_SEPARATOR.'r*', GLOB_ONLYDIR);
+$version = file_get_contents('..'.DIRECTORY_SEPARATOR.'.latest');
 
-// Get last one ...
-$version = array_pop($version);
-// and split
-$version = explode(DIRECTORY_SEPARATOR, $version);
-
-include '..'.DIRECTORY_SEPARATOR.array_pop($version).DIRECTORY_SEPARATOR.'index.php';
+include '..'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.'index.php';
