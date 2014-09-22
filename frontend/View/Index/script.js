@@ -624,24 +624,20 @@ function updateChart( forceUpdate, scroll ) {
                 }
 
                 $(data).each(function(id, row) {
-                    var time;
+                    if (channel.type == 'scatter') {
+                        /* Show scatters at their real timestamps, ALSO for consolidated data */
+                        var point = { x: row.timestamp * 1000 };
+                    } else {
+                        var point = { x: Math.round(row.timestamp / res) * res * 1000 };
+                    }
 
                     /* Check time range channels, only if not full day 00:00 .. 24:00 */
                     if (channel.time2-channel.time1 < 86400 && fromDate == toDate) {
                         /* Get todays seconds from timestamp */
                         date.setTime(row.timestamp * 1000);
-                        time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
+                        var time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
                         /* Skip data outside display time range */
                         if (time < channel.time1 || time > channel.time2) return;
-                    }
-
-                    var point = {};
-
-                    if (channel.type == 'scatter') {
-                        /* Show scatters at their real timestamps, ALSO for consolidated data */
-                        point.x = row.timestamp * 1000;
-                    } else {
-                        point.x = Math.round(row.timestamp / res) * res * 1000;
                     }
 
                     if ($.isNumeric(row.data)) {
@@ -901,7 +897,7 @@ $(function() {
     $("#to").datepicker({
         altField: '#todate',
         altFormat: 'mm/dd/yy',
-        maxDate: 0,
+        maxDate: 1,
         showButtonPanel: true,
         showWeek: true,
         changeMonth: true,
@@ -1251,7 +1247,7 @@ $(function() {
                         today = ('0'+(d.getMonth()+1)).slice(-2) + '/' +
                                 ('0'+d.getDate()).slice(-2) + '/' +
                                 d.getFullYear();
-                    if ($('#todate').val() == today) {
+                    if ($('#todate').val() >= today) {
                         setTimeout(function() {
                             /* Scroll to navigation as top most visible element */
                             if (chart) pvlng.scroll('#nav');

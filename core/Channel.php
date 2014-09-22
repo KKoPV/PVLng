@@ -10,6 +10,11 @@
 abstract class Channel {
 
     /**
+     * Allow for the channel data update
+     */
+    public $AllowUpdate = FALSE;
+
+    /**
      * Mark that a channel is used as sub channel for readout
      */
     public $isChild = FALSE;
@@ -141,6 +146,14 @@ abstract class Channel {
     }
 
     /**
+     * Run additional code before channel will be added to hierarchy
+     * Return FALSE to skip
+     */
+    public static function beforeAdd2Tree( $parent ) {
+        return TRUE;
+    }
+
+    /**
      * Run additional code after channel was created / changed
      * If $tree is set, channel was just created
      */
@@ -154,10 +167,14 @@ abstract class Channel {
 
         // Root node (id == 1) accept always childs
         if ($this->id == 1 OR $this->childs == -1 OR count($childs) < $this->childs) {
-            return NestedSet::getInstance()->insertChildNode($channel, $this->id);
+            $c = new ORM\ChannelView($channel);
+            $model = $c->ModelClass();
+            if ($model::beforeAdd2Tree($this)) {
+                return NestedSet::getInstance()->insertChildNode($channel, $this->id);
+            }
+        } else {
+            Messages::Error(__('AcceptChild', $this->childs, $this->name), 400);
         }
-
-        Messages::Error(__('AcceptChild', $this->childs, $this->name), 400);
     }
 
     /**
@@ -285,7 +302,7 @@ abstract class Channel {
         }
 
         // Write performance only for "real" savings if the program flow
-        // can to here and not returned earlier
+        // came to here and not returned earlier
         $this->performance->setAction('write');
 
         $rc = $reading
@@ -294,9 +311,61 @@ abstract class Channel {
               ->setData($this->value)
               ->insert();
 
+        if ($rc == 0 and $this->AllowUpdate) {
+            $rc = $this->update($request, $timestamp);
+        }
+
         if ($rc) Hook::process('data.save.after', $this);
 
         return $rc;
+    }
+
+    /**
+     *
+     */
+    public function update( $request, $timestamp ) {
+
+        $this->check_before_write($request);
+
+        // Default behavior
+        $reading = ORM\Reading::factory($this->numeric);
+
+        if ($this->numeric) {
+            // Check that new value is inside the valid range
+            if ((!is_null($this->valid_from) AND $this->value < $this->valid_from) OR
+                (!is_null($this->valid_to)   AND $this->value > $this->valid_to)) {
+
+                $msg = sprintf('Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
+                               $this->value, $this->valid_from, $this->valid_to);
+
+                $cfg = new ORM\Config('LogInvalid');
+
+                if ($cfg->value != 0) ORM\Log::save($this->name, $msg);
+
+                throw new Exception($msg, 200);
+            }
+
+            $lastReading = $reading->getLastReading($this->entity, $timestamp);
+            // Check that new reading value is inside the threshold range,
+            // except 1st reading at all ($lastreading == NULL)
+            if ($this->threshold > 0 AND !is_null($lastReading) AND
+                abs($this->value-$lastReading) > $this->threshold) {
+                // Throw away invalid reading value
+                return 0;
+            }
+
+            // Check that new meter reading value can't be lower than before
+            if ($this->meter AND $lastReading AND $this->value < $lastReading) {
+                return 0;
+            }
+        }
+
+        // Write performance only for "real" savings if the program flow
+        // can to here and not returned earlier
+        $this->performance->setAction('update');
+
+        $reading->filterByIdTimestamp($this->entity, $timestamp)->findOne();
+        return $reading->getId() ? $reading->setData($this->value)->update() : 0;
     }
 
     /**
@@ -478,9 +547,9 @@ abstract class Channel {
                     $q->filter('timestamp', array('min'=>$this->start-$this->TimestampMeterOffset[$this->period[1]]));
                 }
             }
-            if ($this->end < time()) {
+       #     if ($this->end < time()) {
                 $q->filter('timestamp', array('max'=>$this->end-1));
-            }
+       #     }
         }
     }
 
@@ -652,24 +721,9 @@ abstract class Channel {
     /**
      *
      */
-    protected function before_write( $request ) {
+    protected function before_write( &$request ) {
 
-        if (!$this->write) {
-            throw new \Exception('Can\'t write data to '.$this->name.', '
-                                .'instance of '.get_class($this), 400);
-        }
-
-        if (!isset($request['data']) OR !is_scalar($request['data'])) {
-            throw new Exception($this->guid.' - Missing data value', 400);
-        }
-
-        // Check if a WRITEMAP::{...} exists to rewrite e.g. from numeric to non-numeric
-        if (preg_match('~^WRITEMAP::(.*?)$~m', $this->comment, $args) AND
-            $map = json_decode($args[1], TRUE)) {
-            $request['data'] = ($_=&$map[$request['data']]) ?: 'unknown ('.$request['data'].')';
-        }
-
-        $this->value = $request['data'];
+        $this->check_before_write($request);
 
         Hook::process('data.save.before', $this);
 
@@ -875,5 +929,31 @@ abstract class Channel {
      *
      */
     private $_childs;
+
+    /**
+     * Essential checks before write data
+     */
+    private function check_before_write( &$request ) {
+
+        if (!$this->write) {
+            throw new \Exception(
+                'Can\'t write data to '.$this->name.', instance of '.get_class($this),
+                400
+            );
+        }
+
+        if (!isset($request['data']) OR !is_scalar($request['data'])) {
+            throw new Exception($this->guid.' - Missing data value', 400);
+        }
+
+        // Check if a WRITEMAP::{...} exists to rewrite e.g. from numeric to non-numeric
+        if (preg_match('~^WRITEMAP::(.*?)$~m', $this->comment, $args) AND
+            $map = json_decode($args[1], TRUE)) {
+            $request['data'] = ($_=&$map[$request['data']]) ?: 'unknown ('.$request['data'].')';
+        }
+
+        $this->value = $request['data'];
+
+    }
 
 }

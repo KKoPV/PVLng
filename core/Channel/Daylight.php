@@ -29,7 +29,8 @@ class Daylight extends InternalCalc {
     public static function checkData( Array &$fields, $add2tree ) {
         if ($ok = parent::checkData($fields, $add2tree)) {
             if ($fields['resolution']['VALUE'] == 1 AND $fields['extra']['VALUE'] == '') {
-                $fields['extra']['ERROR'][] = __('model::Daylight_IrradiationIsRequired');
+                $fields['resolution']['ERROR'][] = __('model::Daylight_IrradiationIsRequired');
+                $fields['extra']['ERROR'][]      = __('model::Daylight_seeAbove');
                 $ok = FALSE;
             }
         }
@@ -96,9 +97,7 @@ class Daylight extends InternalCalc {
               ->group('`timestamp` DIV 86400');
 
             // Select average of inner select
-            $q = 'SELECT '.$q->AVG('data').' FROM ('.$q->SQL().') t';
-
-            $this->resolution = $this->db->queryOne($q);
+            $this->resolution = $this->db->queryOne('SELECT '.$q->AVG('data').' FROM ('.$q->SQL().') t');
         }
 
         // Get marker icons to $Icon_sunrise, $Icon_zenit, $Icon_sunset
@@ -120,20 +119,23 @@ class Daylight extends InternalCalc {
                 // Daylight curve
                 $daylight = $sunset - $sunrise;
 
-                if ($this->TimestampMeterOffset[$this->period[1]]) {
+                if ($sec = $this->TimestampMeterOffset[$this->period[1]]) {
                     // Calculate exact stepping during daylight times
-                    $range = $this->period[0] * $this->TimestampMeterOffset[$this->period[1]];
-                    if ($range > $daylight) $range = $daylight;
-                    $step = floor($daylight / $range);
-                    $step = $daylight / $step;
+                    $step = $this->period[0] * $sec;
                 } else {
                     $step = 60;
                 }
 
-                do {
+                // Set start point
+                $this->saveValue($sunrise, 0);
+                // Align to step
+                $sunrise = floor($sunrise / $step) * $step + $step;
+                while ($sunrise < $sunset) {
                     $this->saveValue($sunrise, sin(($sunset-$sunrise) * M_PI / $daylight));
                     $sunrise += $step;
-                } while ($sunrise <= $sunset+1);
+                }
+                // Set end point
+                $this->saveValue($sunset, 0);
             }
 
             $day += 24*60*60;

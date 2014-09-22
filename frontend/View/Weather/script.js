@@ -77,13 +77,8 @@ $(function() {
 
             var html = new htmlhelper($('table tbody', '#content'));
 
-            /* Hourly forecast, ONLY today and tomorrow */
-            var day = 1;
-
+            /* Hourly forecast */
             $.each(response.hourly_forecast, function(id, data) {
-                if (data.FCTTIME.hour == 0) day++;
-                if (day > 2) return;
-
                 /* https://www.utexas.edu/depts/grg/kimmel/nwsforecasts.html
                    "sky" is the amount expected to be covered by opaque clouds, the type that
                    do not allow other clouds, or blue sky to be visible through or above them.
@@ -95,6 +90,14 @@ $(function() {
                    Fair                         Less than 40% cloud cover, no
                                                 precipitation and no extreme weather */
                 var rgb = 255 - (data.sky * 255 / 100).toFixed(0);
+
+                if (data.FCTTIME.hour == 0) {
+                    html.add(
+                        html.td('<strong>'+data.FCTTIME.weekday_name_abbrev+'<strong>')
+                            .prop('rowspan', 4)
+                            .css({ backgroundColor: '#F0F0F0' })
+                    );
+                }
 
                 html.add(
                     html.td($('<img/>').prop('src', data.icon_url).css({ width: '50px', height: '50px' })),

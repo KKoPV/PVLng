@@ -9,18 +9,14 @@
  */
 -->
 
+<!-- IF {TYPEHELP} -->
+<p id="typehelp">{TYPEHELP}</p>
+<!-- ENDIF -->
+
 <h3>
     <img src="{ICON}" class="channel-icon-large" alt="">
     <strong>{TYPENAME}</strong>
 </h3>
-
-<!-- IF {TYPEHELP} -->
-<p>
-    <strong><img src="/images/ico/exclamation-circle.png"
-        style="width:16px;height:16px;margin-right:8px" width="16" height="16" alt="!"/></strong>
-    <em>{TYPEHELP}</em>
-</p>
-<!-- ENDIF -->
 
 <form action="/channel/edit" method="post">
 
@@ -47,7 +43,7 @@
 
     <!-- IF {VISIBLE} -->
     <tr <!-- IF {ERROR} -->style="background-color:#FFE0E0;border-top:solid 1px white;border-bottom:solid 1px white"<!-- ENDIF -->>
-        <td style="vertical-align:top;padding-top:.75em">
+        <td style="vertical-align:top;padding-top:.75em;white-space:nowrap">
             <label for="{FIELD}">{NAME}</label>
             <!-- IF {REQUIRED} -->
                 <img class="ico" src="/images/required.gif" alt="*">
@@ -112,7 +108,7 @@
             <!-- ENDIF -->
             </div>
             <span style="color:red" class="xs">
-                <!-- BEGIN ERROR --><br class="clear" />{ERROR}<!-- END -->
+                <!-- BEGIN ERROR -->{ERROR}<br class="clear" /><!-- END -->
             </span>
         </td>
         <td class="hint">

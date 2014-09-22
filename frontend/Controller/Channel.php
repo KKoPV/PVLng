@@ -94,28 +94,6 @@ class Channel extends \Controller {
     /**
      *
      */
-    public function AddPOST_Action() {
-
-        if (($type = $this->request->post('type')) == '') return;
-
-        $this->prepareFields($type);
-
-        $this->view->Type = $type;
-
-        // Preset channel unit
-        $type = new \ORM\ChannelType($type);
-        $this->fields['unit']['VALUE'] = $type->getUnit();
-
-        $model = $type->ModelClass();
-        $model::beforeCreate($this->fields);
-
-        $this->ignore_returnto = TRUE;
-        $this->app->foreward('Edit');
-    }
-
-    /**
-     *
-     */
     public function TemplatePOST_Action() {
 
         if (($template = $this->request->post('template')) == '') return;
@@ -256,6 +234,29 @@ class Channel extends \Controller {
     /**
      *
      */
+    public function AddPOST_Action() {
+
+        if (($type = $this->request->post('type')) == '') return;
+
+        $this->prepareFields($type);
+
+        $this->view->Type = $type;
+
+        // Preset channel unit
+        $type = new \ORM\ChannelType($type);
+        $this->fields['name']['VALUE'] = $type->getName();
+        $this->fields['unit']['VALUE'] = $type->getUnit();
+
+        $model = $type->ModelClass();
+        $model::beforeCreate($this->fields);
+
+        $this->ignore_returnto = TRUE;
+        $this->app->foreward('Edit');
+    }
+
+    /**
+     *
+     */
     public function Add_Action() {
         $this->view->SubTitle = __('CreateChannel');
 
@@ -357,7 +358,6 @@ class Channel extends \Controller {
             if (isset($channel['type-new'])) $channel['type'] = $channel['type-new'];
 
             $type  = new \ORM\ChannelType($channel['type']);
-
             $model = $type->ModelClass();
             $model::beforeEdit($entity, $this->fields);
 
@@ -381,8 +381,9 @@ class Channel extends \Controller {
                         // Init icon with type icon
                         $entity->setIcon($type->getIcon());
                         $entity->insert();
-                        if ($this->request->post('add2tree') AND $addTo = $this->request->post('tree')) {
-                            $tree = \NestedSet::getInstance()->insertChildNode($entity->getId(), $addTo);
+                        if ($this->request->post('add2tree') AND
+                            $addTo = $this->request->post('tree') AND
+                            $tree = \Channel::byId($addTo)->addChild($entity->getId())) {
                             \Messages::Success(__('HierarchyCreated', 1));
                         }
                     } else {
@@ -399,8 +400,8 @@ class Channel extends \Controller {
 
             $this->ignore_returnto = !$ok;
 
-            $this->view->Id   = $entity->getId();
-            $this->view->Type = $entity->getType();
+            $this->view->Id   = $channel['id'];
+            $this->view->Type = $channel['type'];
         }
     }
 
@@ -528,7 +529,7 @@ class Channel extends \Controller {
         // Get general field settings from channel type itself
         $fieldSettings = array($type->getType());
 
-        if (!is_null($entity)) {
+        if ($entity) { // NULL or 0
             $entity = new \ORM\Channel($entity);
             if ($entity->getNumeric()) {
                 $fieldSettings[] = 'numeric';

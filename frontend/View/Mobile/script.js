@@ -323,23 +323,18 @@ function updateWeather() {
     var chart = $('#weather-chart').html($('#weather-wait').clone().show()),
         container = $('#weather').empty(),
         temperatures = [],
-        l = { en: 'EN', de: 'DL' }[language];;
+        l = { en: 'EN', de: 'DL' }[language];
 
     $.ajax({
         url: 'http://api.wunderground.com/api/'+APIkey+'/hourly/forecast/lang:' + l +
              '/q/' + latitude + ',' + longitude + '.json',
         dataType: 'jsonp',
         success: function(response) {
-            /* Show only this and next day */
-            var day = 1;
             container.empty();
             $.each(response.hourly_forecast, function(id, data) {
-                if (data.FCTTIME.hour == 0) day++;
-                if (day > 2) return;
-
                 if (data.FCTTIME.hour == 0) {
                     $('<div/>')
-                    .html(data.FCTTIME.weekday_name_abbrev.split('').join('<br />'))
+                    .html($('<span/>').html(data.FCTTIME.weekday_name_abbrev.split('').join('<br />')))
                     .addClass('mark')
                     .appendTo(container);
                 }

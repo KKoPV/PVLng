@@ -17,15 +17,21 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
+    protected $entity_org;
+
+    /**
+     *
+     */
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
 
-        $this->data = $this->numeric ? new \ORM\ReadingNumMemory :  new \ORM\ReadingStrMemory;
+        $this->data = $this->numeric ? new \ORM\ReadingNumMemory : new \ORM\ReadingStrMemory;
 
         // If the same channel is used in one chart multiple times (also as
         // Alias), we have a race condition and the instances deletes the data
         // of the others ...
         // So save for each instance its own data set
+        $this->entity_org = $this->entity;
         $this->entity = rand(64000, 65535);
 
         // Clean up

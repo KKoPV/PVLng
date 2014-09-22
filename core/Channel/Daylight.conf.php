@@ -32,15 +32,15 @@ return array(
         'visible'  => FALSE
     ),
 
-    'resolution' => array(
-        'position' => 420,
-        'type'     => 'bool;0:Marker;1:Curve',
-        'required' => FALSE
-    ),
-
     'times' => array(
         'position' => 430,
         'type'     => 'bool;0:no;1:yes',
+    ),
+
+    'resolution' => array(
+        'position' => 490,
+        'type'     => 'bool;0:Marker;1:Curve',
+        'required' => FALSE
     ),
 
     'extra' => array(
