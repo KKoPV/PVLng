@@ -212,7 +212,7 @@ try {
 
         $section = array_merge(
             array(
-                'enabled' => 0,
+                'enabled' => FALSE,
                 'name'    => '<unknown>',
                 'handler' => '<handler unknown>',
                 'runeach' => 1
@@ -233,6 +233,7 @@ try {
                 if (TESTMODE AND !file_exists($file)) {
                     throw new Exception('Missing handler script: '.$file);
                 }
+                unset($section['enabled'], $section['name'], $section['handler']);
                 require $file;
             } else {
                 out( 1, 'Skip, not that minute');

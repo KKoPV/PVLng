@@ -13,7 +13,7 @@
  * $section['<key>'] (keys lowercase)
  */
 
-$url = sprintf('http://api.wunderground.com/api/%s/conditions/lang:%s/q/%f,%f.json',
+$url = sprintf('http://api.wunderground.com/api/%s/conditions/hourly/lang:%s/q/%f,%f.json',
                $section['apikey'], $section['language'],
                $config->get('Location.Latitude'), $config->get('Location.Longitude'));
 
@@ -35,6 +35,12 @@ if ($info['http_code'] != 200) {
     return;
 }
 
-$cnt = Channel::byGUID($section['channel'])->write(json_decode($data, TRUE));
+$data = json_decode($data, TRUE);
+$cnt = Channel::byGUID($section['channel'])->write($data);
+
+// Forecast
+foreach ($data['hourly_forecast'] as $forecast) {
+    $cnt += Channel::byGUID($section['channel'])->write($forecast, $forecast['FCTTIME']['epoch']);
+}
 
 out(1, 'Updated   : %d channels', $cnt);

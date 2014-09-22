@@ -2,10 +2,10 @@
 -- For development branch only!
 --
 
-INSERT INTO `pvlng_type`
-(`id`, `name`, `description`, `model`, `type`, `childs`, `read`, `write`, `graph`, `icon`)
-VALUES
-(7, 'Solar Edge Plant', 'model::SolarEdgeInverter', 'SE\\Inverter', 1, -1, 0, 1, 0, '/images/ico/solar_edge.png');
+INSERT INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`, `childs`, `read`, `write`, `graph`, `icon`) VALUES
+(6, 'Inverter string', 'model::Group', 'Channel', '', 'group', -1, 0, 0, 0, '/images/ico/solar-panel.png'),
+(7, 'Solar Edge Plant', 'model::SolarEdgeInverter', 'SE\\Inverter', '', 'group', -1, 0, 1, 0, '/images/ico/solar_edge.png'),
+(74, 'Irradiation forecast', 'model::ClearSky', 'IrradiationForecast', 'W/m²', 'sensor', 0, 1, 1, 1, '/images/ico/brightness.png');
 
 -- ------------------------------------------------
 -- Aliases must get their own GUIDs in hierarchy
@@ -32,3 +32,16 @@ UPDATE `pvlng_tree` h, `pvlng_channel` c
 
 --
 -- ------------------------------------------------
+
+DELIMITER ;;
+CREATE FUNCTION `pvlng_id` () RETURNS int
+BEGIN
+  SELECT `value` INTO @ID FROM `pvlng_config` WHERE `key` = 'Installation';
+  IF @ID IS NULL THEN
+    SELECT ROUND(RAND()*1000000) INTO @ID;
+    INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`)
+       VALUES ('Installation', @ID, 'Unique PVLng installation Id', 'num');
+  END IF;
+  RETURN @ID;
+END;;
+DELIMITER ;

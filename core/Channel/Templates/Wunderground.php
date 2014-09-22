@@ -84,5 +84,14 @@ return array(
             'channel'     => 'current_observation->weather',
             'numeric'     => 0,
         ),
+
+        array(
+            'type'        => 74, // Irradiation forecast
+            'name'        => 'Irradiation forecast',
+            'channel'     => 'sky',
+            'decimals'    => 0,
+            'resolution'  => 800,
+            'unit'        => 'W/m²',
+        ),
     )
 );

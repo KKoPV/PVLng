@@ -8,7 +8,7 @@
         /**
          * Common settings
          */
-        'enabled' => TRUE,
+        'enabled' => TRUE, // (TRUE|FALSE|0) '0' runs only in test mode!
         'Name'    => 'A meaningful name for debugging here...'
         'Handler' => 'Wunderground', // DON'T change!
         'RunEach' => 5, // Minutes
@@ -19,15 +19,21 @@
         'APIKey'   => '',
 
         /**
-         * Your language code; e.g. english: EN, german: DL
+         * Your language code; english: EN, german: DL
          * http://www.wunderground.com/weather/api/d/docs?d=resources/country-to-iso-matching
          */
         'Language' => 'EN',
 
-        /**
-         * GUID of your Wunderground group channel
-         */
-        'Channel' => ''
+        'Channel' => array(
+            /**
+             * GUID of your 'Wunderground' group channel
+             */
+            'Actual'   => '',
+            /**
+             * GUID of your 'Sky cover forecast' channel
+             */
+            'Forecast' => ''
+        )
 
     ),
 
