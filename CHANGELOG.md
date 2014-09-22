@@ -1,4 +1,6 @@
 #### Current
+
+* [`d31c1b5`](../../commit/d31c1b5) Update compressed styles and scripts (Knut Kohl)
 * [`a0fb4ca`](../../commit/a0fb4ca) Add irradiation forcast channel type to Wunderground group. (Knut Kohl)
 * [`b6b8b04`](../../commit/b6b8b04) Simplify logic for latest API release (Knut Kohl)
 * [`01e07a8`](../../commit/01e07a8) Fix some errors in add/edit of a channel and frontend (Knut Kohl)
@@ -15,11 +17,15 @@
 * [`3aa2f16`](../../commit/3aa2f16) Finalize SE Optimzer template (Knut Kohl)
 * [`66c3f4a`](../../commit/66c3f4a) Fix wrong ignored config files (Knut Kohl)
 * [`7e7d77e`](../../commit/7e7d77e) Centralize API key setting for front end JS (Knut Kohl)
+
 #### v2.12.1
+
 * [`d2a3a8e`](../../commit/d2a3a8e) Fixed missing view pvlng_channel_view (Knut Kohl)
 * [`6d96c47`](../../commit/6d96c47) Feature release 2.12.0 (Knut Kohl)
 * [`5a630fb`](../../commit/5a630fb) Update compressed styles and scripts (Knut Kohl)
+
 #### v2.12.0
+
 * [`9f2de47`](../../commit/9f2de47) Bumped version to 2.12.0 (Knut Kohl)
 * [`91257e4`](../../commit/91257e4) Fix calulation of 1st consumption value in Accumulator (Knut Kohl)
 * [`0af22c5`](../../commit/0af22c5) Adjust Solar Edge handlers (Knut Kohl)
@@ -44,7 +50,9 @@
 * [`689190f`](../../commit/689190f) Store chart height from URL parameter in cookie (Knut Kohl)
 * [`5c18bd5`](../../commit/5c18bd5) Remove estimated output for diplay times after sunset (Knut Kohl)
 * [`01ee7b2`](../../commit/01ee7b2) Auto refresh chart on page comes to active only if date display range is not in the past (Knut Kohl)
+
 #### v2.11.0
+
 * [`9839a04`](../../commit/9839a04) Bumped version to 2.11.0 (Knut Kohl)
 * [`90a03b6`](../../commit/90a03b6) Update scripts and styles (Knut Kohl)
 * [`14f220f`](../../commit/14f220f) Add Infoframe (Knut Kohl)
@@ -54,13 +62,19 @@
 * [`495d4a3`](../../commit/495d4a3) Make Select2 dropdown list longer for about 12 rows (Knut Kohl)
 * [`5ee4a74`](../../commit/5ee4a74) Reorganize style and scripts compressor shell scripts (Knut Kohl)
 * [`e578899`](../../commit/e578899) Adjust generator watermark in chart and remove border around legend (Knut Kohl)
+
 #### v2.10.2
+
 * [`d5088a5`](../../commit/d5088a5) Update compressed styles and scripts (Knut Kohl)
 * [`ee9e405`](../../commit/ee9e405) Fix wrong label alignment for "last" data point marker (Knut Kohl)
+
 #### v2.10.1
+
 * [`c00ce9e`](../../commit/c00ce9e) Fix wrong label alignment for "last" data point marker (Knut Kohl)
 * [`59d507e`](../../commit/59d507e) v2.9.1 Hotfix release (Knut Kohl)
+
 #### v2.10.0
+
 * [`1be4160`](../../commit/1be4160) Bumped version to 2.10.0 (Knut Kohl)
 * [`ade4b88`](../../commit/ade4b88) Add script to add images into Memcache (Knut Kohl)
 * [`e86a35e`](../../commit/e86a35e) Add routes for hierarchy manipulation to API (Knut Kohl)
@@ -107,11 +121,15 @@
 * [`12f2c19`](../../commit/12f2c19) Make login as modal dialog (Knut Kohl)
 * [`5a0f88b`](../../commit/5a0f88b) Add copy of channels in overview (Knut Kohl)
 * [`e4b0b05`](../../commit/e4b0b05) Add Drag&Drop of groups (Knut Kohl)
+
 #### v2.9.1
+
 * [`90be958`](../../commit/90be958) Fix typo in JS code (Knut Kohl)
 * [`31ab6b4`](../../commit/31ab6b4) v2.9.0 Maintenance release/2.9.0 (Knut Kohl)
 * [`2093ed4`](../../commit/2093ed4) * hotfix/2.8.1: Fix wrong config include (Knut Kohl)
+
 #### v2.9.0
+
 * [`943686f`](../../commit/943686f) v2.9.0 release (Knut Kohl)
 * [`110105c`](../../commit/110105c) Fix sum of AccumulatorFull model (Knut Kohl)
 * [`10919c2`](../../commit/10919c2) Adjust AccumulatorFull to work correct with meter channels (Knut Kohl)
@@ -127,29 +145,43 @@
 * [`37dba77`](../../commit/37dba77) Add HTML hooks for head and body (before and after) content (Knut Kohl)
 * [`00834db`](../../commit/00834db) * hotfix/2.8.1: Fix wrong config include (Knut Kohl)
 * [`5bf17dc`](../../commit/5bf17dc) * release/2.8.0: v2.8.0 release (Knut Kohl)
+
 #### v2.8.1
+
 * [`686f257`](../../commit/686f257) Fix wrong config include (Knut Kohl)
 * [`c091abb`](../../commit/c091abb) * release/2.8.0: v2.8.0 Maintenance release (Knut Kohl)
 * [`e4c7806`](../../commit/e4c7806) * hotfix/2.7.4: Fix handling saved views (Knut Kohl)
+
 #### v2.8.0
+
 * [`1eb4869`](../../commit/1eb4869) v2.8.0 release (Knut Kohl)
 * [`3493576`](../../commit/3493576) Minor changes (Knut Kohl)
 * [`70c4e69`](../../commit/70c4e69) Adjust config files handling and naming convention (Knut Kohl)
 * [`f60fed1`](../../commit/f60fed1) Fix menu (Knut Kohl)
 * [`53fb59e`](../../commit/53fb59e) Fix menu links (Knut Kohl)
+
 #### v2.7.4
+
 * [`b8e50d4`](../../commit/b8e50d4) Fix handling saved views (Knut Kohl)
 * [`f399343`](../../commit/f399343) Fix handling saved views (Knut Kohl)
+
 #### v2.7.3
+
 * [`d273c95`](../../commit/d273c95) Fix handling saved views (Knut Kohl)
 * [`87e537f`](../../commit/87e537f) Fix handling saved views (Knut Kohl)
+
 #### v2.7.2
+
 * [`ffe6f67`](../../commit/ffe6f67) Fix handling saved views (Knut Kohl)
+
 #### v2.7.1
+
 * [`b906c42`](../../commit/b906c42) Fix menu links (Knut Kohl)
 * [`79fdafd`](../../commit/79fdafd)   v2.7.0 Maintenance release   Adjust language selection   Adjust Github links   Split navigation and content in template   Adjust Fix model for time range display in chart   Fix last reading logic, consider timestamp if given   Adjust accessible modules logic depending on session user   Rework hook logic   Adjust JSON routing   Update README.md to new repo name   Adjust frontend layout   Adjust Github links   Fix links to List view from Index and Overview   Update README.md, add hint to post-merge hook gist (Knut Kohl)
 * [`b162b02`](../../commit/b162b02) 2.6.1 Hotfix release (Knut Kohl)
+
 #### v2.7.0
+
 * [`5353239`](../../commit/5353239) v2.7.0 release (Knut Kohl)
 * [`c333ff2`](../../commit/c333ff2) Adjust language selection (Knut Kohl)
 * [`554f086`](../../commit/554f086) Adjust Github links (Knut Kohl)
@@ -165,12 +197,16 @@
 * [`8bc5173`](../../commit/8bc5173) Fix links to List view from Index and Overview (Knut Kohl)
 * [`754c352`](../../commit/754c352) Fix links to List view from Index and Overview (Knut Kohl)
 * [`1fc8af4`](../../commit/1fc8af4) Update README.md, add hint to post-merge hook gist (Knut Kohl)
+
 #### v2.6.1
+
 * [`cffc4f9`](../../commit/cffc4f9) Fix missing JS variable (Knut Kohl)
 * [`17d5c37`](../../commit/17d5c37) v2.6.0 Feature release (Knut Kohl)
 * [`2ff3c80`](../../commit/2ff3c80) v2.5.0 feature release (Knut Kohl)
 * [`8e8ea4e`](../../commit/8e8ea4e) Fix script error when output is compressed Fix redirect to /adminpass for Nginx ($_SEVER['PATH_INFO'] is not set in every case) (Knut Kohl)
+
 #### v2.6.0
+
 * [`d99b216`](../../commit/d99b216) v2.6.0 release (Knut Kohl)
 * [`edbd824`](../../commit/edbd824) Minor fixes (Knut Kohl)
 * [`e2b0d0d`](../../commit/e2b0d0d) Update Highcharts to v3.0.10 (Knut Kohl)
@@ -191,7 +227,9 @@
 * [`f9322a8`](../../commit/f9322a8) Add ability to define custom commands at start via prepend.php file (Knut Kohl)
 * [`92d2625`](../../commit/92d2625) Separate data acquisition scripts into own repository: https://github.com/K-Ko/PVLng-scripts (Knut Kohl)
 * [`2fe1812`](../../commit/2fe1812) Fix setup redirect, config.php.dist and script (Knut Kohl)
+
 #### v2.5.0
+
 * [`e7c95d2`](../../commit/e7c95d2) v2.5.0 release (Knut Kohl)
 * [`1d1de7e`](../../commit/1d1de7e) Adjust templates (Knut Kohl)
 * [`8948c2c`](../../commit/8948c2c) Adjust caches, fix Memcache (Knut Kohl)
@@ -200,11 +238,15 @@
 * [`e50ff2f`](../../commit/e50ff2f) Change order of load last readings, after datatable was initialized (Knut Kohl)
 * [`ab2e631`](../../commit/ab2e631) Adjust layout for public charts view (Knut Kohl)
 * [`4dc7edc`](../../commit/4dc7edc) Add output of actual branch in development mode (Knut Kohl)
+
 #### v2.4.1
+
 * [`95ead51`](../../commit/95ead51) Fix script error when output is compressed Fix redirect to /adminpass for Nginx ($_SEVER['PATH_INFO'] is not set in every case) (Knut Kohl)
 * [`baead2f`](../../commit/baead2f) v2.4.0 feature release (Knut Kohl)
 * [`4e9bb81`](../../commit/4e9bb81) v2.3.0 feature release (Knut Kohl)
+
 #### v2.4.0
+
 * [`893bd90`](../../commit/893bd90) v2.4.0 release (Knut Kohl)
 * [`6f05f43`](../../commit/6f05f43) Minor fixes (Knut Kohl)
 * [`135f867`](../../commit/135f867) Rename Yield class for PV-Log, yield is reserved since PHP 5.5 (Knut Kohl)
@@ -217,7 +259,9 @@
 * [`1258e53`](../../commit/1258e53) Adjust API and split into more maintainable files (Knut Kohl)
 * [`25d338c`](../../commit/25d338c) Adjust S0 serial listener, improve foreground mode (Knut Kohl)
 * [`57c6f20`](../../commit/57c6f20) Adjust CSS and JS Compession (Knut Kohl)
+
 #### v2.3.0
+
 * [`41d6fa1`](../../commit/41d6fa1) v2.3.0 release (Knut Kohl)
 * [`d02f73d`](../../commit/d02f73d) Fix readout for meter channels with consolidation periods (Knut Kohl)
 * [`c3d76e7`](../../commit/c3d76e7) Fix layout (Knut Kohl)
@@ -225,7 +269,9 @@
 * [`1fd40ae`](../../commit/1fd40ae) Add List module to show reading values as table (Knut Kohl)
 * [`3549afb`](../../commit/3549afb) Add missing create table statement for pvlng_changes (Knut Kohl)
 * [`cca020f`](../../commit/cca020f) v2.2.0 feature release (Knut Kohl)
+
 #### v2.2.0
+
 * [`e1ab8a2`](../../commit/e1ab8a2) Bumped version to 2.2.0 (Knut Kohl)
 * [`d85d6c6`](../../commit/d85d6c6) Update development SQL script, reqired for Extra data on channels (Knut Kohl)
 * [`29d12db`](../../commit/29d12db) Add script for Smart Energy Groups update  [#21](../../issues/21) (Knut Kohl)
@@ -245,7 +291,9 @@
 * [`cd2bcb4`](../../commit/cd2bcb4) Add consolidation presets for charts (Knut Kohl)
 * [`e8858ee`](../../commit/e8858ee) Fix type update for foreign key restrictions (Knut Kohl)
 * [`a657f5b`](../../commit/a657f5b) Release v2.1.0 (Knut Kohl)
+
 #### v2.1.0
+
 * [`937b68a`](../../commit/937b68a) Bumped version to 2.1.0 (Knut Kohl)
 * [`ec6461c`](../../commit/ec6461c) Some refratoring (Knut Kohl)
 * [`17e0472`](../../commit/17e0472) Adjust data readout as child channel (Knut Kohl)
@@ -377,7 +425,9 @@
 * [`6529981`](../../commit/6529981) To create a clean pull request (Patrick Feisthammel)
 * [`d263272`](../../commit/d263272) Added support for IPSwitch Devices (Patrick Feisthammel)
 * [`3f591ce`](../../commit/3f591ce) removed unused chosen.jquery.js (Patrick Feisthammel)
+
 #### v2.0.0rc2
+
 * [`358bd6e`](../../commit/358bd6e) Bumped version to 2.0.0rc2 (Knut Kohl)
 * [`2488376`](../../commit/2488376) Fixed wrong channel icon path Fixed not displayed private channels Fixed HTML entities in gauge sub channels (Knut Kohl)
 * [`18fc54e`](../../commit/18fc54e) Ignore not yet created hooks configuration file (Knut Kohl)
@@ -385,9 +435,13 @@
 * [`fa315bd`](../../commit/fa315bd) Redirect to /adminpass if no admin user defined yet, only once after fresh install (Knut Kohl)
 * [`f586e0a`](../../commit/f586e0a) Fix check for $_SERVER variables, PATH_INFO is on Apache not set for "empty" / calls (Knut Kohl)
 * [`3dfd9f5`](../../commit/3dfd9f5) Fix loading view for not logged in users (Knut Kohl)
+
 #### v2.0.0rc1
 
+
+
 #### v2.0.0
+
 * [`cf3ad6c`](../../commit/cf3ad6c) Bumped version to 2.0.0 (Knut Kohl)
 * [`ce6afcf`](../../commit/ce6afcf) Merge pull request  [#13](../../issues/13) from pafei/develop (Knut Kohl)
 * [`58bbaad`](../../commit/58bbaad) Adjust layout for charts view depending on logged in or not (Knut Kohl)
@@ -635,7 +689,9 @@
 * [`da4b560`](../../commit/da4b560) Add loading controller specific configuration (Knut Kohl)
 * [`81c67fb`](../../commit/81c67fb) Minor inprovements (Knut Kohl)
 * [`36daf9a`](../../commit/36daf9a) Missing SQL file in release (Knut Kohl)
+
 #### v1.3.0
+
 * [`2c6c024`](../../commit/2c6c024) Bumped version 1.3.0 (Knut Kohl)
 * [`4d7f5c3`](../../commit/4d7f5c3) Minor fixes (Knut Kohl)
 * [`f2cf3da`](../../commit/f2cf3da) Tune logic for reading overall data from meter channels (Knut Kohl)
@@ -650,7 +706,9 @@
 * [`932328c`](../../commit/932328c) Fix offset and PowerAcW calculation for PV-Log (Knut Kohl)
 * [`d57b863`](../../commit/d57b863) Adjust chart display (Knut Kohl)
 * [`f8485f7`](../../commit/f8485f7) Fix not correct destroyed session on logout (Knut Kohl)
+
 #### v1.2.0
+
 * [`2a8e482`](../../commit/2a8e482) Bumped version 1.2.0 (Knut Kohl)
 * [`c0cc73c`](../../commit/c0cc73c) Boost transformation performance by using memory streams (Knut Kohl)
 * [`1835c72`](../../commit/1835c72) Add missing style sheet for Adminer (Knut Kohl)
@@ -660,13 +718,21 @@
 * [`30c1037`](../../commit/30c1037) Fix consumption calculation for working with 1 result line only (Knut Kohl)
 * [`c61bfdd`](../../commit/c61bfdd) Add UTC "summertime" emulation for PV-Log (Knut Kohl)
 * [`ea5a016`](../../commit/ea5a016) Improved route for view loading (Knut Kohl)
+
 #### v1.1.0
+
 * [`a6cbe48`](../../commit/a6cbe48) Correct consumption handling (Knut Kohl)
+
 #### v1.0.0.2
+
 * [`606d728`](../../commit/606d728) Fix constant (Knut Kohl)
+
 #### v1.0.0.1
+
 * [`78248d6`](../../commit/78248d6) Fix wrong version index (Knut Kohl)
+
 #### v1.0.0
+
 * [`35d76c8`](../../commit/35d76c8) Bumped version 1.0.0 (Knut Kohl)
 * [`94e8371`](../../commit/94e8371) First source commit (Knut Kohl)
 * [`404a205`](../../commit/404a205) Initial commit (Knut Kohl)
