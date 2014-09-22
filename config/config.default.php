@@ -93,6 +93,12 @@ return array(
     # 'Cache' => 'Mock',         // Disable caching complete
 
     /**
+     * Send anonymous statistics: channel count and reading count overall
+     * You can check in statistics.php what will be send
+     */
+    'SendStatistics' => TRUE,
+
+    /**
      * Model flags
      */
     'Model' => array(
@@ -112,6 +118,13 @@ return array(
                 // To disable zenit icon, set to NULL
                 #'Zenit'   => NULL,
             )
+        ),
+
+        'IrradiationForecast' => array(
+            /**
+             * Average of last ? days for irradiation sensor channel
+             */
+            'AverageDays' => 5,
         ),
 
         /**

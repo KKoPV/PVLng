@@ -13,7 +13,7 @@ class Controller extends slimMVC\Controller {
      *
      */
     public function __destruct() {
-        include ROOT_DIR . DS . 'stats.php';
+        include ROOT_DIR . DS . 'statistics.php';
     }
 
     /**

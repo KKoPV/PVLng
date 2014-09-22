@@ -175,6 +175,19 @@ abstract class ORM implements \Iterator, \Countable {
 
     /**
      *
+     * @return integer
+     */
+    public function rowCount() {
+        // Select direct from information_schema, SELECT COUNT(*) on large partitioned takes to long
+        $sql = 'SELECT `table_rows`
+                  FROM `information_schema`.`tables`
+                 WHERE `table_schema` = DATABASE()
+                   AND `table_name`  = "'.$this->table.'"';
+        return ($res = $this->_query($sql) AND $row = $res->fetch_array(MYSQLI_NUM)) ? +$row[0] : 0;
+    }
+
+    /**
+     *
      */
     public function asAssoc() {
         if ($this->lastFind == 1) {
