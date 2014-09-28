@@ -40,6 +40,12 @@
                 </td>
             </tr>
             <tr>
+                <td>{{LatestAPIVersion}}</td>
+                <td>
+                    <code id="latest" class="b"></code>
+                </td>
+            </tr>
+            <tr>
                 <td style="vertical-align:top">{{YourAPIcode}}</td>
                 <td>
                     <form method="post" style="float:right">

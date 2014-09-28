@@ -8,4 +8,6 @@
  * @version    1.0.0
  */
 
+Header('Content-Type: text/plain');
+
 die(file_get_contents('..'.DIRECTORY_SEPARATOR.'.latest'));

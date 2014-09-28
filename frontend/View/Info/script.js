@@ -66,6 +66,8 @@ $(function() {
         }
     });
 
+    $.get(PVLngAPI + '../version', function(data) { $('#latest').text(data) });
+
     /* Load charts on Tab activation, not before */
     var tabs2 = tabs3 = tabs4 = false;
 
