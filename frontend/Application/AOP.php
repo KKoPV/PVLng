@@ -70,7 +70,15 @@ class YryieMiddleware extends Slim\Middleware {
         // Run inner middleware and application
         $this->next->call();
 
-        Yryie::SQL(slimMVC\MySQLi::getInstance()->queries);
+        // Analyse queries to find missing indexes
+        $db = slimMVC\MySQLi::getInstance();
+        foreach ($db->queries as $sql) {
+            Yryie::SQL($sql);
+            if ($res = $db->query('EXPLAIN '.$sql)) {
+                $res = $res->fetch_object();
+                Yryie::Debug('INDEX: '.$res->key.' ('.$res->possible_keys.')');
+            }
+        }
 
         Yryie::Debug(
             '%d Queries in %.0f ms / %.1f ms each',

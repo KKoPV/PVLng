@@ -11,11 +11,7 @@ if (!Session::get('User')) return;
 /**
  *
  */
-PVLng::Menu(
-    'info', 60, '/info',
-    I18N::translate('Information'),
-    I18N::translate('InfoHint') . ' (Shift+F5)'
-);
+PVLng::Menu(60, '/info', __('Information'), 'Shift+F6');
 
 /**
  * Routes

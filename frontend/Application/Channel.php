@@ -11,30 +11,9 @@ if (!Session::get('User')) return;
 /**
  *
  */
-PVLng::Menu( 'channel', 50, '#', __('Channels') );
+PVLng::Menu('10.20', '/channel', __('Channels'), 'Shift+F3');
 
-/**
- *
- */
-PVLng::SubMenu(
-    'channel', 10, '/type', __('ChannelTypes')
-);
-
-PVLng::SubMenu(
-    'channel', 20, '/channel', __('Channels'), __('ChannelsHint') . ' (Shift+F4)'
-);
-
-PVLng::SubMenu(
-    'channel', 21, '/channel/add', __('CreateChannel')
-);
-
-PVLng::SubMenu(
-    'channel', 30, '/overview', __('Overview'), __('OverviewHint')
-);
-
-PVLng::SubMenu(
-    'channel', 40, '/tariff', __('Tariffs'), __('TariffsHint')
-);
+PVLng::Menu('10.20.10', '/channel/add', __('CreateChannel'));
 
 /**
  * Routes

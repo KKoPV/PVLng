@@ -58,7 +58,6 @@ class Controller extends slimMVC\Controller {
         );
 
         $this->view->Menu = PVLng::getMenu();
-        $this->view->SubMenus = json_encode(PVLng::getSubMenu());
         $this->view->Languages = PVLng::getLanguages();
     }
 

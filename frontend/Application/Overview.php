@@ -9,6 +9,11 @@
 if (!Session::get('User')) return;
 
 /**
+ *
+ */
+PVLng::Menu('10.10', '/overview', __('Overview'), 'Shift+F4');
+
+/**
  * Routes
  */
 $app->get('/overview', $checkAuth, function() use ($app) {

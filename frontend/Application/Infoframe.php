@@ -10,9 +10,7 @@
 /**
  *
  */
-PVLng::SubMenu(
-    'index', 10, '/infoframe', __('Infoframe')
-);
+PVLng::Menu('20.90', '/infoframe', __('Infoframe'));
 
 /**
  * Routes

@@ -12,67 +12,51 @@ abstract class PVLng {
     /**
      *
      */
-    public static function Menu( $module, $pos, $route, $label, $hint='' ) {
-        while (isset(self::$Menu[$pos])) $pos++;
-        self::$Menu[$pos] = array(
-            'MODULE' => $module,
-            'ROUTE'  => $route,
-            'LABEL'  => $label,
-            'HINT'   => $hint
-        );
+    public static $MenuPathSeparator = '.';
+
+    /**
+     *
+     */
+    public static function Menu( $path, $route, $label, $hint='' ) {
+    $path = explode(self::$MenuPathSeparator, $path);
+        // Root pointer
+        $menu =& self::$Menu;
+
+        // Move pointer along the path
+        foreach ($path as $id=>$key) {
+            if ($id == 0) {
+                $menu = &$menu[$key];
+            } else {
+                $sub = 'SUBMENU'.$id;
+                if (!array_key_exists($sub, $menu)) $menu[$sub] = array();
+                if ($key == '') $key = count($menu[$sub]);
+                $menu = &$menu[$sub][$key];
+            }
+        }
+        $menu['ROUTE'] = $route;
+        $menu['LABEL'] = $label;
+        $menu['HINT']  = $hint;
+
+        return $key;
     }
 
     /**
      *
      */
     public static function getMenu() {
-        ksort(self::$Menu);
+        // Sort menu and sub menus by key
+        self::sortMenu(self::$Menu);
         return self::$Menu;
     }
 
     /**
      *
      */
-    public static function SubMenu( $modules, $pos, $route, $label, $hint='' ) {
-
-        if (!is_array($modules)) $modules = array($modules);
-
-        foreach ($modules as $module) {
-            if (!isset(self::$SubMenu[$module])) self::$SubMenu[$module] = array();
-
-            $p = $pos;
-            while (isset(self::$SubMenu[$module][$p])) $p++;
-
-            self::$SubMenu[$module][$p] = array(
-                'ROUTE'  => $route,
-                'LABEL'  => $label,
-                'HINT'   => $hint
-            );
-        }
-    }
-
-    /**
-     *
-     */
-    public static function getSubMenu( $module=NULL ) {
-        foreach (self::$SubMenu as &$submenu) {
-            ksort($submenu);
-        }
-        if (isset(self::$SubMenu[$module])) {
-            return self::$SubMenu[$module];
-        } elseif ($module === NULL) {
-            return self::$SubMenu;
-        };
-    }
-
-    /**
-     *
-     */
-    public static function Language( $code, $label, $position=0 ) {
+    public static function Language( $code, $label, $icon=NULL, $position=0 ) {
         while (isset(self::$Language[$position])) $position++;
         self::$Language[$position] = array(
-            'POSITION' => $position,
             'CODE'     => $code,
+            'ICON'     => $icon ?: $code,
             'LABEL'    => $label
         );
     }
@@ -110,11 +94,17 @@ abstract class PVLng {
     /**
      *
      */
-    protected static $SubMenu = array();
+    protected static $Language = array();
 
     /**
      *
      */
-    protected static $Language = array();
+    protected static function sortMenu(&$menu, $level='') {
+        ksort($menu);
+        foreach ($menu as &$item) {
+            $sub = 'SUBMENU'.($level+1);
+            if (isset($item[$sub])) self::sortMenu($item[$sub]);
+        }
+    }
 
 }

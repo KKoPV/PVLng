@@ -10,11 +10,7 @@
 /**
  *
  */
-PVLng::Menu(
-    'weather', 80, '/weather',
-    I18N::translate('Weather'),
-    I18N::translate('WeatherForecast')
-);
+PVLng::Menu(80, '/weather', __('Weather'), 'Shift+F8');
 
 /**
  * Routes

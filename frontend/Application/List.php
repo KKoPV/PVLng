@@ -11,11 +11,7 @@ if (!Session::get('User')) return;
 /**
  *
  */
-PVLng::Menu(
-    'list', 30, '/list',
-    I18N::translate('List'),
-    I18N::translate('ListHint') . ' (Shift+F3)'
-);
+PVLng::Menu('20.30','/list', __('Lists'), 'Shift+F5');
 
 /**
  * Routes

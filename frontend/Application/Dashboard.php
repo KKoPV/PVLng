@@ -10,11 +10,7 @@
 /**
  *
  */
-PVLng::Menu(
-    'dashboard', 20, '/dashboard',
-    I18N::translate('Dashboards'),
-    I18N::translate('DashboardHint') . ' (Shift+F2)'
-);
+PVLng::Menu('20.20', '/dashboard', __('Dashboards'), 'Shift+F2');
 
 /**
  *
@@ -22,10 +18,8 @@ PVLng::Menu(
 $tblDashboard = new ORM\Dashboard;
 $user = Session::get('user');
 foreach ($tblDashboard->order('name')->find() as $dashboard) {
-    if ($user OR $dashboard->getPublic()) {
-        PVLng::SubMenu(
-            'dashboard', 0, '/dashboard/'.$dashboard->getSlug(), $dashboard->getName()
-        );
+    if ($user || $dashboard->getPublic()) {
+        PVLng::Menu('20.20.', '/dashboard/'.$dashboard->getSlug(), $dashboard->getName());
     }
 }
 

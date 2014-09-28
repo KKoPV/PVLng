@@ -7,11 +7,35 @@
  * @version    1.0.0
  */
 
-PVLng::Menu(
-    'index', 10, '/',
-    I18N::translate('Charts'),
-    I18N::translate('ChartHint') . ' (Shift+F1)'
-);
+/**
+ *
+ */
+PVLng::Menu('20.10', '/', __('Charts'), 'Shift+F1');
+
+// Add direct links to charts only if not chart controller is the active one
+
+$RequestPath = $app->request()->getPathInfo();
+
+if ($RequestPath != '/' AND !strstr($RequestPath, '/index')) {
+
+    $tblView = new ORM\View;
+
+    if (Session::get('user')) {
+        PVLng::Menu('20.10.10', '#', __('private'));
+        foreach ($tblView->filterByPublic(0)->find() as $view) {
+            PVLng::Menu('20.10.10.', '/chart/'.$view->getSlug(), $view->getName());
+        }
+        $tblView->reset();
+    }
+
+    PVLng::Menu('20.10.20', '#', __('public'));
+
+    foreach ($tblView->filterByPublic(1)->find() as $view) {
+        PVLng::Menu('20.10.20.', '/chart/'.$view->getSlug(), $view->getName());
+    }
+}
+
+unset($RequestPath);
 
 /**
  * Routes

@@ -9,6 +9,11 @@
 if (!Session::get('User')) return;
 
 /**
+ *
+ */
+PVLng::Menu('10.30', '/type', __('ChannelTypes'));
+
+/**
  * Routes
  */
 $app->get('/type', $checkAuth, function() use ($app) {
