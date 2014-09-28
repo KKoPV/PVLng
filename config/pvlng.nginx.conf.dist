@@ -20,13 +20,6 @@
 ### $ sudo apt-get install nginx-extras
 ###
 
-upstream php5-fpm {
-    # With php5-cgi alone:
-#   server 127.0.0.1:9000;
-    # With php5-fpm:
-    server unix:/var/run/php5-fpm.sock;
-}
-
 server {
     ###
     # Server name & port
@@ -87,6 +80,8 @@ server {
     location @mc_miss {
         access_log off;
         try_files /public/$uri =404;
+        expires max;
+        add_header Last-Modified "Sat, 1 Jan 2000 00:0:00 GMT";
     }
 
     ###
@@ -116,11 +111,13 @@ server {
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
         fastcgi_read_timeout 300;
 
-        # pass to upstream
-        fastcgi_pass php5-fpm;
-
         fastcgi_index index.php;
         include fastcgi_params;
+
+        # With php5-cgi alone:
+        #fastcgi_pass 127.0.0.1:9000;
+        # With php5-fpm:
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
     }
 
     ###
