@@ -7,8 +7,8 @@
         <th>{{ExampleUnit}}</th>
         <th>{{Model}}</th>
         <th>{{Type}}</th>
-        <th>{{Childs}}</th>
-        <th></th>
+        <th><i class="ico node-select-all tip" title="{{AcceptChildCount}}"></i></th>
+        <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
         <th></th>
     </tr>
 </thead>
@@ -27,36 +27,25 @@
         <td class="c">
             <!-- Add invisible spans for sorting -->
             <!-- IF {CHILDS} == -1 -->
-                <span class="sort">X</span>
-                {{unlimited}}
-            <!-- ELSEIF {CHILDS} == 0 -->
-                <span class="sort">0</span>
-                {{no}}
-            <!-- ELSE -->
-                <span class="sort">{CHILDS}</span>
-                {CHILDS}
-            <!-- ENDIF -->
+                <span class="sort">X</span>&infin;
+            <!-- ELSEIF {CHILDS} == 0 -->-<!-- ELSE -->{CHILDS}<!-- ENDIF -->
         </td>
         <td class="icons">
             <!-- Add invisible spans for sorting -->
             <!-- IF {READ} AND {WRITE} -->
-                <span class="sort">1</span>
-                <img src="/images/ico/read-write.png" alt="rw">
+                <i class="ico drive-globe"></i>
             <!-- ELSEIF {WRITE} -->
-                <span class="sort">2</span>
-                <img src="/images/ico/write.png" alt="w">
+                <i class="ico drive--pencil"></i>
             <!-- ELSEIF {READ} -->
-                <span class="sort">3</span>
-                <img src="/images/ico/read.png" alt="r">
+                <i class="ico drive--arrow"></i>
             <!-- ELSE -->
-                <span class="sort">4</span>
-                <img src="/images/pix.gif" alt="">
+                <i class="ico pix"></i>
             <!-- ENDIF -->
 
             <!-- IF {GRAPH} -->
-                <img src="/images/ico/chart.png" alt="g">
+                <i class="ico chart"></i>
             <!-- ELSE -->
-                <img src="/images/pix.gif" alt="">
+                <i class="ico pix"></i>
             <!-- ENDIF -->
 
             <form action="channel/add" method="post">
@@ -72,14 +61,25 @@
     <!-- END -->
 </tbody>
 
+<tfoot>
+    <tr>
+        <th colspan="6"></th>
+        <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
+        <th></th>
+    </tr>
+</tfoot>
+
 </table>
 
-<div id="legend" class="icons">
-    <strong>{{Legend}}</strong>:
-    <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
-    <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
-    <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>,
-    <span><img src="/images/ico/chart.png">{{UsableInCharts}}</span>,
-    <span><img src="/images/ico/document--plus.png">{{CreateChannel}}</span>,
-    <span><img src="/images/ico/plus_circle_frame.png">{{ShowDescription}}</span>
+<!-- Legend -->
+
+<div id="IconLegend">
+    <div class="icons legendtip">
+        <i class="ico drive-globe"></i>{{ReadWritableEntity}}<br />
+        <i class="ico drive--pencil"></i>{{WritableEntity}}<br />
+        <i class="ico drive--arrow"></i>{{ReadableEntity}}<br />
+        <i class="ico chart"></i>{{UsableInCharts}}<br />
+        <i class="ico document--plus"></i>{{CreateChannel}}<br />
+        <i class="ico plus-circle-frame"></i>{{ShowDescription}}
+    </div>
 </div>

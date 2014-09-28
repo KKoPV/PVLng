@@ -50,32 +50,6 @@ var pvlng = new function() {
         }
     },
 
-    this.menu = new function() {
-        var that = this;
-        this.Timer = null;
-
-        this.setTimer = function() {
-            if (that.Timer) return;
-
-            that.Timer = setTimeout(
-                function() {
-                    $('#submenu').parent().hide();
-                    that.unsetTimer();
-                },
-                3000
-            );
-            /* console.log('Set MenuTimer: '+that.Timer); */
-        };
-
-        this.unsetTimer = function() {
-            if (!that.Timer) return;
-
-            /* console.log('Unset MenuTimer: '+that.Timer); */
-            that.Timer = clearTimeout(that.Timer);
-        };
-
-    }
-
     /**
      * Scroll to #top as top most visible element
      */
@@ -295,31 +269,6 @@ $(function() {
             return d.promise();
         }
     });
-
-    /**
-     *
-     */
-    $('a.module').hover(
-        function() {
-            var submenu = submenus[$(this).data('module')];
-            if (!submenu) return;
-
-            pvlng.menu.unsetTimer();
-
-            var menu = $('#submenu').empty();
-            $.each(submenu, function(id, el) {
-                $('<a/>').prop('href', el.ROUTE).text(el.LABEL)
-                    .prop('title', el.HINT).tipTip()
-                    .appendTo(menu)
-                    .hover(
-                        pvlng.menu.unsetTimer,
-                        pvlng.menu.setTimer
-                    );
-            });
-            menu.buttonset().parent().show();
-        },
-        pvlng.menu.setTimer
-    );
 
     /**
      *

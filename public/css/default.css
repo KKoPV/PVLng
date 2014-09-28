@@ -61,15 +61,17 @@ a:hover, a:active {
 
 /* Tooltips
 --------------------------------------------------------------------------- */
-.tip {
+.tip,
+.tip-right,
+.tip-top {
     cursor: help;
 }
 
-a.tip,
-button.tip,
+a.tip, a.tip-right, a.tip-top,
+button.tip, button.tip-right, button.tip-top,
+.tipbtn, .tipbtn-right, .tipbtn-top,
 input[type=image],
-.tipbtn,
-img.btn {
+.btn {
     cursor: pointer;
 }
 
@@ -78,7 +80,11 @@ img.btn {
 }
 
 a.tip img,
-img.tip {
+a.tip-right img,
+a.tip-top img,
+img.tip,
+img.tip-right,
+img.tip-top {
     border: 0;
 }
 
@@ -86,11 +92,6 @@ img.tip {
     font-size: 90%;
     text-shadow: none;
     padding: .5em 1em;
-}
-
-.select2-results {
-    /* Show about 12 rows below search input */
-    max-height: 20em;
 }
 
 /* Chart-Tooltips
@@ -118,6 +119,8 @@ img.tip {
     color: black;
 }
 
+/* Menu
+--------------------------------------------------------------------------- */
 #menu {
     margin-top: .75em;
 }
@@ -125,6 +128,16 @@ img.tip {
 #menu div,
 #footer div {
     padding: 3px;
+}
+
+/* SmartMenu config - instance specific stuff not covered in the theme */
+.sm {
+  position: relative;
+  z-index: 9999;
+  width: auto;
+}
+.sm ul {
+  width: 15em; /* fixed width only please - you can use the "subMenusMinWidth"/"subMenusMaxWidth" script options to override this if you like */
 }
 
 /* Footer
@@ -169,11 +182,17 @@ img.ico {
     margin-right: 3px;
 }
 
+.icons .ico {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
 .icons input[type=image] {
     width: 16px;
     height: 16px;
     padding-left: 3px;
     padding-right: 3px;
+    vertical-align: inherit;
 }
 
 img.channel-icon {
@@ -198,10 +217,13 @@ td.imgbar {
 
 /* Other
 --------------------------------------------------------------------------- */
-.legendtip img {
-    padding: 2px;
-    margin-right: 8px;
-    margin-bottom: 2px;
+.select2-results {
+    /* Show about 12 rows below search input */
+    max-height: 20em;
+}
+
+.legendtip i {
+    margin: 6px 8px -4px 0;
     background-color: white;
 }
 

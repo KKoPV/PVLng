@@ -1253,7 +1253,7 @@ $(function() {
                             if (chart) pvlng.scroll('#nav');
                             updateChart();
                         },
-                        1000);
+                        3000);
                     }
                 }
             } else {

@@ -10,9 +10,7 @@
 -->
 
 <!-- Use this image as spacer for not available moving actions of channels -->
-<!-- DEFINE SpacerImg -->
-<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw" style="height:0px" alt="">
-<!-- END DEFINE -->
+<!-- DEFINE SpacerImg --><i class="ico pix"></i><!-- END DEFINE -->
 
 <div id="tabs" class="ui-tabs">
 
@@ -37,9 +35,7 @@
                     <th class="r">{{Amount}}</th>
                     <th class="l">{{Unit}}</th>
                     <th class="r" style="white-space:nowrap">{{Earning}} / {{Cost}}</th>
-                    <th>
-                        <img src="/images/ico/information_frame.png" style="margin-left:10px" class="tip" tip="#IconLegend" alt="?">
-                    </th>
+                    <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
                 </tr>
             </thead>
 
@@ -65,12 +61,12 @@
                     <td id="costs{ID}" class="costs"></td>
                     <td class="icons">
                         <!-- IF {GRAPH} -->
-                        <img src="/images/ico/chart.png" class="btn chartdialog" alt="c">
+                        <i class="ico chart btn chartdialog"></i>
                         <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
                         <!-- IF {READ} -->
-                        <img src="/images/ico/document-invoice.png" class="btn showlist" alt="l">
+                        <i class="ico document-invoice btn showlist"></i>
                         <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-                        <img src="/images/ico/node_design.png" class="btn editentity" alt="e">
+                        <i class="ico node-design btn editentity"></i>
                         </a>
                     </td>
                 </tr>
@@ -82,9 +78,7 @@
                     <th colspan="3">&nbsp;</th>
                     <th class="l">{{Total}}:</th>
                     <th id="costs" style="padding-right:10px" class="r"></th>
-                    <th>
-                        <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
-                    </th>
+                    <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
                 </tr>
             </tfoot>
         </table>
@@ -121,9 +115,9 @@
 
 <div id="IconLegend">
     <div class="icons legendtip">
-        <img src="/images/ico/lock.png">{{PrivateChannel}}<br />
-        <img src="/images/ico/chart.png">{{ChartSettingsTip}}<br />
-        <img src="/images/ico/document-invoice.png">{{ListHint}}<br />
-        <img src="/images/ico/node_design.png">{{EditEntity}}
+        <i class="ico lock"></i>{{PrivateChannel}}<br />
+        <i class="ico chart"></i>{{ChartSettingsTip}}<br />
+        <i class="ico document-invoice"></i>{{ListHint}}<br />
+        <i class="ico node-design"></i>{{EditEntity}}
     </div>
 </div>

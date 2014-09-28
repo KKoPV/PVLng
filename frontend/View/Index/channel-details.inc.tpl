@@ -18,5 +18,5 @@
 <!-- ENDIF -->
 
 <!-- IF !{PUBLIC} -->
-    <small style="margin-left:1em"><img src="/images/ico/lock.png" class="ico" alt="[private]"></small>
+    <i class="ico lock" style="margin-left:1em"></i>
 <!-- ENDIF -->

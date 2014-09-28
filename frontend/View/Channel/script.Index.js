@@ -109,7 +109,7 @@ $(function() {
     });
 
     /* Bind click listener to all delete channel images */
-    $('.delete-channel', '#entities tbody').addClass('btn').on('click', function() {
+    $('.node-delete', '#entities tbody').addClass('btn').on('click', function() {
 
         /* Get tree table Id from parent <tr> */
         var tr = $(this).parents('tr');

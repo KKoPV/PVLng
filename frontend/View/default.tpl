@@ -33,8 +33,6 @@
         <!-- END -->
     ];
 
-    var submenus = {SUBMENUS};
-
     </script>
 
     <meta http-equiv="Content-Style-Type" content="text/css" />
@@ -53,15 +51,17 @@
     <link rel="stylesheet" href="/css/tipTip.css" />
     <link rel="stylesheet" href="/css/select2.css" />
     <link rel="stylesheet" href="/css/spectrum.css" />
-    <!-- With background images -->
-    <link rel="stylesheet" href="/css/iCheck/flat.css" />
-    <link rel="stylesheet" href="/css/iCheck/line.css" />
+    <link rel="stylesheet" href="/css/sm-core-css.css" />
+    <link rel="stylesheet" href="/css/sm-clean.css" />
+    <link rel="stylesheet" href="/css/flags.css" />
+    <link rel="stylesheet" href="/css/sprites.css" />
     <!-- ELSE -->
     <link rel="stylesheet" href="/css/min.css" />
+    <!-- ENDIF -->
+
     <!-- With background images -->
     <link rel="stylesheet" href="/css/iCheck/flat.min.css" />
     <link rel="stylesheet" href="/css/iCheck/line.min.css" />
-    <!-- ENDIF -->
 
     {HEAD}
 
@@ -135,6 +135,7 @@
     <script src="/js/jquery.tipTip.js"></script>
     <script src="/js/jquery.icheck.js"></script>
     <script src="/js/jquery.pnotify.js"></script>
+    <script src="/js/jquery.smartmenus.min.js"></script>
     <script src="/js/dataTables.js"></script>
     <script src="/js/select2.min.js"></script>
     <script src="/js/shortcut.js"></script>

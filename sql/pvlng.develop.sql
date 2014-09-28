@@ -2,6 +2,8 @@
 -- For development branch only!
 --
 
+ALTER TABLE `pvlng_view` ADD INDEX `public` (`public`);
+
 INSERT INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`, `childs`, `read`, `write`, `graph`, `icon`) VALUES
 (6, 'Inverter string', 'model::Group', 'Channel', '', 'group', -1, 0, 0, 0, '/images/ico/solar-panel.png'),
 (7, 'Solar Edge Plant', 'model::SolarEdgeInverter', 'SE\\Inverter', '', 'group', -1, 0, 1, 0, '/images/ico/solar_edge.png'),
@@ -38,7 +40,8 @@ CREATE FUNCTION `pvlng_id` () RETURNS int
 BEGIN
   SELECT `value` INTO @ID FROM `pvlng_config` WHERE `key` = 'Installation';
   IF @ID IS NULL THEN
-    SELECT ROUND(RAND()*1000000) INTO @ID;
+    -- Range of 100000 .. 999999
+    SELECT 100000 + ROUND(RAND()*900000) INTO @ID;
     INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`)
        VALUES ('Installation', @ID, 'Unique PVLng installation Id', 'num');
   END IF;

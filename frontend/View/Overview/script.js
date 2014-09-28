@@ -49,8 +49,8 @@ $(function() {
     var pauseRedraw = false;
 
     if (lscache.get(sHNC)) {
-        $('#treetoggle').attr('src','/images/ico/toggle_expand.png').attr('alt','[+]').data('expanded', 0);
-        $('#treetoggletip').html('{{ExpandAll}}');
+        $('#treetoggle', '#tree').removeClass('off').addClass('on');
+        $('#treetoggletip', '#tree').html('{{ExpandAll}}');
     }
 
     oTable = $('#tree').dataTable({
@@ -110,33 +110,24 @@ $(function() {
         }
     });
 
-    $('#treetoggle').click(function(event) {
-        event.preventDefault();
-
-        $(document.body).addClass('wait');
-
-        /* Forces show of processing indicator ... */
-        setTimeout(function() {
-            var toggler = $('#treetoggle');
-            pauseRedraw = true;
-            if (toggler.data('expanded') == 1) {
-                oTable.treetable('collapseAll');
-                toggler.attr('src','/images/ico/toggle_expand.png').attr('alt','[+]').data('expanded', 0);
-                $('#treetoggletip').html('{{ExpandAll}}');
-                lscache.set(sHNC, true);
-            } else {
-                hiddenNodes = [];
-                lscache.set(sHN, hiddenNodes);
-                oTable.treetable('expandAll');
-                toggler.attr('src','/images/ico/toggle.png').attr('alt','[-]').data('expanded', 1);
-                $('#treetoggletip').html('{{CollapseAll}}');
-                lscache.set(sHNC, false);
-            }
-            pauseRedraw = false;
-            oTable.fnDraw();
-
-            $(document.body).removeClass('wait');
-        }, 1);
+    $('#treetoggle', '#tree').click(function(event) {
+        pauseRedraw = true;
+        var el = $(this);
+        if (el.hasClass('off')) {
+            oTable.treetable('collapseAll');
+            el.removeClass('off').addClass('on');
+            $('#treetoggletip').html('{{ExpandAll}}');
+            lscache.set(sHNC, true);
+        } else {
+            hiddenNodes = [];
+            lscache.set(sHN, hiddenNodes);
+            oTable.treetable('expandAll');
+            el.removeClass('on').addClass('off');
+            $('#treetoggletip').html('{{CollapseAll}}');
+            lscache.set(sHNC, false);
+        }
+        pauseRedraw = false;
+        oTable.fnDraw();
     });
 
     $('.droppable').droppable({
@@ -266,7 +257,7 @@ $(function() {
     });
 
     /* Bind click listener to all delete node images */
-    $('#tree tbody').on('click', '.delete-node', function() {
+    $('#tree tbody').on('click', '.node-delete, .node-delete-next', function() {
 
         /* Get tree table Id from parent <tr> */
         var tr   = this.parentNode.parentNode,

@@ -14,7 +14,7 @@ $(function() {
         bSort: false,
         aoColumnDefs: [
             /* Adjust columns with icons */
-            { sWidth: "1%", aTargets: [ 2, 3 ] }
+            { sWidth: "1%", aTargets: [ 2 ] }
         ]
     });
 

@@ -79,6 +79,18 @@ $(function() {
         maxWidth: '400px',
         edgeOffset: 10
     });
+    $('.tip-right, .tipbtn-right').tipTip({
+        attribute: 'tip',
+        defaultPosition: 'right',
+        maxWidth: '400px',
+        edgeOffset: 10
+    });
+    $('.tip-top, .tipbtn-top').tipTip({
+        attribute: 'tip',
+        defaultPosition: 'top',
+        maxWidth: '400px',
+        edgeOffset: 10
+    });
     $('#tiptip_content').addClass('ui-state-default');
 
     $('button, a.button, input[type=submit], input[type=checkbox].button, input[type=radio].button').each(function(id, el) {
@@ -138,6 +150,14 @@ $(function() {
         }
     });
 
+    $('.back-to-top').click(function(e) {
+        e.preventDefault();
+        jQuery('html, body').animate({scrollTop: 0}, fadeDuration);
+        return false;
+    });
+
+    $('.sm').smartmenus({ mainMenuSubOffsetY: 12 });
+
     $('.language').click(function(e) {
         e.preventDefault();
         /* Detect if there is already parameters in URL */
@@ -146,20 +166,15 @@ $(function() {
         return false;
     });
 
-    $('.back-to-top').click(function(e) {
-        e.preventDefault();
-        jQuery('html, body').animate({scrollTop: 0}, fadeDuration);
-        return false;
-    });
-
     shortcut.add('Shift+F1', function() { window.location = '/'; });
     shortcut.add('Shift+F2', function() { window.location = '/dashboard'; });
-    shortcut.add('Shift+F3', function() { window.location = '/list'; });
-    shortcut.add('Shift+F4', function() { window.location = '/channel'; });
-    shortcut.add('Shift+F5', function() { window.location = '/info'; });
-    shortcut.add('Shift+F6', function() { window.location = '/description'; });
+    shortcut.add('Shift+F3', function() { window.location = '/channel'; });
+    shortcut.add('Shift+F4', function() { window.location = '/overview'; });
+    shortcut.add('Shift+F5', function() { window.location = '/list'; });
+    shortcut.add('Shift+F6', function() { window.location = '/info'; });
+    shortcut.add('Shift+F7', function() { window.location = '/description'; });
+    shortcut.add('Shift+F8', function() { window.location = '/weather'; });
     shortcut.add('Alt+L',    function() { window.location = '/logout'; });
-
 });
 
 var timer, verbose = false;

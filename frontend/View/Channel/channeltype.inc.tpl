@@ -1,13 +1,13 @@
 <!-- Add invisible spans for sorting -->
 <!-- IF {READ} AND {WRITE} -->
     <span style="display:none">1</span>
-    <img src="/images/ico/read-write.png" alt="rw">
+    <i class="ico drive-globe"></i>
 <!-- ELSEIF {WRITE} -->
     <span style="display:none">2</span>
-    <img src="/images/ico/write.png" alt="w">
+    <i class="ico drive--pencil"></i>
 <!-- ELSEIF {READ} -->
     <span style="display:none">3</span>
-    <img src="/images/ico/read.png" alt="r">
+    <i class="ico drive--arrow"></i>
 <!-- ELSE -->
     <span style="display:none">4</span>
 <!-- ENDIF -->

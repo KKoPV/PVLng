@@ -1,0 +1,29 @@
+.ico { display: inline-block; background: url('sprite-ico.png') no-repeat top left; width: 16px; height: 16px;  }
+.ico.pix { background-position: 0px 0px; }
+.ico.node-select-all { background-position: -21px 0px;  }
+.ico.node-select-child { background-position: -42px 0px;  }
+.ico.node-insert-next { background-position: -63px 0px;  }
+.ico.node-delete { background-position: -84px 0px;  }
+.ico.node-delete-next { background-position: -105px 0px;  }
+.ico.node-design { background-position: -126px 0px;  }
+.ico.document-invoice { background-position: -147px 0px;  }
+.ico.document--plus { background-position: -168px 0px;  }
+.ico.license-key { background-position: -189px 0px;  }
+.ico.information-frame { background-position: -210px 0px;  }
+.ico.navigation-270-frame { background-position: -231px 0px;  }
+.ico.navigation-090-frame { background-position: -252px 0px;  }
+.ico.navigation-180-frame { background-position: -273px 0px;  }
+.ico.drive { background-position: -294px 0px;  }
+.ico.drive-globe { background-position: -315px 0px;  }
+.ico.drive--pencil { background-position: -336px 0px;  }
+.ico.drive--arrow { background-position: -357px 0px;  }
+.ico.lock { background-position: -378px 0px;  }
+.ico.chart { background-position: -399px 0px;  }
+.ico.plus-circle-frame { background-position: -420px 0px;  }
+.ico.minus-circle-frame { background-position: -441px 0px;  }
+.ico.arrow-split { background-position: -462px 0px;  }
+.ico.arrow-switch { background-position: -483px 0px;  }
+
+.toggle { display: inline-block; background: url('sprite-toggle.png') no-repeat top left; width: 16px; height: 16px;  }
+.toggle.on { background-position: 0px 0px;  }
+.toggle.off { background-position: -21px 0px;  }

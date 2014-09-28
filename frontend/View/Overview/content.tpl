@@ -9,11 +9,6 @@
  */
 -->
 
-<!-- Use this image as spacer for not available moving actions of channels, 1px transparent GIF -->
-<!-- DEFINE SpacerImg -->
-<img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw" style="height:0px" alt="" />
-<!-- END DEFINE -->
-
 <!-- DEFINE ChannelSelectOptions -->
     <option></option>
     <!-- BEGIN CHANNELS -->
@@ -35,15 +30,12 @@
     <thead>
     <tr>
         <th style="text-align:left !important">
-            <img id="treetoggle" data-expanded="1" src="/images/ico/toggle.png" class="fl tipbtn"
-                 width="16" height="16" tip="#treetoggletip" alt="[+]">
+            <i id="treetoggle" class="toggle off fl tipbtn" tip="#treetoggletip"></i>
             <div id="treetoggletip" style="display:none">{{CollapseAll}}</div>
             <div class="c">{{ChannelHierarchy}}</div>
         </th>
         <th></th>
-        <th>
-            <img src="/images/ico/information_frame.png" style="margin-left:10px" class="tip" tip="#IconLegend" alt="?">
-        </th>
+        <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
     </tr>
     </thead>
 
@@ -60,68 +52,52 @@
                 <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
                 <!-- IF {DESCRIPTION} --><small> ({DESCRIPTION})</small><!-- ENDIF -->
                 <!-- IF !{PUBLIC} -->
-                    <img src="/images/ico/lock.png" style="margin-left:.5em" alt="[private]">
+                    <i class="ico lock" style="margin-left:.5em"></i>
                 <!-- ENDIF -->
             </span>
         </td>
 
         <td class="icons">
             <!-- IF {CHILDS} -->
-            <img src="/images/ico/node_insert_next.png" class="btn" onclick="addChild({ID}); return false" alt="+">
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-
-            <!-- IF {HASCHILDS} -->
-            <img src="/images/ico/node_delete.png" class="btn delete-node" alt="--">
-            <!-- ELSE -->
-            <img src="/images/ico/node_delete_next.png" class="btn delete-node" alt="--">
-            <!-- ENDIF -->
-
+            <i class="ico node-insert-next btn" onclick="addChild({ID}); return false"></i>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+            <i class="ico node-delete<!-- IF !{HASCHILDS} -->-next<!-- ENDIF --> btn"></i>
             <!-- IF {LEVEL} > 2 -->
             <form action="/overview/moveup" method="post">
-            <input type="hidden" name="id" value="{ID}">
-            <input type="image" src="/images/ico/navigation_180_frame.png"
-                   style="background-color:transparent" alt="h">
+                <input type="hidden" name="id" value="{ID}">
+                <input type="image" src="/images/ico/navigation_180_frame.png"
+                       style="background-color:transparent" alt="h">
             </form>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {UPPER} != 0 -->
-            <a href="/overview/moveleft" onclick="return moveChild({ID}, 'moveleft')">
-                <img src="/images/ico/navigation_090_frame.png" alt="u">
-            </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <i class="ico navigation-090-frame btn" onclick="return moveChild({ID}, 'moveleft')"></i>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {LOWER} != 0 -->
-            <a href="/overview/moveright" onclick="return moveChild({ID}, 'moveright')">
-                <img src="/images/ico/navigation_270_frame.png" alt="d">
-            </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <i class="ico navigation-270-frame btn" onclick="return moveChild({ID}, 'moveright')"></a>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
         </td>
 
         <td class="icons">
             <!-- IF {READ} -->
-            <a href="/list/{GUID}">
-                <img src="/images/ico/document-invoice.png" alt="l">
-            </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <a href="/list/{GUID}" class="ico document-invoice"></a>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/edit/{ENTITY}?returnto=/overview">
-                <img src="/images/ico/node_design.png" alt="e">
-            </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <a href="/channel/edit/{ENTITY}?returnto=/overview" class="ico node-design"></a>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/add/{ENTITY}?returnto=/overview">
-                <img src="/images/ico/node_select_child.png" alt="e">
-            </a>
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <a href="/channel/add/{ENTITY}?returnto=/overview" class="ico node-select-child"></a>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {CHILDS} AND {GUID} AND {TYPE_ID} != "30" AND !{ALIAS} -->
-            <img src="/images/ico/arrow-split.png" class="btn create-alias" alt="a">
-            <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
+            <i class="ico arrow-split btn create-alias"></i>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {GUID} -->
-            <img src="/images/ico/license-key.png" class="btn guid" data-guid="{GUID}" alt="G">
+            <i class="ico license-key guid btn" data-guid="{GUID}"></i>
             <!-- ENDIF -->
         </td>
     </tr>
@@ -130,9 +106,8 @@
 
     <tr data-tt-id="1" class="droppable group">
         <td class="icons">
-            <img src="/images/ico/plus_circle_frame.png" class="btn" alt="+"
-                 style="margin-left:8px;margin-right:6px" onclick="addChild(1)">
-            <img src="/images/ico/information_frame.png" class="tip" tip="#DragDropHelp" alt="?">
+            <i class="ico plus-circle-frame btn" onclick="addChild(1)"></i>
+            <i class="ico information-frame tip" tip="#DragDropHelp"></i>
             <div id="DragDropHelp" style="display:none">{{DragDropHelp}}</div>
         </td>
         <td></td>
@@ -143,7 +118,7 @@
 
     <tfoot>
     <tr>
-        <th colspan="3" style="padding-top:8px;padding-bottom:8px;text-align:left">
+        <th colspan="2" style="padding-top:8px;padding-bottom:8px;text-align:left">
             <div id="drag-new-wrapper" style="display:none;margin-top:.5em;margin-bottom:1em">
                 <span id="drag-new" class="draggable">
                     <img src="/images/ico/hand.png" class="channel-icon">
@@ -154,6 +129,7 @@
                 <!-- MACRO ChannelSelectOptions -->
             </select>
         </th>
+        <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
     </tr>
     <tfoot>
 </table>
@@ -162,19 +138,19 @@
 
 <div id="IconLegend">
     <div class="icons legendtip">
-        <img src="/images/ico/lock.png">{{PrivateChannel}}<br />
-        <img src="/images/ico/plus_circle_frame.png">{{AddOneToManyChannels}}<br />
-        <img src="/images/ico/node_insert_next.png">{{AssignEntity}}<br />
-        <img src="/images/ico/node_delete_next.png">{{DeleteEntity}}<br />
-        <img src="/images/ico/node_delete.png">{{DeleteBranch}}<br />
-        <img src="/images/ico/navigation_180_frame.png">{{MoveEntityLeft}}<br />
-        <img src="/images/ico/navigation_090_frame.png">{{MoveEntityUp}}<br />
-        <img src="/images/ico/navigation_270_frame.png">{{MoveEntityDown}}<br />
-        <img src="/images/ico/document-invoice.png">{{ListHint}}<br />
-        <img src="/images/ico/node_design.png">{{EditEntity}}<br />
-        <img src="/images/ico/node_select_child.png">{{CloneEntity}}<br />
-        <img src="/images/ico/arrow-split.png">{{AliasEntity}}<br />
-        <img src="/images/ico/license-key.png">{{ShowGUID}}
+        <i class="ico lock"></i>{{PrivateChannel}}<br />
+        <i class="ico plus-circle-frame"></i>{{AddOneToManyChannels}}<br />
+        <i class="ico node-insert-next"></i>{{AssignEntity}}<br />
+        <i class="ico node-delete-next"></i>{{DeleteEntity}}<br />
+        <i class="ico node-delete"></i>{{DeleteBranch}}<br />
+        <i class="ico navigation-180-frame"></i>{{MoveEntityLeft}}<br />
+        <i class="ico navigation-090-frame"></i>{{MoveEntityUp}}<br />
+        <i class="ico navigation-270-frame"></i>{{MoveEntityDown}}<br />
+        <i class="ico document-invoice"></i>{{ListHint}}<br />
+        <i class="ico node-design"></i>{{EditEntity}}<br />
+        <i class="ico node-select-child"></i>{{CloneEntity}}<br />
+        <i class="ico arrow-split"></i>{{AliasEntity}}<br />
+        <i class="ico license-key"></i>{{ShowGUID}}
     </div>
 </div>
 
