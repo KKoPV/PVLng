@@ -85,33 +85,45 @@
     </div>
 
     <div id="tabs-2">
-        <div class="alpha grid_8">
-            <select id="load-delete-view" data-placeholder="--- {{SelectChart}} ---"></select>
-            <button id="btn-load" style="margin:0 1em" class="tip" title="{{Load}}">{{Load}}</button>
-            <button id="btn-delete" data-confirmed="0" class="tip" title="{{Delete}}">{{Delete}}</button>
-            <br /><br />
-            <input id="saveview" type="text" class="fl" value="{VIEW}" size="35" />
-
-            <select id="visibility" style="margin-left:.5em">
-                <option value="0">{{PrivateChart}}</option>
-                <option value="1">{{PublicChart}}</option>
-                <option value="2">{{MobileChart}}</option>
-            </select>
-
-            <img src="/images/ico/information_frame.png" class="tip" title="{{publicHint}}"
-                 style="margin-left:8px;width:16px;height:16px" width="16" height="16" />
-            <button id="btn-save" class="tip" style="margin-left:.5em" title="{{Save}}">{{Save}}</button>
+        <div>
+            <div class="alpha grid_4">
+                <select id="load-delete-view" style="width:100%" data-placeholder="--- {{SelectChart}} ---"></select>
+            </div>
+            <div class="fl">
+                <button id="btn-load" class="tip" title="{{Load}}">{{Load}}</button>
+                <button id="btn-delete" class="tip" style="margin-left:1em" title="{{Delete}}">{{Delete}}</button>
+            </div>
+            <div class="r">
+                <a id="btn-bookmark" href="#" class="tip" title="{{DragBookmark}}">Bookmark</a>
+            </div>
         </div>
-        <div class="r">
-            <a id="btn-bookmark" href="#" class="tip" title="{{DragBookmark}}">Bookmark</a>
-            <br /><br />
-            <a id="btn-permanent" href="#" class="tip" title="{{DragPermanent}}">Permanent bookmark</a>
+
+        <div class="clear"></div><br />
+
+        <div>
+            <div class="alpha grid_4">
+                <input id="saveview" type="text" class="fl" value="{VIEW}" style="width:97%">
+            </div>
+            <div class="fl">
+                <select id="visibility">
+                    <option value="0">{{PrivateChart}}</option>
+                    <option value="1">{{PublicChart}}</option>
+                    <option value="2">{{MobileChart}}</option>
+                </select>
+                <button id="btn-save" class="tip"  style="margin-left:1em"title="{{Save}}">{{Save}}</button>
+                <i class="ico information-frame tip" style="margin-left:1em" title="{{publicHint}}"></i>
+            </div>
+            <div class="r">
+                <a id="btn-permanent" href="#" class="tip" title="{{DragPermanent}}">Permanent bookmark</a>
+            </div>
         </div>
 
         <div class="clear"></div>
     </div>
 
 </div>
+
+<!-- Legend -->
 
 <div id="IconLegend">
     <div class="icons legendtip">

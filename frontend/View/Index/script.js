@@ -1127,16 +1127,15 @@ $(function() {
 
         if (option.val() == '') return;
 
-        if (btn.data('confirmed') == 0) {
+        if (btn.hasClass('confirmed') == 0) {
             /* Replace text, make red and mark confirmed for next click */
-            btn.button({ label: '{{Sure}}?', text: true }).data('confirmed', 1)
-               .find('.ui-button-text').css('color', 'red');
+            btn.button({ label: '{{Sure}}?', text: true }).addClass('confirmed');
             /* Reset after 5s */
             setTimeout(function() {
-                $('#btn-delete').button({ label: '&nbsp;', text: false }).data('confirmed', 0);
+                $('#btn-delete').button({ label: '&nbsp;', text: false }).removeClass('confirmed');
             }, 5000);
         } else {
-            btn.button({ label: '&nbsp;', text: false, }).button('disable').data('confirmed', 0);
+            btn.button({ label: '&nbsp;', text: false, }).button('disable').removeClass('confirmed');
             $('#chart').addClass('wait');
 
             $.ajax({

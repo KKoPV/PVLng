@@ -96,6 +96,10 @@
     display: none;
 }
 
+.confirmed .ui-button-text {
+    color: red;
+}
+
 .disabled {
     color: #C0C0C0;
 }
