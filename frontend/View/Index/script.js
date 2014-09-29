@@ -322,6 +322,7 @@ function ChartDialog( id ) {
     $('#d-time2').val(p.time2);
     $('#d-time-slider').slider('values', [ TimeStrToSec(p.time1), TimeStrToSec(p.time2) ]);
     $('#d-legend').prop('checked', p.legend);
+    $('#d-hidden').prop('checked', p.hidden);
     $('#d-position').text(p.position);
     $('#d-position-slider').slider('value', p.position);
 
@@ -567,13 +568,15 @@ function updateChart( forceUpdate, scroll ) {
                   ? ' (' + attr.description + ')'
                   : '';
 
-                var serie = { /* HTML decode channel name */
+                var serie = {
                     data: [],
                     color: channel.color,
                     id: channel.id,
+                    /* HTML decode channel name */
                     name: $('<div/>').html(attr.name + t).text(),
                     showInLegend: channel.legend,
                     type: channel.type,
+                    visible: !channel.hidden,
                     yAxis: channel.axis,
                     /* Own properties */
                     colorDiff: channel.colorusediff,
@@ -986,6 +989,7 @@ $(function() {
                 p.colordiff = $('#d-color-diff').spectrum('get').toHexString();
                 p.threshold = +$('#d-color-threshold').val().replace(',', '.');
                 p.legend = $('#d-legend').is(':checked');
+                p.hidden = $('#d-hidden').is(':checked');
                 p.position = +$('#d-position').text();
 
                 p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
@@ -1043,7 +1047,6 @@ $(function() {
         } else if (this.value == 'scatter') {
             notScatter.addClass('disabled');
             notScatter.find('input, select').prop('disabled', true);
-            $('#d-color-use-diff').iCheck('uncheck').trigger('ifToggled');
         }
         $('input').iCheck('update');
     });

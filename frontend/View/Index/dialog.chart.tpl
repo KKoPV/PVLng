@@ -131,19 +131,19 @@
         </tr>
         <tr class="even">
             <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
-            <td class="not-bar">
-                <!-- Align controls correct using a table ... -->
+            <td class="not-bar not-scatter">
+                <!-- Align controls correct using a simple table ... -->
                 <table><tr>
                 <td style="padding-left:0">
-                    <input id="d-color-use-diff" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="0" checked="checked">
+                    <input id="d-color-use-diff" class="iCheck" type="radio" name="color-pos-neg" value="0" checked="checked">
                     <label for="d-color-use-diff">{{no}}</label>
                 </td>
                 <td>
-                    <input id="d-color-pos" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="1">
+                    <input id="d-color-pos" class="iCheck" type="radio" name="color-pos-neg" value="1">
                     <label for="d-color-pos">{{above}}</label>
                 </td>
                 <td>
-                    <input id="d-color-neg" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="-1">
+                    <input id="d-color-neg" class="iCheck" type="radio" name="color-pos-neg" value="-1">
                     <label for="d-color-neg">{{below}}</label>
                 </td>
                 <td>
@@ -171,9 +171,13 @@
         </tr>
         <tr class="even">
             <td><label for="d-legend">{{Legend}}</label></td>
-            <td><input id="d-legend" type="checkbox" class="iCheck" /></td>
+            <td><input id="d-legend" type="checkbox" class="iCheck"></td>
         </tr>
         <tr class="odd">
+            <td><label for="d-hidden">{{StartHidden}}</label></td>
+            <td><input id="d-hidden" type="checkbox" class="iCheck"></td>
+        </tr>
+        <tr class="even">
             <td>
                 <label for="d-position">{{ChartPosition}}</label>
                 <img src="/images/ico/information_frame.png" class="ico tip"

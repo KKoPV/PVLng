@@ -44,6 +44,7 @@ function presentation( data ) {
     this.time2 = '24:00';
     this.legend = true;
     this.position = 0;
+    this.hidden = false;
 
     try {
         data = JSON.parse(data);

@@ -48,3 +48,6 @@ BEGIN
   RETURN @ID;
 END;;
 DELIMITER ;
+
+CREATE OR REPLACE VIEW `pvlng_performance_view` AS
+select `aggregation`,`action`,unix_timestamp(concat(`year`,'-',`month`,'-',`day`,' ',`hour`)) AS `timestamp`,`average` from `pvlng_performance_avg`;
