@@ -109,6 +109,12 @@ return array(
              */
             'CurveDays' => 5,
             /**
+             * How to calculate the average
+             * 0 - harmonic (default)
+             * 1 - arithmetic
+             */
+            'Average' => 0,
+            /**
              * Icons
              */
             'Icons' => array(
@@ -127,20 +133,19 @@ return array(
             'AverageDays' => 5,
         ),
 
-        /**
-         * How to calculate the average of data in History channels
-         *
-         * 0 - linear (default)
-         * 1 - harmonic
-         * 2 - geometric
-         */
-         'History' => array(
-             'Average' => 0
-         ),
+        'History' => array(
+            /**
+             * How to calculate the average of data in History channels
+             * 0 - arithmetic (default)
+             * 1 - harmonic
+             * 2 - geometric
+             */
+            'Average' => 0
+        ),
 
-         'Estimate' => array(
-             'Marker' => '/images/energy.png'
-         ),
+        'Estimate' => array(
+            'Marker' => '/images/energy.png'
+        ),
     ),
 
     /**

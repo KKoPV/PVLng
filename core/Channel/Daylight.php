@@ -96,8 +96,10 @@ class Daylight extends InternalCalc {
                 ))
               ->group('`timestamp` DIV 86400');
 
-            // Select average of inner select
-            $this->resolution = $this->db->queryOne('SELECT '.$q->AVG('data').' FROM ('.$q->SQL().') t');
+            $mean = ($this->config->get('Model.Daylight.Average') == 0)
+                  ? /* Select harmonic mean   */ $q->COUNT('data').'/SUM(1/`data`)'
+                  : /* Select arithmetic mean */ $q->AVG('data');
+            $this->resolution = $this->db->queryOne('SELECT '.$mean.' FROM ('.$q->SQL().') t');
         }
 
         // Get marker icons to $Icon_sunrise, $Icon_zenit, $Icon_sunset
