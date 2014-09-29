@@ -28,6 +28,21 @@ function moveChild( id, action ) {
 }
 
 /**
+ * Add class "marked-for-deletion" for all relevant rows,
+ * call recursive and move downwards to handle all sub channels
+ */
+function markRows4Deletion( id) {
+    oTable.$('tr').each(function(i, tr) {
+        tr = $(tr);
+        if (tr.data('tt-id') == id) {
+            tr.animate({ backgroundColor: '#FFCCCC' }).addClass('marked-for-deletion');
+        } else if (tr.data('tt-parent-id') == id) {
+            markRows4Deletion(tr.data('tt-id'));
+        }
+    });
+}
+
+/**
  *
  */
 var oTable, cancelDragging;
@@ -260,16 +275,11 @@ $(function() {
     $('#tree tbody').on('click', '.node-delete, .node-delete-next', function() {
 
         /* Get tree table Id from parent <tr> */
-        var tr   = this.parentNode.parentNode,
-            node = $(tr).data('tt-id'),
-            msg  = $(tr).hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
+        var tr = $(this.parentNode.parentNode);
 
-        oTable.$('tr').each(function(i, tr) {
-            var tr = $(tr);
-            if (tr.data('tt-id') == node || tr.data('tt-parent-id') == node) {
-                tr.animate({ backgroundColor: '#FFCCCC' }).addClass('marked-for-deletion');
-            }
-        });
+        markRows4Deletion(tr.data('tt-id'));
+
+        var msg = tr.hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
 
         $.confirm($('<p/>').html(msg), '{{Confirm}}', '{{Yes}}', '{{No}}')
         .then(function(ok) {
