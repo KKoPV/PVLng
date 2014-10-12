@@ -69,32 +69,32 @@ CREATE TABLE `pvlng_settings` (
   `value` varchar(100) NOT NULL,
   `order` tinyint(3) unsigned NOT NULL,
   `description` varchar(1000) NOT NULL,
-  `type` enum('','num','bool','option') NOT NULL,
+  `type` enum('str','num','bool','option') NOT NULL,
   `data` varchar(255) NOT NULL,
   PRIMARY KEY (`scope`,`name`,`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT='Application settings';
 
 INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `description`, `type`, `data`) VALUES
-('core', '', 'Cookie', 'PVLng', 40, 'Session cookie name', '', ''),
 ('core', '', 'Language', 'en', 10, 'Default language', 'option', 'en:English;de:Deutsch'),
+('core', '', 'Latitude', '', 50, 'Location latitude<br /><small>Your geographic coordinate that specifies the north-south position (-90..90)</small>', 'num', ''),
+('core', '', 'Longitude', '', 60, 'Location longitude<br /><small>Your geographic coordinate that specifies the east-west position (-180..180)</small>', 'num', ''),
 ('core', '', 'SendStats', '1', 30, 'Send anonymous statistics', 'bool', ''),
-('core', '', 'Title', 'PhotoVoltaic Logger new generation', 20, 'Your personal title', '', ''),
-('core', '', 'Latitude', '51.5486', 50, 'Location latitude<br /><small>Your geographic coordinate that specifies the north-south position (-90..90)</small>', 'num', ''),
-('core', '', 'Longitude', '12.1333', 60, 'Location longitude<br /><small>Your geographic coordinate that specifies the east-west position (-180..180)</small>', 'num', ''),
+('core', '', 'Title', 'PhotoVoltaic Logger new generation', 20, 'Your personal title (HTML allowed)', 'str', ''),
 ('controller', 'Index', 'ChartHeight', '528', 10, 'Default chart height', 'num', ''),
 ('controller', 'Index', 'NotifyAll', '1', 30, 'Notify overall loading time for all channels', 'bool', ''),
 ('controller', 'Index', 'NotifyEach', '0', 40, 'Notify loading time for each channel', 'bool', ''),
 ('controller', 'Index', 'Refresh', '300', 20, 'Auto refresh chart each ? seconds, set 0 to disable', 'num', ''),
 ('controller', 'Mobile', 'ChartHeight', '320', 0, 'Default chart height', 'num', ''),
 ('controller', 'Tariff', 'TimesLines', '10', 0, 'Initial times lines for each taiff', 'num', ''),
-('controller', 'Weather', 'APIkey', '', 0, 'Wunderground API key', '', ''),
+('controller', 'Weather', 'APIkey', '', 0, 'Wunderground API key', 'str', ''),
 ('model', 'Daylight', 'Average', '0', 10, 'Calculation method for irradiation average', 'option', '0:geometric mean;1:arithmetic mean'),
 ('model', 'Daylight', 'CurveDays', '5', 20, 'Build average over the last ? days', 'num', ''),
-('model', 'Daylight', 'SunriseIcon', '/images/sunrise.png', 30, 'Sunrise marker image', '', ''),
-('model', 'Daylight', 'SunsetIcon', '/images/sunset.png', 40, 'Sunset marker image', '', ''),
-('model', 'Daylight', 'ZenitIcon', '/images/zenit.png', 50, 'Sun zenit marker image', '', ''),
-('model', 'Estimate', 'Marker', '/images/energy.png', 0, 'Marker image', '', ''),
-('model', 'History', 'AverageDays', '5', 0, 'Build average over the last ? days', 'num', '');
+('model', 'Daylight', 'SunriseIcon', '/images/sunrise.png', 30, 'Sunrise marker image', 'str', ''),
+('model', 'Daylight', 'SunsetIcon', '/images/sunset.png', 40, 'Sunset marker image', 'str', ''),
+('model', 'Daylight', 'ZenitIcon', '/images/zenit.png', 50, 'Sun zenit marker image', 'str', ''),
+('model', 'Estimate', 'Marker', '/images/energy.png', 0, 'Marker image', 'str', ''),
+('model', 'History', 'AverageDays', '5', 0, 'Build average over the last ? days', 'num', ''),
+('model', 'InternalCalc', 'LifeTime', '60', 0, 'Buffer lifetime of calculated data in seconds<br /><small>(e.g. if your store most data each 5 minutes, set to 300 and so on)</small>', 'num', '');
 
 CREATE VIEW `pvlng_settings_keys` AS select concat(`pvlng_settings`.`scope`,if((`pvlng_settings`.`name` <> ''),concat('.',`pvlng_settings`.`name`),''),'.',`pvlng_settings`.`key`) AS `key`,`pvlng_settings`.`value` AS `value` from `pvlng_settings`;
 
@@ -107,9 +107,9 @@ CREATE TABLE `pvlng_reading_tmp` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Buffer and remember internal calculated data';
 
 INSERT INTO `pvlng_reading_tmp` (`id`, `start`, `end`, `created`) VALUES
-(40,	1413064800,	1413151200,	1413142806),
-(77,	1413064800,	1413151200,	1413142812),
-(213,	1413064800,	1413151200,	1413141754);
+(40, 1413064800, 1413151200, 1413142806),
+(77, 1413064800, 1413151200, 1413142812),
+(213, 1413064800, 1413151200, 1413141754);
 
 DELIMITER ;;
 
