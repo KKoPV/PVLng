@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 return array(
@@ -66,22 +66,6 @@ return array(
     ),
 
     /**
-     * Default language, 'en' or 'de', Translators are welcome :-)
-     *
-     * Will be overwritten by browsers accept language settings if exists
-     */
-    'Language' => 'en',
-
-    /**
-     * Defaults, no need to change
-     *
-     * Login cookie settings for private installation
-     */
-    'Cookie' => array(
-        'Name' => 'PVLng',
-    ),
-
-    /**
      * Preferd cache mode, auto detect best one if empty
      */
     'Cache' => NULL,
@@ -93,135 +77,9 @@ return array(
     # 'Cache' => 'Mock',         // Disable caching complete
 
     /**
-     * Send anonymous statistics: channel count and reading count overall
-     * You can check in statistics.php what will be send
-     */
-    'SendStatistics' => TRUE,
-
-    /**
-     * Model flags
-     */
-    'Model' => array(
-
-        'Daylight' => array(
-            /**
-             * Average of last ? days
-             */
-            'CurveDays' => 5,
-            /**
-             * How to calculate the average
-             * 0 - harmonic (default)
-             * 1 - arithmetic
-             */
-            'Average' => 0,
-            /**
-             * Icons
-             */
-            'Icons' => array(
-                'Sunrise' => '/images/sunrise.png',
-                'Sunset'  => '/images/sunset.png',
-                'Zenit'   => '/images/zenit.png',
-                // To disable zenit icon, set to NULL
-                #'Zenit'   => NULL,
-            )
-        ),
-
-        'IrradiationForecast' => array(
-            /**
-             * Average of last ? days for irradiation sensor channel
-             */
-            'AverageDays' => 5,
-        ),
-
-        'History' => array(
-            /**
-             * How to calculate the average of data in History channels
-             * 0 - arithmetic (default)
-             * 1 - harmonic
-             * 2 - geometric
-             */
-            'Average' => 0
-        ),
-
-        'Estimate' => array(
-            'Marker' => '/images/energy.png'
-        ),
-    ),
-
-    /**
-     * Controller settings
-     */
-    'Controller' => array(
-
-        'Index' => array(
-            /**
-             * Chart canvas height, width is 940px,
-             *
-             * - Ratio  5 x  4 : 752
-             * - Ratio  4 x  3 : 705
-             * - Ratio 16 x 10 : 587
-             * - Ratio 10 x  6 : 564
-             * - Ratio 16 x  9 : 528
-             */
-            'ChartHeight' => 528,
-
-            /**
-             * Chart auto refresh timeout in sec., set 0 for no automatic refresh
-             */
-            'Refresh' => 300,
-
-            /**
-             * Show notification for each loaded channel
-             */
-            'NotifyLoadEach' => FALSE,
-
-            /**
-             * Show notification for loaded channels when all channels was loaded
-             */
-            'NotifyLoadAll' => TRUE,
-        ),
-
-        'Dashboard' => array(
-            /**
-             * Login for dashboards required?
-             */
-            'Login' => TRUE,
-        ),
-
-        'Tariff' => array(
-            /**
-             * Tariff price line count
-             */
-            'TimesLineCount' => 6,
-        ),
-
-        'Mobile' => array(
-            /**
-             * Chart canvas height
-             */
-            'ChartHeight' => 320,
-        ),
-
-        'Weather' => array(
-            /**
-             * Wunderground API key
-             * http://www.wunderground.com/weather/api/
-             */
-            'APIkey' => ''
-        ),
-
-    ),
-
-    /**
      * View settings
      */
     'View' => array(
-
-        /**
-         * Replace static images by base64 encoded inline code
-         * Only for images with max x/y of 8px
-         */
-        'InlineImages'     => 8,
 
         /**
          * FALSE, 0, 10, 62
