@@ -140,6 +140,13 @@ $api->cache = Cache::factory(
     $config->get('Cache')
 );
 
+slimMVC\ORM::setDatabase($api->db);
+slimMVC\ORM::setCache($api->cache);
+
+foreach ((new ORM\SettingsKeys)->find()->asAssoc() as $setting) {
+    $config->set($setting['key'], $setting['value']);
+}
+
 /**
  * Nested set for channel tree
  */

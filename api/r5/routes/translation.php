@@ -14,7 +14,7 @@
 $api->get('/translation', function() use ($api) {
 
     $texts = array(array(
-        'Code'    => 'Code (don\'t touch)',
+        'Code'    => 'Code (don\'t touch!)',
         'Content' => 'Translate this'
     ));
 
@@ -28,7 +28,7 @@ $api->get('/translation', function() use ($api) {
       ->order('code_set')
       ->order('code_code');
 
-    $api->db->Buffered = TRUE;
+    $api->db->setBuffered();
 
     if ($res = $api->db->query($q)) {
         while ($row = $res->fetch_assoc()) $texts[] = $row;

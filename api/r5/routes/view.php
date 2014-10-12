@@ -34,13 +34,17 @@ $api->get('/views(/:language)', function( $language='en' ) use ($api) {
         );
     }
 
+    $noData = $api->request->get('no_data');
+
     $views = new ORM\View;
 
     if ($api->request->get('sort_by_visibilty')) $views->order('public');
 
     foreach ($views->order('name')->find() as $view) {
         if ($api->APIKeyValid == 1 OR $view->getPublic() == 1) {
-            $result[] = $view->asAssoc();
+            $data = $view->asAssoc();
+            if ($noData) unset($data['data']);
+            $result[] = $data;
         }
     }
 

@@ -14,8 +14,8 @@ class View extends Slim\View {
      */
     public function render( $result ) {
 
-        $app = Slim\Slim::getInstance();
-        $response = $app->response;
+        $this->app = API::getInstance();
+        $response = $this->app->response;
 
         if ($filename = $this->get('filename')) {
             $response['Cache-Control'] = 'no-cache, must-revalidate';
@@ -52,6 +52,11 @@ class View extends Slim\View {
     /**
      *
      */
+    protected $app;
+
+    /**
+     *
+     */
     protected function asCSV( $result, $sep ) {
         if (!$result instanceof Buffer AND !is_array($result)) {
             $result = array($result);
@@ -78,8 +83,7 @@ class View extends Slim\View {
 
         require_once LIB_DIR . DS . 'contrib' . DS . 'Array2XML.php';
 
-        $config = slimMVC\Config::getInstance();
-        $app = slimMVC\App::getInstance();
+        $config = $this->app->config;
 
         $data = $config->get('View.XML.Data', 'data');
         $node = $config->get('View.XML.Node', 'reading');

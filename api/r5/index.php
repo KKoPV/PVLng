@@ -8,19 +8,38 @@
  * @version    1.0.0
  */
 
-setlocale(LC_NUMERIC, 'C');
-
 /**
  * Directories
  */
 define('DS',       DIRECTORY_SEPARATOR);
-define('API_DIR',  dirname(__FILE__));
-define('ROOT_DIR', dirname(dirname(dirname(__FILE__))));
+define('BASE_DIR', dirname(__FILE__));
+define('ROOT_DIR', dirname(dirname(BASE_DIR)));
+define('CONF_DIR', ROOT_DIR . DS . 'config');
 define('CORE_DIR', ROOT_DIR . DS . 'core');
 define('LIB_DIR',  ROOT_DIR . DS . 'lib');
-define('TEMP_DIR', ROOT_DIR . DS . 'tmp');
+define('TEMP_DIR', ROOT_DIR . DS . 'tmp'); // Outside document root!
 
-file_exists(API_DIR.DS.'prepend.php') && include API_DIR.DS.'prepend.php';
+$version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
+define('PVLNG',              'PhotoVoltaic Logger new generation');
+define('PVLNG_VERSION',      $version[0]);
+define('PVLNG_VERSION_DATE', $version[1]);
+
+/**
+ * Initialize
+ */
+setlocale(LC_NUMERIC, 'C');
+
+if ($dev = file_exists(ROOT_DIR . DS . '.develop')) {
+    ini_set('display_startup_errors', 1);
+    ini_set('display_errors', 1);
+    error_reporting(-1);
+} else {
+    ini_set('display_startup_errors', 0);
+    ini_set('display_errors', 0);
+    error_reporting(0);
+}
+
+file_exists(BASE_DIR.DS.'prepend.php') && include BASE_DIR.DS.'prepend.php';
 
 /**
  * Initialize Loader
@@ -29,185 +48,97 @@ include LIB_DIR . DS . 'Loader.php';
 
 Loader::register(
     array(
-        'path'    => array(LIB_DIR, CORE_DIR),
+        'path'    => array(BASE_DIR, LIB_DIR, CORE_DIR),
         'pattern' => array('%s.php'),
         'exclude' => array('contrib/')
     ),
     TEMP_DIR
 );
 
-class API extends Slim\Slim {
-
-    /**
-     * Get named parameter as string
-     */
-    public function strParam( $name, $default='' ) {
-        $value = trim($this->request->params($name));
-        return !is_null($value) ? $value : $default;
-    }
-
-    /**
-     * Get named parameter as integer
-     */
-    public function intParam( $name, $default=0 ) {
-        $value = trim($this->request->params($name));
-        return $value != '' ? (int) $value : (int) $default;
-    }
-
-    /**
-     * Get named parameter as boolean, all of (true|on|yes|1) interpreted as TRUE
-     */
-    public function boolParam( $name, $default=FALSE ) {
-        $value = strtolower(trim($this->request->params($name)));
-        return $value != ''
-             ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
-             : $default;
-    }
-
-    /**
-     *
-     */
-    public function stopAPI( $message, $code=400 ) {
-        $this->status($code);
-        $this->response()->header('X-Status-Reason', $message);
-        $this->render(array( 'status'=>$code<400?'success':'error', 'message'=>$message ));
-        $this->stop();
-    }
-}
-
-$config = slimMVC\Config::getInstance()
-        ->load(ROOT_DIR . DS . 'config' . DS . 'config.default.php')
-        ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
-        ->load('config.php', FALSE);
-
-$config->set('develop', file_exists(ROOT_DIR . DS . '.develop'));
-
-if ($config->get('develop')) {
-    ini_set('display_startup_errors', 1);
-    ini_set('display_errors', 1);
-    error_reporting(-1);
-}
-
-require 'View.php';
-
 $api = new API(array(
-    'mode'      => 'production',
-    'log.level' => Slim\Log::ALERT,
+    'mode'      => $dev ? 'development' : 'production',
+    'log.level' => $dev ? Slim\Log::INFO : Slim\Log::ALERT,
     'debug'     => FALSE, // No debug mode at all
     'view'      => new View
 ));
 
-// ---------------------------------------------------------------------------
-// Detect language to use
-// ---------------------------------------------------------------------------
-// 1st the default
-$lang = $config->get('Language', 'en');
-
-// 2nd Check accepted languages
-if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-    foreach (explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) as $l) {
-        $l = explode('-', $l);
-        if ($l[0] == 'en' OR $l[0] == 'de') {
-            $lang = $l[0];
-            break;
-        }
-    }
-}
-
-$api->Language = $lang;
+$api->Language = 'en';
+$api->version  = substr($api->request()->getRootUri(), 5);
 
 /**
- * Setup database connection
+ * Configuration
  */
-$c = $config->get('Database');
-slimMVC\MySQLi::setCredentials(
-    $c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']
-);
-slimMVC\MySQLi::$SETTINGS_TABLE = 'pvlng_config';
-
-$api->version = substr($api->request()->getRootUri(), 5);
-
-if ($config->get('develop')) {
-    $api->config('mode', 'development');
-    $api->config('log.level', Slim\Log::INFO);
-}
-
-$api->db = slimMVC\MySQLi::getInstance();
-
-$api->cache = Cache::factory(
-    array(
-        'Directory' => TEMP_DIR,
-        'TTL'       => 86400
-    ),
-    $config->get('Cache')
-);
+$api->container->singleton('config', function() {
+    return (new slimMVC\Config)
+           ->load(ROOT_DIR . DS . 'config' . DS . 'config.default.php')
+           ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
+           ->load('config.php', FALSE);
+});
 
 /**
- * Nested set for channel tree
+ * Database
  */
-include_once LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
-
-NestedSet::Init(array (
-    'db'    => $api->db,
-    'debug' => true,
-    'lang'  => 'en',
-    'path'  => LIB_DIR . DS . 'contrib' . DS . 'messages',
-    'db_table' => array (
-        'tbl'  => 'pvlng_tree',
-        'nid'  => 'id',
-        'l'    => 'lft',
-        'r'    => 'rgt',
-        'mov'  => 'moved',
-        'pay'  => 'entity'
-    )
-));
-
-BabelKitMySQLi::setParams(array( 'table' => 'pvlng_babelkit' ));
-BabelKitMySQLi::setDB($api->db);
-BabelKitMySQLi::setCache($api->cache);
-
-try {
-    I18N::setBabelKit(BabelKitMySQLi::getInstance());
-} catch (Exception $e) {
-    die('<p>Missing translations!</p><p>Did you loaded '
-       .'<tt><strong>sql/pvlng.sql</strong></tt> '
-       .'into your database?!</p>');
-}
-
-I18N::setLanguage($api->Language);
-I18N::setCodeSet('app');
-I18N::setAddMissing($config->get('I18N.Add'));
-if ($config->get('I18N.Mark')) {
-    I18N::setMarkMissing();
-}
+$api->container->singleton('db', function() use ($api) {
+    extract($api->config->get('Database'), EXTR_REFS);
+    $db = new \slimMVC\MySQLi($host, $username, $password, $database, $port, $socket);
+    $db->setSettingsTable('pvlng_config');
+    return $db;
+});
 
 /**
- * Some defines
+ * Cache
  */
-$version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
-define('PVLNG',              'PhotoVoltaic Logger new generation');
-define('PVLNG_VERSION',      $version[0]);
-define('PVLNG_VERSION_DATE', $version[1]);
-
-$api->response->headers->set('X-Version', PVLNG_VERSION);
-$api->response->headers->set('X-API', $api->version);
+$api->container->singleton('cache', function() use ($api) {
+    return Cache::factory(
+        array('Directory' => TEMP_DIR, 'TTL' => 86400),
+        $api->config->get('Cache')
+    );
+});
 
 // ---------------------------------------------------------------------------
-// The helper functions
+// Hooks
 // ---------------------------------------------------------------------------
-Slim\Route::setDefaultConditions(array(
-    'guid' => '(\w{4}-){7}\w{4}',
-    'id'   => '\d+',
-    'slug' => '[@\w\d-]+'
-));
-
-/**
- * - Detect requested content type by file extension, correct PATH_INFO value
- *   without extension and set Response content header
- * - Analyse X-PVLng-Key header
- */
 $api->hook('slim.before', function() use ($api) {
+
+    slimMVC\ORM::setDatabase($api->db);
+    slimMVC\ORM::setCache($api->cache);
+
+    foreach ((new ORM\SettingsKeys)->find() as $setting) {
+        $api->config->set($setting->getKey(), $setting->getValue());
+    }
+
+    BabelKitMySQLi::setParams(array( 'table' => 'pvlng_babelkit' ));
+    BabelKitMySQLi::setDB($api->db);
+    BabelKitMySQLi::setCache($api->cache);
+
+    I18N::setLanguage($api->Language);
+    I18N::setCodeSet('app');
+    I18N::setBabelKit(BabelKitMySQLi::getInstance());
+
+    /**
+     * Nested set for channel tree
+     */
+    include_once LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
+
+    NestedSet::Init(array (
+        'db'    => $api->db,
+        'debug' => FALSE,
+        'lang'  => 'en',
+        'path'  => LIB_DIR . DS . 'contrib' . DS . 'messages',
+        'db_table' => array (
+            'tbl'  => 'pvlng_tree',
+            'nid'  => 'id', 'l' => 'lft', 'r' => 'rgt', 'mov'  => 'moved', 'pay' => 'entity'
+        )
+    ));
+
+    $headers = $api->Request()->Headers();
+
+    /**
+     * Detect requested content type by file extension, correct PATH_INFO value
+     * without extension and set Response content header
+     */
     $PathInfo = $api->environment['PATH_INFO'];
+
     if ($dot = strrpos($PathInfo, '.')) {
         // File extension
         $ext = substr($PathInfo, $dot+1);
@@ -232,12 +163,12 @@ $api->hook('slim.before', function() use ($api) {
     $api->contentType($type);
 
     // Analyse X-PVLng-Key header
-    $APIKey = $api->request->headers->get('X-PVLng-Key');
+    $key = $headers->get('X-PVLng-Key');
 
-    if ($APIKey == '') {
+    if ($key == '') {
         // Key was not given
         $api->APIKeyValid = FALSE;
-    } elseif ($APIKey == $api->db->queryOne('SELECT getAPIKey()')) {
+    } elseif ($key == $api->db->queryOne('SELECT getAPIKey()')) {
         // Key is given and valid
         $api->APIKeyValid = TRUE;
     } else {
@@ -246,30 +177,32 @@ $api->hook('slim.before', function() use ($api) {
     }
 
     // Analyse X-PVLng-DryRun header
-    if ($api->dryrun = $api->request->headers->get('X-PVLng-DryRun', FALSE)) {
+    if ($api->dryrun = $headers->get('X-PVLng-DryRun', FALSE)) {
         $api->contentType('text/plain');
         echo 'Dry run, no data will be saved.', PHP_EOL;
     }
 });
 
-/**
- *
- */
-$api->error(function($e) use ($api) {
-    if ($api->request->headers->get('X-PVLng-Trace')) {
-        echo $e;
-    } else {
-        $api->stopAPI($e->getMessage(), $e->getCode());
+class TimerMiddleware extends Slim\Middleware {
+    public function call() {
+        $app = $this->app;
+        $this->time = microtime(TRUE);
+        $this->next->call();
+        $this->time = microtime(TRUE) - $this->time;
+        $headers = $app->Response()->Headers();
+        $headers->set('X-Time',    sprintf('%.1f ms', $this->time*1000));
+        $headers->set('X-Queries', $app->db->getQueryCount());
+        $headers->set('X-Memory',  sprintf('%d kByte', memory_get_peak_usage(TRUE)/1024));
+        $headers->set('X-Version', PVLNG_VERSION);
+        $headers->set('X-API',     $app->version);
     }
-});
+    protected $time;
+}
+$api->add(new TimerMiddleware);
 
-/**
- *
- */
-$api->notFound(function() use ($api) {
-    // Catch also /
-    $api->redirect($api->request()->getRootUri() . '/help');
-});
+// ---------------------------------------------------------------------------
+// The helper functions
+// ---------------------------------------------------------------------------
 
 /**
  *
@@ -294,15 +227,29 @@ $accessibleChannel = function(Slim\Route $route) use ($api) {
 /**
  *
  */
-$checkLocation = function() use ($api, $config) {
-    $api->Latitude  = $config->get('Location.Latitude');
-    $api->Longitude = $config->get('Location.Longitude');
+$checkLocation = function() use ($api) {
+    $api->Latitude  = $api->config->get('Core.Latitude');
+    $api->Longitude = $api->config->get('Core.Longitude');
 
     if ($api->Latitude == '' OR $api->Longitude == '') {
-        $api->stopAPI('No valid location defined in configuration', 404);
+        $api->stopAPI('No valid location defined in settings', 404);
     }
 };
 
+/**
+ *
+ */
+$api->error(function($e) use ($api) {
+    if ($api->Request()->Headers()->get('X-PVLng-Trace')) {
+        echo $e;
+    } else {
+        $api->stopAPI($e->getMessage(), $e->getCode());
+    }
+});
+
+/**
+ *
+ */
 function SaveCSVdata( $guid, $rows, $sep ) {
 
     // Ignore empty datasets
@@ -370,13 +317,33 @@ function SaveCSVdata( $guid, $rows, $sep ) {
 }
 
 // ---------------------------------------------------------------------------
+// Declare default conditions before routes
+// ---------------------------------------------------------------------------
+Slim\Route::setDefaultConditions(array(
+    'guid' => '(\w{4}-){7}\w{4}',
+    'id'   => '\d+',
+    'slug' => '[@\w\d-]+'
+));
+
+// ---------------------------------------------------------------------------
 // The routes
 // ---------------------------------------------------------------------------
-foreach (glob(API_DIR.DS.'routes'.DS.'*.php') as $routes) include $routes;
+foreach (glob(BASE_DIR.DS.'routes'.DS.'*.php') as $routes) include $routes;
 
 /**
- * Let's go
+ * Route not found, redirect to help instead
+ */
+$api->notFound(function() use ($api) {
+    // Catch also /
+    $api->redirect($api->request()->getRootUri() . '/help');
+});
+
+/**
+ * Run application
  */
 $api->run();
 
-file_exists(API_DIR.DS.'append.php') && include API_DIR.DS.'append.php';
+file_exists(BASE_DIR.DS.'append.php') && include BASE_DIR.DS.'append.php';
+
+// Send statistics each 6 hours if activated
+if ($api->config->SendStatistics) PVLng::SendStatistics();
