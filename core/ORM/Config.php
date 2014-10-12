@@ -22,14 +22,14 @@ class Config extends ConfigBase {
      *
      */
     public function getAPIkey() {
-        return $this->app->db->queryOne('SELECT `getAPIkey`()');
+        return self::$db->queryOne('SELECT `getAPIkey`()');
     }
 
     /**
      *
      */
     public function resetAPIkey() {
-        $this->app->db->query(
+        self::$db->query(
             'UPDATE `'.$this->table.'` SET `value` = UUID() WHERE `key` = "APIKey" LIMIT 1'
         );
     }

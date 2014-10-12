@@ -133,6 +133,10 @@ return array(
         'default'     => 1
     ),
 
+    'icon' => array(
+        'position'    => 905
+    ),
+
     'comment' => array(
         'position'    => 910,
         'type'        => 'textarea',

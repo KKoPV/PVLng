@@ -9,26 +9,15 @@
  */
 
 /**
- * Token login
- */
-if ($token = $app->request->get('token')) {
-    $AdminUser = $app->config->get('Admin.User');
-    if ($token == PVLng::getLoginToken()) {
-        Session::set('user', $AdminUser);
-        Messages::Success(__('Welcome', $AdminUser));
-    } else {
-        Messages::Error('Sorry, invalid login token');
-        Header('Location: /logout');
-        exit;
-    }
-}
-
-/**
  * Routes
  */
 $app->map('/login', function() use ($app) {
     $app->process('Admin', 'Login');
 })->via('GET', 'POST');
+
+$app->get('/login/:token', function($token) use ($app) {
+    $app->process('Admin', 'Login', array('token' => $token));
+});
 
 $app->any('/logout', function() use ($app) {
     $app->process('Admin', 'Logout');
@@ -36,15 +25,15 @@ $app->any('/logout', function() use ($app) {
 
 $app->map('/adminpass', function() use ($app) {
     $app->process('Admin', 'AdminPassword');
-})->via('GET', 'POST');
+})->via('GET', 'POST')->Language = 'en';
 
-$app->map('/_config', $checkAuth, function() use ($app) {
-    $app->process('Admin', 'Config');
-})->via('GET', 'POST');
+$app->post('/location', function() use ($app) {
+    $app->process('Admin', 'Location');
+})->Language = 'en';
 
 $app->map('/cc', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Clearcache');
-})->via('GET', 'POST');
+})->via('GET', 'POST')->Language = 'en';
 
 $app->get('/bk', function() {
     Header('Location: /public/bk/index.php');

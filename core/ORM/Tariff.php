@@ -30,14 +30,14 @@ class Tariff extends TariffBase {
 
         if (!$this->getId() OR !$from) return;
 
-        $this->app->db->query('
+        self::$db->query('
                 INSERT INTO `pvlng_tariff_date`
                 SELECT {2}, `date`, `cost`
                   FROM `pvlng_tariff_date`
                  WHERE `id` = {1}
         ', $from, $this->getId());
 
-        $this->app->db->query('
+        self::$db->query('
                 INSERT INTO `pvlng_tariff_time`
                 SELECT {2}, `date`, `time`, `days`, `tariff`, `comment`
                   FROM `pvlng_tariff_time`
@@ -68,7 +68,7 @@ class Tariff extends TariffBase {
         $start = $tariff = 0;
         $data = array();
 
-        foreach ($this->app->db->queryRows($sql, $this->getId(), date('Y-m-d', $date)) as $row) {
+        foreach (self::$db->queryRows($sql, $this->getId(), date('Y-m-d', $date)) as $row) {
             if ($row->time != $start) {
                 // New line found
                 $data[] = array(
@@ -115,7 +115,7 @@ class Tariff extends TariffBase {
         $data = array();
 
         while ($from < $to) {
-            foreach ($this->app->db->queryRows($sql, $this->getId(), date('Y-m-d', $from)) as $row) {
+            foreach (self::$db->queryRows($sql, $this->getId(), date('Y-m-d', $from)) as $row) {
                 if ($last != $row->tariff) {
                  $data[date('U', $from) + $row->time] = $row->tariff;
                    $last = $row->tariff;

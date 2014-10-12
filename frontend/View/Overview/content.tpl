@@ -46,8 +46,9 @@
     <tr data-tt-id="{ID}" class="droppable <!-- IF {CHILDS} -->group<!-- ELSE -->channel<!-- ENDIF -->"
         <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
         <td>
+            <a name="_{ID}"></a>
             <span class="icons draggable" data-id="{ID}">
-                <img src="{ICON}" class="channel-icon tip" title="{TYPE}" alt="({TYPE})">
+                <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon tip" title="{TYPE}" alt="({TYPE})">
                 <strong<!-- IF {ALIAS_OF} --> class="alias"<!-- ENDIF -->>{NAME}</strong>
                 <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
                 <!-- IF {DESCRIPTION} --><small> ({DESCRIPTION})</small><!-- ENDIF -->
@@ -80,20 +81,20 @@
         </td>
 
         <td class="icons">
-            <!-- IF {READ} -->
-            <a href="/list/{GUID}" class="ico document-invoice"></a>
+            <!-- IF {TYPE_ID} != "0" -->
+            <a href="/channel/edit/{ENTITY}?returnto=/overview%23_{ID}" class="ico node-design"></a>
             <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/edit/{ENTITY}?returnto=/overview" class="ico node-design"></a>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
-
-            <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/add/{ENTITY}?returnto=/overview" class="ico node-select-child"></a>
+            <a href="/channel/add/{ENTITY}?returnto=/overview%23_{ID}" class="ico node-select-child"></a>
             <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {CHILDS} AND {GUID} AND {TYPE_ID} != "30" AND !{ALIAS} -->
             <i class="ico arrow-split btn create-alias"></i>
+            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+
+            <!-- IF {READ} -->
+            <a href="/list/{GUID}" class="ico document-invoice"></a>
             <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
             <!-- IF {GUID} -->
@@ -178,10 +179,8 @@
         <div style="float:left;padding-top:4px;width:35px">
             <input type="radio" class="iCheck" id="countmax" name="countmax" value="0" checked="checked">
         </div>
-        <label for="countmax">
-            <input type="number" step="1" style="width:3em;margin-right:.5em" class="numbersOnly" name="count" value="1">
-            {{Positions}}
-        </label>
+        <input type="number" step="1" style="width:3em" class="numbersOnly" name="count" value="1">
+        <label for="countmax" style="margin-left:.5em">{{Positions}}</label>
     </p>
     <p>
         <div style="float:left;padding-top:4px;width:35px">
@@ -189,6 +188,5 @@
         </div>
         <label for="movecountmax">{{MoveChannelStartEnd}}</label>
     </p>
-
     </form>
 </div>

@@ -17,24 +17,13 @@ class Overview extends \Controller {
     /**
      *
      */
-    public function __construct() {
-        parent::__construct();
-
-        $this->Tree = \NestedSet::getInstance();
-    }
-
-    /**
-     *
-     */
     public function afterPOST() {
-//         if ($this->Tree->isError()) {
-//             foreach ($this->Tree->getError() as $value) {
-//                 if (strstr($value, 'NestedSet::checkRootNode()') == '')
-//                     \Messages::Error($value);
-//             }
-//         }
-
-        $this->app->redirect('/overview');
+        if ($returnto = \Session::get('returnto')) {
+            \Session::set('returnto');
+            $this->app->redirect($returnto);
+        } else {
+            $this->app->redirect('/overview');
+        }
     }
 
     /**
@@ -43,9 +32,9 @@ class Overview extends \Controller {
     public function Index_Action() {
         $this->view->SubTitle = \I18N::_('Overview');
 
-        /// \Yryie::StartTimer('LoadTreeWithParents', 'Load tree with parents', 'db');
+        /// \Yryie::StartTimer('Load tree with parents', NULL, 'db');
         $this->view->Data = (new \ORM\Tree)->getWithParents();
-        /// \Yryie::StopTimer('LoadTreeWithParents');
+        /// \Yryie::StopTimer();
 
         $channels = array();
         $tblChannels = new \ORM\ChannelView;
@@ -100,7 +89,6 @@ class Overview extends \Controller {
     public function DragDropPOST_Action() {
         if (($target = $this->request->post('target')) == '') return;
 
-
         if ($id = $this->request->post('entity')) {
             // Add new single channel
             $this->adjustTarget($target, $id, $real_target, $offset);
@@ -142,7 +130,7 @@ class Overview extends \Controller {
 
         // Correct position below new target
         while ($offset-- > 0) {
-            if (!$this->Tree->moveLft($id)) break;
+            if (!$this->app->tree->moveLft($id)) break;
         }
     }
 
@@ -154,7 +142,7 @@ class Overview extends \Controller {
             // Set an off-wall high value, loop breaks anyway if can't move anymore...
             $count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
             while ($count--) {
-                if (!$this->Tree->moveLft($id)) break;
+                if (!$this->app->tree->moveLft($id)) break;
             }
         }
     }
@@ -167,7 +155,7 @@ class Overview extends \Controller {
             // Set an off-wall high value, loop breaks anyway if can't move anymore...
             $count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
             while ($count--) {
-                if (!$this->Tree->moveRgt($id)) break;
+                if (!$this->app->tree->moveRgt($id)) break;
             }
         }
     }
@@ -177,7 +165,7 @@ class Overview extends \Controller {
      */
     public function MoveUpPOST_Action() {
         if ($id = $this->request->post('id')) {
-            $this->Tree->moveUp($id);
+            $this->app->tree->moveUp($id);
         }
     }
 
@@ -186,18 +174,13 @@ class Overview extends \Controller {
      */
     public function MoveDownPOST_Action() {
         if ($id = $this->request->post('id')) {
-            $this->Tree->moveDown($id);
+            $this->app->tree->moveDown($id);
         }
     }
 
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected $Tree;
 
     /**
      * Find out if channel to delete has an alias channel and
@@ -226,12 +209,12 @@ class Overview extends \Controller {
             $real_target = $target;
         } else {
             // Target accept NO childs, so find parent and calculate offset for later move
-            $real_target = $this->Tree->getParent($target);
+            $real_target = $this->app->tree->getParent($target);
             $real_target = $real_target['id'];
 
             // Search position of drop target in existing childs
             $holdsSelf = FALSE;
-            $childs = $this->Tree->getChilds($real_target);
+            $childs = $this->app->tree->getChilds($real_target);
             foreach ($childs as $pos=>$child) {
                 if ($child['id'] == $id) {
                     $holdsSelf = $pos;

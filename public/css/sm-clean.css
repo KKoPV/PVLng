@@ -68,6 +68,10 @@
 /* Menu items
 ===================*/
 
+  .sm-clean a.disabled {
+    color:#909090 !important;
+  }
+
   .sm-clean a {
     padding:5px;
     color:#555;
@@ -82,6 +86,7 @@
   .sm-clean a.highlighted {
     color:#D23600;
   }
+
 /*
   .sm-clean-vertical a:hover, .sm-clean-vertical a:focus, .sm-clean-vertical a:active,
   .sm-clean-vertical a.highlighted {

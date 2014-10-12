@@ -7,35 +7,37 @@
  * @version    1.0.0
  */
 
-/**
- *
- */
-PVLng::Menu('20.10', '/', __('Charts'), 'Shift+F1');
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('20.10', '/', 'Charts', TRUE, 'Shift+F1');
+});
 
 // Add direct links to charts only if not chart controller is the active one
+$app->hook('slim.before.dispatch', function () use ($app) {
+    $route = $app->Router()->getCurrentRoute();
+    $pattern = $route->getPattern();
 
-$RequestPath = $app->request()->getPathInfo();
+    if ($pattern != '/' AND $pattern != '/index') {
 
-if ($RequestPath != '/' AND !strstr($RequestPath, '/index')) {
+        $tblView = new ORM\View;
 
-    $tblView = new ORM\View;
+        if ($app->user) {
+            $app->menu->add('20.10.10', '#', 'private');
+            foreach ($tblView->filterByPublic(0)->find() as $view) {
+                $app->menu->add('20.10.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+            }
+            $tblView->reset();
 
-    if (Session::get('user')) {
-        PVLng::Menu('20.10.10', '#', __('private'));
-        foreach ($tblView->filterByPublic(0)->find() as $view) {
-            PVLng::Menu('20.10.10.', '/chart/'.$view->getSlug(), $view->getName());
+            $app->menu->add('20.10.20', '#', 'public');
+            foreach ($tblView->filterByPublic(1)->find() as $view) {
+                $app->menu->add('20.10.20.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+            }
+        } else {
+            foreach ($tblView->filterByPublic(1)->find() as $view) {
+                $app->menu->add('20.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+            }
         }
-        $tblView->reset();
     }
-
-    PVLng::Menu('20.10.20', '#', __('public'));
-
-    foreach ($tblView->filterByPublic(1)->find() as $view) {
-        PVLng::Menu('20.10.20.', '/chart/'.$view->getSlug(), $view->getName());
-    }
-}
-
-unset($RequestPath);
+});
 
 /**
  * Routes

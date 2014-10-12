@@ -17,9 +17,10 @@
 
 var ChartHeight = {INDEX_CHARTHEIGHT},
     RefreshTimeout = {INDEX_REFRESH},
+    aborted = false,
     qs = {},
     chart = false,
-    chartLoading = '<img src="/images/loading_dots.gif" width="64" height="21" />',
+    chartLoading = '<img src="/images/loading_dots.gif" width="64" height="21">',
     channels_chart = [],
     updateTimeout,
     updateActive = false,
@@ -27,12 +28,12 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
     browserPrefix = null,
     lastChanged = (new Date).getTime() / 1000 / 60,
     oTable,
-    xhrPool = [],
     channels = {
         <!-- BEGIN DATA -->
-        {ID}: { id: {ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}', entity: {ENTITY} },
+        {ID}: { id: {ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}', entity: {ENTITY}, n: {NUMERIC} },
         <!-- END -->
     },
+
     /**
      * Scale timestamps down to full minute, hour, day, week, month, quarter or year
      */
@@ -154,8 +155,8 @@ var views = new function Views() {
         this.views = {};
         var that = this;
         $.getJSON(
-            PVLngAPI + '/views.json',
-            { sort_by_visibilty: true },
+            PVLngAPI + 'views.json',
+            { sort_by_visibilty: true, no_data: true },
             function(data) {
                 var l = data.length;
                 for (var i = 0; i<l; i++) {
@@ -199,43 +200,52 @@ var views = new function Views() {
 
     this.load = function( slug, collapse, callback ) {
         if (typeof this.views[slug] == 'undefined') return;
-        if (typeof collapse == 'undefined') collapse = false;
 
         $('#chart').addClass('wait');
 
-        var expanded = tree.expanded, preset;
-        if (!expanded) tree.toggle(true);
+        $.getJSON(
+            PVLngAPI + 'view/'+slug+'.json',
+            function(data) {
+                if (typeof collapse == 'undefined') collapse = false;
 
-        this.actual = this.views[slug];
+                var expanded = tree.expanded, preset;
+                if (!expanded) tree.toggle(true);
 
-        /* Uncheck all channels and ... */
-        $('input.channel').iCheck('uncheck').val('');
-        $('tr.channel').removeClass('checked');
-        /* ... re-check all channels in view */
-        $.each(JSON.parse(this.actual.data), function (id, p) {
-            if (id == 'p') {
-                preset = p;
-            } else {
-                $('#c'+id).val(p).iCheck('check');
+                views.views[slug].data = data;
+                views.actual = views.views[slug];
+
+                /* Uncheck all channels and ... */
+                $('input.channel').iCheck('uncheck').val('');
+                $('tr.channel').removeClass('checked');
+                /* ... re-check all channels in view */
+                $.each(views.actual.data, function (id, p) {
+                    if (id == 'p') {
+                        preset = p;
+                    } else {
+                        $('#c'+id).val(p).iCheck('check');
+                    }
+                });
+
+                /* Re-arrange channels in collapsed tree */
+                if (collapse || !expanded) tree.toggle(false);
+
+                /* Scroll to navigation as top most visible element */
+                pvlng.scroll('#nav');
+
+                $('#preset').val(preset).trigger('change'); /* Realods chart */
+
+                $('#load-delete-view').val(views.actual.slug).trigger('change');
+                $('#saveview').val(views.actual.name);
+                $('#visibility').val(views.actual.public).trigger('change');
+                $('#modified').hide();
+
+                if (typeof callback != 'undefined') callback(views.actual);
             }
+        ).fail(function( jqXHR, textStatus ) {
+            alert( "Request failed: " + textStatus );
+        }).always(function() {
+            $('#chart').removeClass('wait');
         });
-
-        /* Re-arrange channels in collapsed tree */
-        if (collapse || !expanded) tree.toggle(false);
-
-        /* Scroll to navigation as top most visible element */
-        pvlng.scroll('#nav');
-
-        $('#preset').val(preset).trigger('change'); /* Realods chart */
-
-        $('#load-delete-view').val(this.actual.slug).trigger('change');
-        $('#saveview').val(this.actual.name);
-        $('#visibility').val(this.actual.public).trigger('change');
-        $('#modified').hide();
-
-        if (typeof callback != 'undefined') callback(this.actual);
-
-        $('#chart').removeClass('wait');
     };
 };
 
@@ -290,12 +300,16 @@ function ChartDialog( id ) {
     /* Get stringified settings */
     var p = $('#c'+id).val();
 
-    if (p == 'on') {
-        /* Initial, no presetaion set yet */
+    if (p == '' || p == 'on') {
+        /* Initial, not checked or no presetaion set yet */
         p = new presentation();
-        /* Suggest scatter for channels without unit */
-        if (!channels[id].unit) $('#scatter-candidate').show();
+        /* Suggest scatter for channels without unit  or non-numeric */
+        if (!channels[id].unit || !channels[id].n) {
+            $('#scatter-candidate').show();
+            p.type = 'scatter';
+        }
     } else {
+        /* Init presetation */
         p = new presentation(p);
     }
 
@@ -355,10 +369,8 @@ function updateChart( forceUpdate, scroll ) {
         ts = (new Date).getTime(),
         channels_new = [], yAxisMap = [], yAxis = [],
         channel, channel_clone, buffer = [],
-        aborted = false,
         res = xResolution[period] ? xResolution[period] : 1,
         expanded = tree.expanded;
-
 
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
     if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
@@ -470,7 +482,10 @@ function updateChart( forceUpdate, scroll ) {
     }
 
     /* Any channels checked for drawing? */
-    if (channels_new.length == 0) return;
+    if (channels_new.length == 0) {
+        updateActive = FALSE;
+        return;
+    }
 
     $('#chart').addClass('wait');
 
@@ -523,7 +538,7 @@ function updateChart( forceUpdate, scroll ) {
 
         $('#s'+channel.id).show();
 
-        var url = PVLngAPI + 'data/' + channel.guid + '.json';
+        var url = PVLngAPI + 'data/' + channel.guid + '.json?_canAbort=true';
 
         _log('Fetch', url);
 
@@ -535,6 +550,7 @@ function updateChart( forceUpdate, scroll ) {
                 start:      fromDate,
                 end:        toDate + '+1day',
                 period:     (channel.type != 'scatter') ? period_count + period : '',
+                _canAbort:  true,
                 _ts:        date.getTime()
             },
             function(data) {
@@ -684,7 +700,7 @@ function updateChart( forceUpdate, scroll ) {
                     series[id] = serie;
                 }
 
-                if ('{INDEX_NOTIFYLOADEACH}') $.pnotify({
+                if (+'{INDEX_NOTIFYEACH}') $.pnotify({
                     type: 'success',
                     text: attr.name + ' loaded ' +
                           '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
@@ -716,7 +732,7 @@ function updateChart( forceUpdate, scroll ) {
             /* Check if all getJSON() calls finished */
             if (completed != channels_chart.length) return;
 
-            if ('{INDEX_NOTIFYLOADALL}') $.pnotify({
+            if (+'{INDEX_NOTIFYALL}') $.pnotify({
                 type: 'success',
                 text: completed + ' {{ChannelsLoaded}} ' +
                       '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
@@ -760,9 +776,12 @@ $.ajaxQ = (function() {
 
     var id = 0, queue = {};
 
-    $(document).ajaxSend(function(e, jqXHR) {
-        jqXHR._id = ++id;
-        queue[jqXHR._id] = jqXHR;
+    $(document).ajaxSend(function(e, jqXHR, settings) {
+        if (settings.url.indexOf('_canAbort') != -1) {
+            /* queue only channel data requests! */
+            jqXHR._id = ++id;
+            queue[jqXHR._id] = jqXHR;
+        }
     });
 
     $(document).ajaxComplete(function(e, jqXHR) {
@@ -771,12 +790,12 @@ $.ajaxQ = (function() {
 
     return {
         abortAll: function() {
-            aborted = true;
             var cnt = 0;
             $.each(queue, function(i, jqXHR) {
                 jqXHR.abort();
                 cnt++;
             });
+            if (cnt) aborted = true;
             return cnt;
         }
     };
@@ -787,7 +806,6 @@ $.ajaxQ = (function() {
  *
  */
 function updateOutput() {
-    aborted = true;
     updateActive = false;
     updateChart();
 }
@@ -882,7 +900,15 @@ $(function() {
     }
     chartOptions.chart.height = ChartHeight;
 
-    var d = qs.date ? new Date(qs.date) : new Date();
+    var dFrom, dTo;
+    if (qs.from && qs.to) {
+        dFrom = new Date(qs.from);
+        dTo   = new Date(qs.to);
+    } else if (qs.date) {
+        dFrom = dTo = new Date(qs.date);
+    } else {
+        dFrom = dTo = new Date();
+    }
 
     $("#from").datepicker({
         altField: '#fromdate',
@@ -895,7 +921,7 @@ $(function() {
         onClose: function( selectedDate ) {
             $("#to").datepicker( "option", "minDate", selectedDate );
         }
-    }).datepicker('setDate', d);
+    }).datepicker('setDate', dFrom);
 
     $("#to").datepicker({
         altField: '#todate',
@@ -908,7 +934,7 @@ $(function() {
         onClose: function( selectedDate ) {
             $("#from").datepicker( "option", "maxDate", selectedDate );
         }
-    }).datepicker('setDate', d);
+    }).datepicker('setDate', dTo);
 
     Highcharts.setOptions({
         global: { alignTicks: false },
@@ -1111,17 +1137,18 @@ $(function() {
     $('#treetoggle').click(function() { tree.toggle() });
 
     $('#btn-load').button({
-        icons: { primary: 'ui-icon-folder-open' },
-        text: false
+        icons: { primary: 'ui-icon-folder-open' }, text: false
     }).click(function(event) {
-        /* Shift-Click sets display date to today */
-        if (event.shiftKey) $('#btn-reset').trigger('click');
-        views.load($('#load-delete-view option:selected').val(), true);
+        if (event.shiftKey) {
+            /* Shift-Click sets display date to today AND reloads chart */
+            $('#btn-reset').trigger('click');
+        } else {
+            views.load($('#load-delete-view option:selected').val(), true);
+        }
     });
 
     $('#btn-delete').button({
-        icons: { primary: 'ui-icon-trash' },
-        text: false
+        icons: { primary: 'ui-icon-trash' }, text: false
     }).click(function(event) {
         var option = $('#load-delete-view option:selected'), btn = $(this);
 
@@ -1161,8 +1188,7 @@ $(function() {
     }).css('font-weight', 'bold');
 
     $('#btn-save').button({
-        icons: { primary: 'ui-icon-disk' },
-        text: false
+        icons: { primary: 'ui-icon-disk' }, text: false
     }).click(function() {
         $(this).button('disable');
         $('#chart').addClass('wait');
@@ -1186,8 +1212,7 @@ $(function() {
             contentType: 'application/json',
             processData: false, /* Send prepared JSON in body */
             data: JSON.stringify(data)
-        }).done(function (data, textStatus, jqXHR) {
-            $.pnotify({ type: textStatus, text: data.name + ' saved' });
+        }).done(function (data) {
             views.fetch(function(views) {
                 /* Rebuild select */
                 views.buildSelect('#load-delete-view', data.slug);
@@ -1196,6 +1221,7 @@ $(function() {
                 if (chart) chart.setTitle(views.actual.name);
             });
             $('#modified').hide();
+            $.pnotify({ type: 'success', text: data.name + ' saved' });
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
                 type: textStatus, hide: false, text: jqXHR.responseText
@@ -1208,13 +1234,12 @@ $(function() {
 
     views.fetch(function(views) {
         views.buildSelect('#load-delete-view');
-        if (user) {
-            $('#top-select').show();
-        } else {
+        if (!user) {
             $('#public-select').show();
             $('#wrapper').show();
         }
         /* Chart slug provided by URL?, load and collapse tree */
+        if (!qs.chart) $('#top-select').show();
         views.load(qs.chart, true);
     });
 
@@ -1255,7 +1280,7 @@ $(function() {
                             if (chart) pvlng.scroll('#nav');
                             updateChart();
                         },
-                        3000);
+                        1000);
                     }
                 }
             } else {

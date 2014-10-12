@@ -9,10 +9,7 @@
  */
 abstract class Channel {
 
-    /**
-     * Allow for the channel data update
-     */
-    public $AllowUpdate = FALSE;
+    public static $Database;
 
     /**
      * Mark that a channel is used as sub channel for readout
@@ -44,10 +41,11 @@ abstract class Channel {
     public static function byGUID( $guid, $alias=TRUE ) {
         $channel = new ORM\Tree;
         $channel->filterByGuid($guid)->findOne();
+        $aliasOf = $channel->getAliasOf();
 
-        if ($channel->getAliasOf() AND $alias) {
+        if ($aliasOf AND $alias) {
             // Is an alias channel, switch direct to the original channel
-            return self::byId($channel->getAliasOf());
+            return self::byId($aliasOf);
         } elseif ($channel->getModel()) {
             // Channel is in tree
             $model = $channel->ModelClass();
@@ -147,11 +145,9 @@ abstract class Channel {
 
     /**
      * Run additional code before channel will be added to hierarchy
-     * Return FALSE to skip
+     * Return FALSE to skip!
      */
-    public static function beforeAdd2Tree( $parent ) {
-        return TRUE;
-    }
+    public static function beforeAdd2Tree( $parent ) {}
 
     /**
      * Run additional code after channel was created / changed
@@ -169,40 +165,24 @@ abstract class Channel {
         if ($this->id == 1 OR $this->childs == -1 OR count($childs) < $this->childs) {
             $c = new ORM\ChannelView($channel);
             $model = $c->ModelClass();
-            if ($model::beforeAdd2Tree($this)) {
+            if ($model::beforeAdd2Tree($this) !== FALSE) {
                 return NestedSet::getInstance()->insertChildNode($channel, $this->id);
             }
         } else {
             Messages::Error(__('AcceptChild', $this->childs, $this->name), 400);
         }
+        return FALSE;
     }
 
     /**
      *
      */
     public function removeFromTree() {
-        $tree = NestedSet::getInstance();
-
-        // Remember parent node
-        $parent = $tree->getParent($this->id);
-
-        if (!$tree->DeleteBranch($this->id)) return FALSE;
-
-        if ($tree->getChildCount($parent['id']) == 0) {
-            // Reset parent channel icon
-            $this->db->query(
-                'UPDATE `pvlng_channel` AS c,
-                        `pvlng_type` AS t
-                    SET c.`icon` = t.`icon`
-                  WHERE c.`id` = {1} AND c.`type` = t.`id`',
-                $parent['entity']
-            );
-        }
-        return TRUE;
+        return NestedSet::getInstance()->DeleteBranch($this->id);
     }
 
     /**
-     *
+     * Capture not defined attributes
      */
     public function __get( $attribute ) {
         throw new Exception('Unknown attribute: '.$attribute, 400);
@@ -305,13 +285,9 @@ abstract class Channel {
         // came to here and not returned earlier
         $this->performance->setAction('write');
 
-        $rc = $reading
-              ->setId($this->entity)
-              ->setTimestamp($timestamp)
-              ->setData($this->value)
-              ->insert();
+        $rc = $reading->setId($this->entity)->setTimestamp($timestamp)->setData($this->value)->insert();
 
-        if ($rc == 0 and $this->AllowUpdate) {
+        if ($rc == 0 AND $timestamp > time()) {
             $rc = $this->update($request, $timestamp);
         }
 
@@ -365,15 +341,25 @@ abstract class Channel {
         $this->performance->setAction('update');
 
         $reading->filterByIdTimestamp($this->entity, $timestamp)->findOne();
-        return $reading->getId() ? $reading->setData($this->value)->update() : 0;
+        $rc = $reading->getId() ? $reading->setData($this->value)->update() : 0;
+/*
+        if ($rc) {
+            // Log successful updates only
+            $msg = isset($lastReading)
+                 ? sprintf('%s: %f > %f', date('Y-m-d H:i:s', $timestamp), $lastReading, $request['data'])
+                 : sprintf('%s: %f', date('Y-m-d H:i:s', $timestamp), $request['data']);
+            ORM\Log::save($this->name, $msg);
+        }
+*/
+        if ($rc) Hook::process('data.update.after', $this);
+
+        return $rc;
     }
 
     /**
      *
      */
     public function read( $request ) {
-
-        $logSQL = slimMVC\Config::getInstance()->get('Log.SQL');
 
         $this->performance->setAction('read');
 
@@ -416,7 +402,6 @@ abstract class Channel {
             $row = (array) $row;
 
             if ($this->period[1] != self::READLAST) {
-                if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
                 $this->SQLHeader($request, $q);
 
                 // Reset query and read add. data
@@ -479,12 +464,12 @@ abstract class Channel {
             $q->filter('id', $this->entity)->order('timestamp');
 
             // Use bufferd result set
-            $this->db->Buffered = TRUE;
+            $this->db->setBuffered();
 
             if ($res = $this->db->query($q)) {
 
                 if ($this->meter) {
-                    if ($this->TimestampMeterOffset[$this->period[1]] > 0) {
+                    if ($this->GroupingPeriod[$this->period[1]] > 0) {
                         $row = $res->fetch_assoc();
                         $offset = $row['data'];
                     } else {
@@ -523,10 +508,8 @@ abstract class Channel {
                 $res->close();
             }
 
-            $this->db->Buffered = FALSE;
+            $this->db->setBuffered(FALSE);
         }
-
-        if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
 
         $this->SQLHeader($request, $q);
 
@@ -544,7 +527,7 @@ abstract class Channel {
                     $q->filter('timestamp', array('min'=>$this->start));
                 } else {
                     // Fetch also period before start for correct consumption calculation!
-                    $q->filter('timestamp', array('min'=>$this->start-$this->TimestampMeterOffset[$this->period[1]]));
+                    $q->filter('timestamp', array('min'=>$this->start-$this->GroupingPeriod[$this->period[1]]));
                 }
             }
        #     if ($this->end < time()) {
@@ -586,6 +569,11 @@ abstract class Channel {
      *
      */
     protected $db;
+
+    /**
+     *
+     */
+    protected $config;
 
     /**
      *
@@ -644,7 +632,7 @@ abstract class Channel {
     /**
      *
      */
-    protected $TimestampMeterOffset = array(
+    protected $GroupingPeriod = array(
         self::NO        =>        0,
         self::ASCHILD   =>        0,
         self::MINUTE    =>       60,
@@ -664,8 +652,7 @@ abstract class Channel {
      */
     protected function __construct( ORM\Tree $channel ) {
         $this->time   = microtime(TRUE);
-        $this->db     = slimMVC\MySQLi::getInstance();
-        $this->config = slimMVC\Config::getInstance();
+        $this->db     = $channel::getDatabase();
 
         foreach ($channel->asAssoc() as $key=>$value) {
             $this->$key = $value;
@@ -786,46 +773,23 @@ abstract class Channel {
 
         // Prepare analysis of request
         $request = array_merge(
-            array(
-                'start'  => '00:00',
-                'end'    => '24:00',
-                'period' => ''
-            ),
+            array('start' => '', 'end' => '', 'period' => ''),
             $request
         );
 
-        $latitude  = $this->config->get('Location.Latitude');
-        $longitude = $this->config->get('Location.Longitude');
-
         // Start timestamp
-        if ($request['start'] == 'sunrise') {
-            if ($latitude == '' OR $longitude == '') {
-                throw new \Exception('Invalid start timestamp: "sunrise", missing Location in config/config.php', 400);
-            }
-            $this->start = date_sunrise(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
-        } else {
-            $this->start = ($request['start'] == '' OR is_numeric($request['start']))
-                         ? $request['start']
-                         : strtotime($request['start']);
-        }
-
-        if ($this->start === FALSE)
+        if ($request['start'] == '') $request['start'] = '00:00';
+        $this->start = is_numeric($request['start']) ? $request['start'] : strtotime($request['start']);
+        if ($this->start === FALSE) {
             throw new \Exception('Invalid start timestamp: '.$request['start'], 400);
+        }
 
         // End timestamp
-        if ($request['end'] == 'sunset') {
-            if ($latitude == '' OR $longitude == '') {
-                throw new \Exception('Invalid end timestamp: "sunset", missing Location in config/config.php', 400);
-            }
-            $this->end = date_sunset(time(), SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600);
-        } else {
-            $this->end = is_numeric($request['end'])
-                       ? $request['end']
-                       : strtotime($request['end']);
-        }
-
-        if ($this->end === FALSE)
+        if ($request['end'] == '') $request['end'] = '24:00';
+        $this->end = is_numeric($request['end']) ? $request['end'] : strtotime($request['end']);
+        if ($this->end === FALSE) {
             throw new \Exception('Invalid end timestamp: '.$request['end'], 400);
+        }
 
         // Consolidation period
         if ($request['period'] != '') {
@@ -911,15 +875,6 @@ abstract class Channel {
 
         return $datafile;
     }
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected $config;
 
     // -------------------------------------------------------------------------
     // PRIVATE

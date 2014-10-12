@@ -33,9 +33,7 @@
             <td>
                 <label for="d-type">{{SeriesType}}</label>
                 <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{ChartTypeHint}}" />
-                <br />
-                <span id="scatter-candidate" class="s i">({{ScatterCandidate}})</span>
+                     style="margin-left:.5em" title="{{ChartTypeHint}}">
             </td>
             <td>
                 <select id="d-type">
@@ -46,6 +44,8 @@
                     <option value="bar">{{BarChart}}</option>
                     <option value="scatter">{{ScatterChart}}</option>
                 </select>
+                <img id="scatter-candidate" src="/images/ico/information_frame.png"
+                     style="margin-left:1em" class="ico tip" title="{{ScatterCandidate}}">
             </td>
         </tr>
         <tr class="odd">
@@ -184,19 +184,20 @@
                      style="margin-left:.5em" title="{{ChartPositionHint}}" />
             </td>
             <td>
-                <table id="table-pos">
-                <tr>
+                <!-- Align layout with a table -->
+                <table id="table-pos"><tr>
                     <td class="xs" style="width:16px">
-                        <img src="/images/layers-stack-arrange-back.png" class="tip" title="{{MoreIntoBackground}}" alt="<<">
+                        <img src="/images/pix.gif" data-src="/images/layers-stack-arrange-back.png"
+                             class="def ico tip" title="{{MoreIntoBackground}}" alt="<<">
                     </td>
                     <td style="padding-left:1.4em;padding-right:1.4em">
                         <div id="d-position-slider" style="margin-top:5px"></div>
                     </td>
                     <td class="xs r" style="width:16px">
-                        <img src="/images/layers-stack-arrange.png" class="tip" title="{{MoreIntoForeground}}" alt=">>">
+                        <img src="/images/pix.gif" data-src="/images/layers-stack-arrange.png"
+                             class="def ico tip" title="{{MoreIntoForeground}}" alt=">>">
                     </td>
-                </tr>
-                </table>
+                </tr></table>
             </td>
         </tr>
         </tbody>

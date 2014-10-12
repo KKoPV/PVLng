@@ -7,10 +7,9 @@
  * @version    1.0.0
  */
 
-/**
- *
- */
-PVLng::Menu(80, '/weather', __('Weather'), 'Shift+F8');
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add(70, '/weather', 'Weather', TRUE, 'Shift+F8');
+});
 
 /**
  * Routes

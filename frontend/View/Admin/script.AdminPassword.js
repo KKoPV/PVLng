@@ -35,11 +35,6 @@ jQuery.fn.selectText = function(){
 /**
  *
  */
-var GoogleMapsGeocoder;
-
-/**
- *
- */
 $(function() {
 
     $('#adminpass').DataTable({
@@ -51,9 +46,9 @@ $(function() {
         bJQueryUI: true
     });
 
-    $('.pre').click(function() {
+    $('pre').click(function() {
         /* select all, make ready for copy */
-        $(this).select();
+        $(this).selectText();
     }).mouseup(function(e) {
         e.preventDefault();
     });
@@ -61,31 +56,19 @@ $(function() {
     if ('{ADMINPASS}') {
 
         $('#geoloc').button({
-            icons: {
-                primary: 'ui-icon-search'
-            },
-            text: false
+            icons: { primary: 'ui-icon-search' }, text: false
         }).click(function(){
 
             var location = $('#text').val();
 
-            GoogleMapsGeocoder = new google.maps.Geocoder();
-
-            GoogleMapsGeocoder.geocode(
-                {
-                    address: location
-                },
+            (new google.maps.Geocoder()).geocode(
+                { address: location },
                 function(data) {
                     _log('Geo data', data);
 
-                    $("#location").html(
-                        $('#pre').html()
-                        .replace(   /* Round to 3 decimals */
-                            '$lat', Math.round(data[0].geometry.location.lat() * 1000) / 1000
-                        ).replace(
-                            '$lon', Math.round(data[0].geometry.location.lng() * 1000) / 1000
-                        )
-                    );
+                    $('#lat').val((Math.round(data[0].geometry.location.lat()*10000)/10000));
+                    $('#lon').val((Math.round(data[0].geometry.location.lng()*10000)/10000));
+                    $("#location").show();
 
                     /* http://moz.com/ugc/everything-you-never-wanted-to-know-about-google-maps-parameters */
                     var url = 'https://maps.google.com/maps?t=m&source=s_q&ie=UTF8&hq=&z=14&output=embed'+
@@ -93,8 +76,7 @@ $(function() {
                               '&hnear='+encodeURIComponent(data[0].formatted_address);
                     _log('Map URL', url);
 
-                    $('#map').prop('src', url);
-                    $('#locresult').fadeIn();
+                    $('#map').prop('src', url).fadeIn();
                 }
             );
 

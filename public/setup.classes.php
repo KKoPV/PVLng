@@ -23,8 +23,7 @@ abstract class Setup {
 
             echo '<h3>', $i++, '. ', $class->getTitle(), '</h3>';
 
-            $messages = array();
-            $class->process($params, $messages);
+            $class->process($params);
 
             echo '<ul>';
             foreach ($class->getMessages() as $msg) {
@@ -53,7 +52,7 @@ abstract class SetupTask {
     /**
      * Prepare result array
      */
-    abstract public function process( $params, &$messages );
+    abstract public function process( $params );
 
     /**
      *
@@ -90,7 +89,7 @@ abstract class SetupTask {
      *
      */
     protected function success() {
-        $this->messages[] = '<span style="color:green">' . implode(' ', func_get_args()) . ' - OK</span>';
+        $this->messages[] = '<span style="color:green">' . implode(' ', func_get_args()) . ' - <strong>OK</strong></span>';
     }
 
     /**
@@ -98,7 +97,7 @@ abstract class SetupTask {
      */
     protected function error() {
         $this->error = TRUE;
-        $this->messages[] = '<span style="color:red">' . implode(' ', func_get_args()) . ' - FAILED</span>';
+        $this->messages[] = '<span style="color:red">' . implode(' ', func_get_args()) . ' - <strong>FAILED</strong></span>';
     }
 
     /**
@@ -130,12 +129,13 @@ class PHPVersion extends SetupTask {
     /**
      *
      */
-    public function process( $params, &$messages ) {
-        $this->info('Require at least PHP '.$params[0]);
-        if (version_compare(PHP_VERSION, $params[0], 'ge')) {
-            $this->success('PHP', PHP_VERSION);
+    public function process( $params ) {
+        // $params == min. version
+        $this->info('Require at least PHP', $params);
+        if (version_compare(PHP_VERSION, $params, 'ge')) {
+            $this->success('Found PHP', PHP_VERSION);
         } else {
-            $this->error('PHP', PHP_VERSION);
+            $this->error('Found PHP', PHP_VERSION);
         }
     }
 
@@ -156,16 +156,22 @@ class PHPExtensions extends SetupTask {
     /**
      *
      */
-    public function process( $params, &$messages ) {
-        foreach ($params as $ext=>$name) {
+    public function process( $params ) {
+        foreach ($params as $ext=>$data) {
             if (extension_loaded($ext)) {
-                $this->success($name);
+                $this->success($data[0]);
+            } elseif (!isset($data[1]) OR $data[1]) {
+                $this->error(sprintf($this->PHPLink, $ext, $data[0]), ' - Please install extension');
             } else {
-                $this->error($name, ': Please install extension:', $ext);
+                $this->info(sprintf($this->PHPLink, $ext, $data[0]), ' - <i>not installed, but recommended</i>');
             }
         }
     }
 
+    /**
+     *
+     */
+    protected $PHPLink = '<a href="http://php.net/manual/book.%s.php" target="_blank">%s</a>';
 }
 
 /**
@@ -183,7 +189,7 @@ class Permissions extends SetupTask {
     /**
      *
      */
-    public function process( $params, &$messages ) {
+    public function process( $params ) {
         foreach ($params as $test=>$func) {
             if ($func($test)) {
                 $this->success(str_replace('_', ' ', $func), '<tt>', $test, '</tt>');
@@ -210,7 +216,7 @@ class Configuration extends SetupTask {
     /**
      *
      */
-    public function process( $params, &$messages ) {
+    public function process( $params ) {
         if (!file_exists($params['config'])) {
             $this->info('<tt>', $params['config'], '</tt> missing');
             $this->info('Try to create from <tt>', $params['default'], '</tt>');
@@ -222,9 +228,9 @@ class Configuration extends SetupTask {
         } else {
             $this->error('Can\'t create <tt>', basename($params['config']), '</tt>');
             $this->error('Please copy <tt>',
-                        basename($params['default']),
-                        '</tt> to <tt>',
-                        basename($params['config']), '</tt>');
+                         basename($params['default']),
+                         '</tt> to <tt>',
+                         basename($params['config']), '</tt>');
         }
     }
 
@@ -245,7 +251,7 @@ class MySQLi extends SetupTask {
     /**
      *
      */
-    public function process( $params, &$messages ) {
+    public function process( $params ) {
         $config = include $params['config'];
 
         $db = new \MySQLi(
@@ -258,12 +264,12 @@ class MySQLi extends SetupTask {
         );
 
         if (!$db->connect_error) {
-            $res = $db->query('SELECT version()');
-            $row = $res->fetch_array();
-            $this->success('MySQL', $row[0]);
+            $this->success('Connect to MySQL ( Version',
+                           $db->query('SELECT version()')->fetch_array(MYSQL_NUM)[0],
+                           ')');
         } else {
             $this->error(htmlspecialchars($db->connect_error));
-            $this->info('Please check your database settings');
+            $this->info('Please check your database settings!');
         }
 
     }

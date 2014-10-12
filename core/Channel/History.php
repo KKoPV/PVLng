@@ -20,12 +20,12 @@ class History extends InternalCalc {
     public static function checkData( Array &$fields, $add2tree ) {
         $ok = parent::checkData($fields, $add2tree);
 
-        if ($fields['valid_from']['VALUE'] >= 0) {
-            $fields['valid_from']['ERROR'][] = __('Must be lower than 0');
+        if ($fields['valid_from']['VALUE'] <= 0) {
+            $fields['valid_from']['ERROR'][] = __('ValueMustGTzero');
             $ok = FALSE;
         }
         if ($fields['valid_to']['VALUE'] < 0) {
-            $fields['valid_to']['ERROR'][] = __('Must be greater or equal 0');
+            $fields['valid_to']['ERROR'][] = __('ValueMustGEzero');
             $ok = FALSE;
         }
 
@@ -35,50 +35,59 @@ class History extends InternalCalc {
     /**
      *
      */
-    public function read( $request ) {
+    public function before_read( $request ) {
 
-        $this->before_read($request);
+        parent::before_read($request);
+
+        if ($this->dataExists(300)) return; // Buffer for 5 min.
 
         $child = $this->getChild(1);
 
-        $result = new \Buffer;
-
-        if (!$child) return $this->after_read($result);
+        if (!$child) return;
 
         // Inherit properties from child
         $this->meter = $child->meter;
 
         // Fetch all data, compress later
-        unset($request['period']);
+        $request['period'] = '1i';
 
         if ($this->valid_to == 0) {
             // Last x days, move request start backwards
-            $request['start'] = $this->start + $this->valid_from * 86400;
+            $request['start'] = $this->start - $this->valid_from * 86400;
             // Move request end backwards to 00:00
             $request['end'] = strtotime('today');
+
             // Save data into temp. table
             $this->saveValues($child->read($request));
         } else {
             // Find earliest data
             $q = new \DBQuery('pvlng_reading_num');
             $q->get($q->FROM_UNIXTIME($q->MIN('timestamp'), '"%Y"'));
-
             for ($i=$this->db->queryOne($q)-date('Y'); $i<=0; $i++) {
-                $request['start'] = strtotime(date('Y-m-d ', $this->start + $this->valid_from * 86400).$i.'years');
-                $request['end']   = strtotime(date('Y-m-d ', $this->end + $this->valid_to * 86400).$i.'years');
+                $request['start'] = strtotime(date('Y-m-d ', $this->start - $this->valid_from * 86400).$i.'years');
+                $request['end']   = strtotime(date('Y-m-d ', $this->end   + $this->valid_to   * 86400).$i.'years');
                 // Save data into temp. table
                 $this->saveValues($child->read($request));
             }
         }
+        $this->dataCreated(TRUE);
+    }
 
-        if ($this->period[0] * $this->TimestampMeterOffset[$this->period[1]] < 600) {
+    /**
+     *
+     */
+    public function read( $request ) {
+
+        $this->before_read($request);
+
+        $result = new \Buffer;
+
+        if ($this->period[0] * $this->GroupingPeriod[$this->period[1]] < 600) {
             // Smooth result at least 10 minutes
             $this->period = array(10, self::MINUTE);
-        } elseif ($this->threshold AND $this->period[1] == self::MINUTE) {
-            // Smooth result by cut period by "threshold", only for minutes
-            $this->period[0] *= $this->threshold;
         }
 
+        // Prepare inner query
         $q = new \DBQuery('pvlng_reading_num_tmp');
         $q->get($q->FROM_UNIXTIME('timestamp', '"%H"'), 'hour')
           ->get($q->FROM_UNIXTIME('timestamp', '"%i"'), 'minute');
@@ -89,7 +98,8 @@ class History extends InternalCalc {
             $q->get($q->SUM('data'), 'data');
         } else {
 
-            switch (\slimMVC\Config::getInstance()->get('Model.History.Average')) {
+            $settings = new \ORM\Settings;
+            switch ($settings->getModelValue('History', 'Average')) {
                 default:
                     // Linear average
                     $q->get($q->AVG('data'), 'data');
@@ -111,32 +121,68 @@ class History extends InternalCalc {
           ->get($this->periodGrouping(), 'g')
           ->filter('id', $this->entity)
           ->groupBy('g');
-        $inner = $q->SQL();
-        $q->select('('.$inner.') t')
-          ->groupBy('hour')
-          ->groupBy('minute');
+
+        $inner = $q;
+
+        $day = $this->start;
+
+        do {
+            $h = clone $inner;
+            $h->filter('timestamp', array('bt' => array($day - $this->valid_from * 86400, $day - $this->valid_from * 86400 + 86400)));
+
+            $q = (new \DBQuery)->select('('.substr($h, 0, -1).') t')->groupBy('hour')->groupBy('minute');
 
 #echo $q;
+            $d = date('d', $day);
+            $m = date('m', $day);
+            $y = date('Y', $day);
 
-        $day   = date('d', ($this->start+$this->end)/2);
-        $month = date('m', ($this->start+$this->end)/2);
-        $year  = date('Y', ($this->start+$this->end)/2);
+            if ($res = $this->db->query($h)) {
+                $first = TRUE;
+                while ($row = $res->fetch_object()) {
+                    $ts = mktime($row->hour, $row->minute, 0, $m, $d, $y);
+                    if ($first) {
+                        $result->write(array(
+                            'datetime'    => date('Y-m-d H:i:s', $ts-60),
+                            'timestamp'   => $ts-60,
+                            'data'        => 0,
+                            'min'         => 0,
+                            'max'         => 0,
+                            'count'       => 1,
+                            'timediff'    => 0,
+                            'consumption' => 0
+                        ), $row->g-1);
+                        $first = FALSE;
+                    }
+                    $result->write(array(
+                        'datetime'    => date('Y-m-d H:i:s', $ts),
+                        'timestamp'   => $ts,
+                        'data'        => +$row->data,
+                        'min'         => +$row->min,
+                        'max'         => +$row->max,
+                        'count'       => +$row->count,
+                        'timediff'    => 0,
+                        'consumption' => 0
+                    ), $row->g);
 
-        if ($res = $this->db->query($q)) {
-            while ($row = $res->fetch_object()) {
-                $ts = mktime($row->hour, $row->minute, 0, $month, $day, $year);
-                $result->write(array(
-                    'datetime'    => date('Y-m-d H:i:s', $ts),
-                    'timestamp'   => $ts,
-                    'data'        => +$row->data,
-                    'min'         => +$row->min,
-                    'max'         => +$row->max,
-                    'count'       => +$row->count,
-                    'timediff'    => 0,
-                    'consumption' => 0
-                ), $row->g);
+                    $last = $row;
+                }
+                if (isset($last)) {
+                    $result->write(array(
+                        'datetime'    => date('Y-m-d H:i:s', $ts+60),
+                        'timestamp'   => $ts+60,
+                        'data'        => 0,
+                        'min'         => 0,
+                        'max'         => 0,
+                        'count'       => 1,
+                        'timediff'    => 0,
+                        'consumption' => 0
+                    ), $last->g+1);
+                }
             }
-        }
+
+            $day += 24*60*60;
+        } while ($day < $this->end);
 
         // Skip validity handling of after_read!
         $this->valid_from = $this->valid_to = NULL;

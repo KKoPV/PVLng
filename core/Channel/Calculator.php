@@ -21,11 +21,11 @@ class Calculator extends Channel {
         $childs = $this->getChilds(TRUE);
         if (empty($childs)) {
             // Add 1st child
-            $child = parent::addChild($channel);
-            // Adopt meter and icon
-            $self = new \ORM\Channel($this->entity);
-            $new  = $this->getRealChannel($channel);
-            $self->setMeter($new->getMeter())->setIcon($new->getIcon())->update();
+            if ($child = parent::addChild($channel)) {
+                // Adopt meter
+                $self = new \ORM\Channel($this->entity);
+                $self->setMeter($this->getRealChannel($channel)->getMeter())->update();
+            }
         } else {
             // Check if the new child have the same type and unit as the 1st (and any other) child
             $first = $childs[0];

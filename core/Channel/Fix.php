@@ -21,15 +21,22 @@ class Fix extends InternalCalc {
 
         parent::before_read($request);
 
+        if ($this->dataExists()) return;
+
         $ts = $this->start;
 
-        // Show pseudo reading at each consolidation range point or at least each hour
-        $delta = $this->TimestampMeterOffset[$this->period[1]];
-        $delta = $delta ?: 3600; // 1hr
+        if ($this->isChild) {
+            $delta = 60;
+        } else {
+            // Show pseudo reading at each consolidation range point or at least each hour
+            $delta = $this->GroupingPeriod[$this->period[1]] ?: 3600; // 1hr
+        }
 
         while ($ts <= $this->end) {
             $this->saveValue($ts, 1);
             $ts += $delta;
         }
+
+        $this->dataCreated();
     }
 }

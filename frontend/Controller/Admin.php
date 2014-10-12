@@ -49,7 +49,7 @@ class Admin extends \Controller {
                 \Session::set('returnto');
                 $this->app->redirect($r);
             } else {
-                $this->app->redirect('index');
+                $this->app->redirect('/');
             }
 
         } else {
@@ -61,14 +61,14 @@ class Admin extends \Controller {
      * Token login
      */
     public function LoginGET_Action() {
-        $AdminUser = $this->config->get('Admin.User');
-        $AdminPass = $this->config->get('Admin.Password');
+        $admin = $this->config->get('Admin.User');
+        $pass  = $this->config->get('Admin.Password');
 
-        if ($this->request->get('token') == md5($_SERVER['REMOTE_ADDR'].$AdminUser.$AdminPass)) {
-            \Session::set('user', $AdminUser);
-            \Messages::Success(__('Welcome', $this->User));
+        if ($this->app->params->get('token') == \PVLng::getLoginToken()) {
+            \Session::set('user', $admin);
+            \Messages::Success(__('Welcome', $admin));
         }
-        $this->app->redirect('index');
+        $this->app->redirect('/');
     }
 
     /**
@@ -77,6 +77,22 @@ class Admin extends \Controller {
     public function Logout_Action() {
         \Session::destroy();
         setcookie(\Session::token(), '', time()-60*60*24, '/');
+        $this->app->redirect('index');
+    }
+
+    /**
+     *
+     */
+    public function LocationPOST_Action() {
+        if ($loc = $this->app->request->post('loc')) {
+            $settings = new \ORM\Settings;
+            foreach ($loc as $key=>$value) {
+                $settings->reset()
+                         ->filterByScopeNameKey('core', '', $key)->findOne()
+                         ->setValue($value)->update();
+            }
+            \Messages::Success(__('DataSaved'));
+        }
         $this->app->redirect('index');
     }
 

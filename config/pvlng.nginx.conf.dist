@@ -64,34 +64,59 @@ server {
     ###
     # Handle images via MemCache, if installed
     #
-    location ~* \.(?:png|gif|jpg|jpeg|ico)$ {
-        access_log off;
-        expires max;
-        add_header Last-Modified "Sat, 1 Jan 2000 00:0:00 GMT";
-        set $memcached_key $uri;
-        ### Adjust for your MemCache server
-        memcached_pass 127.0.0.1:11211;
-        error_page 404 = @mc_miss;
-    }
 
     ###
-    # Fall back for not chached files
+    # Handle images
     #
-    location @mc_miss {
-        access_log off;
-        try_files /public/$uri =404;
-        expires max;
-        add_header Last-Modified "Sat, 1 Jan 2000 00:0:00 GMT";
+    #   IF you have Memcache installed,
+    #   comment out this and uncomment the next 2 sections and
+    #   Adjust your Memcache host for your setup!
+    #
+    location ~* \.(?:png|gif|jpg|jpeg|ico)$ {
+        access_log    off;
+        try_files     /public/$uri =404;
+        add_header Expires "Thu, 31 Dec 2037 23:55:55 GMT";
+        add_header Cache-Control "public, max-age=315360000";
     }
+
+#    ###
+#    # Handle images via MemCache
+#    #
+#    location ~* \.(?:png|gif|jpg|jpeg|ico)$ {
+#        access_log    off;
+#        add_header Expires "Thu, 31 Dec 2037 23:55:55 GMT";
+#        add_header Cache-Control "public, max-age=315360000";
+#        set $memcached_key $uri;
+#        ### Adjust for your MemCache server
+#        memcached_pass 127.0.0.1:11211;
+#        error_page 404 = @mc_miss;
+#    }
+#    location @mc_miss {
+#        # Fall back for not yet cached image files
+#        access_log    off;
+#        try_files     /public/$uri =404;
+#        add_header Expires "Thu, 31 Dec 2037 23:55:55 GMT";
+#        add_header Cache-Control "public, max-age=315360000";
+#    }
 
     ###
     # Handle styles and scripts
     #
-    location ~* /public/*/\.(?:js|css)$ {
-        try_files     /public/$uri =404;
-        expires       max;
-        add_header    Cache-Control public;
+    location ~* \.(?:js\.gz|css\.gz|js|css)$ {
         log_not_found off;
+        try_files     /public/$uri =404;
+        add_header Expires "Thu, 31 Dec 2037 23:55:55 GMT";
+        add_header Cache-Control "public, max-age=315360000";
+    }
+
+    ###
+    # Handle rescoures files
+    #
+    location /resources {
+        access_log off;
+        try_files  /public/$uri =404;
+        add_header Expires "Thu, 31 Dec 2037 23:55:55 GMT";
+        add_header Cache-Control "public, max-age=315360000";
     }
 
     ###

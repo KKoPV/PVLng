@@ -8,17 +8,15 @@
  * @version    1.0.0
  */
 
-if (!($app->debug = Session::checkRequest('debug'))) return;
+if (!$app->debug = Session::checkRequest('debug')) return;
 
-/**
- * Preload Yryie
- */
-require_once LIB_DIR . DS . 'Yryie.php';
+Yryie::TimeUnit(Yryie::TIME_AUTO);
+Yryie::Versions();
 
 /**
  * Define Loader callback to manipulate file content to include
  */
-Loader::registerCallback(function( $filename ) {
+Loader::registerCallback(function($filename) {
     // Insert .AOP before file extension, so .../file.php becomes .../file.AOP.php
     $parts = explode('.', realpath($filename));
     array_splice($parts, -1, 0, 'AOP');
@@ -36,22 +34,25 @@ Loader::registerCallback(function( $filename ) {
 
         // Only files marked as AOP relevant will be analysed
         if (strpos($code, '/* // AOP // */') !== FALSE) {
-
             // Build file content hash to check if AOP relevant code was found
             $hash = md5($code);
 
+            Yryie::Info('Compile: '.$filename);
+            Yryie::StartTimer(basename($filenameAOP));
             Yryie::transformCode($code);
+            Yryie::StopTimer();
 
             if ($hash != md5($code) AND file_put_contents($filenameAOP, $code)) {
                 // File content was changed and AOP file could created
                 $filename = $filenameAOP;
+                Yryie::Info('Created: '.$filename);
             }
         }
     } else {
         // AOP file still exists and is ut-to-date
         $filename = $filenameAOP;
+        Yryie::Info('Reuse: '.basename($filename));
     }
-
     return $filename;
 });
 
@@ -64,30 +65,30 @@ class YryieMiddleware extends Slim\Middleware {
      *
      */
     public function call() {
-        // Put versions infos on top
-        if (!Yryie::loadFromSession()) Yryie::Versions();
+        Yryie::Call(func_get_args());
+
+        $app = $this->app;
+        $db  = $app->db;
 
         // Run inner middleware and application
         $this->next->call();
 
+        // Buffer query count and times
+        $qCnt  = $db->getQueryCount();
+        $qTime = $db->getQueryTime();
+
         // Analyse queries to find missing indexes
-        $db = slimMVC\MySQLi::getInstance();
         foreach ($db->queries as $sql) {
             Yryie::SQL($sql);
             if ($res = $db->query('EXPLAIN '.$sql)) {
                 $res = $res->fetch_object();
-                Yryie::Debug('INDEX: '.$res->key.' ('.$res->possible_keys.')');
+                Yryie::SQL('INDEX: '.$res->key.' ('.$res->possible_keys.')');
             }
         }
 
-        Yryie::Debug(
-            '%d Queries in %.0f ms / %.1f ms each',
-            slimMVC\MySQLi::$QueryCount,
-            slimMVC\MySQLi::$QueryTime,
-            slimMVC\MySQLi::$QueryTime / slimMVC\MySQLi::$QueryCount
-        );
+        Yryie::Debug('%d queries in %.3fms (%.3fms each)', $qCnt, $qTime, $qTime/$qCnt);
 
-        if ($this->app->response->headers['Location']) {
+        if ($app->Response()->headers['Location']) {
             // Redirection
             Yryie::finalizeTimers();
             Yryie::saveToSession();
@@ -96,10 +97,10 @@ class YryieMiddleware extends Slim\Middleware {
 
         Yryie::finalize();
 
-        $body = $this->app->response->getBody();
+        $body = $app->Response()->getBody();
         $placeholder = '<div id="YRYIE"></div>';
 
-        if ($this->app->debug == 'trace') {
+        if ($app->debug == 'trace') {
 
             $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
             Yryie::$TraceDelimiter = ';';
@@ -116,8 +117,6 @@ class YryieMiddleware extends Slim\Middleware {
         }
         Yryie::reset();
 
-        $this->app->response->setBody($body);
+        $app->Response()->setBody($body);
     }
 }
-
-$app->add(new YryieMiddleware());

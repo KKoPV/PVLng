@@ -45,6 +45,11 @@ class View extends \Slim\View {
         parent::__construct();
 
         $this->app = App::getInstance();
+
+        $this->app->container->singleton('JavaScriptPacker', function() {
+            return new JavaScriptPacker(0);
+        });
+
         $this->dataPointer =& $this->data;
 
         $this->Helper = new ViewHelper;
@@ -83,9 +88,9 @@ class View extends \Slim\View {
         $TplCompiled = TEMP_DIR . DS . $TplCompiled . '.php';
 
         if (!file_exists($TplCompiled) OR filemtime($TplCompiled) < filemtime($TplFile)) {
-            $html = php_strip_whitespace($TplFile);
-            $this->compile($html);
-            file_put_contents($TplCompiled, $html);
+            #\Yryie::StartTimer($TplFile, 'Compile '.$TplFile, 'Compile template');
+            file_put_contents($TplCompiled, $this->compile($TplFile));
+            #\Yryie::StopTimer();
         }
 
         // save data
@@ -216,7 +221,9 @@ class View extends \Slim\View {
     /**
      *
      */
-    protected function compile( &$html ) {
+    protected function compile( $TplFile ) {
+        $html = php_strip_whitespace($TplFile);
+
         if (strpos($html, '<!-- COMPILE OFF -->') === FALSE) {
 
             // <!-- INCLUDE template.tpl -->
@@ -324,80 +331,98 @@ class View extends \Slim\View {
 
         }
 
-        $this->compressCode($html);
+        if (!$this->app->config->get('View.Verbose')) {
+            if (substr(strtolower($TplFile), -4) == '.css') {
+                $html = $this->compressCSS($html);
+            } elseif (substr(strtolower($TplFile), -3) == '.js') {
+                $html = $this->compressJS($html);
+            } else {
+                $html = $this->compressTemplate($html);
+            }
+            $html = $this->compress($html);
+        }
+
+        return trim($html);
     }
 
     /**
      *
      */
-    protected function compressCode( &$html ) {
-        if (!$this->app->config->get('View.Verbose')) {
+    protected function compressCSS( $html ) {
+        return preg_replace(
+            array(
+                /* remove whitespace on both sides of colons : , and ; */
+                '~\s*([,:;])\s*~',
+                /* remove whitespace on both sides of curly brackets {} */
+                '~;?\s*([{}])\s*~',
+            ),
+            '$1',
+            $html
+        );
+    }
 
-            $pre = array();
-            // mask <pre>, <code> and <tt> sequences
-            if (preg_match_all('~<(pre|code|tt).*?</\\1>~is', $html, $matches, PREG_SET_ORDER)) {
-                foreach ($matches as $match) {
-                    $hash = md5($match[0]);
-                    $pre[$hash] = $match[0];
-                    $html = str_replace($match[0], $hash, $html);
-                }
-            }
+    /**
+     *
+     */
+    protected function compressJS( $html ) {
+        return $this->app->JavaScriptPacker->pack($html);
+    }
 
-            // Compress inline CSS
-            if (preg_match_all('~<style>.*?</style>~is', $html, $matches, PREG_SET_ORDER)) {
-                foreach ($matches as $match) {
-                    $html = str_replace($match[0], preg_replace(array(
-                        /* remove multiline comments */
-                        '~/\*.*?\*/~s',
-                        /* remove tabs, spaces, newlines, etc. */
-                        '~\r|\n|\t|\s\s+~',
-                        /* remove whitespace on both sides of colons : , and ; */
-                        '~\s?([,:;])\s?~',
-                        /* remove whitespace on both sides of curly brackets {} */
-                        '~;?\s?([{}])\s?~',
-                    ), array('', '', '$1', '$1'), $match[0]), $html);
-                }
-            }
-
-            // Compress inline JS
-            if (preg_match_all('~<script>.*?</script>~is', $html, $matches, PREG_SET_ORDER)) {
-                if (!$this->JavaScriptPacker) $this->JavaScriptPacker = new JavaScriptPacker(0);
-                foreach ($matches as $match) {
-                    $html = str_replace($match[0], $this->JavaScriptPacker->pack($match[0]), $html);
-                }
-            }
-
-            // Remove HTML comments
-            $html = preg_replace('~<!--.*?-->~s', '', $html);
-            // Remove JS/PHP comments
-            $html = preg_replace('~/\*.*?\*/~s', '', $html);
-            // Replace multiple white spaces/new lines with one space
-            $html = preg_replace('~\s{2,}~s', ' ', $html);
-            // Remove whitespaces between tags
-            $html = preg_replace('~>\s+<~s', '><', $html);
-
-            // remove pairs of ?><?php
-            $html = preg_replace('~\s*\?'.'><\?php\s*~', ' ', $html);
-
-            // Restore <pre>...</pre> sections
-            $html = str_replace(array_keys($pre), array_values($pre), $html);
-        }
-
-        if ($xy = $this->app->config->get('View.InlineImages') AND
-            preg_match_all('~<img [^>]*src=(["\'])([^"\']+?)\\1~', $html, $images, PREG_SET_ORDER)) {
-            foreach ($images as $img) {
-                $file = BASE_DIR . DS . $img[2];
-                if (file_exists($file) AND
-                    $info = getimagesize(BASE_DIR . DS . $img[2]) AND
-                    $info[0] <= $xy AND $info[1] <= $xy) {
-                    $html = str_replace($img[2],
-                            'data:'.$info['mime'].';base64,'.base64_encode(file_get_contents($file)),
-                            $html);
-                }
+    /**
+     *
+     */
+    protected function compressTemplate( $html ) {
+        // Remove empty pairs of <style></style>
+        $html = preg_replace('~\s*<style>\s*</style>\s*~', '', $html);
+        // Compress inline CSS
+        if (preg_match_all('~<style>.*?</style>~is', $html, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $html = str_replace($match[0], $this->compressCSS($match[0]), $html);
             }
         }
 
-        $html = trim($html);
+        // Remove empty pairs of <script></script>
+        $html = preg_replace('~\s*<script>\s*</script>\s*~', '', $html);
+        // Compress inline JS
+        if (preg_match_all('~<script>.*?</script>~is', $html, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $html = str_replace($match[0], $this->compressJS($match[0]), $html);
+            }
+        }
+
+        return $html;
+    }
+
+    /**
+     *
+     */
+    protected function compress( $html ) {
+        $pre = array();
+        // mask <pre>, <code> and <tt> sequences
+        if (preg_match_all('~<(pre|code|tt).*?</\\1>~is', $html, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $hash = md5($match[0]);
+                $pre[$hash] = $match[0];
+                $html = str_replace($match[0], $hash, $html);
+            }
+        }
+
+        // Remove HTML comments
+        $html = preg_replace('~<!--.*?-->~s', '', $html);
+        // Remove JS/PHP comments
+        $html = preg_replace('~/\*.*?\*/~s', '', $html);
+        // Replace multiple white spaces/new lines with one space
+        $html = preg_replace('~\s+~s', ' ', $html);
+        // Remove whitespaces between tags
+        $html = preg_replace('~>\s+<~s', '><', $html);
+
+        // Remove pairs of ?><?php
+        $html = preg_replace('~\s*\?'.'><\?php\s*~', ' ', $html);
+
+        // Restore <pre>...</pre> sections
+        $html = str_replace(array_keys($pre), array_values($pre), $html);
+
+        return $html;
     }
 
     /**

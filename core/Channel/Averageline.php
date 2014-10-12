@@ -24,6 +24,8 @@ class Averageline extends InternalCalc {
 
         parent::before_read($request);
 
+        if ($this->dataExists()) return;
+
         $ts = $cnt = $sum = 0;
 
         /**
@@ -45,5 +47,7 @@ class Averageline extends InternalCalc {
                 $this->saveValue($row['timestamp'], $avg);
             }
         }
+
+        $this->dataCreated();
     }
 }

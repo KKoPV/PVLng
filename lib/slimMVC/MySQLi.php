@@ -1,68 +1,17 @@
 <?php
 /**
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 namespace slimMVC;
 
 /**
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
 class MySQLi extends \MySQLi {
-
-    /**
-     * Some shortcuts to connections
-     */
-    const MASTER = 0;
-    const SLAVE  = 1;
-
-    /**
-     *
-     */
-    public static $DIE_ON_ERROR = FALSE;
-
-    /**
-     *
-     */
-    public static $SETTINGS_TABLE = 'settings';
-
-    /**
-     *
-     */
-    public static $SETTINGS_KEY_FIELD = 'key';
-
-    /**
-     *
-     */
-    public static $SETTINGS_VALUE_FIELD = 'value';
-
-    /**
-     *
-     */
-    public static $DEBUG = FALSE;
-
-    /**
-     *
-     */
-    public static $QueryCount = 0;
-
-    /**
-     *
-     */
-    public static $QueryTime = 0;
-
-    /**
-     *
-     */
-    public $Buffered = FALSE;
 
     /**
      *
@@ -72,156 +21,82 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public $SQL;
+    public function __construct( $host, $username, $passwd, $dbname, $port, $socket ) {
+        @parent::__construct($host, $username, $passwd, $dbname, $port, $socket);
 
-    /**
-     * Call this as 1st!
-     */
-    public static function setCredentials( $host, $user, $password, $database, $port=3309, $socket='', $connection=self::MASTER ) {
-        self::$credentials[$connection] = array(
-            'host'     => $host,
-            'user'     => $user,
-            'password' => $password,
-            'database' => $database,
-            'port'     => +$port,
-            'socket'   => $socket
-        );
+        $this->DBName = $dbname;
+        $this->Cli = !isset($_SERVER['REQUEST_METHOD']);
+
+        // Call org. query with less overhead
+        parent::query('SET NAMES "utf8"');
+        parent::query('SET CHARACTER SET utf8');
+
+        // Avoid SQL error (1690): BIGINT UNSIGNED value is out of range
+        parent::query('SET sql_mode = NO_UNSIGNED_SUBTRACTION');
+        mysqli_report(MYSQLI_REPORT_STRICT);
     }
 
     /**
      *
      */
-    public static function setUser( $user, $connection=self::MASTER ) {
-        self::initConnection($connection);
-        self::$credentials[$connection]['user'] = $user;
+    public function getDatabase() {
+        return $this->DBName;
     }
 
     /**
      *
      */
-    public static function getUser( $connection=self::MASTER ) {
-        self::initConnection($connection);
-        return self::$credentials[$connection]['user'];
+    public function setDieOnError( $die=TRUE ) {
+        $this->dieOnError = (bool) $die;
     }
 
     /**
      *
      */
-    public static function setPassword( $password, $connection=self::MASTER ) {
-        self::initConnection($connection);
-        self::$credentials[$connection]['password'] = $password;
+    public function setSettingsTable( $name ) {
+        $this->Settings[0] = $name;
     }
 
     /**
      *
      */
-    public static function getPassword( $connection=self::MASTER ) {
-        self::initConnection($connection);
-        return self::$credentials[$connection]['password'];
+    public function setSettingsKey( $name ) {
+        $this->Settings[1] = $name;
     }
 
     /**
      *
      */
-    public static function setDatabase( $database, $connection=self::MASTER ) {
-        self::initConnection($connection);
-        self::$credentials[$connection]['database'] = $database;
+    public function setSettingsValue( $name ) {
+        $this->Settings[2] = $name;
     }
 
     /**
      *
      */
-    public static function getDatabase( $connection=self::MASTER ) {
-        self::initConnection($connection);
-        return self::$credentials[$connection]['database'];
+    public function getQueryCount() {
+        return $this->QueryCount;
     }
 
     /**
      *
      */
-    public static function setHost( $host, $connection=self::MASTER ) {
-        self::initConnection($connection);
-        self::$credentials[$connection]['host'] = $host;
+    public function getQueryTime() {
+        return $this->QueryTime;
     }
 
     /**
      *
      */
-    public static function getHost( $connection=self::MASTER ) {
-        self::initConnection($connection);
-        return self::$credentials[$connection]['host'];
-    }
-
-    /**
-     *
-     */
-    public static function setPort( $port, $connection=self::MASTER ) {
-        self::initConnection($connection);
-        self::$credentials[$connection]['port'] = +$port;
-    }
-
-    /**
-     *
-     */
-    public static function getPort( $connection=self::MASTER ) {
-        self::initConnection($connection);
-        return self::$credentials[$connection]['port'];
-    }
-
-    /**
-     *
-     */
-    public static function setSocket( $socket, $connection=self::MASTER ) {
-        self::initConnection($connection);
-        self::$credentials[$connection]['socket'] = $socket;
-    }
-
-    /**
-     *
-     */
-    public static function getSocket( $connection=self::MASTER ) {
-        self::initConnection($connection);
-        return self::$credentials[$connection]['socket'];
-    }
-
-    /**
-     *
-     */
-    public static function getInstance( $connection=self::MASTER ) {
-        if (!isset(self::$Instance[$connection])) {
-            self::$Instance[$connection] = new self($connection);
-            if (self::$Instance[$connection]->connect_errno) {
-                throw new \Exception (self::$Instance[$connection]->connect_error,
-                                      self::$Instance[$connection]->connect_errno);
-            }
-            self::$Instance[$connection]->bootstrap();
-        }
-        return self::$Instance[$connection];
-    }
-
-    /**
-     *
-     */
-    public static function setDebug( $debug=TRUE ) {
-        self::$DEBUG = (bool) $debug;
+    public function setBuffered( $buffered=TRUE ) {
+        $this->Buffered = (bool) $buffered;
     }
 
     /**
      *
      */
     public function debug( $debug=TRUE ) {
-        self::setDebug($debug);
-        return $this;
-    }
-
-    /**
-     *
-     */
-    public function load( $file ) {
-        foreach (simplexml_load_file($file) as $key=>$value) {
-            // Force SimpleXMLElement with CDATA correct as string
-            $this->SQL->$key = (string) $value;
-        }
+        $this->debug = (bool) $debug;
         return $this;
     }
 
@@ -229,15 +104,13 @@ class MySQLi extends \MySQLi {
      *
      */
     public function sql( $query ) {
-        $args = func_get_args();
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if ($this->SQL->$query != '') $query = $this->SQL->$query;
-
-        // mask any % before replacing...
+        // Mask any % before replacing...
         $query = str_replace('%', '%%', trim($query));
 
-        // Replaceplaceholder {1} ... with %1$s ...
+        // Replace placeholder {1} ... with %1$s ...
         $query = preg_replace('~\{(\d+)\}~', '%$1$s', $query);
 
         if (isset($args[0])) {
@@ -262,7 +135,7 @@ class MySQLi extends \MySQLi {
 
         $query = $this->sql($query, $args);
 
-        if (self::$DEBUG) {
+        if ($this->debug) {
             echo $this->Cli ? "\n" : '<pre>';
             echo '[' . date('H:i:s'), '] ', $query;
             echo $this->Cli ? "\n" : '</pre>';
@@ -273,8 +146,8 @@ class MySQLi extends \MySQLi {
         $result = parent::query($query, $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT);
         $this->error();
 
-        self::$QueryTime += (microtime(TRUE) - $t) * 1000;
-        self::$QueryCount++;
+        $this->QueryTime += (microtime(TRUE) - $t) * 1000;
+        $this->QueryCount++;
         $this->queries[] = preg_replace('~\s+~', ' ', $query);
 
         return $result;
@@ -294,7 +167,7 @@ class MySQLi extends \MySQLi {
         if ($result = $this->query($query, $args)) {
             /// $t = microtime(TRUE);
             while ($row = $result->fetch_object()) $rows[] = $row;
-            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
+            /// $this->QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
         $this->Buffered = FALSE;
@@ -316,7 +189,7 @@ class MySQLi extends \MySQLi {
         if ($result = $this->query($query, $args)) {
             /// $t = microtime(TRUE);
             while ($row = $result->fetch_assoc()) $rows[] = $row;
-            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
+            /// $this->QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
         $this->Buffered = FALSE;
@@ -336,9 +209,7 @@ class MySQLi extends \MySQLi {
         $this->Buffered = TRUE;
         $row = NULL;
         if ($result = $this->query($query, $args)) {
-            /// $t = microtime(TRUE);
             $row = $result->fetch_object();
-            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
         $this->Buffered = FALSE;
@@ -358,9 +229,7 @@ class MySQLi extends \MySQLi {
         $this->Buffered = TRUE;
         $row = NULL;
         if ($result = $this->query($query, $args)) {
-            /// $t = microtime(TRUE);
             $row = $result->fetch_assoc();
-            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
         $this->Buffered = FALSE;
@@ -379,14 +248,12 @@ class MySQLi extends \MySQLi {
 
         $rc = '';
         if ($result = $this->query($query, $args)) {
-            /// $t = microtime(TRUE);
             if (is_object($result)) {
                 $a = $result->fetch_row();
                 $rc = $a[0];
             } else {
                 $rc = $result;
             }
-            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
         }
         return $rc;
     }
@@ -402,9 +269,7 @@ class MySQLi extends \MySQLi {
 
         $rows = array();
         if ($result = $this->query($query, $args)) {
-            /// $t = microtime(TRUE);
             while ($row = $result->fetch_array()) $rows[] = $row[0];
-            /// self::$QueryTime += (microtime(TRUE) - $t) * 1000;
          }
         return $rows;
     }
@@ -431,10 +296,9 @@ class MySQLi extends \MySQLi {
      */
     public function set( $key, $value ) {
         $replace = sprintf('REPLACE `%s` (`%s`, `%s`) VALUES (LOWER("{1}"), "{2}")',
-                           self::$SETTINGS_TABLE, self::$SETTINGS_KEY_FIELD,
-                           self::$SETTINGS_VALUE_FIELD);
+                           $this->Settings[0], $this->Settings[1], $this->Settings[2]);
 
-        $key = $this->real_escape_string($key);
+        $key   = $this->real_escape_string($key);
         $value = $this->real_escape_string($value);
 
         $this->query($replace, $key, $value);
@@ -452,8 +316,7 @@ class MySQLi extends \MySQLi {
      */
     public function get( $key ) {
         $query = sprintf('SELECT `%s` FROM `%s` WHERE `%s` = LOWER("{1}") LIMIT 1',
-                         self::$SETTINGS_VALUE_FIELD, self::$SETTINGS_TABLE,
-                         self::$SETTINGS_KEY_FIELD);
+                         $this->Settings[2], $this->Settings[0], $this->Settings[1]);
 
         $key = $this->real_escape_string($key);
 
@@ -463,13 +326,6 @@ class MySQLi extends \MySQLi {
         }
     }
 
-    /**
-     *
-     */
-    public function __destruct() {
-        #$this->close();
-    }
-
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
@@ -477,102 +333,51 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    protected static $credentials = array();
+    protected $DBName;
 
     /**
      *
      */
-    protected static function initConnection($connection) {
-        if (!isset(self::$credentials[$connection])) {
-            self::setCredentials( 'localhost', '', '', '', 3309, '', $connection);
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // PRIVATE
-    // -------------------------------------------------------------------------
+    protected $Cli;
 
     /**
      *
      */
-    private static $Instance = array();
+    protected $dieOnError = FALSE;
+
+    /**
+     * Table name, key field name, value field name
+     */
+    protected $Settings = array( 'settings', 'key', 'value' );
 
     /**
      *
      */
-    private $Cli;
+    protected $Buffered = FALSE;
 
     /**
      *
      */
-    private function __construct($connection) {
-        @parent::__construct(
-            self::$credentials[$connection]['host'],
-            self::$credentials[$connection]['user'],
-            self::$credentials[$connection]['password'],
-            self::$credentials[$connection]['database'],
-            self::$credentials[$connection]['port'],
-            self::$credentials[$connection]['socket']
-        );
-    }
+    protected $QueryCount = 0;
 
     /**
      *
      */
-    private function bootstrap() {
-        $this->SQL = new SQLs;
-        $this->Cli = !isset($_SERVER['REQUEST_METHOD']);
-        // Call org. query with less overhead
-        parent::query('SET NAMES "utf8"');
-        parent::query('SET CHARACTER SET utf8');
-        // Avoid SQL error (1690): BIGINT UNSIGNED value is out of range
-        parent::query('SET sql_mode = NO_UNSIGNED_SUBTRACTION');
-        mysqli_report(MYSQLI_REPORT_STRICT);
-    }
+    protected $QueryTime = 0;
+
+    /**
+     *
+     */
+    protected $debug = FALSE;
 
     /**
      *
      */
     private function error() {
-        if (!$this->errno OR !self::$DIE_ON_ERROR) return;
+        if (!$this->errno OR !$this->dieOnError) return;
 
-        echo $this->error, PHP_EOL, PHP_EOL;
+        echo $this->error, PHP_EOL;
         exit(1);
     }
-
-    /**
-     * Don't clone a singleton ;-)
-     */
-    private function __clone() {}
-
-}
-
-/**
- * Magic class for SQL statements
- */
-class SQLs {
-
-    /**
-     *
-     */
-    public function __set( $key, $sql ) {
-        $this->sql[strtolower($key)] = $sql;
-    }
-
-    /**
-     *
-     */
-    public function __get( $key ) {
-        return ($_=&$this->sql[strtolower($key)]) ?: '';
-    }
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected $sql = array();
 
 }

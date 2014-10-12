@@ -2,10 +2,10 @@
 /**
  *
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 namespace slimMVC;
 
@@ -16,27 +16,56 @@ abstract class ORM implements \Iterator, \Countable {
 
     /**
      *
+     */
+    public static function setDatabase( \MySQLi $db ) {
+        self::$db = $db;
+    }
+
+    /**
+     *
+     */
+    public static function getDatabase() {
+        return self::$db;
+    }
+
+    /**
+     *
+     */
+    public static function setCache( \Cache $cache ) {
+        self::$cache = $cache;
+    }
+
+    /**
+     *
+     */
+    public static function getCache( $cache ) {
+        return self::$cache;
+    }
+
+    /**
+     *
      * @param mixed $id Key describing one row, on primary keys
      *                  with more than field, provide an array
      */
     public function __construct( $id=NULL ) {
-        $this->app = App::getInstance();
-        $this->db = $this->app->db;
+        if (!self::$db) {
+            throw new \Exception(__CLASS__.': Call setDatabase() (and setCache()) before!');
+        }
 
         if (empty($this->fields)) {
-            $schemaKey = 'ORMtable.' . MySQLi::getDatabase() . '.' . $this->table;
-            if ($schema = $this->app->cache->get($schemaKey)) {
+            $schemaKey = 'ORMtable.' . self::$db->getDatabase() . '.' . $this->table;
+            if ($schema = self::$cache->get($schemaKey)) {
                 list($this->fields, $this->nullable, $this->primary, $this->autoinc) = $schema;
             } else {
                 // Read table schema
-                $res = $this->db->query('SHOW COLUMNS FROM '.$this->table);
+                $res = self::$db->query('SHOW COLUMNS FROM '.$this->table);
                 while ($row = $res->fetch_object()) {
                     $this->fields[$row->Field]   = '';
                     $this->nullable[$row->Field] = ($row->Null == 'YES');
                     if ($row->Key   == 'PRI') $this->primary[] = $row->Field;
                     if ($row->Extra == 'auto_increment') $this->autoinc = $row->Field;
                 }
-                $this->app->cache->set($schemaKey, array(
+                self::$cache->set($schemaKey, array(
                     $this->fields, $this->nullable, $this->primary, $this->autoinc
                 ));
             }
@@ -280,14 +309,14 @@ abstract class ORM implements \Iterator, \Countable {
      *
      */
     public function isError() {
-        return (bool) $this->db->errno;
+        return (bool) self::$db->errno;
     }
 
     /**
      *
      */
     public function Error() {
-        return $this->db->error;
+        return self::$db->error;
     }
 
     /**
@@ -423,15 +452,13 @@ abstract class ORM implements \Iterator, \Countable {
     // PROTECTED
     // -------------------------------------------------------------------------
 
-    /**
-     *
-     */
-    protected $app;
+    protected static $db;
+    protected static $cache;
 
     /**
      *
      */
-    protected $db;
+    protected $app;
 
     /**
      *
@@ -525,7 +552,7 @@ abstract class ORM implements \Iterator, \Countable {
      *
      */
     protected function quote( $value ) {
-        return $this->db->real_escape_string($value);
+        return self::$db->real_escape_string($value);
     }
 
     /**
@@ -547,10 +574,10 @@ abstract class ORM implements \Iterator, \Countable {
              . ' (' . implode(', ', $values) . ')';
 
         try {
-            if ($this->_query($sql) AND $this->autoinc AND $this->db->insert_id) {
-                $this->set($this->autoinc, $this->db->insert_id);
+            if ($this->_query($sql) AND $this->autoinc AND self::$db->insert_id) {
+                $this->set($this->autoinc, self::$db->insert_id);
             }
-            return ($this->db->affected_rows <= 0) ? 0 : $this->db->affected_rows;
+            return (self::$db->affected_rows <= 0) ? 0 : self::$db->affected_rows;
         } catch(Exception $e) {
             return 0;
         }
@@ -585,16 +612,21 @@ abstract class ORM implements \Iterator, \Countable {
      */
     protected function _query( $sql ) {
         $this->sql[] = $sql;
-        $res = $this->db->query($sql);
+        $res = self::$db->query($sql);
 
         // You have an error in your SQL syntax; check the manual ...
-        if ($this->db->errno == 1149) die($this->db->error . ' : ' . $sql);
+        if (self::$db->errno == 1149) die(self::$db->error . ' : ' . $sql);
 
-        if ($this->throwException AND $this->db->errno) {
-            throw new \Exception('Database error: '.$this->db->error, $this->db->errno);
+        if ($this->throwException AND self::$db->errno) {
+            throw new \Exception('Database error: '.self::$db->error, self::$db->errno);
         }
 
         return $res;
     }
 
 }
+
+/**
+ * Init with pseudo cache
+ */
+ORM::setCache(new \Cache\Mock);

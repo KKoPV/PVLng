@@ -9,7 +9,9 @@
  */
 -->
 
-<small><img src="{ICON}" class="channel-icon tip" title="{TYPE}" alt="({TYPE})"></small>
+<small>
+    <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon tip" title="{TYPE}" alt="({TYPE})">
+</small>
 
 <strong class="tip" title="{GUID}">{NAME}</strong>
 

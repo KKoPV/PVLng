@@ -17,15 +17,14 @@ class InternalConsumption extends InternalCalc {
     /**
      * Accept only childs of the same entity type
      */
-    public function addChild( $guid ) {
+    public function addChild( $channel ) {
         // Check if the new child is a meter
-        $new = self::byGUID($guid);
-        if ($new->meter) {
+        if ((new \ORM\ChannelView($channel))->getMeter()) {
             // ok, add new child
-            return parent::addChild($guid);
+            return parent::addChild($channel);
         }
 
-        throw new Exception('"'.$this->name.'" accepts only meters as sub channels!', 400);
+        throw new \Exception('"'.$this->name.'" accepts only meters as sub channels!', 400);
     }
 
     /**
@@ -34,6 +33,8 @@ class InternalConsumption extends InternalCalc {
     protected function before_read( $request ) {
 
         parent::before_read($request);
+
+        if ($this->dataExists()) return;
 
         $childs = $this->getChilds();
 
@@ -101,6 +102,8 @@ class InternalConsumption extends InternalCalc {
                 $row2 = $child2->next()->current();
             }
         }
+        $this->dataCreated();
+
         $child1->close();
         $child2->close();
     }

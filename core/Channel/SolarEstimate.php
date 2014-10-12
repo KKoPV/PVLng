@@ -28,8 +28,10 @@ class SolarEstimate extends InternalCalc {
         if ($this->end < strtotime('midnight')) return;
 
         // Only during daylight times today
-        $sunset = $this->config->getSunset($this->start);
+        $sunset = (new \ORM\Settings)->getSunset($this->start);
         if ($sunset < time()) return;
+
+        if ($this->dataExists()) return;
 
         $child = $this->getChild(1);
         $days  = $this->extra;
@@ -132,6 +134,8 @@ class SolarEstimate extends InternalCalc {
             $this->saveValue($lastTimestampToday, $value);
             $this->saveValue($sunset, $value);
         }
+
+        $this->dataCreated();
     }
 
     /**

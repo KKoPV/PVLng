@@ -36,6 +36,6 @@ abstract class Reading extends ReadingBase {
             $q->filter('timestamp', array('le'=>$timestamp));
         }
 
-        return $this->app->db->queryOne($q);
+        return self::$db->queryOne($q);
     }
 }

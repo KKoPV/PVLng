@@ -12,14 +12,14 @@
 <form method="post">
 
 <p>
-    <div class="fl"><input id="cb-tpl" type="checkbox" name="tpl" class="iCheck"></div>
+    <div class="fl"><input id="cb-tpl" type="checkbox" name="tpl" class="iCheck" checked="checked"></div>
     <label for="cb-tpl" style="margin-left:.5em">
         Clear cached templates from <tt style="font-size:120%;font-weight:bold">{TEMPDIR}</tt>
     </label>
 </p>
 
 <p>
-    <div class="fl"><input id="cb-cache" type="checkbox" name="cache" class="iCheck"></div>
+    <div class="fl"><input id="cb-cache" type="checkbox" name="cache" class="iCheck" checked="checked"></div>
     <label for="cb-cache" style="margin-left:.5em">
         Clear <tt style="font-size:140%;font-weight:bold">OpCode</tt> and
         <tt style="font-size:140%;font-weight:bold">user</tt> cache

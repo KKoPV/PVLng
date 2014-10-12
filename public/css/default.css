@@ -68,6 +68,7 @@ a:hover, a:active {
 }
 
 a.tip, a.tip-right, a.tip-top,
+a .tip, a .tip-right, a .tip-top, /* For images inside a tags */
 button.tip, button.tip-right, button.tip-top,
 .tipbtn, .tipbtn-right, .tipbtn-top,
 input[type=image],
@@ -217,6 +218,10 @@ td.imgbar {
 
 /* Other
 --------------------------------------------------------------------------- */
+.marked-for-deletion td {
+    background-color: #FFC0C0 !important;
+}
+
 .select2-results {
     /* Show about 12 rows below search input */
     max-height: 20em;
@@ -243,6 +248,15 @@ select,
 textarea {
     padding: .2em .3em;
     background-color: white;
+}
+
+input.guid {
+    font-family: monospace;
+    font-size: x-large;
+    text-align: center;
+    width: 100%;
+    border: 0;
+    outline: 0;
 }
 
 .clickable {

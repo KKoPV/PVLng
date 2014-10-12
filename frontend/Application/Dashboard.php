@@ -7,21 +7,16 @@
  * @version    1.0.0
  */
 
-/**
- *
- */
-PVLng::Menu('20.20', '/dashboard', __('Dashboards'), 'Shift+F2');
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('20.20', '/dashboard', 'Dashboards', TRUE, 'Shift+F2');
 
-/**
- *
- */
-$tblDashboard = new ORM\Dashboard;
-$user = Session::get('user');
-foreach ($tblDashboard->order('name')->find() as $dashboard) {
-    if ($user || $dashboard->getPublic()) {
-        PVLng::Menu('20.20.', '/dashboard/'.$dashboard->getSlug(), $dashboard->getName());
+    $tblDashboard = new ORM\Dashboard;
+    foreach ($tblDashboard->order('name')->find() as $dashboard) {
+        if ($app->user || $dashboard->getPublic()) {
+            $app->menu->add('20.20.', '/dashboard/'.$dashboard->getSlug(), ':'.$dashboard->getName());
+        }
     }
-}
+});
 
 /**
  * Routes

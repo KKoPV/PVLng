@@ -35,7 +35,7 @@ function markRows4Deletion( id) {
     oTable.$('tr').each(function(i, tr) {
         tr = $(tr);
         if (tr.data('tt-id') == id) {
-            tr.animate({ backgroundColor: '#FFCCCC' }).addClass('marked-for-deletion');
+            tr.addClass('marked-for-deletion');
         } else if (tr.data('tt-parent-id') == id) {
             markRows4Deletion(tr.data('tt-id'));
         }
@@ -70,10 +70,6 @@ $(function() {
 
     oTable = $('#tree').dataTable({
         bSort: false,
-        bInfo: false,
-        bLengthChange: false,
-        bPaginate: false,
-        bProcessing: true,
         bAutoWidth: false,
         bFilter: true,        /* Allow filter by coding, but   */
         sDom: '<"H"r>t<"F">', /* remove filter input from DOM. */
@@ -155,6 +151,7 @@ $(function() {
             /* Create hidden form and submit */
             $('<form/>', { action: '/overview/dragdrop', method: 'post' } )
             .appendTo('body')
+            .append($('<input/>', { type: 'hidden', name: 'returnto', value: '/overview#_'+$(this).data('tt-id') }))
             .append($('<input/>', { type: 'hidden', name: 'target', value: $(this).data('tt-id') }))
             .append($('<input/>', { type: 'hidden', name: 'id',     value: ui.helper.data('id') }))
             .append($('<input/>', { type: 'hidden', name: 'entity', value: ui.draggable.data('entity') }))
@@ -228,16 +225,14 @@ $(function() {
     });
 
     /* Bind click listener to all GUID images */
-    $('#tree tbody').on('click', '.guid', function() {
+    $('.guid', '#tree tbody').click(function() {
         $.alert(
-            $('<p/>').append(
-                $('<input/>')
-                    .css({ fontFamily: 'monospace', fontSize: '150%', width: '100%', border: 0, outline: 0 })
-                    .prop('readonly', 'readonly')
-                    .val($(this).data('guid'))
-                    /* Prepare to copy into clipboard ... */
-                    .on('click', function() { this.select() })
-            ),
+             $('<input/>')
+                .addClass('guid')
+                .prop('readonly', 'readonly')
+                .val($(this).data('guid'))
+                /* Prepare to copy into clipboard ... */
+                .click(function() { this.select() }),
             '{{Channel}} GUID'
         );
     });
@@ -261,7 +256,7 @@ $(function() {
                 text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
             });
             /* Remove icon, unbind handler and reset cursor */
-            $(that).prop('src', '/images/pix.gif').removeClass('create-alias').removeClass('btn');
+            $(that).removeClass('arrow-split').removeClass('create-alias').removeClass('btn');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
                 type: textStatus, hide: false, sticker: false, text: errorThrown
@@ -275,18 +270,17 @@ $(function() {
     $('#tree tbody').on('click', '.node-delete, .node-delete-next', function() {
 
         /* Get tree table Id from parent <tr> */
-        var tr = $(this.parentNode.parentNode);
+        var tr = $(this.parentNode.parentNode), node = tr.data('tt-id');
 
-        markRows4Deletion(tr.data('tt-id'));
+        markRows4Deletion(node);
 
         var msg = tr.hasClass('group') ? '{{ConfirmDeleteTreeItems}}' : '{{ConfirmDeleteTreeNode}}';
 
-        $.confirm($('<p/>').html(msg), '{{Confirm}}', '{{Yes}}', '{{No}}')
-        .then(function(ok) {
+        $.confirm($('<p/>').html(msg), '{{Confirm}}', '{{Yes}}', '{{No}}').then(function(ok) {
             var rows = $('.marked-for-deletion');
 
             if (!ok) {
-                rows.removeClass('.marked-for-deletion').css({ backgroundColor: '' });
+                rows.removeClass('marked-for-deletion');
                 return;
             }
 
@@ -297,21 +291,18 @@ $(function() {
                 url: PVLngAPI + 'tree/' + node + '.json',
                 dataType: 'json',
             }).done(function(data, textStatus, jqXHR) {
-                /* Loop all rows and delete also rows with tt-parent-id = node if any */
-                rows.animate({ backgroundColor: '#CCFFCC' }, 'slow', function() {
-                    rows.each(function(i, tr) {
-                        /* Get row position and delete without redraw */
-                        oTable.fnDeleteRow(oTable.fnGetPosition(tr), null, false);
-                    });
-                    oTable.fnDraw();
+                rows.each(function(i, tr) {
+                    /* Get row position and delete without redraw */
+                    oTable.fnDeleteRow(oTable.fnGetPosition(tr), null, false);
                 });
+                oTable.fnDraw();
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
                     type: textStatus, hide: false, sticker: false,
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
-                rows.removeClass('.marked-for-deletion').css({ backgroundColor: '' });
+                rows.removeClass('marked-for-deletion');
                 oTable.removeClass('wait');
             });
         });

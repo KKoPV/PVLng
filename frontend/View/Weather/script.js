@@ -61,7 +61,7 @@ $(function() {
 
     if (!APIkey) {
         $('h3', '#content')
-        .html('Missing Wunderground API key, see config.php for details');
+        .html('Missing Wunderground API key please <a href="/settings#controller-Weather-APIkey">configure</a> before');
     } else {
 
     $.ajax({

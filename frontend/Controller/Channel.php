@@ -21,8 +21,7 @@ class Channel extends \Controller {
         parent::before();
 
         $tblChannel = new \ORM\ChannelView;
-        $tblChannel->filter('type_id', array('min'=>1))->find();
-        $this->view->Entities = $tblChannel->asAssoc();
+        $this->view->Channels = $tblChannel->filter('type_id', array('min'=>1))->find()->asAssoc();
 
         $this->fields = array();
 
@@ -164,17 +163,15 @@ class Channel extends \Controller {
 
         // Build hierarchy
         /// \Yryie::StartTimer('hierarchy', 'Create hierarchy', 'db');
-        $tree = \NestedSet::getInstance();
-
         // Remember Grouping Id for templates without own grouping channel (index 0)
         $groupId = $this->request->post('tree') ?: 1;
 
         foreach ($channels as $id=>$channel) {
             if ($id == 0) {
-                $groupId = $tree->insertChildNode($channel['id'], $groupId);
+                $groupId = $this->app->tree->insertChildNode($channel['id'], $groupId);
             } elseif ($channel['id']) {
                 // Remember tree position
-                $channels[$id]['tree'] = $tree->insertChildNode($channel['id'], $groupId);
+                $channels[$id]['tree'] = $this->app->tree->insertChildNode($channel['id'], $groupId);
             } else {
                 $channels[$id]['tree'] = 0;
             }
@@ -378,9 +375,8 @@ class Channel extends \Controller {
 
                     // CAN'T simply replace because of the foreign key in the tree!
                     if (!$entity->getId()) {
-                        // Init icon with type icon
-                        $entity->setIcon($type->getIcon());
                         $entity->insert();
+                        \Messages::Success(__('ChannelSaved'));
                         if ($this->request->post('add2tree') AND
                             $addTo = $this->request->post('tree') AND
                             $tree = \Channel::byId($addTo)->addChild($entity->getId())) {
@@ -388,9 +384,9 @@ class Channel extends \Controller {
                         }
                     } else {
                         $entity->update();
+                        \Messages::Success(__('ChannelSaved'));
                     }
 
-                    \Messages::Success(__('ChannelSaved'));
                     $model::afterSave($entity, $tree);
                 } catch (\Exception $e) {
                     \Messages::Error('['.$e->getCode().'] '.$e->getMessage());
@@ -575,6 +571,7 @@ class Channel extends \Controller {
                 $data
             );
 
+            // Test if translations exists
             $h = 'model::'.$type->model.'_'.$key;
             $name = __($h);
             $data['NAME'] = ($name != $h) ? $name : __('channel::'.$key);
@@ -583,64 +580,107 @@ class Channel extends \Controller {
             $name = __($h);
             $data['HINT'] = ($name != $h) ? $name : __('channel::'.$key.'Hint');
 
-            if (is_null($entity)) {
-                $data['VALUE'] = trim($data['DEFAULT']);
-            }
+            // Set value in ADD mode to default
+            if (is_null($entity)) $data['VALUE'] = trim($data['DEFAULT']);
 
-            if (strpos($data['TYPE'], 'bool') === 0) {
-                preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
-                foreach ($matches as $option) {
-                    $data['OPTIONS'][] = array(
-                        'VALUE'   => trim($option[1]),
-                        'TEXT'    => __(trim($option[2])),
-                        'CHECKED' => (trim($option[1]) == $data['VALUE'])
-                    );
-                }
-                $data['TYPE'] = 'bool';
-            } elseif (strpos($data['TYPE'], 'select') === 0) {
-                preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
-                foreach ($matches as $option) {
-                    $data['OPTIONS'][] = array(
-                        'VALUE'    => trim($option[1]),
-                        'TEXT'     => __(trim($option[2])),
-                        'SELECTED' => (trim($option[1]) == $data['VALUE'])
-                    );
-                }
-                $data['TYPE'] = 'select';
-            } elseif (strpos($data['TYPE'], 'range') === 0) {
-                list(, $start, $end, $step) = explode(';', $data['TYPE'].';1', 4); // step of 1 as default
-                for ($i=$start; $i<=$end; $i+=$step) {
-                    $data['OPTIONS'][] = array(
-                        'VALUE'    => $i,
-                        'TEXT'     => $i,
-                        'SELECTED' => ($i == $data['VALUE'])
-                    );
-                }
-              $data['TYPE'] = 'select';
-            } elseif (preg_match('~^sql:(.?):(.*?)$~i', $data['TYPE'], $matches)) {
-                // Tranform into select options
-                if ($matches[1] != '') {
-                    // Empty option for select2 placeholder
-                    $data['OPTIONS'][] = NULL;
-                }
-                foreach ($this->db->queryRowsArray($matches[2]) as $option) {
-                    $option = array_values($option);
-                    $data['OPTIONS'][] = array(
-                        'VALUE'    => trim($option[0]),
-                        'TEXT'     => __(trim($option[1])),
-                        'SELECTED' => (trim($option[0]) == $data['VALUE'])
-                    );
-                }
-                $data['TYPE'] = 'select';
-            }
+            switch (TRUE) {
+
+                // Boolean
+                case strpos($data['TYPE'], 'bool') === 0:
+                    preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
+                    foreach ($matches as $option) {
+                        $data['OPTIONS'][] = array(
+                            'VALUE'   => trim($option[1]),
+                            'TEXT'    => __(trim($option[2])),
+                            'CHECKED' => (trim($option[1]) == $data['VALUE'])
+                        );
+                    }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'bool';
+                  break;
+
+                // Select
+                case strpos($data['TYPE'], 'select') === 0:
+                    preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
+                    foreach ($matches as $option) {
+                        $data['OPTIONS'][] = array(
+                            'VALUE'    => trim($option[1]),
+                            'TEXT'     => __(trim($option[2])),
+                            'SELECTED' => (trim($option[1]) == $data['VALUE'])
+                        );
+                    }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'select';
+                  break;
+
+                // Range
+                case strpos($data['TYPE'], 'range') === 0:
+                    list(, $start, $end, $step) = explode(';', $data['TYPE'].';1', 4); // step of 1 as default
+                    for ($i=$start; $i<=$end; $i+=$step) {
+                        $data['OPTIONS'][] = array(
+                            'VALUE'    => $i,
+                            'TEXT'     => $i,
+                            'SELECTED' => ($i == $data['VALUE'])
+                        );
+                    }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'select';
+                  break;
+
+                // SQL
+                case preg_match('~^sql:(.?):(.*?)$~i', $data['TYPE'], $matches):
+                    // Tranform into select options
+                    if ($matches[1] != '') {
+                        // Empty option for select2 placeholder
+                        $data['OPTIONS'][] = NULL;
+                    }
+                    foreach ($this->db->queryRowsArray($matches[2]) as $option) {
+                        $option = array_values($option);
+                        $data['OPTIONS'][] = array(
+                            'VALUE'    => trim($option[0]),
+                            'TEXT'     => __(trim($option[1])),
+                            'SELECTED' => (trim($option[0]) == $data['VALUE'])
+                        );
+                    }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'select';
+                  break;
+
+                // Detect icon by field name, not by type
+                case $key == 'icon':
+                    // In ADD mode the value is empty, preset from type
+                    if (empty($data['VALUE'])) $data['VALUE'] = $type->getIcon();
+
+                    // Collect possible icons
+                    if ($res = $this->db->query(new \DBQuery('pvlng_type_icons'))) {
+                        while ($row = $res->fetch_object()) {
+                            $name = explode(',', $row->name);
+                            // Use max. the first 4 type names
+                            if (count($name) < 4) {
+                                $name = implode(', ', $name);
+                            } else {
+                                $name = implode(', ', array_slice($name, 0, 4)) . ' ...';
+                            }
+                            $data['ICONS'][] = array(
+                                'ICON'   => $row->icon,
+                                'NAME'   => $name,
+                                'ACTUAL' => ($data['VALUE'] == $row->icon)
+                            );
+                        }
+                    }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'icon';
+                  break;
+
+            } // switch
         }
 
-        $this->view->Type = $type->id;
-        $this->view->TypeName = $type->name;
-        if ($type->unit) $this->view->TypeName .= ' [' . $type->unit . ']';
-        $this->view->Icon = $type->icon;
+        $this->view->Type = $type->getId();
+        $this->view->Icon = $type->getIcon();
+        $this->view->TypeName = $type->getName();
+        $this->view->TypeDesc = __($type->getDescription());
 
-        $h = $type->description.'Help';
+        $h = $type->getDescription().'Help';
         $help = __($h);
         // Check if a help text exists
         $this->view->TypeHelp = $help != $h ? $help : '';

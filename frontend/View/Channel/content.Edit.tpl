@@ -3,20 +3,20 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
-
-<!-- IF {TYPEHELP} -->
-<p id="typehelp">{TYPEHELP}</p>
-<!-- ENDIF -->
 
 <h3>
     <img src="{ICON}" class="channel-icon-large" alt="">
     <strong>{TYPENAME}</strong>
 </h3>
+
+<p>
+    <!-- IF !{TYPEHELP} -->{TYPEDESC}<!-- ELSE -->{TYPEHELP}<!-- ENDIF -->
+</p>
 
 <form action="/channel/edit" method="post">
 
@@ -46,7 +46,7 @@
         <td style="vertical-align:top;padding-top:.75em;white-space:nowrap">
             <label for="{FIELD}">{NAME}</label>
             <!-- IF {REQUIRED} -->
-                <img class="ico" src="/images/required.gif" alt="*">
+                <img class="ico tip" src="/images/required.gif" title="{{required}}" alt="*">
             <!-- ENDIF -->
         </td>
         <td style="vertical-align:top;padding-top:.5em;padding-bottom:.5em">
@@ -88,8 +88,7 @@
                     <!-- END -->
                 </select>
             <!-- ELSEIF {TYPE} == "textarea" -->
-                <textarea id="{FIELD}" name="c[{FIELD}]" <!-- IF {CODE} -->class="code"<!-- ENDIF -->
-                          placeholder="{PLACEHOLDER}"
+                <textarea id="{FIELD}" name="c[{FIELD}]" class="code" placeholder="{PLACEHOLDER}"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                           <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                 >{VALUE}</textarea>
@@ -99,6 +98,12 @@
                        <!-- IF {CODE} --> class="code"<!-- ENDIF -->
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
+            <!-- ELSEIF {TYPE} == "icon" -->
+                <select id="icon-select" name="c[{FIELD}]">
+                    <!-- BEGIN ICONS -->
+                    <option id="{ICON}" value="{ICON}" <!-- IF {ACTUAL} -->selected="selected"<!-- ENDIF -->>{NAME}</option>
+                    <!-- END -->
+                </select>
             <!-- ELSE --><!-- Normal text field -->
                 <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="50"
                        placeholder="{PLACEHOLDER}"

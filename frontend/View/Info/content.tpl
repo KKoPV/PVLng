@@ -48,7 +48,7 @@
             <tr>
                 <td style="vertical-align:top">{{YourAPIcode}}</td>
                 <td>
-                    <form method="post" style="float:right">
+                    <form method="post" style="float:right;margin-left:1em;margin-bottom:1em">
                         <input type="hidden" name="regenerate" value="1" />
                         <input id="regenerate" type="submit" value="{{Regenerate}}" />
                     </form>
@@ -81,7 +81,7 @@
             <!-- BEGIN STATS -->
             <tr class="tip" tip="#tip-{GUID}">
                 <td class="icons">
-                    <img src="{ICON}" class="tip channel-icon" alt="" title="{TYPE}" />
+                    <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon tip" title="{TYPE}" alt="">
                     {NAME}
                 </td>
                 <td>{DESCRIPTION}</td>

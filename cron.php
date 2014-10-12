@@ -9,12 +9,22 @@
  * @version     1.0.0
  */
 
+// Command line parameters
+extract(getopt('vtfh'), EXTR_PREFIX_ALL, 'p');
+define('TESTMODE', isset($p_t));
+
 /**
  * Initialize
  */
-ini_set('display_startup_errors', 0);
-ini_set('display_errors', 0);
-error_reporting(0);
+if (!TESTMODE) {
+    ini_set('display_startup_errors', 0);
+    ini_set('display_errors', 0);
+    error_reporting(0);
+} else {
+    ini_set('display_startup_errors', 1);
+    ini_set('display_errors', 1);
+    error_reporting(-1);
+}
 
 setlocale(LC_NUMERIC, 'C');
 iconv_set_encoding('internal_encoding', 'UTF-8');
@@ -30,13 +40,10 @@ define('ROOT_DIR', BASE_DIR);
 define('CONF_DIR', ROOT_DIR . DS . 'config');
 define('CORE_DIR', ROOT_DIR . DS . 'core');
 define('LIB_DIR',  ROOT_DIR . DS . 'lib');
-define('APP_DIR',  ROOT_DIR . DS . 'frontend');
+define('TEMP_DIR', ROOT_DIR . DS . 'tmp'); // Outside document root!
 
-// Outside document root!
-define('TEMP_DIR', ROOT_DIR . DS . 'tmp');
-
-file_exists(CONF_DIR . DS . 'config.php') || die('Missing: ' . CONF_DIR . DS . 'config.php');
-file_exists(CONF_DIR . DS . 'config.cron.php') || die('Missing: ' . CONF_DIR . DS . 'config.cron.php');
+file_exists(CONF_DIR . DS . 'config.php') OR die('Missing: ' . CONF_DIR . DS . 'config.php');
+file_exists(CONF_DIR . DS . 'config.cron.php') OR die('Missing: ' . CONF_DIR . DS . 'config.cron.php');
 
 /**
  * Initialize Auto-Loader
@@ -45,53 +52,36 @@ include LIB_DIR . DS . 'Loader.php';
 
 Loader::register(
     array(
-        'path'    => array(CORE_DIR, LIB_DIR, APP_DIR),
+        'path'    => array(CORE_DIR, LIB_DIR),
         'pattern' => array('%s.php'),
         'exclude' => array('contrib/')
     ),
     TEMP_DIR
 );
 
-$config = slimMVC\Config::getInstance()
-        ->load(CONF_DIR . DS . 'config.default.php')
-        ->load(CONF_DIR . DS . 'config.php')
-        ->load(CONF_DIR . DS . 'config.cron.php', TRUE, 'Export');
-
-/**
- * Initialize cache
- */
-$cache = Cache::factory(
-    array(
-        'Token'     => 'PVLng',
-        'Directory' => TEMP_DIR,
-        'TTL'       => 86400
-    ),
-    $config->get('Cache')
-);
-
-// ---------------------------------------------------------------------------
-// Let's go
-// ---------------------------------------------------------------------------
-
-$app = new slimMVC\App();
-
-$app->config = $config;
-$app->cache  = $cache;
+$config = (new slimMVC\Config)
+          ->load(CONF_DIR . DS . 'config.default.php')
+          ->load(CONF_DIR . DS . 'config.php')
+          // Load into "Cron" namespace
+          ->load(CONF_DIR . DS . 'config.cron.php', TRUE, 'Cron');
 
 /**
  * Database
  */
-$c = $config->get('Database');
-slimMVC\MySQLi::setCredentials(
-    $c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']
-);
-slimMVC\MySQLi::$SETTINGS_TABLE = 'pvlng_config';
-
 try {
     // Try connect to database
-    $app->db = slimMVC\MySQLi::getInstance();
+    $c = $config->get('Database');
+    $db = new slimMVC\MySQLi($c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']);
 } catch (Exception $e) {
     die('Unable to connect to database!');
+}
+
+$db->setSettingsTable('pvlng_config');
+
+slimMVC\ORM::setDatabase($db);
+
+foreach ((new ORM\SettingsKeys)->find()->asAssoc() as $setting) {
+    $config->set($setting['key'], $setting['value']);
 }
 
 /**
@@ -100,7 +90,7 @@ try {
 include LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
 
 NestedSet::Init(array(
-    'db'       => $app->db,
+    'db'       => $db,
     'debug'    => true,
     'lang'     => 'en',
     'path'     => LIB_DIR . DS . 'contrib' . DS . 'messages',
@@ -180,12 +170,7 @@ function curl( $options, &$result, &$info=array() ) {
     return TRUE;
 }
 
-// Command line parameters
-extract(getopt('vtfh'), EXTR_PREFIX_ALL, 'p');
-
 if (isset($p_h)) usage();
-
-define('TESTMODE', isset($p_t));
 
 $p_v = isset($p_v) ? (is_array($p_v)?count($p_v):1) : 0;
 // Increase verbosity by 1 in test mode
@@ -200,15 +185,14 @@ if (VERBOSE) {
 if (TESTMODE) {
     out( 1, 'Test mode');
 } else {
-    // Give the other (data saving) cron jobs some more time to finish...
-    out( 1, 'Snooze 5 seconds ...');
-    sleep(5);
+    out( 1, 'Snooze 10 seconds, give the other (data saving) cron jobs some more time to finish ...');
+    sleep(10);
 }
 
 $minute = +date('i');
 
 try {
-    foreach ($config->get('Export') as $section) {
+    foreach ($config->get('Cron') as $section) {
 
         $section = array_merge(
             array(

@@ -1,37 +1,22 @@
 <?php
 /**
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 namespace slimMVC;
 
 /**
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
 class Config extends \Slim\Helper\Set {
 
     /**
      *
      */
-    public static $NamespaceSeparator = '.';
-
-    /**
-     *
-     */
-    public static function getInstance() {
-        if (!self::$Instance) {
-            self::$Instance = new self;
-        }
-        return self::$Instance;
-    }
+    public $NamespaceSeparator = '.';
 
     /**
      *
@@ -41,7 +26,7 @@ class Config extends \Slim\Helper\Set {
             $data = include $file;
             $data = $this->array_change_key_case_deep($data);
             $p =& $this->data;
-            $key = explode(self::$NamespaceSeparator, mb_strtolower($namespace));
+            $key = explode($this->NamespaceSeparator, mb_strtolower($namespace));
             while ($k = array_shift($key)) $p =& $p[$k];
             $p = $this->array_replace_deep($p, $data);
         }
@@ -64,7 +49,7 @@ class Config extends \Slim\Helper\Set {
      *
      */
     public function set( $key, $value ) {
-        $key = explode(self::$NamespaceSeparator, mb_strtolower($key));
+        $key = explode($this->NamespaceSeparator, mb_strtolower($key));
         $current =& $this->data;
         while ($k = array_shift($key)) $current =& $current[$k];
         $current = $value;
@@ -75,14 +60,14 @@ class Config extends \Slim\Helper\Set {
      *
      */
     public function __set( $key, $value ) {
-        return $this->set(str_replace('_', self::$NamespaceSeparator, $key), $value);
+        return $this->set(str_replace('_', $this->NamespaceSeparator, $key), $value);
     }
 
     /**
      *
      */
     public function get( $key, $default=NULL ) {
-        $key = explode(self::$NamespaceSeparator, mb_strtolower($key));
+        $key = explode($this->NamespaceSeparator, mb_strtolower($key));
         $current =& $this->data;
         while ($k = array_shift($key)) {
             if (!isset($current[$k])) return $default;
@@ -95,27 +80,7 @@ class Config extends \Slim\Helper\Set {
      *
      */
     public function __get( $key ) {
-        return $this->get(str_replace('_', self::$NamespaceSeparator, $key));
-    }
-
-    /**
-     *
-     */
-    public function getSunrise( $day ) {
-        return date_sunrise($day, SUNFUNCS_RET_TIMESTAMP,
-                           +$this->get('Location.Latitude'),
-                           +$this->get('Location.Longitude'),
-                           90, date('Z')/3600);
-    }
-
-    /**
-     *
-     */
-    public function getSunset( $day ) {
-        return date_sunset($day, SUNFUNCS_RET_TIMESTAMP,
-                           +$this->get('Location.Latitude'),
-                           +$this->get('Location.Longitude'),
-                           90, date('Z')/3600);
+        return $this->get(str_replace('_', $this->NamespaceSeparator, $key));
     }
 
     // -------------------------------------------------------------------------
@@ -156,14 +121,5 @@ class Config extends \Slim\Helper\Set {
         // Return the joined array
         return $base;
     }
-
-    // -------------------------------------------------------------------------
-    // PRIVATE
-    // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    private static $Instance = array();
 
 }

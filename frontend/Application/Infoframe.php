@@ -7,10 +7,10 @@
  * @version    1.0.0
  */
 
-/**
- *
- */
-PVLng::Menu('20.90', '/infoframe', __('Infoframe'));
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('20.90', '#', '---');
+    $app->menu->add('20.91', '/infoframe', 'Infoframe');
+});
 
 /**
  * Routes

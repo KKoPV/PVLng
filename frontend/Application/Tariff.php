@@ -6,12 +6,10 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-if (!Session::get('User')) return;
 
-/**
- *
- */
-PVLng::Menu('10.40', '/tariff', __('Tariffs'));
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('10.40', '/tariff', 'Tariffs', !!$app->user);
+});
 
 /**
  * Routes

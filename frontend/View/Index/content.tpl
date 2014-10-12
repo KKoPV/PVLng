@@ -19,9 +19,9 @@
         <!-- INCLUDE dateselect.inc.tpl -->
     </div>
     <div class="grid_2 c" style="margin:0 2%">
-        <img id="modified" src="/images/modified.png" width="24" height="24"
+        <img id="modified" src="/images/pix.gif" data-src="/images/modified.png" class="def tip"
              style="display:none;margin-top:6px;width:24px;height:24px" alt="[ unsaved changes ]"
-             class="tip" title="{{UnsavedChanges}}" />
+             title="{{UnsavedChanges}}" />
         &nbsp;
     </div>
     <div class="r">
@@ -32,7 +32,7 @@
 <div class="clear"></div>
 
 <div id="chart">
-    <div id="top-select">{{NoChannelsSelectedYet}}</div>
+    <div id="top-select" style="display:none">{{NoChannelsSelectedYet}}</div>
 </div>
 
 <div class="clear"></div>

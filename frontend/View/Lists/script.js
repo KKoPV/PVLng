@@ -23,7 +23,8 @@ function updateList() {
         var icon = $('#icon');
         icon.prop('src', icon.data('none'));
         $('#icon-private').hide();
-        $('#editentity').hide();
+        $('#edit-entity').hide();
+        $('#guid').hide();
         listTable.fnClearTable();
         $('.export').button('option', 'disabled', true);
         return;
@@ -50,7 +51,7 @@ function updateList() {
         },
         function(data) {
             /* pop out 1st row with attributes */
-            var channel = data.shift();
+            channel = data.shift();
 
             /* Only real channels allow deletion for readings */
             if (channel.childs == 0 && channel.write == 1) {
@@ -60,7 +61,8 @@ function updateList() {
 
             $('#icon').prop('src', channel.icon).prop('title', channel.type).tipTip();
             $('#icon-private').toggle(!channel.public);
-            $('#editentity').data('guid',channel.guid).show();
+            $('#edit-entity').data('guid',channel.guid).show();
+            $('#guid').data('guid',channel.guid).show();
             $('.export').button('option', 'disabled', data.length == 0);
 
             $(data).each(function(id, row) {
@@ -139,7 +141,7 @@ $(function() {
     $('#to').datepicker({
         altField: '#todate',
         altFormat: 'mm/dd/yy',
-        maxDate: 0,
+        maxDate: 1,
         showButtonPanel: true,
         showWeek: true,
         changeMonth: true,
@@ -194,8 +196,10 @@ $(function() {
 
     /* Bind click listener to all delete buttons */
     $('#list tbody').on('click', '.delete-reading', function() {
-        var tr = this.parentNode.parentNode,
-            ts = $(this).data('timestamp'),
+        var tr = this.parentNode.parentNode;
+        $(tr).addClass('marked-for-deletion');
+
+        var ts = $(this).data('timestamp'),
             msg = $('<p/>').html('{{DeleteReadingConfirm}}')
                   .append($('<ul/>')
                       .append($('<li/>').html((new Date(ts*1000)).toLocaleString()))
@@ -203,19 +207,19 @@ $(function() {
                   );
 
         $.confirm(msg, '{{Confirm}}', '{{Yes}}', '{{No}}').then(function(ok) {
-            if (!ok) return;
+            if (!ok) {
+                $('.marked-for-deletion').removeClass('marked-for-deletion');
+                return;
+            }
 
             $(document.body).addClass('wait');
 
-            var url = PVLngAPI + 'data/' + channel.guid + '/' + ts + '.json',
-                pos = listTable.fnGetPosition(tr);
-
             $.ajax({
                 type: 'DELETE',
-                url: url,
+                url: PVLngAPI + 'data/' + channel.guid + '/' + ts + '.json',
                 dataType: 'json',
             }).done(function(data, textStatus, jqXHR) {
-                listTable.fnDeleteRow(pos);
+                listTable.fnDeleteRow(listTable.fnGetPosition(tr));
                 $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
@@ -223,6 +227,7 @@ $(function() {
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
+                $('.marked-for-deletion').removeClass('marked-for-deletion');
                 $(document.body).removeClass('wait');
             });
         });
@@ -238,14 +243,27 @@ $(function() {
         updateList();
     });
 
-    $('#editentity').click(function() {
+    $('#edit-entity').click(function() {
         window.location.href = '/channel/edit/' + $(this).data('guid') + '?returnto=/list/' + $(this).data('guid');
+    });
+
+    /* Bind click listener to all GUID images */
+    $('#guid').click(function() {
+        $.alert(
+            $('<input/>')
+                .addClass('guid')
+                .prop('readonly', 'readonly')
+                .val($(this).data('guid'))
+                /* Prepare to copy into clipboard ... */
+                .click(function() { this.select() }),
+            '{{Channel}} GUID'
+        );
     });
 
     $('#btn-refresh').button({
         icons: { primary: 'ui-icon-refresh' },
         text: false
-    }).click(function(e) {
+    }).click(function() {
         updateList();
         return false;
     });

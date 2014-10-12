@@ -25,7 +25,7 @@ class ReadingStrMemory extends ReadingMemory {
      */
     public function __construct ( $id=NULL ) {
         if (self::$first) {
-            \slimMVC\App::getInstance()->db->query('
+            self::$db->query('
                 CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
                     `id`        smallint unsigned NOT NULL,
                     `timestamp` int               NOT NULL,

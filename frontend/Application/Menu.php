@@ -10,6 +10,7 @@
 /**
  * Basic menu structure
  */
-if (Session::get('User')) PVLng::Menu('10','#', __('MasterData'));
-
-PVLng::Menu('20','#', __('Analysis'));
+$app->hook('slim.before', function () use ($app) {
+    $app->menu->add('10', '#', 'MasterData');
+    $app->menu->add('20', '#', 'Analysis');
+});

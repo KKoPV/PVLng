@@ -1,17 +1,18 @@
-<script>
+<!--
 /**
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
-</script>
+-->
 
 <script src="/js/jquery.treetable.js"></script>
 
 <script>
+
 (function($) {
 /**
  * http://legacy.datatables.net/release-datatables/examples/api/multi_filter_select.html
@@ -51,9 +52,13 @@ $.fn.dataTableExt.oApi.fnGetColumnData = function( oSettings, iColumn ) {
     return asResultData.sort();
 }}(jQuery));
 
+/**
+ *
+ */
 function fnCreateSelect( aData ) {
-  var r='<select><option value="">{{Filter}}?</option>', i, iLen=aData.length;
-    for ( i=0 ; i<iLen ; i++ ) {
+    var r = '<select><option value="">{{Filter}}?</option>',
+        i, iLen = aData.length;
+    for (i=0; i<iLen; i++) {
         r += '<option value="'+aData[i]+'">'+aData[i]+'</option>';
     }
     return r+'</select>';
@@ -83,7 +88,7 @@ $(function() {
         aaSorting: [[ 0, 'asc' ]],
         fnInitComplete: function() {
             pvlng.addClearSearchButton('entities', '{{ClearSearch}}');
-            $('select', '#entities_wrapper').select2();
+            $('select', 'th').select2();
         }
     });
 
@@ -109,7 +114,7 @@ $(function() {
     });
 
     /* Bind click listener to all delete channel images */
-    $('.node-delete', '#entities tbody').addClass('btn').on('click', function() {
+    $('.node-delete', '#entities tbody').addClass('btn').click(function() {
 
         /* Get tree table Id from parent <tr> */
         var tr = $(this).parents('tr');
@@ -143,6 +148,18 @@ $(function() {
         });
     });
 
+    /* Bind click listener to all GUID images */
+    $('.guid', '#entities tbody').click(function() {
+        $.alert(
+            $('<input/>')
+                .addClass('guid')
+                .prop('readonly', 'readonly')
+                .val($(this).data('guid'))
+                /* Prepare to copy into clipboard ... */
+                .click(function() { this.select() }),
+            '{{Channel}} GUID'
+        );
+    });
 
     $('.delete-form').submit(function(){
         currentForm = this;

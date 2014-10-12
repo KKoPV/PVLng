@@ -15,9 +15,14 @@ namespace Channel;
 abstract class InternalCalc extends Channel {
 
     /**
+     * Readings table object
+     */
+    protected $data;
+
+    /**
      *
      */
-    protected $entity_org;
+    protected $LifeTime;
 
     /**
      *
@@ -25,25 +30,11 @@ abstract class InternalCalc extends Channel {
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
 
-        $this->data = $this->numeric ? new \ORM\ReadingNumMemory : new \ORM\ReadingStrMemory;
-
-        // If the same channel is used in one chart multiple times (also as
-        // Alias), we have a race condition and the instances deletes the data
-        // of the others ...
-        // So save for each instance its own data set
-        $this->entity_org = $this->entity;
-        $this->entity = rand(64000, 65535);
-
-        // Clean up
-        $this->data->deleteById($this->entity);
-
+        $this->data = \ORM\ReadingMemory::factory($this->numeric);
         $this->data->id = $this->entity;
-    }
 
-    /**
-     * Readings table object
-     */
-    protected $data;
+        $this->LifeTime = (new \ORM\Settings)->getModelValue('InternalCalc', 'LifeTime');
+    }
 
     /**
      * Overwrite default channel tables
@@ -84,10 +75,28 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
-    protected function after_read( \Buffer $buffer ) {
-        // Clean up
-        $this->data->deleteById($this->entity);
-        return parent::after_read($buffer);
+    protected function dataExists( $lifetime=NULL ) {
+        $sql = $this->db->SQL(
+            'SELECT `pvlng_reading_tmp`({1}, {2}, {3}, {4}, 0)',
+            $this->entity, $this->start, $this->end, $lifetime ?: $this->LifeTime
+        );
+        while (($flag = $this->db->queryOne($sql)) == 1) {
+            // Another instance is generating the data, wait 200ms before next check
+            usleep(200 * 1000);
+        }
+        // = 0 - This instance have to generate the data
+        // > 1 - Timestamp of data generation, reuse
+        return (bool) $flag;
     }
 
+    /**
+     *
+     */
+    protected function dataCreated() {
+        // Data was just created, mark
+        $this->db->query(
+            'SELECT `pvlng_reading_tmp`({1}, {2}, {3}, 0, 1)',
+            $this->entity, $this->start, $this->end
+        );
+    }
 }

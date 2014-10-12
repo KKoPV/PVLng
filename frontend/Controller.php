@@ -13,7 +13,8 @@ class Controller extends slimMVC\Controller {
      *
      */
     public function __destruct() {
-        include ROOT_DIR . DS . 'statistics.php';
+        // Send statistics each 6 hours if activated
+        if ($this->config->SendStatistics) PVLng::SendStatistics();
     }
 
     /**
@@ -23,11 +24,12 @@ class Controller extends slimMVC\Controller {
         parent::__construct();
 
         // Shortcuts
-        $this->db = $this->app->db;
-        $this->cache = $this->app->cache;
-        $this->config = $this->app->config;
-        $this->request = $this->app->request;
-        $this->view = $this->app->view;
+        $app = $this->app;
+        $this->db = $app->db;
+        $this->cache = $app->cache;
+        $this->config = $app->config;
+        $this->request = $app->request;
+        $this->view = $app->view;
 
         $this->view->Helper->translate = function() {
             return call_user_func_array('I18N::translate', func_get_args());
@@ -35,7 +37,7 @@ class Controller extends slimMVC\Controller {
 
         $this->Layout = 'default';
 
-        if ($returnto = $this->app->request->get('returnto')) {
+        if ($returnto = $this->app->request->get('returnto') OR $returnto = $this->app->request->post('returnto')) {
             Session::set('returnto', $returnto);
         }
 
@@ -57,8 +59,8 @@ class Controller extends slimMVC\Controller {
             APP_DIR . DS . 'View'
         );
 
-        $this->view->Menu = PVLng::getMenu();
-        $this->view->Languages = PVLng::getLanguages();
+        $this->view->Menu = $app->menu->get();
+        $this->view->Languages = $app->languages->get();
     }
 
     /**
@@ -119,7 +121,7 @@ class Controller extends slimMVC\Controller {
         $this->view->Latitude = $this->config->get('Location.Latitude');
         $this->view->Longitude = $this->config->get('Location.Longitude');
 
-        $this->view->Title = $this->config->get('Title');
+        $this->view->Title = $this->config->get('Core.Title');
 
         $messages = array();
         foreach (Messages::getRaw() as $message) {
@@ -145,7 +147,9 @@ class Controller extends slimMVC\Controller {
 
         // Put all controller configurations into view
         foreach ($this->config->Controller as $c=>$cfg) {
-            foreach ($cfg as $key=>$value) $this->view->set($c.'_'.$key, $value);
+            foreach ($cfg as $key=>$value) {
+                $this->view->set($c.'_'.$key, $value);
+            }
         }
 
         // Check for new version once a hour

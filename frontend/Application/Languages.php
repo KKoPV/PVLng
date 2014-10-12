@@ -7,8 +7,7 @@
  * @version    1.0.0
  */
 
-/**
- *
- */
-PVLng::Language('en', 'English', 'gb');
-PVLng::Language('de', 'Deutsch');
+$app->hook('slim.before', function() use ($app) {
+    $app->languages->add( 0, 'en', 'English', 'gb');
+    $app->languages->add(10, 'de', 'Deutsch');
+});

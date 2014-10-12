@@ -1,13 +1,13 @@
-<!--
+<?php
 /**
  *
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
--->
+?>
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
@@ -43,20 +43,22 @@ $config = array(
     /**
      * Minimal required PHP version
      */
-    'PHPVersion' => array( '5.3' ),
+    'PHPVersion' => '5.3',
 
     /**
      *
      */
     'PHPExtensions' => array(
-        'bcmath'   => 'BCMath support',
-        'curl'     => 'cURL support',
-        'gd'       => 'Image processing',
-        'json'     => 'JSON support',
-        'mbstring' => 'Multibyte Support',
-        'mysqli'   => 'MySQLi support',
-        'pcre'     => 'PCRE support',
-        'session'  => 'Session support'
+        'bcmath'   => array( 'BCMath support' ),
+        'curl'     => array( 'cURL support' ),
+        'gd'       => array( 'Image processing' ),
+        'json'     => array( 'JSON support' ),
+        'mbstring' => array( 'Multibyte Support' ),
+        'mysqli'   => array( 'MySQLi support' ),
+        'pcre'     => array( 'PCRE support' ),
+        'session'  => array( 'Session support' ),
+        'apc'      => array( 'Alternative PHP Cache (APC)', FALSE ), // not required, but recommended
+        'memcache' => array( 'Memcache', FALSE ), // not required, but recommended
     ),
 
     /**

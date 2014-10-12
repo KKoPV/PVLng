@@ -1,11 +1,4 @@
-#typehelp {
-    float: right;
-    width: 40%;
-    text-align: right;
-    font-weight: bold;
-}
-
-#entities tr:hover {
+#entities tr:hover td {
     background-color: #C0FFC0 !important;
 }
 
@@ -30,7 +23,7 @@ textarea {
 input.code,
 textarea.code {
     font-family: monospace;
-    font-size: 120%;
+    font-size: larger;
 }
 
 /* Borders for opened details row */

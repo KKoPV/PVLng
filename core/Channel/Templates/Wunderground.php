@@ -86,12 +86,11 @@ return array(
         ),
 
         array(
-            'type'        => 74, // Irradiation forecast
-            'name'        => 'Irradiation forecast',
+            'type'        => 80, // Percentage
+            'name'        => 'Sky cover',
             'channel'     => 'sky',
+            'unit'        => '%',
             'decimals'    => 0,
-            'resolution'  => 800,
-            'unit'        => 'W/m²',
         ),
     )
 );

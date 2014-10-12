@@ -24,6 +24,8 @@ class Baseline extends InternalCalc {
 
         parent::before_read($request);
 
+        if ($this->dataExists()) return;
+
         $min = PHP_INT_MAX;
         $ts_min = FALSE;
 
@@ -38,5 +40,7 @@ class Baseline extends InternalCalc {
                 $row['timestamp'] => $min
             ));
         }
+
+        $this->dataCreated();
     }
 }

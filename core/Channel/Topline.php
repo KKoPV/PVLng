@@ -24,6 +24,8 @@ class Topline extends InternalCalc {
 
         parent::before_read($request);
 
+        if ($this->dataExists()) return;
+
         $max = -PHP_INT_MAX;
         $ts_min = FALSE;
 
@@ -38,5 +40,7 @@ class Topline extends InternalCalc {
                 $row['timestamp'] => $max
             ));
         }
+
+        $this->dataCreated();
     }
 }

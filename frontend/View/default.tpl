@@ -207,6 +207,12 @@
                 ta.addClass('textarea-transition');
             }
 
+            /* Deferred image loading */
+            $('img.def').each(function(i, el) {
+                el = $(el);
+                el.prop('src', el.data('src'));
+            });
+
             pvlng.onFinished.run();
         });
     </script>

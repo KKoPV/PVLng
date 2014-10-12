@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -28,12 +28,12 @@
 
     <tbody>
 
-    <!-- BEGIN ENTITIES -->
+    <!-- BEGIN CHANNELS -->
 
     <tr data-id="{ID}">
         <td>
             <a href="/channel/edit/{ID}" class="tip" title="{{EditEntity}}">
-                <img src="{ICON}" class="channel-icon" title="" alt="({TYPE})">
+                <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon" alt="({TYPE})">
             </a>
             {NAME}
             <!-- IF !{PUBLIC} --><i class="ico lock"></i><!-- ENDIF -->
@@ -56,7 +56,7 @@
                 <i class="ico node-delete"></i>
             <!-- ENDIF -->
             <!-- IF {GUID} -->
-                <i class="ico license-key btn" onclick="$.alert('{GUID}', 'GUID'); return false"></i>
+                <i class="ico license-key guid btn" data-guid="{GUID}"></i>
             <!-- ENDIF -->
         </td>
     </tr>

@@ -20,9 +20,10 @@ class Yryie {
     /**
      *
      */
-    const MAXSTRLEN    = 100;
-    const SECONDS      = 0;
-    const MICROSECONDS = 1;
+    const MAXSTRLEN         = 100;
+    const TIME_SECONDS      = 1;
+    const TIME_MICROSECONDS = 2;
+    const TIME_AUTO         = 3;
 
     /**
      * File to write the debug stack during each add()
@@ -141,7 +142,7 @@ class Yryie {
     /**
      * Set TimeUnit...
      *
-     * @param int $TimeUnit (self::SECONDS|self::MIRCOSECONDS)
+     * @param int $TimeUnit (Yryie::TIME_SECONDS|Yryie::TIME_MICROSECONDS|Yryie::TIME_AUTO)
      * @return void
      */
     public static function TimeUnit( $TimeUnit ) {
@@ -394,9 +395,9 @@ class Yryie {
             $id = end($ids);
         }
         list($start, $name, $avg) = self::$Timer[$id];
-        $diff = self::timef(microtime(TRUE)-$start);
+        $diff = microtime(TRUE) - $start;
         self::$TimerLevel--;
-        self::add(sprintf('%s %s: %s', self::$TimerStop, $name, $diff), 'timer');
+        self::add(sprintf('%s %s: %s', self::$TimerStop, $name, self::timef($diff)), 'timer');
         unset(self::$Timer[$id]);
 
         if ($avg != '') {
@@ -440,7 +441,7 @@ class Yryie {
                 sprintf(
                     'avg. "%1$s": %4$s (%3$d in %2$s)',
                     $avg, self::timef($data[0]), $data[1],
-                    self::timef($data[0]/$data[1], self::MICROSECONDS)
+                    self::timef($data[0]/$data[1])
                 ),
                 'timer'
             );
@@ -454,11 +455,13 @@ class Yryie {
      */
     public static function finalize() {
         self::finalizeTimers();
-
-        self::Debug('%d files included', count(get_included_files()));
-        self::Debug('build in %.0f ms', (microtime(TRUE)-$_SERVER['REQUEST_TIME'])*1000);
-        self::Debug('%.0f kByte memory used', memory_get_peak_usage(TRUE)/1024);
-        self::Debug('%d Messages', count(self::$Data));
+        self::Debug(
+            'build in %s; %d kByte memory used; %d files included; %d messages collected',
+            self::timef((microtime(TRUE)-$_SERVER['REQUEST_TIME']), self::TIME_AUTO),
+            memory_get_peak_usage(TRUE)/1024,
+            count(get_included_files()),
+            count(self::$Data)
+        );
     } // function Finalize()
 
     /**
@@ -570,7 +573,7 @@ class Yryie {
         foreach (self::$Data as $row=>$data) $types[$data[1]] = $data[1];
         $sTypes = '';
         $cb = '<input type="checkbox" style="margin-left:1.5em" '
-                 .'onchange="YryieSwitch(\'%s\', this.checked)" checked> %s';
+             .'onchange="YryieSwitch(\'%s\', this.checked)" checked> %s';
         foreach ($types as $type) if ($type) $sTypes .= sprintf($cb, $type, ucwords($type));
         unset($types);
 
@@ -762,7 +765,7 @@ class Yryie {
      *
      * @var int
      */
-    private static $TimeUnit = 0;
+    private static $TimeUnit = self::TIME_SECONDS;
 
     /**
      * Active timer data
@@ -838,10 +841,14 @@ class Yryie {
      * @return string
      */
     private static function timef( $time, $format=NULL ) {
-        if (!isset($format)) $format = self::$TimeUnit;
-        return $format == self::MICROSECONDS
-             ? sprintf('%.2fms', $time*1000)
-             : sprintf('%.5fs', $time);
+        switch ($format ?: self::$TimeUnit) {
+            case self::TIME_AUTO:
+                return $time < 1 ? sprintf('%.3fms', $time*1000) : sprintf('%.3fs', $time);
+            case self::TIME_MICROSECONDS:
+                return sprintf('%.3fms', $time*1000);
+            default:
+                return sprintf('%.3fs', $time);
+        }
     }
 
     /**

@@ -12,62 +12,7 @@ abstract class PVLng {
     /**
      *
      */
-    public static $MenuPathSeparator = '.';
-
-    /**
-     *
-     */
-    public static function Menu( $path, $route, $label, $hint='' ) {
-    $path = explode(self::$MenuPathSeparator, $path);
-        // Root pointer
-        $menu =& self::$Menu;
-
-        // Move pointer along the path
-        foreach ($path as $id=>$key) {
-            if ($id == 0) {
-                $menu = &$menu[$key];
-            } else {
-                $sub = 'SUBMENU'.$id;
-                if (!array_key_exists($sub, $menu)) $menu[$sub] = array();
-                if ($key == '') $key = count($menu[$sub]);
-                $menu = &$menu[$sub][$key];
-            }
-        }
-        $menu['ROUTE'] = $route;
-        $menu['LABEL'] = $label;
-        $menu['HINT']  = $hint;
-
-        return $key;
-    }
-
-    /**
-     *
-     */
-    public static function getMenu() {
-        // Sort menu and sub menus by key
-        self::sortMenu(self::$Menu);
-        return self::$Menu;
-    }
-
-    /**
-     *
-     */
-    public static function Language( $code, $label, $icon=NULL, $position=0 ) {
-        while (isset(self::$Language[$position])) $position++;
-        self::$Language[$position] = array(
-            'CODE'     => $code,
-            'ICON'     => $icon ?: $code,
-            'LABEL'    => $label
-        );
-    }
-
-    /**
-     *
-     */
-    public static function getLanguages() {
-        ksort(self::$Language);
-        return self::$Language;
-    }
+    const StatisticsURL = 'http://stats.pvlng.com/index.php';
 
     /**
      *
@@ -82,29 +27,34 @@ abstract class PVLng {
         ));
     }
 
-    // -----------------------------------------------------------------------
-    // PROTECTED
-    // -----------------------------------------------------------------------
-
     /**
-     *
+     * Send anonymous statistics about channel & readings count
      */
-    protected static $Menu = array();
+    public static function sendStatistics() {
+        $db = slimMVC\MySQLi::getInstance();
 
-    /**
-     *
-     */
-    protected static $Language = array();
+        // Send at least each 6 hours
+        if ($db->LastStats + 6*60*60 > time()) return;
 
-    /**
-     *
-     */
-    protected static function sortMenu(&$menu, $level='') {
-        ksort($menu);
-        foreach ($menu as &$item) {
-            $sub = 'SUBMENU'.($level+1);
-            if (isset($item[$sub])) self::sortMenu($item[$sub]);
-        }
+        // This data will be send
+        $args = array(
+            // Unique installation id
+            $db->queryOne('SELECT `pvlng_id`()'),
+            // Real channels, writable and no childs allowed
+            (new ORM\ChannelView)->filterByChilds(0)->filterByWrite(1)->find()->count(),
+            // Row count in numeric and non-numeric readings tables
+            (new ORM\ReadingNum)->rowCount() + (new ORM\ReadingStr)->rowCount()
+        );
+
+        $ch = curl_init(self::StatisticsURL);
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($args));
+        curl_exec($ch);
+
+        // On error, make next try in 1 hour
+        $db->LastStats = curl_errno($ch) ? time()-5*60*60 : time();
+
+        curl_close($ch);
     }
-
 }

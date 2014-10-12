@@ -27,6 +27,28 @@ INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`) VALUES
 ('DoubleRead', 5, 'Detect double readings by timestamp -+ seconds, set 0 to disable', 'num'),
 ('LogInvalid', 0, 'Log invalid values', 'str');
 
+INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `description`, `type`, `data`) VALUES
+('core', '', 'Cookie', 'PVLng', 40, 'Session cookie name', '', ''),
+('core', '', 'Language', 'en', 10, 'Default language', 'option', 'en:English;de:Deutsch'),
+('core', '', 'SendStats', '1', 30, 'Send anonymous statistics', 'bool', ''),
+('core', '', 'Title', 'PhotoVoltaic Logger new generation', 20, 'Your personal title (HTML allowed)', '', ''),
+('core', '', 'Latitude', '', 50, 'Location latitude<br /><small>Your geographic coordinate that specifies the north-south position (-90..90)</small>', 'num', ''),
+('core', '', 'Longitude', '', 60, 'Location longitude<br /><small>Your geographic coordinate that specifies the east-west position (-180..180)</small>', 'num', ''),
+('controller', 'Index', 'ChartHeight', '528', 10, 'Default chart height', 'num', ''),
+('controller', 'Index', 'NotifyAll', '1', 30, 'Notify overall loading time for all channels', 'bool', ''),
+('controller', 'Index', 'NotifyEach', '0', 40, 'Notify loading time for each channel', 'bool', ''),
+('controller', 'Index', 'Refresh', '300', 20, 'Auto refresh chart each ? seconds, set 0 to disable', 'num', ''),
+('controller', 'Mobile', 'ChartHeight', '320', 0, 'Default chart height', 'num', ''),
+('controller', 'Tariff', 'TimesLines', '10', 0, 'Initial times lines for each taiff', 'num', ''),
+('controller', 'Weather', 'APIkey', '', 0, 'Wunderground API key', '', ''),
+('model', 'Daylight', 'Average', '0', 10, 'Calculation method for irradiation average', 'option', '0:geometric mean;1:arithmetic mean'),
+('model', 'Daylight', 'CurveDays', '5', 20, 'Build average over the last ? days', 'num', ''),
+('model', 'Daylight', 'SunriseIcon', '/images/sunrise.png', 30, 'Sunrise marker image', '', ''),
+('model', 'Daylight', 'SunsetIcon', '/images/sunset.png', 40, 'Sunset marker image', '', ''),
+('model', 'Daylight', 'ZenitIcon', '/images/zenit.png', 50, 'Sun zenit marker image', '', ''),
+('model', 'Estimate', 'Marker', '/images/energy.png', 0, 'Marker image', '', ''),
+('model', 'History', 'AverageDays', '5', 0, 'Build average over the last ? days', 'num', '');
+
 INSERT INTO `pvlng_tree` (`id`, `lft`, `rgt`, `entity`) VALUES
 (1, 1, 12, 1), (2, 2, 3, 2), (3, 4, 5, 3), (4, 6, 11, 4), (5, 7, 10, 5), (6, 8, 9, 2);
 

@@ -2,10 +2,10 @@
 /**
  *
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 class Loader {
 
@@ -39,6 +39,23 @@ class Loader {
                             : FALSE;
 
         spl_autoload_register('Loader::autoload');
+    }
+
+    /**
+     * Manual file loading with callback
+     */
+    public static function load( $file ) {
+        $callback = self::$callback;
+        require_once $callback ? $callback($file) : $file;
+        return TRUE;
+    }
+
+    /**
+     * Manual apply callback
+     */
+    public static function applyCallback( $file ) {
+        $callback = self::$callback;
+        return $callback ? $callback($file) : $file;
     }
 
     /**

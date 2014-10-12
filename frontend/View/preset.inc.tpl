@@ -9,8 +9,9 @@
  */
 -->
 
-<img src="/images/ico/arrow-switch.png" style="margin-right:.5em"
-     onclick="$('.p-select').toggle();" class="tipbtn" tip="{{UseOwnConsolidation}}" />
+<img src="/images/pix.gif" data-src="/images/ico/arrow-switch.png"
+     class="def ico tipbtn" style="margin-right:.5em"
+     onclick="$('.p-select').toggle();" tip="{{UseOwnConsolidation}}" />
 <span class="p-select">{PRESETSELECT}</span>
 <span class="p-select" style="display:none">
     <input id="periodcnt" class="numbersOnly r" style="margin-right:.5em" type="text" value="1" size="2" />
