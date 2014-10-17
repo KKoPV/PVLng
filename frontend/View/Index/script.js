@@ -566,8 +566,9 @@ function updateChart( forceUpdate, scroll ) {
                     series[id] = {};
                     return;
                 }
+
+                console.log('Attributes', attr);
 /*
-                _log('Attributes', attr);
                 _log('Data', data);
 */
                 if (attr.consumption) {
@@ -575,8 +576,8 @@ function updateChart( forceUpdate, scroll ) {
                 }
 
                 if (attr.costs) {
-                    costs += +attr.costs.toFixed({CURRENCYDECIMALS});
-                    $('#costs'+channel.id).html(Highcharts.numberFormat(attr.costs, {CURRENCYDECIMALS}));
+                    costs += +attr.costs.toFixed(CurrencyDecimals);
+                    $('#costs'+channel.id).html(CurrencyFormat.replace('{}', Highcharts.numberFormat(attr.costs, CurrencyDecimals)));
                 }
 
                 /* Add channel description if chart name NOT still contains it */
@@ -737,7 +738,8 @@ function updateChart( forceUpdate, scroll ) {
                 text: completed + ' {{ChannelsLoaded}} ' +
                       '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
             });
-            $('#costs').html(costs ? Highcharts.numberFormat(costs, {CURRENCYDECIMALS}) : '');
+
+            $('#costs').html(costs ? CurrencyFormat.replace('{}', Highcharts.numberFormat(costs, CurrencyDecimals)) : '');
 
             _log('Apply series');
 

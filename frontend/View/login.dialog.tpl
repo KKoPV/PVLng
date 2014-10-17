@@ -6,14 +6,6 @@
 <tbody>
 <tr>
     <td>
-        <label for="user">{{Name}}</label>:
-    </td>
-    <td>
-        <input id="user" class="ui-corner-all" type="text" name="user" />
-    </td>
-</tr>
-<tr>
-    <td>
         <label for="pass">{{Password}}</label>:
     </td>
     <td>

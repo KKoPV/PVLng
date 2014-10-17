@@ -2,12 +2,14 @@
 /**
  *
  *
- * @author Knut Kohl <github@knutkohl.de>
- * @copyright 2012-2013 Knut Kohl
- * @license GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version 1.0.0
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
  */
 -->
+
+<div style="padding:3em 10%">
 
 <form method="post">
 
@@ -31,3 +33,5 @@
 </p>
 
 </form>
+
+</div>

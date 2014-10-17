@@ -25,10 +25,12 @@ class Controller extends slimMVC\Controller {
 
         // Shortcuts
         $app = $this->app;
+
         $this->db = $app->db;
         $this->cache = $app->cache;
         $this->config = $app->config;
         $this->request = $app->request;
+
         $this->view = $app->view;
 
         $this->view->Helper->translate = function() {
@@ -41,15 +43,10 @@ class Controller extends slimMVC\Controller {
             Session::set('returnto', $returnto);
         }
 
-        if (Session::get('user') == $this->config->get('Admin.User')) {
-            // Ok, we have a validated user session
-            $this->User = Session::get('user');
-        }
-
         $this->controller = str_replace('Controller\\', '', get_class($this));
 
         $this->view->Module = strtolower($this->controller);
-        $this->view->User = $this->User;
+        $this->view->User = $app->user;
         $this->view->Embedded = $this->app->request->get('embedded');
 
         $this->view->BaseDir = array(
@@ -68,9 +65,9 @@ class Controller extends slimMVC\Controller {
      */
     public function after() {
         /* For Logout */
-        $this->view->User = $this->User;
-        if ($this->User) {
-            if ($this->config->get('TokenLogin')) {
+        $this->view->User = $this->app->user;
+        if ($this->app->user) {
+            if ($this->config->get('Core.TokenLogin')) {
                 $this->view->Token = \PVLng::getLoginToken();
             }
             while ($this->cache->save('APIkey', $APIkey)) {
@@ -95,6 +92,12 @@ class Controller extends slimMVC\Controller {
      *
      */
     public function finalize( $action ) {
+        if ($this->app->config('mode') == 'development') {
+            $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
+            $this->view->Development = TRUE;
+            $this->config->set('View.Verbose', TRUE);
+        }
+
         $this->view->DateTimeFormat      = $this->config->get('Locale.DateTime');
         $this->view->DateTimeFormatShort = $this->config->get('Locale.DateTimeShort');
         $this->view->DateFormat          = $this->config->get('Locale.Date');
@@ -107,21 +110,15 @@ class Controller extends slimMVC\Controller {
         $this->view->DateFormatJS        = $this->config->get('Locale.DateJS');
         $this->view->Year                = date('Y');
 
-        if ($this->config->get('develop')) {
-            $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
-            $this->view->Development = TRUE;
-            $this->config->set('View.Verbose', TRUE);
-        }
+        $this->view->CurrencyISO      = $this->config->get('Core.Currency.ISO');
+        $this->view->CurrencySymbol   = $this->config->get('Core.Currency.Symbol');
+        $this->view->CurrencyDecimals = $this->config->get('Core.Currency.Decimals');
+        $this->view->CurrencyFormat   = $this->config->get('Core.Currency.Format');
 
-        $this->view->Language = $this->app->Language;
-        $this->view->CurrencyISO = $this->config->get('Currency.ISO');
-        $this->view->CurrencySymbol = $this->config->get('Currency.Symbol');
-        $this->view->CurrencyDecimals = $this->config->get('Currency.Decimals');
-
-        $this->view->Latitude = $this->config->get('Location.Latitude');
-        $this->view->Longitude = $this->config->get('Location.Longitude');
-
-        $this->view->Title = $this->config->get('Core.Title');
+        $this->view->Language  = $this->app->Language;
+        $this->view->Title     = $this->config->get('Core.Title');
+        $this->view->Latitude  = $this->config->get('Core.Latitude');
+        $this->view->Longitude = $this->config->get('Core.Longitude');
 
         $messages = array();
         foreach (Messages::getRaw() as $message) {
@@ -222,11 +219,6 @@ class Controller extends slimMVC\Controller {
      *
      */
     protected $Layout;
-
-    /**
-     *
-     */
-    protected $User;
 
     /**
      *

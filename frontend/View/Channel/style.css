@@ -6,6 +6,10 @@
     background-color: #E0E0E0 !important;
 }
 
+i.sort {
+    display: none;
+}
+
 td.hint {
     font-size: 90%;
     padding-top: .5em;

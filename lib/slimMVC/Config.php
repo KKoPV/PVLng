@@ -22,7 +22,10 @@ class Config extends \Slim\Helper\Set {
      *
      */
     public function load( $file, $required=TRUE, $namespace='' ) {
-        if (isset($file) AND (file_exists($file) OR $required)) {
+        if ($required AND !file_exists($file)) {
+            throw new \Exception('Missing reqiured configuration file: '.$file);
+        }
+        if (file_exists($file)) {
             $data = include $file;
             $data = $this->array_change_key_case_deep($data);
             $p =& $this->data;

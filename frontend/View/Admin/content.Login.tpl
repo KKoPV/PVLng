@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -22,20 +22,15 @@
     <table id="logintable">
         <tbody>
         <tr>
-            <td><label for="user">{{Name}}</label>:</td>
-            <td><input type="text" class="ui-corner-all" id="user" name="user" /></td>
-        </tr>
-
-        <tr>
             <td><label for="pass">{{Password}}</label>:</td>
-            <td><input type="password" class="ui-corner-all" id="pass" name="pass" /></td>
+            <td><input type="password" class="ui-corner-all" id="pass" name="pass"></td>
         </tr>
 
         <tr>
             <td></td>
             <td>
                 <div class="fl" style="margin-right:0.5em">
-                    <input id="save" type="checkbox" name="save" class="iCheck" />
+                    <input id="save" type="checkbox" name="save" class="iCheck">
                 </div>
                 <label for="save">{{StayLoggedIn}}</label>
             </td>
@@ -43,7 +38,7 @@
 
         <tr>
             <td></td>
-            <td><input type="submit" value="{{Login}}" /></td>
+            <td><input type="submit" value="{{Login}}"></td>
         </tr>
         </tbody>
     </table>

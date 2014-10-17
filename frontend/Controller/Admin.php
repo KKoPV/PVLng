@@ -28,19 +28,9 @@ class Admin extends \Controller {
 
         $hasher = new \PasswordHash();
 
-        $user = $this->request->post('user');
-        $pass = $this->request->post('pass');
-
-        $AdminUser = $this->config->get('Admin.User');
-        $AdminPass = $this->config->get('Admin.Password');
-
-        // Ignore case of user name input
-        if (strtolower($AdminUser) == strtolower($user) AND
-            $hasher->CheckPassword($pass, $AdminPass)) {
-
-            $this->User = $AdminUser;
-            \Session::set('user', $AdminUser);
-            \Messages::Success(__('Welcome', $this->User));
+        if ($hasher->CheckPassword($this->request->post('pass'), $this->config->get('Core.Password'))) {
+            \Session::set('user', TRUE);
+            $this->app->user = TRUE;
 
             if ($this->request->post('save')) self::RememberLogin();
 
@@ -61,12 +51,8 @@ class Admin extends \Controller {
      * Token login
      */
     public function LoginGET_Action() {
-        $admin = $this->config->get('Admin.User');
-        $pass  = $this->config->get('Admin.Password');
-
         if ($this->app->params->get('token') == \PVLng::getLoginToken()) {
-            \Session::set('user', $admin);
-            \Messages::Success(__('Welcome', $admin));
+            \Session::set('user', TRUE);
         }
         $this->app->redirect('/');
     }
@@ -75,9 +61,58 @@ class Admin extends \Controller {
      *
      */
     public function Logout_Action() {
+        // Remember messages
+        $msgs = \Session::get(\Messages::$SessionVar);
+
         \Session::destroy();
         setcookie(\Session::token(), '', time()-60*60*24, '/');
-        $this->app->redirect('index');
+
+        \Session::start('PVLng');
+        \Session::set(\Messages::$SessionVar, $msgs);
+        $this->app->redirect('/');
+    }
+
+    /**
+     *
+     */
+    public function AdminPasswordPOST_Action() {
+
+        if ($this->request->post('p1') == '' OR
+            $this->request->post('p2') == '') {
+            \Messages::Error(\I18N::_('AdminAndPasswordRequired'), TRUE);
+            $this->view->Ok = FALSE;
+            return;
+        }
+
+        if ($this->request->post('p1') != $this->request->post('p2')) {
+            \Messages::Error(__('PasswordsNotEqual'), TRUE);
+            $this->view->Ok = FALSE;
+            return;
+        }
+
+        $hasher = new \PasswordHash();
+        $settings = new \ORM\Settings;
+        $this->view->Ok = $settings->filterByScopeNameKey('core', '', 'Password')
+                                   ->findOne()
+                                   ->setValue($hasher->HashPassword($this->request->post('p1')))
+                                   ->update();
+
+        if ($this->view->Ok) {
+            \Messages::Success(__('PasswordSaved'));
+            \Session::set('User', TRUE);
+            $this->app->redirect('/location');
+        }
+    }
+
+    /**
+     *
+     */
+    public function AdminPassword_Action() {
+        if ($this->config->get('Core.Password')) {
+            \Messages::Error('Administration password still defined! Please change it via settings menu!');
+            $this->app->redirect('/');
+        }
+        $this->view->SubTitle = __('GenerateAdminHash');
     }
 
     /**
@@ -93,39 +128,14 @@ class Admin extends \Controller {
             }
             \Messages::Success(__('DataSaved'));
         }
-        $this->app->redirect('index');
+        $this->app->redirect('/');
     }
 
     /**
      *
      */
-    public function AdminPasswordPOST_Action() {
-        if ($this->request->post('u') == '' OR
-            $this->request->post('p1') == '' OR
-            $this->request->post('p2') == '') {
-            \Messages::Error(\I18N::_('AdminAndPasswordRequired'), TRUE);
-            return;
-        }
-
-        if ($this->request->post('p1') != $this->request->post('p2')) {
-            \Messages::Error(__('PasswordsNotEqual'), TRUE);
-            return;
-        }
-
-        $hasher = new \PasswordHash();
-        $this->view->AdminUser = $this->request->post('u');
-        $this->view->AdminPass = $hasher->HashPassword($this->request->post('p1'));
-    }
-
-    /**
-     *
-     */
-    public function AdminPassword_Action() {
-        if ($this->config->get('Admin.User') != '') {
-            \Messages::Error('Admin credentials still defined! You can\'t change them for security reasons without clearing the "Admin > User" entry in config/config.php');
-            $this->app->redirect('index');
-        }
-        $this->view->SubTitle = __('GenerateAdminHash');
+    public function Location_Action() {
+        $this->view->SubTitle = __('FindYourLocation');
     }
 
     /**

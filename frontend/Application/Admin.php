@@ -27,9 +27,9 @@ $app->map('/adminpass', function() use ($app) {
     $app->process('Admin', 'AdminPassword');
 })->via('GET', 'POST')->Language = 'en';
 
-$app->post('/location', function() use ($app) {
+$app->map('/location', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Location');
-})->Language = 'en';
+})->via('GET', 'POST')->Language = 'en';
 
 $app->map('/cc', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Clearcache');

@@ -32,16 +32,11 @@
     </div>
     <div class="grid_4 r">
         <span id="title1">{TITLE}</span>
-        <br />
-        <!-- IF {USER} -->
-        <br />
-        <!-- IF {TOKEN} -->
-        <a href="/login?token={TOKEN}" class="tip" title="{{LoginToken}}">&bull;</a>
-        &nbsp;
-        <!-- ENDIF -->
-        <a href="/logout" class="tip" title="{{Logout}}">{USER}</a>
+        <br /><br />
+        <!-- IF {USER} AND {TOKEN} -->
+            <a href="/login/{TOKEN}" class="tip" title="{{LoginToken}}">&bull;</a>
         <!-- ELSE -->
-        &nbsp;
+            &nbsp;
         <!-- ENDIF -->
     </div>
 </div>

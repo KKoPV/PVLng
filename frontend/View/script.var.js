@@ -17,9 +17,14 @@ var PVLngVersion = '{VERSION}',
     DecimalSeparator = '{DSEP}',
     ThousandSeparator = '{TSEP}',
 
-    language = '{LANGUAGE}',
-    latitude = {raw:LATITUDE},
-    longitude = {raw:LONGITUDE},
+    CurrencyISO = '{CURRENCY}',
+    CurrencySymbol = '{CURRENCYSYMBOL}',
+    CurrencyDecimals = '{CURRENCYDECIMALS}',
+    CurrencyFormat = '{CURRENCYFORMAT}',
+
+    language  = '{LANGUAGE}',
+    latitude  = +'{raw:LATITUDE}', /* Handles empty strings */
+    longitude = +'{raw:LONGITUDE}',
 
     verbose = '{VERBOSE}',
     user = '{USER}';

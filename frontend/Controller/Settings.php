@@ -25,6 +25,21 @@ class Settings extends \Controller {
         $tbl = new \ORM\Settings;
         $ok  = TRUE;
 
+        // Handle password change separately
+        $p1 = $data['p1'];  $p2 = $data['p2'];  unset($data['p1'], $data['p2']);
+
+        $pwChanged = FALSE;
+
+        if ($p1 != '' OR $p2 != '') {
+            if ($p1 == $p2) {
+                $data['core--Password'] = (new \PasswordHash)->HashPassword($p1);
+                $pwChanged = TRUE;
+            } else {
+                \Messages::Error(__('PasswordsNotEqual'));
+                $ok = FALSE;
+            }
+        }
+
         foreach ($data as $var=>$value) {
             list($scope, $name, $key) = explode('-', $var);
             if (!$tbl->checkValueType($scope, $name, $key, $value)) {
@@ -41,6 +56,10 @@ class Settings extends \Controller {
 
         if ($ok) {
             \Messages::Success(__('DataSaved'));
+            if ($pwChanged) {
+                \Messages::Info(__('PleaseRelogin'));
+                $this->app->redirect('/logout');
+            }
             $this->app->redirect('/settings');
         }
     }

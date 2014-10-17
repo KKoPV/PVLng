@@ -113,7 +113,7 @@ $app->container->singleton('db', function() use ($app) {
 $app->container->singleton('cache', function() use ($app) {
     return \Cache::factory(
         array('Directory' => TEMP_DIR, 'TTL' => 86400),
-        $app->config->get('Cache')
+        $app->config->get('Cache') ?: 'MemCache,APC,File'
     );
 });
 
@@ -131,8 +131,6 @@ $app->container->singleton('menu', function() {
 $app->container->singleton('languages', function() {
     return new \PVLng\Language;
 });
-
-$app->config->set('develop', $dev);
 
 // ---------------------------------------------------------------------------
 // Hooks
@@ -157,7 +155,7 @@ $app->hook('slim.before', function() use ($app) {
 
     if (isset($_COOKIE[Session::token()])) {
         // Ok, remembered user
-        Session::set('user', $app->config->get('Admin.User'));
+        Session::set('user', (bool) $app->config->get('Core.Password'));
         Controller\Admin::RememberLogin();
     }
 
@@ -221,7 +219,7 @@ $app->hook('slim.before.dispatch', function() use ($app) {
     /**
      * Check Admin config
      */
-    if ($app->config->get('Admin.User') == '' AND strpos($pattern, '/adminpass') === FALSE) {
+    if ($app->config->get('Core.Password') == '' AND strpos($pattern, '/adminpass') === FALSE) {
         $app->redirect('/adminpass');
     }
 
@@ -299,7 +297,7 @@ $app->hook('slim.before.dispatch', function() use ($app) {
 // ---------------------------------------------------------------------------
 $checkAuth = function( Slim\Route $route ) use ($app) {
     // Check logged in user
-    if ($app->user !== $app->config->get('Admin.User')) {
+    if (!$app->user) {
         Messages::Info(__('LoginRequired'));
         $app->redirect('/');
     }

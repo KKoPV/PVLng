@@ -73,21 +73,27 @@
                         <!-- BEGIN LANGUAGES -->
                         <li>
                         <a class="language" data-lang="{CODE}" href="?lang={CODE}">
-                            <img src="/images/pix.gif" class="flag flag-{ICON}" style="margin-right:10px" alt="{CODE}">
+                            <img src="/images/pix.gif" class="flag flag-{ICON}" style="margin-right:10px">
                             {LABEL}
                         </a>
                         </li>
                         <!-- END -->
                     </ul>
                 </li>
-                <!-- IF !{USER} -->
                 <li>
+                <!-- IF !{USER} -->
                     <a href="#" class="tip" title="{{Login}}">
-                        <img src="/images/pix.gif" data-src="/images/logout.png" style="width:12px;height:12px"
-                             alt="L" width="12" height="12" onclick="$('#login-dialog').dialog('open'); return false" />
+                        <img src="/images/pix.gif" data-src="/images/sign-in.png" class="def"
+                             style="width:16px;height:16px"
+                             onclick="$('#login-dialog').dialog('open'); return false" alt="L">
                     </a>
-                </li>
+                <!-- ELSE -->
+                    <a href="/logout" class="tip" title="{{Logout}}">
+                        <img src="/images/pix.gif" data-src="/images/sign-out.png" class="def"
+                             style="width:16px;height:16px" alt="L">
+                    </a>
                 <!-- ENDIF -->
+                </li>
             </ul>
         </div>
 

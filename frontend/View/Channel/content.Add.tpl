@@ -28,9 +28,9 @@
             <tr>
                 <th>{{EntityType}}</th>
                 <th style="white-space:nowrap">{{ExampleUnit}}</th>
-                <th style="white-space:nowrap">{{Childs}}</th>
+                <th><i class="ico node-select-all tip" title="{{AcceptChildCount}}"></i></th>
                 <th class="icons">
-                    <img src="/images/ico/information_frame.png" style="margin-right:-5px" class="tip" tip="#IconLegend" alt="?">
+                    <i class="ico information-frame tip" style="margin-right:-5px" tip="#IconLegend"></i>
                 </th>
                 <th>{{Description}}</th>
                 <th>{{Select}}</th>
@@ -42,19 +42,17 @@
             <tr>
                 <td class="icons" style="white-space:nowrap;font-weight:bold">
                     <label for="type-{ID}">
-                        <img style="vertical-align:middle;margin-right:8px" src="{ICON}" alt="" />
+                        <img src="/images/pix.gif" data-src="{ICON}" class="def"
+                             style="vertical-align:middle;margin-right:8px" alt="">
                         {NAME}
                     </label>
                 </td>
                 <td>{UNIT}</td>
                 <td class="c">
-                    <!-- IF {CHILDS} == 0 -->
-                        {{no}}
-                    <!-- ELSEIF {CHILDS} == -1 -->
-                        {{unlimited}}
-                    <!-- ELSE -->
-                        {CHILDS}
-                    <!-- ENDIF -->
+                    <!-- Add invisible spans for sorting -->
+                    <!-- IF {CHILDS} == -1 -->
+                        <i class="sort">X</i>&infin;
+                    <!-- ELSEIF {CHILDS} == 0 -->-<!-- ELSE -->{CHILDS}<!-- ENDIF -->
                 </td>
                 <td class="icons">
                     <!-- INCLUDE channeltype.inc.tpl -->
@@ -91,7 +89,8 @@
             <tr>
                 <td class="icons" style="white-space:nowrap;font-weight:bold">
                     <label for="{FILE}">
-                        <img style="vertical-align:middle;margin-right:8px" src="{ICON}" alt="" />
+                        <img src="/images/pix.gif" data-src="{ICON}" class="def"
+                             style="vertical-align:middle;margin-right:8px" alt="" />
                         {NAME}
                     </label>
                 </td>
@@ -123,8 +122,8 @@
 
 <div id="IconLegend">
     <div class="icons legendtip">
-        <img src="/images/ico/read-write.png">{{ReadWritableEntity}}<br />
-        <img src="/images/ico/write.png">{{WritableEntity}}<br />
-        <img src="/images/ico/read.png">{{ReadableEntity}}
+        <i class="ico drive-globe"></i>{{ReadWritableEntity}}<br />
+        <i class="ico drive--pencil"></i>{{WritableEntity}}<br />
+        <i class="ico drive--arrow"></i>{{ReadableEntity}}
     </div>
 </div>
