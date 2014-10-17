@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# set -x
+
+if [ -z "$1" ]; then
+    echo "Usage $0 <branch>"
+    exit
+fi
+
+echo "Fetch last version from GitHub"
+echo
+
+git checkout $1
+[ $? ] && exit 128
+git pull
+
+### Extract MySQL credentials
+function dbconf {
+    sed -n 's/.*['\''"]'$1'['\''"] *=> *['\''"]*\([^'\''",]*\).*/\1/p' config/config.php | tail -n1
+}
+dbhost=$(dbconf Host)
+dbport=$(dbconf Port)
+dbsocket=$(dbconf Socket)
+dbuser=$(dbconf Username)
+dbpass=$(dbconf Password)
+dbname=$(dbconf Database)
+
+params="-h $dbhost -P $dbport -u $dbuser"
+
+[ "$dbsocket" ] && params="$params -S $dbsocket"
+[ "$dbpass" ]   && params="$params -p$dbpass"
+
+level=$(mysql $params -BNe 'SELECT `value` FROM `pvlng_config` WHERE `key`="DBPatchLevel"' $dbname)
+level=${level:-0}
+
+echo
+echo "Actual data patch level is $level"
+
+path=$(dirname $0)/sql/patches
+
+tmp=$(tempfile)
+trap "rm $tmp" 0
+
+ls $path >$tmp
+
+while read f; do
+
+    patch=$(echo $f | sed -n 's/^\([0-9]\+\)/\1/p')
+
+    if [ $patch -gt $level ]; then
+
+        echo -n "Apply patch $f ... "
+        mysql $params $dbname <$path/$f
+        echo done
+
+        ### Remember last patch
+        last=$patch
+
+    fi
+
+done <$tmp
+
+if [ "$last" ]; then
+    mysql $params -Be 'REPLACE INTO `pvlng_config` (`key`, `value`) VALUES ("DBPatchLevel", "'$last'")' $dbname
+    echo "Patched database to level $last"
+else
+    echo "No patches required"
+fi
+
+echo
+echo "Open 'http://your.domain.here/cc' in your browser and clear the caches!"
+echo
+echo "Clear also your browser cache!"

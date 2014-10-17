@@ -21,12 +21,6 @@ UPDATE `pvlng_channel`
    SET `icon` = (SELECT `icon` from `pvlng_type` WHERE `id` = 10)
  WHERE `id` = 5;
 
-INSERT INTO `pvlng_config` (`key`, `value`, `comment`, `type`) VALUES
-('Currency', 'EUR', 'Costs currency', 'str'),
-('CurrencyDecimals', 2, 'Costs currency decimals', 'num'),
-('DoubleRead', 5, 'Detect double readings by timestamp -+ seconds, set 0 to disable', 'num'),
-('LogInvalid', 0, 'Log invalid values', 'str');
-
 INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `description`, `type`, `data`) VALUES
 ('core', '', 'Cookie', 'PVLng', 40, 'Session cookie name', '', ''),
 ('core', '', 'Language', 'en', 10, 'Default language', 'option', 'en:English;de:Deutsch'),
@@ -41,6 +35,7 @@ INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `descrip
 ('controller', 'Mobile', 'ChartHeight', '320', 0, 'Default chart height', 'num', ''),
 ('controller', 'Tariff', 'TimesLines', '10', 0, 'Initial times lines for each taiff', 'num', ''),
 ('controller', 'Weather', 'APIkey', '', 0, 'Wunderground API key', '', ''),
+('model', '', 'DoubleRead', '5', 0, 'Detect double readings by timestamp &plusmn;seconds<br /><small>(set 0 to disable)</small>', 'num', '0:geometric mean;1:arithmetic mean'),
 ('model', 'Daylight', 'Average', '0', 10, 'Calculation method for irradiation average', 'option', '0:geometric mean;1:arithmetic mean'),
 ('model', 'Daylight', 'CurveDays', '5', 20, 'Build average over the last ? days', 'num', ''),
 ('model', 'Daylight', 'SunriseIcon', '/images/sunrise.png', 30, 'Sunrise marker image', '', ''),

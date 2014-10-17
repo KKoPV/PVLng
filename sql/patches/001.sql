@@ -1,10 +1,11 @@
---
--- For development branch only!
---
+ALTER TABLE `pvlng_config` DROP `type`;
 
 ALTER TABLE `pvlng_babelkit` CHANGE `code_code` `code_code` varchar(50) NOT NULL AFTER `code_lang`;
 
 ALTER TABLE `pvlng_view` ADD INDEX `public` (`public`);
+
+ALTER TABLE `pvlng_reading_num` ADD INDEX `timestamp` (`timestamp`);
+ALTER TABLE `pvlng_reading_str` ADD INDEX `timestamp` (`timestamp`);
 
 UPDATE `pvlng_type` SET `childs` = -1 WHERE `id` = 29;
 UPDATE `pvlng_type` SET `icon` = '/images/ico/fronius.png' WHERE `id` = 43 OR `id` = 44;
@@ -19,7 +20,6 @@ INSERT INTO `pvlng_type` (`id`, `name`, `description`, `model`, `unit`, `type`, 
 CREATE OR REPLACE VIEW `pvlng_type_icons` AS
 select `pvlng_type`.`icon` AS `icon`,group_concat(`pvlng_type`.`name` order by `pvlng_type`.`name` ASC separator ',') AS `name` from `pvlng_type` where (`pvlng_type`.`id` <> 0) group by `pvlng_type`.`icon` order by group_concat(`pvlng_type`.`name` order by `pvlng_type`.`name` ASC separator ',');
 
--- ------------------------------------------------
 -- Aliases must get their own GUIDs in hierarchy
 
 DROP TRIGGER `pvlng_tree_bi`;
@@ -42,7 +42,6 @@ UPDATE `pvlng_tree` h, `pvlng_channel` c
    SET h.`guid` = GUID()
  WHERE h.`entity` = c.`id` and c.`type` = 0 AND h.`guid` IS NULL;
 
---
 -- ------------------------------------------------
 
 DELIMITER ;;
@@ -87,6 +86,7 @@ INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `descrip
 ('controller', 'Mobile', 'ChartHeight', '320', 0, 'Default chart height', 'num', ''),
 ('controller', 'Tariff', 'TimesLines', '10', 0, 'Initial times lines for each taiff', 'num', ''),
 ('controller', 'Weather', 'APIkey', '', 0, 'Wunderground API key', 'str', ''),
+('model', '', 'DoubleRead', '5', 0, 'Detect double readings by timestamp &plusmn;seconds<br /><small>(set 0 to disable)</small>', 'num', '0:geometric mean;1:arithmetic mean'),
 ('model', 'Daylight', 'Average', '0', 10, 'Calculation method for irradiation average', 'option', '0:geometric mean;1:arithmetic mean'),
 ('model', 'Daylight', 'CurveDays', '5', 20, 'Build average over the last ? days', 'num', ''),
 ('model', 'Daylight', 'SunriseIcon', '/images/sunrise.png', 30, 'Sunrise marker image', 'str', ''),
@@ -98,56 +98,72 @@ INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `descrip
 
 CREATE VIEW `pvlng_settings_keys` AS select concat(`pvlng_settings`.`scope`,if((`pvlng_settings`.`name` <> ''),concat('.',`pvlng_settings`.`name`),''),'.',`pvlng_settings`.`key`) AS `key`,`pvlng_settings`.`value` AS `value` from `pvlng_settings`;
 
+-- #######################################################################################
+
 CREATE TABLE `pvlng_reading_tmp` (
   `id` smallint(5) unsigned NOT NULL COMMENT 'pvlng_channel -> id',
   `start` int(10) unsigned NOT NULL COMMENT 'Generated for start .. end',
   `end` int(10) unsigned NOT NULL COMMENT 'Generated for start .. end',
+  `uid` smallint(5) unsigned NOT NULL COMMENT 'Tempory data Id',
   `created` int(10) unsigned NOT NULL COMMENT 'Record created',
-  PRIMARY KEY (`id`)
+  `lifetime` mediumint(8) unsigned NOT NULL COMMENT 'Lifetime of data',
+  PRIMARY KEY (`id`,`start`,`end`),
+  UNIQUE KEY `uid` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Buffer and remember internal calculated data';
-
-INSERT INTO `pvlng_reading_tmp` (`id`, `start`, `end`, `created`) VALUES
-(40, 1413064800, 1413151200, 1413142806),
-(77, 1413064800, 1413151200, 1413142812),
-(213, 1413064800, 1413151200, 1413141754);
 
 DELIMITER ;;
 
+CREATE TRIGGER `pvlng_reading_tmp_bi` BEFORE INSERT ON `pvlng_reading_tmp` FOR EACH ROW
+SET new.`uid` = 1 + FLOOR(RAND()*32766);;
+
 CREATE TRIGGER `pvlng_reading_tmp_ad` AFTER DELETE ON `pvlng_reading_tmp` FOR EACH ROW
 BEGIN
-  DELETE FROM `pvlng_reading_num_tmp`WHERE `id` = old.`id`;
-  DELETE FROM `pvlng_reading_str_tmp`WHERE `id` = old.`id`;
+  DELETE FROM `pvlng_reading_num_tmp`WHERE `id` = old.`uid`;
+  DELETE FROM `pvlng_reading_str_tmp`WHERE `id` = old.`uid`;
 END;;
 
-CREATE FUNCTION `pvlng_reading_tmp`(`in_id` smallint unsigned, `in_start` int unsigned, `in_end` int unsigned, `in_lifetime` mediumint unsigned, `in_mode` tinyint(1) unsigned) RETURNS int(10) unsigned
+CREATE FUNCTION `pvlng_reading_tmp_start`(`in_id` smallint unsigned, `in_start` int unsigned, `in_end` int unsigned, `in_lifetime` mediumint unsigned) RETURNS smallint(6)
 BEGIN
     -- Insert failed, so check existing data
-    -- start = 0 - other process is just creating the data, return 1 as "have to wait" marker
-    -- not valid start end range - return 0 to recreate data
+    -- created = 0 - other process is just creating the data,
+    --               return 0 as "have to wait" marker
+    -- created > 0 - return uid to mark correct data
     DECLARE EXIT HANDLER FOR 1062 -- Duplicate entry '%s' for key %d
     RETURN (
-        SELECT IFNULL(IF(`start` = 0, 1, `created`), 0) FROM `pvlng_reading_tmp`
-        WHERE `id`= in_id AND `start` <> 0 AND `start` <= in_start AND `end` >= in_end
+        SELECT IF(`created` = 0, 0, `uid`)
+          FROM `pvlng_reading_tmp`
+         WHERE `id` = in_id AND `start` = in_start AND `end` = in_end
     );
 
-    IF in_mode = 0 THEN
-        -- Remove out-data and hanging data
-        DELETE FROM `pvlng_reading_tmp`
-         WHERE `id`= in_id  AND `created` + in_lifetime < UNIX_TIMESTAMP();
+    -- Mark out-dated data, set invalid timestamps, remove them later in pvlng_reading_tmp_done
+    UPDATE `pvlng_reading_tmp`
+       SET `start` = `start`+1, `end` = `end`+1
+     WHERE `id` = in_id AND `created` BETWEEN 1 AND UNIX_TIMESTAMP()-`lifetime`
+        OR `created` BETWEEN 1 AND UNIX_TIMESTAMP()-86400;
 
-        -- Try to insert marker
-        INSERT INTO `pvlng_reading_tmp` (`id`, `created`) VALUES ( in_id, UNIX_TIMESTAMP() );
-        -- Insert succeeded, caller is the one to create the data
-        RETURN 0;
-    ELSE
-        UPDATE `pvlng_reading_tmp`
-           SET `start` = in_start, `end` = in_end, `created` = UNIX_TIMESTAMP()
-         WHERE `id` = in_id;
-        RETURN 0;
-    END IF;
+    -- Try to insert initial row
+    INSERT INTO `pvlng_reading_tmp` ( `id`, `start`, `end`, `lifetime` )
+         VALUES ( in_id, in_start, in_end, in_lifetime );
+
+    -- Insert succeeded, return neg. uid as marker to create data
+    RETURN (
+        SELECT -`uid` FROM `pvlng_reading_tmp`
+         WHERE `id` = in_id AND `start` = in_start AND `end` = in_end
+    );
+END;;
+
+CREATE PROCEDURE `pvlng_reading_tmp_done`(IN `in_uid` smallint unsigned)
+BEGIN
+    -- Mark as done
+    UPDATE `pvlng_reading_tmp` SET `created` = UNIX_TIMESTAMP() WHERE `uid` = in_uid;
+
+    -- Read original channel Id
+    SELECT DISTINCT `id` INTO @ID FROM `pvlng_reading_tmp` WHERE `uid` = in_uid;
+
+    -- Remove out-dated data for this Id or older 1 day, NOT DELETE created == 0 :-)
+    DELETE FROM `pvlng_reading_tmp`
+     WHERE `id` = @ID AND `created` BETWEEN 1 AND UNIX_TIMESTAMP()-`lifetime`
+        OR `created` BETWEEN 1 AND UNIX_TIMESTAMP()-86400;
 END;;
 
 DELIMITER ;
-
-ALTER TABLE `pvlng_reading_num` ADD INDEX `timestamp` (`timestamp`);
-ALTER TABLE `pvlng_reading_str` ADD INDEX `timestamp` (`timestamp`);
