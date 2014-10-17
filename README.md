@@ -22,13 +22,14 @@ wget -qO - https://raw.github.com/KKoPV/PVLng/develop/install | bash
 
 ## Upgrade
 
-If a new master release is out, you can upgrade your repository and database with
+If a new master (or development) release is out, you can upgrade your repository and database with
 
 ```
-./git-upgrade
+./upgrade.git master
 ```
 
-from your installation directory.
+from your installation directory. This will checkout the latest changes from GitHub and apply all outstanding database patches.
+(The script will work also with the develop branch.)
 
 ## Git hook
 
