@@ -28,6 +28,13 @@ class Config extends ConfigBase {
     /**
      *
      */
+    public function getInstallation() {
+        return self::$db->queryOne('SELECT `pvlng_id`()');
+    }
+
+    /**
+     *
+     */
     public function resetAPIkey() {
         self::$db->query(
             'UPDATE `'.$this->table.'` SET `value` = UUID() WHERE `key` = "APIKey" LIMIT 1'

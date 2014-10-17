@@ -100,7 +100,7 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
             $attr['consumption'] = round($cons, $attr['decimals']);
             $attr['costs'] = round(
                 $cons * $attr['cost'],
-                \slimMVC\Config::getInstance()->Currency_Decimals
+                \slimMVC\Config::getInstance()->Core_Currency_Decimals
             );
 
         }

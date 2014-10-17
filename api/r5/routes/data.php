@@ -21,8 +21,8 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
                  : strtotime($request['timestamp'])
                  )
                : NULL;
-    $cnt = Channel::byGUID($guid)->write($request, $timestamp);
-    if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
+      $cnt = Channel::byGUID($guid)->write($request, $timestamp);
+      if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
 })->name('PUT /data/:guid')->help = array(
     'since'       => 'r2',
     'description' => 'Save a reading value',
@@ -117,9 +117,8 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
             $attr['consumption'] = round($cons, $attr['decimals']);
             $attr['costs'] = round(
                 $cons * $attr['cost'],
-                $api->config->get('Currency.Decimals')
+                $api->config->get('Core.Currency.Decimals')
             );
-
         }
         $result->write($attr);
     }
