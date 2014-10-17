@@ -365,11 +365,16 @@ abstract class Channel {
 
         $this->before_read($request);
 
+        if ($this->isChild) {
+            // For channels used as childs set period to 1 minute
+            $this->period = array(1, self::ASCHILD);
+        }
+      /*
         if ($this->isChild AND $this->period[1] == self::NO) {
             // For channels used as childs set period to at least 1 minute
             $this->period[1] = self::ASCHILD;
         }
-
+      */
         $q = DBQuery::forge($this->table[$this->numeric]);
 
         $buffer = new Buffer;
@@ -465,9 +470,10 @@ abstract class Channel {
 
             // Use bufferd result set
             $this->db->setBuffered();
+            $offset = $last = 0;
 
             if ($res = $this->db->query($q)) {
-
+              /*
                 if ($this->meter) {
                     if ($this->GroupingPeriod[$this->period[1]] > 0) {
                         $row = $res->fetch_assoc();
@@ -477,7 +483,7 @@ abstract class Channel {
                     }
                     $last = 0;
                 }
-
+              */
                 while ($row = $res->fetch_assoc()) {
 
                     $row['consumption'] = 0;
@@ -634,7 +640,7 @@ abstract class Channel {
      */
     protected $GroupingPeriod = array(
         self::NO        =>        0,
-        self::ASCHILD   =>        0,
+        self::ASCHILD   =>       60,
         self::MINUTE    =>       60,
         self::HOUR      =>     3600,
         self::DAY       =>    86400,
@@ -752,8 +758,7 @@ abstract class Channel {
             $this->value += $this->offset;
 
             if ($this->meter AND $this->value == $lastReading) {
-                // Ignore for meters values which are equal last reading
-                throw new Exception(NULL, 200);
+                throw new Exception('Ignore meter values which are equal last reading', 200);
             }
         }
     }
@@ -844,15 +849,28 @@ abstract class Channel {
 
             if ($this->numeric) {
                 // Skip invalid (numeric) rows
-                // Apply valid_from and valid_to here ONLY if channel
-                // is NOT writable, this will be handled during write()
-                if ($this->write OR
+                // Apply valid_from and valid_to here only
+                // - channel is NOT writable, this will be handled during write()
+                // - NOT read as child channel
+                if ($this->write OR $this->isChild OR
                     ((is_null($this->valid_from) OR $row['data'] >= $this->valid_from) AND
                      (is_null($this->valid_to)   OR $row['data'] <= $this->valid_to))) {
 
                     $this->value = $row['data'];
                     Hook::process('data.read.after', $this);
                     $row['data'] = $this->value;
+
+                    if ($this->isChild) {
+                        $row['data'] = round($this->value, $this->decimals);
+                        $row['min']  = round($row['min'], $this->decimals);
+                        $row['max']  = round($row['max'], $this->decimals);
+
+                        if ($this->meter AND $lastrow) {
+                            $row['consumption'] = round($row['data'] - $lastrow['data'], $this->decimals);
+                        } else {
+                            $row['consumption'] = 0;
+                        }
+                    }
 
                     $datafile->write($row, $id);
                     $lastrow = $row;

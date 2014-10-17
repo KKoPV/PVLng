@@ -44,23 +44,17 @@ class SensorToMeter extends Channel {
 
         $this->before_read($request);
 
-        if ($offset = $this->GroupingPeriod[$this->period[1]]) {
-            // Fetch additional row BEFORE start timestamp
-            $request['start'] = $this->start - $offset;
-        }
-
         $buffer = $this->getChild(1)->read($request)->rewind();
-        $row = $buffer->current();
-        $last = $row['timestamp'];
-        $buffer->next();
+        $last = 0;
 
         $result = new \Buffer;
 
         $consumption = 0;
         while ($row = $buffer->current()) {
-            $row['consumption'] = ($row['timestamp'] - $last) / 3600 * $row['data'];
-            $consumption += $row['consumption'];
+            $cons = round($last ? ($row['timestamp'] - $last) / 3600 * $row['data'] : 0, $this->decimals);
+            $consumption += $cons;
             $row['data'] = $consumption;
+            $row['consumption'] = $cons;
             $result->write($row, $buffer->key());
             $last = $row['timestamp'];
             $buffer->next();

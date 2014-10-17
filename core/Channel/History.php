@@ -39,7 +39,7 @@ class History extends InternalCalc {
 
         parent::before_read($request);
 
-        if ($this->dataExists(300)) return; // Buffer for 5 min.
+        if ($this->dataExists(12*60*60)) return; // Buffer for 12h
 
         $child = $this->getChild(1);
 
@@ -47,9 +47,6 @@ class History extends InternalCalc {
 
         // Inherit properties from child
         $this->meter = $child->meter;
-
-        // Fetch all data, compress later
-        $request['period'] = '1i';
 
         if ($this->valid_to == 0) {
             // Last x days, move request start backwards

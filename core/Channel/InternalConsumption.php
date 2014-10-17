@@ -38,17 +38,12 @@ class InternalConsumption extends InternalCalc {
 
         $childs = $this->getChilds();
 
-        // For correct calculations read all child data
-        $request['period'] = '1i';
-
         $child1 = $childs[0]->read($request);
         $row1   = $child1->rewind()->current();
 
         $child2 = $childs[1]->read($request);
         $row2   = $child2->rewind()->current();
         $FirstKey2 = $child2->key();
-
-        $result = new \Buffer;
 
         $last = 0;
 
@@ -59,7 +54,7 @@ class InternalConsumption extends InternalCalc {
 
             if (empty($row2)) {
                 $last = $row1['data'] = $last + $row1['consumption'];
-                $this->saveValue($row1['timestamp'], $row1['data']);
+                $this->saveValue($row1['timestamp'], $last);
                 $row1 = $child1->next()->current();
                 continue;
             }
@@ -86,8 +81,7 @@ class InternalConsumption extends InternalCalc {
                     // Remember $last ONLY for timestamps before 2nd channel
                     // starts and NOT for data holes
                     $last = $row1['data'];
-
-                    $this->saveValue($row1['timestamp'], $row1['data']);
+                    $this->saveValue($row1['timestamp'], $last);
                 }
 
                 $row1 = $child1->next()->current();
@@ -96,7 +90,7 @@ class InternalConsumption extends InternalCalc {
 
                 if (!empty($row1)) {
                     $last = $row1['data'];
-                    $this->saveValue($row1['timestamp'], $row1['data']);
+                    $this->saveValue($row1['timestamp'], $last);
                 }
 
                 $row2 = $child2->next()->current();

@@ -85,7 +85,7 @@ class Daylight extends InternalCalc {
 
         parent::before_read($request);
 
-        if ($this->dataExists(21600)) return; // Buffer for 6h
+        if ($this->dataExists(12*60*60)) return; // Buffer for 12h
 
         if ($this->numeric AND $this->extra) {
             // Fetch average of last x days of irradiation channel to buid curve

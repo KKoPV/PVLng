@@ -17,6 +17,11 @@ abstract class InternalCalc extends Channel {
     /**
      * Readings table object
      */
+    protected $orgId;
+
+    /**
+     * Readings table object
+     */
     protected $data;
 
     /**
@@ -30,8 +35,9 @@ abstract class InternalCalc extends Channel {
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
 
+        $this->orgId = $this->entity;
+
         $this->data = \ORM\ReadingMemory::factory($this->numeric);
-        $this->data->id = $this->entity;
 
         $this->LifeTime = (new \ORM\Settings)->getModelValue('InternalCalc', 'LifeTime');
     }
@@ -48,8 +54,8 @@ abstract class InternalCalc extends Channel {
      *
      */
     protected function saveValue( $timestamp, $value ) {
-        $this->data->timestamp = $timestamp;
-        $this->data->data      = $value;
+        $this->data->setTimestamp($timestamp);
+        $this->data->setData($value);
         return $this->data->insert();
     }
 
@@ -76,17 +82,29 @@ abstract class InternalCalc extends Channel {
      *
      */
     protected function dataExists( $lifetime=NULL ) {
-        $sql = $this->db->SQL(
-            'SELECT `pvlng_reading_tmp`({1}, {2}, {3}, {4}, 0)',
-            $this->entity, $this->start, $this->end, $lifetime ?: $this->LifeTime
+
+        if (!is_null($lifetime)) $this->LifeTime = $lifetime;
+
+        $sql = $this->db->sql(
+            'SELECT `pvlng_reading_tmp_start`({1}, {2}, {3}, {4})',
+            $this->orgId, $this->start, $this->end, $this->LifeTime
         );
-        while (($flag = $this->db->queryOne($sql)) == 1) {
-            // Another instance is generating the data, wait 200ms before next check
-            usleep(200 * 1000);
+
+        while (($uid = $this->db->queryOne($sql)) == 0) {
+            // Another instance is generating the data, wait 100ms before next check
+            usleep(100 * 1000);
         }
-        // = 0 - This instance have to generate the data
-        // > 1 - Timestamp of data generation, reuse
-        return (bool) $flag;
+
+        // < 0 - This instance have to generate the data
+        // > 0 - temp. Id of data, reuse
+        if ($uid < 0) {
+            $this->entity = -$uid;
+            $this->data->setId($this->entity);
+            return FALSE;
+        } else {
+            $this->entity = $uid;
+            return TRUE;
+        }
     }
 
     /**
@@ -94,9 +112,6 @@ abstract class InternalCalc extends Channel {
      */
     protected function dataCreated() {
         // Data was just created, mark
-        $this->db->query(
-            'SELECT `pvlng_reading_tmp`({1}, {2}, {3}, 0, 1)',
-            $this->entity, $this->start, $this->end
-        );
+        $this->db->query('CALL `pvlng_reading_tmp_done`({1})', $this->entity);
     }
 }
