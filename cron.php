@@ -9,100 +9,7 @@
  * @version     1.0.0
  */
 
-// Command line parameters
-extract(getopt('vtfh'), EXTR_PREFIX_ALL, 'p');
-define('TESTMODE', isset($p_t));
-
-/**
- * Initialize
- */
-if (!TESTMODE) {
-    ini_set('display_startup_errors', 0);
-    ini_set('display_errors', 0);
-    error_reporting(0);
-} else {
-    ini_set('display_startup_errors', 1);
-    ini_set('display_errors', 1);
-    error_reporting(-1);
-}
-
-setlocale(LC_NUMERIC, 'C');
-iconv_set_encoding('internal_encoding', 'UTF-8');
-mb_internal_encoding('UTF-8');
-clearstatcache();
-
-/**
- * Directories
- */
-define('DS',       DIRECTORY_SEPARATOR);
-define('BASE_DIR', dirname(__FILE__));
-define('ROOT_DIR', BASE_DIR);
-define('CONF_DIR', ROOT_DIR . DS . 'config');
-define('CORE_DIR', ROOT_DIR . DS . 'core');
-define('LIB_DIR',  ROOT_DIR . DS . 'lib');
-define('TEMP_DIR', ROOT_DIR . DS . 'tmp'); // Outside document root!
-
-file_exists(CONF_DIR . DS . 'config.php') OR die('Missing: ' . CONF_DIR . DS . 'config.php');
-file_exists(CONF_DIR . DS . 'config.cron.php') OR die('Missing: ' . CONF_DIR . DS . 'config.cron.php');
-
-/**
- * Initialize Auto-Loader
- */
-include LIB_DIR . DS . 'Loader.php';
-
-Loader::register(
-    array(
-        'path'    => array(CORE_DIR, LIB_DIR),
-        'pattern' => array('%s.php'),
-        'exclude' => array('contrib/')
-    ),
-    TEMP_DIR
-);
-
-$config = (new slimMVC\Config)
-          ->load(CONF_DIR . DS . 'config.default.php')
-          ->load(CONF_DIR . DS . 'config.php')
-          // Load into "Cron" namespace
-          ->load(CONF_DIR . DS . 'config.cron.php', TRUE, 'Cron');
-
-/**
- * Database
- */
-try {
-    // Try connect to database
-    $c = $config->get('Database');
-    $db = new slimMVC\MySQLi($c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']);
-} catch (Exception $e) {
-    die('Unable to connect to database!');
-}
-
-$db->setSettingsTable('pvlng_config');
-
-slimMVC\ORM::setDatabase($db);
-
-foreach ((new ORM\SettingsKeys)->find()->asAssoc() as $setting) {
-    $config->set($setting['key'], $setting['value']);
-}
-
-/**
- * Init Nested set for channel tree
- */
-include LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
-
-NestedSet::Init(array(
-    'db'       => $db,
-    'debug'    => true,
-    'lang'     => 'en',
-    'path'     => LIB_DIR . DS . 'contrib' . DS . 'messages',
-    'db_table' => array (
-        'tbl' => 'pvlng_tree',
-        'nid' => 'id',
-        'l'   => 'lft',
-        'r'   => 'rgt',
-        'mov' => 'moved',
-        'pay' => 'entity'
-    )
-));
+##############################################################################
 
 /**
  *
@@ -115,6 +22,7 @@ Run defined tasks from cron
 Usage: cron.php [options]
 
 Options:
+    -c  Configuration file, defaults to config/config.cron.php
     -t  Test mode, no data will be changed
         Sets verbosity level to info
     -v  Verbosity level info
@@ -132,14 +40,21 @@ EOT;
 /**
  *
  */
-function out( $level, $msg ) {
+function out( $level ) {
     $args = func_get_args();
     $level = array_shift($args);
 
     if ($level > VERBOSE) return;
 
-    $msg = array_shift($args);
+    $msg = count($args) ? array_shift($args) : str_repeat('-', 63);
     vprintf('['.date('d-M H:i:s').'] '.$msg.PHP_EOL, $args);
+}
+
+/**
+ *
+ */
+function okv( $level, $key, $value ) {
+    if ($level <= VERBOSE) out($level, '%-20s = %s', $key, print_r($value, TRUE));
 }
 
 /**
@@ -158,73 +73,190 @@ function curl( $options, &$result, &$info=array() ) {
     curl_close($ch);
 
     // Debug curl
-    out(1, 'Curl      : %d ms', $info['total_time']*1000);
-    out(2, 'Curl info : %s', print_r($info, TRUE));
+    okv(1, 'Curl', $info['total_time'] . 's');
+    okv(1, 'Bytes up / down', $info['size_upload'] . ' / ' . $info['size_download']);
+    okv(2, 'Curl info', $info);
 
     // Curl error?
     if ($errno) {
-        out(0, 'Curl error [%d] : %s', $errno, $error);
+        okv(0, 'Curl error', '['.$errno.'] '.$error);
         return FALSE;
     }
 
     return TRUE;
 }
 
-if (isset($p_h)) usage();
+##############################################################################
 
-$p_v = isset($p_v) ? (is_array($p_v)?count($p_v):1) : 0;
+// Command line parameters
+// -f is undocumentd and forces run, ignore actual minute
+extract(getopt('c:vtfh'), EXTR_PREFIX_ALL, 'param');
+
+if (isset($param_h)) usage();
+
+define('TESTMODE', isset($param_t));
+
+$param_v = isset($param_v) ? (is_array($param_v)?count($param_v):1) : 0;
+
 // Increase verbosity by 1 in test mode
-TESTMODE && $p_v++;
-define('VERBOSE', $p_v);
+TESTMODE && $param_v++;
+define('VERBOSE', $param_v);
 
-if (VERBOSE) {
-    ini_set('display_errors', 1);
-    error_reporting(-1);
-}
+setlocale(LC_NUMERIC, 'C');
+iconv_set_encoding('internal_encoding', 'UTF-8');
+mb_internal_encoding('UTF-8');
+clearstatcache();
+
+/**
+ * Directories
+ */
+define('DS',       DIRECTORY_SEPARATOR);
+define('BASE_DIR', dirname(__FILE__));
+define('ROOT_DIR', BASE_DIR);
+define('CONF_DIR', ROOT_DIR . DS . 'config');
+define('CORE_DIR', ROOT_DIR . DS . 'core');
+define('LIB_DIR',  ROOT_DIR . DS . 'lib');
+define('TEMP_DIR', ROOT_DIR . DS . 'tmp'); // Outside document root!
+
+/**
+ * Initialize
+ */
+ini_set('display_startup_errors', !VERBOSE);
+ini_set('display_errors', !VERBOSE);
+error_reporting(!VERBOSE ? 0 : -1);
 
 if (TESTMODE) {
-    out( 1, 'Test mode');
+    okv( 1, 'Mode', 'TEST');
 } else {
-    out( 1, 'Snooze 10 seconds, give the other (data saving) cron jobs some more time to finish ...');
+    out( 1, 'Snooze 10 seconds, give the other (data saving) cron jobs some time to finish ...');
     sleep(10);
 }
 
-$minute = +date('i');
+/**
+ * Initialize Auto-Loader
+ */
+include LIB_DIR . DS . 'Loader.php';
+
+Loader::register(
+    array(
+        'path'    => array(CORE_DIR, LIB_DIR),
+        'pattern' => array('%s.php'),
+        'exclude' => array('contrib/')
+    ),
+    TEMP_DIR
+);
+
+$param_c = isset($param_c) ? $param_c : 'config.cron.php';
+okv( 1, 'Config file', CONF_DIR . DS . $param_c);
 
 try {
-    foreach ($config->get('Cron') as $section) {
+    $config = (new slimMVC\Config)
+              ->load(CONF_DIR . DS . 'config.default.php')
+              ->load(CONF_DIR . DS . 'config.php', TRUE)
+              // Load into "Cron" namespace
+              ->load(CONF_DIR . DS . $param_c, TRUE, 'Cron');
+} catch (Exception $e) {
+    die($e->getMessage());
+}
 
-        $section = array_merge(
-            array(
-                'enabled' => FALSE,
-                'name'    => '<unknown>',
-                'handler' => '<handler unknown>',
-                'runeach' => 1
-            ),
-            $section
-        );
+/**
+ * Fork here child processes for each section
+ */
+$minute = +date('i');
+$sections = $config->get('Cron');
+$cnt = count($sections);
 
-        out(1, '---------------------------------------------------------------');
-        out(1, '--- %s (%s)', $section['name'], $section['handler']);
-        out(1, '---------------------------------------------------------------');
+$id = -1;  // Parent will NOT change the $id
 
-        if ($section['enabled'] === TRUE OR
-            TESTMODE AND $section['enabled'] === 0) {
-            // Run in test mode at any minute or if forced flag was set...
-            if (TESTMODE OR isset($p_f) OR $minute % $section['runeach'] == 0) {
-                $file = ROOT_DIR . DS . 'cron' . DS . $section['handler'] . '.php';
-                // Check for file exists only during test, in live don't check anymore
-                if (TESTMODE AND !file_exists($file)) {
-                    throw new Exception('Missing handler script: '.$file);
-                }
-                unset($section['enabled'], $section['name'], $section['handler']);
-                require $file;
-            } else {
-                out( 1, 'Skip, not that minute');
+for ($i=0; $i<$cnt; $i++) {
+
+   switch ($pid = pcntl_fork()) {
+
+      default:
+         // @parent
+         pcntl_waitpid($pid, $status);
+         break;
+
+      case -1:
+         // @fail
+         die('Fork failed');
+         break;
+
+      case 0:
+         // @child: Break out to loop and set section $id to process
+         $id = $i;
+         break 2;
+   }
+}
+
+// parent process finished loop
+if ($id == -1) exit;
+
+// Collect outputs to show at once
+ob_start();
+
+$section = array_merge(
+    array(
+        'handler' => '<handler unknown>',
+        'enabled' => FALSE,
+        'name'    => '<unknown>',
+        'runeach' => 1
+    ),
+    $sections[$id]
+);
+
+out(1);
+out(1, '[%d] %s (%s)', ($id+1), $section['name'], $section['handler']);
+out(1);
+
+/**
+ * Database
+ */
+try {
+    // Try connect to database
+    $c = $config->get('Database');
+    $db = new slimMVC\MySQLi($c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']);
+} catch (Exception $e) {
+    die('Unable to connect to database!');
+}
+
+$db->setSettingsTable('pvlng_config');
+
+slimMVC\ORM::setDatabase($db);
+
+foreach ((new ORM\SettingsKeys)->find() as $setting) {
+    $config->set($setting->getKey(), $setting->getValue());
+}
+
+/**
+ * Init Nested set for channel tree
+ */
+include LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
+
+NestedSet::Init(array(
+    'db'=>$db, 'debug'=>FALSE, 'lang'=>'en', 'path'=>LIB_DIR.DS.'contrib'.DS.'messages',
+    'db_table' => array (
+        'tbl'=>'pvlng_tree', 'nid'=>'id', 'l'=>'lft', 'r'=>'rgt', 'mov'=>'moved', 'pay'=>'entity'
+    )
+));
+
+try {
+    if ($section['enabled'] === TRUE OR
+        TESTMODE AND $section['enabled'] === 0) {
+        // Run in test mode at any minute or if forced flag was set...
+        if (TESTMODE OR isset($param_f) OR $minute % $section['runeach'] == 0) {
+            $file = ROOT_DIR . DS . 'cron' . DS . $section['handler'] . '.php';
+            // Check for file exists only during test, in live don't check anymore
+            if (TESTMODE AND !file_exists($file)) {
+                throw new Exception('Missing handler script: '.$file);
             }
+            unset($section['enabled'], $section['name'], $section['handler']);
+            require $file;
         } else {
-            out( 1, 'Skip, disabled');
+            out(1, 'Skip, not that minute');
         }
+    } else {
+        out(1, 'Skip, disabled');
     }
 } catch (Exception $e) {
     out(0, 'ERROR: %s', $e->getMessage());

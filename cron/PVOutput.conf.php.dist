@@ -5,13 +5,17 @@
 
     array(
 
+        // -------------------------------------------------------------------
+        // DON'T CHANGE
+        'Handler' => 'PVOutput',
+        // -------------------------------------------------------------------
+
         /**
          * Common settings
          */
-        'enabled' => TRUE,
-        'Name'    => 'A meaningful name for debugging here...'
-        'Handler' => 'PVOutput', // DON'T change!
-        'RunEach' => 5, // From system settings (5|10|15) minutes
+        'enabled' => TRUE,           // (TRUE|FALSE|0) '0' runs only in test mode!
+        'Name'    => 'PVOutput',     // A meaningful name for debugging
+        'RunEach' => 5,              // From system settings (5|10|15) minutes
 
         /**
          * PVOutput API key and System Id
