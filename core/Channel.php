@@ -26,9 +26,11 @@ abstract class Channel {
             throw new Exception('No channel found for Id: '.$id, 400);
         }
 
-        if ($channel->getAliasOf() AND $alias) {
+        $aliasOf = $channel->getAliasOf();
+
+        if ($aliasOf AND $alias) {
             // Is an alias channel, switch direct to the original channel
-            return self::byId($channel->getAliasOf());
+            return self::byId($aliasOf);
         }
 
         $model = $channel->ModelClass();
@@ -246,10 +248,12 @@ abstract class Channel {
      */
     public function write( $request, $timestamp=NULL ) {
 
-        $this->before_write($request);
-
         // Default behavior
         $reading = ORM\Reading::factory($this->numeric);
+
+        $this->lastReading = $reading->getLastReading($this->entity, $timestamp);
+
+        $this->before_write($request);
 
         if ($this->numeric) {
             // Check that new value is inside the valid range
@@ -266,18 +270,17 @@ abstract class Channel {
                 throw new Exception($msg, 200);
             }
 
-            $lastReading = $reading->getLastReading($this->entity, $timestamp);
             // Check that new reading value is inside the threshold range,
-            // except 1st reading at all ($lastreading == NULL)
-            if ($this->threshold > 0 AND !is_null($lastReading) AND
-                abs($this->value-$lastReading) > $this->threshold) {
+            // except 1st reading at all ($this->lastreading == NULL)
+            if ($this->threshold > 0 AND !is_null($this->lastReading) AND
+                abs($this->value-$this->lastReading) > $this->threshold) {
                 // Throw away invalid reading value
-                return 0;
+                throw new Exception('Ignore invalid reading value: '.$this->value, 200);
             }
 
             // Check that new meter reading value can't be lower than before
-            if ($this->meter AND $lastReading AND $this->value < $lastReading) {
-                $this->value = $lastReading;
+            if ($this->meter AND $this->lastReading AND $this->value < $this->lastReading) {
+                $this->value = $this->lastReading;
             }
         }
 
@@ -301,10 +304,12 @@ abstract class Channel {
      */
     public function update( $request, $timestamp ) {
 
-        $this->check_before_write($request);
-
         // Default behavior
         $reading = ORM\Reading::factory($this->numeric);
+
+        $this->lastReading = $reading->getLastReading($this->entity, $timestamp);
+
+        $this->check_before_write($request);
 
         if ($this->numeric) {
             // Check that new value is inside the valid range
@@ -321,17 +326,16 @@ abstract class Channel {
                 throw new Exception($msg, 200);
             }
 
-            $lastReading = $reading->getLastReading($this->entity, $timestamp);
             // Check that new reading value is inside the threshold range,
-            // except 1st reading at all ($lastreading == NULL)
-            if ($this->threshold > 0 AND !is_null($lastReading) AND
-                abs($this->value-$lastReading) > $this->threshold) {
+            // except 1st reading at all ($this->lastreading == NULL)
+            if ($this->threshold > 0 AND !is_null($this->lastReading) AND
+                abs($this->value-$this->lastReading) > $this->threshold) {
                 // Throw away invalid reading value
                 return 0;
             }
 
             // Check that new meter reading value can't be lower than before
-            if ($this->meter AND $lastReading AND $this->value < $lastReading) {
+            if ($this->meter AND $this->lastReading AND $this->value < $this->lastReading) {
                 return 0;
             }
         }
@@ -345,8 +349,8 @@ abstract class Channel {
 /*
         if ($rc) {
             // Log successful updates only
-            $msg = isset($lastReading)
-                 ? sprintf('%s: %f > %f', date('Y-m-d H:i:s', $timestamp), $lastReading, $request['data'])
+            $msg = isset($this->lastReading)
+                 ? sprintf('%s: %f > %f', date('Y-m-d H:i:s', $timestamp), $this->lastReading, $request['data'])
                  : sprintf('%s: %f', date('Y-m-d H:i:s', $timestamp), $request['data']);
             ORM\Log::save($this->name, $msg);
         }
@@ -365,16 +369,6 @@ abstract class Channel {
 
         $this->before_read($request);
 
-        if ($this->isChild) {
-            // For channels used as childs set period to 1 minute
-            $this->period = array(1, self::ASCHILD);
-        }
-      /*
-        if ($this->isChild AND $this->period[1] == self::NO) {
-            // For channels used as childs set period to at least 1 minute
-            $this->period[1] = self::ASCHILD;
-        }
-      */
         $q = DBQuery::forge($this->table[$this->numeric]);
 
         $buffer = new Buffer;
@@ -734,22 +728,20 @@ abstract class Channel {
                     throw new Exception('Invalid meter reading: 0', 422);
                 }
 
-                $lastReading = ORM\Reading::factory($this->numeric)->getLastReading($this->entity);
-
-                if ($this->meter AND $this->value + $this->offset < $lastReading AND $this->adjust) {
+                if ($this->meter AND $this->value + $this->offset < $this->lastReading AND $this->adjust) {
                     // Auto-adjust channel offset
                     ORM\Log::save(
                         $this->name,
                         sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
-                                $this->offset, $lastReading, $this->value)
+                                $this->offset, $lthis->astReading, $this->value)
                     );
 
                     // Update channel in database
                     $t = new ORM\Channel($this->entity);
-                    $t->offset = $lastReading;
+                    $t->offset = $this->lastReading;
                     $t->update();
 
-                    $this->offset = $lastReading;
+                    $this->offset = $this->lastReading;
                 }
             }
 
@@ -757,7 +749,7 @@ abstract class Channel {
             // Apply offset
             $this->value += $this->offset;
 
-            if ($this->meter AND $this->value == $lastReading) {
+            if ($this->meter AND $this->value == $this->lastReading) {
                 throw new Exception('Ignore meter values which are equal last reading', 200);
             }
         }
@@ -766,7 +758,7 @@ abstract class Channel {
     /**
      *
      */
-    protected function before_read( $request ) {
+    protected function before_read( &$request ) {
         // Readable channel?
         if (!$this->read)
             throw new \Exception('Can\'t read data from '.$this->name.', '
@@ -774,7 +766,7 @@ abstract class Channel {
 
         // Required number of child channels?
         if ($this->childs >= 0 AND count($this->getChilds()) != $this->childs)
-            throw new \Exception($this->name.' must have '.$this->childs.' child(s)', 400);
+            throw new \Exception($this->name.' MUST have '.$this->childs.' child(s)', 400);
 
         // Prepare analysis of request
         $request = array_merge(
@@ -783,40 +775,58 @@ abstract class Channel {
         );
 
         // Start timestamp
-        if ($request['start'] == '') $request['start'] = '00:00';
+        if ($request['start'] == '') {
+            $request['start'] = 'midnight';
+        } elseif (preg_match('~^sunrise(?:;(\d+))*~', $request['start'], $args)) {
+            $request['start'] = (new \ORM\Settings)->getSunrise($this->time);
+            if (isset($args[1])) $request['start'] -= $args[1]*60;
+        }
         $this->start = is_numeric($request['start']) ? $request['start'] : strtotime($request['start']);
         if ($this->start === FALSE) {
             throw new \Exception('Invalid start timestamp: '.$request['start'], 400);
         }
 
         // End timestamp
-        if ($request['end'] == '') $request['end'] = '24:00';
+        if ($request['end'] == '') {
+            $request['end'] = 'midnight next day';
+        } elseif (preg_match('~^sunset(?:;(\d+))*~', $request['end'], $args)) {
+            $request['end'] = (new \ORM\Settings)->getSunset($this->time);
+            if (isset($args[1])) $request['end'] += $args[1]*60;
+        }
         $this->end = is_numeric($request['end']) ? $request['end'] : strtotime($request['end']);
         if ($this->end === FALSE) {
             throw new \Exception('Invalid end timestamp: '.$request['end'], 400);
         }
 
-        // Consolidation period
-        if ($request['period'] != '') {
-            // normalize aggr. periods
-            if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all?)$~',
-                           $request['period'], $args)) {
-                $this->period = array($args[1]?:1, self::NO);
-                switch (substr($args[2], 0, 2)) {
-                    case 'i': case 'mi':  $this->period[1] = self::MINUTE;   break;
-                    case 'h': case 'ho':  $this->period[1] = self::HOUR;     break;
-                    case 'd': case 'da':  $this->period[1] = self::DAY;      break;
-                    case 'w': case 'we':  $this->period[1] = self::WEEK;     break;
-                    case 'm': case 'mo':  $this->period[1] = self::MONTH;    break;
-                    case 'q': case 'qa':  $this->period[1] = self::QUARTER;  break;
-                    case 'y': case 'ye':  $this->period[1] = self::YEAR;     break;
-                    case 'l': case 'la':  $this->period[1] = self::LAST;     break;
-                    case 'r': case 're':  $this->period[1] = self::READLAST; break;
-                    case 'a': case 'al':  $this->period[1] = self::ALL;      break;
-                }
-            } else {
-                throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
+        // Normalize aggregation period
+        if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all)$~',
+                       strtolower($request['period']), $args)) {
+
+            $this->period[0] = $args[1] ?: 1;
+
+            switch (substr($args[2], 0, 2)) {
+                default:              $this->period[1] = self::NO;       break;
+                case 'i': case 'mi':  $this->period[1] = self::MINUTE;   break;
+                case 'h': case 'ho':  $this->period[1] = self::HOUR;     break;
+                case 'd': case 'da':  $this->period[1] = self::DAY;      break;
+                case 'w': case 'we':  $this->period[1] = self::WEEK;     break;
+                case 'm': case 'mo':  $this->period[1] = self::MONTH;    break;
+                case 'q': case 'qa':  $this->period[1] = self::QUARTER;  break;
+                case 'y': case 'ye':  $this->period[1] = self::YEAR;     break;
+                case 'l': case 'la':  $this->period[1] = self::LAST;     break;
+                case 'r': case 're':  $this->period[1] = self::READLAST; break;
+                case 'a': case 'al':  $this->period[1] = self::ALL;      break;
             }
+        } else {
+            throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
+        }
+
+        // If no period is set for channels with childs, align child data at least to 1 min.
+        if ($this->childs != 0 AND $this->period[1] == self::NO) {
+            // Correct period for this channel
+            $this->period = array(1, self::MINUTE);
+            // Correct period for later child channel reads
+            $request['period'] = '1min';
         }
     }
 

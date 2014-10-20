@@ -17,14 +17,21 @@ namespace Channel;
  */
 class Baseline extends InternalCalc {
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
-    public function before_read( $request ) {
+    protected function before_read( $request ) {
 
         parent::before_read($request);
 
         if ($this->dataExists()) return;
+
+        // Read out all data
+        $request['period'] = '1i';
 
         $min = PHP_INT_MAX;
         $ts_min = FALSE;

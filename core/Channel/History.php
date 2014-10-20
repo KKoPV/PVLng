@@ -35,44 +35,6 @@ class History extends InternalCalc {
     /**
      *
      */
-    public function before_read( $request ) {
-
-        parent::before_read($request);
-
-        if ($this->dataExists(12*60*60)) return; // Buffer for 12h
-
-        $child = $this->getChild(1);
-
-        if (!$child) return;
-
-        // Inherit properties from child
-        $this->meter = $child->meter;
-
-        if ($this->valid_to == 0) {
-            // Last x days, move request start backwards
-            $request['start'] = $this->start - $this->valid_from * 86400;
-            // Move request end backwards to 00:00
-            $request['end'] = strtotime('today');
-
-            // Save data into temp. table
-            $this->saveValues($child->read($request));
-        } else {
-            // Find earliest data
-            $q = new \DBQuery('pvlng_reading_num');
-            $q->get($q->FROM_UNIXTIME($q->MIN('timestamp'), '"%Y"'));
-            for ($i=$this->db->queryOne($q)-date('Y'); $i<=0; $i++) {
-                $request['start'] = strtotime(date('Y-m-d ', $this->start - $this->valid_from * 86400).$i.'years');
-                $request['end']   = strtotime(date('Y-m-d ', $this->end   + $this->valid_to   * 86400).$i.'years');
-                // Save data into temp. table
-                $this->saveValues($child->read($request));
-            }
-        }
-        $this->dataCreated(TRUE);
-    }
-
-    /**
-     *
-     */
     public function read( $request ) {
 
         $this->before_read($request);
@@ -185,6 +147,51 @@ class History extends InternalCalc {
         $this->valid_from = $this->valid_to = NULL;
 
         return $this->after_read($result);
+    }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected function before_read( &$request ) {
+
+        parent::before_read($request);
+
+        if ($this->dataExists(12*60*60)) return; // Buffer for 12h
+
+        $child = $this->getChild(1);
+
+        if (!$child) return;
+
+        // Read out all data
+        $request['period'] = '1i';
+
+        // Inherit properties from child
+        $this->meter = $child->meter;
+
+        if ($this->valid_to == 0) {
+            // Last x days, move request start backwards
+            $request['start'] = $this->start - $this->valid_from * 86400;
+            // Move request end backwards to 00:00
+            $request['end'] = strtotime('today');
+
+            // Save data into temp. table
+            $this->saveValues($child->read($request));
+        } else {
+            // Find earliest data
+            $q = new \DBQuery('pvlng_reading_num');
+            $q->get($q->FROM_UNIXTIME($q->MIN('timestamp'), '"%Y"'));
+            for ($i=$this->db->queryOne($q)-date('Y'); $i<=0; $i++) {
+                $request['start'] = strtotime(date('Y-m-d ', $this->start - $this->valid_from * 86400).$i.'years');
+                $request['end']   = strtotime(date('Y-m-d ', $this->end   + $this->valid_to   * 86400).$i.'years');
+                // Save data into temp. table
+                $this->saveValues($child->read($request));
+            }
+        }
+        $this->dataCreated(TRUE);
     }
 
 }

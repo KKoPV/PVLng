@@ -83,14 +83,6 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
     $request['p1'] = $p1;
     $request['p2'] = $p2;
 
-    if ($_=&$request['start'] == 'sunrise') {
-        $request['start'] = $api->config->getSunrise(time());
-    }
-
-    if ($_=&$request['end'] == 'sunset') {
-        $request['end'] = $api->config->getSunset(time());
-    }
-
     $channel = Channel::byGUID($guid);
 
     // Special models can provide an own GET functionality

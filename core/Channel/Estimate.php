@@ -14,6 +14,10 @@ namespace Channel;
  */
 class Estimate extends InternalCalc {
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
@@ -37,7 +41,7 @@ class Estimate extends InternalCalc {
     /**
      *
      */
-    protected function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 
@@ -45,6 +49,9 @@ class Estimate extends InternalCalc {
         $this->end = min(strtotime(date('Y-m-d 12:00', $this->end)), $this->end);
 
         if ($this->dataExists()) return;
+
+        // Read out all data
+        $request['period'] = '1i';
 
         $estimates = array();
         foreach (explode("\n", $this->extra) as $line) {

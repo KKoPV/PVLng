@@ -27,16 +27,23 @@ class InternalConsumption extends InternalCalc {
         throw new \Exception('"'.$this->name.'" accepts only meters as sub channels!', 400);
     }
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
-    protected function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 
         if ($this->dataExists()) return;
 
         $childs = $this->getChilds();
+
+        // Read out all data
+        $request['period'] = '1i';
 
         $child1 = $childs[0]->read($request);
         $row1   = $child1->rewind()->current();

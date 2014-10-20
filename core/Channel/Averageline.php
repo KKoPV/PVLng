@@ -17,16 +17,23 @@ namespace Channel;
  */
 class Averageline extends InternalCalc {
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
-    public function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 
         if ($this->dataExists()) return;
 
         $ts = $cnt = $sum = 0;
+
+        // Read out all data
+        $request['period'] = '1i';
 
         /**
          * Calulated with the Hölder mean fomulas

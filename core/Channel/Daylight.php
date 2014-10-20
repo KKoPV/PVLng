@@ -81,7 +81,7 @@ class Daylight extends InternalCalc {
     /**
      *
      */
-    protected function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 

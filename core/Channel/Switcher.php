@@ -22,7 +22,7 @@ class Switcher extends Channel {
         $this->before_write($request);
 
         // Get last value and ...
-        $last = \ORM\Reading::factory($this->numeric)->getLastReading($this->entity);
+        $last = \ORM\Reading::factory($this->numeric)->getLastReading($this->entity, $timestamp);
 
         // ... skip not changed value since last write
         if ($this->numeric  AND (float)  $last == (float)  $this->value OR
