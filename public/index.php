@@ -224,6 +224,14 @@ $app->hook('slim.before.dispatch', function() use ($app) {
     }
 
     /**
+     * Check location
+     */
+    if (($app->config->get('Core.Latitude') == '' OR $app->config->get('Core.Longitude') == '') AND
+        strpos($pattern, '/adminpass') === FALSE AND strpos($pattern, '/location') === FALSE) {
+        $app->redirect('/location');
+    }
+
+    /**
      * Check mobile client
      */
     if (substr($pattern, 0,  2) != '/m' AND

@@ -330,10 +330,11 @@ function ChartDialog( id ) {
     $('input:radio[name="color-pos-neg"][value="'+p.colorusediff+'"]').prop('checked', true);
     $('#d-color-diff').val(p.colordiff).spectrum('set', p.colordiff);
     $('#d-color-threshold').val(p.threshold);
-    $('#d-color-use-diff').trigger('ifToggled');
     /* Display times in chart */
     $('#d-time1').val(p.time1);
     $('#d-time2').val(p.time2);
+    $('#d-daylight').prop('checked', p.daylight);
+    $('#d-daylight-grace').val(p.daylight_grace);
     $('#d-time-slider').slider('values', [ TimeStrToSec(p.time1), TimeStrToSec(p.time2) ]);
     $('#d-legend').prop('checked', p.legend);
     $('#d-hidden').prop('checked', p.hidden);
@@ -341,7 +342,7 @@ function ChartDialog( id ) {
     $('#d-position-slider').slider('value', p.position);
 
     /* Update only in context of dialog chart */
-    $('input', '#dialog-chart').iCheck('update');
+    $('input.iCheck', '#dialog-chart').iCheck('update').trigger('ifToggled');
     $('select', '#dialog-chart').trigger('change');
 
     /* Set the id into the dialog for onClose to write data back */
@@ -538,7 +539,14 @@ function updateChart( forceUpdate, scroll ) {
 
         $('#s'+channel.id).show();
 
-        var url = PVLngAPI + 'data/' + channel.guid + '.json?_canAbort=true';
+        var url = PVLngAPI + 'data/' + channel.guid + '.json',
+            start = fromDate,
+            end = toDate + '+1day';
+
+        if (channel.daylight) {
+            start = 'sunrise;'+channel.daylight_grace;
+            end = 'sunset;'+channel.daylight_grace;
+        }
 
         _log('Fetch', url);
 
@@ -547,8 +555,8 @@ function updateChart( forceUpdate, scroll ) {
             {
                 attributes: true,
                 full:       true,
-                start:      fromDate,
-                end:        toDate + '+1day',
+                start:      start,
+                end:        end,
                 period:     (channel.type != 'scatter') ? period_count + period : '',
                 _canAbort:  true,
                 _ts:        date.getTime()
@@ -992,6 +1000,13 @@ $(function() {
     /**
      *
      */
+    $("#d-table > tbody > tr").each(function(id, tr) {
+        $(tr).addClass(id % 2 ? 'even' : 'odd');
+    });
+
+    /**
+     *
+     */
     $("#dialog-chart").dialog({
         autoOpen: false,
         position: [ null, 20 ],
@@ -1022,6 +1037,8 @@ $(function() {
 
                 p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
                 p.time2 = SecToTimeStr(TimeStrToSec($('#d-time2').val(), 24));
+                p.daylight = $('#d-daylight').is(':checked');
+                p.daylight_grace = +$('#d-daylight-grace').val();
 
                 p = p.toString();
 
@@ -1111,7 +1128,11 @@ $(function() {
         /* Insert separate span to style text */
       .append($('<span/>').prop('id', 'd-position').css({ fontSize: 'xx-small', color: 'gray' }));
 
-    $('input').iCheck('update');
+    $('#d-daylight').on('ifToggled', function(e) {
+        $('#d-daylight-grace').prop('disabled', !$(this).is(':checked'));
+    });
+
+    $('input.iCheck').iCheck('update');
 
     $('input.channel').on('ifToggled', function() {
         $('#r'+this.id).toggleClass('checked', this.checked);

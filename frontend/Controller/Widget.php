@@ -71,7 +71,7 @@ class Widget extends \Controller {
                 $time2 = min($time2 + 12*60*60, strtotime('24:00'));
             }
 
-            $this->view->GUID    = $channel->guid;
+            $this->view->UID     = mt_rand(1000, 9999);
             $this->view->Unit    = $channel->unit;
             $this->view->Width   = $this->intParam('width', 320);
             $this->view->Height  = $this->intParam('height', 200);

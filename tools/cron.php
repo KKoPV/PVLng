@@ -64,6 +64,7 @@ function curl( $options, &$result, &$info=array() ) {
     $ch = curl_init();
 
     curl_setopt_array($ch, $options);
+    curl_setopt(CURLOPT_TIMEOUT, 20);
 
     $result = curl_exec($ch);
     $info   = curl_getinfo($ch);
@@ -89,8 +90,8 @@ function curl( $options, &$result, &$info=array() ) {
 ##############################################################################
 
 // Command line parameters
-// -f is undocumentd and forces run, ignore actual minute
-extract(getopt('c:vtfh'), EXTR_PREFIX_ALL, 'param');
+// -i is undocumentd and ignore minutes interval, run always
+extract(getopt('c:ivth'), EXTR_PREFIX_ALL, 'param');
 
 if (isset($param_h)) usage();
 
@@ -112,7 +113,7 @@ clearstatcache();
  */
 define('DS',       DIRECTORY_SEPARATOR);
 define('BASE_DIR', dirname(__FILE__));
-define('ROOT_DIR', BASE_DIR);
+define('ROOT_DIR', dirname(BASE_DIR));
 define('CONF_DIR', ROOT_DIR . DS . 'config');
 define('CORE_DIR', ROOT_DIR . DS . 'core');
 define('LIB_DIR',  ROOT_DIR . DS . 'lib');
@@ -244,7 +245,7 @@ try {
     if ($section['enabled'] === TRUE OR
         TESTMODE AND $section['enabled'] === 0) {
         // Run in test mode at any minute or if forced flag was set...
-        if (TESTMODE OR isset($param_f) OR $minute % $section['runeach'] == 0) {
+        if (TESTMODE OR isset($param_i) OR $minute % $section['runeach'] == 0) {
             $file = ROOT_DIR . DS . 'cron' . DS . $section['handler'] . '.php';
             // Check for file exists only during test, in live don't check anymore
             if (TESTMODE AND !file_exists($file)) {

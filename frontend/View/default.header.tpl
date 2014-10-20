@@ -9,10 +9,10 @@
  */
 -->
 
-<div id="header">
-    <div class="grid_2 s">
+<div id="header" class="grid_10">
+    <div class="grid_2 alpha s">
         <a class="fl" href="/">
-            <img style="width:100px;height:60px" src="/images/logo.png">
+            <img style="width:75px;height:45px" src="/images/logo.png">
         </a>
         <div class="b" style="margin-left:120px">
             <!-- IF {USER} AND {DEVELOPMENT} -->
@@ -28,15 +28,13 @@
         </div>
     </div>
     <div class="grid_4 c">
-        <h3 style="margin-bottom:0">{SUBTITLE}</h3>
+        <h3 style="margin-top:.5em;margin-bottom:0">{SUBTITLE}</h3>
     </div>
-    <div class="grid_4 r">
+    <div class="r">
         <span id="title1">{TITLE}</span>
-        <br /><br />
         <!-- IF {USER} AND {TOKEN} -->
-            <a href="/login/{TOKEN}" class="tip" title="{{LoginToken}}">&bull;</a>
-        <!-- ELSE -->
-            &nbsp;
+        <br /><a href="/login/{TOKEN}" class="tip" title="{{LoginToken}}">&bull;</a>
         <!-- ENDIF -->
     </div>
+    <div class="clear"></div>
 </div>

@@ -100,7 +100,7 @@ class Admin extends \Controller {
         if ($this->view->Ok) {
             \Messages::Success(__('PasswordSaved'));
             \Session::set('User', TRUE);
-            $this->app->redirect('/location');
+            $this->app->redirect('/');
         }
     }
 

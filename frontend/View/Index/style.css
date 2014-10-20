@@ -50,6 +50,13 @@
     vertical-align: middle;
 }
 
+#d-time-slider {
+    float: left;
+    margin-left: 2em;
+    margin-top: .5em;
+    width: 9em;
+}
+
 #td-axis .iradio_flat {
     margin-right: 3px;
 }

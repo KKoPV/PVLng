@@ -49,6 +49,11 @@
         <td>
             <a href="/channel/edit/{ID}" class="ico node-design"></a>
             <a href="/channel/add/{ID}" class="ico node-select-child"></a>
+            <!-- IF {READ} -->
+                <a href="/list/{ID}" class="ico document-invoice"></a>
+            <!-- ELSE -->
+                <i class="ico pix"></i>
+            <!-- ENDIF -->
             <!-- IF {TREE} -->
                 <!-- Can't delete channels assigned in channel hierarchy -->
                 <i class="ico pix"></i>
@@ -89,6 +94,7 @@
         <i class="ico drive--arrow"></i>{{ReadableEntity}}<br />
         <i class="ico node-design"></i>{{EditEntity}}<br />
         <i class="ico node-select-child"></i>{{CloneEntity}}<br />
+        <i class="ico document-invoice"></i>{{ListHint}}<br />
         <i class="ico node-delete"></i>{{DeleteEntityHint}}<br />
         <i class="ico license-key"></i>{{ShowGUID}}
     </div>

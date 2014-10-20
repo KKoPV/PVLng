@@ -2,10 +2,10 @@ Usage
 -----
 
     1st include common function definitions once per page (inside body tag, NOT in head tag):
-        <script src="http://your.domain.here/widget.inc.js"></script>
+        <script src="http://your.domain.here/widget/inc/js"></script>
 
     2nd include widget script for each chart
-        <script src="http://your.domain.here/widget.js?guid=<channel GUID>[&period=0][&with=320][&height=200][&color=#2F7ED8][&area=false][&lables=true]"></script>
+        <script src="http://your.domain.here/widget/js?guid=<channel GUID>[&period=0][&with=320][&height=200][&color=#2F7ED8][&area=false][&lables=true]"></script>
 
 Parameters
 ----------

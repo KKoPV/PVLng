@@ -42,6 +42,8 @@ function presentation( data ) {
     this.all = false;
     this.time1 = '00:00';
     this.time2 = '24:00';
+    this.daylight = false;
+    this.daylight_grace = 0;
     this.legend = true;
     this.position = 0;
     this.hidden = false;

@@ -109,7 +109,6 @@ img.tip-top {
 --------------------------------------------------------------------------- */
 #header {
     margin-top: .5em;
-    margin-bottom: .5em;
 }
 
 #title1 {
@@ -308,7 +307,6 @@ tt {
 }
 
 .alias {
-    color: gray;
     font-style: italic;
 }
 

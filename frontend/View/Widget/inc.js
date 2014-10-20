@@ -7,14 +7,14 @@
  * @version     1.0.0
  */
 
-function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $labels, $time1, $time2 ) {
+function _pvlng_chart( $uid, $width, $height, $data, $text, $area, $color, $labels, $time1, $time2 ) {
 
     new Highcharts.Chart({
-        credits: { enabled: false },
-        legend: { enabled: false },
-        tooltip: { enabled: false },
+        credits: false,
+        legend: false,
+        tooltip: false,
         chart: {
-            renderTo: $chart,
+            renderTo: 'pvlng-chart-'+$uid,
             margin: [ $labels ? 5 : 0, 0, 17, $labels ? null : 0 ]
         },
         title: { text: '' }, /* Hide title at all */
@@ -25,12 +25,12 @@ function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $la
             y: $height - 12
         },
         xAxis: [{
-            title: { enabled: false },
+            title: false,
             labels: { enabled: false },
             tickLength: 0
         }],
         yAxis: [{
-            title: { enabled: false },
+            title: false,
             labels: { enabled: $labels },
             gridLineWidth: $labels,
             minPadding: 0.001,
@@ -63,7 +63,7 @@ function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $la
     div.style.textAlign = 'right';
     div.style.width = $width+'px';
 
-    /* powered by link */
+    /* powered by */
     var a = document.createElement('a');
     a.setAttribute('href', 'http://pvlng.com');
     a.appendChild(document.createTextNode('powered by PVLng.com'));
@@ -74,8 +74,7 @@ function _pvlng_chart( $chart, $width, $height, $data, $text, $area, $color, $la
     div.appendChild(a);
 
     /* Insert AFTER chart */
-    var chart = document.getElementById($chart);
-    chart.parentNode.insertBefore(div, chart.nextSibling);
+    document.getElementById('pvlng-widget-'+$uid).appendChild(div);
 
 }
 

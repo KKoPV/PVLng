@@ -67,6 +67,10 @@
                  class="def tip" alt="tipTip"
                  title="TipTip is a very lightweight and intelligent custom tooltip jQuery plugin.">
         </a>
+        <a href="http://pvlng.com/Contributions" target="_blank">
+            <img src="/images/pix.gif" data-src="/images/plus-white.png"
+                 class="def tip" style="width:16px" alt="more" title="More contributions">
+        </a>
     </div>
 </div>
 </div>
