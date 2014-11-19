@@ -7,10 +7,9 @@
  * You can use any grid from http://960.gs - WITH 10 COLUMNS!
  */
 body {
-    font-family: Verdana, Arial, sans-serif;
     max-width: 1200px;
     margin: 0 auto;
-    font-size: 90%;
+    font-family: Verdana, Arial, sans-serif;
 }
 
 #content {
@@ -100,9 +99,9 @@ img.tip-top {
 .chart-tooltips {
     width: auto !important;
     padding: .3em !important;
+    background-color: rgb(255,255,200) !important;
     font-family: Verdana, Arial, sans-serif !important;
     font-size: 85% !important;
-    background-color: rgb(255,255,200) !important;
 }
 
 /* Header
@@ -133,7 +132,6 @@ img.tip-top {
 /* SmartMenu config - instance specific stuff not covered in the theme */
 .sm {
   position: relative;
-  z-index: 9999;
   width: auto;
 }
 .sm ul {
