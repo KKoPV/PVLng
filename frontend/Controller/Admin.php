@@ -141,28 +141,6 @@ class Admin extends \Controller {
     /**
      *
      */
-    public function ConfigPOST_Action() {
-        foreach ($this->request->post('c') as $key=>$value) {
-            $q = \DBQuery::forge()->update('pvlng_config')
-                 ->set('value', $value)->whereEQ('key', $key)->limit(1);
-            $this->db->query($q);
-        }
-        \Messages::success(__('DataSaved'));
-    }
-
-    /**
-     *
-     */
-    public function Config_Action() {
-        $this->view->SubTitle = __('Configuration');
-
-        $q = \DBQuery::forge('pvlng_config')->whereNE('type');
-        $this->view->Data = $this->db->queryRows($q);
-    }
-
-    /**
-     *
-     */
     public function ClearcachePOST_Action() {
         $info = $this->app->cache->info();
         if ($this->request->post('tpl')) {

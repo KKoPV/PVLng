@@ -26,7 +26,7 @@
 
 <!-- Wrap menu widget for correct with calulation -->
 <div id="menu" class="grid_10">
-    <div class="ui-widget-header ui-corner-all" style="height:34px">
+    <div class="ui-widget-header ui-corner-all" style="height:35px">
         <div class="fl">
             <ul class="sm sm-clean">
                 <!-- BEGIN MENU -->

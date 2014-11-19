@@ -43,7 +43,7 @@
 
 <div class="clear"></div>
 
-<div id="nav" class="ui-widget-header ui-corner-all" style="padding:4px;height:34px;margin:.5em 0">
+<div id="nav" class="ui-widget-header ui-corner-all" style="padding:4px;height:32px;margin:.5em 0">
     <div class="fl">
         <!-- INCLUDE dateselect.inc.tpl -->
     </div>

@@ -129,15 +129,15 @@
             <td class="not-bar not-scatter">
                 <!-- Align controls correct using a simple table ... -->
                 <table><tr>
-                <td style="padding-left:0">
+                <td style="padding-right:1em">
                     <input id="d-color-use-diff" class="iCheck" type="radio" name="color-pos-neg" value="0" checked="checked">
                     <label for="d-color-use-diff">{{no}}</label>
                 </td>
-                <td>
+                <td style="padding-right:1em">
                     <input id="d-color-pos" class="iCheck" type="radio" name="color-pos-neg" value="1">
                     <label for="d-color-pos">{{above}}</label>
                 </td>
-                <td>
+                <td style="padding-right:1em">
                     <input id="d-color-neg" class="iCheck" type="radio" name="color-pos-neg" value="-1">
                     <label for="d-color-neg">{{below}}</label>
                 </td>
@@ -168,10 +168,16 @@
         <tr>
             <td><label for="d-daylight">{{DuringDaylight}}</label></td>
             <td>
-                <div class="fl" style="margin-right:.5em">
+                <table><tr>
+                <td style="padding-right:1em">
                     <input id="d-daylight" type="checkbox" class="iCheck">
-                </div>
-                &plusmn; <input id="d-daylight-grace" type="text" style="text-align:right" size="3" disabled="disabled"> {{Minutes}}
+                </td>
+                <td>
+                    &plusmn;
+                    <input id="d-daylight-grace" type="number" style="text-align:right" size="3">
+                    &nbsp;{{Minutes}}
+                </td>
+                </tr></table>
             </td>
         </tr>
         <tr>

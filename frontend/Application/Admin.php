@@ -35,7 +35,6 @@ $app->map('/cc', $checkAuth, function() use ($app) {
     $app->process('Admin', 'Clearcache');
 })->via('GET', 'POST')->Language = 'en';
 
-$app->get('/bk', function() {
-    Header('Location: /public/bk/index.php');
-    exit;
+$app->get('/bk', function() use ($app) {
+    $app->redirect('/public/bk/index.php');
 });

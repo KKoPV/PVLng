@@ -12,6 +12,7 @@ namespace Channel;
 /**
  *
  */
+#class MeterToSensor extends InternalCalc {
 class MeterToSensor extends Channel {
 
     /**

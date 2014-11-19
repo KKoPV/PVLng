@@ -11,6 +11,6 @@
  * Basic menu structure
  */
 $app->hook('slim.before', function () use ($app) {
-    $app->menu->add('10', '#', 'MasterData');
+    $app->menu->add('10', '#', 'MasterData', !!$app->user);
     $app->menu->add('20', '#', 'Analysis');
 });

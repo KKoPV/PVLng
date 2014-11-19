@@ -98,7 +98,7 @@ $c = include __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'confi
 
 $c = $c['Database'];
 
-$db = new MySQLi($c['Host'], $c['Username'], $c['Password'], $c['Database'], $c['Port'], $c['Socket']);
+$db = new \MySQLi($c['Host'], $c['Username'], $c['Password'], $c['Database'], $c['Port'], $c['Socket']);
 
 if ($db->connect_error) die($db->connect_error);
 
@@ -111,8 +111,6 @@ $table = 'pvlng_reading_num';
 if ($dryrun) {
     e(0, 'Dry run, make no changes!');
 } else {
-    // Fetch Ids
-
     if ($testmode) {
         // For testing only: Work on a table copy
         $table = 'pvlng_reading_num_test_'.date('ymd_Hi');

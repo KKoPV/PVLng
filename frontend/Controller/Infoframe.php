@@ -44,29 +44,30 @@ class Infoframe extends \Controller {
             $this->app->redirect('/');
         }
 
-        $white = imagecolorallocate($im, 255, 255, 255);
-        $black = imagecolorallocate($im, 0, 0, 0);
-        $border = 3;
-
         foreach (include $config as $id=>$item) {
             $item = array_merge(
                 array(
-                    'guid'   => NULL,
-                    'start'  => '-5minutes',
-                    'period' => 'last',
-                    'font'   => 5,
-                    'label'  => '<Label '.$id.'?'.'>',
-                    'x'      => 0,
-                    'y'      => 0,
+                    'guid'    => NULL,
+                    'start'   => '-5minutes',
+                    'period'  => 'last',
+                    'font'    => 5,
+                    'label'   => '<Label '.$id.'?'.'>',
+                    'bgcolor' => NULL,
+                    'border'  => 3,
+                    'color'   => array(0, 0, 0),
+                    'x'       => 0,
+                    'y'       => 0,
                 ),
                 $item
             );
 
+            $bgcolor = $item['bgcolor'] ? imagecolorallocate($im, $item['bgcolor'][0], $item['bgcolor'][1], $item['bgcolor'][2]) : NULL;
+            $color   = imagecolorallocate($im, $item['color'][0], $item['color'][1], $item['color'][2]);
+
             if ($item['guid']) {
                 $value = \Channel::byGUID($item['guid'])
-                       ->read(array('start'=>$item['start'], 'period'=>$item['period']))
-                       ->rewind()
-                       ->current();
+                         ->read(array('start'=>$item['start'], 'period'=>$item['period']))
+                         ->rewind()->current();
                 $label = isset($value['data']) ? sprintf($item['label'], $value['data']) : '';
             } elseif ($item['label'] == '{DATETIME}') {
                 $label = date($this->config->get('Locale.DateTime'));
@@ -80,10 +81,12 @@ class Infoframe extends \Controller {
                 $font = $item['font'];
                 $x = $item['x'];
                 $y = $item['y'];
-                imagefilledrectangle($im, $x-$border, $y-$border,
-                                     $x+imagefontwidth($font)*strlen($label)+$border,
-                                     $y+imagefontheight($font)+$border, $white);
-                imagestring($im, $font, $x, $y, $label, $black);
+                if ($bgcolor) {
+                    imagefilledrectangle($im, $x-$item['border'], $y-$item['border'],
+                                         $x+imagefontwidth($font)*strlen($label)+$item['border'],
+                                         $y+imagefontheight($font)+$item['border'], $bgcolor);
+                }
+                imagestring($im, $font, $x, $y, $label, $color);
             }
         }
 

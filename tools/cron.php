@@ -64,7 +64,7 @@ function curl( $options, &$result, &$info=array() ) {
     $ch = curl_init();
 
     curl_setopt_array($ch, $options);
-    curl_setopt(CURLOPT_TIMEOUT, 20);
+    curl_setopt(CURLOPT_TIMEOUT, 30);
 
     $result = curl_exec($ch);
     $info   = curl_getinfo($ch);

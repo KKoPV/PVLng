@@ -39,7 +39,7 @@
 
     <!-- IF {DEVELOPMENT} -->
     <link rel="stylesheet" href="/css/normalize.css" />
-    <link rel="stylesheet" href="/css/jquery-ui.min.css" />
+    <link rel="stylesheet" href="/css/jquery-ui.css" />
     <link rel="stylesheet" href="/css/default.css" />
     <link rel="stylesheet" href="/css/grid.css" />
     <link rel="stylesheet" href="/css/jquery.dataTables.css" />
@@ -113,7 +113,7 @@
 
     </div>
 
-    <script src="//code.jquery.com/jquery-2.0.0.js"></script>
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
     <!-- load Highcharts scripts direct from highcharts.com -->
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script src="http://code.highcharts.com/highcharts-more.js"></script>
@@ -208,17 +208,13 @@
             }
 
             /* Deferred image loading */
-            $('img.def').each(function(i, el) {
-                el = $(el);
-                el.prop('src', el.data('src'));
-            });
+            $('img.def').prop('src', function() { return $(this).data('src') });
 
             pvlng.onFinished.run();
         });
     </script>
 
-    <!-- IF !{USER} -->
-        <!-- INCLUDE login.dialog.tpl -->
-    <!-- ENDIF -->
+    <!-- IF !{USER} --><!-- INCLUDE login.dialog.tpl --><!-- ENDIF -->
+    <!-- INCLUDE hook.end.tpl -->
 </body>
 </html>

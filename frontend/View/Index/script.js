@@ -50,6 +50,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
     chartOptions = {
         chart: {
             renderTo: 'chart',
+            style: { fontFamily: 'inherit' },
             alignTicks: false,
             zoomType: 'x',
             resetZoomButton: {
@@ -532,7 +533,8 @@ function updateChart( forceUpdate, scroll ) {
 
     chart.showLoading(chartLoading);
 
-    var series = [], costs = 0, date = new Date();
+    var series = [], costs = 0, date = new Date(),
+        today = ('0'+(date.getMonth()+1)).slice(-2) + '/' + ('0'+date.getDate()).slice(-2) + '/' + date.getFullYear();
 
     /* get data */
     $(channels_chart).each(function(id, channel) {
@@ -543,7 +545,7 @@ function updateChart( forceUpdate, scroll ) {
             start = fromDate,
             end = toDate + '+1day';
 
-        if (channel.daylight) {
+        if (channel.daylight && today == toDate) {
             start = 'sunrise;'+channel.daylight_grace;
             end = 'sunset;'+channel.daylight_grace;
         }
@@ -788,7 +790,7 @@ $.ajaxQ = (function() {
 
     $(document).ajaxSend(function(e, jqXHR, settings) {
         if (settings.url.indexOf('_canAbort') != -1) {
-            /* queue only channel data requests! */
+            /* Queue only channel data requests! */
             jqXHR._id = ++id;
             queue[jqXHR._id] = jqXHR;
         }
@@ -1009,7 +1011,6 @@ $(function() {
      */
     $("#dialog-chart").dialog({
         autoOpen: false,
-        position: [ null, 20 ],
         width: 750,
         modal: true,
         buttons: {
@@ -1126,10 +1127,11 @@ $(function() {
         /* Style slider handle to acceppt position text */
         .css({ width: '2em', marginLeft: '-1em', textDecoration: 'none', textAlign: 'center' })
         /* Insert separate span to style text */
-      .append($('<span/>').prop('id', 'd-position').css({ fontSize: 'xx-small', color: 'gray' }));
+        .append($('<span/>').prop('id', 'd-position').css({ fontSize: 'xx-small', color: 'gray' }));
 
     $('#d-daylight').on('ifToggled', function(e) {
-        $('#d-daylight-grace').prop('disabled', !$(this).is(':checked'));
+        var checked = !$(this).is(':checked');
+        $('#d-daylight-grace').prop('disabled', checked).spinner('option', 'disabled', checked);
     });
 
     $('input.iCheck').iCheck('update');
@@ -1140,16 +1142,14 @@ $(function() {
     });
 
     $('#btn-refresh').button({
-        icons: { primary: 'ui-icon-refresh' },
-        text: false
+        icons: { primary: 'ui-icon-refresh' }, text: false
     }).click(function(event) {
         event.preventDefault();
         updateChart(event.shiftKey);
     });
 
     $('#btn-permanent').button({
-        icons: { primary: 'ui-icon-image' },
-        text: false
+        icons: { primary: 'ui-icon-image' }, text: false
     });
 
     $('#btn-bookmark').button({

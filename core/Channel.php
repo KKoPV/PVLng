@@ -257,6 +257,7 @@ abstract class Channel {
 
         if ($this->numeric) {
             // Check that new value is inside the valid range
+
             if ((!is_null($this->valid_from) AND $this->value < $this->valid_from) OR
                 (!is_null($this->valid_to)   AND $this->value > $this->valid_to)) {
 
@@ -467,17 +468,7 @@ abstract class Channel {
             $offset = $last = 0;
 
             if ($res = $this->db->query($q)) {
-              /*
-                if ($this->meter) {
-                    if ($this->GroupingPeriod[$this->period[1]] > 0) {
-                        $row = $res->fetch_assoc();
-                        $offset = $row['data'];
-                    } else {
-                        $offset = 0;
-                    }
-                    $last = 0;
-                }
-              */
+
                 while ($row = $res->fetch_assoc()) {
 
                     $row['consumption'] = 0;
@@ -522,17 +513,7 @@ abstract class Channel {
     protected function filterReadTimestamp( &$q ) {
         if ($this->period[1] != self::ALL) {
             // Time is only relevant for period != ALL
-            if ($this->start) {
-                if (!$this->meter) {
-                    $q->filter('timestamp', array('min'=>$this->start));
-                } else {
-                    // Fetch also period before start for correct consumption calculation!
-                    $q->filter('timestamp', array('min'=>$this->start-$this->GroupingPeriod[$this->period[1]]));
-                }
-            }
-       #     if ($this->end < time()) {
-                $q->filter('timestamp', array('max'=>$this->end-1));
-       #     }
+            $q->filter('timestamp', array('bt' => array($this->start, $this->end-1)));
         }
     }
 

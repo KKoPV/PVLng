@@ -13,7 +13,7 @@
 <input type="hidden" id="todate" />
 
 <div id="nav" class="ui-widget-header ui-corner-all"
-     style="padding:4px;height:34px;<!-- IF {EMBEDDED} == "2" -->;display:none<!-- ENDIF -->">
+     style="padding:4px;height:32px;<!-- IF {EMBEDDED} == "2" -->;display:none<!-- ENDIF -->">
 
     <div class="alpha grid_4">
         <!-- INCLUDE dateselect.inc.tpl -->

@@ -45,7 +45,7 @@
     background-color: #E8E8E8;
 }
 
-#d-table td {
+#d-table > tbody > tr > td {
     padding: .5em .5em;
     vertical-align: middle;
 }
