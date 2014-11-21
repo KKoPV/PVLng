@@ -28,9 +28,7 @@ $api->map('/hash', function() use ($api) {
 })->via('GET', 'POST')->name('hash')->help = array(
     'since'       => 'r3',
     'description' => 'Create MD5 and SHA1 hashes and a slug for the given text',
-    'parameters'  => array(
-        'text' => array(
-            'description' => 'Text to make hashes for'
-        )
+    'payload'  => array(
+        'text' => 'Text to make hashes for'
     )
 );
