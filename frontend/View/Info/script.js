@@ -25,6 +25,8 @@ $(function() {
         bSort: false
     });
 
+    $('#table-db').DataTable();
+
     $('#regenerate').click(function() {
         /* Replace text, make bold red and unbind this click handler */
         $(this).val("{{Sure}}?").css('fontWeight','bold').css('color','red').unbind();
@@ -46,10 +48,6 @@ $(function() {
     });
 
     $('#table-stats').DataTable({
-        bLengthChange: false,
-        bFilter: false,
-        bInfo: false,
-        bPaginate: false,
         aoColumns: [
             null,
             null,
@@ -68,12 +66,13 @@ $(function() {
 
     $.get(PVLngAPI + '../version', function(data) { $('#latest').text(data) });
 
-    /* Load charts on Tab activation, not before */
-    var tabs2 = tabs3 = tabs4 = false;
-
     $('.ui-tabs').on('tabsactivate', function(e, ui) {
-        if (ui.newPanel.selector == '#tabs-2' && !tabs2) {
-            tabs2 = true;
+        if (ui.newPanel.hasClass('panel-loaded')) return;
+
+        switch (ui.newPanel.selector) {
+
+        case '#tabs-2':
+
             var options = ChartOptions;
             options.series[0].data = [
                 <!-- BEGIN STATS --><!-- IF {READINGS} -->
@@ -118,8 +117,10 @@ $(function() {
                     $(el).html('<small>'+jqXHR.responseJSON.message+'</small>').addClass('fail');
                 });
             });
-        } else if (ui.newPanel.selector == '#tabs-3' && !tabs3) {
-            tabs3 = true;
+            break;
+
+        case '#tabs-3':
+
             var options = ChartOptions;
             options.series[0].data = [
                 ['{{DatabaseSize}}', {DATABASESIZE}],
@@ -135,8 +136,10 @@ $(function() {
 
             /* Use width of 1st visible tab container (#tab-1) to set chart width */
             $('#db-chart').width($('#tabs-1').width()).highcharts(options);
-        } else if (ui.newPanel.selector == '#tabs-4' && !tabs4) {
-            tabs4 = true;
+            break;
+
+        case '#tabs-4':
+
             var hits = {raw:CACHEHITS}, misses = {raw:CACHEMISSES};
 
             if (!hits || !misses) {
@@ -160,6 +163,8 @@ $(function() {
             /* Use width of 1st visible tab container (#tab-1) to set chart width */
             $('#cache-chart').width($('#tabs-1').width()).show().highcharts(options);
         }
+
+        ui.newPanel.addClass('panel-loaded');
     });
 });
 </script>

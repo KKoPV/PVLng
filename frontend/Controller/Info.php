@@ -48,6 +48,17 @@ class Info extends \Controller {
 
         $this->view->Stats = (new \ORM\ReadingStatistics)->find()->asAssoc();
 
+        $this->view->TableSize = $this->db->queryRowsArray('
+            SELECT `table_name`
+                 , `table_comment`
+                 , `table_rows`
+                 , ROUND((`data_length` + `index_length`)/1024/1024, 2) AS `size_mb`
+              FROM `information_schema`.`TABLES`
+             WHERE `table_type` = "BASE TABLE"
+               AND `table_schema` = "'.$this->config->get('Database.Database').'"
+               AND `table_name` LIKE "pvlng_%"
+        ');
+
         $this->view->CacheInfo   = $this->app->cache->info();
         $this->view->CacheHits   = $this->app->cache->getHits();
         $this->view->CacheMisses = $this->app->cache->getMisses();

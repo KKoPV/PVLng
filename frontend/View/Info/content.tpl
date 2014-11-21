@@ -111,6 +111,35 @@
 
         <div id="db-chart" style="height:250px"></div>
 
+        <table id="table-db">
+            <thead>
+            <tr>
+                <th class="l">{{DatabaseTable}}</th>
+                <th class="l">{{Comment}}</th>
+                <th class="r">{{Rows}}</th>
+                <th class="r">{{Size}} [MB]</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- BEGIN TABLESIZE -->
+            <tr>
+                <td>{TABLE_NAME}</td>
+                <td>{TABLE_COMMENT}</td>
+                <td class="r">{TABLE_ROWS}</td>
+                <td class="r">{SIZE_MB}</td>
+            </tr>
+            <!-- END -->
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <th colspan="4"></th>
+            </tr>
+            </tfoot>
+
+        </table>
+
     </div>
 
     <div id="tabs-4">
