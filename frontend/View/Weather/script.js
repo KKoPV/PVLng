@@ -115,7 +115,7 @@ $(function() {
                 html.add(
                     html.td($('<img/>').prop('src', data.icon_url)).css({ padding: '0 5px' }),
                     html.td(data.date.weekday_short),
-                    html.td(data.low.celsius+'-'+data.high.celsius, true),
+                    html.td(data.low.celsius+' - '+data.high.celsius, true),
                     html.td()
                 );
             });
