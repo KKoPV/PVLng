@@ -71,98 +71,97 @@ $(function() {
 
         switch (ui.newPanel.selector) {
 
-        case '#tabs-2':
+            case '#tabs-2':
 
-            var options = ChartOptions;
-            options.series[0].data = [
-                <!-- BEGIN STATS --><!-- IF {READINGS} -->
-                ["{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->", {raw:READINGS}],
-                <!-- ENDIF --><!-- END -->
-            ];
+                var options = ChartOptions;
+                options.series[0].data = [
+                    <!-- BEGIN STATS --><!-- IF {READINGS} -->
+                    ["{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->", {raw:READINGS}],
+                    <!-- ENDIF --><!-- END -->
+                ];
 
-            if (options.series[0].data.length == 0) {
-                $('#stats-chart').hide();
-                return;
-            }
+                if (!options.series[0].data.length) {
+                    $('#stats-chart').hide();
+                } else {
+                    options.plotOptions.pie.dataLabels.formatter = function() {
+                        return '<b>'+this.point.name+'</b>: '
+                             + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
+                             + ' ('
+                             + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                             + ' %)'
+                    };
 
-            options.plotOptions.pie.dataLabels.formatter = function() {
-                return '<b>'+this.point.name+'</b>: '
-                     + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
-                     + ' ('
-                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
-                     + ' %)'
-            };
+                    $('.last-reading', '#table-stats').each(function(id, el) {
+                        $.getJSON(
+                            PVLngAPI + 'data/' + $(el).data('guid') + '.json',
+                            {
+                                attributes: true, /* need decimals for formating */
+                                period:     'readlast'
+                            },
+                            function(data) {
+                                if (data.length < 2) return;
+                                var attr = data.shift(), val;
+                                if (attr.numeric) {
+                                    $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
+                                } else {
+                                    $(el).html(data[0].data != "" ? data[0].data : '<empty>');
+                                }
+                                $(el).addClass('ok');
+                            }
+                        ).fail(function(jqXHR) {
+                            $(el).html('<small>'+jqXHR.responseJSON.message+'</small>').addClass('fail');
+                        });
+                    });
 
-            /* Use width of 1st visible tab container (#tab-1) to set chart width */
-            $('#stats-chart').width($('#tabs-1').width()).highcharts(options);
+                    /* Use width of 1st visible tab container (#tab-1) to set chart width */
+                    $('#stats-chart').width($('#tabs-1').width()).highcharts(options);
+                }
+                break;
 
-            $('.last-reading', '#table-stats').each(function(id, el) {
-                $.getJSON(
-                    PVLngAPI + 'data/' + $(el).data('guid') + '.json',
-                    {
-                        attributes: true, /* need decimals for formating */
-                        period:     'readlast'
-                    },
-                    function(data) {
-                        if (data.length < 2) return;
-                        var attr = data.shift(), val;
-                        if (attr.numeric) {
-                            $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
-                        } else {
-                            $(el).html(data[0].data != "" ? data[0].data : '<empty>');
-                        }
-                        $(el).addClass('ok');
-                    }
-                ).fail(function(jqXHR) {
-                    $(el).html('<small>'+jqXHR.responseJSON.message+'</small>').addClass('fail');
-                });
-            });
-            break;
+            case '#tabs-3':
 
-        case '#tabs-3':
+                var options = ChartOptions;
+                options.series[0].data = [
+                    ['{{DatabaseSize}}', {DATABASESIZE}],
+                    ['{{DatabaseFree}}', {DATABASEFREE}]
+                ];
+                options.plotOptions.pie.dataLabels.formatter = function() {
+                    return '<b>'+this.point.name+'</b>: '
+                         + Highcharts.numberFormat(this.point.y, 1, DecimalSeparator, ThousandSeparator)
+                         + ' MB ('
+                         + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                         + ' %)'
+                };
 
-            var options = ChartOptions;
-            options.series[0].data = [
-                ['{{DatabaseSize}}', {DATABASESIZE}],
-                ['{{DatabaseFree}}', {DATABASEFREE}]
-            ];
-            options.plotOptions.pie.dataLabels.formatter = function() {
-                return '<b>'+this.point.name+'</b>: '
-                     + Highcharts.numberFormat(this.point.y, 1, DecimalSeparator, ThousandSeparator)
-                     + ' MB ('
-                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
-                     + ' %)'
-            };
+                /* Use width of 1st visible tab container (#tab-1) to set chart width */
+                $('#db-chart').width($('#tabs-1').width()).highcharts(options);
+                break;
 
-            /* Use width of 1st visible tab container (#tab-1) to set chart width */
-            $('#db-chart').width($('#tabs-1').width()).highcharts(options);
-            break;
+            case '#tabs-4':
 
-        case '#tabs-4':
+                var hits = {raw:CACHEHITS}, misses = {raw:CACHEMISSES};
 
-            var hits = {raw:CACHEHITS}, misses = {raw:CACHEMISSES};
+                if (!hits || !misses) {
+                    $('#cache-chart').hide();
+                } else {
+                    var options = ChartOptions;
+                    options.series[0].data = [
+                        ['{{CacheHits}}',   hits],
+                        ['{{CacheMisses}}', misses]
+                    ];
+                    options.plotOptions.pie.dataLabels.formatter = function() {
+                        return '<b>'+this.point.name+'</b>: '
+                             + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
+                             + ' ('
+                             + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                             + ' %)'
+                    };
 
-            if (!hits || !misses) {
-                $('#cache-chart').hide();
-                return;
-            }
+                    /* Use width of 1st visible tab container (#tab-1) to set chart width */
+                    $('#cache-chart').width($('#tabs-1').width()).show().highcharts(options);
+                }
 
-            var options = ChartOptions;
-            options.series[0].data = [
-                ['{{CacheHits}}',   hits],
-                ['{{CacheMisses}}', misses]
-            ];
-            options.plotOptions.pie.dataLabels.formatter = function() {
-                return '<b>'+this.point.name+'</b>: '
-                     + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
-                     + ' ('
-                     + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
-                     + ' %)'
-            };
-
-            /* Use width of 1st visible tab container (#tab-1) to set chart width */
-            $('#cache-chart').width($('#tabs-1').width()).show().highcharts(options);
-        }
+        } /* switch */
 
         ui.newPanel.addClass('panel-loaded');
     });
