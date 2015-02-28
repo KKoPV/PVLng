@@ -1,4 +1,20 @@
 /**
+ * Helper functions for charting
+ *
+ * @author        Knut Kohl <github@knutkohl.de>
+ * @copyright     2012-2013 Knut Kohl
+ * @license       GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @version       1.1.0
+ *
+ * 1.1.0
+ * - Since HighCharts 4.1.1 have labels by default a text shadow,
+ *   disable for min/max/last labels
+ *
+ * 1.0.0
+ * - Initial creation
+ */
+
+/**
  *
  */
 var presentation_defaults = {
@@ -170,7 +186,7 @@ function setMinMax( serie, channel ) {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
             color: color,
-            style: { fontWeight: 'bold' },
+            style: { fontWeight: 'bold', textShadow: null },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,
@@ -195,7 +211,7 @@ function setMinMax( serie, channel ) {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
             color: color,
-            style: { fontWeight: 'bold' },
+            style: { fontWeight: 'bold', textShadow: null },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,
@@ -223,7 +239,7 @@ function setMinMax( serie, channel ) {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
             color: color,
-            style: { fontWeight: 'bold' },
+            style: { fontWeight: 'bold', textShadow: null },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,

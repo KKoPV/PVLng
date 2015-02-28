@@ -1,11 +1,10 @@
 /**
- *
+ * Some common scripts
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
- * @revision    $Rev$
  */
 
 console.time('Duration');
@@ -23,25 +22,32 @@ $.fn.autoWidth = function(options) {
     this.each(function() {
         maxWidth = Math.max($(this).width(), maxWidth);
     });
+
     this.css('display', 'inline-block').width(maxWidth + settings.marginRight);
 };
 
 /**
- * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+ * Idea from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
  */
-$.extend({
-    parseQueryString: function() {
-        var qs = window.location.search.replace('?', '');
-        if (qs == '') return {};
-        result = {};
-        $.each(qs.split('&'), function(i, v){
-            var pair = v.split('=');
-            /* decodeURI doesn't work for the date strings :-( */
-            result[pair[0]] = (pair.length > 1) ? pair[1].replace(/%2F/g, '/') : '';
+$.parseQueryString = function() {
+    var qs;
+    result = {};
+    if (qs = window.location.search.replace('?', '')) {
+        $.each(qs.split('&'), function(id, data) {
+            var v = data.split('=');
+            if (v.length == 2) result[v[0]] = decodeURIComponent(v[1]);
         });
-        return result;
     }
-});
+    return result;
+};
+
+/**
+ * Display wait cursor for whole page
+ */
+$.wait = function(show) {
+    if (typeof show === 'undefined') show = true;
+    $('html').css('cursor', show ? 'wait' : 'default');
+};
 
 /**
  *
@@ -177,6 +183,9 @@ $(function() {
     shortcut.add('Alt+L',    function() { window.location = '/logout'; });
 });
 
+/**
+ *
+ */
 var timer, verbose = false;
 
 /**

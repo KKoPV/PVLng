@@ -10,6 +10,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     font-family: Verdana, Arial, sans-serif;
+    font-size: 90%;
 }
 
 #content {
@@ -231,7 +232,7 @@ td.imgbar {
 
 .wait,
 .wait * {
-    cursor: wait !important;
+    cursor: progress !important;
 }
 
 .textarea-transition {
