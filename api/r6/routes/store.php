@@ -20,7 +20,7 @@ $api->put('/store/:key', $APIkeyRequired, function($key) use ($api) {
     // Set HTTP code 201 for "created"
     $api->response->setStatus(201);
 })->name('PUT /store/:key')->help = array(
-    'since'       => 'r5',
+    'since'       => 'r6',
     'description' => 'Save a value for a key',
     'apikey'      => TRUE,
     'payload'     => '["<data>"]'
@@ -32,7 +32,7 @@ $api->put('/store/:key', $APIkeyRequired, function($key) use ($api) {
 $api->get('/store/:key', $APIkeyRequired, function($key) use ($api) {
     $api->render(array($key => $api->db->get('API-'.strtolower($key))));
 })->name('GET /store/:key')->help = array(
-    'since'       => 'r5',
+    'since'       => 'r6',
     'description' => 'Retrieve a value for a key',
     'apikey'      => TRUE
 );

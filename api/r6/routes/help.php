@@ -18,7 +18,7 @@ $api->any('/help', function() use ($api, $version) {
         $pattern = $route->getPattern();
 
         $help = array(
-            'pattern'     => $api->request()->getRootUri() . $pattern,
+            'pattern'     => str_replace('latest', $version, $api->request()->getRootUri()) . $pattern,
             'methods'     => implode(', ', $route->getHttpMethods()),
             'since'       => 'r1',
             'description' => $route->getName(),
@@ -59,7 +59,7 @@ $api->any('/helphtml', function() use ($api, $version) {
         $pattern = $route->getPattern();
 
         $help = array(
-            'uri'         => $api->request()->getRootUri() . $pattern,
+            'uri'         => str_replace('latest', $version, $api->request()->getRootUri()) . $pattern,
             'pattern'     => substr($pattern, 1),
             'methods'     => '['.implode('|', $route->getHttpMethods()).']',
             'since'       => 'r1',
