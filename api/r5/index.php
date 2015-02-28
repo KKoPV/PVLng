@@ -8,6 +8,18 @@
  * @version    1.0.0
  */
 
+define('DEVELOP', (isset($_SERVER['HTTP_X_PVLNG_TRACE']) AND $_SERVER['HTTP_X_PVLNG_TRACE']));
+
+if (DEVELOP) {
+    ini_set('display_startup_errors', 1);
+    ini_set('display_errors', 1);
+    error_reporting(-1);
+} else {
+    ini_set('display_startup_errors', 0);
+    ini_set('display_errors', 0);
+    error_reporting(0);
+}
+
 /**
  * Directories
  */
@@ -29,16 +41,6 @@ define('PVLNG_VERSION_DATE', $version[1]);
  */
 setlocale(LC_NUMERIC, 'C');
 
-if ($dev = file_exists(ROOT_DIR . DS . '.develop')) {
-    ini_set('display_startup_errors', 1);
-    ini_set('display_errors', 1);
-    error_reporting(-1);
-} else {
-    ini_set('display_startup_errors', 0);
-    ini_set('display_errors', 0);
-    error_reporting(0);
-}
-
 file_exists(BASE_DIR.DS.'prepend.php') && include BASE_DIR.DS.'prepend.php';
 
 /**
@@ -56,8 +58,8 @@ Loader::register(
 );
 
 $api = new API(array(
-    'mode'      => $dev ? 'development' : 'production',
-    'log.level' => $dev ? Slim\Log::INFO : Slim\Log::ALERT,
+    'mode'      => DEVELOP ? 'development' : 'production',
+    'log.level' => DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
     'debug'     => FALSE, // No debug mode at all
     'view'      => new View
 ));
@@ -183,22 +185,10 @@ $api->hook('slim.before', function() use ($api) {
     }
 });
 
-class TimerMiddleware extends Slim\Middleware {
-    public function call() {
-        $app = $this->app;
-        $this->time = microtime(TRUE);
-        $this->next->call();
-        $this->time = microtime(TRUE) - $this->time;
-        $headers = $app->Response()->Headers();
-        $headers->set('X-Time',    sprintf('%.1f ms', $this->time*1000));
-        $headers->set('X-Queries', $app->db->getQueryCount());
-        $headers->set('X-Memory',  sprintf('%d kByte', memory_get_peak_usage(TRUE)/1024));
-        $headers->set('X-Version', PVLNG_VERSION);
-        $headers->set('X-API',     $app->version);
-    }
-    protected $time;
-}
-$api->add(new TimerMiddleware);
+/**
+ * Debugging middleware
+ */
+DEVELOP && include BASE_DIR.DS.'develop.php';
 
 // ---------------------------------------------------------------------------
 // The helper functions
@@ -320,9 +310,13 @@ function SaveCSVdata( $guid, $rows, $sep ) {
 // Declare default conditions before routes
 // ---------------------------------------------------------------------------
 Slim\Route::setDefaultConditions(array(
-    'guid' => '(\w{4}-){7}\w{4}',
-    'id'   => '\d+',
-    'slug' => '[@\w\d-]+'
+    'date'      => '\d{4}-\d{2}-\d{2}',
+    'guid'      => '(\w{4}-){7}\w{4}',
+    'id'        => '\d+',
+    'latitude'  => '[\d.-]+',
+    'longitude' => '[\d.-]+',
+    'offset'    => '\d+',
+    'slug'      => '[@\w\d-]+',
 ));
 
 // ---------------------------------------------------------------------------

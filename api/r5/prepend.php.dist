@@ -13,4 +13,4 @@
  *
  * http://newrelic.com/monitor-everything
  */
-// if (extension_loaded('newrelic')) newrelic_set_appname('PVLng-API-r4');
+// if (extension_loaded('newrelic')) newrelic_set_appname('PVLng-API');

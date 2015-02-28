@@ -14,10 +14,13 @@
 $api->get('/channels', function() use ($api) {
     $channels = array();
     foreach ((new ORM\ChannelView)->find() as $channel) {
-        if ($api->APIKeyValid OR $channel->public) $channels[$channel->id] = $channel->asAssoc();
+        if (!$channel->guid OR (!$api->APIKeyValid AND !$channel->public)) continue;
+        $ch = $channel->asAssoc();
+        unset($ch['id']);
+        $channels[$channel->id] = $ch;
     }
     ksort($channels);
-    $api->render($channels);
+    $api->render(array_values($channels));
 })->name('GET /channels')->help = array(
     'since'       => 'r3',
     'description' => 'Fetch all channels',
@@ -38,13 +41,58 @@ $api->get('/channel/:guid', $accessibleChannel, function($guid) use ($api) {
 /**
  *
  */
+$api->get('/channel/:guid/stats', $accessibleChannel, function($guid) use ($api) {
+    $channel = Channel::byGUID($guid);
+
+    $result = $api->boolParam('attributes', FALSE)
+            ? $channel->getAttributes()
+            : array('guid' => $channel->guid);
+
+    if ($channel->numeric) {
+        $q = new DBQuery('pvlng_reading_num');
+        $q->get($q->MIN('timestamp'), 'timestamp_first')
+          ->get($q->MAX('timestamp'), 'timestamp_last')
+          ->get($q->COUNT('id'), 'readings')
+          ->get($q->MIN('data'), 'min')
+          ->get($q->MAX('data'), 'max')
+          ->get($q->AVG('data'), 'avg')
+          ->whereEQ('id', $channel->entity);
+    } else {
+        $q = new DBQuery('pvlng_reading_str');
+        $q->get($q->MIN('timestamp'), 'timestamp_first')
+          ->get($q->MAX('timestamp'), 'timestamp_last')
+          ->get($q->COUNT('id'), 'readings')
+          ->whereEQ('id', $channel->entity);
+    }
+    $result = $result + $api->db->queryRowArray($q);
+    if ($result['timestamp_last']) {
+        $q->reset();
+        $q->get('data', 'last')
+          ->whereEQ('id', $channel->entity)
+          ->whereEQ('timestamp', $result['timestamp_last']);
+        $result = $result + $api->db->queryRowArray($q);
+    } else {
+        $result['last'] = NULL;
+    }
+
+    $api->render($result);
+})->conditions(array(
+    'attribute' => '\w+'
+))->name('GET /channel/:guid/stats')->help = array(
+    'since'       => 'r5',
+    'description' => 'Fetch channel statistics',
+);
+
+/**
+ *
+ */
 $api->get('/channel/:guid/:attribute', $accessibleChannel, function($guid, $attribute) use ($api) {
     $api->render(Channel::byGUID($guid)->getAttributes($attribute));
 })->conditions(array(
     'attribute' => '\w+'
 ))->name('GET /channel/:guid/:attribute')->help = array(
     'since'       => 'r3',
-    'description' => 'Fetch all channel attributes or specific channel attribute',
+    'description' => 'Fetch specific channel attribute',
 );
 
 /**

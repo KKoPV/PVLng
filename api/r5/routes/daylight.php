@@ -17,9 +17,7 @@ $api->get('/sunrise(/:date)', $checkLocation, function($date=NULL) use ($api) {
         'sunrise' =>
         date_sunrise($date, SUNFUNCS_RET_TIMESTAMP, $api->Latitude, $api->Longitude, 90, date('Z')/3600)
     ));
-})->conditions(array(
-    'date' => '\d{4}-\d{2}-\d{2}'
-))->name('sunrise intern')->help = array(
+})->name('/sunrise(/:date)')->help = array(
     'since'       => 'r3',
     'description' => 'Get sunrise of day, using configured loaction'
 );
@@ -33,11 +31,7 @@ $api->get('/sunrise/:latitude/:longitude(/:date)', function($latitude, $longitud
         'sunrise' =>
         date_sunrise($date, SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600)
     ));
-})->conditions(array(
-    'latitude'  => '[\d.-]+',
-    'longitude' => '[\d.-]+',
-    'date'      => '\d{4}-\d{2}-\d{2}'
-))->name('sunrise')->help = array(
+})->name('/sunrise/:latitude/:longitude(/:date)')->help = array(
     'since'       => 'r3',
     'description' => 'Get sunrise for location and day'
 );
@@ -51,9 +45,7 @@ $api->get('/sunset(/:date)', $checkLocation, function($date=NULL) use ($api) {
         'sunrise' =>
         date_sunset($date, SUNFUNCS_RET_TIMESTAMP, $api->Latitude, $api->Longitude, 90, date('Z')/3600)
     ));
-})->conditions(array(
-    'date' => '\d{4}-\d{2}-\d{2}'
-))->name('sunset intern')->help = array(
+})->name('/sunset(/:date)')->help = array(
     'since'       => 'r3',
     'description' => 'Get sunset of day, using configured loaction'
 );
@@ -67,11 +59,7 @@ $api->get('/sunset/:latitude/:longitude(/:date)', function($latitude, $longitude
         'sunset' =>
         date_sunset($date, SUNFUNCS_RET_TIMESTAMP, $latitude, $longitude, 90, date('Z')/3600)
     ));
-})->conditions(array(
-    'latitude'  => '[\d.-]+',
-    'longitude' => '[\d.-]+',
-    'date'      => '\d{4}-\d{2}-\d{2}'
-))->name('sunset')->help = array(
+})->name('/sunset/:latitude/:longitude(/:date)')->help = array(
     'since'       => 'r3',
     'description' => 'Get sunset of day'
 );
@@ -87,9 +75,7 @@ $api->get('/daylight(/:offset)', $checkLocation, function($offset=0) use ($api) 
     $api->render(array(
         'daylight' => (int) ($sunrise-$offset <= $now AND $now <= $sunset+$offset)
     ));
-})->conditions(array(
-    'offset' => '\d+'
-))->name('daylight intern')->help = array(
+})->name('/daylight(/:offset)')->help = array(
     'since'       => 'r3',
     'description' => 'Check for daylight for configured location, accept additional minutes before/after',
 );
@@ -105,11 +91,7 @@ $api->get('/daylight/:latitude/:longitude(/:offset)', function($latitude, $longi
     $api->render(array(
         'daylight' => (int) ($sunrise-$offset <= $now AND $now <= $sunset+$offset)
     ));
-})->conditions(array(
-    'latitude'  => '[\d.-]+',
-    'longitude' => '[\d.-]+',
-    'offset'    => '\d+',
-))->name('daylight')->help = array(
+})->name('/daylight/:latitude/:longitude(/:offset)')->help = array(
     'since'       => 'r3',
     'description' => 'Check for daylight, accept additional minutes before/after',
 );

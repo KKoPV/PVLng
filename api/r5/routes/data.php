@@ -194,6 +194,24 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
 /**
  *
  */
+$api->get('/data/stats', function() use ($api) {
+    $api->render($api->db->queryRowsArray(
+        'SELECT c.`guid`, c.`name`, c.`description`, c.`numeric`, c.`decimals`,
+                t.*, IFNULL(n.`data`, s.`data`) AS `data`
+           FROM `pvlng_reading_count` AS t
+           LEFT JOIN `pvlng_channel_view` AS c USING(`id`)
+           LEFT JOIN `pvlng_reading_num` AS n USING(`id`, `timestamp`)
+           LEFT JOIN `pvlng_reading_str` AS s USING(`id`, `timestamp`)
+          ORDER BY `id`'
+    ));
+})->name('GET /data/stats')->help = array(
+    'since'       => 'r5',
+    'description' => 'Fetch readings statistics',
+);
+
+/**
+ *
+ */
 $api->delete('/data/:guid/:timestamp', $APIkeyRequired, function($guid, $timestamp) use ($api) {
     $channel = Channel::byGUID($guid);
     $tbl = $channel->numeric ? new \ORM\ReadingNum : new \ORM\ReadingStr;
