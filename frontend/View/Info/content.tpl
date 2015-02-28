@@ -64,7 +64,9 @@
 
     <div id="tabs-2">
 
-        <div id="stats-chart"></div>
+        <div id="stats-chart">
+            <p class="c b" style="padding:1em;background-color:#FFFF88">{{JustAMoment}}</p>
+        </div>
 
         <table id="table-stats">
             <thead>
@@ -85,11 +87,8 @@
                     {NAME}
                 </td>
                 <td>{DESCRIPTION}</td>
-                <td class="r">
-                    <span style="display:none">{raw:READINGS}</span>
-                    {READINGS}
-                </td>
-                <td class="r last-reading" data-guid="{GUID}">?</td>
+                <td id="r-{GUID}" class="r">0</td>
+                <td id="d-{GUID}" class="r"></td>
                 <td>{UNIT}</td>
             </tr>
             <!-- END -->
@@ -98,7 +97,7 @@
             <tfoot>
             <tr>
                 <th class="l" colspan="2"></th>
-                <th class="r"></th>
+                <th id="sumReadings" class="r">0</th>
                 <th class="l" colspan="2"></th>
             </tr>
             </tfoot>

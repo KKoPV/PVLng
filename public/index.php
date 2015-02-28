@@ -82,6 +82,13 @@ $app = new slimMVC\App(array(
     'debug'     => $dev
 ));
 
+// If installed from GitHub, find branch and actual commit
+$head = file(ROOT_DIR.DS.'.git'.DS.'HEAD', FILE_IGNORE_NEW_LINES);
+if (!empty($head) AND preg_match('~: (.*?)([^/]+)$~', $head[0], $args)) {
+    $app->view->PVLng_Branch = trim($args[2]);
+    $app->view->PVLng_Commit = trim(file_get_contents(ROOT_DIR.DS.'.git'.DS.$args[1].$args[2]));
+}
+
 include CORE_DIR . DS . 'AOP.php';
 
 /**

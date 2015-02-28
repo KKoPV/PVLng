@@ -16,16 +16,22 @@ var ChartOptions = {
     tooltip: false,
     plotOptions: { pie: { dataLabels: { enabled: true } } },
     /* Init empty dataset */
-    series: [{ data: null }]
+    series: [{ data: [] }]
 };
 
+$.extend( jQuery.fn.dataTableExt.oSort, {
+    'readings-pre':  function ( a )    { return parseInt(a.replace(/[^0-9]/g, '')) },
+    'readings-asc':  function ( a, b ) { return a - b },
+    'readings-desc': function ( a, b ) { return b - a }
+});
+
 $(function() {
+
+    $.get(PVLngAPI + '../version', function(data) { $('#latest').text(data) });
 
     $('#table-info, #table-cache').DataTable({
         bSort: false
     });
-
-    $('#table-db').DataTable();
 
     $('#regenerate').click(function() {
         /* Replace text, make bold red and unbind this click handler */
@@ -33,97 +39,84 @@ $(function() {
         return false;
     });
 
-    $.extend( jQuery.fn.dataTableExt.oSort, {
-        "numeric-span-pre": function ( a ) {
-            return +a.match(/>(.*?)</)[1];
-        },
-
-        "numeric-span-asc": function( a, b ) {
-            return ((a < b) ? -1 : ((a > b) ? 1 : 0));
-        },
-
-        "numeric-span-desc": function(a,b) {
-            return ((a < b) ? 1 : ((a > b) ? -1 : 0));
-        }
-    });
-
     $('#table-stats').DataTable({
-        aoColumns: [
-            null,
-            null,
-            { sType: 'numeric-span', sWidth: '1%' },
-            { bSortable: false },
-            { sWidth: '1%' }
-        ],
-
-        fnFooterCallback: function( nFoot, aData, iStart, iEnd, aiDisplay ) {
-            var th = nFoot.getElementsByTagName('th'), len = aData.length, cnt = 0;
-            th[0].innerHTML = len + " {{Channels}}";
-            while (len--) cnt += +aData[len][2].match(/>(.*?)</)[1];
-            th[1].innerHTML = $.number(cnt, 0, '', ThousandSeparator);
-        }
+        aoColumnDefs: [ { asSorting: ['asc'], aTargets: [0] } ]
     });
 
-    $.get(PVLngAPI + '../version', function(data) { $('#latest').text(data) });
+    $('#table-db').DataTable();
 
     $('.ui-tabs').on('tabsactivate', function(e, ui) {
-        if (ui.newPanel.hasClass('panel-loaded')) return;
+        if (ui.newPanel.hasClass('tab-loaded')) return;
 
         switch (ui.newPanel.selector) {
 
+            /* Channel readings statistics */
             case '#tabs-2':
 
-                var options = ChartOptions;
-                options.series[0].data = [
-                    <!-- BEGIN STATS --><!-- IF {READINGS} -->
-                    ["{NAME}<!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->", {raw:READINGS}],
-                    <!-- ENDIF --><!-- END -->
-                ];
+                $.wait();
 
-                if (!options.series[0].data.length) {
-                    $('#stats-chart').hide();
-                } else {
-                    options.plotOptions.pie.dataLabels.formatter = function() {
-                        return '<b>'+this.point.name+'</b>: '
-                             + Highcharts.numberFormat(this.point.y, 0, DecimalSeparator, ThousandSeparator)
-                             + ' ('
-                             + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
-                             + ' %)'
-                    };
+                var options = ChartOptions, sumReadings = 0, name;
 
-                    $('.last-reading', '#table-stats').each(function(id, el) {
-                        $.getJSON(
-                            PVLngAPI + 'data/' + $(el).data('guid') + '.json',
-                            {
-                                attributes: true, /* need decimals for formating */
-                                period:     'readlast'
-                            },
-                            function(data) {
-                                if (data.length < 2) return;
-                                var attr = data.shift(), val;
-                                if (attr.numeric) {
-                                    $(el).number(data[0].data, attr.decimals, DecimalSeparator, ThousandSeparator);
-                                } else {
-                                    $(el).html(data[0].data != "" ? data[0].data : '<empty>');
-                                }
-                                $(el).addClass('ok');
+                options.plotOptions.pie.dataLabels.formatter = function() {
+                    return '<b>'+this.point.name+'</b>: '
+                         + Highcharts.numberFormat(this.point.y, 0, '', ThousandSeparator)
+                         + ' / '
+                         + Highcharts.numberFormat(this.point.percentage, 2, DecimalSeparator, ThousandSeparator)
+                         + ' %'
+                };
+
+                $.getJSON(
+                    PVLngAPI + 'data/stats.json',
+                    function(data) {
+                        $(data).each(function(id, data) {
+                            sumReadings += data.readings;
+/*
+                            $('#r-'+data.guid+'-raw').text(data.readings).parent(/* td * /).addClass('ok');
+*/
+                            $('#r-'+data.guid).number(data.readings, 0, '', ThousandSeparator).addClass('ok');
+
+                            if (data.numeric) {
+                                $('#d-'+data.guid).number(data.data, data.decimals, DecimalSeparator, ThousandSeparator).addClass('ok');
+                            } else {
+                                $('#d-'+data.guid).html(data.data != '' ? data.data : '<empty>').addClass('ok');
                             }
-                        ).fail(function(jqXHR) {
-                            $(el).html('<small>'+jqXHR.responseJSON.message+'</small>').addClass('fail');
-                        });
-                    });
 
-                    /* Use width of 1st visible tab container (#tab-1) to set chart width */
-                    $('#stats-chart').width($('#tabs-1').width()).highcharts(options);
-                }
+                            name = data.name;
+                            if (data.description) name += ' ('+data.description+')';
+                            options.series[0].data.push([ name, +data.readings ]);
+                        });
+                        $('#sumReadings').number(sumReadings, 0, '', ThousandSeparator);
+
+                        /* Re-create DataTable and apply sorting for changed readings column */
+                        $('#table-stats').DataTable({
+                            bDestroy: true,
+                            aoColumns: [ null, null, { sType: 'readings' }, { bSortable: false }, { sWidth: '1%' } ]
+                        });
+
+                        if (options.series[0].data.length) {
+                            /* Re-sort channels */
+                            options.series[0].data.sort(function(a,b) { return a[0]<b[0]?-1:1 });
+                            /* Use width of 1st visible tab container (#tab-1) to set chart width */
+                            $('#stats-chart').width($('#tabs-1').width()).highcharts(options);
+                        } else {
+                            $('#stats-chart').hide();
+                        }
+                    }
+                ).fail(function(jqXHR) {
+                    $('#stats-chart').html(jqXHR.responseJSON.message).addClass('fail');
+                }).always(function() {
+                    $.wait(false);
+                });
+
                 break;
 
+            /* Databse & tables size */
             case '#tabs-3':
 
                 var options = ChartOptions;
                 options.series[0].data = [
-                    ['{{DatabaseSize}}', {DATABASESIZE}],
-                    ['{{DatabaseFree}}', {DATABASEFREE}]
+                    ['{{DatabaseSize}}', {raw:DATABASESIZE}],
+                    ['{{DatabaseFree}}', {raw:DATABASEFREE}]
                 ];
                 options.plotOptions.pie.dataLabels.formatter = function() {
                     return '<b>'+this.point.name+'</b>: '
@@ -137,6 +130,7 @@ $(function() {
                 $('#db-chart').width($('#tabs-1').width()).highcharts(options);
                 break;
 
+            /* Cache usage */
             case '#tabs-4':
 
                 var hits = {raw:CACHEHITS}, misses = {raw:CACHEMISSES};
@@ -163,7 +157,7 @@ $(function() {
 
         } /* switch */
 
-        ui.newPanel.addClass('panel-loaded');
+        ui.newPanel.addClass('tab-loaded');
     });
 });
 </script>

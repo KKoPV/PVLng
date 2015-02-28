@@ -1,4 +1,4 @@
-<?php
+<?php /* // AOP // */
 /**
  *
  *
@@ -38,25 +38,30 @@ class Info extends \Controller {
         $this->view->SubTitle   = __('Information');
         $this->view->ServerName = $_SERVER['SERVER_NAME'];
 
+        // Buffer DB name
+        $dbName = $this->config->get('Database.Database');
+
         list($this->view->DatabaseSize, $this->view->DatabaseFree) =
         $this->db->queryRowArray('
-            SELECT SUM(`data_length`+`index_length`)/1024/1024 AS "0"
-                 , SUM(`data_free`)/1024/1024 AS "1"
-              FROM `information_schema`.`tables`
-             WHERE `table_schema` = "'.$this->config->get('Database.Database').'"
+            SELECT SUM(`DATA_LENGTH` + `INDEX_LENGTH`)/1024/1024 AS `0`
+                 , SUM(`DATA_FREE`)/1024/1024                    AS `1`
+              FROM `information_schema`.`TABLES`
+             WHERE `TABLE_SCHEMA` = "'.$dbName.'" AND `TABLE_NAME` LIKE "pvlng_%"
         ');
 
-        $this->view->Stats = (new \ORM\ReadingStatistics)->find()->asAssoc();
+        $channels = new \ORM\ChannelView;
+        $this->view->Stats = $channels->filterByChilds(0)->filterByWrite(1)->find()->asAssoc();
+
+#        $this->view->Stats = (new \ORM\ReadingStatistics)->find()->asAssoc();
 
         $this->view->TableSize = $this->db->queryRowsArray('
-            SELECT `table_name`
-                 , `table_comment`
-                 , `table_rows`
-                 , ROUND((`data_length` + `index_length`)/1024/1024, 2) AS `size_mb`
+            SELECT `TABLE_NAME`
+                 , `TABLE_COMMENT`
+                 , `TABLE_ROWS`
+                 , ROUND((`DATA_LENGTH` + `INDEX_LENGTH`)/1024/1024, 2) AS `size_mb`
               FROM `information_schema`.`TABLES`
-             WHERE `table_type` = "BASE TABLE"
-               AND `table_schema` = "'.$this->config->get('Database.Database').'"
-               AND `table_name` LIKE "pvlng_%"
+             WHERE `TABLE_TYPE` = "BASE TABLE"
+               AND `TABLE_SCHEMA` = "'.$dbName.'" AND `TABLE_NAME` LIKE "pvlng_%"
         ');
 
         $this->view->CacheInfo   = $this->app->cache->info();

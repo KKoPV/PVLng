@@ -9,13 +9,16 @@
  */
 -->
 
+<!-- @ToDo Some adjustments for labels required for 4.1.2 -->
+<!-- DEFINE HIGHCHARTS_VERSION -->4.0<!-- END DEFINE -->
+
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-    <title>{SUBTITLE} | {strip_tags:TITLE}</title>
+    <title>{strip_tags:TITLE} | {SUBTITLE}</title>
     <meta name="description" content="{PVLNG}" />
     <meta name="author" content="Knut Kohl" />
 
@@ -114,10 +117,6 @@
     </div>
 
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-    <!-- load Highcharts scripts direct from highcharts.com -->
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="http://code.highcharts.com/highcharts-more.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
     <script>
         <!-- INCLUDE config.default.js -->
@@ -126,6 +125,12 @@
     </script>
 
     <!-- IF {DEVELOPMENT} -->
+
+    <!-- Load Highcharts scripts direct from highcharts.com -->
+    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts.src.js"></script>
+    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts-more.src.js"></script>
+    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/modules/exporting.src.js"></script>
+
     <script src="/js/jquery-ui.min.js"></script>
     <script src="/js/jquery-ui-i18n.min.js"></script>
     <script src="/js/jquery.dataTables.min.js"></script>
@@ -151,8 +156,16 @@
     <script src="/js/trmix.min.js"></script>
     <script src="/js/Blob.min.js"></script>
     <script src="/js/FileSaver.min.js"></script>
+    <script src="/js/qr.js"></script>
+
     <!-- ELSE -->
+
+    <!-- Load Highcharts scripts direct from highcharts.com -->
+    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts.js"></script>
+    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts-more.js"></script>
+    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/modules/exporting.js"></script>
     <script src="/js/min.js"></script>
+
     <!-- ENDIF -->
 
     <!-- IF {LANGUAGE} != "en" -->
@@ -209,6 +222,21 @@
 
             /* Deferred image loading */
             $('img.def').prop('src', function() { return $(this).data('src') });
+
+            /* QR-Code for mobile view */
+            qr.canvas({
+                canvas: document.getElementById('qr-code'),
+                value: location.protocol+'//'+location.hostname+'/m',
+                level: 'M'
+            });
+
+            /* Actual branch and commit */
+            var branch = '{PVLNG_BRANCH}';
+            if (branch) {
+                $('#commit').text(
+                    '(' + branch + '/' + '{PVLNG_COMMIT})'.substr(0,7) + ')'
+                );
+            }
 
             pvlng.onFinished.run();
         });

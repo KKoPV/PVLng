@@ -22,7 +22,7 @@
            class="tip" style="margin-left:.5em" title="Changelog version {VERSION} / {VERSIONDATE} on GitHub">
             <img src="/images/pix.gif" data-src="/images/Octocat.png" class="def">
         </a>
-        v{VERSION}
+        v{VERSION}&nbsp;<span id="commit"></span>
     </div>
 
     <div id="powered" class="s r">

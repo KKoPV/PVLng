@@ -61,6 +61,19 @@
                     <!-- ENDIF -->
                 </li>
                 <!-- END -->
+
+                <!-- QR code for mobile view -->
+                <li>
+                    <a href="#" class="tip-top" title="{HINT}" onclick="return false">
+                        <img src="/images/pix.gif" data-src="/images/ico/barcode-2d.png" class="ico def">
+                    </a>
+                    <ul>
+                        <li class="c">
+                            <p class="s">{{ScanForMobileView}}</p>
+                            <canvas id="qr-code" style="padding-bottom:10px">
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
 
@@ -83,14 +96,12 @@
                 <li>
                 <!-- IF !{USER} -->
                     <a href="#" class="tip" title="{{Login}}">
-                        <img src="/images/pix.gif" data-src="/images/sign-in.png" class="def"
-                             style="width:16px;height:16px"
+                        <img src="/images/pix.gif" data-src="/images/sign-in.png" class="ico def"
                              onclick="$('#login-dialog').dialog('open'); return false" alt="L">
                     </a>
                 <!-- ELSE -->
                     <a href="/logout" class="tip" title="{{Logout}}">
-                        <img src="/images/pix.gif" data-src="/images/sign-out.png" class="def"
-                             style="width:16px;height:16px" alt="L">
+                        <img src="/images/pix.gif" data-src="/images/sign-out.png" class="ico def" alt="L">
                     </a>
                 <!-- ENDIF -->
                 </li>

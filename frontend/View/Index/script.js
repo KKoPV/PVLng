@@ -63,13 +63,14 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
                 load: function () {
                     this.renderer
                         .label('PVLng v'+PVLngVersion)
-                        .attr({ padding: 1 })
+                        .attr('padding', 1)
                         .css({ color: 'lightgray', fontSize: '11px' })
                         .add();
                 },
                 redraw: function () {
+                    /* Date and time, but without seconds */
                     this.renderer
-                        .label((new Date).toLocaleString(), 0, 16)
+                        .label((new Date).toLocaleString().slice(0,-3), 0, 16)
                         .attr({ fill: 'white', padding: 1 })
                         .css({ color: 'lightgray', fontSize: '9px' })
                         .add();
@@ -200,9 +201,8 @@ var views = new function Views() {
     };
 
     this.load = function( slug, collapse, callback ) {
-        if (typeof this.views[slug] == 'undefined') return;
 
-        $('#chart').addClass('wait');
+        if (typeof this.views[slug] == 'undefined') return;
 
         $.getJSON(
             PVLngAPI + 'view/'+slug+'.json',
@@ -240,12 +240,10 @@ var views = new function Views() {
                 $('#visibility').val(views.actual.public).trigger('change');
                 $('#modified').hide();
 
-                if (typeof callback != 'undefined') callback(views.actual);
+                if (typeof callback !== 'undefined') callback(views.actual);
             }
         ).fail(function( jqXHR, textStatus ) {
             alert( "Request failed: " + textStatus );
-        }).always(function() {
-            $('#chart').removeClass('wait');
         });
     };
 };
@@ -430,10 +428,12 @@ function updateChart( forceUpdate, scroll ) {
 
     /* Build channels */
     $(buffer).each(function(id, channel) {
-        /* axis on right side */
+        /* Axis on right side */
         var is_right = !(channel.axis % 2);
 
-        /* axis from chart point of view */
+        /* Remember original axis for change detection */
+        channel.axis_org = channel.axis;
+        /* Axis from chart point of view */
         channel.axis = yAxisMap.indexOf(channel.axis);
 
         if (channel.type == 'areasplinerange') {
@@ -489,7 +489,7 @@ function updateChart( forceUpdate, scroll ) {
         return;
     }
 
-    $('#chart').addClass('wait');
+    $.wait();
 
     _log('Channels:', channels_new);
     _log('yAxis:', yAxis);
@@ -507,6 +507,7 @@ function updateChart( forceUpdate, scroll ) {
             if (JSON.stringify(channels_new[i]) != JSON.stringify(channels_chart[i])) {
                 changed = true;
                 channels_chart = channels_new;
+                break;
             }
         }
     }
@@ -533,11 +534,15 @@ function updateChart( forceUpdate, scroll ) {
 
     chart.showLoading(chartLoading);
 
-    var series = [], costs = 0, date = new Date(),
-        today = ('0'+(date.getMonth()+1)).slice(-2) + '/' + ('0'+date.getDate()).slice(-2) + '/' + date.getFullYear();
+    var series = [], costs = 0, date = new Date(), AJAXcount = 0,
+        today = ('0'+(date.getMonth()+1)).slice(-2) + '/' +
+                ('0'+date.getDate()).slice(-2) + '/' + date.getFullYear();
 
     /* get data */
     $(channels_chart).each(function(id, channel) {
+
+        /* Count channel AJAX calls */
+        AJAXcount++;
 
         $('#s'+channel.id).show();
 
@@ -732,20 +737,22 @@ function updateChart( forceUpdate, scroll ) {
             }
         }).always(function(data, status) {
 
-            if (aborted) return;
+            /* Another AJAX call is done */
+            --AJAXcount;
+
+            if (aborted) {
+                updateActive = false;
+                return;
+            }
 
             $('#s'+channel.id).hide();
 
-            /* Check real count of elements in series array! */
-            var completed = series.filter(function(a){ return a !== undefined }).length;
-            _log(completed+' series completed');
-
-            /* Check if all getJSON() calls finished */
-            if (completed != channels_chart.length) return;
+            /* All calls are done on AJAXcount == 0 */
+            if (AJAXcount > 0) return;
 
             if (+'{INDEX_NOTIFYALL}') $.pnotify({
                 type: 'success',
-                text: completed + ' {{ChannelsLoaded}} ' +
+                text: series.length + ' {{ChannelsLoaded}} ' +
                       '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
             });
 
@@ -769,14 +776,15 @@ function updateChart( forceUpdate, scroll ) {
                 updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
             }
 
+
             /* Redraw independent from other DOM changes via setTimeout */
             setTimeout(function() {
                 chart.hideLoading();
                 chart.redraw();
+                $.wait(false);
+                updateActive = false;
             }, 0);
 
-            $('#chart').removeClass('wait');
-            updateActive = false;
         });
     });
 }
@@ -841,7 +849,7 @@ function deleteReading() {
         if (!ok) return;
 
         chart.showLoading(chartLoading);
-        $('#chart').addClass('wait');
+        $.wait();
 
         $.ajax(
             { type: 'DELETE', url: url, dataType: 'json' }
@@ -855,7 +863,7 @@ function deleteReading() {
             });
         }).always(function() {
             chart.hideLoading();
-            $('#chart').removeClass('wait');
+            $.wait(false);
         });
     })
 }
@@ -1186,7 +1194,7 @@ $(function() {
             }, 5000);
         } else {
             btn.button({ label: '&nbsp;', text: false, }).button('disable').removeClass('confirmed');
-            $('#chart').addClass('wait');
+            $.wait();
 
             $.ajax({
                 type: 'DELETE',
@@ -1204,7 +1212,7 @@ $(function() {
                     text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
                 });
             }).always(function() {
-                $('#chart').removeClass('wait');
+                $.wait(false);
                 btn.button({ label: '&nbsp;', text: false }).data('confirmed', 0).button('enable');
             });
         }
@@ -1214,7 +1222,7 @@ $(function() {
         icons: { primary: 'ui-icon-disk' }, text: false
     }).click(function() {
         $(this).button('disable');
-        $('#chart').addClass('wait');
+        $.wait();
 
         /* Save view */
         var btn = this,
@@ -1250,7 +1258,7 @@ $(function() {
                 type: textStatus, hide: false, text: jqXHR.responseText
             });
         }).always(function() {
-            $('#chart').removeClass('wait');
+            $.wait(false);
             $(btn).button('enable');
         });
     });

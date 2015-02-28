@@ -27,9 +27,9 @@
         <th style="width:40px !important"></th>
         <th style="width:70px !important"></th>
         <th class="l">{{Name}}</th>
-        <th class="l">{{Channel::Description}}</th>
-        <th class="l">{{Channel::Resolution}}</th>
-        <th class="l">{{Channel::Unit}}</th>
+        <th class="l">{{Channel::description}}</th>
+        <th class="l">{{Channel::resolution}}</th>
+        <th class="l">{{Channel::unit}}</th>
         <th><img src="/images/ico/lock.png" class="tip" title="{{Private}}"></th>
         <th></th>
     </tr>
@@ -89,16 +89,16 @@
             <span style="margin-left:110px;display:none">
 
                 <div class="attr">
-                    <label for="p{_LOOP}serial">{{Channel::Serial}}</label>
+                    <label for="p{_LOOP}serial">{{Channel::serial}}</label>
                     <input id="p{_LOOP}serial" type="text" name="p[{_LOOP}][serial]" value="{SERIAL}" size="40">
                 </div>
                 <!-- IF {_LOOP} != "0" AND {NUMERIC} -->
                 <div class="attr">
-                    <label for="p{_LOOP}valid_from">{{Channel::Valid_From}}</label>
+                    <label for="p{_LOOP}valid_from">{{Channel::valid_from}}</label>
                     <input id="p{_LOOP}valid_from" type="text" name="p[{_LOOP}][valid_from]" value="{VALID_FROM}" size="6" placeholder="0{__TSEP}000{__DSEP}00">
                 </div>
                 <div class="attr">
-                    <label for="p{_LOOP}decimals">{{Channel::Decimals}}</label>
+                    <label for="p{_LOOP}decimals">{{Channel::decimals}}</label>
                     <input id="p{_LOOP}decimals" type="text" name="p[{_LOOP}][decimals]" value="{DECIMALS}" size="1" placeholder="0">
                 </div>
                 <!-- ENDIF -->
@@ -106,12 +106,12 @@
                 <div class="clear"></div>
 
                 <div class="attr">
-                    <label for="p{_LOOP}channel">{{Channel::Channel}}</label>
+                    <label for="p{_LOOP}channel">{{Channel::channel}}</label>
                     <input id="p{_LOOP}channel" type="text" name="p[{_LOOP}][channel]" value="{CHANNEL}" size="40">
                 </div>
                 <!-- IF {_LOOP} != "0" AND {NUMERIC} -->
                 <div class="attr">
-                    <label for="p{_LOOP}valid_to">{{Channel::Valid_To}}</label>
+                    <label for="p{_LOOP}valid_to">{{Channel::valid_to}}</label>
                     <input id="p{_LOOP}valid_to" type="text" name="p[{_LOOP}][valid_to]" value="{VALID_TO}" size="6" placeholder="0{__TSEP}000{__DSEP}00">
                 </div>
                 <!-- ENDIF -->
@@ -119,7 +119,7 @@
                 <div class="clear"></div>
 
                 <div class="attr">
-                    <label for="p{_LOOP}comment">{{Channel::Comment}}</label>
+                    <label for="p{_LOOP}comment">{{Channel::comment}}</label>
                     <textarea id="p{_LOOP}comment" name="p[{_LOOP}][comment]" cols="40">{COMMENT}</textarea>
                 </div>
 

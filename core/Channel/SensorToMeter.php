@@ -5,14 +5,18 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @version     1.1.0
+ *
+ * v1.1.0
+ * - Switch to InternalCalc to work correct with periods last/readlast
+ *
  */
 namespace Channel;
 
 /**
  *
  */
-class SensorToMeter extends Channel {
+class SensorToMeter extends InternalCalc {
 
     /**
      * Accept only childs without meter attribute set
@@ -40,26 +44,23 @@ class SensorToMeter extends Channel {
     /**
      *
      */
-    public function read( $request ) {
+    protected function before_read( &$request ) {
 
-        $this->before_read($request);
+        parent::before_read($request);
 
-        $buffer = $this->getChild(1)->read($request)->rewind();
-        $last = 0;
+        if ($this->dataExists()) return;
 
-        $result = new \Buffer;
+        // Read out all data
+        unset($request['period']);
 
-        $consumption = 0;
-        while ($row = $buffer->current()) {
-            $cons = round($last ? ($row['timestamp'] - $last) / 3600 * $row['data'] : 0, $this->decimals);
-            $consumption += $cons;
-            $row['data'] = $consumption;
-            $row['consumption'] = $cons;
-            $result->write($row, $buffer->key());
+        $last = $sum = 0;
+
+        foreach ($this->getChild(1)->read($request) as $row) {
+            $sum += $last ? ($row['timestamp'] - $last) / 3600 * $row['data'] : 0;
             $last = $row['timestamp'];
-            $buffer->next();
+            $this->saveValue($last, $sum);
         }
 
-        return $this->after_read($result);
+        $this->dataCreated();
     }
 }

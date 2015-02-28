@@ -45,14 +45,18 @@ class Tree extends TreeBase {
     /**
      *
      */
-    public function getWithParents() {
-        $parent = array( 1 => '' );
+    public function getWithParents( $publicOnly=FALSE ) {
+        // Remember parents Id, init level 0
+        $parent = array( NULL );
         $nodes = array();
 
         // Without root node
-        $rows = $this->reset()->filter('id', array('min'=>2))->find()->asAssoc();
+        $this->reset()->filter('id', array('min'=>2));
+        if ($publicOnly) $this->filterByPublic(1);
+        $rows = $this->find()->asAssoc();
 
         foreach ($rows as $row) {
+            $row['level']--;
             $parent[$row['level']] = $row['id'];
             $row['parent'] = $parent[$row['level']-1];
             $nodes[] = $row;

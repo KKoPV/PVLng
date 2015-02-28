@@ -80,6 +80,7 @@ abstract class ORM implements \Iterator, \Countable {
      */
     public function setThrowException( $throw=TRUE ) {
         $this->throwException = (bool) $throw;
+        return $this;
     }
 
     /**
