@@ -95,12 +95,14 @@ class InternalConsumption extends InternalCalc {
 
             } else /* $key1 > $key2 */ {
 
-                if (!empty($row1)) {
-                    $last = $row1['data'];
-                    $this->saveValue($row1['timestamp'], $last);
+                if ($key1 == $FirstKey1) {
+                    $row2 = $child2->next()->current();
+                } else {
+                    // Data hole in child 1, remember actual consumption for later
+                    $_c = $row2['consumption'];
+                    $row2 = $child2->next()->current();
+                    $row2['consumption'] += $_c;
                 }
-
-                $row2 = $child2->next()->current();
             }
         }
         $this->dataCreated();
@@ -108,5 +110,4 @@ class InternalConsumption extends InternalCalc {
         $child1->close();
         $child2->close();
     }
-
 }
