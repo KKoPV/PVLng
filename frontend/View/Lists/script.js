@@ -56,7 +56,7 @@ function updateList() {
             /* Only real channels allow deletion for readings */
             if (channel.childs == 0 && channel.write == 1) {
                 /* Prepare delete icon */
-                var icon = '<img src="/images/ico/minus_circle.png" class="delete-reading btn tip" title="{{DeleteReading}}" ';
+                var icon = '<img src="/images/ico/minus_circle.png" class="delete-reading btn"';
             }
 
             $('#icon').prop('src', channel.icon).prop('title', channel.type).tipTip();
@@ -68,7 +68,7 @@ function updateList() {
             $(data).each(function(id, row) {
                 var delbtn=null;
                 if (icon) {
-                    delbtn = icon + 'data-timestamp="' + row.timestamp + '" data-value="' + row.data + '">';
+                    delbtn = icon + ' data-timestamp="' + row.timestamp + '" data-value="' + row.data + '">';
                 }
                 listTable.fnAddData(
                     [
