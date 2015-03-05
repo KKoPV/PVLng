@@ -18,9 +18,7 @@ class Loader {
         $classMap  = self::getClassMap();
 
         if (isset($classMap[$className])) {
-            $callback = self::$callback;
-            $source = $callback ? $callback($classMap[$className]) : $classMap[$className];
-            require_once $source;
+            self::load($classMap[$className]);
             return TRUE;
         }
     }
@@ -45,8 +43,8 @@ class Loader {
      * Manual file loading with callback
      */
     public static function load( $file ) {
-        $callback = self::$callback;
-        require_once $callback ? $callback($file) : $file;
+        $file = self::applyCallback($file);
+        require_once $file;
         return TRUE;
     }
 
@@ -54,16 +52,18 @@ class Loader {
      * Manual apply callback
      */
     public static function applyCallback( $file ) {
-        $callback = self::$callback;
-        return $callback ? $callback($file) : $file;
+        foreach (self::$Callback as $Callback) {
+            $file = $Callback($file);
+        }
+        return $file;
     }
 
     /**
      *
      */
-    public static function registerCallback( $callback ) {
-        if (is_callable($callback)) {
-            self::$callback = $callback;
+    public static function registerCallback( $Callback ) {
+        if (is_callable($Callback)) {
+            self::$Callback[] = $Callback;
         } else {
             throw new Exception('Not a callable function provided for Loader::registerCallback()');
         }
@@ -76,7 +76,7 @@ class Loader {
     /**
      *
      */
-    protected static $callback;
+    protected static $Callback = array();
 
     /**
      *

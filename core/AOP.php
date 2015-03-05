@@ -17,12 +17,12 @@ Yryie::Versions();
  * Define Loader callback to manipulate file content to include
  */
 Loader::registerCallback(function($filename) {
-    // Insert .AOP before file extension, so .../file.php becomes .../file.AOP.php
+    // Insert .aop before file extension, so .../file.php becomes .../file.aop.php
     $parts = explode('.', realpath($filename));
-    array_splice($parts, -1, 0, 'AOP');
-    $filenameAOP = implode('.', $parts);
+    $filenameAOP = $parts[0] . '.aop.' . $parts[count($parts)-1];
 
     // Strip root directory and replace directory separators with ~ to get unique names
+    $filenameAOP = str_replace(TEMP_DIR, '', $filenameAOP);
     $filenameAOP = str_replace(ROOT_DIR, '', $filenameAOP);
     $filenameAOP = str_replace(DS, '~', $filenameAOP);
     $filenameAOP = trim($filenameAOP, '~');
@@ -32,21 +32,20 @@ Loader::registerCallback(function($filename) {
         // (Re-)Create AOP file
         $code = file_get_contents($filename);
 
-        // Only files marked as AOP relevant will be analysed
-        if (strpos($code, '/* // AOP // */') !== FALSE) {
-            // Build file content hash to check if AOP relevant code was found
-            $hash = md5($code);
+        // Build file content hash to check if AOP relevant code was found
+        $hash = md5($code);
 
-            Yryie::Info('Compile: '.$filename);
-            Yryie::StartTimer(basename($filenameAOP));
-            Yryie::transformCode($code);
-            Yryie::StopTimer();
+        Yryie::Info('Compile: '.$filename);
+        Yryie::StartTimer(basename($filenameAOP));
+        Yryie::transformCode($code);
+        Yryie::StopTimer();
 
-            if ($hash != md5($code) AND file_put_contents($filenameAOP, $code)) {
-                // File content was changed and AOP file could created
-                $filename = $filenameAOP;
-                Yryie::Info('Created: '.$filename);
-            }
+        if ($hash == md5($code)) $code = "<?php include '$filename';";
+
+        if (file_put_contents($filenameAOP, $code)) {
+            // File content was changed and AOP file could created
+            $filename = $filenameAOP;
+            Yryie::Info('Created: '.$filename);
         }
     } else {
         // AOP file still exists and is ut-to-date
