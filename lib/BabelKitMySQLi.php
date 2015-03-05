@@ -7,7 +7,7 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-require_once dirname(__FILE__) . DS . 'contrib' . DS . 'BabelKit.php';
+Loader::load(LIB_DIR . DS . 'contrib' . DS . 'BabelKit.php');
 
 /**
  *
