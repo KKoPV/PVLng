@@ -89,6 +89,7 @@ if (!empty($head) AND preg_match('~: (.*?)([^/]+)$~', $head[0], $args)) {
     $app->view->PVLng_Commit = trim(file_get_contents(ROOT_DIR.DS.'.git'.DS.$args[1].$args[2]));
 }
 
+include CORE_DIR . DS . 'Hooks.php';
 include CORE_DIR . DS . 'AOP.php';
 
 /**

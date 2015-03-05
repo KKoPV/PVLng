@@ -259,21 +259,4 @@ BEGIN
      WHERE `uid` = in_uid;
 END;;
 
-DROP EVENT IF EXISTS `pvlng_optimize`;;
-CREATE EVENT `pvlng_optimize` ON SCHEDULE EVERY 1 DAY STARTS '2000-01-01 00:00:00' ON COMPLETION PRESERVE ENABLE DO BEGIN
-    OPTIMIZE TABLE `pvlng_reading_tmp`;
-
-    -- MEMORY tabels does not support OPTIMIZE, so drop them if no write active
-    SELECT COUNT(1) INTO @CNT
-      FROM `pvlng_reading_tmp`
-     WHERE `created` < 0;
-
-    IF @CNT = 0 THEN
-        -- Will also remove entries from temp. tables
-        TRUNCATE `pvlng_reading_tmp`;
-
-        DROP TABLE `pvlng_reading_num_tmp`, `pvlng_reading_str_tmp`;
-    END IF;
-END;;
-
 DELIMITER ;
