@@ -70,7 +70,7 @@
                     <ul>
                         <li class="c">
                             <p class="s">{{ScanForMobileView}}</p>
-                            <canvas id="qr-code" style="padding-bottom:10px">
+                            <img id="qr-code" style="width:100px;height:100px;padding-bottom:10px">
                         </li>
                     </ul>
                 </li>

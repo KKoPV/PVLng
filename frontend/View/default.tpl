@@ -223,20 +223,25 @@
             /* Deferred image loading */
             $('img.def').prop('src', function() { return $(this).data('src') });
 
-            /* QR-Code for mobile view */
-            qr.canvas({
-                canvas: document.getElementById('qr-code'),
-                value: location.protocol+'//'+location.hostname+'/m',
-                level: 'M'
-            });
-
             /* Actual branch and commit */
             var branch = '{PVLNG_BRANCH}';
             if (branch) {
-                $('#commit').text(
-                    '(' + branch + '/' + '{PVLNG_COMMIT})'.substr(0,7) + ')'
-                );
+                $('#commit').text('(' + branch + '/' + '{PVLNG_COMMIT})'.substr(0,7) + ')');
             }
+
+            /* QR-Code for mobile view, cache in local storage */
+            $('#qr-code').prop('src', function() {
+                var q = 'qrcode-mobile', qrData = lscache.get(q);
+                if (!qrData) {
+                    qrData = qr.toDataURL({
+                        value: location.protocol+'//'+location.hostname+'/m',
+                        level: 'M'
+                    });
+                    /* Save to local storage */
+                    lscache.set(q, qrData);
+                }
+                return qrData;
+            });
 
             pvlng.onFinished.run();
         });
