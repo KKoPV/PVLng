@@ -48,7 +48,7 @@ Loader::registerCallback(function($filename) {
             Yryie::Info('Created: '.$filename);
         }
     } else {
-        // AOP file still exists and is ut-to-date
+        // AOP file still exists and is up-to-date
         $filename = $filenameAOP;
         Yryie::Info('Reuse: '.basename($filename));
     }
