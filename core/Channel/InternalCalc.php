@@ -38,8 +38,6 @@ abstract class InternalCalc extends Channel {
         $this->orgId = $this->entity;
 
         $this->data = \ORM\ReadingMemory::factory($this->numeric);
-
-        $this->LifeTime = (new \ORM\Settings)->getModelValue('InternalCalc', 'LifeTime');
     }
 
     /**
@@ -83,7 +81,15 @@ abstract class InternalCalc extends Channel {
      */
     protected function dataExists( $lifetime=NULL ) {
 
-        if (!is_null($lifetime)) $this->LifeTime = $lifetime;
+        if (!is_null($lifetime)) {
+            $this->LifeTime = $lifetime;
+        } else {
+            $this->LifeTime = $this->end-1 < strtotime('midnight')
+                           // Buffer data in the past (before today) for 1 day
+                            ? 86400
+                           // Use configration setting
+                            : (new \ORM\Settings)->getModelValue('InternalCalc', 'LifeTime');
+        }
 
         $sql = $this->db->sql(
             'SELECT `pvlng_reading_tmp_start`({1}, {2}, {3}, {4})',
