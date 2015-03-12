@@ -541,6 +541,8 @@ function updateChart( forceUpdate, scroll ) {
     /* get data */
     $(channels_chart).each(function(id, channel) {
 
+        channel._ts = date.getTime();
+
         /* Count channel AJAX calls */
         AJAXcount++;
 
@@ -566,7 +568,7 @@ function updateChart( forceUpdate, scroll ) {
                 end:        end,
                 period:     (channel.type != 'scatter') ? period_count + period : '',
                 _canAbort:  true,
-                _ts:        date.getTime()
+                _ts:        channel._ts
             },
             function(data) {
 
@@ -582,10 +584,9 @@ function updateChart( forceUpdate, scroll ) {
                     return;
                 }
 
-                console.log('Attributes', attr);
-/*
+                _log('Attributes', attr);
                 _log('Data', data);
-*/
+
                 if (attr.consumption) {
                     $('#cons'+channel.id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
                 }
@@ -649,8 +650,8 @@ function updateChart( forceUpdate, scroll ) {
                         /* Mostly non-numeric channels */
                         serie.dataLabels.align = 'left';
                         serie.dataLabels.rotation = 270;
-                        serie.dataLabels.x = 3;
-                        /* Move a bit up */
+                        serie.dataLabels.style = { textShadow: 0 };
+                        /* Move a bit */
                         serie.dataLabels.y = -8;
                     }
                 } else if (channel.type != 'bar') {
@@ -747,6 +748,8 @@ function updateChart( forceUpdate, scroll ) {
 
             $('#s'+channel.id).hide();
 
+            $('#cons'+channel.id).prop('title', 'loaded in ' + ((new Date).getTime() - channel._ts) + ' ms').tipTip();
+
             /* All calls are done on AJAXcount == 0 */
             if (AJAXcount > 0) return;
 
@@ -772,10 +775,9 @@ function updateChart( forceUpdate, scroll ) {
                 });
             }
 
-            if (RefreshTimeout > 0) {
+            if ($('#cb-autorefresh').is(':checked') && RefreshTimeout > 0) {
                 updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
             }
-
 
             /* Redraw independent from other DOM changes via setTimeout */
             setTimeout(function() {
@@ -1142,6 +1144,21 @@ $(function() {
         $('#d-daylight-grace').prop('disabled', checked).spinner('option', 'disabled', checked);
     });
 
+    /* Inject checkbox for chart auto refresh */
+    var cb_refresh = $('<input/>').prop('id', 'cb-autorefresh').prop('type', 'checkbox')
+        .prop('checked', !(lscache.get('chart-autorefresh') === false));
+    /* Wrapper div for iChecked checkbox */
+    $('<div/>').addClass('fr').css('margin', '6px 0 0 6px')
+        .append(cb_refresh).appendTo('#preset-wrapper');
+    /* iCheck after inserted into wrapper DIV */
+    cb_refresh.iCheck({ checkboxClass: 'icheckbox_flat' })
+        .on('ifToggled', function(e) {
+            /* Remember current state */
+            lscache.set('chart-autorefresh', $(this).is(':checked'))
+        })
+        /* Put the hint onto parent div injected by iCheck around the checkbox */
+        .parent().prop('title', '{{ChartAutoRefresh}}');
+
     $('input.iCheck').iCheck('update');
 
     $('input.channel').on('ifToggled', function() {
@@ -1305,7 +1322,7 @@ $(function() {
                         today = ('0'+(d.getMonth()+1)).slice(-2) + '/' +
                                 ('0'+d.getDate()).slice(-2) + '/' +
                                 d.getFullYear();
-                    if ($('#todate').val() >= today) {
+                    if ($('#cb-autorefresh').is(':checked') && $('#todate').val() >= today) {
                         setTimeout(function() {
                             /* Scroll to navigation as top most visible element */
                             if (chart) pvlng.scroll('#nav');

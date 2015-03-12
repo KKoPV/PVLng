@@ -24,7 +24,7 @@
              title="{{UnsavedChanges}}" />
         &nbsp;
     </div>
-    <div class="r">
+    <div id="preset-wrapper" class="r">
         <!-- INCLUDE preset.inc.tpl -->
     </div>
 </div>

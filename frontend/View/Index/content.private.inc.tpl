@@ -55,9 +55,7 @@
                              class="def ico spinner" alt="o" />
                         <!-- INCLUDE channel-details.inc.tpl -->
                     </td>
-                    <td class="icons r">
-                        <span id="cons{ID}" class="consumption"></span>
-                    </td>
+                    <td id="cons{ID}" class="consumption"></td>
                     <td>{UNIT}</td>
                     <td id="costs{ID}" class="costs"></td>
                     <td class="icons">
