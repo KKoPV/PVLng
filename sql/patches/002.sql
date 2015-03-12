@@ -15,7 +15,8 @@ CREATE TABLE `pvlng_reading_tmp` (
   `uid` smallint(5) unsigned NOT NULL COMMENT 'Temporary data Id',
   `created` int(10) NOT NULL COMMENT 'Record created',
   PRIMARY KEY (`id`,`start`,`end`),
-  UNIQUE KEY `uid` (`uid`)
+  UNIQUE KEY `uid` (`uid`),
+  INDEX `created` (`created`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Buffer and remember internal calculated data';
 
 DROP TRIGGER `pvlng_reading_tmp_bi`;
