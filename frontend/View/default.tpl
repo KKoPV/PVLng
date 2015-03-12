@@ -9,9 +9,6 @@
  */
 -->
 
-<!-- @ToDo Some adjustments for labels required for 4.1.2 -->
-<!-- DEFINE HIGHCHARTS_VERSION -->4.0<!-- END DEFINE -->
-
 <!doctype html>
 <html class="no-js" lang="en">
 <head>
@@ -124,12 +121,9 @@
         <!-- INCLUDE script.var.js -->
     </script>
 
-    <!-- IF {DEVELOPMENT} -->
+    <!-- INCLUDE highcharts.tpl -->
 
-    <!-- Load Highcharts scripts direct from highcharts.com -->
-    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts.src.js"></script>
-    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts-more.src.js"></script>
-    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/modules/exporting.src.js"></script>
+    <!-- IF {DEVELOPMENT} -->
 
     <script src="/js/jquery-ui.min.js"></script>
     <script src="/js/jquery-ui-i18n.min.js"></script>
@@ -160,10 +154,6 @@
 
     <!-- ELSE -->
 
-    <!-- Load Highcharts scripts direct from highcharts.com -->
-    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts.js"></script>
-    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/highcharts-more.js"></script>
-    <script src="http://code.highcharts.com/<!-- MACRO HIGHCHARTS_VERSION -->/modules/exporting.js"></script>
     <script src="/js/min.js"></script>
 
     <!-- ENDIF -->

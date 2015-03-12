@@ -62,23 +62,26 @@
                 </li>
                 <!-- END -->
 
-                <!-- QR code for mobile view -->
-                <li>
-                    <a href="#" class="tip-top" title="{HINT}" onclick="return false">
-                        <img src="/images/pix.gif" data-src="/images/ico/barcode-2d.png" class="ico def">
-                    </a>
-                    <ul>
-                        <li class="c">
-                            <p class="s">{{ScanForMobileView}}</p>
-                            <img id="qr-code" style="width:100px;height:100px;padding-bottom:10px">
-                        </li>
-                    </ul>
-                </li>
             </ul>
         </div>
 
         <div class="fr">
             <ul class="sm sm-clean">
+                <!-- QR code for mobile view -->
+                <li>
+                    <a href="#" class="tip" tip="#qr">
+                        <img src="/images/pix.gif" data-src="/images/ico/barcode-2d.png" class="ico def">
+                    </a>
+                    <div id="qr">
+                        <div id="qr" class="c ui-corner-all"
+                             style="font-size:larger;margin:.5em;padding:2em;color:black;background-color:white;text-shadow:0">
+                            {{ScanForMobileView}}
+                            <br /><br />
+                            <img id="qr-code" style="width:100px;height:100px">
+                        </div>
+                    </div>
+                </li>
+
                 <li>
                     <a href="#"><img src="/images/pix.gif" data-src="/images/lang-select.gif"
                                      class="def" style="width:33px;height:21px" alt="L"></a>

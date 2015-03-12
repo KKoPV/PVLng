@@ -45,16 +45,14 @@
     <script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>
 
+    <!-- INCLUDE highcharts.tpl -->
+
     <!-- IF {DEVELOPMENT} -->
     <script src="/js/mobile.js"></script>
     <script src="/js/chart.js"></script>
     <!-- ELSE -->
     <script src="/js/min.mobile.js"></script>
     <!-- ENDIF -->
-
-    <!-- load Highcharts scripts direct from highcharts.com -->
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="http://code.highcharts.com/highcharts-more.js"></script>
 
     <script>
         <!-- INCLUDE script.var.js -->
