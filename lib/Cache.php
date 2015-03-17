@@ -34,9 +34,10 @@ abstract class Cache {
      *
      * @param string $key Unique cache Id
      * @param string $data
+     * @param int $ttl Time to live
      * @return bool
      */
-    abstract public function write( $key, $data );
+    abstract public function write( $key, $data, $ttl );
 
     /**
      * Retrieve raw data from cache
@@ -68,14 +69,14 @@ abstract class Cache {
     /**
      * Create/find a cache instance
      *
-     * @param string $class Force cache class to create
      * @param array $settings
+     * @param string $classes Force cache class to create
      * @return Cache
      */
     public static final function factory( $settings=array(), $classes=NULL ) {
-        $caches = ($classes == '') ? self::$Caches : explode(',', $classes);
+        $classes = ($classes == '') ? self::$Caches : explode(',', $classes);
 
-        foreach ($caches as $class) {
+        foreach ($classes as $class) {
             $class = 'Cache\\'.$class;
 
             if (!class_exists($class))
@@ -85,6 +86,7 @@ abstract class Cache {
             if ($cache->isAvailable()) return $cache;
         }
 
+        // If no cache is available, return mockup class
         return new Cache\Mock;
     } // function factory()
 
@@ -161,7 +163,7 @@ abstract class Cache {
      * @param int $ttl Time to live, if set to 0, expire never
      * @return bool
      */
-    public final function save( $key, &$data, $ttl=NULL ) {
+    public final function save( $key, &$data, $ttl=0 ) {
         if ($key == end($this->stack)) {
             $this->set($key, $data, $ttl);
             // done, remove id from stack
@@ -171,7 +173,7 @@ abstract class Cache {
             // $key is in stack, but NOT on top
             throw new CacheException(__CLASS__.': Stack problem - '.end($this->stack).' not properly finished!', 99);
         } else {
-            $data = $this->get($key, $ttl);
+            $data = $this->get($key);
             if ($data !== NULL) {
                 // Content found in cache, done
                 return FALSE;
@@ -255,13 +257,13 @@ abstract class Cache {
         if (!isset($ttl)) $ttl = $this->settings['TTL'];
 
         if (!is_array($key)) {
-            return $this->write($key, array($this->ts, $ttl, $data));
+            return $this->write($key, array($this->ts, $ttl, $data), $ttl);
         }
 
         // Multiple values
         $ok = TRUE;
         foreach ($key as $k=>$v) {
-            $ok = ($ok AND $this->write($key, array($this->ts, $ttl, $v)));
+            $ok = ($ok AND $this->write($key, array($this->ts, $ttl, $v), $ttl));
         }
         return $ok;
     }
@@ -291,13 +293,9 @@ abstract class Cache {
      * Retrieve raw data from cache
      *
      * @param string $key Unique cache Id
-     * @param int $expire Time to live or timestamp
-     *                                        - = 0 - expire never
-     *                                        - > 0 - Time to live
-     *                                        - < 0 - Timestamp of expiration
      * @return mixed
      */
-    public function get( $key, $expire=0 ) {
+    public function get( $key ) {
         $cdata = $this->fetch($key);
 
         if ($cdata === NULL) return;
@@ -306,7 +304,7 @@ abstract class Cache {
         list($ts, $ttl, $data) = $cdata;
 
         // Data valid?
-        if ($this->valid($ts, $ttl, $expire)) return $data;
+        if ($this->valid($ts, $ttl)) return $data;
 
         // else drop data for this key
         $this->delete($key);
@@ -366,11 +364,11 @@ abstract class Cache {
     /**
      * Available caching methods
      *
-     * @todo Test 'EAccelerator', 'XCache', 'MemCache'
+     * @todo Test 'EAccelerator', 'XCache'
      * @var array $Caches
      */
     protected static $Caches = array(
-        'APC', 'MemCache', 'MemCacheOne',
+        'MemCache', 'APC', 'MemCacheOne',
         // Only avail. with a writeable directory
         'File', 'Files',
         // Always avail.
@@ -384,24 +382,12 @@ abstract class Cache {
      * @see get()
      * @param int $ts Timestamp when data was last saved
      * @param int $ttl Time to live of data to check against
-     * @param int $expire Time to live or timestamp
-     *                                        - = 0 - expire never
-     *                                        - > 0 - Time to live
-     *                                        - < 0 - Timestamp of expiration
      * @return bool
      */
-    protected function valid( $ts, $ttl, $expire ) {
-        if (isset($expire)) {
-            // expiration timestamp set
-            if ($expire === 0 OR
-                    $expire > 0 AND $this->ts+$expire >= $ts+$ttl OR
-                    $expire < 0 AND $ts >= -$expire) return TRUE;
-        } else {
-            // expiration timestamp NOT set
-            if ($ttl === 0 OR
-                    $ttl > 0 AND $ts+$ttl >= $this->ts OR
-                    $ttl < 0 AND -$ttl >= $this->ts) return TRUE;
-        }
+    protected function valid( $ts, $ttl ) {
+        if ($ttl === 0 ||
+            $ttl > 0 && $ts+$ttl >= $this->ts ||
+            $ttl < 0 && -$ttl >= $this->ts) return TRUE;
         return FALSE;
     } // function valid()
 

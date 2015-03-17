@@ -25,10 +25,10 @@ return array(
      * Preferd cache mode, auto detect best one if empty
      */
     'Cache' => NULL
-    // Force one, if you like, MemCache is best tested and recommended
+    // Force one, if you like,
+    // MemCache is best tested and recommended!
     # 'Cache' => 'MemCache'     // MUST BE ISTALLED AND ENABLED!
     # 'Cache' => 'APC'          // MUST BE ISTALLED AND ENABLED!
-    # 'Cache' => 'File'
     # 'Cache' => 'Mock'         // Disable caching complete
 
 );

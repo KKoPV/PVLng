@@ -96,7 +96,7 @@ $api->container->singleton('db', function() use ($api) {
 $api->container->singleton('cache', function() use ($api) {
     return Cache::factory(
         array('Directory' => TEMP_DIR, 'TTL' => 86400),
-        $api->config->get('Cache')
+        $api->config->get('Cache') ?: 'MemCache,APC'
     );
 });
 
@@ -107,6 +107,7 @@ $api->hook('slim.before', function() use ($api) {
 
     slimMVC\ORM::setDatabase($api->db);
     slimMVC\ORM::setCache($api->cache);
+    Channel::setCache($api->cache);
 
     foreach ((new ORM\SettingsKeys)->find() as $setting) {
         $api->config->set($setting->getKey(), $setting->getValue());

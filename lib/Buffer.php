@@ -14,9 +14,10 @@ class Buffer implements Iterator, Countable {
     /**
      * Use PHPs internal temp stream, use file for data greater 5 MB
      */
-    public function __construct( $size=5 ) {
+    public function __construct( $data=array(), $size=5 ) {
         $this->fh = fopen('php://temp/maxmemory:'.(1024 * 1024 * $size), 'w+');
         $this->rowCount = 0;
+        foreach ($data as $key=>$row) $this->write($row, $key);
         $this->rewind();
     }
 

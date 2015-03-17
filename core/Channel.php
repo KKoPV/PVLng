@@ -17,6 +17,13 @@ abstract class Channel {
     public $isChild = FALSE;
 
     /**
+     *
+     */
+    public static function setCache( Cache $cache ) {
+        self::$cache = $cache;
+    }
+
+    /**
      * Helper function to build an instance
      */
     public static function byId( $id, $alias=TRUE ) {
@@ -545,6 +552,11 @@ abstract class Channel {
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected static $cache;
 
     /**
      *

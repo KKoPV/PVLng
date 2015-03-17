@@ -49,7 +49,7 @@ class File extends AbstractFile {
      * @param string $data
      * @return bool
      */
-    public function write( $key, $data ) {
+    public function write( $key, $data, $ttl ) {
         $this->data[$key] = $data;
         $this->modified = TRUE;
     } // function write()

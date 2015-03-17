@@ -70,8 +70,8 @@ class MemCache extends \Cache {
         return $this->memcache->connect($this->host, $this->port);
     }
 
-    public function write( $key, $data ) {
-        return $this->memcache->set($this->key($key), $data);
+    public function write( $key, $data, $ttl ) {
+      return $this->memcache->set($this->key($key), $data, 0, $ttl ? $this->ts+$ttl : 0);
     }
 
     public function fetch( $key ) {

@@ -36,8 +36,8 @@ class APC extends \Cache {
      * @param string $data
      * @return bool
      */
-    public function write( $key, $data ) {
-        return apc_store($this->key($key), $this->serialize($data), $data[1]);
+    public function write( $key, $data, $ttl ) {
+        return apc_store($this->key($key), $this->serialize($data), $ttl ? $this->ts+$ttl : 0);
     }
 
     /**

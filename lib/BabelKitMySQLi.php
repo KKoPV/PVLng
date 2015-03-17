@@ -31,7 +31,7 @@ class BabelKitMySQLi extends BabelKit {
     /**
      *
      */
-    public static function setCache( $cache ) {
+    public static function setCache( Cache $cache ) {
         self::$cache = $cache;
     }
 

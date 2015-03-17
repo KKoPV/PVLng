@@ -47,6 +47,7 @@ class InternalConsumption extends InternalCalc {
 
         $child1 = $childs[0]->read($request);
         $row1   = $child1->rewind()->current();
+        $FirstKey1 = $child1->key();
 
         $child2 = $childs[1]->read($request);
         $row2   = $child2->rewind()->current();
@@ -105,6 +106,7 @@ class InternalConsumption extends InternalCalc {
                 }
             }
         }
+
         $this->dataCreated();
 
         $child1->close();
