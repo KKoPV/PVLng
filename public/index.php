@@ -33,12 +33,16 @@ function _redirect( $route ) {
 /**
  * Initialize
  */
+file_exists(ROOT_DIR . DS . 'prepend.php') && include ROOT_DIR . DS . 'prepend.php';
+
 setlocale(LC_NUMERIC, 'C');
 iconv_set_encoding('internal_encoding', 'UTF-8');
 mb_internal_encoding('UTF-8');
 clearstatcache();
 
-if ($dev = file_exists(ROOT_DIR . DS . '.develop')) {
+defined('DEVELOP') OR define('DEVELOP', FALSE);
+
+if (DEVELOP) {
     ini_set('display_startup_errors', 1);
     ini_set('display_errors', 1);
     error_reporting(-1);
@@ -47,8 +51,6 @@ if ($dev = file_exists(ROOT_DIR . DS . '.develop')) {
     ini_set('display_errors', 0);
     error_reporting(0);
 }
-
-file_exists(ROOT_DIR . DS . 'prepend.php') && include ROOT_DIR . DS . 'prepend.php';
 
 file_exists(CONF_DIR . DS . 'config.php') || _redirect('/public/setup.php');
 
@@ -77,9 +79,9 @@ Session::start('PVLng');
 $_SERVER['SCRIPT_NAME'] = '/';
 
 $app = new slimMVC\App(array(
-    'mode'      => $dev ? 'development' : 'production',
-    'log.level' => $dev ? Slim\Log::INFO : Slim\Log::ALERT,
-    'debug'     => $dev
+    'mode'      => DEVELOP ? 'development' : 'production',
+    'log.level' => DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
+    'debug'     => DEVELOP
 ));
 
 // If installed from GitHub, find branch and actual commit
@@ -121,7 +123,7 @@ $app->container->singleton('db', function() use ($app) {
 $app->container->singleton('cache', function() use ($app) {
     return \Cache::factory(
         array('Directory' => TEMP_DIR, 'TTL' => 86400),
-        $app->config->get('Cache') ?: 'MemCache,APC,File'
+        $app->config->get('Cache') ?: 'MemCache,APC'
     );
 });
 

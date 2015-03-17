@@ -113,7 +113,11 @@
 
     </div>
 
+    <!-- IF {DEVELOPMENT} -->
+    <script src="//code.jquery.com/jquery-2.1.1.js"></script>
+    <!-- ELSE -->
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <!-- ENDIF -->
 
     <script>
         <!-- INCLUDE config.default.js -->
@@ -124,7 +128,6 @@
     <!-- INCLUDE highcharts.tpl -->
 
     <!-- IF {DEVELOPMENT} -->
-
     <script src="/js/jquery-ui.min.js"></script>
     <script src="/js/jquery-ui-i18n.min.js"></script>
     <script src="/js/jquery.dataTables.min.js"></script>
@@ -151,11 +154,8 @@
     <script src="/js/Blob.min.js"></script>
     <script src="/js/FileSaver.min.js"></script>
     <script src="/js/qr.js"></script>
-
     <!-- ELSE -->
-
     <script src="/js/min.js"></script>
-
     <!-- ENDIF -->
 
     <!-- IF {LANGUAGE} != "en" -->

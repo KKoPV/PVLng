@@ -45,8 +45,9 @@ $.parseQueryString = function() {
  * Display wait cursor for whole page
  */
 $.wait = function(show) {
-    if (typeof show === 'undefined') show = true;
-    $('html').css('cursor', show ? 'wait' : 'default');
+    // Defaults to true
+    if (!arguments.length) show = true;
+    $('html').css('cursor', show ? 'progress' : 'default');
 };
 
 /**
@@ -61,7 +62,7 @@ $(function() {
 
     $.datepicker.setDefaults($.datepicker.regional[$.datepicker.regional[language] ? language : '']);
 
-    /* Inititilize Pines Notify */
+    // Inititilize Pines Notify
     $.pnotify.defaults.styling = 'jqueryui';
     $.pnotify.defaults.delay = 5000;
     $.pnotify.defaults.history = false;
@@ -79,7 +80,7 @@ $(function() {
         $.pnotify(msg);
     });
 
-    /* Inititilize Tooltips */
+    // Inititilize Tooltips
     $('.tip, .tipbtn').tipTip({
         attribute: 'tip',
         maxWidth: '400px',
@@ -146,7 +147,7 @@ $(function() {
 
     $('input[type=number]').prop('type', 'text').addClass('number-spinner').spinner();
 
-    /* Back to top */
+    // Back to top
     var fadeDuration = 500;
     $(window).scroll(function() {
         if ($(this).scrollTop()) {
@@ -219,7 +220,7 @@ function _log() {
 }
 
 /**
- *
+ * disabled, not used yet
  * /
 String.prototype.repeat = function(count) {
     if (count < 1) return '';

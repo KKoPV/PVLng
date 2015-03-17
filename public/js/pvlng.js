@@ -1,6 +1,11 @@
 /**
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
+
 var pvlng = new function() {
 
     /**
@@ -10,7 +15,7 @@ var pvlng = new function() {
      */
     this.cookie = new function() {
 
-        this.set = function (name, value, days) {
+        this.set = function(name, value, days) {
             var expires = '';
             if (days) {
                 var date = new Date();
@@ -20,7 +25,7 @@ var pvlng = new function() {
             document.cookie = escape(name) + '=' + escape(value) + expires + '; path=/';
         },
 
-        this.get = function (name) {
+        this.get = function(name) {
             var nameEQ = escape(name) + '=';
             var ca = document.cookie.split(';');
             for (var i=0; i<ca.length; i++) {
@@ -168,17 +173,17 @@ var pvlng = new function() {
     /**
      *
      */
-    this.changeDates = function ( dir ) {
+    this.changeDates = function( dir ) {
         dir *= 24*60*60*1000;
 
         var from = new Date(Date.parse($('#from').datepicker('getDate')) + dir),
             to = new Date(Date.parse($('#to').datepicker('getDate')) + dir);
-/*
-        if (to > new Date) {
-            $.pnotify({ type: 'info', text: "Can't go beyond today." });
+
+        if (to > (new Date).getTime()+24*60*60*1000) {
+            $.pnotify({ type: 'info', text: "Can't go beyond tomorrow." });
             return;
         }
-*/
+
         $('#from').datepicker('option', 'maxDate', to).datepicker('setDate', from);
         $('#to').datepicker('option', 'minDate', from).datepicker('setDate', to);
 
@@ -188,7 +193,7 @@ var pvlng = new function() {
     /**
      *
      */
-    this.changePreset = function () {
+    this.changePreset = function() {
         var preset = $('#preset').val().match(/(\d+)(\w+)/);
 
         if (!preset) {
@@ -253,12 +258,12 @@ $(function() {
                 close: function() { $(this).remove() }
             };
             /* Use given texts for buttons */
-            options.buttons[OkText] = function () {
+            options.buttons[OkText] = function() {
                 $(this).dialog('close');
                 d.resolve(true);
                 return true;
             };
-            options.buttons[CancelText] = function () {
+            options.buttons[CancelText] = function() {
                 $(this).dialog('close');
                 d.resolve(false);
                 return false;

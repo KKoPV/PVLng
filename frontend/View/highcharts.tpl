@@ -12,10 +12,13 @@
     Load Highcharts scripts direct from highcharts.com
     Pin HighCharts version, new versions may have some "bugs"
 -->
+
+<!-- IF {DEVELOPMENT} -->
+<script src="http://code.highcharts.com/4.1.4/highcharts.src.js"></script>
+<script src="http://code.highcharts.com/4.1.4/highcharts-more.src.js"></script>
+<script src="http://code.highcharts.com/4.1.4/modules/exporting.src.js"></script>
+<!-- ELSE -->
 <script src="http://code.highcharts.com/4.1.4/highcharts.js"></script>
 <script src="http://code.highcharts.com/4.1.4/highcharts-more.js"></script>
 <script src="http://code.highcharts.com/4.1.4/modules/exporting.js"></script>
-
-<!-- IF {DEVELOPMENT} -->
-<!-- ELSE -->
 <!-- ENDIF -->

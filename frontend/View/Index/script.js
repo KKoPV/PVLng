@@ -49,16 +49,6 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
 
     chartOptions = {
         chart: {
-            renderTo: 'chart',
-            style: { fontFamily: 'inherit' },
-            alignTicks: false,
-            zoomType: 'x',
-            resetZoomButton: {
-                relativeTo: 'chart',
-                position: { x: -40 }
-            },
-            panning: true,
-            panKey: 'shift',
             events: {
                 load: function () {
                     this.renderer
@@ -75,14 +65,24 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
                         .css({ color: 'lightgray', fontSize: '9px' })
                         .add();
                 }
-            }
+            },
+            panning: true,
+            panKey: 'shift',
+            renderTo: 'chart',
+            resetZoomButton: {
+                relativeTo: 'chart',
+                position: { x: -40 }
+            },
+            style: { fontFamily: 'inherit' },
+            zoomType: 'x'
         },
-        title: { text: '' },
-        /* legend: { borderRadius: 5, borderWidth: 1 }, */
         credits: false,
+        loading: {
+            labelStyle: { top: '40%' },
+            style: { opacity: 0.8 }
+        },
         plotOptions: {
             series: {
-                point: { events: { click: PVLngAPIkey ? deleteReading : null } },
                 turboThreshold: 0
             },
             line: { marker: { enabled: false } },
@@ -99,7 +99,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             },
             bar: { groupPadding: 0.1 }
         },
-        xAxis : { type: 'datetime' },
+        title: { text: '' },
         tooltip: {
             useHTML: true,
             formatter: function() {
@@ -140,10 +140,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             crosshairs: true,
             shared: true
         },
-        loading: {
-            labelStyle: { top: '40%' },
-            style: { opacity: 0.8 }
-        }
+        xAxis : { type: 'datetime' }
     };
 
 /**
@@ -200,14 +197,14 @@ var views = new function Views() {
         el.trigger('change');
     };
 
-    this.load = function( slug, collapse, callback ) {
+    this.load = function( slug, collapse ) {
 
         if (typeof this.views[slug] == 'undefined') return;
+        if (arguments.length < 2) collapse = false;
 
         $.getJSON(
             PVLngAPI + 'view/'+slug+'.json',
             function(data) {
-                if (typeof collapse == 'undefined') collapse = false;
 
                 var expanded = tree.expanded, preset;
                 if (!expanded) tree.toggle(true);
@@ -233,14 +230,11 @@ var views = new function Views() {
                 /* Scroll to navigation as top most visible element */
                 pvlng.scroll('#nav');
 
-                $('#preset').val(preset).trigger('change'); /* Realods chart */
-
                 $('#load-delete-view').val(views.actual.slug).trigger('change');
                 $('#saveview').val(views.actual.name);
                 $('#visibility').val(views.actual.public).trigger('change');
                 $('#modified').hide();
-
-                if (typeof callback !== 'undefined') callback(views.actual);
+                $('#preset').val(preset).trigger('change'); /* Reloads chart */
             }
         ).fail(function( jqXHR, textStatus ) {
             alert( "Request failed: " + textStatus );
@@ -351,10 +345,12 @@ function ChartDialog( id ) {
 /**
  *
  */
-function updateChart( forceUpdate, scroll ) {
+function updateChart( force ) {
 
     clearTimeout(updateTimeout);
     updateTimeout = null;
+
+    if (force) updateActive = false;
 
     if (updateActive || !windowVisible) return;
 
@@ -373,7 +369,7 @@ function updateChart( forceUpdate, scroll ) {
         expanded = tree.expanded;
 
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
-    if ($.ajaxQ.abortAll() != 0) forceUpdate = true;
+    if ($.ajaxQ.abortAll() != 0) force = true;
 
     if (user && views.actual) {
         /* Provide permanent link only for logged in user and not embedded view level 2 */
@@ -407,9 +403,9 @@ function updateChart( forceUpdate, scroll ) {
         var ch = channels[$(el).data('id')],
             channel = new presentation($(el).val());
         channel.id = ch.id;
-        channel.name = $('<div/>').html(ch.name).text();
-        channel.guid = ch.guid;
-        channel.unit = ch.unit;
+        channel.name  = $('<div/>').html(ch.name).text();
+        channel.guid  = ch.guid;
+        channel.unit  = ch.unit;
         channel.time1 = TimeStrToSec(channel.time1,  0);
         channel.time2 = TimeStrToSec(channel.time2, 24);
         /* Remember channel in correct order */
@@ -428,9 +424,6 @@ function updateChart( forceUpdate, scroll ) {
 
     /* Build channels */
     $(buffer).each(function(id, channel) {
-        /* Axis on right side */
-        var is_right = !(channel.axis % 2);
-
         /* Remember original axis for change detection */
         channel.axis_org = channel.axis;
         /* Axis from chart point of view */
@@ -459,11 +452,12 @@ function updateChart( forceUpdate, scroll ) {
         if (!yAxis[channel.axis]) {
             yAxis[channel.axis] = {
                 lineColor: channel.color,
-                showEmpty: false,
                 minPadding: 0,
-                maxPadding: 0,
-                opposite: is_right
+                /* Axis on right side */
+                opposite: !(channel.axis_org % 2),
+                showEmpty: false
             };
+
             /* Only 1st left axis shows grid lines */
             if (channel.axis != 0) {
                 yAxis[channel.axis].gridLineWidth = 0;
@@ -475,13 +469,6 @@ function updateChart( forceUpdate, scroll ) {
             yAxis[channel.axis].title = { text: channel.unit };
         }
     });
-
-    if (yAxis.length > 1) {
-        $(yAxis).each(function(id) {
-            yAxis[id].startOnTick = false;
-            yAxis[id].endOnTick = false;
-        });
-    }
 
     /* Any channels checked for drawing? */
     if (channels_new.length == 0) {
@@ -498,7 +485,7 @@ function updateChart( forceUpdate, scroll ) {
     var changed = false, now = (new Date).getTime() / 1000 / 60;
 
     /* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
-    if (forceUpdate || channels_new.length != channels_chart.length || now - lastChanged > 30) {
+    if (force || channels_new.length != channels_chart.length || now - lastChanged > 30) {
         changed = true;
         channels_chart = channels_new;
         lastChanged = now;
@@ -629,7 +616,7 @@ function updateChart( forceUpdate, scroll ) {
                         /* Other color for values below threshold */
                         serie.negativeColor = channel.colordiff;
                     }
-                    serie.threshold = channel.threshold;
+                    serie.threshold = channel.threshold || 0;
                 }
 
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
@@ -829,46 +816,9 @@ $.ajaxQ = (function() {
  */
 function updateOutput() {
     updateActive = false;
-    updateChart();
+    updateChart(true);
 }
 
-/**
- *
- */
-function deleteReading() {
-    if (!this.series.options.raw) return $.alert('Can\'t delete from consolidated data.', 'Error');
-
-    var point = this, /* Remember point to remove afterwards from chart */
-        url = PVLngAPI + 'data/' + this.series.options.guid + '/' + (this.x/1000).toFixed(0) + '.json',
-        msg = $('<p/>').html('{{DeleteReadingConfirm}}'),
-        ul = $('<ul/>')
-             .append($('<li/>').html(this.series.name))
-             .append($('<li/>').html((new Date(this.x)).toLocaleString()))
-             .append($('<li/>').html('{{Reading}} : ' + this.y + ' ' + this.series.options.unit));
-
-    $.confirm($('<p/>').append(msg).append(ul), '{{DeleteReading}}', '{{Yes}}', '{{No}}')
-    .then(function(ok) {
-        if (!ok) return;
-
-        chart.showLoading(chartLoading);
-        $.wait();
-
-        $.ajax(
-            { type: 'DELETE', url: url, dataType: 'json' }
-        ).done(function(data, textStatus, jqXHR) {
-            point.remove();
-            $.pnotify({ type: 'success', text: '{{ReadingDeleted}}' });
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-            $.pnotify({
-                type: textStatus, hide: false,
-                text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
-            });
-        }).always(function() {
-            chart.hideLoading();
-            $.wait(false);
-        });
-    })
-}
 /**
  *
  */
@@ -958,8 +908,10 @@ $(function() {
         }
     }).datepicker('setDate', dTo);
 
+    /**
+     * Highcharts localization defaults
+     */
     Highcharts.setOptions({
-        global: { alignTicks: false },
         lang: {
             thousandsSep: '{TSEP}',
             decimalPoint: '{DSEP}',

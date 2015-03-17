@@ -41,8 +41,13 @@
 
     {CONTENT}
 
-    <script src="//code.jquery.com/jquery-2.0.0.js"></script>
+    <!-- IF {DEVELOPMENT} -->
+    <script src="//code.jquery.com/jquery-2.1.1.js"></script>
+    <script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.js"></script>
+    <!-- ELSE -->
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+    <!-- ENDIF -->
     <script src="/js/jquery-ui.min.js"></script>
 
     <!-- INCLUDE highcharts.tpl -->
