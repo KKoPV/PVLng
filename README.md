@@ -39,18 +39,29 @@ apply all outstanding database patches. (The script will work also with the deve
 To make sure to clear the temp. directory after each `git pull`, put this
 [Gist](https://gist.github.com/K-Ko/e7c01e0c7490ee4352fb) into `.git/hooks/post-merge` and make executable.
 
-# Scripts for data acquisition
+## Scripts for data acquisition
 
 The scripts for data acquisition resides in its own repository: [PVLng-scripts](https://github.com/KKoPV/PVLng-scripts)
 
-# Issues
+## Issues
 
 Please use appropriately tagged github [issues](https://github.com/KKoPV/PVLng/issues) to request features or report bugs.
 
-# Contributing
+## Contributing
 
 All code contributions and bug reports are much appreciated.
 
  - The project is managed with the [Git Flow branching model](http://nvie.com/posts/a-successful-git-branching-model/) and [tools](https://github.com/nvie/gitflow), so all pull requests **must** target the `develop` branch (not `master`)
  - Please use soft tabs (four spaces) instead of hard tabs
  - Include commenting where appropriate and add a descriptive pull request message
+
+## Branches
+
+- `master` is the latest deployed version
+- `develop` is the primary development branch
+
+## Publishing
+
+Release version numbers will follow the format:
+
+`<version>.<update>.<patch>`
