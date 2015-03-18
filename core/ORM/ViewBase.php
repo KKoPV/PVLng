@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -142,17 +142,6 @@ abstract class ViewBase extends \slimMVC\ORM {
     }   // filterBySlug()
 
     /**
-     * Filter for field 'name'
-     *
-     * @param  mixed    $name Filter value
-     * @return Instance For fluid interface
-     */
-    public function filterByName( $name ) {
-        $this->filter[] = '`name` = "'.$this->quote($name).'"';
-        return $this;
-    }   // filterByName()
-
-    /**
      * Filter for field 'public'
      *
      * @param  mixed    $public Filter value
@@ -162,6 +151,17 @@ abstract class ViewBase extends \slimMVC\ORM {
         $this->filter[] = '`public` = "'.$this->quote($public).'"';
         return $this;
     }   // filterByPublic()
+
+    /**
+     * Filter for field 'name'
+     *
+     * @param  mixed    $name Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByName( $name ) {
+        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+        return $this;
+    }   // filterByName()
 
     /**
      * Filter for field 'data'
@@ -184,5 +184,22 @@ abstract class ViewBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_view';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_view` (
+          `name` varchar(50) NOT NULL COMMENT \'Chart name\',
+          `public` tinyint(1) unsigned NOT NULL COMMENT \'View type (private/public/mobile)\',
+          `data` text NOT NULL COMMENT \'Serialized channel data\',
+          `slug` varchar(50) NOT NULL COMMENT \'URL-save slug\',
+          PRIMARY KEY (`name`,`public`),
+          UNIQUE KEY `slug` (`slug`),
+          KEY `public` (`public`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'View variants\'
+    ';
 
 }

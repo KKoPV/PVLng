@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -153,5 +153,21 @@ abstract class TariffDateBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_tariff_date';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_tariff_date` (
+          `id` int(10) unsigned NOT NULL COMMENT \'pvlng_tariff -> id\',
+          `date` date NOT NULL COMMENT \'Start date for this tariff (incl.) \',
+          `cost` float DEFAULT NULL COMMENT \'Fix costs per day, e.g. EUR / kWh\',
+          PRIMARY KEY (`id`,`date`),
+          KEY `date` (`date`),
+          CONSTRAINT `pvlng_tariff_date_ibfk_2` FOREIGN KEY (`id`) REFERENCES `pvlng_tariff` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    ';
 
 }

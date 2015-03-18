@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -63,17 +63,6 @@ abstract class ConfigBase extends \slimMVC\ORM {
         return $this;
     }   // setComment()
 
-    /**
-     * Basic setter for field 'type'
-     *
-     * @param  mixed    $type Type value
-     * @return Instance For fluid interface
-     */
-    public function setType( $type ) {
-        $this->fields['type'] = $type;
-        return $this;
-    }   // setType()
-
     // -----------------------------------------------------------------------
     // Getter methods
     // -----------------------------------------------------------------------
@@ -104,15 +93,6 @@ abstract class ConfigBase extends \slimMVC\ORM {
     public function getComment() {
         return $this->fields['comment'];
     }   // getComment()
-
-    /**
-     * Basic getter for field 'type'
-     *
-     * @return mixed Type value
-     */
-    public function getType() {
-        return $this->fields['type'];
-    }   // getType()
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -151,17 +131,6 @@ abstract class ConfigBase extends \slimMVC\ORM {
         return $this;
     }   // filterByComment()
 
-    /**
-     * Filter for field 'type'
-     *
-     * @param  mixed    $type Filter value
-     * @return Instance For fluid interface
-     */
-    public function filterByType( $type ) {
-        $this->filter[] = '`type` = "'.$this->quote($type).'"';
-        return $this;
-    }   // filterByType()
-
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
@@ -172,5 +141,19 @@ abstract class ConfigBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_config';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_config` (
+          `key` varchar(50) NOT NULL,
+          `value` varchar(1000) NOT NULL,
+          `comment` varchar(255) NOT NULL,
+          PRIMARY KEY (`key`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Application settings\'
+    ';
 
 }

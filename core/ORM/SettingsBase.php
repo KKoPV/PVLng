@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -309,5 +309,24 @@ abstract class SettingsBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_settings';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_settings` (
+          `scope` enum(\'core\',\'controller\',\'model\') NOT NULL,
+          `name` varchar(100) NOT NULL,
+          `key` varchar(100) NOT NULL,
+          `value` varchar(100) NOT NULL,
+          `order` tinyint(3) unsigned NOT NULL,
+          `description` varchar(1000) NOT NULL,
+          `type` enum(\'str\',\'num\',\'bool\',\'option\') NOT NULL,
+          `data` varchar(255) NOT NULL,
+          PRIMARY KEY (`scope`,`name`,`key`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Application settings\'
+    ';
 
 }

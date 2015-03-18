@@ -1,26 +1,26 @@
 <?php
 /**
- * Abstract base class for table 'pvlng_reading_num'
+ * Abstract base class for table 'pvlng_reading_str'
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "Reading.php"
+ * To extend the functionallity, edit "ReadingStr.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
 /**
  *
  */
-abstract class ReadingBase extends \slimMVC\ORM {
+abstract class ReadingStrBase extends \slimMVC\ORM {
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -111,17 +111,6 @@ abstract class ReadingBase extends \slimMVC\ORM {
     }   // filterByIdTimestamp()
 
     /**
-     * Filter for field 'id'
-     *
-     * @param  mixed    $id Filter value
-     * @return Instance For fluid interface
-     */
-    public function filterById( $id ) {
-        $this->filter[] = '`id` = "'.$this->quote($id).'"';
-        return $this;
-    }   // filterById()
-
-    /**
      * Filter for field 'timestamp'
      *
      * @param  mixed    $timestamp Filter value
@@ -133,6 +122,17 @@ abstract class ReadingBase extends \slimMVC\ORM {
     }   // filterByTimestamp()
 
     /**
+     * Filter for field 'id'
+     *
+     * @param  mixed    $id Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterById( $id ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        return $this;
+    }   // filterById()
+
+    /**
      * Filter for field 'data'
      *
      * @param  mixed    $data Filter value
@@ -142,5 +142,32 @@ abstract class ReadingBase extends \slimMVC\ORM {
         $this->filter[] = '`data` = "'.$this->quote($data).'"';
         return $this;
     }   // filterByData()
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_reading_str';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_reading_str` (
+          `id` smallint(5) unsigned NOT NULL,
+          `timestamp` int(10) unsigned NOT NULL,
+          `data` varchar(50) NOT NULL,
+          PRIMARY KEY (`id`,`timestamp`),
+          KEY `timestamp` (`timestamp`),
+          KEY `id` (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Alphanumeric readings\'
+    ';
 
 }

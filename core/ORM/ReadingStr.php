@@ -16,15 +16,20 @@ namespace ORM;
 /**
  *
  */
-class ReadingStr extends Reading {
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
+class ReadingStr extends ReadingStrBase {
 
     /**
      *
      */
-    protected $table = 'pvlng_reading_str';
+    public function getLastReading( $id, $timestamp=NULL ) {
+        $q = new \DBQuery($this->table);
+        $q->get('data')->filter('id', $id)->order('timestamp', TRUE)->limit(1);
+
+        if (!is_null($timestamp)) {
+            $q->filter('timestamp', array('le'=>$timestamp));
+        }
+
+        return self::$db->queryOne($q);
+    }
 
 }

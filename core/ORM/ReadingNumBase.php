@@ -1,10 +1,10 @@
 <?php
 /**
- * Abstract base class for table 'pvlng_log'
+ * Abstract base class for table 'pvlng_reading_num'
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "Log.php"
+ * To extend the functionallity, edit "ReadingNum.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
@@ -20,7 +20,7 @@ namespace ORM;
 /**
  *
  */
-abstract class LogBase extends \slimMVC\ORM {
+abstract class ReadingNumBase extends \slimMVC\ORM {
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -31,8 +31,15 @@ abstract class LogBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * 'id' is AutoInc, no setter
+     * Basic setter for field 'id'
+     *
+     * @param  mixed    $id Id value
+     * @return Instance For fluid interface
      */
+    public function setId( $id ) {
+        $this->fields['id'] = $id;
+        return $this;
+    }   // setId()
 
     /**
      * Basic setter for field 'timestamp'
@@ -44,17 +51,6 @@ abstract class LogBase extends \slimMVC\ORM {
         $this->fields['timestamp'] = $timestamp;
         return $this;
     }   // setTimestamp()
-
-    /**
-     * Basic setter for field 'scope'
-     *
-     * @param  mixed    $scope Scope value
-     * @return Instance For fluid interface
-     */
-    public function setScope( $scope ) {
-        $this->fields['scope'] = $scope;
-        return $this;
-    }   // setScope()
 
     /**
      * Basic setter for field 'data'
@@ -90,15 +86,6 @@ abstract class LogBase extends \slimMVC\ORM {
     }   // getTimestamp()
 
     /**
-     * Basic getter for field 'scope'
-     *
-     * @return mixed Scope value
-     */
-    public function getScope() {
-        return $this->fields['scope'];
-    }   // getScope()
-
-    /**
      * Basic getter for field 'data'
      *
      * @return mixed Data value
@@ -112,15 +99,16 @@ abstract class LogBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field 'id'
+     * Filter for unique fields 'id', 'timestamp'
      *
-     * @param  mixed    $id Filter value
+     * @param  mixed    $id, $timestamp Filter values
      * @return Instance For fluid interface
      */
-    public function filterById( $id ) {
+    public function filterByIdTimestamp( $id, $timestamp ) {
         $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
         return $this;
-    }   // filterById()
+    }   // filterByIdTimestamp()
 
     /**
      * Filter for field 'timestamp'
@@ -134,15 +122,15 @@ abstract class LogBase extends \slimMVC\ORM {
     }   // filterByTimestamp()
 
     /**
-     * Filter for field 'scope'
+     * Filter for field 'id'
      *
-     * @param  mixed    $scope Filter value
+     * @param  mixed    $id Filter value
      * @return Instance For fluid interface
      */
-    public function filterByScope( $scope ) {
-        $this->filter[] = '`scope` = "'.$this->quote($scope).'"';
+    public function filterById( $id ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
         return $this;
-    }   // filterByScope()
+    }   // filterById()
 
     /**
      * Filter for field 'data'
@@ -164,7 +152,7 @@ abstract class LogBase extends \slimMVC\ORM {
      *
      * @var string $table Table name
      */
-    protected $table = 'pvlng_log';
+    protected $table = 'pvlng_reading_num';
 
     /**
      * SQL for creation
@@ -172,14 +160,16 @@ abstract class LogBase extends \slimMVC\ORM {
      * @var string $createSQL
      */
     protected $createSQL = '
-        CREATE TABLE `pvlng_log` (
-          `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-          `timestamp` datetime NOT NULL,
-          `scope` varchar(40) NOT NULL,
-          `data` text,
-          PRIMARY KEY (`id`),
-          KEY `timestamp` (`timestamp`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=40975 DEFAULT CHARSET=utf8 COMMENT=\'Logging messages\'
+        CREATE TABLE `pvlng_reading_num` (
+          `id` smallint(5) unsigned NOT NULL,
+          `timestamp` int(10) unsigned NOT NULL,
+          `data` decimal(13,4) NOT NULL,
+          PRIMARY KEY (`id`,`timestamp`),
+          KEY `timestamp` (`timestamp`),
+          KEY `id` (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Numeric readings\'
+        /*!50100 PARTITION BY LINEAR KEY (id)
+        PARTITIONS 10 */
     ';
 
 }

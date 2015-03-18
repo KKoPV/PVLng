@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-abstract class Reading extends ReadingBase {
+abstract class Reading {
 
     /**
      *
@@ -25,17 +25,4 @@ abstract class Reading extends ReadingBase {
         return $numeric ? new ReadingNum : new ReadingStr;
     }
 
-    /**
-     *
-     */
-    public function getLastReading( $id, $timestamp=NULL ) {
-        $q = new \DBQuery($this->table);
-        $q->get('data')->filter('id', $id)->order('timestamp', TRUE)->limit(1);
-
-        if (!is_null($timestamp)) {
-            $q->filter('timestamp', array('le'=>$timestamp));
-        }
-
-        return self::$db->queryOne($q);
-    }
 }

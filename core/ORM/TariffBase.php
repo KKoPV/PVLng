@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -134,5 +134,20 @@ abstract class TariffBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_tariff';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_tariff` (
+          `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+          `name` varchar(50) NOT NULL,
+          `comment` varchar(250) NOT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `Tariff name` (`name`)
+        ) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8
+    ';
 
 }

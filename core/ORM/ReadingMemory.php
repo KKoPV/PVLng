@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-abstract class ReadingMemory extends ReadingBase {
+abstract class ReadingMemory {
 
     /**
      *
@@ -24,4 +24,5 @@ abstract class ReadingMemory extends ReadingBase {
     public static function factory( $numeric ) {
         return $numeric ? new ReadingNumMemory : new ReadingStrMemory;
     }
+
 }

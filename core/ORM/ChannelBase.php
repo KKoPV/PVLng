@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -754,5 +754,44 @@ abstract class ChannelBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_channel';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_channel` (
+          `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+          `guid` char(39) DEFAULT NULL COMMENT \'Unique GUID\',
+          `name` varchar(255) NOT NULL COMMENT \'Unique identifier\',
+          `description` varchar(255) NOT NULL COMMENT \'Longer description\',
+          `serial` varchar(30) NOT NULL,
+          `channel` varchar(255) NOT NULL,
+          `type` smallint(5) unsigned NOT NULL COMMENT \'pvlng_type -> id\',
+          `resolution` double NOT NULL DEFAULT \'1\',
+          `unit` varchar(10) NOT NULL,
+          `decimals` tinyint(1) unsigned NOT NULL DEFAULT \'2\',
+          `meter` tinyint(1) unsigned NOT NULL,
+          `numeric` tinyint(1) unsigned NOT NULL DEFAULT \'1\',
+          `offset` double NOT NULL,
+          `adjust` tinyint(1) unsigned NOT NULL COMMENT \'allow auto adjustment of offset\',
+          `cost` double DEFAULT NULL COMMENT \'per unit or unit * h\',
+          `tariff` int(10) unsigned DEFAULT NULL,
+          `threshold` double unsigned DEFAULT NULL,
+          `valid_from` double DEFAULT NULL COMMENT \'Numeric min. acceptable value\',
+          `valid_to` double DEFAULT NULL COMMENT \'Numeric max. acceptable value\',
+          `public` tinyint(1) unsigned NOT NULL DEFAULT \'1\' COMMENT \'Public channels don\'\'t need API key to read\',
+          `extra` text NOT NULL COMMENT \'Not visible field for models to store extra info\',
+          `comment` text NOT NULL COMMENT \'Internal comment\',
+          `icon` varchar(255) NOT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `GUID` (`guid`),
+          KEY `type` (`type`),
+          KEY `tariff` (`tariff`),
+          CONSTRAINT `pvlng_channel_ibfk_1` FOREIGN KEY (`type`) REFERENCES `pvlng_type` (`id`) ON UPDATE CASCADE,
+          CONSTRAINT `pvlng_channel_ibfk_2` FOREIGN KEY (`tariff`) REFERENCES `pvlng_tariff` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+        ) ENGINE=InnoDB AUTO_INCREMENT=662 DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'The channels defined\'
+    ';
 
 }

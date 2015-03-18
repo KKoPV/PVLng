@@ -1,10 +1,10 @@
 <?php
 /**
- * Abstract base class for table 'pvlng_log'
+ * Abstract base class for table 'pvlng_reading_str_tmp'
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "Log.php"
+ * To extend the functionallity, edit "ReadingStrMemory.php"
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
@@ -20,7 +20,7 @@ namespace ORM;
 /**
  *
  */
-abstract class LogBase extends \slimMVC\ORM {
+abstract class ReadingStrMemoryBase extends \slimMVC\ORM {
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -31,8 +31,15 @@ abstract class LogBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * 'id' is AutoInc, no setter
+     * Basic setter for field 'id'
+     *
+     * @param  mixed    $id Id value
+     * @return Instance For fluid interface
      */
+    public function setId( $id ) {
+        $this->fields['id'] = $id;
+        return $this;
+    }   // setId()
 
     /**
      * Basic setter for field 'timestamp'
@@ -44,17 +51,6 @@ abstract class LogBase extends \slimMVC\ORM {
         $this->fields['timestamp'] = $timestamp;
         return $this;
     }   // setTimestamp()
-
-    /**
-     * Basic setter for field 'scope'
-     *
-     * @param  mixed    $scope Scope value
-     * @return Instance For fluid interface
-     */
-    public function setScope( $scope ) {
-        $this->fields['scope'] = $scope;
-        return $this;
-    }   // setScope()
 
     /**
      * Basic setter for field 'data'
@@ -90,15 +86,6 @@ abstract class LogBase extends \slimMVC\ORM {
     }   // getTimestamp()
 
     /**
-     * Basic getter for field 'scope'
-     *
-     * @return mixed Scope value
-     */
-    public function getScope() {
-        return $this->fields['scope'];
-    }   // getScope()
-
-    /**
      * Basic getter for field 'data'
      *
      * @return mixed Data value
@@ -110,6 +97,18 @@ abstract class LogBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
+
+    /**
+     * Filter for unique fields 'id', 'timestamp'
+     *
+     * @param  mixed    $id, $timestamp Filter values
+     * @return Instance For fluid interface
+     */
+    public function filterByIdTimestamp( $id, $timestamp ) {
+        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
+        return $this;
+    }   // filterByIdTimestamp()
 
     /**
      * Filter for field 'id'
@@ -134,17 +133,6 @@ abstract class LogBase extends \slimMVC\ORM {
     }   // filterByTimestamp()
 
     /**
-     * Filter for field 'scope'
-     *
-     * @param  mixed    $scope Filter value
-     * @return Instance For fluid interface
-     */
-    public function filterByScope( $scope ) {
-        $this->filter[] = '`scope` = "'.$this->quote($scope).'"';
-        return $this;
-    }   // filterByScope()
-
-    /**
      * Filter for field 'data'
      *
      * @param  mixed    $data Filter value
@@ -164,7 +152,7 @@ abstract class LogBase extends \slimMVC\ORM {
      *
      * @var string $table Table name
      */
-    protected $table = 'pvlng_log';
+    protected $table = 'pvlng_reading_str_tmp';
 
     /**
      * SQL for creation
@@ -172,14 +160,14 @@ abstract class LogBase extends \slimMVC\ORM {
      * @var string $createSQL
      */
     protected $createSQL = '
-        CREATE TABLE `pvlng_log` (
-          `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-          `timestamp` datetime NOT NULL,
-          `scope` varchar(40) NOT NULL,
-          `data` text,
-          PRIMARY KEY (`id`),
-          KEY `timestamp` (`timestamp`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=40975 DEFAULT CHARSET=utf8 COMMENT=\'Logging messages\'
+        CREATE TABLE `pvlng_reading_str_tmp` (
+          `id` smallint(5) unsigned NOT NULL,
+          `timestamp` int(11) NOT NULL,
+          `data` varchar(50) NOT NULL,
+          PRIMARY KEY (`id`,`timestamp`)
+        ) ENGINE=MEMORY DEFAULT CHARSET=utf8
+        /*!50100 PARTITION BY LINEAR KEY (id)
+        PARTITIONS 10 */
     ';
 
 }

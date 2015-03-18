@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-class ReadingNumMemory extends ReadingMemory {
+class ReadingNumMemory extends ReadingNumMemoryBase {
 
     /**
      *
@@ -41,17 +41,12 @@ class ReadingNumMemory extends ReadingMemory {
     }
 
     // -------------------------------------------------------------------------
-    // PROTECTED
+    // PRIVATE
     // -------------------------------------------------------------------------
 
     /**
      * First call
      */
-    protected static $first = TRUE;
-
-    /**
-     *
-     */
-    protected $table = 'pvlng_reading_num_tmp';
+    private static $first = TRUE;
 
 }

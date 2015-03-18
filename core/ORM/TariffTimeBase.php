@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -248,5 +248,26 @@ abstract class TariffTimeBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_tariff_time';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_tariff_time` (
+          `id` int(10) unsigned NOT NULL COMMENT \'pvlng_tariff_date -> id\',
+          `date` date NOT NULL COMMENT \'pvlng_tariff_date -> date\',
+          `time` time NOT NULL COMMENT \'Starting time (incl.)\',
+          `days` set(\'1\',\'2\',\'3\',\'4\',\'5\',\'6\',\'7\') NOT NULL COMMENT \'1 Mo .. 7 Su\',
+          `tariff` float DEFAULT NULL COMMENT \'e.g. EUR / kWh\',
+          `comment` varchar(250) NOT NULL,
+          PRIMARY KEY (`id`,`date`,`time`,`days`),
+          KEY `days` (`days`),
+          KEY `date` (`date`),
+          KEY `time` (`time`),
+          CONSTRAINT `pvlng_tariff_time_ibfk_1` FOREIGN KEY (`id`, `date`) REFERENCES `pvlng_tariff_date` (`id`, `date`) ON DELETE CASCADE ON UPDATE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    ';
 
 }

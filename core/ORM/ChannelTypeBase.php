@@ -9,11 +9,11 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2015 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.2.0 / 2015-03-18
  */
 namespace ORM;
 
@@ -389,5 +389,31 @@ abstract class ChannelTypeBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_type';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_type` (
+          `id` smallint(5) unsigned NOT NULL,
+          `name` varchar(60) NOT NULL,
+          `description` varchar(255) NOT NULL,
+          `model` varchar(30) NOT NULL DEFAULT \'Group\',
+          `unit` varchar(10) NOT NULL,
+          `type` enum(\'group\',\'general\',\'numeric\',\'sensor\',\'meter\') NOT NULL,
+          `childs` tinyint(1) NOT NULL,
+          `read` tinyint(1) unsigned NOT NULL,
+          `write` tinyint(1) unsigned NOT NULL,
+          `graph` tinyint(1) unsigned NOT NULL,
+          `icon` varchar(255) NOT NULL,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `name` (`name`),
+          KEY `childs` (`childs`),
+          KEY `read` (`read`),
+          KEY `write` (`write`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Channel types\'
+    ';
 
 }
