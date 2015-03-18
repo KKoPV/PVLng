@@ -21,61 +21,53 @@ class Ratio extends Calculator {
 
         $this->before_read($request);
 
-        // Cache data specific for the aggregation period
-        $ttl      = $this->period[0] * $this->GroupingPeriod[$this->period[1]];
-        $cacheKey = __CLASS__.'-'.$this->id.'-'.$ttl;
+        $childs = $this->getChilds();
 
-        while (self::$cache->save($cacheKey, $data, $ttl)) {
+        $child1 = $childs[0]->read($request);
+        $child2 = $childs[1]->read($request);
 
-            $childs = $this->getChilds();
+        $row1 = $child1->rewind()->current();
+        $row2 = $child2->rewind()->current();
 
-            $child1 = $childs[0]->read($request);
-            $child2 = $childs[1]->read($request);
+        $result = new \Buffer;
 
-            $row1 = $child1->rewind()->current();
-            $row2 = $child2->rewind()->current();
+        while (!empty($row1) OR !empty($row2)) {
 
-            $data = array();
+            $key1 = $child1->key();
+            $key2 = $child2->key();
 
-            while (!empty($row1) OR !empty($row2)) {
+            if ($key1 === $key2) {
 
-                $key1 = $child1->key();
-                $key2 = $child2->key();
+                // Avoid division by zero
+                $row1['data'] = $row2['data'] ? $row1['data'] / $row2['data'] : 0;
+                $row1['min']  = $row2['min']  ? $row1['min']  / $row2['min']  : 0;
+                $row1['max']  = $row2['max']  ? $row1['max']  / $row2['max']  : 0;
 
-                if ($key1 == $key2) {
+                // Remove consumption, may be we have a meter channel
+                $row1['consumption'] = 0;
 
-                    // Avoid division by zero
-                    $row1['data'] = $row2['data'] ? $row1['data'] / $row2['data'] : 0;
-                    $row1['min']  = $row2['min']  ? $row1['min']  / $row2['min']  : 0;
-                    $row1['max']  = $row2['max']  ? $row1['max']  / $row2['max']  : 0;
+                $result->write($row1, $key1);
 
-                    // Remove consumption, may be we have a meter channel
-                    $row1['consumption'] = 0;
+                // Read both next rows
+                $row1 = $child1->next()->current();
+                $row2 = $child2->next()->current();
 
-                    $data[$key1] = $row1;
+            } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                    // read both next rows
-                    $row1 = $child1->next()->current();
-                    $row2 = $child2->next()->current();
+                // Read only row 1
+                $row1 = $child1->next()->current();
 
-                } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
+            } else /* $key1 > $key2 */ {
 
-                    // read only row 1
-                    $row1 = $child1->next()->current();
+                // Read only row 2
+                $row2 = $child2->next()->current();
 
-                } else /* $key1 > $key2 */ {
-
-                    // read only row 2
-                    $row2 = $child2->next()->current();
-
-                }
             }
-            $child1->close();
-            $child2->close();
-
         }
+        $child1->close();
+        $child2->close();
 
-        return $this->after_read(new \Buffer($data));
+        return $this->after_read($result);
     }
 
 }
