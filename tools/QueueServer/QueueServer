@@ -1,0 +1,124 @@
+#!/bin/bash
+
+#set -x
+
+pwd=$(dirname $(readlink -f $0))
+
+conf=$pwd/QueueServer.conf
+
+[ -f "$conf" ] || ( echo 'Missing configuration file!'; exit 127 )
+
+### --------------------------------------------------------------------------
+function startServer { startOne Server; }
+function startWorker { startOne Worker; }
+
+function startOne {
+    local proc=$1
+
+    ### Check process Id
+    pid=$(getPid $proc)
+
+    if [ "$pid" ]; then
+        echo "PVLng Socket $proc is running ($pid)"
+        return
+    else
+        echo -n "Starting PVLng Socket $proc ... "
+        $php $pwd/$proc.php -m $MEMCACHE -p $PORT >/tmp/Socket$proc.log 2>&1 &
+    fi
+
+    ### Wait a bit if process runs properly
+    sleep 0.5
+
+    ### Check process Id again
+    pid=$(getPid $proc)
+    if [ "$pid" ]; then
+        echo "done ($pid)"
+    else
+        echo FAILED
+    fi
+}
+
+### --------------------------------------------------------------------------
+function stopServer { stopOne Server; }
+function stopWorker { stopOne Worker; }
+
+function stopOne {
+    local proc=$1
+
+    ### Check process Id
+    pid=$(getPid $proc)
+
+    if [ ! "$pid" ]; then
+        echo "PVLng Socket $proc is not running"
+        return
+    fi
+
+    echo -n "Kill PVLng Socket $proc ($pid) ... "
+    kill $pid
+
+    ### Wait a bit
+    sleep 0.5
+
+    ### Check process Id again
+    pid=$(getPid $proc)
+    if [ ! "$pid" ]; then
+        echo done
+    else
+        echo FAILED
+    fi
+}
+
+### --------------------------------------------------------------------------
+function statusServer { statusOne Server; }
+function statusWorker { statusOne Worker; }
+
+function statusOne {
+    local proc=$1
+
+    ### Check process Id
+    pid=$(getPid $proc)
+
+    if [ "$pid" ]; then
+        echo "PVLng Socket $proc is running ($pid)"
+    else
+        echo "PVLng Socket $proc is not running"
+    fi
+}
+
+### --------------------------------------------------------------------------
+function getPid {
+    set -- $(COLUMNS=512; ps aux | grep -e "[ /]QueueServer/$1.php")
+    echo $2
+}
+
+### --------------------------------------------------------------------------
+php=$(which php)
+
+. $conf
+
+echo
+
+case $1 in
+    start)
+        startServer
+        startWorker
+        ;;
+    stop)
+        stopServer
+        stopWorker
+        ;;
+    status)
+        statusServer
+        statusWorker
+        ;;
+    restart)
+        stopServer
+        startServer
+        stopWorker
+        startWorker
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac

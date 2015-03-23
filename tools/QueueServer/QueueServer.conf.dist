@@ -1,0 +1,4 @@
+
+SOCKETPORT=7777
+
+MEMCACHE='localhost:11211'
