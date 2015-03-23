@@ -96,7 +96,7 @@ $api->container->singleton('db', function() use ($api) {
 $api->container->singleton('cache', function() use ($api) {
     return Cache::factory(
         array('Directory' => TEMP_DIR, 'TTL' => 86400),
-        $api->config->get('Cache') ?: 'MemCache,APC'
+        $api->config->get('Cache', 'MemCache,APC,file')
     );
 });
 
