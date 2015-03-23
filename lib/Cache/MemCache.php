@@ -146,4 +146,16 @@ class MemCache extends \Cache {
      */
     protected $memcache;
 
+    /**
+     * Build internal Id from external Id and the cache token
+     *
+     * Don't hash here, Memcache will do this anyway
+     *
+     * @param string $key Unique cache Id
+     * @return string
+     */
+    protected function key( $key ) {
+        return $this->settings['Token'].':'.$key;
+    } // function key()
+
 }
