@@ -157,7 +157,7 @@
             <!-- BEGIN CACHEINFO -->
             <tr>
                 <td>{strtolower:_LOOP}</td>
-                <td>{CACHEINFO}</td>
+                <td>{raw:CACHEINFO}</td>
             </tr>
             <!-- END -->
             </tbody>
