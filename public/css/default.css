@@ -249,8 +249,8 @@ textarea {
 }
 
 input.guid {
-    font-family: monospace;
-    font-size: x-large;
+    font-family: Courier New, monospace;
+    font-size: large;
     text-align: center;
     width: 100%;
     border: 0;

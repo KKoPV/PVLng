@@ -19,7 +19,8 @@ Yryie::Versions();
 Loader::registerCallback(function($filename) {
     // Insert .aop before file extension, so .../file.php becomes .../file.aop.php
     $parts = explode('.', realpath($filename));
-    $filenameAOP = $parts[0] . '.aop.' . $parts[count($parts)-1];
+    array_splice($parts, count($parts)-1, 0, 'aop');
+    $filenameAOP = implode('.', $parts);
 
     // Strip root directory and replace directory separators with ~ to get unique names
     $filenameAOP = str_replace(TEMP_DIR, '', $filenameAOP);
@@ -35,22 +36,22 @@ Loader::registerCallback(function($filename) {
         // Build file content hash to check if AOP relevant code was found
         $hash = md5($code);
 
-        Yryie::Info('Compile: '.$filename);
-        Yryie::StartTimer(basename($filenameAOP));
+       # Yryie::Info('Compile: '.$filename);
+        Yryie::StartTimer('Compile '.str_replace(ROOT_DIR.DS, '', $filename).' to '.basename($filenameAOP));
         Yryie::transformCode($code);
-        Yryie::StopTimer();
 
         if ($hash == md5($code)) $code = "<?php include '$filename';";
 
         if (file_put_contents($filenameAOP, $code)) {
             // File content was changed and AOP file could created
             $filename = $filenameAOP;
-            Yryie::Info('Created: '.$filename);
+            #Yryie::Info('Created: '.$filename);
         }
+        Yryie::StopTimer();
     } else {
         // AOP file still exists and is up-to-date
         $filename = $filenameAOP;
-        Yryie::Info('Reuse: '.basename($filename));
+        Yryie::Info('reuse '.basename($filename));
     }
     return $filename;
 });

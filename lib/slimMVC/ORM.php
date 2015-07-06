@@ -95,6 +95,15 @@ abstract class ORM implements \Iterator, \Countable {
      *
      * @return instance
      */
+    public function filterRaw( $condition ) {
+        $this->filter[] = $condition;
+        return $this;
+    }
+
+    /**
+     *
+     * @return instance
+     */
     public function filter( $field, $value=NULL ) {
         if (!is_array($field)) {
             $field = $this->field($field);

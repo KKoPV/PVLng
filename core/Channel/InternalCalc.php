@@ -97,8 +97,8 @@ abstract class InternalCalc extends Channel {
         );
 
         while (($uid = $this->db->queryOne($sql)) == 0) {
-            // Another instance is generating the data, wait 100ms before next check
-            usleep(100 * 1000);
+            // Another instance is generating the data, wait some time before next check
+            usleep(200 * 1000);
         }
 
         // < 0 - This instance have to generate the data

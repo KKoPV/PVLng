@@ -40,7 +40,7 @@ abstract class Channel {
             return self::byId($aliasOf);
         }
 
-        $model = $channel->ModelClass();
+        $model = $channel->getModelClass();
         return new $model($channel);
     }
 
@@ -48,8 +48,12 @@ abstract class Channel {
      * Helper function to build an instance
      */
     public static function byGUID( $guid, $alias=TRUE ) {
+        if ($guid == '') {
+            throw new Exception('Missing channel GUID!');
+        }
+
         $channel = new ORM\Tree;
-        $channel->filterByGuid($guid)->findOne();
+        $channel->filterRaw('`guid` like "'.$guid.'%"')->findOne();
         $aliasOf = $channel->getAliasOf();
 
         if ($aliasOf AND $alias) {
@@ -57,7 +61,7 @@ abstract class Channel {
             return self::byId($aliasOf);
         } elseif ($channel->getModel()) {
             // Channel is in tree
-            $model = $channel->ModelClass();
+            $model = $channel->getModelClass();
             return new $model($channel);
         } else {
             // NOT in tree, may be a real writable channel?! "Fake" a tree entry
@@ -68,7 +72,7 @@ abstract class Channel {
                 $data['id'] = 0;
                 $data['entity'] = $c->getId();
                 $channel->set($data);
-                $model = $c->ModelClass();
+                $model = $c->getModelClass();
                 return new $model($channel);
             }
         }
@@ -173,7 +177,7 @@ abstract class Channel {
         // Root node (id == 1) accept always childs
         if ($this->id == 1 OR $this->childs == -1 OR count($childs) < $this->childs) {
             $c = new ORM\ChannelView($channel);
-            $model = $c->ModelClass();
+            $model = $c->getModelClass();
             if ($model::beforeAdd2Tree($this) !== FALSE) {
                 return NestedSet::getInstance()->insertChildNode($channel, $this->id);
             }
@@ -517,22 +521,11 @@ abstract class Channel {
     /**
      *
      */
-    protected function filterReadTimestamp( &$q ) {
-        if ($this->period[1] != self::ALL) {
-            // Time is only relevant for period != ALL
-            $q->filter('timestamp', array('bt' => array($this->start, $this->end-1)));
-        }
-    }
-
-    /**
-     *
-     */
-    protected function SQLHeader( $request, $q ) {
-        if (headers_sent() OR !array_key_exists('sql', $request) OR !$request['sql']) return;
-
-        $sql = $this->name;
-        if ($this->description) $sql .= ' (' . $this->description . ')';
-        Header('X-SQL-' . uniqid() . ': ' . $sql . ': ' . preg_replace('~\n+~', ' ', $q));
+    public function getTag( $tag ) {
+        $tag = strtolower($tag);
+        return array_key_exists($tag, $this->_tags)
+             ? $this->_tags[$tag]
+             : NULL;
     }
 
     /**
@@ -607,6 +600,11 @@ abstract class Channel {
     protected $attributes = array();
 
     /**
+     *
+     */
+    protected $_tags = array();
+
+    /**
      * Grouping
      */
     const NO        =  0;
@@ -649,6 +647,12 @@ abstract class Channel {
 
         foreach ($channel->asAssoc() as $key=>$value) {
             $this->$key = $value;
+        }
+
+        foreach (explode("\n", $this->tags) as $tag) {
+            list($scope, $value) = explode(':', $tag.':');
+            $scope = preg_replace('~\s+~', ' ', trim($scope));
+            if ($scope) $this->_tags[strtolower($scope)] = trim($value);
         }
 
         $this->performance = new ORM\Performance;
@@ -763,14 +767,17 @@ abstract class Channel {
 
         // Prepare analysis of request
         $request = array_merge(
-            array('start' => '', 'end' => '', 'period' => ''),
+            array('start' => '', 'days' => NULL, 'end' => '', 'period' => ''),
             $request
         );
 
         // Start timestamp
         if ($request['start'] == '') {
             $request['start'] = 'midnight';
-        } elseif (preg_match('~^sunrise(?:;(\d+))*~', $request['start'], $args)) {
+        } elseif (preg_match('~^-(\d+)$~', $request['start'], $args)) {
+            // Start ? days backwards
+            $request['start'] = 'midnight -'.$args[1].'days';
+        } elseif (preg_match('~^sunrise(?:[;-](\d+))*~', $request['start'], $args)) {
             $request['start'] = (new \ORM\Settings)->getSunrise($this->time);
             if (isset($args[1])) $request['start'] -= $args[1]*60;
         }
@@ -779,10 +786,16 @@ abstract class Channel {
             throw new \Exception('Invalid start timestamp: '.$request['start'], 400);
         }
 
-        // End timestamp
+        // 1st days count ...
+        if (is_numeric($request['days'])) {
+            $request['end'] = $this->start + $request['days']*86400;
+        } else
+        // ... 2nd end timestamp
         if ($request['end'] == '') {
             $request['end'] = 'midnight next day';
-        } elseif (preg_match('~^sunset(?:;(\d+))*~', $request['end'], $args)) {
+        } elseif (preg_match('~^-(\d+)$~', $request['end'], $args)) {
+            $request['end'] = 'midnight -'.$args[1].'days';
+        } elseif (preg_match('~^sunset(?:[;+](\d+))*~', $request['end'], $args)) {
             $request['end'] = (new \ORM\Settings)->getSunset($this->time);
             if (isset($args[1])) $request['end'] += $args[1]*60;
         }
@@ -792,8 +805,12 @@ abstract class Channel {
         }
 
         // Normalize aggregation period
-        if (preg_match('~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|d|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all)$~',
-                       strtolower($request['period']), $args)) {
+        if (preg_match(
+                '~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|'.
+                'd|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all)$~',
+                strtolower($request['period']),
+                $args
+            )) {
 
             $this->period[0] = $args[1] ?: 1;
 
@@ -895,6 +912,27 @@ abstract class Channel {
         }
 
         return $datafile;
+    }
+
+    /**
+     *
+     */
+    protected function filterReadTimestamp( &$q ) {
+        if ($this->period[1] != self::ALL) {
+            // Time is only relevant for period != ALL
+            $q->filter('timestamp', array('bt' => array($this->start, $this->end-1)));
+        }
+    }
+
+    /**
+     *
+     */
+    protected function SQLHeader( $request, $q ) {
+        if (headers_sent() OR !array_key_exists('sql', $request) OR !$request['sql']) return;
+
+        $sql = $this->name;
+        if ($this->description) $sql .= ' (' . $this->description . ')';
+        Header('X-SQL-' . uniqid() . ': ' . $sql . ': ' . preg_replace('~\n+~', ' ', $q));
     }
 
     // -------------------------------------------------------------------------

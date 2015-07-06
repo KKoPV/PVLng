@@ -123,7 +123,7 @@ $app->container->singleton('db', function() use ($app) {
 $app->container->singleton('cache', function() use ($app) {
     return \Cache::factory(
         array('Directory' => TEMP_DIR, 'TTL' => 86400),
-        $app->config->get('Cache', 'MemCache,APC,file')
+        $app->config->get('Cache', 'MemCache,APC,File')
     );
 });
 

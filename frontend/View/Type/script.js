@@ -10,7 +10,7 @@
 
 $(function() {
 
-    var oTable = $('.dataTable').dataTable({
+    var oTable = $('#tblTypes').dataTable({
         bFilter: true,
         bInfo: true,
         aoColumns: [
@@ -23,6 +23,9 @@ $(function() {
             { bSortable: false, sWidth: '1%' },
             { sClass: 'details-control', bSortable: false }
         ],
+        fnInitComplete: function() {
+            pvlng.addClearSearchButton('tblTypes', '{{ClearSearch}}');
+        }
     });
 
     /* Add event listener for opening and closing details */

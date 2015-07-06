@@ -92,6 +92,10 @@ class Controller extends slimMVC\Controller {
      *
      */
     public function finalize( $action ) {
+
+        // If no layout is set, assume raw data was generated
+        if (!$this->Layout) return;
+
         if ($this->app->config('mode') == 'development') {
             $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
             $this->view->Development = TRUE;

@@ -226,7 +226,9 @@ function updateChart() {
                         }
                     } else {
                         point.y = 0;
-                        point.name = row[2];
+                        var n = (row[2]+'|').split('|');
+                        point.name = n[0];
+                        if (n[1]) point.marker = { symbol: 'url('+n[1]+')' };
                     }
                     serie.data.push(point);
                 });
@@ -254,15 +256,24 @@ function updateChart() {
                 if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
 
                 if (channel.type == 'scatter') {
+                    if (attr.marker) serie.marker = { symbol: 'url('+attr.marker+')' };
                     serie.dataLabels = {
                         enabled: true,
-                        align: 'left',
-                        rotation: 270,
-                        align: 'left',
-                        x: 4,
-                        y: -7,
-                        formatter: function() { return this.point.name }
+                        formatter: function() {
+                            /* Switch for non-numeric / numeric channels */
+                            return typeof this.point.name != 'undefined'
+                                 ? this.point.name
+                                 : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
+                        }
                     };
+                    if (attr.unit.trim() == '') {
+                        /* Mostly non-numeric channels */
+                        serie.dataLabels.align = 'left';
+                        serie.dataLabels.rotation = 270;
+                        serie.dataLabels.style = { textShadow: 0 };
+                        /* Move a bit */
+                        serie.dataLabels.y = -8;
+                    }
                 } else if (channel.type != 'bar') {
                     if (channel.style != 'Solid') serie.dashStyle = channel.style;
                     serie.lineWidth = channel.width;

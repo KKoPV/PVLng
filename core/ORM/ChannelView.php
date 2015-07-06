@@ -21,7 +21,7 @@ class ChannelView extends ChannelViewBase {
     /**
      *
      */
-    public function ModelClass() {
+    public function getModelClass() {
         return 'Channel\\'.$this->model;
     }
 

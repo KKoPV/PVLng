@@ -141,7 +141,7 @@ $(function() {
     $('#to').datepicker({
         altField: '#todate',
         altFormat: 'mm/dd/yy',
-        maxDate: 1,
+        maxDate: 5,
         showButtonPanel: true,
         showWeek: true,
         changeMonth: true,

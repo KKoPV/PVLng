@@ -12,7 +12,7 @@ class View extends Slim\View {
     /**
      *
      */
-    public function render( $result ) {
+    public function render( $result, $data=NULL ) {
 
         $this->app = API::getInstance();
         $response = $this->app->response;
@@ -69,7 +69,10 @@ class View extends Slim\View {
             }
             echo ']';
         } else {
-            echo json_encode($this->normalizeJSON($result));
+            echo (is_scalar($result) AND json_decode($result) !== FALSE)
+                 // $result is still a JSON string
+               ? $result
+               : json_encode($this->normalizeJSON($result));
         }
     }
 
@@ -86,12 +89,12 @@ class View extends Slim\View {
             foreach ((array) $row as $value) {
                 // Mask line breaks
                 $value = str_replace("\r", '', $value);
-                $value = str_replace("\n", '\n', $value);
+                $value = str_replace(PHP_EOL, '\n', $value);
                 if (strstr($value, $sep)) $value = '"' . $value . '"';
                 $line .= $sep . $value;
             }
             // Trim leading separator
-            echo substr($line, 1), "\n";
+            echo substr($line, 1), PHP_EOL;
         }
     }
 
@@ -103,28 +106,28 @@ class View extends Slim\View {
         require_once LIB_DIR . DS . 'contrib' . DS . 'Array2XML.php';
 
         if ($result instanceof Buffer) {
-            echo '<?xml version="1.0" encoding="UTF-8" ?'.'>' . "\n";
-            echo '<data lastUpdated="'.date('c').'">' . "\n";
+            echo '<?xml version="1.0" encoding="UTF-8" ?'.'>' . PHP_EOL;
+            echo '<data lastUpdated="'.date('c').'">' . PHP_EOL;
 
             $attr = $app->request->get('attributes');
 
             foreach ($result as $row) {
                 $node = $attr ? 'attributes' : 'reading';
-                $xml = '<' . $node . '>' . "\n";
+                $xml = '<' . $node . '>' . PHP_EOL;
                 foreach ($row as $key=>$value) {
-                    $xml .= '<' . $key . '>' . $value . '</' . $key . '>' . "\n";
+                    $xml .= '<' . $key . '>' . $value . '</' . $key . '>' . PHP_EOL;
                 }
-                $xml .= '</' . $node . '>' . "\n";
+                $xml .= '</' . $node . '>' . PHP_EOL;
                 echo $xml;
                 $attr = FALSE;
             }
-            echo '</data>' . "\n";
+            echo '</data>' . PHP_EOL;
 
         } else {
 
             $result = array(
                 '@attributes' => array('lastUpdated' => date('c')),
-                $data => (array) $result,
+                'data' => (array) $result,
             );
 
             Array2XML::Init('1.0', 'UTF-8', $app->config('mode')=='development');
@@ -137,23 +140,24 @@ class View extends Slim\View {
      *
      */
     protected function asTXT( $result ) {
-        if (!$result instanceof Buffer AND !is_array($result)) {
-            $result = array($result);
-        }
+        if ($result instanceof Buffer OR is_array($result)) {
+            // Reformat only iterable content
+            $cnt = count($result);
+            $line = 0;
 
-        $cnt = count($result);
-        $line = 0;
-
-        foreach ($result as $key=>$value) {
-            if (is_array($value)) $value = implode(' ', $value);
-            $value = str_replace("\r", '', $value);
-            $value = str_replace("\n", '\n', $value);
-            if ($cnt > 1) {
-                echo trim($key . ': ' . $value);
-                if (++$line < $cnt) echo ' / ';
-            } else {
-                echo $value;
+            foreach ($result as $key=>$value) {
+                if (is_array($value)) $value = implode(' ', $value);
+                $value = str_replace("\r", '', $value);
+                $value = str_replace("\n", '\n', $value);
+                if ($cnt > 1) {
+                    echo trim($key . ': ' . $value);
+                    if (++$line < $cnt) echo ' / ';
+                } else {
+                    echo $value, PHP_EOL;
+                }
             }
+        } else {
+            echo $result;
         }
     }
 

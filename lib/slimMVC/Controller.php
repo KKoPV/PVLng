@@ -82,7 +82,7 @@ abstract class Controller {
     protected function boolParam( $name, $default ) {
         $value = strtolower(trim($this->app->Request()->params($name)));
         return $value != ''
-             ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
+             ? preg_match('~^(?:1|x|on|y|yes|true)$~', $value)
              : $default;
     }
 }

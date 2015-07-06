@@ -83,7 +83,9 @@
         <td class="icons">
             <!-- IF {TYPE_ID} != "0" -->
             <a href="/channel/edit/{ENTITY}?returnto=/overview%23_{ID}" class="ico node-design"></a>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+            <!-- ELSE -->
+            <a href="/channel/edit/{ENTITY_OF}?returnto=/overview%23_{ID}" class="ico node-design"></a>
+            <!-- ENDIF -->
 
             <!-- IF {TYPE_ID} != "0" -->
             <a href="/channel/add/{ENTITY}?returnto=/overview%23_{ID}" class="ico node-select-child"></a>
@@ -97,7 +99,7 @@
             <a href="/list/{GUID}" class="ico document-invoice"></a>
             <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
 
-            <!-- IF {GUID} -->
+            <!-- IF {READ} OR {WRITE} -->
             <i class="ico license-key guid btn" data-guid="{GUID}"></i>
             <!-- ENDIF -->
         </td>

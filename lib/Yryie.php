@@ -57,7 +57,7 @@ class Yryie {
     /**
      *
      */
-    public static function transformCode( &$code, $functions=TRUE ) {
+    public static function transformCode( &$code, $functions=FALSE ) {
         // Single line comments: /// PHP code...
         $code = preg_replace('~^(\s*)///\s+([^*]*?)$~m', '$1$2 /// AOP', $code);
 
@@ -69,7 +69,7 @@ class Yryie {
         if ($functions AND
             preg_match_all('~function\s+(\w+)[^{]+?{~', $code, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $code = str_replace($match[0], $match[0] . ' \Yryie::Call(func_get_args()); /// AOP', $code);
+                $code = str_replace($match[0], $match[0] . ' \Yryie::Call(func_get_args()); /* AOP */ ', $code);
             }
         }
     }
@@ -803,7 +803,10 @@ class Yryie {
                                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAIxSURBVHjaYvz//z8DJQAggBgDC1dm2ziYdL779p8bbNa/fwz/gfjvv79A+j/Dv/9A/t+/QPo/mP4LlONj+/31+vWn5ev6wqYCBBCLibXJJFYObiZxDpIs5v767e8kID0VIIBYvv3+z/Tt3ReSnf4dqA9EAwQQy/+//xlao1VINiCl4yGYBggglv9AP4JA2q7vDLPcOBn27dsHDIZ/DH/+/GFwcHZn2Ld7O4OFnTvDkX1bGUAB/hcYDkFBQeAwAgGAAGJhgMbCZEcOhh+//zNY2joCA/I/wx+ouLWjO1iJtZMX0GBQoEJc8O8PxACAAGKCmZS95ysDBysjw5EDexgOHdjNcGD3NrD4/p2bGRgZGRj2blsHxGsZ9m5dDTHgL8TlAAHEUDrvyn8Q+PXn3/+fv//9//ELgr8B8Xcg/vL9z/9PQPzh25//77/++f/uyx+w+qiaTSCKASCAmP5BXZCx4yMDGwsjw16gn3fv3MqwdeNasPiWjWsYmIFO2LRmGcP6lYsY1i6fD3HBP4gLAAKIIX/6GbCJv//++/8b6goQ/v4LFX/58ff/Z6ArQBgEQkrXgF0AEEBM/6F+Sd38loGFmZFh5/YtDFs3b2BYt3o5WHz1iiVgesmC2QyL5s9kmDd7Kpj/H+oCgABiyJl04j85ILBoJdgFAAHE8vT+w1WZ/b/D/oHSO9A1oHgG+e/v799gGpwHQPniLzRfgMQglq8CEQABxEhpbgQIICYGCgFAgAEAg5qXcfrnux4AAAAASUVORK5CYII=" />
                         Yryie %1$s
                     </th>
-                    <th colspan="4" class="hide">Visible types: %2$s</th>
+                    <th colspan="4" class="hide">
+                        Visible types: %2$s
+                        <a style="float:right" href="?debug=0">disable</a>
+                    </th>
                 </tr>
                 <tr class="hide">
                     <th colspan="2" class="time">Time</th>
@@ -858,7 +861,7 @@ class Yryie {
      * @return array Array( class, function )
      */
     private static function called( $skip ) {
-        $bt = debug_backtrace();
+#        $bt = debug_backtrace();
         return array(@$bt[$skip]['class'], @$bt[$skip]['function']);
     }
 }

@@ -126,7 +126,8 @@ class Loader {
                         if (!$file->isDir() AND !preg_match('~'.DS.'\.\w+~', $name)) {
                             $filename = str_replace($path.DS, '', $file->getPathname());
                             foreach (self::$settings['pattern'] as $pattern) {
-                                $pattern = str_replace('%s', '([\w/]+)', $pattern);
+                                // Unix: / , Windows: \
+                                $pattern = str_replace('%s', '([\w/\\\\]+)', $pattern);
                                 $pattern = str_replace('%s', '(\w+)', $pattern);
                                 if (preg_match('~'.$pattern.'~', $filename, $args)) {
                                     self::$ClassMap[$args[1]] = $name;

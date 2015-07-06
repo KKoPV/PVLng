@@ -1,5 +1,6 @@
 <?php
 /**
+ * Simple Memcache Queue
  *
  * Idea from http://dev.ionous.net/2009/01/memcached-lockless-queue.html
  */
@@ -13,45 +14,35 @@ class SMQ {
     /**
      *
      */
-    public function __construct( $id='SMQ' ) {
+    public function __construct( $id='SMQ', $host='localhost', $port=11211 ) {
         $this->mc = new \Memcache;
+
+        if (!$this->mc->addServer($host, $port, TRUE)) {
+            throw new \Exception('Unable to connect to '.$host.':'.$port);
+        }
+
+        // Unique queue name
         $this->queue = $id;
-        $this->write = $this->key('!');
-        $this->read  = $this->key('?');
+
+        // Cache key for write pointer
+        $this->write = $this->key('>');
+
+        // Cache key for read pointer
+        $this->read  = $this->key('<');
     }
 
     /**
      *
-     * @return bool Returns TRUE on success or FALSE on failure
-     */
-    public function addServer( $host, $port, $persistent=TRUE, $weight=100 ) {
-        if (!$this->mc->addServer($host, $port, $persistent, $weight)) {
-            throw new Exception('Unable to connect to '.$host.':'.$port);
-        }
-
-        if (count($this->mc->getExtendedStats()) > 1) return;
-
-        // Added 1st correct server, init pointers
-        if ($this->mc->get($this->write) === FALSE) {
-            // Init aqctual write pointer with 0 if not yet exists
-            $this->mc->set($this->write, 0);
-        }
-
-        if ($this->mc->get($this->read) === FALSE) {
-            // Init last read pointer with 0 if not yet exists, 1st add() will create Id 1!
-            $this->mc->set($this->read, 0);
-        }
-    }
-
-    /**
-     *
-     * @return bool Returns TRUE on success or FALSE on failure
+     * @return integer|bool Returns write pointer Id on success or FALSE on failure
      */
     public function push( $data ) {
         // Ignore empty data sets
-        if ($data == '')  return;
+        if ($data == '') return;
 
-        // Increment pointer 1st to get the iId to work with
+        // Make sure, write pointer is initialized
+        $this->getWrite();
+
+        // Increment pointer to get the Id to work with
         $id = $this->mc->increment($this->write);
 
         return $this->mc->add($this->key($id), $data) ? $id : FALSE;
@@ -59,12 +50,13 @@ class SMQ {
 
     /**
      *
+     * @return mixed
      */
     public function pull() {
-        // Not outstanding queue entry
-        if ($this->mc->get($this->read) >= $this->mc->get($this->write)) return;
+        // No outstanding queue entry: return
+        if ($this->getRead() >= $this->getWrite()) return;
 
-        // Increment pointer 1st to get the iId to work with
+        // Increment pointer to get the Id to work with
         $id = $this->mc->increment($this->read);
 
         $key    = $this->key($id);
@@ -77,7 +69,7 @@ class SMQ {
     /**
      * For debugging only
      */
-    public function getIds() {
+    public function _getIds() {
         return array(
             $this->mc->get($this->write),
             $this->mc->get($this->read)
@@ -89,25 +81,48 @@ class SMQ {
     // -----------------------------------------------------------------------
 
     /**
-     * Memcache instance
+     * @var \Memcache Memcache instance
      */
     protected $mc;
 
     /**
-     *
+     * @var string Write pointer name
      */
     protected $write;
 
     /**
-     *
+     * @var string Read pointer name
      */
     protected $read;
 
     /**
+     * Build key name from queue name and key name
      *
+     * @return string
      */
     protected function key( $key ) {
         return $this->queue.':'.$key;
     }
 
+    /**
+     * Check write and read pointer
+     *
+     * @return int
+     */
+    protected function getWrite() {
+        $value = $this->mc->get($this->write);
+        if ($value === FALSE) $this->mc->set($this->write, 0);
+        return +$value; // Make FALSE to 0
+    }
+
+    /**
+     * Check write and read pointer
+     *
+     * @return int
+     */
+    protected function getRead() {
+        $value = $this->mc->get($this->read);
+        if ($value === FALSE) $this->mc->set($this->read, 0);
+        return +$value; // Make FALSE to 0
+    }
 }

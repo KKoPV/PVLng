@@ -9,3 +9,7 @@ tmp/*
 custom/
 description.md
 !.githold
+
+composer.*
+/tests
+/vendor

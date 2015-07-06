@@ -83,7 +83,7 @@ class Channel extends \Controller {
         $type = new \ORM\ChannelType($type);
         $this->fields['unit']['VALUE'] = $type->getUnit();
 
-        $model = $type->ModelClass();
+        $model = $type->getModelClass();
         $model::beforeCreate($this->fields);
 
         $this->ignore_returnto = TRUE;
@@ -244,7 +244,7 @@ class Channel extends \Controller {
         $this->fields['name']['VALUE'] = $type->getName();
         $this->fields['unit']['VALUE'] = $type->getUnit();
 
-        $model = $type->ModelClass();
+        $model = $type->getModelClass();
         $model::beforeCreate($this->fields);
 
         $this->ignore_returnto = TRUE;
@@ -269,7 +269,7 @@ class Channel extends \Controller {
                 $this->fields['name']['VALUE'] = __('CopyOf') . ' ' . $this->fields['name']['VALUE'];
 
                 $type = new \ORM\ChannelType($channel->getType());
-                $model = $type->ModelClass();
+                $model = $type->getModelClass();
                 $model::beforeEdit($channel, $this->fields);
             }
 
@@ -355,7 +355,7 @@ class Channel extends \Controller {
             if (isset($channel['type-new'])) $channel['type'] = $channel['type-new'];
 
             $type  = new \ORM\ChannelType($channel['type']);
-            $model = $type->ModelClass();
+            $model = $type->getModelClass();
             $model::beforeEdit($entity, $this->fields);
 
             // Set values
@@ -429,7 +429,7 @@ class Channel extends \Controller {
             $type = new \ORM\ChannelType($channel->getType());
 
             if ($this->app->request->isGet()) { // If POST, this is called only if there where errors
-                $model = $type->ModelClass();
+                $model = $type->getModelClass();
                 foreach ($channel->asAssoc() as $key=>$value) {
                     if (array_key_exists($key, $this->fields)) $this->fields[$key]['VALUE'] = $value;
                 }

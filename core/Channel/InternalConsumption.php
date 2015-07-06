@@ -55,7 +55,7 @@ class InternalConsumption extends InternalCalc {
 
         $last = 0;
 
-        while (!empty($row1) OR !empty($row2)) {
+        while (!empty($row1) || !empty($row2)) {
 
             $key1 = $child1->key();
             $key2 = $child2->key();
@@ -83,7 +83,7 @@ class InternalConsumption extends InternalCalc {
                 $row1 = $child1->next()->current();
                 $row2 = $child2->next()->current();
 
-            } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
+            } elseif (is_null($key2) || !is_null($key1) && $key1 < $key2) {
 
                 if ($key2 == $FirstKey2) {
                     // Remember $last ONLY for timestamps before 2nd channel
@@ -101,8 +101,10 @@ class InternalConsumption extends InternalCalc {
                 } else {
                     // Data hole in child 1, remember actual consumption for later
                     $_c = $row2['consumption'];
-                    $row2 = $child2->next()->current();
-                    $row2['consumption'] += $_c;
+                    if ($row2 = $child2->next()->current()) {
+                        // At least one remaining child 2
+                        $row2['consumption'] += $_c;
+                    }
                 }
             }
         }

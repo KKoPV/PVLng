@@ -227,9 +227,6 @@ var views = new function Views() {
                 /* Re-arrange channels in collapsed tree */
                 if (collapse || !expanded) tree.toggle(false);
 
-                /* Scroll to navigation as top most visible element */
-                pvlng.scroll('#nav');
-
                 $('#load-delete-view').val(views.actual.slug).trigger('change');
                 $('#saveview').val(views.actual.name);
                 $('#visibility').val(views.actual.public).trigger('change');
@@ -477,6 +474,9 @@ function updateChart( force ) {
     }
 
     $.wait();
+
+    /* Scroll to navigation as top most visible element */
+    pvlng.scroll('#nav');
 
     _log('Channels:', channels_new);
     _log('yAxis:', yAxis);
@@ -874,8 +874,8 @@ $(function() {
 
     var dFrom, dTo;
     if (qs.from && qs.to) {
-        dFrom = new Date(qs.from);
-        dTo   = new Date(qs.to);
+        dFrom = new Date(qs.from.substr(0,1) != '-' ? qs.from : (new Date()).getTime() + qs.from * 24*60*60 * 1000);
+        dTo   = new Date(qs.to.substr(0,1)   != '+' ? qs.to   : (new Date()).getTime() + qs.to * 24*60*60 * 1000);
     } else if (qs.date) {
         dFrom = dTo = new Date(qs.date);
     } else {
@@ -898,7 +898,7 @@ $(function() {
     $("#to").datepicker({
         altField: '#todate',
         altFormat: 'mm/dd/yy',
-        maxDate: 1,
+        maxDate: 3,
         showButtonPanel: true,
         showWeek: true,
         changeMonth: true,
@@ -959,6 +959,22 @@ $(function() {
             window.location.href = '/channel/edit/' + channels[$(this).parents('tr').data('tt-id')].entity +
                                    '?returnto=' + (views.actual.slug ? '/chart/' + views.actual.slug : '/');
         });
+
+        /* Inject checkbox for chart auto refresh */
+        var cb_refresh = $('<input/>').prop('id', 'cb-autorefresh').prop('type', 'checkbox')
+            .prop('checked', !(lscache.get('chart-autorefresh') === false));
+        /* Wrapper div for iChecked checkbox */
+        $('<div/>').addClass('fr').css('margin', '6px 0 0 6px')
+            .append(cb_refresh).appendTo('#preset-wrapper');
+        /* iCheck after inserted into wrapper DIV */
+        cb_refresh.iCheck({ checkboxClass: 'icheckbox_flat' })
+            .on('ifToggled', function(e) {
+                /* Remember current state */
+                lscache.set('chart-autorefresh', $(this).is(':checked'))
+            })
+            /* Put the hint onto parent div injected by iCheck around the checkbox */
+            .parent().prop('title', '{{ChartAutoRefresh}}').tipTip();
+
     }
 
     /**
@@ -1095,21 +1111,6 @@ $(function() {
         var checked = !$(this).is(':checked');
         $('#d-daylight-grace').prop('disabled', checked).spinner('option', 'disabled', checked);
     });
-
-    /* Inject checkbox for chart auto refresh */
-    var cb_refresh = $('<input/>').prop('id', 'cb-autorefresh').prop('type', 'checkbox')
-        .prop('checked', !(lscache.get('chart-autorefresh') === false));
-    /* Wrapper div for iChecked checkbox */
-    $('<div/>').addClass('fr').css('margin', '6px 0 0 6px')
-        .append(cb_refresh).appendTo('#preset-wrapper');
-    /* iCheck after inserted into wrapper DIV */
-    cb_refresh.iCheck({ checkboxClass: 'icheckbox_flat' })
-        .on('ifToggled', function(e) {
-            /* Remember current state */
-            lscache.set('chart-autorefresh', $(this).is(':checked'))
-        })
-        /* Put the hint onto parent div injected by iCheck around the checkbox */
-        .parent().prop('title', '{{ChartAutoRefresh}}');
 
     $('input.iCheck').iCheck('update');
 
@@ -1275,12 +1276,7 @@ $(function() {
                                 ('0'+d.getDate()).slice(-2) + '/' +
                                 d.getFullYear();
                     if ($('#cb-autorefresh').is(':checked') && $('#todate').val() >= today) {
-                        setTimeout(function() {
-                            /* Scroll to navigation as top most visible element */
-                            if (chart) pvlng.scroll('#nav');
-                            updateChart();
-                        },
-                        1000);
+                        setTimeout(updateChart, 1000);
                     }
                 }
             } else {

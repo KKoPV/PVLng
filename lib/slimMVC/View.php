@@ -64,7 +64,7 @@ class View extends \Slim\View {
     /**
      *
      */
-    public function render( $template ) {
+    public function render( $template, $data=NULL ) {
         if (file_exists($template)) {
             // Concrete file
             $TplFile = $template;
@@ -397,6 +397,10 @@ class View extends \Slim\View {
      *
      */
     protected function compress( $html ) {
+
+        // Remember explicit spaces between variables
+        $html = preg_replace('~ \?'.'> +<\?php ~', "\x01", $html);
+
         $pre = array();
         // mask <pre>, <code> and <tt> sequences
         if (preg_match_all('~<(pre|code|tt).*?</\\1>~is', $html, $matches, PREG_SET_ORDER)) {
@@ -418,6 +422,9 @@ class View extends \Slim\View {
 
         // Remove pairs of ?><?php
         $html = preg_replace('~\s*\?'.'><\?php\s*~', ' ', $html);
+
+        // Restore explicit spaces between variables
+        $html = str_replace("\x01", '?'.'> <?php ', $html);
 
         // Restore <pre>...</pre> sections
         $html = str_replace(array_keys($pre), array_values($pre), $html);

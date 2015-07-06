@@ -24,10 +24,10 @@ class Selector extends Channel {
 
         // Indicator channel
         $child1 = $childs[0]->read($request);
+        $row1 = $child1->rewind()->current();
+
         // Data channel
         $child2 = $childs[1]->read($request);
-
-        $row1 = $child1->rewind()->current();
         $row2 = $child2->rewind()->current();
 
         $result = new \Buffer;
@@ -74,5 +74,4 @@ class Selector extends Channel {
 
         return $this->after_read($result);
     }
-
 }

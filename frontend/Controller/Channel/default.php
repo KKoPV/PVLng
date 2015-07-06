@@ -137,6 +137,11 @@ return array(
         'position'    => 905
     ),
 
+    'tags' => array(
+        'position'    => 907,
+        'type'        => 'textarea',
+    ),
+
     'comment' => array(
         'position'    => 910,
         'type'        => 'textarea',

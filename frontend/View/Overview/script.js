@@ -225,7 +225,7 @@ $(function() {
     });
 
     /* Bind click listener to all GUID images */
-    $('.guid', '#tree tbody').click(function() {
+    $('#tree tbody').on('click', '.guid', function() {
         $.alert(
              $('<input/>')
                 .addClass('guid')
@@ -284,7 +284,7 @@ $(function() {
                 return;
             }
 
-            oTable.addClass('wait');
+            $.wait();
 
             $.ajax({
                 type: 'DELETE',
@@ -299,11 +299,11 @@ $(function() {
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 $.pnotify({
                     type: textStatus, hide: false, sticker: false,
-                    text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+                    text: jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.statusText
                 });
             }).always(function() {
                 rows.removeClass('marked-for-deletion');
-                oTable.removeClass('wait');
+                $.wait(false);
             });
         });
     });
@@ -344,7 +344,7 @@ $(function() {
         .children('select').select2();
     });
 
-    shortcut.add('ESC', function() { cancelDragging = true; });
+    shortcut.add('ESC',   function() { cancelDragging = true; });
     shortcut.add('Alt+N', function() { window.location = '/channel/add'; });
 });
 

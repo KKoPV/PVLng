@@ -12,7 +12,9 @@
  *
  */
 $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
+
     $request = json_decode($api->request->getBody(), TRUE);
+
     // Check request for 'timestamp' attribute, take as is if numeric,
     // otherwise convert datetime to timestamp
     $timestamp = isset($request['timestamp'])
@@ -21,8 +23,15 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
                  : strtotime($request['timestamp'])
                  )
                : NULL;
-      $cnt = Channel::byGUID($guid)->write($request, $timestamp);
-      if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
+
+    try {
+        $cnt = Channel::byGUID($guid)->write($request, $timestamp);
+    } catch (Exception $e) {
+        $api->stopAPI($e->getMessage(), 400);
+    }
+
+    if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
+
 })->name('PUT /data/:guid')->help = array(
     'since'       => 'r2',
     'description' => 'Save a reading value',
@@ -67,7 +76,7 @@ $api->put('/data/raw/:guid', $APIkeyRequired, function($guid) use ($api) {
     // Channel handles raw data
     $cnt = Channel::byGUID($guid)->write($api->request->getBody());
     if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
-})->name('put raw data')->help = array(
+})->name('PUT /data/raw/:guid')->help = array(
     'since'       => 'r4',
     'description' => 'Save raw data, channel decide what to do with them',
     'apikey'      => TRUE,
@@ -83,12 +92,18 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
     $request['p1'] = $p1;
     $request['p2'] = $p2;
 
-    $channel = Channel::byGUID($guid);
+    try {
+        $channel = Channel::byGUID($guid);
+    } catch (Exception $e) {
+        $api->stopAPI($e->getMessage(), 404);
+    }
 
     // Special models can provide an own GET functionality
     // e.g. for special return formats like PVLog or Sonnenertrag
     if (method_exists($channel, 'GET')) {
-        $api->render($channel->GET($request));
+        $return = $channel->GET($request);
+        $filename = isset($request['filename']) ? $request['filename'] : NULL;
+        $api->render($return, array('filename'=>$filename));
         return;
     }
 
@@ -147,7 +162,7 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
 
     $api->render($result);
 
-})->name('get data')->help = array(
+})->name('GET /data/:guid(/:p1(/:p2))')->help = array(
     'since'       => 'r2',
     'description' => 'Read reading values',
     'parameters'  => array(
@@ -221,7 +236,7 @@ $api->delete('/data/:guid/:timestamp', $APIkeyRequired, function($guid, $timesta
     } else {
         $api->stopAPI('Reading not found', 400);
     }
-})->name('delete data')->help = array(
+})->name('DELETE /data/:guid/:timestamp')->help = array(
     'since'       => 'r2',
     'description' => 'Delete a reading value',
     'apikey'      => TRUE,

@@ -1,5 +1,5 @@
 
-<table class="dataTable">
+<table id="tblTypes" class="dataTable">
 <thead>
     <tr>
         <th>{{Id}}</th>

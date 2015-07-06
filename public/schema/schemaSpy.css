@@ -161,6 +161,10 @@ span.container {
     padding: 2px;
 }
 
+span.indent {
+    font-size: 75%;
+}
+
 a:link {
     color: #489148;
 }

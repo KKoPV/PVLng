@@ -45,18 +45,23 @@ rm -rf $schema 2>/dev/null
 
 if [ -d "$schema" ]; then
 
+    echo Patch files ...
     ### Make some justifications, e.g. remove server name etc.
     find $schema -name '*.html' -exec \
     sed -i "s~<span title='Database'>.*</span>.<span title='Schema'>.*</span>\.~~g; \
             s~<span title='Database'>.*</span>.<span title='Schema'>.*</span>~PVLng~g; \
             s~<title>.*</title>~<title>PVLng database schema</title>~g" {} \;
 
+    echo Patch styles ...
     ### Save generated styles and ...
     mv $schema/schemaSpy.css $pwd/schemaSpy.css.org
     ### replace with tuned ones
     cp $pwd/schemaSpy.css $schema/
 
-    find $schema -name '*.html' -exec dos2unix -qo {} \;
-    find $schema -name '*.js' -exec dos2unix -qo {} \;
+    echo Fix unix line endings ...
+    find $schema -name '*.html' -exec dos2unix -q -o {} \;
+    find $schema -name '*.js' -exec dos2unix -q -o {} \;
+
+    [ -f "$pwd/schemaSpy.after" ] && . $pwd/schemaSpy.after
 
 fi

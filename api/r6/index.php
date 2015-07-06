@@ -36,6 +36,7 @@ $version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
 define('PVLNG',              'PhotoVoltaic Logger new generation');
 define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
+define('PVLNG_VERSION_FULL', PVLNG . ' ' . PVLNG_VERSION);
 
 /**
  * Initialize
@@ -74,7 +75,7 @@ include BASE_DIR . DS . 'functions.php';
  * Configuration
  */
 $api->container->singleton('config', function() {
-    return (new slimMVC\Config)
+    return (new \slimMVC\Config)
            ->load(ROOT_DIR . DS . 'config' . DS . 'config.default.php')
            ->load(ROOT_DIR . DS . 'config' . DS . 'config.php')
            ->load('config.php', FALSE);
@@ -96,7 +97,7 @@ $api->container->singleton('db', function() use ($api) {
 $api->container->singleton('cache', function() use ($api) {
     return Cache::factory(
         array('Directory' => TEMP_DIR, 'TTL' => 86400),
-        $api->config->get('Cache', 'MemCache,APC,file')
+        $api->config->get('Cache', 'MemCache,APC,File')
     );
 });
 
@@ -143,23 +144,22 @@ $api->hook('slim.before', function() use ($api) {
      * Detect requested content type by file extension, correct PATH_INFO value
      * without extension and set Response content header
      */
-    $PathInfo = $api->environment['PATH_INFO'];
+    preg_match('~^(.*?)(\..*?)?(\?.*)?$~', $api->environment['PATH_INFO'], $args);
 
-    if ($dot = strrpos($PathInfo, '.')) {
-        // File extension
-        $ext = substr($PathInfo, $dot+1);
-        // Correct PATH_INFO, remove extension
-        $api->environment['PATH_INFO'] = substr($PathInfo, 0, $dot);
+    // Correct PATH_INFO, remove parameters
+    $api->environment['PATH_INFO'] = $args[1];
+
+    if (!empty($args[2])) {
         // All supported content types
-        switch ($ext) {
-            case 'csv':   $type = 'application/csv';   break;
-            case 'tsv':   $type = 'application/tsv';   break;
-            case 'txt':   $type = 'text/plain';        break;
-            case 'xml':   $type = 'application/xml';   break;
-            case 'json':  $type = 'application/json';  break;
+        switch (/* Extension */ $args[2]) {
+            case '.csv':   $type = 'application/csv';   break;
+            case '.tsv':   $type = 'application/tsv';   break;
+            case '.txt':   $type = 'text/plain';        break;
+            case '.xml':   $type = 'application/xml';   break;
+            case '.json':  $type = 'application/json';  break;
             default:
                 $api->contentType('text/plain');
-                $api->halt(400, 'Unknown Accept content type: '.$ext);
+                $api->halt(400, 'Unknown Accept content type: '.$args[2]);
         }
     } else {
         // Defaults to JSON
@@ -315,7 +315,8 @@ function SaveCSVdata( $guid, $rows, $sep ) {
 // ---------------------------------------------------------------------------
 Slim\Route::setDefaultConditions(array(
     'date'      => '\d{4}-\d{2}-\d{2}',
-    'guid'      => '(\w{4}-){7}\w{4}',
+#    'guid'      => '(\w{4}-){7}\w{4}',
+    'guid'      => '\w{4}-\w{4}(-\w{4})?(-\w{4})?(-\w{4})?(-\w{4})?(-\w{4})?(-\w{4})?',
     'id'        => '\d+',
     'latitude'  => '[\d.-]+',
     'longitude' => '[\d.-]+',

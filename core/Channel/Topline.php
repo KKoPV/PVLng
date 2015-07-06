@@ -28,26 +28,10 @@ class Topline extends InternalCalc {
 
         parent::before_read($request);
 
-        if ($this->dataExists()) return;
-
-        // Read out all data
-        $request['period'] = '1i';
-
-        $max = -PHP_INT_MAX;
-        $ts_min = FALSE;
-
-        foreach ($this->getChild(1)->read($request) as $row) {
-            if ($ts_min === FALSE) $ts_min = $row['timestamp'];
-            $max = max($max, $row['data']);
+        if (!$this->dataExists()) {
+            // Calc direct inside database
+            $this->db->query('CALL pvlng_model_topline({1}, {2})', $this->entity, $this->getChild(1)->entity);
+            $this->dataCreated();
         }
-
-        if ($ts_min !== FALSE) {
-            $this->saveValues(array(
-                $ts_min           => $max,
-                $row['timestamp'] => $max
-            ));
-        }
-
-        $this->dataCreated();
     }
 }

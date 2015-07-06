@@ -24,9 +24,9 @@ class Ratio extends Calculator {
         $childs = $this->getChilds();
 
         $child1 = $childs[0]->read($request);
-        $child2 = $childs[1]->read($request);
-
         $row1 = $child1->rewind()->current();
+
+        $child2 = $childs[1]->read($request);
         $row2 = $child2->rewind()->current();
 
         $result = new \Buffer;

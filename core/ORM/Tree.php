@@ -38,7 +38,7 @@ class Tree extends TreeBase {
     /**
      *
      */
-    public function ModelClass() {
+    public function getModelClass() {
         return 'Channel\\'.$this->getModel();
     }
 
@@ -63,5 +63,14 @@ class Tree extends TreeBase {
         }
 
         return $nodes;
+    }
+
+    /**
+     * Get full name with description (if defined): Name (Description)
+     */
+    public function getFullName() {
+        $name = $this->getName();
+        if ($description = $this->getDescription) $name .= ' ('.$description.')';
+        return $name;
     }
 }

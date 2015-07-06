@@ -1,10 +1,29 @@
 -- Speed up some look-ups
 ALTER TABLE `pvlng_reading_num` ADD INDEX `id` (`id`);
 ALTER TABLE `pvlng_reading_str` ADD INDEX `id` (`id`);
+ALTER TABLE `pvlng_performance` ADD INDEX `timestamp` (`timestamp`);
 
 -- GUID is always 39 characters long
 ALTER TABLE `pvlng_channel`
     CHANGE `guid` `guid` char(39) NULL COMMENT 'Unique GUID' AFTER `id`;
+ALTER TABLE `pvlng_channel`
+    ADD `tags` text NOT NULL COMMENT 'scope:value tags, one per line' AFTER `public`;
+
+DROP TRIGGER `pvlng_tree_bi`;
+DELIMITER ;;
+CREATE TRIGGER `pvlng_tree_bi` BEFORE INSERT ON `pvlng_tree` FOR EACH ROW
+BEGIN
+  SELECT `e`.`type`, `t`.`childs`
+    INTO @TYPE, @CHILDS
+    FROM `pvlng_channel` `e`
+    JOIN `pvlng_type` `t` ON `e`.`type` = `t`.`id`
+   WHERE `e`.`id` = new.`entity`;
+   IF @TYPE = 0 OR @CHILDS != 0 THEN
+    -- Aliases get always an own GUID
+     SET new.`guid` = GUID();
+   END IF;
+END;;
+DELIMITER ;
 
 DROP TABLE IF EXISTS `pvlng_reading_tmp`;
 CREATE TABLE `pvlng_reading_tmp` (
@@ -261,3 +280,54 @@ BEGIN
 END;;
 
 DELIMITER ;
+
+CREATE OR REPLACE VIEW `pvlng_tree_view` AS
+SELECT `n`.`id` AS `id`,
+       `n`.`entity` AS `entity`,
+       ifnull(`n`.`guid`,`c`.`guid`) AS `guid`,
+       if(`co`.`id`,`co`.`name`,`c`.`name`) AS `name`,
+       if(`co`.`id`,`co`.`serial`,`c`.`serial`) AS `serial`,
+       `c`.`channel` AS `channel`,
+       if(`co`.`id`,`co`.`description`,`c`.`description`) AS `description`,
+       if(`co`.`id`,`co`.`resolution`,`c`.`resolution`) AS `resolution`,
+       if(`co`.`id`,`co`.`cost`,`c`.`cost`) AS `cost`,
+       if(`co`.`id`,`co`.`meter`,`c`.`meter`) AS `meter`,
+       if(`co`.`id`,`co`.`numeric`,`c`.`numeric`) AS `numeric`,
+       if(`co`.`id`,`co`.`offset`,`c`.`offset`) AS `offset`,
+       if(`co`.`id`,`co`.`adjust`,`c`.`adjust`) AS `adjust`,
+       if(`co`.`id`,`co`.`unit`,`c`.`unit`) AS `unit`,
+       if(`co`.`id`,`co`.`decimals`,`c`.`decimals`) AS `decimals`,
+       if(`co`.`id`,`co`.`threshold`,`c`.`threshold`) AS `threshold`,
+       if(`co`.`id`,`co`.`valid_from`,`c`.`valid_from`) AS `valid_from`,
+       if(`co`.`id`,`co`.`valid_to`,`c`.`valid_to`) AS `valid_to`,
+       if(`co`.`id`,`co`.`public`,`c`.`public`) AS `public`,
+       if(`co`.`id`,`co`.`tags`,`c`.`tags`) AS `tags`,
+       if(`co`.`id`,`co`.`extra`,`c`.`extra`) AS `extra`,
+       if(`co`.`id`,`co`.`comment`,`c`.`comment`) AS `comment`,
+       `t`.`id` AS `type_id`,
+       `t`.`name` AS `type`,
+       `t`.`model` AS `model`,
+       `t`.`childs` AS `childs`,
+       `t`.`read` AS `read`,
+       `t`.`write` AS `write`,
+       `t`.`graph` AS `graph`,
+       if(`co`.`id`,`co`.`icon`,`c`.`icon`) AS `icon`,
+       `ca`.`id` AS `alias`,
+       `ta`.`id` AS `alias_of`,
+       `ta`.`entity` AS `entity_of`,
+       (((count(0) - 1) + (`n`.`lft` > 1)) + 1) AS `level`,
+       round((((`n`.`rgt` - `n`.`lft`) - 1) / 2),0) AS `haschilds`,
+       ((((min(`p`.`rgt`) - `n`.`rgt`) - (`n`.`lft` > 1)) / 2) > 0) AS `lower`,
+       ((`n`.`lft` - max(`p`.`lft`)) > 1) AS `upper`
+ FROM `pvlng_tree` `n`
+ JOIN `pvlng_tree` `p`
+ JOIN `pvlng_channel` `c` on (`n`.`entity` = `c`.`id`)
+ JOIN `pvlng_type` `t` on (`c`.`type` = `t`.`id`)
+ LEFT JOIN `pvlng_channel` `ca` on (if(`t`.`childs`,`n`.`guid`,`c`.`guid`) = `ca`.`channel`) AND (`ca`.`type` = 0)
+ LEFT JOIN `pvlng_tree` `ta` on (`c`.`channel` = `ta`.`guid`)
+ LEFT JOIN `pvlng_channel` `co` on (`ta`.`entity` = `co`.`id`) AND (`c`.`type` = 0)
+WHERE ((`n`.`lft` BETWEEN `p`.`lft` AND `p`.`rgt`)
+  AND ((`p`.`id` <> `n`.`id`)
+   OR (`n`.`lft` = 1)))
+GROUP BY `n`.`id`
+ORDER BY `n`.`lft`;
