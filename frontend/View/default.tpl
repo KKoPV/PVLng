@@ -55,6 +55,7 @@
     <link rel="stylesheet" href="/css/sm-clean.css" />
     <link rel="stylesheet" href="/css/flags.css" />
     <link rel="stylesheet" href="/css/sprites.css" />
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
     <!-- ELSE -->
     <link rel="stylesheet" href="/css/min.css" />
     <!-- ENDIF -->
@@ -76,11 +77,10 @@
 </head>
 
 <body>
-
     <img id="pageload" src="/images/loading_dots.gif"
          style="position:fixed;top:50%;left:50%;width:64px;height:21px;margin-left:-32px;margin-top:-15px">
 
-    <div id="container" class="container_10" style="display:none">
+    <div id="container" class="container_10" style="opacity:0">
 
         <!-- INCLUDE hook.body.before.tpl -->
 
@@ -112,6 +112,16 @@
         <!-- INCLUDE hook.body.after.tpl -->
 
     </div>
+
+        <!--
+    <a href="#" class="go-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
+        title="{{BackToTop}}">
+        <i class="fa fa-arrow-up fa-lg"></i>
+        <img src="/images/ico/arrow-stop-090.png" class="ico">
+    </a>
+        -->
+
+    <i class="fa fa-arrow-up go-top ui-state-default ui-corner-tl ui-corner-bl tipbtn" title="{{BackToTop}}"></i>
 
     <!-- IF {DEVELOPMENT} -->
     <script src="//code.jquery.com/jquery-2.1.1.js"></script>
@@ -169,14 +179,7 @@
 
     {SCRIPTS}
 
-    <a href="#" class="back-to-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
-       style="border-right:0" title="{{BackToTop}}">
-        <img src="/images/ico/arrow-stop-090.png" class="ico">
-    </a>
-
     <script>
-
-        var overlay;
 
         $(function($) {
 
@@ -185,8 +188,6 @@
                 allowClear: true,
                 dropdownAutoWidth: true
             });
-
-            overlay = new pvlng.Overlay();
 
             /* Library versions */
             $('#highcharts-version').text(Highcharts.version);
@@ -233,8 +234,13 @@
                 return qrData;
             });
 
+            $('#pageload').remove();
+            $('#container').fadeTo(0, 1);
+
             pvlng.onFinished.run();
         });
+
+
     </script>
 
     <!-- IF !{USER} --><!-- INCLUDE login.dialog.tpl --><!-- ENDIF -->

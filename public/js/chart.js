@@ -63,6 +63,7 @@ function presentation( data ) {
     this.legend = true;
     this.position = 0;
     this.hidden = false;
+    this.outline = false;
 
     try {
         data = JSON.parse(data);

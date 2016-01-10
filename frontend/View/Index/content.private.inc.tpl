@@ -9,9 +9,6 @@
  */
 -->
 
-<!-- Use this image as spacer for not available moving actions of channels -->
-<!-- DEFINE SpacerImg --><i class="ico pix"></i><!-- END DEFINE -->
-
 <div id="tabs" class="ui-tabs">
 
     <ul>
@@ -35,7 +32,7 @@
                     <th class="r">{{Amount}}</th>
                     <th class="l">{{Unit}}</th>
                     <th class="r" style="white-space:nowrap">{{Earning}} / {{Cost}}</th>
-                    <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
+                    <th></th>
                 </tr>
             </thead>
 
@@ -59,14 +56,12 @@
                     <td>{UNIT}</td>
                     <td id="costs{ID}" class="costs"></td>
                     <td class="icons">
-                        <!-- IF {GRAPH} -->
-                        <i class="ico chart btn chartdialog"></i>
-                        <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-                        <!-- IF {READ} -->
-                        <i class="ico document-invoice btn showlist"></i>
-                        <!-- ELSE --><!-- MACRO SpacerImg --><!-- ENDIF -->
-                        <i class="ico node-design btn editentity"></i>
-                        </a>
+                        <i class="fa fa-fw btn<!-- IF {GRAPH} --> fa-bar-chart chartdialog<!-- ENDIF -->"></i>
+                        <i class="fa fa-fw btn<!-- IF {READ} --> fa-file-text showlist<!-- ENDIF -->"></i>
+                        <i class="fa fa-fw btn fa-pencil editentity"></i>
+                        <!-- IF {READ} OR {WRITE} -->
+                            <i class="fa fa-fw btn fa-key fa-rotate-90 guid" data-guid="{GUID}"></i>
+                        <!-- ENDIF -->
                     </td>
                 </tr>
                 <!-- END -->
@@ -77,10 +72,19 @@
                     <th colspan="3">&nbsp;</th>
                     <th class="l">{{Total}}:</th>
                     <th id="costs" style="padding-right:10px" class="r"></th>
-                    <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
+                    <th></th>
                 </tr>
             </tfoot>
         </table>
+
+        <div class="icon-legend">
+            <i class="fa fa-lock"></i>{{PrivateChannel}} &nbsp;
+            <i class="fa fa-bar-chart"></i>{{ChartSettingsTip}} &nbsp;
+            <i class="fa fa-file-text"></i>{{ListHint}} &nbsp;
+            <i class="fa fa-pencil"></i>{{EditEntity}} &nbsp;
+            <i class="fa fa-key fa-rotate-90"></i>{{ShowGUID}}
+        </div>
+
     </div>
 
     <div id="tabs-2">
@@ -120,15 +124,4 @@
         <div class="clear"></div>
     </div>
 
-</div>
-
-<!-- Legend -->
-
-<div id="IconLegend">
-    <div class="icons legendtip">
-        <i class="ico lock"></i>{{PrivateChannel}}<br />
-        <i class="ico chart"></i>{{ChartSettingsTip}}<br />
-        <i class="ico document-invoice"></i>{{ListHint}}<br />
-        <i class="ico node-design"></i>{{EditEntity}}
-    </div>
 </div>

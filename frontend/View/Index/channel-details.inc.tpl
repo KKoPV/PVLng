@@ -20,5 +20,5 @@
 <!-- ENDIF -->
 
 <!-- IF !{PUBLIC} -->
-    <i class="ico lock" style="margin-left:1em"></i>
+    <i class="fa fa-lock" style="margin-left:.5em"></i>
 <!-- ENDIF -->

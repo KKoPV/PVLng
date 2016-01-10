@@ -13,28 +13,24 @@ $app->hook('slim.before', function() use ($app) {
 
 // Add direct links to charts only if not chart controller is the active one
 $app->hook('slim.before.dispatch', function () use ($app) {
-    $route = $app->Router()->getCurrentRoute();
-    $pattern = $route->getPattern();
+    $tblView = new ORM\View;
 
-    if ($pattern != '/' AND $pattern != '/index') {
+    if ($app->user) {
+        // Private charts
+        $app->menu->add('20.10.10', '#', 'private');
+        foreach ($tblView->filterByPublic(0)->find() as $view) {
+            $app->menu->add('20.10.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+        }
 
-        $tblView = new ORM\View;
-
-        if ($app->user) {
-            $app->menu->add('20.10.10', '#', 'private');
-            foreach ($tblView->filterByPublic(0)->find() as $view) {
-                $app->menu->add('20.10.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
-            }
-            $tblView->reset();
-
-            $app->menu->add('20.10.20', '#', 'public');
-            foreach ($tblView->filterByPublic(1)->find() as $view) {
-                $app->menu->add('20.10.20.', '/chart/'.$view->getSlug(), ':'.$view->getName());
-            }
-        } else {
-            foreach ($tblView->filterByPublic(1)->find() as $view) {
-                $app->menu->add('20.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
-            }
+        // Public charts
+        $app->menu->add('20.10.20', '#', 'public');
+        foreach ($tblView->reset()->filterByPublic(1)->find() as $view) {
+            $app->menu->add('20.10.20.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+        }
+    } else {
+        // Public charts only
+        foreach ($tblView->filterByPublic(1)->find() as $view) {
+            $app->menu->add('20.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
         }
     }
 });

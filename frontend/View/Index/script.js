@@ -17,6 +17,9 @@
 
 var ChartHeight = {INDEX_CHARTHEIGHT},
     RefreshTimeout = {INDEX_REFRESH},
+    isEmbedded = {EMBEDDED},
+    notifyLoadEach = {INDEX_NOTIFYEACH},
+    notifyLoadAll = {INDEX_NOTIFYALL},
     aborted = false,
     qs = {},
     chart = false,
@@ -33,6 +36,9 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
         {ID}: { id: {ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}', entity: {ENTITY}, n: {NUMERIC} },
         <!-- END -->
     },
+
+    tzOffset = {raw:TZOFFSET}, /* Timezone offset in seconds */
+    tzOffsetToolTip = ((new Date()).getTimezoneOffset() * 60 + tzOffset) * 1000,
 
     /**
      * Scale timestamps down to full minute, hour, day, week, month, quarter or year
@@ -131,7 +137,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
                 });
                 return (body)
                      ? '<table id="chart-tooltip"><thead><tr><th colspan="3">' +
-                       (new Date(this.x).toLocaleString()).replace(/:00$/, '') +
+                       (new Date(this.x+tzOffsetToolTip).toLocaleString()).replace(/:00$/, '') +
                        '</th></tr></thead><tbody>' + body + '</tbody></table>'
                      : null;
             },
@@ -330,6 +336,7 @@ function ChartDialog( id ) {
     $('#d-hidden').prop('checked', p.hidden);
     $('#d-position').text(p.position);
     $('#d-position-slider').slider('value', p.position);
+    $('#d-outline').prop('checked', p.outline);
 
     /* Update only in context of dialog chart */
     $('input.iCheck', '#dialog-chart').iCheck('update').trigger('ifToggled');
@@ -347,9 +354,7 @@ function updateChart( force ) {
     clearTimeout(updateTimeout);
     updateTimeout = null;
 
-    if (force) updateActive = false;
-
-    if (updateActive || !windowVisible) return;
+    if (!force && (updateActive || !windowVisible)) return;
 
     updateActive = true;
 
@@ -399,12 +404,21 @@ function updateChart( force ) {
     $('input.channel:checked').each(function(id, el) {
         var ch = channels[$(el).data('id')],
             channel = new presentation($(el).val());
-        channel.id = ch.id;
-        channel.name  = $('<div/>').html(ch.name).text();
-        channel.guid  = ch.guid;
-        channel.unit  = ch.unit;
-        channel.time1 = TimeStrToSec(channel.time1,  0);
-        channel.time2 = TimeStrToSec(channel.time2, 24);
+
+        channel._id = ch.id;
+
+        /* http://stackoverflow.com/a/15710692 */
+        channel._hash = JSON.stringify(channel).split('').reduce(function(a,b) {
+            a=((a<<5)-a)+b.charCodeAt(0);
+            return a&a
+        }, 0);
+
+        channel.name     = $('<div/>').html(ch.name).text();
+        channel.guid     = ch.guid;
+        channel.unit     = ch.unit;
+        channel.time1    = TimeStrToSec(channel.time1,  0);
+        channel.time2    = TimeStrToSec(channel.time2, 24);
+        channel.linkedTo = null;
         /* Remember channel in correct order */
         buffer.push(channel);
         /* Channel axis still registered? */
@@ -421,6 +435,8 @@ function updateChart( force ) {
 
     /* Build channels */
     $(buffer).each(function(id, channel) {
+        channel.id     = 10*id;
+        channel.zIndex = 10*id;
         /* Remember original axis for change detection */
         channel.axis_org = channel.axis;
         /* Axis from chart point of view */
@@ -435,10 +451,12 @@ function updateChart( force ) {
             } else {
                 /* period, add channel and ... */
                 channels_new.push(channel);
-                /* ... add 2nd spline channel! */
-                var channel_clone = $.extend({}, channel);
+                /* ... add 2nd spline channel behind! */
+                channel_clone = $.extend({}, channel);
+                channel_clone.id -= 1;
                 channel_clone.linkedTo = ':previous';
                 channel_clone.type = 'spline';
+                channel_clone.zIndex -= 1;
                 channels_new.push(channel_clone);
             }
         } else {
@@ -487,21 +505,23 @@ function updateChart( force ) {
     /* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
     if (force || channels_new.length != channels_chart.length || now - lastChanged > 30) {
         changed = true;
-        channels_chart = channels_new;
         lastChanged = now;
     } else {
         for (var i=0, l=channels_new.length; i<l; i++) {
-            if (JSON.stringify(channels_new[i]) != JSON.stringify(channels_chart[i])) {
+            if (channels_new[i]._hash != channels_chart[i]._hash) {
                 changed = true;
-                channels_chart = channels_new;
                 break;
             }
         }
     }
 
     if (changed) {
-        /* Use UTC for timestamps with a period >= day to avoid wrong hours in hint */
-        Highcharts.setOptions({ global: { useUTC: (res > xResolution.h) } });
+        Highcharts.setOptions({
+            global: {
+                /* timezone offset in minutes */
+                timezoneOffset: -tzOffset / 60
+            }
+        });
 
         /* Happens also on 1st call! */
         chartOptions.yAxis = yAxis;
@@ -513,6 +533,8 @@ function updateChart( force ) {
         chart.reflow();
         /* Show zoom and pan help */
         $('#zoom-hint').show();
+
+        channels_chart = channels_new;
     }
 
     var f = $('#from').val(), t = $('#to').val();
@@ -533,7 +555,7 @@ function updateChart( force ) {
         /* Count channel AJAX calls */
         AJAXcount++;
 
-        $('#s'+channel.id).show();
+        $('#s'+channel._id).show();
 
         var url = PVLngAPI + 'data/' + channel.guid + '.json',
             start = fromDate,
@@ -566,8 +588,8 @@ function updateChart( force ) {
                     attr = data.shift();
                 } catch(err) {
                     console.error(data);
-                    /* Set pseudo channel */
-                    series[id] = {};
+                    /* Set pseudo channel
+                    series[id] = {}; */
                     return;
                 }
 
@@ -575,12 +597,12 @@ function updateChart( force ) {
                 _log('Data', data);
 
                 if (attr.consumption) {
-                    $('#cons'+channel.id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
+                    $('#cons'+channel._id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
                 }
 
                 if (attr.costs) {
                     costs += +attr.costs.toFixed(CurrencyDecimals);
-                    $('#costs'+channel.id).html(CurrencyFormat.replace('{}', Highcharts.numberFormat(attr.costs, CurrencyDecimals)));
+                    $('#costs'+channel._id).html(CurrencyFormat.replace('{}', Highcharts.numberFormat(attr.costs, CurrencyDecimals)));
                 }
 
                 /* Add channel description if chart name NOT still contains it */
@@ -589,20 +611,23 @@ function updateChart( force ) {
                   : '';
 
                 var serie = {
-                    data: [],
                     color: channel.color,
+                    data: [],
                     id: channel.id,
+                    /* Force legend color! */
+                    legendColor: channel.color,
+                    linkedTo: channel.linkedTo,
                     /* HTML decode channel name */
                     name: $('<div/>').html(attr.name + t).text(),
                     showInLegend: channel.legend,
                     type: channel.type,
                     visible: !channel.hidden,
                     yAxis: channel.axis,
+                    zIndex: channel.zIndex,
                     /* Own properties */
                     colorDiff: channel.colorusediff,
                     decimals: attr.decimals,
                     guid: channel.guid,
-                    legendColor: channel.color, /* Force legend color */
                     unit: attr.unit,
                     raw: (period == '')
                 };
@@ -619,7 +644,6 @@ function updateChart( force ) {
                     serie.threshold = channel.threshold || 0;
                 }
 
-                if (channel.linkedTo != undefined) serie.linkedTo = channel.linkedTo;
                 serie.tooltip = { valueSuffix: attr.unit ? attr.unit : '' };
 
                 if (channel.type == 'scatter') {
@@ -644,6 +668,15 @@ function updateChart( force ) {
                 } else if (channel.type != 'bar') {
                     if (channel.style != 'Solid') serie.dashStyle = channel.style;
                     serie.lineWidth = channel.width;
+                }
+
+                if (channel.outline) {
+                    serie.shadow = {
+                        /* No offset, draw a semitransparent shadow
+                           of 3px on each side of serie */
+                        color: '#FFFFFF', offsetX: 0, offsetY: 0,
+                        opacity: 0.5, width: serie.lineWidth + 6
+                    };
                 }
 
                 $(data).each(function(id, row) {
@@ -686,25 +719,23 @@ function updateChart( force ) {
                     serie.data.push(point);
                 });
 
+                _log('Serie', serie);
+
                 if (!channel.all && (channel.min || channel.max || channel.last)) {
                     serie = setMinMax(serie, channel);
                 }
 
-                _log('Serie', serie);
-
                 if (!changed) {
                     var s = chart.get(serie.id);
-                    /* Replce data direct in existing chart data */
+                    /* Replace data direct in existing chart data */
                     s.setData(serie.data, false);
                     /* Do we have raw data? Only then deletion of reading value is possible */
                     s.options.raw = (period == '');
-                    /* Add dummy serie for completed check */
-                    series[id] = {};
                 } else {
-                    series[id] = serie;
+                    series[serie.id] = serie;
                 }
 
-                if (+'{INDEX_NOTIFYEACH}') $.pnotify({
+                if (!isEmbedded && notifyLoadEach) $.pnotify({
                     type: 'success',
                     text: attr.name + ' loaded ' +
                           '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
@@ -727,22 +758,21 @@ function updateChart( force ) {
 
             /* Another AJAX call is done */
             --AJAXcount;
-
             if (aborted) {
                 updateActive = false;
                 return;
             }
 
-            $('#s'+channel.id).hide();
+            $('#s'+channel._id).hide();
 
-            $('#cons'+channel.id).prop('title', 'loaded in ' + ((new Date).getTime() - channel._ts) + ' ms').tipTip();
+            $('#cons'+channel._id).prop('title', 'loaded in ' + ((new Date).getTime() - channel._ts) + ' ms').tipTip();
 
             /* All calls are done on AJAXcount == 0 */
             if (AJAXcount > 0) return;
 
-            if (+'{INDEX_NOTIFYALL}') $.pnotify({
+            if (!isEmbedded && notifyLoadAll) $.pnotify({
                 type: 'success',
-                text: series.length + ' {{ChannelsLoaded}} ' +
+                text: channels_chart.length + ' {{ChannelsLoaded}} ' +
                       '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
             });
 
@@ -758,7 +788,7 @@ function updateChart( force ) {
                 /* Add new series */
                 $.each(series, function(i, serie) {
                     /* Valid channel with id */
-                    if (serie.id) chart.addSeries(serie, false);
+                    if (serie) chart.addSeries(serie, false);
                 });
             }
 
@@ -854,22 +884,29 @@ $(function() {
         }
     );
 
-    /**
-     * If a chart height is provided as URL parameter "height", remember in cookie
-     */
     qs = $.parseQueryString();
 
-    if (qs.height) {
-        /* A value of 0 will reset height and remove cookie */
-        if (qs.height > 0) {
-            pvlng.cookie.set('ChartHeight', ChartHeight = qs.height);
-        } else {
-            pvlng.cookie.remove('ChartHeight');
-        }
-    } else {
-        var h = pvlng.cookie.get('ChartHeight');
-        if (h) ChartHeight = h;
+    /* Refesh timeout */
+    if (qs.refresh) {
+        RefreshTimeout = qs.refresh;
     }
+
+    if (!isEmbedded) {
+        /* If a chart height is provided as URL parameter "height", remember in cookie */
+        if (qs.height) {
+            /* A value of 0 will reset height and remove cookie */
+            if (qs.height == 0) {
+                pvlng.cookie.remove('ChartHeight');
+            } else {
+                pvlng.cookie.set('ChartHeight', ChartHeight = qs.height);
+            }
+        } else {
+            if (h = pvlng.cookie.get('ChartHeight')) ChartHeight = h;
+        }
+    } else if (qs.height) {
+        ChartHeight = qs.height;
+    }
+
     chartOptions.chart.height = ChartHeight;
 
     var dFrom, dTo;
@@ -948,13 +985,11 @@ $(function() {
             .prop('href', '/list/' + channels[$(this).parents('tr').data('tt-id')].guid);
         });
 
-        $('.editentity')
-        .each(function() {
+        $('.editentity').each(function() {
             /* For "Open link in new tab" ... */
             $(this).wrap('<a></a>').parent()
             .prop('href', '/channel/edit/' + channels[$(this).parents('tr').data('tt-id')].entity);
-        })
-        .click(function(e) {
+        }).click(function(e) {
             e.preventDefault();
             window.location.href = '/channel/edit/' + channels[$(this).parents('tr').data('tt-id')].entity +
                                    '?returnto=' + (views.actual.slug ? '/chart/' + views.actual.slug : '/');
@@ -1013,6 +1048,7 @@ $(function() {
                 p.legend = $('#d-legend').is(':checked');
                 p.hidden = $('#d-hidden').is(':checked');
                 p.position = +$('#d-position').text();
+                p.outline = $('#d-outline').is(':checked');
 
                 p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
                 p.time2 = SecToTimeStr(TimeStrToSec($('#d-time2').val(), 24));
@@ -1140,12 +1176,15 @@ $(function() {
     $('#btn-load').button({
         icons: { primary: 'ui-icon-folder-open' }, text: false
     }).click(function(event) {
+        $.wait();
+        $(this).button('disable');
         if (event.shiftKey) {
             /* Shift-Click sets display date to today AND reloads chart */
             $('#btn-reset').trigger('click');
         } else {
             views.load($('#load-delete-view option:selected').val(), true);
         }
+        $(this).button('enable');
     });
 
     $('#btn-delete').button({
@@ -1242,6 +1281,19 @@ $(function() {
         /* Chart slug provided by URL?, load and collapse tree */
         if (!qs.chart) $('#top-select').show();
         views.load(qs.chart, true);
+    });
+
+    /* Bind click listener to all GUID images */
+    $('#data-table tbody').on('click', '.guid', function() {
+        $.alert(
+             $('<input/>')
+                .addClass('guid')
+                .prop('readonly', 'readonly')
+                .val($(this).data('guid'))
+                /* Prepare to copy into clipboard ... */
+                .click(function() { this.select() }),
+            '{{Channel}} GUID'
+        );
     });
 
     /**

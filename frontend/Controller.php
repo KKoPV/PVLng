@@ -47,7 +47,7 @@ class Controller extends slimMVC\Controller {
 
         $this->view->Module = strtolower($this->controller);
         $this->view->User = $app->user;
-        $this->view->Embedded = $this->app->request->get('embedded');
+        $this->view->Embedded = $this->app->request->get('embedded') ?: 0;
 
         $this->view->BaseDir = array(
             APP_DIR . DS . 'View' . DS . $this->controller . DS . 'custom',

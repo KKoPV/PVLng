@@ -27,9 +27,9 @@ class ReadingStrMemory extends ReadingStrMemoryBase {
         if (self::$first) {
             self::$db->query('
                 CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
-                    `id`        smallint unsigned NOT NULL,
-                    `timestamp` int               NOT NULL,
-                    `data`      varchar(50)       NOT NULL,
+                    `id`        smallint unsigned NOT NULL DEFAULT 0,
+                    `timestamp` int               NOT NULL DEFAULT 0,
+                    `data`      varchar(50)       NOT NULL DEFAULT "",
                     PRIMARY KEY (`id`, `timestamp`)
                 ) ENGINE=Memory PARTITION BY LINEAR KEY(`id`) PARTITIONS 10
             ');

@@ -24,6 +24,9 @@ class Index extends \Controller {
         $this->view->Data = (new \ORM\Tree)->getWithParents();
         /// \Yryie::StopTimer();
 
+        // Timezone offset in seconds
+        $this->view->tzOffset = date('Z');
+
         $this->PresetAndPeriod();
     }
 }

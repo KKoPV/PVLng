@@ -45,6 +45,7 @@ abstract class BaseAbstract11 extends \Channel {
                     $data->addPowerAcWatts($row['timestamp'], $row['data']);
                 }
             }
+
             if ($property == 'string') {
                 $parent->addString($data);
             } else {

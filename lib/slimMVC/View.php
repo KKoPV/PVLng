@@ -310,7 +310,7 @@ class View extends \Slim\View {
             // Loops
             if (preg_match_all('~<!-- BEGIN ([A-Z][A-Z0-9_]*) -->~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $match) {
-                    $id = rand(100, 999);
+                    $id = rand(10000, 99999);
                     $html = str_replace($match[0], sprintf($this->LoopStart, $id, $match[1]), $html);
                 }
             }

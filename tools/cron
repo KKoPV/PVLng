@@ -15,6 +15,7 @@
  *
  */
 function usage() {
+	$f = __FILE__;
     echo <<<EOT
 
 Run defined tasks from cron
@@ -28,9 +29,10 @@ Options:
     -v  Verbosity level info
     -vv Verbosity level debug
 
-Add this line to your crontab
+Add this lines to your crontab
 
-* * * * * /path/to/your/public_html/cron.php
+# Run cron script each minute
+* * * * * $f
 
 EOT;
 
@@ -64,7 +66,7 @@ function curl( $options, &$result, &$info=array() ) {
     $ch = curl_init();
 
     curl_setopt_array($ch, $options);
-    curl_setopt(CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
     $result = curl_exec($ch);
     $info   = curl_getinfo($ch);
@@ -81,6 +83,7 @@ function curl( $options, &$result, &$info=array() ) {
     // Curl error?
     if ($errno) {
         okv(0, 'Curl error', '['.$errno.'] '.$error);
+        okv(0, 'Parameters', $options);
         return FALSE;
     }
 
@@ -136,17 +139,14 @@ if (TESTMODE) {
 /**
  * Initialize Auto-Loader
  */
-include LIB_DIR . DS . 'Loader.php';
+$loader = require_once ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
+$loader->addPsr4('', array(CORE_DIR, LIB_DIR));
 
-Loader::register(
-    array(
-        'path'    => array(CORE_DIR, LIB_DIR),
-        'pattern' => array('%s.php'),
-        'exclude' => array('contrib/')
-    ),
-    TEMP_DIR
-);
+Loader::register($loader, TEMP_DIR);
 
+/**
+ * Config file
+ */
 $param_c = isset($param_c) ? $param_c : 'config.cron.php';
 okv( 1, 'Config file', CONF_DIR . DS . $param_c);
 

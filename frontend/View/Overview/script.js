@@ -73,10 +73,7 @@ $(function() {
         bAutoWidth: false,
         bFilter: true,        /* Allow filter by coding, but   */
         sDom: '<"H"r>t<"F">', /* remove filter input from DOM. */
-        aoColumnDefs: [
-            { sWidth: "90%", aTargets: [ 0 ] },
-            { sWidth: "1%", aTargets: [ 1, 2 ] }
-        ]
+        aoColumnDefs: [ { sWidth: "99%", aTargets: [ 0 ] } ]
     }).treetable({
         initialState: 'expanded',
         indent: 24,
@@ -232,7 +229,7 @@ $(function() {
                 .prop('readonly', 'readonly')
                 .val($(this).data('guid'))
                 /* Prepare to copy into clipboard ... */
-                .click(function() { this.select() }),
+                .click(function() { this.select() }).select(),
             '{{Channel}} GUID'
         );
     });
@@ -267,7 +264,7 @@ $(function() {
     });
 
     /* Bind click listener to all delete node images */
-    $('#tree tbody').on('click', '.node-delete, .node-delete-next', function() {
+    $('#tree tbody').on('click', '.fa-minus', function() {
 
         /* Get tree table Id from parent <tr> */
         var tr = $(this.parentNode.parentNode), node = tr.data('tt-id');

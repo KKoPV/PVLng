@@ -57,16 +57,10 @@ file_exists(CONF_DIR . DS . 'config.php') || _redirect('/public/setup.php');
 /**
  * Initialize Auto-Loader
  */
-include LIB_DIR . DS . 'Loader.php';
+$loader = require_once ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
+$loader->addPsr4('', array(CORE_DIR, LIB_DIR, APP_DIR));
 
-Loader::register(
-    array(
-        'path'    => array(CORE_DIR, LIB_DIR, APP_DIR),
-        'pattern' => array('%s.php'),
-        'exclude' => array('contrib/')
-    ),
-    TEMP_DIR
-);
+Loader::register($loader, TEMP_DIR);
 
 // ---------------------------------------------------------------------------
 // Let's go

@@ -35,7 +35,6 @@
             <div class="c">{{ChannelHierarchy}}</div>
         </th>
         <th></th>
-        <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
     </tr>
     </thead>
 
@@ -53,67 +52,64 @@
                 <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
                 <!-- IF {DESCRIPTION} --><small> ({DESCRIPTION})</small><!-- ENDIF -->
                 <!-- IF !{PUBLIC} -->
-                    <i class="ico lock" style="margin-left:.5em"></i>
+                    <i class="fa fa-lock" style="margin-left:.5em"></i>
                 <!-- ENDIF -->
             </span>
         </td>
 
         <td class="icons">
             <!-- IF {CHILDS} -->
-            <i class="ico node-insert-next btn" onclick="addChild({ID}); return false"></i>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
-            <i class="ico node-delete<!-- IF !{HASCHILDS} -->-next<!-- ENDIF --> btn"></i>
+            <i class="fa fa-fw fa-plus btn" onclick="addChild({ID}); return false"></i>
+            <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
+
+            <i class="fa fa-fw fa-minus btn"></i>
+
             <!-- IF {LEVEL} > 2 -->
             <form action="/overview/moveup" method="post">
                 <input type="hidden" name="id" value="{ID}">
-                <input type="image" src="/images/ico/navigation_180_frame.png"
-                       style="background-color:transparent" alt="h">
+                <i class="fa fa-fw fa-arrow-left btn" onclick="this.form.submit()"></i>
             </form>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+            <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {UPPER} != 0 -->
-            <i class="ico navigation-090-frame btn" onclick="return moveChild({ID}, 'moveleft')"></i>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+            <i class="fa fa-fw fa-arrow-up btn" onclick="return moveChild({ID}, 'moveleft')"></i>
+            <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {LOWER} != 0 -->
-            <i class="ico navigation-270-frame btn" onclick="return moveChild({ID}, 'moveright')"></a>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
-        </td>
+            <i class="fa fa-fw fa-arrow-down btn" onclick="return moveChild({ID}, 'moveright')"></i>
+            <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
-        <td class="icons">
             <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/edit/{ENTITY}?returnto=/overview%23_{ID}" class="ico node-design"></a>
+            <a href="/channel/edit/{ENTITY}?returnto=/overview%23_{ID}" class="fa fa-fw fa-pencil btn"></a>
             <!-- ELSE -->
-            <a href="/channel/edit/{ENTITY_OF}?returnto=/overview%23_{ID}" class="ico node-design"></a>
+            <a href="/channel/edit/{ENTITY_OF}?returnto=/overview%23_{ID}" class="fa fa-fw fa-pencil btn"></a>
             <!-- ENDIF -->
 
             <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/add/{ENTITY}?returnto=/overview%23_{ID}" class="ico node-select-child"></a>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+            <a href="/channel/add/{ENTITY}?returnto=/overview%23_{ID}" class="fa fa-fw fa-clone btn"></a>
+            <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {CHILDS} AND {GUID} AND {TYPE_ID} != "30" AND !{ALIAS} -->
-            <i class="ico arrow-split btn create-alias"></i>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+            <i class="fa fa-fw fa-code-fork btn"></i>
+            <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {READ} -->
-            <a href="/list/{GUID}" class="ico document-invoice"></a>
-            <!-- ELSE --><i class="ico pix"></i><!-- ENDIF -->
+                <a href="/list/{GUID}" class="fa fa-fw fa-file-text btn"></a>
+            <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {READ} OR {WRITE} -->
-            <i class="ico license-key guid btn" data-guid="{GUID}"></i>
+                <i class="fa fa-fw fa-key fa-rotate-90 btn guid" data-guid="{GUID}"></i>
             <!-- ENDIF -->
         </td>
     </tr>
 
     <!-- END -->
 
-    <tr data-tt-id="1" class="droppable group">
+    <tr data-tt-id="1" class="droppable group tip" tip="#DragDropHelp">
         <td class="icons">
-            <i class="ico plus-circle-frame btn" onclick="addChild(1)"></i>
-            <i class="ico information-frame tip" tip="#DragDropHelp"></i>
+            <i class="fa fa-fw fa-plus btn tip" onclick="addChild(1)" title="{{AddOneToManyChannels}}"></i>
             <div id="DragDropHelp" style="display:none">{{DragDropHelp}}</div>
         </td>
-        <td></td>
         <td></td>
     </tr>
 
@@ -132,29 +128,27 @@
                 <!-- MACRO ChannelSelectOptions -->
             </select>
         </th>
-        <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
     </tr>
     <tfoot>
 </table>
 
 <!-- Legend -->
 
-<div id="IconLegend">
-    <div class="icons legendtip">
-        <i class="ico lock"></i>{{PrivateChannel}}<br />
-        <i class="ico plus-circle-frame"></i>{{AddOneToManyChannels}}<br />
-        <i class="ico node-insert-next"></i>{{AssignEntity}}<br />
-        <i class="ico node-delete-next"></i>{{DeleteEntity}}<br />
-        <i class="ico node-delete"></i>{{DeleteBranch}}<br />
-        <i class="ico navigation-180-frame"></i>{{MoveEntityLeft}}<br />
-        <i class="ico navigation-090-frame"></i>{{MoveEntityUp}}<br />
-        <i class="ico navigation-270-frame"></i>{{MoveEntityDown}}<br />
-        <i class="ico document-invoice"></i>{{ListHint}}<br />
-        <i class="ico node-design"></i>{{EditEntity}}<br />
-        <i class="ico node-select-child"></i>{{CloneEntity}}<br />
-        <i class="ico arrow-split"></i>{{AliasEntity}}<br />
-        <i class="ico license-key"></i>{{ShowGUID}}
-    </div>
+<div class="icon-legend">
+    <i class="fa fa-lock"></i>{{PrivateChannel}} &nbsp;
+    <i class="fa fa-plus"></i>{{AddOneToManyChannels}} &nbsp;
+    <i class="fa fa-minus"></i>{{DeleteEntity}} / {{DeleteBranch}} &nbsp;
+
+    <i class="fa fa-arrow-left"></i>{{MoveEntityLeft}} &nbsp;
+    <i class="fa fa-arrow-up"></i>{{MoveEntityUp}} &nbsp;
+    <i class="fa fa-arrow-down"></i>{{MoveEntityDown}} &nbsp;
+
+    <i class="fa fa-pencil"></i>{{EditEntity}} &nbsp;
+    <i class="fa fa-clone"></i>{{CloneEntity}} &nbsp;
+    <i class="fa fa-code-fork"></i>{{AliasEntity}} &nbsp;
+    
+    <i class="fa fa-file-text"></i>{{ListHint}} &nbsp;
+    <i class="fa fa-key fa-rotate-90"></i>{{ShowGUID}}
 </div>
 
 <!-- Dialogs -->

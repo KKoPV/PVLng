@@ -45,17 +45,19 @@ a:hover, a:active {
     color: black;
 }
 
-/* Back to top link
+/* Go back to top link
 --------------------------------------------------------------------------- */
-.back-to-top {
+.go-top {
     position: fixed;
     bottom: 1.5em;
     right: 0;
     padding: 1em;
+    border-right: 0;
     display: none;
+    color: grey;
 }
 
-.back-to-top:hover {
+.go-top:hover {
     background-color: rgba(135, 135, 135, 0.50);
 }
 
@@ -216,6 +218,11 @@ td.imgbar {
 
 /* Other
 --------------------------------------------------------------------------- */
+.fa-question.tip {
+    vertical-align: super;
+    margin-left: .5em;
+}
+
 .marked-for-deletion td {
     background-color: #FFC0C0 !important;
 }
@@ -225,9 +232,23 @@ td.imgbar {
     max-height: 20em;
 }
 
+.icon-legend {
+    padding: .5em 0;
+    font-size: smaller;
+}
+
+.icon-legend i {
+    padding-right: .25em;
+    color: #404040;
+    font-size: initial;
+}
+
 .legendtip i {
-    margin: 6px 8px -4px 0;
+    padding: 1px;
+    margin: 2px;
     background-color: white;
+    color: #404040;
+    font-size: initial;
 }
 
 .wait,
@@ -263,6 +284,12 @@ input.guid {
 
 tt {
     font-size: 120%;
+}
+
+.fa.btn {
+    margin-left: 2px;
+    margin-right: 2px;
+    color: #404040;
 }
 
 .s {

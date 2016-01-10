@@ -32,8 +32,7 @@
         <tr>
             <td>
                 <label for="d-type">{{SeriesType}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{ChartTypeHint}}">
+                <i class="fa fa-question tip" title="{{ChartTypeHint}}"></i>
             </td>
             <td>
                 <select id="d-type">
@@ -44,8 +43,7 @@
                     <option value="bar">{{BarChart}}</option>
                     <option value="scatter">{{ScatterChart}}</option>
                 </select>
-                <img id="scatter-candidate" src="/images/ico/information_frame.png"
-                     style="margin-left:1em" class="ico tip" title="{{ScatterCandidate}}">
+                <i id="scatter-candidate" class="fa fa-question tip" title="{{ScatterCandidate}}"></i>
             </td>
         </tr>
         <tr>
@@ -115,14 +113,20 @@
         <tr>
             <td>
                 <label for="d-cons">{{ShowConsumption}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{ShowConsumptionHint}}" />
+                <i class="fa fa-question tip" title="{{ShowConsumptionHint}}"></i>
             </td>
             <td class="not-scatter"><input type="checkbox" id="d-cons" class="iCheck" /></td>
         </tr>
         <tr>
             <td>{{Color}}</td>
             <td><input id="d-color" type="color" class="spectrum" /></td>
+        </tr>
+        <tr>
+            <td>
+                <label for="d-outline">{{DrawOutline}}</label>
+                <i class="fa fa-question tip" title="{{DrawOutlineHint}}"></i>
+            </td>
+            <td class="not-bar not-scatter"><input type="checkbox" id="d-outline" class="iCheck" /></td>
         </tr>
         <tr>
             <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
@@ -152,9 +156,7 @@
         <tr>
             <td>
                 <label for="d-time1">{{TimeRange}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin:0 .5em" title="{{TimeRangeHint}}" />
-                {{or}}
+                <i class="fa fa-question tip" title="{{TimeRangeHint}}"></i>
             </td>
             <td>
                 <div class="fl">
@@ -191,8 +193,7 @@
         <tr>
             <td>
                 <label for="d-position">{{ChartPosition}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{ChartPositionHint}}" />
+                <i class="fa fa-question tip" title="{{ChartPositionHint}}"></i>
             </td>
             <td>
                 <!-- Align layout with a table -->

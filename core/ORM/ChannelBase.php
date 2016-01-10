@@ -244,6 +244,17 @@ abstract class ChannelBase extends \slimMVC\ORM {
     }   // setPublic()
 
     /**
+     * Basic setter for field 'tags'
+     *
+     * @param  mixed    $tags Tags value
+     * @return Instance For fluid interface
+     */
+    public function setTags( $tags ) {
+        $this->fields['tags'] = $tags;
+        return $this;
+    }   // setTags()
+
+    /**
      * Basic setter for field 'extra'
      *
      * @param  mixed    $extra Extra value
@@ -459,6 +470,15 @@ abstract class ChannelBase extends \slimMVC\ORM {
     public function getPublic() {
         return $this->fields['public'];
     }   // getPublic()
+
+    /**
+     * Basic getter for field 'tags'
+     *
+     * @return mixed Tags value
+     */
+    public function getTags() {
+        return $this->fields['tags'];
+    }   // getTags()
 
     /**
      * Basic getter for field 'extra'
@@ -712,6 +732,17 @@ abstract class ChannelBase extends \slimMVC\ORM {
     }   // filterByPublic()
 
     /**
+     * Filter for field 'tags'
+     *
+     * @param  mixed    $tags Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByTags( $tags ) {
+        $this->filter[] = '`tags` = "'.$this->quote($tags).'"';
+        return $this;
+    }   // filterByTags()
+
+    /**
      * Filter for field 'extra'
      *
      * @param  mixed    $extra Filter value
@@ -764,34 +795,35 @@ abstract class ChannelBase extends \slimMVC\ORM {
         CREATE TABLE `pvlng_channel` (
           `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
           `guid` char(39) DEFAULT NULL COMMENT \'Unique GUID\',
-          `name` varchar(255) NOT NULL COMMENT \'Unique identifier\',
-          `description` varchar(255) NOT NULL COMMENT \'Longer description\',
-          `serial` varchar(30) NOT NULL,
-          `channel` varchar(255) NOT NULL,
-          `type` smallint(5) unsigned NOT NULL COMMENT \'pvlng_type -> id\',
+          `name` varchar(255) NOT NULL DEFAULT \'\' COMMENT \'Unique identifier\',
+          `description` varchar(255) NOT NULL DEFAULT \'\' COMMENT \'Longer description\',
+          `serial` varchar(30) NOT NULL DEFAULT \'\',
+          `channel` varchar(255) NOT NULL DEFAULT \'\',
+          `type` smallint(5) unsigned NOT NULL DEFAULT \'0\' COMMENT \'pvlng_type -> id\',
           `resolution` double NOT NULL DEFAULT \'1\',
-          `unit` varchar(10) NOT NULL,
+          `unit` varchar(10) NOT NULL DEFAULT \'\',
           `decimals` tinyint(1) unsigned NOT NULL DEFAULT \'2\',
-          `meter` tinyint(1) unsigned NOT NULL,
+          `meter` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
           `numeric` tinyint(1) unsigned NOT NULL DEFAULT \'1\',
-          `offset` double NOT NULL,
-          `adjust` tinyint(1) unsigned NOT NULL COMMENT \'allow auto adjustment of offset\',
+          `offset` double NOT NULL DEFAULT \'0\',
+          `adjust` tinyint(1) unsigned NOT NULL DEFAULT \'0\' COMMENT \'allow auto adjustment of offset\',
           `cost` double DEFAULT NULL COMMENT \'per unit or unit * h\',
           `tariff` int(10) unsigned DEFAULT NULL,
           `threshold` double unsigned DEFAULT NULL,
           `valid_from` double DEFAULT NULL COMMENT \'Numeric min. acceptable value\',
           `valid_to` double DEFAULT NULL COMMENT \'Numeric max. acceptable value\',
           `public` tinyint(1) unsigned NOT NULL DEFAULT \'1\' COMMENT \'Public channels don\'\'t need API key to read\',
+          `tags` text NOT NULL COMMENT \'scope:value tags, one per line\',
           `extra` text NOT NULL COMMENT \'Not visible field for models to store extra info\',
           `comment` text NOT NULL COMMENT \'Internal comment\',
-          `icon` varchar(255) NOT NULL,
+          `icon` varchar(255) NOT NULL DEFAULT \'\',
           PRIMARY KEY (`id`),
           UNIQUE KEY `GUID` (`guid`),
           KEY `type` (`type`),
           KEY `tariff` (`tariff`),
           CONSTRAINT `pvlng_channel_ibfk_1` FOREIGN KEY (`type`) REFERENCES `pvlng_type` (`id`) ON UPDATE CASCADE,
           CONSTRAINT `pvlng_channel_ibfk_2` FOREIGN KEY (`tariff`) REFERENCES `pvlng_tariff` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-        ) ENGINE=InnoDB AUTO_INCREMENT=662 DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'The channels defined\'
+        ) ENGINE=InnoDB AUTO_INCREMENT=693 DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'The channels defined\'
     ';
 
 }

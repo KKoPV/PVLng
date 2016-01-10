@@ -61,7 +61,8 @@ class Settings extends SettingsBase {
     public function getSunrise( $day ) {
         $lat = $this->getScopeValue('core', '', 'Latitude');
         $lon = $this->getScopeValue('core', '', 'Longitude');
-        return date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, +$lat, +$lon, 90, date('Z')/3600);
+        $zenith = 90 + 5/6;
+        return date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, +$lat, +$lon, $zenith, date('Z')/3600);
     }
 
     /**
@@ -70,7 +71,8 @@ class Settings extends SettingsBase {
     public function getSunset( $day ) {
         $lat = $this->getScopeValue('core', '', 'Latitude');
         $lon = $this->getScopeValue('core', '', 'Longitude');
-        return date_sunset($day, SUNFUNCS_RET_TIMESTAMP, +$lat, +$lon, 90, date('Z')/3600);
+        $zenith = 90 + 5/6;
+        return date_sunset($day, SUNFUNCS_RET_TIMESTAMP, +$lat, +$lon, $zenith, date('Z')/3600);
     }
 
     /**

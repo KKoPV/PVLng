@@ -9,7 +9,6 @@
 
 $app->hook('slim.before', function() use ($app) {
     $app->menu->add('20.20', '/dashboard', 'Dashboards', TRUE, 'Shift+F2');
-
     $tblDashboard = new ORM\Dashboard;
     foreach ($tblDashboard->order('name')->find() as $dashboard) {
         if ($app->user || $dashboard->getPublic()) {

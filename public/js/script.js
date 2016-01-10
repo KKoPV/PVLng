@@ -30,11 +30,10 @@ $.fn.autoWidth = function(options) {
  * Idea from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
  */
 $.parseQueryString = function() {
-    var qs;
-    result = {};
-    if (qs = window.location.search.replace('?', '')) {
+    var qs = window.location.search.replace('?', ''), result = {}, v;
+    if (qs) {
         $.each(qs.split('&'), function(id, data) {
-            var v = data.split('=');
+            v = data.split('=');
             if (v.length == 2) result[v[0]] = decodeURIComponent(v[1]);
         });
     }
@@ -45,9 +44,8 @@ $.parseQueryString = function() {
  * Display wait cursor for whole page
  */
 $.wait = function(show) {
-    // Defaults to true
-    if (!arguments.length) show = true;
-    $('html').css('cursor', show ? 'progress' : 'default');
+    if (!arguments.length) show = true; // Defaults to true
+    $('html, body').css('cursor', show ? 'progress' : 'default');
 };
 
 /**
@@ -149,15 +147,15 @@ $(function() {
 
     // Back to top
     var fadeDuration = 500;
-    $(window).scroll(function() {
-        if ($(this).scrollTop()) {
-            $('.back-to-top').fadeIn(fadeDuration);
+    $(window).on('scroll', function() {
+        if ($(this).scrollTop() > 50) {
+            $('.go-top').fadeIn(fadeDuration);
         } else {
-            $('.back-to-top').fadeOut(fadeDuration);
+            $('.go-top').fadeOut(fadeDuration);
         }
     });
 
-    $('.back-to-top').click(function(e) {
+    $('.go-top').on('click', function(e) {
         e.preventDefault();
         jQuery('html, body').animate({scrollTop: 0}, fadeDuration);
         return false;

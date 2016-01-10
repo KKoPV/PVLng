@@ -68,4 +68,7 @@ if (!curl(array(
 okv(1, 'Response', $response);
 
 // Anything went wrong?
-if ($info['http_code'] != 200) okv(0, 'Response', $response);
+if ($info['http_code'] != 200) {
+    // Ignore "PVOutput is offline for maintenance"
+    if (!strstr($response, 'maintenance')) okv(0, 'Response', $response);
+}
