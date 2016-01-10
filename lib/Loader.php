@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Buffering loader
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012-2014 Knut Kohl
@@ -12,7 +12,8 @@ class Loader {
     /**
      *
      */
-    public static function autoload( $className ) {
+    public static function autoload($className)
+    {
         if (isset(self::$ClassMap[$className])) {
             // Buffered file location found
             self::load(self::$ClassMap[$className]);
@@ -28,16 +29,21 @@ class Loader {
     /**
      *
      */
-    public static function register( $loader, $cache=TRUE ) {
+    public static function register($loader, $cache=true)
+    {
         self::$loader = $loader;
 
         // No real path provided
-        if ($cache === TRUE) $cache = sys_get_temp_dir();
+        if ($cache === true) {
+            $cache = sys_get_temp_dir();
+        }
 
         self::$ClassMapFile = $cache
-                            ? sprintf('%s%sclassmap.%s.php', $cache, DS,
-                              substr(md5(serialize(self::$loader)), -7))
-                            : FALSE;
+                            ? sprintf(
+                                  '%s%sclassmap.%s.php',
+                                   $cache, DS, substr(md5(serialize(self::$loader)), -7)
+                              )
+                            : false;
 
         if (self::$ClassMapFile) {
             // Class map exists?
@@ -56,20 +62,22 @@ class Loader {
     /**
      * Cache class map
      */
-    public static function shutdown() {
+    public static function shutdown()
+    {
         // Cache class map if allowed
         ksort(self::$ClassMap);
 
         file_put_contents(
             self::$ClassMapFile,
-            '<?php return ' . var_export(self::$ClassMap, TRUE) . ';'
+            '<?php return ' . var_export(self::$ClassMap, true) . ';'
         );
     }
 
     /**
      * Manual file loading with callback
      */
-    public static function load( $file ) {
+    public static function load($file)
+    {
         $file = self::applyCallback($file);
         require_once $file;
         return TRUE;
@@ -78,7 +86,8 @@ class Loader {
     /**
      * Manual apply callback
      */
-    public static function applyCallback( $file ) {
+    public static function applyCallback($file)
+    {
         foreach (self::$Callback as $Callback) {
             $file = $Callback($file);
         }
@@ -88,7 +97,8 @@ class Loader {
     /**
      *
      */
-    public static function registerCallback( $Callback ) {
+    public static function registerCallback($Callback)
+    {
         if (is_callable($Callback)) {
             self::$Callback[] = $Callback;
         } else {
@@ -96,9 +106,9 @@ class Loader {
         }
     }
 
-    // -------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
     // PROTECTED
-    // -------------------------------------------------------------------------
+    // -----------------------------------------------------------------------
 
     /**
      *

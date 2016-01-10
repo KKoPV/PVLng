@@ -254,14 +254,14 @@ class MySQLi extends SetupTask {
     public function process( $params ) {
         $config = include $params['config'];
 
-        $db = new \MySQLi(
+        $db = @(new \MySQLi(
             self::arrayPath2Key($config, $params['host']),
             self::arrayPath2Key($config, $params['user']),
             self::arrayPath2Key($config, $params['pass']),
             self::arrayPath2Key($config, $params['db']),
-            self::arrayPath2Key($config, $params['port']),
+            (int) self::arrayPath2Key($config, $params['port']),
             self::arrayPath2Key($config, $params['socket'])
-        );
+        ));
 
         if (!$db->connect_error) {
             $this->success('Connect to MySQL ( Version',

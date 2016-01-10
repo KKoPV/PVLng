@@ -113,8 +113,8 @@
                     <option value="1">{{PublicChart}}</option>
                     <option value="2">{{MobileChart}}</option>
                 </select>
+                <i class="fa fa-question tip" title="{{publicHint}}"></i>
                 <button id="btn-save" class="tip"  style="margin-left:1em"title="{{Save}}">{{Save}}</button>
-                <i class="ico information-frame tip" style="margin-left:1em" title="{{publicHint}}"></i>
             </div>
             <div class="r">
                 <a id="btn-permanent" href="#" class="tip" title="{{DragPermanent}}">Permanent bookmark</a>

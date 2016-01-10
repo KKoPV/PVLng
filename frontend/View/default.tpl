@@ -113,15 +113,8 @@
 
     </div>
 
-        <!--
-    <a href="#" class="go-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
-        title="{{BackToTop}}">
-        <i class="fa fa-arrow-up fa-lg"></i>
-        <img src="/images/ico/arrow-stop-090.png" class="ico">
-    </a>
-        -->
-
-    <i class="fa fa-arrow-up go-top ui-state-default ui-corner-tl ui-corner-bl tipbtn" title="{{BackToTop}}"></i>
+    <i class="fa fa-arrow-up go-top ui-state-default ui-corner-tl ui-corner-bl tipbtn"
+       style="display:none" title="{{BackToTop}}"></i>
 
     <!-- IF {DEVELOPMENT} -->
     <script src="//code.jquery.com/jquery-2.1.1.js"></script>

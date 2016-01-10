@@ -12,14 +12,6 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
-    public function __destruct() {
-        // Send statistics each 6 hours if activated
-        if ($this->config->SendStatistics) PVLng::SendStatistics();
-    }
-
-    /**
-     *
-     */
     public function __construct() {
         parent::__construct();
 
@@ -58,6 +50,14 @@ class Controller extends slimMVC\Controller {
 
         $this->view->Menu = $app->menu->get();
         $this->view->Languages = $app->languages->get();
+    }
+
+    /**
+     *
+     */
+    public function __destruct() {
+        // Send statistics each 6 hours if activated
+        if ($this->config->SendStatistics) PVLng::SendStatistics();
     }
 
     /**

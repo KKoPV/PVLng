@@ -8,7 +8,7 @@
  * @version    1.0.0
  */
 
-define('DEVELOP', (isset($_SERVER['HTTP_X_PVLNG_TRACE']) AND $_SERVER['HTTP_X_PVLNG_TRACE']));
+define('DEVELOP', (isset($_SERVER['HTTP_X_DEBUG']) AND $_SERVER['HTTP_X_DEBUG']));
 
 if (DEVELOP) {
     ini_set('display_startup_errors', 1);
@@ -309,8 +309,10 @@ function SaveCSVdata( $guid, $rows, $sep ) {
 // ---------------------------------------------------------------------------
 Slim\Route::setDefaultConditions(array(
     'date'      => '\d{4}-\d{2}-\d{2}',
-#    'guid'      => '(\w{4}-){7}\w{4}',
-    'guid'      => '\w{4}-\w{4}(-\w{4})?(-\w{4})?(-\w{4})?(-\w{4})?(-\w{4})?(-\w{4})?',
+#    'guid'      => '\w{4}(?:-\w{4}){7}',
+    'guid'      => '\w{4}-\w{4}(?:-\w{4}){0,6}',
+    'period'    => '(?:last|readlast|all)',
+    'timestamp' => '\d+',
     'id'        => '\d+',
     'latitude'  => '[\d.-]+',
     'longitude' => '[\d.-]+',

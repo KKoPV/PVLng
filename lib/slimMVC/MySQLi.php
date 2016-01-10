@@ -141,10 +141,13 @@ class MySQLi extends \MySQLi {
             echo $this->Cli ? "\n" : '</pre>';
         }
 
-        $t = microtime(TRUE);
+        $t = microtime(true);
 
         $result = parent::query($query, $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT);
-        $this->error();
+
+        if ($this->errno && $this->dieOnError) {
+            die(sprintf('MySQL ERROR [%d] %s', $this->errno, $this->error));
+        }
 
         $this->QueryTime += (microtime(TRUE) - $t) * 1000;
         $this->QueryCount++;
@@ -298,9 +301,6 @@ class MySQLi extends \MySQLi {
         $replace = sprintf('REPLACE `%s` (`%s`, `%s`) VALUES (LOWER("{1}"), "{2}")',
                            $this->Settings[0], $this->Settings[1], $this->Settings[2]);
 
-        $key   = $this->real_escape_string($key);
-        $value = $this->real_escape_string($value);
-
         $this->query($replace, $key, $value);
     }
 
@@ -318,10 +318,7 @@ class MySQLi extends \MySQLi {
         $query = sprintf('SELECT `%s` FROM `%s` WHERE `%s` = LOWER("{1}") LIMIT 1',
                          $this->Settings[2], $this->Settings[0], $this->Settings[1]);
 
-        $key = $this->real_escape_string($key);
-
-        if ($result = $this->query($query, $key) AND
-            $obj = $result->fetch_object()) {
+        if (($result = $this->query($query, $key)) && ($obj = $result->fetch_object())) {
             return $obj->value;
         }
     }
@@ -343,17 +340,17 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    protected $dieOnError = FALSE;
+    protected $dieOnError = false;
 
     /**
      * Table name, key field name, value field name
      */
-    protected $Settings = array( 'settings', 'key', 'value' );
+    protected $Settings = array('settings', 'key', 'value');
 
     /**
      *
      */
-    protected $Buffered = FALSE;
+    protected $Buffered = false;
 
     /**
      *
@@ -368,16 +365,6 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    protected $debug = FALSE;
-
-    /**
-     *
-     */
-    private function error() {
-        if (!$this->errno OR !$this->dieOnError) return;
-
-        echo $this->error, PHP_EOL;
-        exit(1);
-    }
+    protected $debug = false;
 
 }

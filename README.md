@@ -1,17 +1,17 @@
 # PVLng
 
-[![Join the chat at https://gitter.im/KKoPV/PVLng](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/KKoPV/PVLng?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 PhotoVoltaic Logger new generation
 
-Please see http://pvlng.com for details
+Please see http://pvlng.com for details.
+
+A [demo installation](http://demo.pvlng.com/) is also available.
 
 # Installation
 
 If you want to use git für installing PVLng (recommended), you can simply execute from a shell
 in the directory to install PVLng into:
 
-```
+``` bash
 wget -qO - https://raw.githubusercontent.com/KKoPV/PVLng/master/tools/install | bash
 ```
 
@@ -21,15 +21,17 @@ a basic configuration file with this credentials.
 If you are interested in the latest development version, you can also direct install the development
 branch with:
 
-```
+``` bash
 wget -qO - https://raw.githubusercontent.com/KKoPV/PVLng/develop/tools/install | bash
 ```
+
+Answer to checkout development branch with yes
 
 ## Upgrade
 
 If a new master (or development) release is out, you can upgrade your repository and database with
 
-```
+``` bash
 tools/upgrade.git master
 ```
 
@@ -66,4 +68,4 @@ All code contributions and bug reports are much appreciated.
 
 Release version numbers will follow the format:
 
-`<version>.<update>.<patch>`
+`<major>.<minor>.<patch>`

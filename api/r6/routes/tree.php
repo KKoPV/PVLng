@@ -31,33 +31,39 @@ $api->get('/tree/:id', function($id) use ($api) {
 })->name('GET /tree/:id')->help = array(
     'since'       => 'r5',
     'description' => 'Fetch a channel and its direct child channels',
+    'parameters'  => array(
+        'id'          => 'Tree Id of original channel',
+    )
 );
 
 /**
  * Add channel to Tree
  */
-$api->put('/tree/:p_guid/:c_guid', $APIkeyRequired, function($p_guid, $c_guid) use ($api) {
-    if ($p_guid == '0000-0000-0000-0000-0000-0000-0000-0000') {
+$api->put('/tree/:pguid/:cguid', $APIkeyRequired, function($pguid, $cguid) use ($api) {
+    if ($pguid == '0000-0000-0000-0000-0000-0000-0000-0000') {
         // Interpret as "root node"
         $parent = Channel::byId(1);
     } else {
-        $parent = Channel::byGUID($p_guid);
+        $parent = Channel::byGUID($pguid);
     }
 
-    $child = Channel::byGUID($c_guid);
+    $child = Channel::byGUID($cguid);
     $id = $parent->addChild($child->getId());
 
     // Recreate child to read all attributes
     $child = Channel::byGUID($id);
 
-
 })->conditions(array(
-    'c_guid'      => '(\w{4}-){7}\w{4}',
-    'p_guid'      => '(\w{4}-){7}\w{4}',
+    'pguid'       => '(\w{4}-){7}\w{4}',
+    'cguid'       => '(\w{4}-){7}\w{4}',
 ))->name('PUT /tree/:parent/:id')->help = array(
     'since'       => 'r5',
     'description' => 'Add channel to parent',
-    'apikey'      => TRUE
+    'apikey'      => true,
+    'parameters'  => array(
+        'pguid'       => 'Parent channel GUID',
+        'cguid'       => 'Child channel GUID',
+    )
 );
 
 /**
@@ -84,7 +90,10 @@ $api->put('/tree/alias/:id', $APIkeyRequired, function($id) use ($api) {
 })->name('PUT /tree/alias/:id')->help = array(
     'since'       => 'r4',
     'description' => 'Create alias from given hierarchy Id',
-    'apikey'      => TRUE
+    'apikey'      => true,
+    'parameters'  => array(
+        'id'          => 'Tree Id of original channel',
+    )
 );
 
 /**
@@ -99,7 +108,10 @@ $api->delete('/tree/:id', $APIkeyRequired, function($id) use ($api) {
 })->name('DELETE /tree/:id')->help = array(
     'since'       => 'r4',
     'description' => 'Delete channel from channel hierarchy',
-    'apikey'      => TRUE
+    'apikey'      => true,
+    'parameters'  => array(
+        'id'          => 'Tree Id of original channel',
+    )
 );
 
 /**

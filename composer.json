@@ -1,0 +1,20 @@
+{
+    "name":        "kkopv/pvlng",
+    "description": "PhotoVoltaic Logger new generation",
+    "license":     "MIT",
+    "keywords":    ["Photovoltaic","PV","logger","data warehouse"],
+    "authors": [
+        {
+            "name":  "Knut Kohl",
+            "email": "github@knutkohl.de"
+        }
+    ],
+    "prefer-stable": true,
+    "require": {
+        "slim/slim": "~2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*",
+        "phpunit/php-invoker": "~1.1"
+    }
+}

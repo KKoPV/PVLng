@@ -24,7 +24,7 @@ return array(
     /**
      * Preferd cache mode, auto detect best one if empty
      */
-    'Cache' => NULL
+    'Cache' => null
     // Force one, if you like,
     // MemCache is best tested and recommended!
     # 'Cache' => 'MemCache'     // MUST BE ISTALLED AND ENABLED!

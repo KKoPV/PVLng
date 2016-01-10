@@ -65,7 +65,9 @@
     <div id="tabs-2">
 
         <div id="stats-chart">
-            <p class="c b" style="padding:1em;background-color:#FFFF88">{{JustAMoment}}</p>
+            <p class="c" style="padding:1.5em">
+                <i class="fa fa-circle-o-notch fa-spin fa-2x"></i>
+            </p>
         </div>
 
         <table id="table-stats">

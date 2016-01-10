@@ -67,11 +67,9 @@ $api->get('/channels', function() use ($api) {
  */
 $api->get('/channel/:guid', $accessibleChannel, function($guid) use ($api) {
     $api->render(Channel::byGUID($guid)->getAttributesShort());
-})->conditions(array(
-    'attribute' => '\w+'
-))->name('GET /channel/:guid')->help = array(
+})->name('GET /channel/:guid')->help = array(
     'since'       => 'r3',
-    'description' => 'Fetch single channel attribute',
+    'description' => 'Fetch channel attributes',
 );
 
 /**

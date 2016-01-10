@@ -67,7 +67,7 @@ class MemCache extends \Cache {
      * @{
      */
     public function isAvailable() {
-        return $this->memcache->connect($this->host, $this->port);
+        return @$this->memcache->connect($this->host, $this->port);
     }
 
     public function write( $key, $data, $ttl ) {

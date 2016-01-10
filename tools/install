@@ -3,20 +3,35 @@
 ### Install script
 ###
 ### @author      Knut Kohl <github@knutkohl.de>
-### @copyright   2012-2014 Knut Kohl
+### @copyright   2012-2016 Knut Kohl
 ### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     $Id$
+### @version     1.1.0
 #############################################################################
 
 ### echo ...
-function e { echo =========================================================
-  echo "= $*"; echo =========================================================; }
+function es { echo =========================================================; }
+function e { es; echo "= $*"; es; }
+
 ### return default value $2, if $1 was empty
 function d { [ "$1" ] && echo "$1" || echo "$2"; }
 
 e 'Clone PVLng Github repository'
 git clone https://github.com/KKoPV/PVLng.git .
 [ $? -eq 0 ] || exit 1
+
+es
+read -p "Checkout 'develop' branch for testing [y/N] " input <&1
+[ "$input" == Y -o "$input" == y ]  && git checkout develop
+
+if [ -f composer.json ]; then
+    e 'Check for Composer ...'
+    if [ -z "$(which composer)" ]; then
+        e 'Missing Composer, please follow https://getcomposer.org/download/ for details'
+        exit 1
+    fi
+
+    composer update --no-dev
+fi
 
 while [ "$ok" != Y ]; do
     e 'Setup MySQL database'

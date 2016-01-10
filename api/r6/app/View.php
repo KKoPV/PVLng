@@ -69,10 +69,16 @@ class View extends Slim\View {
             }
             echo ']';
         } else {
-            echo (is_scalar($result) AND json_decode($result) !== FALSE)
-                 // $result is still a JSON string
-               ? $result
-               : json_encode($this->normalizeJSON($result));
+            if (is_scalar($result) && json_decode($result) !== FALSE) {
+                // Ok, is JSON
+            } else {
+                $result = json_encode($this->normalizeJSON($result));
+            }
+            $api = API::getInstance();
+            $callback = $api->request->get('callback');
+            if (!$callback) $callback = $api->request->get('jsonp');
+            if ($callback) $result = $callback.'('.$result.')';
+            echo $result;
         }
     }
 

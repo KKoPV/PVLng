@@ -385,9 +385,10 @@ abstract class Channel {
 
         $buffer = new Buffer;
 
-        if ($this->period[1] == self::READLAST OR
-            // Simply read also last data set for sensor channels
-            (!$this->meter AND $this->period[1] == self::LAST)) {
+        if ($this->period[1] == self::READLAST) {
+
+            // Use special table for last readings
+            $q = DBQuery::forge('pvlng_reading_last');
 
             // Fetch last reading and set some data to 0 to get correct field order
             $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
@@ -397,37 +398,40 @@ abstract class Channel {
               ->get(0, 'max')
               ->get(0, 'count')
               ->get(0, 'timediff')
-              ->get($this->meter ? 'data' : 0, 'consumption')
+              ->get(0, 'consumption')
+              ->filter('id', $this->entity)
+              ->limit(1);
+
+            $row = $this->db->queryRow($q);
+
+            if (!$row) return $this->after_read($buffer);
+
+            $buffer->write((array) $row);
+
+        } elseif (!$this->meter AND $this->period[1] == self::LAST) {
+
+            // Simply read last data set for sensor channels
+
+            // Fetch last reading and set some data to 0 to get correct field order
+            $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
+              ->get('timestamp')
+              ->get('data')
+              ->get($q->MIN('data'), 'min')
+              ->get($q->MAX('data'), 'max')
+              ->get($q->COUNT('id'), 'count')
+              ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
+              ->get(0, 'consumption')
               ->filter('id', $this->entity)
               ->order('timestamp', TRUE)
               ->limit(1);
 
-            if ($this->period[1] != self::READLAST) {
-                $this->filterReadTimestamp($q);
-            }
+            $this->filterReadTimestamp($q);
 
-            $row = (array) $this->db->queryRow($q);
+            $row = $this->db->queryRow($q);
 
             if (!$row) return $this->after_read($buffer);
 
-            $row = (array) $row;
-
-            if ($this->period[1] != self::READLAST) {
-                $this->SQLHeader($request, $q);
-
-                // Reset query and read add. data
-                $q->select($this->table[$this->numeric])
-                  ->get($q->MIN('data'), 'min')
-                  ->get($q->MAX('data'), 'max')
-                  ->get($q->COUNT('id'), 'count')
-                  ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
-                  ->filter('id', $this->entity)
-                  ->limit(1);
-                $this->filterReadTimestamp($q);
-                $row = array_merge($row, (array) $this->db->queryRow($q));
-            }
-
-            $buffer->write($row);
+            $buffer->write((array) $row);
 
         } else {
 
@@ -448,18 +452,21 @@ abstract class Channel {
                   ->get($q->MIN('timestamp'), 'timestamp');
 
                 switch (TRUE) {
+                    // Raw data for non-numeric channels
                     case !$this->numeric:
-                        // Raw data for non-numeric channels
-                        $q->get('data');  break;
+                        $q->get('data');
+                        break;
+                    // Max./Min. value for meters
                     case $this->meter:
-                        // Max./Min. value for meters
                         $d = ($this->resolution > 0) ? $q->MAX('data') : $q->MIN('data');
-                        $q->get($d, 'data');  break;
+                        $q->get($d, 'data');
+                        break;
+                    // Summarize counter ticks
                     case $this->counter:
-                        // Summarize counter ticks
-                        $q->get($q->SUM('data'), 'data');  break;
+                        $q->get($q->SUM('data'), 'data');
+                        break;
+                    // Average value of sensors/proxies
                     default:
-                        // Average value of sensors/proxies
                         $q->get($q->AVG('data'), 'data');
                 } // switch
 

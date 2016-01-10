@@ -127,3 +127,131 @@ $api->any('/helphtml', function() use ($api, $version) {
     'since'       => 'r4',
     'description' => 'This help in HTML for browsers, overview of valid calls',
 );
+
+/**
+ *
+ */
+$api->any('/help/apiary', function() use ($api, $version) {
+
+    $sep = str_repeat('#', 80);
+
+    $parameters = [
+        'guid'       =>   'Channel GUID',
+        'timestamp'  => [ 'Timestamp', 'integer' ],
+    ];
+
+    $content = array(
+        'FORMAT: 1A',
+        null,
+        '# PVLng API '.$version,
+    );
+
+    $routes = array();
+    foreach ($api->router()->getNamedRoutes() as $route) {
+        $pattern = $route->getPattern();
+        $group   = explode('/', $pattern);
+        $pattern = str_replace('latest', $version, $api->request()->getRootUri()) . $pattern;
+        $help = array(
+            'since'       => 'r1',
+            'description' => $route->getName(),
+            'apikey'      => 0
+        );
+        if (isset($route->help)) $help = array_merge($help, $route->help);
+
+        foreach ($route->getConditions() as $key=>$value) {
+            if (preg_match('~:'.$key.'([+(/]|$)~', $pattern)) $help['conditions'][$key] = $value;
+        }
+
+        // Add methods to make array key unique
+        foreach ($route->getHttpMethods() as $method) {
+            if ($method != 'HEAD') $routes[trim($group[1], '(')][$pattern][$method] = $help;
+        }
+    }
+
+    ksort($routes);
+
+    foreach ($routes as $group=>$patterns) {
+        $content[] = null;
+        $content[] = $sep;
+        $content[] = '# Group '.ucwords($group);
+        $content[] = $sep;
+        foreach ($patterns as $pattern=>$methods) {
+            $content[] = null;
+            $content[] = $sep;
+            $pattern = preg_replace_callback(
+                '~:(\w+)([+]?)~',
+                function($p) {
+                    return '{'.($p[2]?'+':'').$p[1].'}';
+                },
+                $pattern
+            );
+            $content[] = '## '.$pattern;
+            foreach ($methods as $method=>$route) {
+                $content[] = null;
+                $content[] = '### '.$route['description'].' ['.$method.']';
+
+                if (!empty($route['conditions'])) {
+                    $content[] = '+ Parameters'."\n";
+
+                    if (isset($route['parameters'])) {
+                        $parameters = array_merge($parameters, $route['parameters']);
+                    }
+
+                    foreach ($route['conditions'] as $parameter=>$regex) {
+                        $param = isset($parameters[$parameter]) ? $parameters[$parameter] : ucfirst($parameter);
+                        if (!is_array($param)) $param = [$param, 'string'];
+                        $content[] = '    + '.$parameter .' ('.$param[1].') - '.$param[0];
+                    }
+                }
+
+                $request = $headers = false;
+
+                if (!empty($route['payload'])) {
+                    $content[] = '+ Request'."\n";
+                    $request = true;
+                    foreach ((array) $route['payload'] as $key=>$desc) {
+                        $content[] = '        '.$key.' - '.$desc;
+                    }
+                }
+
+                if ($route['apikey']) {
+                    if (!$request) {
+                        $content[] = '+ Request'."\n";
+                        $request = true;
+                    }
+                    if (!$headers) {
+                        $content[] = '    + Headers'."\n";
+                        $headers = true;
+                    }
+                    $content[] = '            X-PVLng-Key: Your API key';
+                }
+
+                if (!empty($route['header'])) {
+                    if (!$request) {
+                        $content[] = '+ Request';
+                        $request = true;
+                    }
+                    if (!$headers) {
+                        $content[] = '    + Headers'."\n";
+                        $headers = true;
+                    }
+                    foreach ($route['header'] as $header=>$desc) {
+                        $content[] = '            '.$header.': '.$desc;
+                    }
+                }
+
+                $content[] = '+ Response 200 (application/json)';
+
+#$content[] = print_r($route, 1);
+
+            }
+        }
+    }
+
+    $api->response->headers->set('Content-Type', 'text/plain');
+
+    $api->render(implode("\n", $content));
+})->name('ANY /help/apiary')->help = array(
+    'since'       => 'r6',
+    'description' => 'This help, overview of valid calls',
+);

@@ -36,7 +36,6 @@ function _redirect( $route ) {
 file_exists(ROOT_DIR . DS . 'prepend.php') && include ROOT_DIR . DS . 'prepend.php';
 
 setlocale(LC_NUMERIC, 'C');
-iconv_set_encoding('internal_encoding', 'UTF-8');
 mb_internal_encoding('UTF-8');
 clearstatcache();
 
@@ -343,6 +342,8 @@ if ($app->debug) $app->add(new YryieMiddleware);
  * Run application
  */
 $app->run();
+
+PVLng::sendStatistics();
 
 /**
  * Some statistics

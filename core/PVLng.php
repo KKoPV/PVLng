@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Helper functions
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2014 Knut Kohl
@@ -12,7 +12,7 @@ abstract class PVLng {
     /**
      *
      */
-    const StatisticsURL = 'http://stats.pvlng.com/index.php';
+    const STATS_URL = 'http://stats.pvlng.com/index.php';
 
     /**
      *
@@ -31,10 +31,19 @@ abstract class PVLng {
      * Send anonymous statistics about channel & readings count
      */
     public static function sendStatistics() {
-        $db = slimMVC\MySQLi::getInstance();
+        $db = slimMVC\App::getInstance()->db;
 
-        // Send at least each 6 hours
-        if ($db->LastStats + 6*60*60 > time()) return;
+        // Send statistic at all?
+        if (!$db->queryOne('
+            SELECT `value` FROM `pvlng_settings`
+             WHERE `scope` = "core"
+               AND `name`  = ""
+               AND `key`   = "SendStats"
+             LIMIT 1
+        ')) return;
+
+        // Send once a day
+        if (time() < $db->LastStats + 24*60*60) return;
 
         // This data will be send
         $args = array(
@@ -46,14 +55,14 @@ abstract class PVLng {
             (new ORM\ReadingNum)->rowCount() + (new ORM\ReadingStr)->rowCount()
         );
 
-        $ch = curl_init(self::StatisticsURL);
+        $ch = curl_init(self::STATS_URL);
 
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($args));
         curl_exec($ch);
 
         // On error, make next try in 1 hour
-        $db->LastStats = curl_errno($ch) ? time()-5*60*60 : time();
+        $db->LastStats = curl_errno($ch) ? time()-23*60*60 : time();
 
         curl_close($ch);
     }

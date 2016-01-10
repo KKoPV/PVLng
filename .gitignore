@@ -10,6 +10,6 @@ custom/
 description.md
 !.githold
 
-composer.*
+composer.lock
 /tests
 /vendor

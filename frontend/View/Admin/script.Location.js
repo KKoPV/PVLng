@@ -9,7 +9,7 @@
  */
 -->
 
-<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script src="//maps.google.com/maps/api/js?sensor=false"></script>
 
 <script>
 
@@ -24,9 +24,11 @@ $(function() {
         icons: { primary: 'ui-icon-search' }, text: false
     }).click(function(){
 
+        $('#map-wrapper').hide();
+
         var location = $('#text').val();
 
-        $('#save-loc').button('disable');
+        if (!location) return;
 
         if (!geocoder) geocoder = new google.maps.Geocoder();
 
@@ -38,22 +40,22 @@ $(function() {
                     $.alert('No location found.', 'Sorry');
                     return;
                 }
-                $('#lat').val((Math.round(data[0].geometry.location.lat()*10000)/10000));
-                $('#lon').val((Math.round(data[0].geometry.location.lng()*10000)/10000));
-                $('#save-loc').button('enable');
+
+                $('#lat').val(data[0].geometry.location.lat().toFixed(4));
+                $('#lon').val(data[0].geometry.location.lng().toFixed(4));
 
                 /* http://moz.com/ugc/everything-you-never-wanted-to-know-about-google-maps-parameters */
-                var url = 'https://maps.google.com/maps?t=m&source=s_q&ie=UTF8&hq=&z=14&output=embed'+
-                          '&q='+encodeURIComponent(location)+
-                          '&hnear='+encodeURIComponent(data[0].formatted_address);
+                var url = 'https://maps.google.com/maps?t=m&source=s_q&ie=UTF8&hq=&z=14&output=embed' +
+                          '&q=' + encodeURIComponent(data[0].formatted_address);
                 // console.log(url);
                 $('#map').prop('src', url);
+                $('#map-wrapper').show();
             }
         );
     });
 
     $('#save-loc').button({
-        icons: { primary: 'ui-icon-disk' }, text: false, disabled: true
+        icons: { primary: 'ui-icon-disk' }, text: false
     }).click(function(){
         this.form.submit();
     });

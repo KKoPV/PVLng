@@ -53,7 +53,7 @@ $api->put('/log', $APIkeyRequired, function() use ($api) {
     'since'       => 'r2',
     'description' => 'Store new log entry, scope defaults to \'API '.$api->version.'\'',
     'apikey'      => TRUE,
-    'payload'     => '{"scope":"...", "message":"..."}',
+    'payload'     => array('{"scope":"...", "message":"..."}'=>'Message data'),
 );
 
 /**
@@ -147,7 +147,7 @@ $api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
     'since'       => 'r2',
     'description' => 'Update a log entry',
     'apikey'      => TRUE,
-    'payload'     => '{"scope":"...", "message":"..."}',
+    'payload'     => array('{"scope":"...", "message":"..."}'=>'Message data'),
 );
 
 /**

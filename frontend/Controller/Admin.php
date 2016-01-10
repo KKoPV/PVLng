@@ -29,10 +29,11 @@ class Admin extends \Controller {
         $hasher = new \PasswordHash();
 
         if ($hasher->CheckPassword($this->request->post('pass'), $this->config->get('Core.Password'))) {
-            \Session::set('user', TRUE);
-            $this->app->user = TRUE;
+            \Session::set('user', true);
 
-            if ($this->request->post('save')) self::RememberLogin();
+            if ($this->request->post('save')) {
+                self::RememberLogin();
+            }
 
             if ($r = \Session::get('returnto')) {
                 // Clear before redirect
@@ -69,6 +70,7 @@ class Admin extends \Controller {
 
         \Session::start('PVLng');
         \Session::set(\Messages::$SessionVar, $msgs);
+        \Session::set('user');
         $this->app->redirect('/');
     }
 
@@ -77,29 +79,36 @@ class Admin extends \Controller {
      */
     public function AdminPasswordPOST_Action() {
 
-        if ($this->request->post('p1') == '' OR
-            $this->request->post('p2') == '') {
+        $p1 = $this->request->post('p1');
+        $p2 = $this->request->post('p2');
+
+        if ($p1 == '' OR $p2 == '') {
             \Messages::Error(\I18N::_('AdminAndPasswordRequired'), TRUE);
             $this->view->Ok = FALSE;
             return;
         }
 
-        if ($this->request->post('p1') != $this->request->post('p2')) {
+        if ($p1 != $p2) {
             \Messages::Error(__('PasswordsNotEqual'), TRUE);
             $this->view->Ok = FALSE;
             return;
         }
 
-        $hasher = new \PasswordHash();
+        $hasher   = new \PasswordHash();
         $settings = new \ORM\Settings;
-        $this->view->Ok = $settings->filterByScopeNameKey('core', '', 'Password')
-                                   ->findOne()
-                                   ->setValue($hasher->HashPassword($this->request->post('p1')))
-                                   ->update();
+        $settings->setScope('core')
+                 ->setKey('Password')
+                 ->setValue($hasher->HashPassword($p1))
+                 ->replace();
+
+        $settings->filterByScopeNameKey('core', '', 'Password')->findOne();
+
+        $this->view->Ok = ($settings->getValue() != '');
 
         if ($this->view->Ok) {
             \Messages::Success(__('PasswordSaved'));
-            \Session::set('User', TRUE);
+            \Session::set('user', TRUE);
+            $this->app->user = TRUE;
             $this->app->redirect('/');
         }
     }

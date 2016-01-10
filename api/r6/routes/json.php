@@ -15,7 +15,7 @@ $api->get('/json/:path+', function($path) use ($api) {
     $api->render(JSONxPath($api, $path, $api->request->get('json')));
 })->name('GET /json/:path+')->help = array(
     'description' => 'Extract a section/value from given JSON data from query string',
-    'payload'     => '...json/path/to/node/?json=<JSON data>'
+    'payload'     => array('json' => '<JSON data>')
 );
 
 /**

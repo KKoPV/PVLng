@@ -25,10 +25,12 @@ class Random extends InternalCalc {
 
         parent::before_read($request);
 
-        // make sure, only until now :-)
-        $this->end = min($this->end, time());
+        // Force recreation of data
+        $this->dataExists(0);
 
         $timestamp = $this->start;
+        // make sure, only until now :-)
+        $this_end = min($this->end, time());
         // max. change +- 5
         $threshold = $this->threshold ?: 5;
         // buffer once
@@ -46,14 +48,14 @@ class Random extends InternalCalc {
         }
         $values = array($timestamp => $value);
 
-        while ($timestamp <= $this->end) {
+        while ($timestamp <= $this_end) {
             // calc next value;
             $timestamp += 60;
-            $value += mt_rand() / $randMax * $threshold * mt_rand($minRand, 1);
-            $values[$timestamp] = $value;
+            $value     += mt_rand() / $randMax * $threshold * mt_rand($minRand, 1);
+            $this->saveValue($timestamp, $value);
         }
 
-        $this->saveValues($values);
+        $this->dataCreated();
     }
 
 }

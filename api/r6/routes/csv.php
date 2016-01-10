@@ -25,7 +25,7 @@ $api->put('/csv/:guid', $APIkeyRequired, function($guid) use ($api) {
     'apikey'      => TRUE,
     'header'      => array(
         'X-PVLng-CSV-Separator' => 'Set data separator (if not semicolon) since r5, '
-                                 . '"TAB" as string will be also accepted'
+                                 . 'TAB as string will be also accepted'
     ),
     'payload'     => array(
         '<timestamp>;<value>'   => 'timestamp and value data row(s)',
