@@ -18,8 +18,10 @@ var PVLngVersion = '{VERSION}',
     ThousandSeparator = '{TSEP}',
 
     language = '{LANGUAGE}',
-    latitude = {raw:LATITUDE},
-    longitude = {raw:LONGITUDE},
 
-    verbose = '{VERBOSE',
+    /* May be empty on 1st start */
+    latitude = +'{raw:LATITUDE}',
+    longitude = +'{raw:LONGITUDE}',
+
+    verbose = '{VERBOSE}',
     user = '{USER}';
