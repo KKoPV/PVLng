@@ -63,7 +63,7 @@ done
 params="-h $dbhost -P $dbport -u $dbuser"
 
 [ "$dbsocket" ] && params="$params -S $dbsocket"
-[ "$dbpass" ]   && params="$params -p$dbpass"
+[ "$dbpass" ]   && params="$params --password='$dbpass'"
 
 e 'Import SQL definitions from sql/pvlng.sql ...'
 #echo "mysql $params $dbname <$PWD/sql/pvlng.sql"
