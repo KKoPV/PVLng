@@ -12,7 +12,7 @@ If you want to use git für installing PVLng (recommended), you can simply execu
 in the directory to install PVLng into:
 
 ```
-wget -qO - https://raw.github.com/KKoPV/PVLng/master/tools/install | bash
+wget -qO - https://raw.githubusercontent.com/KKoPV/PVLng/master/tools/install | bash
 ```
 
 The installer will ask for your MySQL credentials, install the basic SQL script and create
@@ -22,7 +22,7 @@ If you are interested in the latest development version, you can also direct ins
 branch with:
 
 ```
-wget -qO - https://raw.github.com/KKoPV/PVLng/develop/tools/install | bash
+wget -qO - https://raw.githubusercontent.com/KKoPV/PVLng/develop/tools/install | bash
 ```
 
 ## Upgrade
