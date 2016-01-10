@@ -12,7 +12,7 @@
 function e { echo =========================================================
   echo "= $*"; echo =========================================================; }
 ### return default value $2, if $1 was empty
-function d { ( [ "$1" ] && echo "$1" ) || echo "$2"; }
+function d { [ "$1" ] && echo "$1" || echo "$2"; }
 
 e 'Clone PVLng Github repository'
 git clone https://github.com/KKoPV/PVLng.git .
@@ -63,11 +63,9 @@ done
 params="-h $dbhost -P $dbport -u $dbuser"
 
 [ "$dbsocket" ] && params="$params -S $dbsocket"
-[ "$dbpass" ]   && params="$params --password='$dbpass'"
 
 e 'Import SQL definitions from sql/pvlng.sql ...'
-#echo "mysql $params $dbname <$PWD/sql/pvlng.sql"
-mysql $params $dbname <$PWD/sql/pvlng.sql
+mysql $params --password="$dbpass" $dbname <$PWD/sql/pvlng.sql
 
 e 'Prepare config/config.php and set database credentials'
 
