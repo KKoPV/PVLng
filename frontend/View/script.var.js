@@ -22,8 +22,10 @@ var PVLngVersion = '{VERSION}',
     CurrencyDecimals = '{CURRENCYDECIMALS}',
     CurrencyFormat = '{CURRENCYFORMAT}',
 
-    language  = '{LANGUAGE}',
-    latitude  = +'{raw:LATITUDE}', /* Handles empty strings */
+    language = '{LANGUAGE}',
+
+    /* May be empty on 1st start */
+    latitude  = +'{raw:LATITUDE}',
     longitude = +'{raw:LONGITUDE}',
 
     verbose = '{VERBOSE}',
