@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-abstract class Json {
+abstract class Json
+{
 
     // -----------------------------------------------------------------------
     // CONST
@@ -66,7 +67,8 @@ abstract class Json {
      *
      * @param array $data Data to build from
      */
-    public function __construct( $data=array() ) {
+    public function __construct($data=array())
+    {
         if (is_array($data)) {
             foreach ($data as $key=>$value) {
                 $class = self::section2class($key);
@@ -88,8 +90,9 @@ abstract class Json {
      * @param  array $data Data for the new instance
      * @return instance Instance of PVLog\JSON2\$class
      */
-    public static function factory( $class, $data=array() ) {
-        $instance = NULL;
+    public static function factory($class, $data=array())
+    {
+        $instance = null;
 
         $class = __NAMESPACE__ . '\\' . self::section2class($class);
 
@@ -117,7 +120,8 @@ abstract class Json {
      * @param  object|array $data Instance of $name or array of Strings
      * @return void
      */
-    public function __set( $name, $data ) {
+    public function __set($name, $data)
+    {
         $this->set($name, $data);
     }
 
@@ -129,7 +133,8 @@ abstract class Json {
      * @param  string       $name Property name
      * @param  object|array $data
      */
-    public function set( $name, $data ) {
+    public function set($name, $data)
+    {
         if (in_array($name, $this->validSections)) {
 
             $validClass = __NAMESPACE__.'\\'.self::section2class($name);
@@ -139,7 +144,9 @@ abstract class Json {
                 return $this;
             }
 
-            $msg = is_object($data) ? 'object '.get_class($data) : print_r($data, TRUE);
+            $msg = is_object($data)
+                 ? 'object '.get_class($data)
+                 : print_r($data, true);
 
             throw new \InvalidArgumentException(
                 'Wrong data '.$msg.' for '.get_class($this).'::'.$name.' - expect '.$validClass
@@ -159,7 +166,8 @@ abstract class Json {
      * @param  string  $name Property name
      * @param  object  $data Instance of $name
      */
-    public function add( $name, $data ) {
+    public function add($name, $data)
+    {
         throw new \InvalidArgumentException(
             'Unknown property: '.get_class($this).'::'.$name
         );
@@ -172,7 +180,8 @@ abstract class Json {
      * @param  string $name Property name
      * @return mixed
      */
-    public function __get( $name ) {
+    public function __get($name)
+    {
         return $this->get($name);
     }
 
@@ -183,8 +192,11 @@ abstract class Json {
      * @param  string $name Property name
      * @return mixed
      */
-    public function get( $name ) {
-        return array_key_exists($name, $this->data) ? $this->data[$name] : NULL;
+    public function get($name)
+    {
+        return array_key_exists($name, $this->data)
+             ? $this->data[$name]
+             : null;
     }
 
     /**
@@ -192,7 +204,8 @@ abstract class Json {
      *
      * @return self For fluid interface
      */
-    public function interpolate() {
+    public function interpolate()
+    {
         foreach ($this->data as $key1=>$value1) {
             if ($value1 instanceof Json) {
                 $value1->interpolate();
@@ -213,7 +226,8 @@ abstract class Json {
      * @param integer $flags Feature flags, see PVLog\Classes\Json\Json constants
      * @return array
      */
-    public function asArray( $flags=0 ) {
+    public function asArray($flags=0)
+    {
         // Work on a copy of data
         $data = array();
 
@@ -228,6 +242,7 @@ abstract class Json {
                 $data[$key1] = $value1;
             }
         }
+
         return $data;
     }
 
@@ -238,7 +253,8 @@ abstract class Json {
      * @param  string $section Section name
      * @return string Section with 1st char uppercase if no different class was found
      */
-    public static function section2class( $section ) {
+    public static function section2class($section)
+    {
         $section = strtolower($section);
         return isset(self::$classMap[$section])
              ? self::$classMap[$section]
@@ -261,13 +277,16 @@ abstract class Json {
      * @var array $classMap Mapping of section to class name for not standard section names
      */
     protected static $classMap = array(
-        'poweracwatts'      => 'Set',
-        'totalwatthours'    => 'Set',
+        'poweracwatts'          => 'Set',
+        'totalwatthours'        => 'Set',
         // Need mappings for UpperCamelCase class names
-        'feedin'            => 'FeedIn',
-        'gridconsumption'   => 'GridConsumption',
-        'totalconsumption'  => 'TotalConsumption',
-        'selfconsumption'   => 'SelfConsumption',
+        'feedin'                => 'FeedIn',
+        'gridconsumption'       => 'GridConsumption',
+        'totalconsumption'      => 'TotalConsumption',
+        'selfconsumption'       => 'SelfConsumption',
+        'batteryin'             => 'BatteryIn',
+        'batteryout'            => 'BatteryOut',
+        'batterychargestatus'   => 'BatteryChargeStatus'
     );
 
     /**
@@ -283,7 +302,8 @@ abstract class Json {
      * @param  string $name Property name
      * @return int
      */
-    protected function _count( $name ) {
+    protected function _count($name)
+    {
         return (array_key_exists($name, $this->data) && is_array($this->data[$name]))
              ? count($this->data[$name])
              : 0;

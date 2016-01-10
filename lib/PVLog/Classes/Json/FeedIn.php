@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-04-02
  * @since    v1.0.0
  */
-class FeedIn extends EnergyMeter {
+class FeedIn extends EnergyMeter
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -35,7 +36,8 @@ class FeedIn extends EnergyMeter {
      * @param  Instance $instance
      * @return self For fluid interface
      */
-    public function setToInstance( Instance $instance ) {
+    public function setToInstance(Instance $instance)
+    {
         $instance->setFeedIn($this);
         return $this;
     }

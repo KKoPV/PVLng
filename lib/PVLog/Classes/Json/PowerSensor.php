@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-abstract class PowerSensor extends Json {
+abstract class PowerSensor extends Json
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -34,10 +35,10 @@ abstract class PowerSensor extends Json {
      *
      * @param array $data Data to build from
      */
-    public function __construct( $data=array() ) {
+    public function __construct($data=array())
+    {
         // Set the defaults
         $this->clearPowerAcWatts();
-
         parent::__construct($data);
     }
 
@@ -48,7 +49,8 @@ abstract class PowerSensor extends Json {
      * @param  float $value Value
      * @return self For fluid interface
      */
-    public function addPowerAcWatts( $datetime, $value ) {
+    public function addPowerAcWatts($datetime, $value)
+    {
         $this->data[Properties::POWER][$datetime] = $value;
         return $this;
     }
@@ -60,7 +62,8 @@ abstract class PowerSensor extends Json {
      *                                [ datetime: value ] or single value
      * @return self For fluid interface
      */
-    public function setPowerAcWatts( $data ) {
+    public function setPowerAcWatts($data)
+    {
         $this->data[Properties::POWER] = $data instanceof Set ? $data : new Set($data);
         return $this;
     }
@@ -70,7 +73,8 @@ abstract class PowerSensor extends Json {
      *
      * @return PVLog\Classes\Json\Set
      */
-    public function getPowerAcWatts() {
+    public function getPowerAcWatts()
+    {
         return $this->data[Properties::POWER];
     }
 
@@ -79,7 +83,8 @@ abstract class PowerSensor extends Json {
      *
      * @return self For fluid interface
      */
-    public function clearPowerAcWatts() {
+    public function clearPowerAcWatts()
+    {
         $this->setPowerAcWatts(new Set);
         return $this;
     }
@@ -89,14 +94,16 @@ abstract class PowerSensor extends Json {
      *
      * @return integer
      */
-    public function countPowerAcWatts() {
+    public function countPowerAcWatts()
+    {
         return count($this->data[Properties::POWER]);
     }
 
     /*
      * Overloaded
      */
-    public function asArray( $flags=0 ) {
+    public function asArray($flags=0)
+    {
         $result = parent::asArray($flags);
 
         if ($flags & self::EXPORT_POWER) {

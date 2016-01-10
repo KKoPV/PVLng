@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-class Strings extends PowerSensor {
+class Strings extends PowerSensor
+{
 
     /**
      * Add the string to an inverter
@@ -31,7 +32,8 @@ class Strings extends PowerSensor {
      * @param  Inverter $inverter
      * @return self For fluid interface
      */
-    public function addToInverter( Inverter $inverter ) {
+    public function addToInverter(Inverter $inverter)
+    {
         $inverter->addString($this);
         return $this;
     }

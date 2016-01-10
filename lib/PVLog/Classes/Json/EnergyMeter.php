@@ -24,7 +24,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-abstract class EnergyMeter extends PowerSensor {
+abstract class EnergyMeter extends PowerSensor
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -37,10 +38,11 @@ abstract class EnergyMeter extends PowerSensor {
      *
      * @param array $data Data to build from
      */
-    public function __construct( $data=array() ) {
+    public function __construct($data=array())
+    {
         // Set the defaults
-        // TODO 2.0: $this->data['lifetime'] = 0;
         $this->clearTotalWattHours();
+        $this->lifeTimeData = false;
 
         if (isset($data[Properties::ENERGY]) && !is_array($data[Properties::ENERGY]) &&
             isset($data[Properties::POWER]) && count($data[Properties::POWER])) {
@@ -60,7 +62,8 @@ abstract class EnergyMeter extends PowerSensor {
    * @param  float $value Value
      * @return self For fluid interface
      */
-    public function addTotalWattHours( $datetime, $value ) {
+    public function addTotalWattHours($datetime, $value)
+    {
         $this->data[Properties::ENERGY][$datetime] = $value;
         return $this;
     }
@@ -72,8 +75,11 @@ abstract class EnergyMeter extends PowerSensor {
      *                                [ datetime: value ] or single value
      * @return self For fluid interface
      */
-    public function setTotalWattHours( $data ) {
-        $this->data[Properties::ENERGY] = $data instanceof Set ? $data : new Set($data);
+    public function setTotalWattHours($data)
+    {
+        $this->data[Properties::ENERGY] = $data instanceof Set
+                                        ? $data
+                                        : new Set($data);
         return $this;
     }
 
@@ -82,7 +88,8 @@ abstract class EnergyMeter extends PowerSensor {
      *
      * @return PVLog\Classes\Json\Set
      */
-    public function getTotalWattHours() {
+    public function getTotalWattHours()
+    {
         return $this->data[Properties::ENERGY];
     }
 
@@ -91,7 +98,8 @@ abstract class EnergyMeter extends PowerSensor {
      *
      * @return self For fluid interface
      */
-    public function clearTotalWattHours() {
+    public function clearTotalWattHours()
+    {
         $this->data[Properties::ENERGY] = new Set;
         return $this;
     }
@@ -101,37 +109,44 @@ abstract class EnergyMeter extends PowerSensor {
      *
      * @return integer
      */
-    public function countTotalWattHours() {
+    public function countTotalWattHours()
+    {
         return count($this->data[Properties::ENERGY]);
+    }
+
+    /**
+     * Setter for creator, must be not empty
+     *
+     * @param bool $lifeTimeData
+     * @return self For fluid interface
+     */
+    public function setLifeTimeData($lifeTimeData=true)
+    {
+        // Force boolean value
+        $this->lifeTimeData = !!$lifeTimeData;
+        return $this;
+    }
+
+    /**
+     * Getter for creator
+     *
+     * @return string
+     */
+    public function getLifeTimeData()
+    {
+        return $this->lifeTimeData;
     }
 
     /*
      * Overloaded
      */
-    public function interpolate() {
+    public function interpolate()
+    {
         parent::interpolate();
-
-        // If no totalWattHours was provided, calculate from "power"
-        if (!count($this->data[Properties::ENERGY]) && count($this->data[Properties::POWER])) {
-            $last  = FALSE;
-            $total = 0;
-            foreach ($this->data[Properties::POWER] as $timestamp=>$value) {
-                // May be, we have here datetimes, so reconvert to timestamp
-                $ts = Helper::asTimestamp($timestamp);
-                if ($last) {
-                    $total += $value * ($ts - $last) / 3600;
-                }
-                $this->data[Properties::ENERGY][$timestamp] = $total;
-                $last = $ts;
-            }
-
-            // Can't be lifetime data
-            // @todo 2.0: $this->setLifetime(0);
-        }
 
         // If no powerAcWatts was provided, calculate from "energy"
         if (!count($this->data[Properties::POWER]) && count($this->data[Properties::ENERGY])) {
-            $last = FALSE;
+            $last = false;
             foreach ($this->data[Properties::ENERGY] as $timestamp=>$value) {
                 // May be, we have here datetimes, so reconvert to timestamp
                 $ts = Helper::asTimestamp($timestamp);
@@ -142,25 +157,57 @@ abstract class EnergyMeter extends PowerSensor {
             }
         }
 
+        // If no totalWattHours was provided, calculate from "power"
+        if (!count($this->data[Properties::ENERGY]) && count($this->data[Properties::POWER])) {
+            $last  = false;
+            $total = 0;
+            foreach ($this->data[Properties::POWER] as $timestamp=>$value) {
+                // May be, we have here datetimes, so reconvert to timestamp
+                $ts = Helper::asTimestamp($timestamp);
+                if ($last) {
+                    $total += $value * ($ts - $last) / 3600;
+                }
+                $this->data[Properties::ENERGY][$timestamp] = $total;
+                $last = $ts;
+            }
+        }
+
         return $this;
     }
 
     /*
      * Overloaded
      */
-    public function asArray( $flags=0 ) {
+    public function asArray($flags=0)
+    {
         $result = parent::asArray($flags);
 
         if (!($flags & self::INTERNAL)) {
+
             if ($flags & self::EXPORT_POWER) {
-                // minutes file, get only last value of Watt hours array
+                // minutes file
+                // Check energy data for lifetime data
+                if ($this->lifeTimeData) {
+                    // Work on a copy!
+                    $a = $result[Properties::ENERGY];
+                    // Get 1st value
+                    $offset = array_shift($a);
+                    if ($offset) {
+                        // Reduce all values by $offset
+                        foreach ($result[Properties::ENERGY] as $key=>$value) {
+                            $result[Properties::ENERGY][$key] = $value - $offset;
+                        }
+                    }
+                }
+
+                // Get only last value of Watt hours array
                 $result[Properties::ENERGY] = count($result[Properties::ENERGY])
                                             ? round(array_pop($result[Properties::ENERGY]))
                                             : 0;
             } else {
                 // day or month file, no power values
                 unset($result[Properties::POWER]);
-                // Minutes file, round energies
+                // Round energies
                 $result[Properties::ENERGY] = array_map('round', $result[Properties::ENERGY]);
             }
         }
@@ -171,6 +218,13 @@ abstract class EnergyMeter extends PowerSensor {
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
+
+    /**
+     * Watt hours data contains lifetime data, no reset on every day start
+     *
+     * @var bool $lifeTimeData
+     */
+    protected $lifeTimeData;
 
     /**
      * Valid child sections

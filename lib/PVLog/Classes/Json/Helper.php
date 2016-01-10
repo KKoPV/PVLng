@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-abstract class Helper {
+abstract class Helper
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -34,7 +35,8 @@ abstract class Helper {
      *
      * @return void
      */
-    public static function setDateFormatMinutes() {
+    public static function setDateFormatMinutes()
+    {
         self::$settings[0] = 'Y-m-d H:i:s';
     }
 
@@ -43,7 +45,8 @@ abstract class Helper {
      *
      * @return void
      */
-    public static function setDateFormatDay() {
+    public static function setDateFormatDay()
+    {
         self::$settings[0] = 'Y-m-d';
     }
 
@@ -52,9 +55,9 @@ abstract class Helper {
      *
      * @return void
      */
-    public static function setDateFormatMonth() {
-        // Last day of month
-        self::$settings[0] = 'Y-m-t';
+    public static function setDateFormatMonth()
+    {
+        self::$settings[0] = 'Y-m';
     }
 
     /**
@@ -62,7 +65,8 @@ abstract class Helper {
      *
      * @return string
      */
-    public static function getDateFormat() {
+    public static function getDateFormat()
+    {
         return self::$settings[0];
     }
 
@@ -72,7 +76,8 @@ abstract class Helper {
      * @param  float  $value Offset in hours
      * @return void
      */
-    public static function setTimestampOffset( $value ) {
+    public static function setTimestampOffset($value)
+    {
         self::$settings[1] = +$value;
     }
 
@@ -81,7 +86,8 @@ abstract class Helper {
      *
      * @return float
      */
-    public static function getTimestampOffset() {
+    public static function getTimestampOffset()
+    {
         return self::$settings[1];
     }
 
@@ -97,7 +103,8 @@ abstract class Helper {
      * @param  string|integer $timestamp Date & time or timestamp
      * @return string Y-m-d H:i:s
      */
-    public static function localTimestamp( $timestamp ) {
+    public static function localTimestamp($timestamp)
+    {
         // Transfor to timestamp if required
         return date(
             'Y-m-d H:i:s',
@@ -113,33 +120,14 @@ abstract class Helper {
      * @param  float|array $value Temperature in degree fahrenheit
      * @return float|array Temperature in degree celsius
      */
-    public static function convertFahrenheitToCelsius( $value ) {
+    public static function convertFahrenheitToCelsius($value)
+    {
         if (is_array($value)) {
             foreach ($value as $key=>$v) {
                 $value[$key] = self::convertFahrenheitToCelsius($v);
             }
         } else {
             $value = ($value - 32) * 5 / 9;
-        }
-
-        return $value;
-    }
-
-    /**
-     * Converts degree Celsius to degree Fahrenheit
-     *
-     * Source: http://de.wikipedia.org/wiki/Grad_Fahrenheit
-     *
-     * @param  float|array $value Temperature in degree celsius
-     * @return float|array Temperature in degree fahrenheit
-     * /
-    public static function convertCelsiusToFahrenheit( $value ) {
-        if (is_array($value)) {
-            foreach ($value as $key=>$v) {
-                $value[$key] = self::convertCelsiusToFahrenheit($v);
-            }
-        } else {
-            $value = $value * 1.8 + 32;
         }
 
         return $value;
@@ -153,14 +141,15 @@ abstract class Helper {
      * @param  string|integer $datetime
      * @return integer
      */
-    public static function asTimestamp( $timestamp ) {
+    public static function asTimestamp($timestamp)
+    {
         // Return numerics as is
         if (is_numeric($timestamp)) {
             return $timestamp;
         }
 
         // Convert datetime & return on success
-        if (($ts = strtotime($timestamp)) !== FALSE) {
+        if (($ts = strtotime($timestamp)) !== false) {
             return $ts;
         }
 

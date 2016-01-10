@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-04-02
  * @since    v1.0.0
  */
-class GridConsumption extends EnergyMeter {
+class GridConsumption extends EnergyMeter
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -35,7 +36,8 @@ class GridConsumption extends EnergyMeter {
      * @param  Instance $instance
      * @return self For fluid interface
      */
-    public function setToInstance( Instance $instance ) {
+    public function setToInstance(Instance $instance)
+    {
         $instance->setGridConsumption($this);
         return $this;
     }

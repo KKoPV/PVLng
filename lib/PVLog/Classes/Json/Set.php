@@ -29,7 +29,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
+class Set extends Json implements \ArrayAccess, \Countable, \Iterator
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -41,7 +42,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @internal
      * @param array $data Data to build from
      */
-    public function __construct( $data=array() ) {
+    public function __construct($data=array())
+    {
         is_array($data) || $data = array('midnight' => $data);
         foreach ($data as $key=>$value) {
             $this[$key] = $value;
@@ -55,7 +57,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @param  object  $data Measuring value
      * @return self    For fluid interface
      */
-    public function add( $name, $data ) {
+    public function add($name, $data)
+    {
         $this[$name] = $data;
         return $this;
     }
@@ -66,7 +69,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @param  array|numeric $data Measuring value
      * @return self For fluid interface
      */
-    public function set( $name, $data=NULL ) {
+    public function set($name, $data=null)
+    {
         if (is_array($name) && is_null($data)) {
             foreach ($name as $datetime=>$value) {
                 $this[$datetime] = $value;
@@ -86,7 +90,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @implements \Countable
      * @return integer
      */
-    public function clear() {
+    public function clear()
+    {
         $this->data = array();
         return $this;
     }
@@ -98,7 +103,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @implements \Countable
      * @return integer
      */
-    public function count() {
+    public function count()
+    {
         return count($this->data);
     }
 
@@ -111,7 +117,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @param  string|integer $datetime Timestamp
      * @param  float $value Value
      */
-    public function offsetSet( $datetime, $value ) {
+    public function offsetSet($datetime, $value)
+    {
         if (is_null($datetime)) {
             throw new \InvalidArgumentException(
                 'Can\'t add a value without date time/timestamp to '.
@@ -129,7 +136,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @implements \ArrayAccess
      * @param  string|integer $datetime Timestamp
      */
-    public function offsetExists( $datetime ) {
+    public function offsetExists($datetime)
+    {
         return isset($this->data[Helper::asTimestamp($datetime)]);
     }
 
@@ -140,7 +148,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @implements \ArrayAccess
      * @param  string|integer $datetime Timestamp
      */
-    public function offsetUnset( $datetime ) {
+    public function offsetUnset($datetime)
+    {
         unset($this->data[Helper::asTimestamp($datetime)]);
     }
 
@@ -151,11 +160,12 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @implements \ArrayAccess
      * @param  string|integer $datetime Timestamp
      */
-    public function offsetGet( $datetime ) {
+    public function offsetGet($datetime)
+    {
         $datetime = Helper::asTimestamp($datetime);
         return array_key_exists($datetime, $this->data)
              ? $this->data[$datetime]
-             : NULL;
+             : null;
     }
 
     /**
@@ -164,7 +174,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @internal
      * @implements \Iterator
      */
-    function rewind() {
+    public function rewind()
+    {
         $this->position = 0;
         // Prepare keys
         ksort($this->data);
@@ -175,7 +186,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @internal
      * @implements \Iterator
      */
-    function current() {
+    public function current()
+    {
         return $this->data[$this->keys[$this->position]];
     }
 
@@ -183,7 +195,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @internal
      * @implements \Iterator
      */
-    function key() {
+    public function key()
+    {
         return $this->keys[$this->position];
     }
 
@@ -191,7 +204,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @internal
      * @implements \Iterator
      */
-    function next() {
+    public function next()
+    {
         ++$this->position;
     }
 
@@ -199,13 +213,14 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @internal
      * @implements \Iterator
      */
-    function valid() {
+    public function valid()
+    {
         if (isset($this->keys[$this->position])) {
-            return TRUE;
+            return true;
         }
         // Free keys memory
-        $this->keys = NULL;
-        return FALSE;
+        $this->keys = null;
+        return false;
     }
 
     /**
@@ -213,7 +228,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      *
      * @return numeric
      */
-    function last() {
+    public function last()
+    {
         $data = array_values($this->data);
         return array_pop($data);
     }
@@ -223,7 +239,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      *
      * @return numeric
      */
-    function sort() {
+    public function sort()
+    {
         ksort($this->data);
         return $this;
     }
@@ -234,7 +251,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
      * @internal
      * @return self For fluid interface
      */
-    public function interpolate() {
+    public function interpolate()
+    {
         // Skip for empty data set
         if (!count($this->data)) return;
 
@@ -284,7 +302,8 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
     /*
      * Overloaded
      */
-    public function asArray( $flags=0 ) {
+    public function asArray($flags=0)
+    {
         // Work on a copy of data
         $data = array();
 
@@ -310,7 +329,7 @@ class Set extends Json implements \ArrayAccess, \Countable, \Iterator {
 
             // Remove trailing 0 values
             // Reverse array, it is easier to delete leading data
-            foreach (array_reverse($data, TRUE) as $timestamp=>$value) {
+            foreach (array_reverse($data, true) as $timestamp=>$value) {
                 // Break loop on 1st non 0 value
                 if ($value) break;
                 unset($data[$timestamp]);

@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-04-08
  * @since    v1.0.0
  */
-abstract class Properties {
+abstract class Properties
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -48,6 +49,21 @@ abstract class Properties {
      * Property name for file content type (Instance)
      */
     const FILE_CONTENT = 'fileContent';
+
+    /**
+     * Value for minutes file content type (Instance)
+     */
+    const FILE_CONTENT_MINUTES = 'minutes';
+
+    /**
+     * Value for days file content type (Instance)
+     */
+    const FILE_CONTENT_DAYS = 'days';
+
+    /**
+     * Value for months file content type (Instance)
+     */
+    const FILE_CONTENT_MONTHS = 'months';
 
     /**
      * Property name for plant section (Instance)
@@ -83,6 +99,21 @@ abstract class Properties {
      * Property name for temperature data in °C (Instance, Inverter)
      */
     const TEMPERATURE = 'temperature';
+
+    /**
+     * Property name for battery input data section (Instance)
+     */
+    const BATTERY_IN = 'batteryIn';
+
+    /**
+     * Property name for battery output data section (Instance)
+     */
+    const BATTERY_OUT = 'batteryOut';
+
+    /**
+     * Property name for battery charge status data in % (Instance)
+     */
+    const BATTERY_CHARGE_STATUS = 'batteryChargeStatus';
 
     /**
      * Property name for inverter section (Plant)

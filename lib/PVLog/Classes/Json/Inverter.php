@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-class Inverter extends EnergyMeter {
+class Inverter extends EnergyMeter
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -34,10 +35,10 @@ class Inverter extends EnergyMeter {
      *
      * @param array $data Data to build from
      */
-    public function __construct( $data=array() ) {
+    public function __construct($data=array())
+    {
         // Set the defaults
         $this->clearStrings();
-
         parent::__construct($data);
     }
 
@@ -47,7 +48,8 @@ class Inverter extends EnergyMeter {
      * @param $string String
      * @return self For fluid interface
      */
-    public function addString( Strings $string ) {
+    public function addString(Strings $string)
+    {
         return $this->add(Properties::STRINGS, $string);
     }
 
@@ -57,16 +59,18 @@ class Inverter extends EnergyMeter {
      * @param  array $strings Array of PVLog\Classes\Json\Strings objects
      * @return self For fluid interface
      */
-    public function setStrings( Array $strings ) {
+    public function setStrings(Array $strings)
+    {
         return $this->set(Properties::STRINGS, $strings);
-  }
+    }
 
     /**
      * Getter for string section
      *
      * @return array of PVLog\Classes\Json\Strings objects
      */
-    public function getStrings() {
+    public function getStrings()
+    {
         return $this->get(Properties::STRINGS);
     }
 
@@ -75,7 +79,8 @@ class Inverter extends EnergyMeter {
      *
      * @return self For fluid interface
      */
-    public function clearStrings() {
+    public function clearStrings()
+    {
         return $this->set(Properties::STRINGS, array());
     }
 
@@ -84,7 +89,8 @@ class Inverter extends EnergyMeter {
      *
      * @return int
      */
-    public function countStrings() {
+    public function countStrings()
+    {
         return $this->_count(Properties::STRINGS);
     }
 
@@ -94,7 +100,8 @@ class Inverter extends EnergyMeter {
      * @param Temperature $data
      * @return self For fluid interface
      */
-    public function setTemperature( Temperature $data ) {
+    public function setTemperature(Temperature $data)
+    {
         return $this->set(Properties::TEMPERATURE, $data);
     }
 
@@ -103,7 +110,8 @@ class Inverter extends EnergyMeter {
      *
      * @return PVLog\Classes\Json\Set|NULL
      */
-    public function getTemperature() {
+    public function getTemperature()
+    {
         return $this->get(Properties::TEMPERATURE);
     }
 
@@ -113,7 +121,8 @@ class Inverter extends EnergyMeter {
      * @param  Plant $plant
      * @return self For fluid interface
      */
-    public function addToPlant( Plant $plant ) {
+    public function addToPlant(Plant $plant)
+    {
         $plant->addInverter($this);
         return $this;
     }
@@ -121,8 +130,9 @@ class Inverter extends EnergyMeter {
     /*
      * Overloaded for additional properties
      */
-    public function add( $property, $data ) {
-        switch (TRUE) {
+    public function add($property, $data)
+    {
+        switch (true) {
             case $property == Properties::STRINGS && $data instanceof Strings:
                 $this->data[Properties::STRINGS][] = $data;
                 break;
@@ -135,8 +145,9 @@ class Inverter extends EnergyMeter {
     /*
      * Overloaded for additional properties
      */
-    public function set( $property, $data ) {
-        switch (TRUE) {
+    public function set($property, $data)
+    {
+        switch (true) {
             case $property == Properties::STRINGS && is_array($data):
                 $err = 0;
                 foreach ($data as $value) {
@@ -158,7 +169,8 @@ class Inverter extends EnergyMeter {
     /*
      * Overloaded
      */
-    public function asArray( $flags=0 ) {
+    public function asArray($flags=0)
+    {
         // Work on a copy of data
         $result = parent::asArray($flags);
 

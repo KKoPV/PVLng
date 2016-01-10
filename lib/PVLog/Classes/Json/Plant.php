@@ -23,7 +23,8 @@ namespace PVLog\Classes\Json;
  * @since    2015-03-14
  * @since    v1.0.0
  */
-class Plant extends EnergyMeter {
+class Plant extends EnergyMeter
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -34,10 +35,10 @@ class Plant extends EnergyMeter {
      *
      * @param array $data Data to build from
      */
-    public function __construct( $data=array() ) {
+    public function __construct($data=array())
+    {
         // Set the defaults
         $this->clearInverters();
-
         parent::__construct($data);
     }
 
@@ -47,7 +48,8 @@ class Plant extends EnergyMeter {
      * @param  Inverter $inverter
      * @return self For fluid interface
      */
-    public function addInverter( Inverter $inverter ) {
+    public function addInverter(Inverter $inverter)
+    {
         return $this->add(Properties::INVERTER, $inverter);
     }
 
@@ -58,7 +60,8 @@ class Plant extends EnergyMeter {
      * @param  array $inverters Array of PVLog\Classes\Json\Inverter objects
      * @return self For fluid interface
      */
-    public function setInverters( Array $inverters ) {
+    public function setInverters(Array $inverters)
+    {
         return $this->set(Properties::INVERTER, $inverters);
     }
 
@@ -67,7 +70,8 @@ class Plant extends EnergyMeter {
      *
      * @return array of PVLog\Classes\Json\Inverter objects
      */
-    public function getInverters() {
+    public function getInverters()
+    {
         return $this->get(Properties::INVERTER);
     }
 
@@ -76,7 +80,8 @@ class Plant extends EnergyMeter {
      *
      * @return self For fluid interface
      */
-    public function clearInverters() {
+    public function clearInverters()
+    {
         return $this->set(Properties::INVERTER, array());
     }
 
@@ -85,15 +90,17 @@ class Plant extends EnergyMeter {
      *
      * @return int
      */
-    public function countInverters() {
+    public function countInverters()
+    {
         return $this->_count(Properties::INVERTER);
     }
 
     /*
      * Overloaded for specific properties
      */
-    public function add( $property, $data ) {
-        switch (TRUE) {
+    public function add($property, $data)
+    {
+        switch (true) {
             case $property == Properties::INVERTER && $data instanceof Inverter:
                 $this->data[Properties::INVERTER][] = $data;
                 break;
@@ -106,8 +113,9 @@ class Plant extends EnergyMeter {
     /*
      * Overloaded for specific properties
      */
-    public function set( $property, $data ) {
-        switch (TRUE) {
+    public function set($property, $data)
+    {
+        switch (true) {
             case $property == Properties::INVERTER && is_array($data):
                 $err = 0;
                 foreach ($data as $value) {
@@ -132,7 +140,8 @@ class Plant extends EnergyMeter {
      * @param  Instance $instance
      * @return self For fluid interface
      */
-    public function setToInstance( Instance $instance ) {
+    public function setToInstance(Instance $instance)
+    {
         $instance->setPlant($this);
         return $this;
     }
@@ -140,12 +149,13 @@ class Plant extends EnergyMeter {
     /*
      * Overloaded
      */
-    public function interpolate() {
+    public function interpolate()
+    {
         parent::interpolate();
 
         // Accumulate data from inverters down to here
-        $this->calcFromDataInverters(Properties::POWER, FALSE);
-        $this->calcFromDataInverters(Properties::ENERGY, TRUE);
+        $this->calcFromDataInverters(Properties::POWER, false);
+        $this->calcFromDataInverters(Properties::ENERGY, true);
 
         return $this;
     }
@@ -167,7 +177,8 @@ class Plant extends EnergyMeter {
      * Calc power or energy section from inverters sums
      * @internal
      */
-    protected function calcFromDataInverters( $property, $energy ) {
+    protected function calcFromDataInverters($property, $energy)
+    {
         $inverterCount = count($this->data[Properties::INVERTER]);
         if (!$inverterCount) return;
 
@@ -206,7 +217,7 @@ class Plant extends EnergyMeter {
                     }
                 }
             }
-        }
+        } 
 
         // Merge given data over calculated data!
         foreach ($save as $timestamp=>$value) {
@@ -216,4 +227,5 @@ class Plant extends EnergyMeter {
         // Sort by timestamp
         $this->data[$property]->sort();
     }
+
 }
