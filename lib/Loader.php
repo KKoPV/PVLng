@@ -13,12 +13,14 @@ class Loader {
      *
      */
     public static function autoload( $className ) {
-        // Handle namespaced and PEAR named classes the same way
-        $className = str_replace(array('\\','_'), DIRECTORY_SEPARATOR, $className);
-        $classMap  = self::getClassMap();
-
-        if (isset($classMap[$className])) {
-            self::load($classMap[$className]);
+        if (isset(self::$ClassMap[$className])) {
+            // Buffered file location found
+            self::load(self::$ClassMap[$className]);
+            return TRUE;
+        } elseif ($file = self::$loader->findFile($className)) {
+            // Not yet buffered, remember
+            self::$ClassMap[$className] = $file;
+            self::load($file);
             return TRUE;
         }
     }
@@ -26,17 +28,42 @@ class Loader {
     /**
      *
      */
-    public static function register( $settings=array(), $cache=TRUE ) {
-        self::$settings = array_merge(self::$settings, array_change_key_case($settings));
+    public static function register( $loader, $cache=TRUE ) {
+        self::$loader = $loader;
 
+        // No real path provided
         if ($cache === TRUE) $cache = sys_get_temp_dir();
 
         self::$ClassMapFile = $cache
                             ? sprintf('%s%sclassmap.%s.php', $cache, DS,
-                              substr(md5(serialize(self::$settings)), -7))
+                              substr(md5(serialize(self::$loader)), -7))
                             : FALSE;
 
+        if (self::$ClassMapFile) {
+            // Class map exists?
+            if (file_exists(self::$ClassMapFile)) {
+                self::$ClassMap = include self::$ClassMapFile;
+            }
+            // Save class map on exit
+            register_shutdown_function('Loader::shutdown');
+        }
+
+        // Switch autoload to self
         spl_autoload_register('Loader::autoload');
+        self::$loader->unregister();
+    }
+
+    /**
+     * Cache class map
+     */
+    public static function shutdown() {
+        // Cache class map if allowed
+        ksort(self::$ClassMap);
+
+        file_put_contents(
+            self::$ClassMapFile,
+            '<?php return ' . var_export(self::$ClassMap, TRUE) . ';'
+        );
     }
 
     /**
@@ -76,12 +103,7 @@ class Loader {
     /**
      *
      */
-    protected static $Callback = array();
-
-    /**
-     *
-     */
-    protected static $ClassMap = array();
+    protected static $loader;
 
     /**
      *
@@ -91,62 +113,11 @@ class Loader {
     /**
      *
      */
-    protected static $settings = array(
-        'path'    => array(),
-        'pattern' => array(
-            '%s.php',
-            '%s.class.php',
-            '%s.interface.php',
-            'class.%s.php',
-            '%s.inc'
-        ),
-        'exclude' => array(),
-    );
+    protected static $ClassMap = array();
 
     /**
      *
      */
-    protected static function getClassMap() {
-        if (empty(self::$ClassMap)) {
-            if (self::$ClassMapFile AND file_exists(self::$ClassMapFile)) {
-                self::$ClassMap = include self::$ClassMapFile;
-            } else {
-                // Build class map
-                foreach (self::$settings['path'] as $path) {
-                    // Iterator for the paths
-                    $files = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($path)
-                    );
-                    // Load the list of files in the path
-                    foreach ($files as $name=>$file ) {
-                        foreach (self::$settings['exclude'] as $pattern) {
-                            // Skip 2 foreach!
-                            if (preg_match('~'.preg_quote($pattern, '~').'~', $name)) continue 2;
-                        }
-                        if (!$file->isDir() AND !preg_match('~'.DS.'\.\w+~', $name)) {
-                            $filename = str_replace($path.DS, '', $file->getPathname());
-                            foreach (self::$settings['pattern'] as $pattern) {
-                                // Unix: / , Windows: \
-                                $pattern = str_replace('%s', '([\w/\\\\]+)', $pattern);
-                                $pattern = str_replace('%s', '(\w+)', $pattern);
-                                if (preg_match('~'.$pattern.'~', $filename, $args)) {
-                                    self::$ClassMap[$args[1]] = $name;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                // Cache class map if allowed
-                if (self::$ClassMapFile) {
-                    ksort(self::$ClassMap);
-                    file_put_contents(self::$ClassMapFile,
-                                      '<?php return ' . var_export(self::$ClassMap, TRUE) . ';');
-                }
-            }
-        }
-
-        return self::$ClassMap;
-    }
+    protected static $Callback = array();
 
 }

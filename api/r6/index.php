@@ -48,16 +48,10 @@ file_exists(BASE_DIR.DS.'prepend.php') && include BASE_DIR.DS.'prepend.php';
 /**
  * Initialize Loader
  */
-include LIB_DIR . DS . 'Loader.php';
+$loader = require_once ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
+$loader->addPsr4('', array(CORE_DIR, LIB_DIR, APP_DIR));
 
-Loader::register(
-    array(
-        'path'    => array(APP_DIR, LIB_DIR, CORE_DIR),
-        'pattern' => array('%s.php'),
-        'exclude' => array('contrib/')
-    ),
-    TEMP_DIR
-);
+Loader::register($loader, TEMP_DIR);
 
 $api = new API(array(
     'mode'      => DEVELOP ? 'development' : 'production',
