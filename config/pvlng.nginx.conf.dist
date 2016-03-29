@@ -28,9 +28,9 @@
 ###
 upstream pvlng_php_upstream {
     # With php5-cgi alone:
-    server 127.0.0.1:9000;
+    #server 127.0.0.1:9000;
     # With php5-fpm:
-    #server unix:/var/run/php5-fpm.sock;
+    server unix:/var/run/php5-fpm.sock;
 }
 
 ##############################################################################
@@ -42,7 +42,7 @@ server {
     # Server name & port
     #
     server_name  example.com;
-    listen       80;
+    listen       *:80;
 
     ###
     # Prepare paths by
@@ -71,11 +71,6 @@ server {
     client_max_body_size 500M;
 
     ###
-    # Remove trailing slashes, the Slim router don't like them
-    #
-    rewrite ^/(.*)/$ /$1 permanent;
-
-    ###
     # Rewrite API calls
     #
     rewrite /api/([^/]+)/?(.*)$ /api/$1/index.php?$2;
@@ -87,6 +82,7 @@ server {
         access_log    off;
         log_not_found off;
         try_files     /public/$uri =404;
+        add_header    Vary Accept-Encoding;
         expires       max;
     }
 
@@ -96,7 +92,7 @@ server {
     location ~* \.(?:js\.gz|css\.gz|js|css)$ {
         log_not_found off;
         try_files     /public/$uri =404;
-        expires max;
+        expires       max;
     }
 
     ###
@@ -124,6 +120,7 @@ server {
 
         # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
+
         fastcgi_read_timeout 3600;
 		fastcgi_pass_header Set-Cookie;
 		fastcgi_pass_header Cookie;
@@ -131,13 +128,20 @@ server {
 
         fastcgi_pass pvlng_php_upstream;
 
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME     $fastcgi_script_name;
+
         ###################
-        # Up to wheezy:
+        # Up to Debian Wheezy:
         #include fastcgi_params;
 
         ###################
-        # From jessie:
+        # From Debian Jessie:
         include fastcgi.conf;
+
+        ###################
+        # With Ajenti:
+        #include fcgi.conf;
     }
 
     ###

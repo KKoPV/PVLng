@@ -10,6 +10,7 @@ custom/
 description.md
 !.githold
 
+info.php
 composer.lock
 /tests
 /vendor
