@@ -483,28 +483,24 @@ abstract class Channel {
 
             // Use bufferd result set
             $this->db->setBuffered();
-            $offset = $last = 0;
+            $last = 0;
 
             if ($res = $this->db->query($q)) {
 
-                while ($row = $res->fetch_assoc()) {
+                $first = $res->fetch_assoc();
+                $offset = $first['data'];
 
-                    $row['consumption'] = 0;
+                while ($first && ($row = $res->fetch_assoc())) {
 
                     if ($this->meter) {
-
-                        if ($offset === 0) {
-                            // 1st row, calculate start data
-                            $offset = $row['data'];
-                        }
-
                         $row['data'] -= $offset;
                         $row['min']  -= $offset;
                         $row['max']  -= $offset;
-
                         // calc consumption from previous max value
                         $row['consumption'] = $row['data'] - $last;
                         $last = $row['data'];
+                    } else {
+                        $row['consumption'] = 0;
                     }
 
                     // remove grouping value and save
@@ -922,13 +918,15 @@ abstract class Channel {
     }
 
     /**
-     *
+     * Time is only relevant for period != ALL
      */
     protected function filterReadTimestamp( &$q ) {
-        if ($this->period[1] != self::ALL) {
-            // Time is only relevant for period != ALL
-            $q->filter('timestamp', array('bt' => array($this->start, $this->end-1)));
-        }
+        if ($this->period[1] == self::ALL) return;
+
+        // Read one period before real start for meter calculation
+        $start = $this->start - $this->period[0] * $this->GroupingPeriod[$this->period[1]];
+        // End is midnight > minus 1 second
+        $q->filter('timestamp', array('bt' => array($start, $this->end-1)));
     }
 
     /**
