@@ -11,9 +11,9 @@ abstract class Session {
 
     /**
      *
-     * @var bool $Debug
+     * @var bool $debug
      */
-    public static $Debug = FALSE;
+    public static $debug = false;
 
     /**
      *
@@ -25,7 +25,7 @@ abstract class Session {
      *
      * @var mixed $NVL
      */
-    public static $NVL = NULL;
+    public static $NVL = null;
 
     /**
      * Set session save path
@@ -83,30 +83,31 @@ abstract class Session {
      * @param bool $secure If TRUE the browser only sends the cookie over https
      * @return void
      */
-    public static function start( $name, $ttl=0, $path='/', $domain=NULL, $secure=NULL ) {
+    public static function start( $name=null, $ttl=0, $path='/', $domain=NULL, $secure=NULL ) {
         if (!isset($_SERVER['HTTP_USER_AGENT'])) $_SERVER['HTTP_USER_AGENT'] = 'cli';
 
-        self::__dbg('Set name to "%s"', $name);
-        $name = session_name($name);
-        self::__dbg('Old name was "%s"', $name);
+        if ($name) {
+            self::__dbg('Set name to "%s"', $name);
+            $name = session_name($name);
+            self::__dbg('Old name was "%s"', $name);
+        }
 
         // Set SSL level
         $https = $secure ?: (isset($_SERVER['HTTPS']) AND $_SERVER['HTTPS']);
 
-        session_set_cookie_params($ttl, $path, $domain, $https, TRUE);
+        session_set_cookie_params($ttl, $path, $domain, $https, true);
 
         self::__start();
 
-        // Make sure the session hasn't expired and is valid ...
-        if (self::validate()) {
-            // Give a 5% chance of the session id changing on any request
-            if (rand(1, 100) <= 5) self::regenerate();
-        } else {
-            // ... and destroy it if it has
-            $_SESSION = array();
-            self::destroy();
-            self::__start();
-        }
+//         // Make sure the session hasn't expired and is valid ...
+//         if (self::validate()) {
+//             // Give a 5% chance of the session id changing on any request
+//             if (rand(1, 100) <= 5) self::regenerate();
+//         } else {
+//             // ... and destroy it if it has
+//             self::destroy();
+//             self::__start();
+//         }
 
         self::__dbg('Started "%s" = "%s"', session_name(), session_id());
 
@@ -126,58 +127,10 @@ abstract class Session {
     /**
      * Update the current session id with a newly generated one
      *
-     * @param bool $clear Clear all session data
      * @return bool Success
      */
-    public static function regenerate( $clear=FALSE ) {
-        // If this session is obsolete it means there already is a new id
-        if (isset($_SESSION['_OBSOLETE']) && $_SESSION['_OBSOLETE']) return;
-
-        self::__dbg('Regenerate ID: was "%s"', session_id());
-
-        // Set current session to expire in 10 seconds
-        $_SESSION['_OBSOLETE'] = TRUE;
-
-        if ($ok = session_regenerate_id(TRUE)) {
-            // hang on to the new session id
-            $sid = session_id();
-            // close the old and new sessions
-            self::close();
-            // re-open the new session
-            session_id($sid);
-            self::__start();
-            self::__dbg('Regenerate ID: now "%s"', session_id());
-        } else {
-            self::__dbg('Regenerate ID: FAILED');
-        }
-        // Now we unset the obsolete and expiration values for the session we want to keep
-        unset($_SESSION['_OBSOLETE']);
-
-        if ($clear) $_SESSION = array();
-
-        return $ok;
-    }
-
-    /**
-     * Remove all session cookies
-     *
-     * idea from http://php.net/manual/function.session-get-cookie-params.php
-     * UCN from powerlord at spamless dot vgmusic dot com, 19-Nov-2002 08:35
-     *
-     * @return void
-     */
-    public static function RemoveCookies() {
-        self::__dbg('Remove cookies');
-
-        $CookieInfo = session_get_cookie_params();
-
-        if (empty($CookieInfo['domain']) AND empty($CookieInfo['secure'])) {
-            setCookie(session_name(), session_id(), 1, $CookieInfo['path']);
-        } elseif (empty($CookieInfo['secure'])) {
-            setCookie(session_name(), session_id(), 1, $CookieInfo['path'], $CookieInfo['domain']);
-        } else {
-            setCookie(session_name(), session_id(), 1, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
-        }
+    public static function regenerate() {
+        return session_regenerate_id(true);
     }
 
     /**
@@ -185,27 +138,32 @@ abstract class Session {
      *
      * Write the session data
      *
-     * @see removeCookies()
      * @return void
      */
-    public static function close() {
-        @session_write_close();
+    public static function close()
+    {
+        return @session_write_close();
     }
 
     /**
      * Destroy the session
      *
-     * @see removeCookies()
      * @see close()
-     * @param bool $removeCookies Remove also all session cookies
      * @return void
      */
-    public static function destroy( $removeCookies=TRUE ) {
+    public static function destroy()
+    {
         self::__dbg('Destroy "%s" = "%s"', session_name(), session_id());
-        $_SESSION = array();
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time()-42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+        $_SESSION = array(); //destroy all of the session variables
         self::close();
-        @session_destroy();
-        if ($removeCookies) self::removeCookies();
+        return @session_destroy();
     }
 
     /**
@@ -352,25 +310,6 @@ abstract class Session {
     }
 
     //---------------------------------------------------------------------------
-    // PROTECTED
-    //---------------------------------------------------------------------------
-
-    /**
-     * This function is used to see if a session has expired or not.
-     *
-     * @return bool
-     */
-    protected static function validate() {
-        if (isset($_SESSION['_OBSOLETE'])) return FALSE;
-
-        if (!isset($_SESSION['_HTTP_USER_AGENT']) OR
-            $_SESSION['_HTTP_USER_AGENT'] !== self::token()) {
-            return FALSE;
-        }
-        return TRUE;
-    }
-
-    //---------------------------------------------------------------------------
     // PRIVATE
     //---------------------------------------------------------------------------
 
@@ -417,7 +356,7 @@ abstract class Session {
      * Collect debug infos
      */
     private static function __dbg() {
-        if (!self::$Debug) return;
+        if (!self::$debug) return;
 
         $params = func_get_args();
         $msg = array_shift($params);

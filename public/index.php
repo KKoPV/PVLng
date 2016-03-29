@@ -26,7 +26,7 @@ define('PVLNG_VERSION',      $version[0]);
 define('PVLNG_VERSION_DATE', $version[1]);
 
 function _redirect( $route ) {
-    $protocol = (isset($_SERVER['HTTPS']) AND $_SERVER['HTTPS']) ? 'https' : 'http';
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']) ? 'https' : 'http';
     die(Header('Location: '.$protocol.'://'.$_SERVER['HTTP_HOST'].$route));
 }
 
@@ -39,7 +39,7 @@ setlocale(LC_NUMERIC, 'C');
 mb_internal_encoding('UTF-8');
 clearstatcache();
 
-defined('DEVELOP') OR define('DEVELOP', FALSE);
+defined('DEVELOP') || define('DEVELOP', false);
 
 if (DEVELOP) {
     ini_set('display_startup_errors', 1);
@@ -61,10 +61,13 @@ $loader->addPsr4('', array(CORE_DIR, LIB_DIR, APP_DIR));
 
 Loader::register($loader, TEMP_DIR);
 
+if (DEVELOP == 2) include CORE_DIR . DS . 'AOP.php';
+
 // ---------------------------------------------------------------------------
 // Let's go
 // ---------------------------------------------------------------------------
-Session::start('PVLng');
+Session::$debug = DEVELOP;
+Session::start();
 
 /**
  * Run in /public - fake SCRIPT_NAME for correct Slim routing
@@ -72,9 +75,9 @@ Session::start('PVLng');
 $_SERVER['SCRIPT_NAME'] = '/';
 
 $app = new slimMVC\App(array(
-    'mode'      => DEVELOP ? 'development' : 'production',
-    'log.level' => DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
-    'debug'     => DEVELOP
+    'mode'        => DEVELOP ? 'development' : 'production',
+    'log.level'   => DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
+    'debug'       => DEVELOP
 ));
 
 // If installed from GitHub, find branch and actual commit
@@ -85,7 +88,6 @@ if (!empty($head) AND preg_match('~: (.*?)([^/]+)$~', $head[0], $args)) {
 }
 
 include CORE_DIR . DS . 'Hooks.php';
-include CORE_DIR . DS . 'AOP.php';
 
 /**
  * Configuration
@@ -336,12 +338,14 @@ $app->notFound(function() use ($app) {
 });
 
 // Register AOP as outer-most middleware
-if ($app->debug) $app->add(new YryieMiddleware);
+if (DEVELOP == 2) $app->add(new YryieMiddleware);
 
 /**
  * Run application
  */
 $app->run();
+
+Session::close();
 
 PVLng::sendStatistics();
 

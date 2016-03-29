@@ -8,8 +8,6 @@
  * @version    1.0.0
  */
 
-if (!$app->debug = Session::checkRequest('debug')) return;
-
 Yryie::TimeUnit(Yryie::TIME_AUTO);
 Yryie::Versions();
 
@@ -65,13 +63,17 @@ class YryieMiddleware extends Slim\Middleware {
      *
      */
     public function call() {
-        Yryie::Call(func_get_args());
-
         $app = $this->app;
         $db  = $app->db;
 
+        Yryie::loadFromSession();
+
+        Yryie::Call(func_get_args());
+
         // Run inner middleware and application
         $this->next->call();
+
+        foreach (Session::$Messages as $msg) Yryie::Debug('Session: '.$msg);
 
         // Buffer query count and times
         $qCnt  = $db->getQueryCount();
@@ -90,6 +92,7 @@ class YryieMiddleware extends Slim\Middleware {
 
         if ($app->Response()->headers['Location']) {
             // Redirection
+            Yryie::Debug('Redirect to %s', $app->Response()->headers['Location']);
             Yryie::finalizeTimers();
             Yryie::saveToSession();
             return;
@@ -100,7 +103,7 @@ class YryieMiddleware extends Slim\Middleware {
         $body = $app->Response()->getBody();
         $placeholder = '<div id="YRYIE"></div>';
 
-        if ($app->debug == 'trace') {
+        if ($app->debug == 3) {
 
             $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
             Yryie::$TraceDelimiter = ';';
@@ -112,7 +115,7 @@ class YryieMiddleware extends Slim\Middleware {
         } else {
             // Replace placeholder with debug data
             $body = str_replace($placeholder,
-                                Yryie::getCSS() . Yryie::getJS(TRUE, TRUE) . Yryie::Render(),
+                                Yryie::getCSS() . Yryie::getJS(true, true) . Yryie::Render(),
                                 $body);
         }
         Yryie::reset();

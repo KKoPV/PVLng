@@ -9,14 +9,14 @@
         <label for="pass">{{Password}}</label>:
     </td>
     <td>
-        <input id="pass" class="ui-corner-all" type="password" name="pass" />
+        <input id="pass" class="ui-corner-all" type="password" name="pass">
     </td>
 </tr>
 <tr>
     <td></td>
     <td>
         <div class="fl" style="margin-right:0.5em">
-            <input id="save" type="checkbox" name="save" class="iCheck" />
+            <input id="save" type="checkbox" name="save" class="iCheck">
         </div>
         <label for="save">{{StayLoggedIn}}</label>
     </td>
@@ -42,12 +42,11 @@ $(function() {
         resizable: false,
         width: '25em',
         modal: true,
-        open: function( event, ui ) {
-            $('#user').val(pvlng.cookie.get('PVLng.User'));
+        open: function() {
+            $('#save').iCheck('update');
         },
         buttons: {
             '{{Login}}':  function() {
-                pvlng.cookie.set('PVLng.User', $('#user').val(), 365);
                 $(this).find('form').submit();
             }
         }

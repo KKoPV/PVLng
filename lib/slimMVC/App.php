@@ -31,10 +31,19 @@ class App extends \Slim\Slim {
     }
 
     /**
-     *
+     * Overwrite
      */
     public function foreward( $action ) {
         $this->action = $action;
+    }
+
+    /**
+     * Overwrite
+     */
+    public function redirect($url='/', $status=302)
+    {
+        \Session::close();
+        parent::redirect($url, $status);
     }
 
     /**

@@ -133,7 +133,7 @@ class Yryie {
      * @param bool $active
      * @return void
      */
-    public static function Active( $active=NULL ) {
+    public static function Active( $active=null ) {
         self::Trace();
         if (isset($active)) self::$Active = (bool) $active;
         return self::$Active;
@@ -159,6 +159,8 @@ class Yryie {
      * @return void
      */
     public static function Info( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -177,6 +179,8 @@ class Yryie {
      * @return void
      */
     public static function Code( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -195,6 +199,8 @@ class Yryie {
      * @return void
      */
     public static function State( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -213,6 +219,8 @@ class Yryie {
      * @return void
      */
     public static function SQL( $sql ) {
+        if (!self::$Active) return;
+
         if (is_array($sql)) {
             foreach ($sql as $q) self::add($q, 'sql');
         } else {
@@ -230,6 +238,8 @@ class Yryie {
      * @return void
      */
     public static function Debug( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -248,6 +258,8 @@ class Yryie {
      * @return void
      */
     public static function Warning( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -266,6 +278,8 @@ class Yryie {
      * @return void
      */
     public static function Error( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -284,6 +298,8 @@ class Yryie {
      * @return void
      */
     public static function Call( $args ) {
+        if (!self::$Active) return;
+
         $params = array();
         foreach($args as $arg) $params[] = is_scalar($arg) ? $arg : gettype($arg);
         self::add(implode(', ', $params), 'call');

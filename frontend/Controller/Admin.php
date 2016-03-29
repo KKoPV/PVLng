@@ -31,16 +31,16 @@ class Admin extends \Controller {
         if ($hasher->CheckPassword($this->request->post('pass'), $this->config->get('Core.Password'))) {
             \Session::set('user', true);
 
-            if ($this->request->post('save')) {
-                self::RememberLogin();
-            }
+            if ($this->request->post('save')) self::RememberLogin();
+
+            \Session::close();
 
             if ($r = \Session::get('returnto')) {
                 // Clear before redirect
                 \Session::set('returnto');
                 $this->app->redirect($r);
             } else {
-                $this->app->redirect('/');
+                $this->app->redirect();
             }
 
         } else {
@@ -53,9 +53,9 @@ class Admin extends \Controller {
      */
     public function LoginGET_Action() {
         if ($this->app->params->get('token') == \PVLng::getLoginToken()) {
-            \Session::set('user', TRUE);
+            \Session::set('user', true);
         }
-        $this->app->redirect('/');
+        $this->app->redirect();
     }
 
     /**
@@ -64,14 +64,11 @@ class Admin extends \Controller {
     public function Logout_Action() {
         // Remember messages
         $msgs = \Session::get(\Messages::$SessionVar);
-
         \Session::destroy();
-        setcookie(\Session::token(), '', time()-60*60*24, '/');
-
-        \Session::start('PVLng');
+        \Session::start();
+        \Session::regenerate();
         \Session::set(\Messages::$SessionVar, $msgs);
-        \Session::set('user');
-        $this->app->redirect('/');
+        $this->app->redirect();
     }
 
     /**
