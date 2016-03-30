@@ -1,9 +1,9 @@
 <?php
 /**
- * Buffering loader
+ * Buffering class loader
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
@@ -12,18 +12,18 @@ class Loader {
     /**
      *
      */
-    public static function autoload($className)
+    public static function autoload($class)
     {
-        if (isset(self::$ClassMap[$className])) {
+        if (isset(self::$classMap[$class])) {
             // Buffered file location found
-            self::load(self::$ClassMap[$className]);
-            return TRUE;
-        } elseif ($file = self::$loader->findFile($className)) {
-            // Not yet buffered, remember
-            self::$ClassMap[$className] = $file;
-            self::load($file);
-            return TRUE;
+            $file = self::$classMap[$class];
+        } else {
+            // Mark to save new class map at the end if a file was found
+            $file = self::$loader->findFile($class);
+            self::$classMapChanged = ($file != '');
         }
+
+        return $file ? self::load($file) : false;
     }
 
     /**
@@ -38,17 +38,18 @@ class Loader {
             $cache = sys_get_temp_dir();
         }
 
-        self::$ClassMapFile = $cache
+        self::$classMapFile = $cache
                             ? sprintf(
                                   '%s%sclassmap.%s.php',
                                    $cache, DS, substr(md5(serialize(self::$loader)), -7)
                               )
                             : false;
 
-        if (self::$ClassMapFile) {
-            // Class map exists?
-            if (file_exists(self::$ClassMapFile)) {
-                self::$ClassMap = include self::$ClassMapFile;
+        if (self::$classMapFile) {
+            // Class map exists and is a valid array?
+            if (file_exists(self::$classMapFile) &&
+                is_array($classMap = @include self::$classMapFile)) {
+                self::$classMap = $classMap;
             }
             // Save class map on exit
             register_shutdown_function('Loader::shutdown');
@@ -64,12 +65,14 @@ class Loader {
      */
     public static function shutdown()
     {
+        if (!self::$classMapChanged) return;
+
         // Cache class map if allowed
-        ksort(self::$ClassMap);
+        ksort(self::$classMap);
 
         file_put_contents(
-            self::$ClassMapFile,
-            '<?php return ' . var_export(self::$ClassMap, true) . ';'
+            self::$classMapFile,
+            '<?php return ' . var_export(self::$classMap, true) . ';'
         );
     }
 
@@ -78,9 +81,7 @@ class Loader {
      */
     public static function load($file)
     {
-        $file = self::applyCallback($file);
-        require_once $file;
-        return TRUE;
+        return require_once self::applyCallback($file);
     }
 
     /**
@@ -88,22 +89,25 @@ class Loader {
      */
     public static function applyCallback($file)
     {
-        foreach (self::$Callback as $Callback) {
-            $file = $Callback($file);
+        foreach (self::$callbacks as $callback) {
+            $file = $callback($file);
         }
         return $file;
     }
 
     /**
-     *
+     * Register a loading callback callable
      */
-    public static function registerCallback($Callback)
+    public static function registerCallback($callback, $position=0)
     {
-        if (is_callable($Callback)) {
-            self::$Callback[] = $Callback;
-        } else {
-            throw new Exception('Not a callable function provided for Loader::registerCallback()');
+        if (!is_callable($callback)) {
+            throw new Exception('Not a callable provided for Loader::registerCallback()');
         }
+
+        // If position is occupied move behind
+        while (isset(self::$callbacks[$position])) $position++;
+        self::$callbacks[$position] = $callback;
+        return $position;
     }
 
     // -----------------------------------------------------------------------
@@ -118,16 +122,21 @@ class Loader {
     /**
      *
      */
-    protected static $ClassMapFile;
+    protected static $classMapFile;
 
     /**
      *
      */
-    protected static $ClassMap = array();
+    protected static $classMap = array();
 
     /**
      *
      */
-    protected static $Callback = array();
+    protected static $classMapChanged = false;
+
+    /**
+     *
+     */
+    protected static $callbacks = array();
 
 }
