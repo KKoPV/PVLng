@@ -941,6 +941,17 @@ abstract class Channel {
     }
 
     // -------------------------------------------------------------------------
+    // PROTECTED
+    // -------------------------------------------------------------------------
+
+    /**
+     * Shortcut method for save array access
+     */
+    protected function array_value(array $array, $key, $default=null) {
+        return array_key_exists($key, $array) ? $array[$key] : $default;
+    }
+
+    // -------------------------------------------------------------------------
     // PRIVATE
     // -------------------------------------------------------------------------
 
