@@ -8,7 +8,7 @@
  * @version    1.0.0
  */
 class Loader {
-
+private static $l = array();
     /**
      *
      */
@@ -19,8 +19,11 @@ class Loader {
             $file = self::$classMap[$class];
         } else {
             // Mark to save new class map at the end if a file was found
-            $file = self::$loader->findFile($class);
-            self::$classMapChanged = ($file != '');
+            if ($file = self::$loader->findFile($class)) {
+                self::$classMap[$class] = $file;
+                self::$l[] = '//  ' . $class;
+                self::$classMapChanged = true;
+            }
         }
 
         return $file ? self::load($file) : false;
@@ -73,6 +76,7 @@ class Loader {
         file_put_contents(
             self::$classMapFile,
             '<?php return ' . var_export(self::$classMap, true) . ';'
+            . PHP_EOL . PHP_EOL . implode(PHP_EOL, self::$l)
         );
     }
 
