@@ -38,23 +38,23 @@
 
             <tbody>
                 <!-- BEGIN DATA -->
-                <tr id="rc{ID}" data-tt-id="{ID}"
+                <tr id="rc{raw:ID}" data-tt-id="{raw:ID}"
                     class="channel<!-- IF {GRAPH} --> graph<!-- ENDIF -->"
                     <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->
                     >
                     <td>
                         <!-- IF {GRAPH} -->
-                        <input id="c{ID}" type="checkbox" class="channel iCheck" data-id="{ID}" />
+                        <input id="c{raw:ID}" type="checkbox" class="channel iCheck" data-id="{raw:ID}" />
                         <!-- ENDIF -->
                     </td>
                     <td <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
-                        <img id="s{ID}" src="/images/pix.gif" data-src="/images/spinner.gif"
+                        <img id="s{raw:ID}" src="/images/pix.gif" data-src="/images/spinner.gif"
                              class="def ico spinner" alt="o" />
                         <!-- INCLUDE channel-details.inc.tpl -->
                     </td>
-                    <td id="cons{ID}" class="consumption"></td>
+                    <td id="cons{raw:ID}" class="consumption"></td>
                     <td>{UNIT}</td>
-                    <td id="costs{ID}" class="costs"></td>
+                    <td id="costs{raw:ID}" class="costs"></td>
                     <td class="icons">
                         <i class="fa fa-fw btn<!-- IF {GRAPH} --> fa-bar-chart chartdialog<!-- ENDIF -->"></i>
                         <i class="fa fa-fw btn<!-- IF {READ} --> fa-file-text showlist<!-- ENDIF -->"></i>

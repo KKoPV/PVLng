@@ -30,17 +30,17 @@
 
         <!-- BEGIN DATA -->
         <!-- IF {PUBLIC} -->
-        <tr id="rc{ID}" class="channel">
+        <tr id="rc{raw:ID}" class="channel">
             <td>
-                <input id="c{ID}" class="channel" type="checkbox" style="display:none"
-                       data-id="{ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
-                <img id="s{ID}" src="/images/spinner.gif" class="spinner" alt="o">
+                <input id="c{raw:ID}" class="channel" type="checkbox" style="display:none"
+                       data-id="{raw:ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
+                <img id="s{raw:ID}" src="/images/spinner.gif" class="spinner" alt="o">
                 <!-- INCLUDE channel-details.inc.tpl -->
             </td>
             <td class="icons r">
-                <span id="cons{ID}" class="consumption"></span>
+                <span id="cons{raw:ID}" class="consumption"></span>
             </td>
-            <td id="u{ID}">{UNIT}</td>
+            <td id="u{raw:ID}">{UNIT}</td>
         </tr>
         <!-- ENDIF -->
         <!-- END -->

@@ -33,7 +33,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
     oTable,
     channels = {
         <!-- BEGIN DATA -->
-        {ID}: { id: {ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}', entity: {ENTITY}, n: {NUMERIC} },
+        {raw:ID}: { id: {raw:ID}, guid: '{GUID}', name: '{NAME}', unit: '{UNIT}', entity: {ENTITY}, n: {NUMERIC} },
         <!-- END -->
     },
 
