@@ -52,7 +52,8 @@ return array(
             'decimals'    => 0,
             'meter'       => 1,
             'adjust'      => 1,
-            'comment'     => 'Fill the "cost" with the amount of money you get for each watt hour (e.g. cent / 1000 / 1000 to get EUR).',
+            'comment'     => 'Fill the "cost" with the amount of money you get for each watt hour (e.g. cent / 1000 / 1000 to get EUR).'."\n\n"
+                           . 'Adjust offset automatic, transmitted value resets each morning.',
         ),
 
         array(

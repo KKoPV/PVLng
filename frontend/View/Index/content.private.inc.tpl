@@ -40,7 +40,7 @@
                 <!-- BEGIN DATA -->
                 <tr id="rc{raw:ID}" data-tt-id="{raw:ID}"
                     class="channel<!-- IF {GRAPH} --> graph<!-- ENDIF -->"
-                    <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->
+                    <!-- IF {PARENT} -->data-tt-parent-id="{raw:PARENT}" <!-- ENDIF -->
                     >
                     <td>
                         <!-- IF {GRAPH} -->

@@ -120,8 +120,14 @@
 
                 <div class="attr">
                     <label for="p{_LOOP}comment">{{Channel::comment}}</label>
-                    <textarea id="p{_LOOP}comment" name="p[{_LOOP}][comment]" cols="40">{COMMENT}</textarea>
+                    <textarea id="p{_LOOP}comment" name="p[{_LOOP}][comment]" cols="41">{COMMENT}</textarea>
                 </div>
+                <!-- IF {_LOOP} != "0" AND {METER} -->
+                <div class="attr">
+                    <label for="p{_LOOP}adjust">{{Channel::adjust}}</label>
+                    <input id="p{_LOOP}adjust" type="checkbox" class="iCheck" name="p[{_LOOP}][adjust]" value="1" <!-- IF {ADJUST} == 1 -->checked<!-- ENDIF -->>
+                </div>
+                <!-- ENDIF -->
 
             </span>
         </td>

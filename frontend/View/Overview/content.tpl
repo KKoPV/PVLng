@@ -14,7 +14,7 @@
     <!-- BEGIN CHANNELS -->
     <optgroup label="{TYPE}">
         <!-- BEGIN MEMBERS -->
-        <option value="{ID}">
+        <option value="{raw:ID}">
             {NAME}
             <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
             <!-- IF {DESCRIPTION} --> ({DESCRIPTION})<!-- ENDIF -->
@@ -42,11 +42,11 @@
 
     <!-- BEGIN DATA -->
 
-    <tr data-tt-id="{ID}" class="droppable <!-- IF {CHILDS} -->group<!-- ELSE -->channel<!-- ENDIF -->"
-        <!-- IF {PARENT} -->data-tt-parent-id="{PARENT}" <!-- ENDIF -->>
+    <tr data-tt-id="{raw:ID}" class="droppable <!-- IF {CHILDS} -->group<!-- ELSE -->channel<!-- ENDIF -->"
+        <!-- IF {PARENT} -->data-tt-parent-id="{raw:PARENT}" <!-- ENDIF -->>
         <td>
-            <a name="_{ID}"></a>
-            <span class="icons draggable" data-id="{ID}">
+            <a name="_{raw:ID}"></a>
+            <span class="icons draggable" data-id="{raw:ID}">
                 <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon tip" title="{TYPE}" alt="({TYPE})">
                 <strong<!-- IF {ALIAS_OF} --> class="alias"<!-- ENDIF -->>{NAME}</strong>
                 <!-- IF {UNIT} --> [{UNIT}]<!-- ENDIF -->
@@ -59,34 +59,34 @@
 
         <td class="icons">
             <!-- IF {CHILDS} -->
-            <i class="fa fa-fw fa-plus btn" onclick="addChild({ID}); return false"></i>
+            <i class="fa fa-fw fa-plus btn" onclick="addChild({raw:ID}); return false"></i>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <i class="fa fa-fw fa-minus btn"></i>
 
             <!-- IF {LEVEL} > 2 -->
             <form action="/overview/moveup" method="post">
-                <input type="hidden" name="id" value="{ID}">
+                <input type="hidden" name="id" value="{raw:ID}">
                 <i class="fa fa-fw fa-arrow-left btn" onclick="this.form.submit()"></i>
             </form>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {UPPER} != 0 -->
-            <i class="fa fa-fw fa-arrow-up btn" onclick="return moveChild({ID}, 'moveleft')"></i>
+            <i class="fa fa-fw fa-arrow-up btn" onclick="return moveChild({raw:ID}, 'moveleft')"></i>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {LEVEL} != 1 AND {LOWER} != 0 -->
-            <i class="fa fa-fw fa-arrow-down btn" onclick="return moveChild({ID}, 'moveright')"></i>
+            <i class="fa fa-fw fa-arrow-down btn" onclick="return moveChild({raw:ID}, 'moveright')"></i>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/edit/{ENTITY}?returnto=/overview%23_{ID}" class="fa fa-fw fa-pencil btn"></a>
+            <a href="/channel/edit/{ENTITY}?returnto=/overview%23_{raw:ID}" class="fa fa-fw fa-pencil btn"></a>
             <!-- ELSE -->
-            <a href="/channel/edit/{ENTITY_OF}?returnto=/overview%23_{ID}" class="fa fa-fw fa-pencil btn"></a>
+            <a href="/channel/edit/{ENTITY_OF}?returnto=/overview%23_{raw:ID}" class="fa fa-fw fa-pencil btn"></a>
             <!-- ENDIF -->
 
             <!-- IF {TYPE_ID} != "0" -->
-            <a href="/channel/add/{ENTITY}?returnto=/overview%23_{ID}" class="fa fa-fw fa-clone btn"></a>
+            <a href="/channel/add/{ENTITY}?returnto=/overview%23_{raw:ID}" class="fa fa-fw fa-clone btn"></a>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
             <!-- IF {CHILDS} AND {GUID} AND {TYPE_ID} != "30" AND !{ALIAS} -->

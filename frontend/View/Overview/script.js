@@ -144,7 +144,7 @@ $(function() {
         drop: function(event, ui) {
             if (cancelDragging) return;
             ui.helper.hide();
-            overlay.show();
+            /* overlay.show();
             /* Create hidden form and submit */
             $('<form/>', { action: '/overview/dragdrop', method: 'post' } )
             .appendTo('body')
