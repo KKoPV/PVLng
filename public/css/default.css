@@ -291,6 +291,10 @@ tt {
     color: #404040;
 }
 
+a.fa.btn {
+    text-decoration: none;
+}
+
 .s {
     font-size: smaller;
 }
