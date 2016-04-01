@@ -321,7 +321,7 @@ abstract class Channel {
 
         $this->lastReading = $reading->getLastReading($this->entity, $timestamp);
 
-        $this->check_before_write($request);
+        $this->check_before_write($request, $timestamp);
 
         if ($this->numeric) {
             // Check that new value is inside the valid range
@@ -487,8 +487,11 @@ abstract class Channel {
 
             if ($res = $this->db->query($q)) {
 
-                $first = $res->fetch_assoc();
-                $offset = $first['data'];
+                if ($this->meter && ($first = $res->fetch_assoc())) {
+                    $offset = $first['data'];
+                } else {
+                    $first = true;
+                }
 
                 while ($first && ($row = $res->fetch_assoc())) {
 
@@ -706,6 +709,35 @@ abstract class Channel {
     }
 
     /**
+     * Essential checks before write data
+     */
+    protected function check_before_write( &$request ) {
+
+        if (!$this->write) {
+            throw new \Exception(
+                'Can\'t write data to '.$this->name.', instance of '.get_class($this),
+                400
+            );
+        }
+
+        if (!isset($request['data']) OR !is_scalar($request['data'])) {
+            throw new Exception($this->guid.' - Missing data value', 400);
+        }
+
+        // Check if a WRITEMAP::{...} exists to rewrite e.g. from numeric to non-numeric
+        if (preg_match('~^WRITEMAP::(.*?)$~m', $this->tags, $args) &&
+            ($map = json_decode($args[1], true))) {
+            $request['data'] = $this->array_value($map, $request['data'], 'unknown ('.$request['data'].')');
+        } elseif (preg_match('~^WRITEMAP::(.*?)$~m', $this->comment, $args) &&
+            ($map = json_decode($args[1], true))) {
+            $request['data'] = $this->array_value($map, $request['data'], 'unknown ('.$request['data'].')');
+        }
+
+        $this->value = $request['data'];
+
+    }
+
+    /**
      *
      */
     protected function before_write( &$request ) {
@@ -733,7 +765,7 @@ abstract class Channel {
                     ORM\Log::save(
                         $this->name,
                         sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
-                                $this->offset, $lthis->astReading, $this->value)
+                                $this->offset, $lthis->lastReading, $this->value)
                     );
 
                     // Update channel in database
@@ -940,10 +972,6 @@ abstract class Channel {
         Header('X-SQL-' . uniqid() . ': ' . $sql . ': ' . preg_replace('~\n+~', ' ', $q));
     }
 
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
     /**
      * Shortcut method for save array access
      */
@@ -959,31 +987,5 @@ abstract class Channel {
      *
      */
     private $_childs;
-
-    /**
-     * Essential checks before write data
-     */
-    private function check_before_write( &$request ) {
-
-        if (!$this->write) {
-            throw new \Exception(
-                'Can\'t write data to '.$this->name.', instance of '.get_class($this),
-                400
-            );
-        }
-
-        if (!isset($request['data']) OR !is_scalar($request['data'])) {
-            throw new Exception($this->guid.' - Missing data value', 400);
-        }
-
-        // Check if a WRITEMAP::{...} exists to rewrite e.g. from numeric to non-numeric
-        if (preg_match('~^WRITEMAP::(.*?)$~m', $this->comment, $args) AND
-            $map = json_decode($args[1], TRUE)) {
-            $request['data'] = ($_=&$map[$request['data']]) ?: 'unknown ('.$request['data'].')';
-        }
-
-        $this->value = $request['data'];
-
-    }
 
 }

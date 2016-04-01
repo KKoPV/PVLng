@@ -144,7 +144,6 @@ $(function() {
         drop: function(event, ui) {
             if (cancelDragging) return;
             ui.helper.hide();
-            /* overlay.show();
             /* Create hidden form and submit */
             $('<form/>', { action: '/overview/dragdrop', method: 'post' } )
             .appendTo('body')
@@ -211,7 +210,6 @@ $(function() {
         buttons: {
             '{{Add}}': function() {
                 $(this).dialog('close');
-                overlay.show();
                 $(this).find('form').submit();
             },
             '{{Cancel}}': function() {
@@ -237,8 +235,6 @@ $(function() {
     /* Bind click listener to all create alias images */
     $('#tree tbody').on('click', '.create-alias', function() {
 
-        overlay.show();
-
         /* Get tree table Id from parent <tr> */
         var node = $(this.parentNode.parentNode).data('tt-id'),
             that = this;
@@ -258,8 +254,6 @@ $(function() {
             $.pnotify({
                 type: textStatus, hide: false, sticker: false, text: errorThrown
             });
-        }).always(function() {
-            overlay.hide();
         });
     });
 
@@ -313,7 +307,6 @@ $(function() {
         buttons: {
             '{{Ok}}': function() {
                 $(this).dialog('close');
-                overlay.show();
                 $(this).find('form').submit()
             },
             '{{Cancel}}': function() {

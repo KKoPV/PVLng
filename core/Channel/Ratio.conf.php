@@ -20,7 +20,6 @@ return array(
      */
 
     'unit' => array(
-        'readonly' => TRUE,
         'default'  => '%',
     ),
 
@@ -29,7 +28,7 @@ return array(
     ),
 
     'valid_to' => array(
-        'default'  => '100',
+        'default'  => '1',
     ),
 
 );
