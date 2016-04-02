@@ -114,12 +114,12 @@ class APC extends \Cache {
 
     public function getHits() {
         $stats = apc_cache_info();
-        return $stats['num_hits'];
+        return @$stats['num_hits'] ?: 0;
     }
 
     public function getMisses() {
         $stats = apc_cache_info();
-        return $stats['num_misses'];
+        return @$stats['num_misses'] ?: 0;
     }
 
     // -------------------------------------------------------------------------

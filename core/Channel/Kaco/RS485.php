@@ -23,11 +23,14 @@ class RS485 extends \Channel
      */
     public function write($request, $timestamp=null)
     {
-        // Something went wrong...
-        if (count($request) < 2) return 0;
 
-        // Timestamp is in $request[0] + $request[1]
-        $datetime  = implode(' ', array_splice($request, 0, 2));
+        $data = explode(' ', $request['data']);
+
+        // Something went wrong...
+        if (count($data) < 2) return 0;
+
+        // Timestamp is in $data[0] + $data[1]
+        $datetime  = implode(' ', array_splice($data, 0, 2));
 
         // Transform to integer
         if (!($timestamp = strtotime($datetime))) {
@@ -45,7 +48,7 @@ class RS485 extends \Channel
             $param = $child->channel - 1;
 
             // Channel value found in data?
-            if (!($value = $this->array_value($request, $param))) continue;
+            if (!($value = $this->array_value($data, $param))) continue;
 
             // Interpret empty numeric value as invalid
             if ($child->numeric && ($value == '')) continue;
