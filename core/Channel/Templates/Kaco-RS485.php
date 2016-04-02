@@ -45,7 +45,7 @@ return array(
 
         // Real channels
         array(
-            'type'        => 50, // Energy meter, absolute
+            'type'        => 50, // Energy meter absolute
             'name'        => 'E-Total',
             'channel'     => 10,
             'unit'        => 'Wh',
@@ -63,7 +63,7 @@ return array(
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 1,
-            'comment'     => 'Set lower valid border to avoid store invalid data (inverter OFF)'
+            'comment'     => 'Set lower valid border to avoid store invalid data (inverter off)'
         ),
 
         array(
@@ -73,7 +73,7 @@ return array(
             'unit'        => 'V',
             'decimals'    => 0,
             'valid_from'  => 1,
-            'comment'     => 'Set lower valid border to avoid store invalid data (inverter OFF)'
+            'comment'     => 'Set lower valid border to avoid store invalid data (inverter off)'
         ),
 
         array(
@@ -83,7 +83,7 @@ return array(
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
-            'comment'     => 'Set lower valid border to avoid store invalid data (inverter OFF)'
+            'comment'     => 'Set lower valid border to avoid store invalid data (inverter off)'
         ),
 
         array(
@@ -93,7 +93,7 @@ return array(
             'unit'        => 'W',
             'decimals'    => 0,
             'valid_from'  => 1,
-            'comment'     => 'Set lower valid border to avoid store invalid data (inverter OFF)'
+            'comment'     => 'Set lower valid border to avoid store invalid data (inverter off)'
         ),
 
         array(
@@ -103,7 +103,7 @@ return array(
             'unit'        => 'V',
             'decimals'    => 0,
             'valid_from'  => 1,
-            'comment'     => 'Set lower valid border to avoid store invalid data (inverter OFF)'
+            'comment'     => 'Set lower valid border to avoid store invalid data (inverter off)'
         ),
 
         array(
@@ -113,7 +113,7 @@ return array(
             'unit'        => 'A',
             'decimals'    => 1,
             'valid_from'  => 0.001,
-            'comment'     => 'Set lower valid border to avoid store invalid data (inverter OFF)'
+            'comment'     => 'Set lower valid border to avoid store invalid data (inverter off)'
         ),
 
         array(
@@ -121,12 +121,12 @@ return array(
             'name'        => 'State',
             'channel'     => 2,
             'numeric'     => 0,
-#            'comment'     => 'The following JSON map object will translate the numeric reading value during write to textual representation (ALL IN ONE LINE).'."\n\n"
-#                            .'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"Startup","5":"Startup","6":"Startup","7":"Running","8":"Standby","9":"Boot loading","19":"Error"}'
+            'tags'        => 'The following JSON map object will translate the numeric reading value during write to textual representation (ALL IN ONE LINE).'."\n\n"
+                            .'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"MPP","5":"MPP","6":"Wait","7":"Wait","8":"Wait","10":"Overheated off","11":"Overheated","12":"Overload shutdown","13":"Overload shutdown L1","14":"Grid failure","15":"Transition for night","18":"RCD A off","19":"Insulation resistance","30":"Error measurement","31":"RCD B error","32":"Error self-test","33":"Error DC","34":"Error com."}'
         ),
 
         array(
-            'type'        => 51, // Temperature sensor
+            'type'        => 60, // Temperature sensor
             'name'        => 'Inverter temperature',
             'channel'     => 9,
             'unit'        => '°C',
