@@ -192,7 +192,7 @@ function updateCharts() {
                     charts[chart_id] = new Highcharts.Chart(options);
                 }
 
-                charts[chart_id].series[0].data[0].update(data[0].data);
+                charts[chart_id] && charts[chart_id].series[0].data[0].update(data[0].data);
             }
         );
     });

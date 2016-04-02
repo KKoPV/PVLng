@@ -403,7 +403,6 @@ abstract class Channel {
               ->limit(1);
 
             $row = $this->db->queryRow($q);
-
             if (!$row) return $this->after_read($buffer);
 
             $buffer->write((array) $row);
@@ -413,8 +412,8 @@ abstract class Channel {
             // Simply read last data set for sensor channels
 
             // Fetch last reading and set some data to 0 to get correct field order
-            $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
-              ->get('timestamp')
+            $q->get($q->FROM_UNIXTIME($q->MAX('timestamp')), 'datetime')
+              ->get($q->MAX('timestamp'))
               ->get('data')
               ->get($q->MIN('data'), 'min')
               ->get($q->MAX('data'), 'max')
@@ -422,7 +421,7 @@ abstract class Channel {
               ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
               ->get(0, 'consumption')
               ->filter('id', $this->entity)
-              ->order('timestamp', TRUE)
+              ->order('timestamp', true)
               ->limit(1);
 
             $this->filterReadTimestamp($q);
@@ -734,7 +733,6 @@ abstract class Channel {
         }
 
         $this->value = $request['data'];
-
     }
 
     /**

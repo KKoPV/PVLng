@@ -21,8 +21,8 @@ class Switcher extends Channel {
 
         parent::check_before_write($request);
 
-        if ($this->numeric  && ((float)  $this->lastReading == (float)  $this->value) ||
-            !$this->numeric && ((string) $this->lastReading == (string) $this->value)) {
+        if (($this->numeric  && ((float)  $this->lastReading == (float)  $this->value)) ||
+            (!$this->numeric && ((string) $this->lastReading == (string) $this->value))) {
             // Skip not changed value since last write
             throw new \Exception(null, 200);
         }

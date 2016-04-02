@@ -132,11 +132,11 @@
         </td>
         <td>
             <div class="fl" style="margin:.5em 1em 0 0">
-                <input type="checkbox" id="add2tree" name="add2tree" class="iCheck" onchange="$('#tree').prop('disabled',!this.checked)" />
+                <input type="checkbox" id="add2tree" name="add2tree" class="iCheck" checked onchange="$('#tree').prop('disabled',!this.checked)" />
             </div>
-            <select id="tree" name="tree" disabled="disabled">
+            <select id="tree" name="tree">
                 <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
-                <option value="0" disabled="disabled">{{AsChild}}</option>
+                <option value="0" disabled="disabled">{{AsChildOf}}</option>
                     <!-- BEGIN ADDTREE -->
                     <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
                     <!-- END -->

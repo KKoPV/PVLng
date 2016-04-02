@@ -143,7 +143,7 @@
     {{Overview}}: &nbsp;
     <select name="tree">
         <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
-        <option value="0" disabled="disabled">{{AsChild}}</option>
+        <option value="0" disabled="disabled">{{AsChildOf}}</option>
         <!-- BEGIN ADDTREE -->
             <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>
                 {INDENT}{NAME}
