@@ -765,7 +765,7 @@ abstract class Channel {
                     ORM\Log::save(
                         $this->name,
                         sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
-                                $this->offset, $lthis->lastReading, $this->value)
+                                $this->offset, $this->lastReading, $this->value)
                     );
 
                     // Update channel in database
