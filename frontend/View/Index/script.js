@@ -302,7 +302,10 @@ function ChartDialog( id ) {
         /* Suggest scatter for channels without unit  or non-numeric */
         if (!channels[id].unit || !channels[id].n) {
             $('#scatter-candidate').show();
+            /* Propose type Scatter and ... */
             p.type = 'scatter';
+            /* ... show all values */
+            p.all  = true;
         }
     } else {
         /* Init presetation */
@@ -487,7 +490,7 @@ function updateChart( force ) {
 
     /* Any channels checked for drawing? */
     if (channels_new.length == 0) {
-        updateActive = FALSE;
+        updateActive = false;
         return;
     }
 
@@ -712,7 +715,7 @@ function updateChart( force ) {
                     } else {
                         point.y = 0;
                         var n = (row.data+'|').split('|');
-                        point.name = n[0];
+                        point.name = channel.all ? n[0] : '';
                         if (n[1]) point.marker = { symbol: 'url('+n[1]+')' };
                     }
 
@@ -1107,6 +1110,10 @@ $(function() {
         } else if (this.value == 'scatter') {
             notScatter.addClass('disabled');
             notScatter.find('input, select').prop('disabled', true);
+            /* Set different color flag no none */
+            $('#d-color-use-diff').prop('checked', true);
+            /* Uncheck all not valid checkboxes */
+            $('.iCheck.not-scatter').prop('checked', false);
         }
         $('input').iCheck('update');
     });

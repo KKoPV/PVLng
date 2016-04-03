@@ -17,9 +17,9 @@ class Switcher extends Channel {
     /**
      *
      */
-    protected function check_before_write(&$request) {
+    protected function before_write(&$request) {
 
-        parent::check_before_write($request);
+        parent::before_write($request);
 
         if (($this->numeric  && ((float)  $this->lastReading == (float)  $this->value)) ||
             (!$this->numeric && ((string) $this->lastReading == (string) $this->value))) {

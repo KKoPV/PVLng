@@ -19,6 +19,7 @@ class Daylight extends InternalCalc {
      */
     public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
         parent::beforeEdit($channel, $fields);
+        // times no longer used but needed here to not break existing channels
         list($fields['times']['VALUE'], $fields['extra']['VALUE']) = $channel->extra;
     }
 
@@ -43,6 +44,7 @@ class Daylight extends InternalCalc {
      */
     public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
         parent::beforeSave($fields, $channel);
+        // times no longer used but needed here to not break existing channels
         $channel->extra = array(+$fields['times']['VALUE'], $fields['extra']['VALUE']);
     }
 
@@ -112,12 +114,25 @@ class Daylight extends InternalCalc {
         do {
             $sunrise = $this->settings->getSunrise($day);
             $sunset  = $this->settings->getSunset($day);
+            $noon    = ($sunrise + $sunset) / 2;
 
             if (!$this->numeric) {
                 // Static sunrise / sunset marker with time label depending of "times" attribute
-                $this->setMarker($sunrise,             $this->settings->getModelValue('Daylight', 'SunriseIcon'));
-                $this->setMarker(($sunrise+$sunset)/2, $this->settings->getModelValue('Daylight', 'ZenitIcon'));
-                $this->setMarker($sunset,              $this->settings->getModelValue('Daylight', 'SunsetIcon'));
+                $this->saveValue(
+                    $sunrise,
+                    date('H:i', $sunrise) . '|'
+                  . $this->settings->getModelValue('Daylight', 'SunriseIcon')
+                );
+                $this->saveValue(
+                    $noon,
+                    date('H:i', $noon) . '|'
+                  . $this->settings->getModelValue('Daylight', 'ZenitIcon')
+                );
+                $this->saveValue(
+                    $sunset,
+                    date('H:i', $sunset) . '|'
+                  . $this->settings->getModelValue('Daylight', 'SunsetIcon')
+                );
 
             } else {
 
@@ -142,20 +157,11 @@ class Daylight extends InternalCalc {
             }
 
             $day += 24*60*60;
+
         } while ($day < $this->end);
 
         $this->dataCreated();
 
         $this->resolution = 1;
     }
-
-    /**
-     *
-     */
-    protected function setMarker( $time, $icon ) {
-        if ($icon) $this->saveValue($time, ($this->times ? date('H:i', $time) : '') . '|' . $icon);
-    }
-
-
-
 }
