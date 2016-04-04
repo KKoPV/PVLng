@@ -305,7 +305,7 @@ function ChartDialog( id ) {
             /* Propose type Scatter and ... */
             p.type = 'scatter';
             /* ... show all values */
-            p.all  = true;
+            p.all = true;
         }
     } else {
         /* Init presetation */
@@ -1106,14 +1106,16 @@ $(function() {
         /* Disable all invalid options for given type */
         if (this.value == 'bar') {
             notBar.addClass('disabled');
+            notBar.find('input[type="checkbox"]').prop('checked', false);
             notBar.find('input, select').prop('disabled', true);
+            /* Set different color flag no none */
+            $('#d-color-use-diff').prop('checked', true);
         } else if (this.value == 'scatter') {
             notScatter.addClass('disabled');
+            notScatter.find('input[type="checkbox"]').prop('checked', false);
             notScatter.find('input, select').prop('disabled', true);
             /* Set different color flag no none */
             $('#d-color-use-diff').prop('checked', true);
-            /* Uncheck all not valid checkboxes */
-            $('.iCheck.not-scatter').prop('checked', false);
         }
         $('input').iCheck('update');
     });

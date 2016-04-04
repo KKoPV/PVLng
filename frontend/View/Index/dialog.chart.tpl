@@ -35,15 +35,23 @@
                 <i class="fa fa-question tip" title="{{ChartTypeHint}}"></i>
             </td>
             <td>
-                <select id="d-type">
-                    <option value="line">{{LineChart}}</option>
-                    <option value="spline">{{SplineChart}}</option>
-                    <option value="areasplinerange"> {{AreaSplineRangeChart}}</option>
-                    <option value="areaspline">{{AreaSplineChart}}</option>
-                    <option value="bar">{{BarChart}}</option>
-                    <option value="scatter">{{ScatterChart}}</option>
-                </select>
-                <i id="scatter-candidate" class="fa fa-question tip" title="{{ScatterCandidate}}"></i>
+                <table>
+                    <tr>
+                        <td>
+                            <select id="d-type">
+                                <option value="line">{{LineChart}}</option>
+                                <option value="spline">{{SplineChart}}</option>
+                                <option value="areasplinerange"> {{AreaSplineRangeChart}}</option>
+                                <option value="areaspline">{{AreaSplineChart}}</option>
+                                <option value="bar">{{BarChart}}</option>
+                                <option value="scatter">{{ScatterChart}}</option>
+                            </select>
+                        </td>
+                        <td id="scatter-candidate">
+                            {{ScatterCandidate}}
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
         <tr>
@@ -93,19 +101,19 @@
             <td>{{MarkExtremes}}</td>
             <td>
                 <div class="fl not-bar not-scatter not-meter" style="margin-right:1em">
-                    <input id="d-min" type="checkbox" class="iCheck not-scatter" />
+                    <input id="d-min" type="checkbox" class="iCheck" />
                     <label for="d-min">{{MarkMin}}</label>
                 </div>
                 <div class="fl not-scatter not-meter" style="margin-right:1em">
-                    <input id="d-max" type="checkbox" class="iCheck not-scatter" />
+                    <input id="d-max" type="checkbox" class="iCheck" />
                     <label for="d-max">{{MarkMax}}</label>
                 </div>
                 <div class="fl not-bar not-scatter" style="margin-right:1em">
-                    <input id="d-last" type="checkbox" class="iCheck not-scatter" />
+                    <input id="d-last" type="checkbox" class="iCheck" />
                     <label for="d-last">{{MarkLast}}</label>
                 </div>
                 <div class="fl">
-                    <input id="d-all" type="checkbox" class="iCheck not-scatter" />
+                    <input id="d-all" type="checkbox" class="iCheck" />
                     <label for="d-all">{{MarkAll}}</label>
                 </div>
             </td>
@@ -115,7 +123,9 @@
                 <label for="d-cons">{{ShowConsumption}}</label>
                 <i class="fa fa-question tip" title="{{ShowConsumptionHint}}"></i>
             </td>
-            <td class="not-scatter"><input type="checkbox" id="d-cons" class="iCheck not-scatter" /></td>
+            <td class="not-scatter">
+                <input type="checkbox" id="d-cons" class="iCheck" />
+            </td>
         </tr>
         <tr>
             <td>{{Color}}</td>
@@ -126,7 +136,9 @@
                 <label for="d-outline">{{DrawOutline}}</label>
                 <i class="fa fa-question tip" title="{{DrawOutlineHint}}"></i>
             </td>
-            <td class="not-bar not-scatter"><input type="checkbox" id="d-outline" class="iCheck not-scatter" /></td>
+            <td class="not-bar not-scatter">
+                <input type="checkbox" id="d-outline" class="iCheck not-scatter" />
+            </td>
         </tr>
         <tr>
             <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
