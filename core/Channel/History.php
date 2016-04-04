@@ -41,7 +41,7 @@ class History extends InternalCalc {
 
         $result = new \Buffer;
 
-        if ($this->period[0] * $this->GroupingPeriod[$this->period[1]] < 600) {
+        if ($this->period[0] * self::$Grouping[$this->period[1]][0] < 600) {
             // Smooth result at least 10 minutes
             $this->period = array(10, self::MINUTE);
         }

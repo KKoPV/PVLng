@@ -37,7 +37,7 @@ class Random extends InternalCalc {
         $randMax = mt_getrandmax();
 
         if ($this->meter) {
-            $timestamp -= $this->GroupingPeriod[$this->period[1]];
+            $timestamp -= self::$Grouping[$this->period[1]][0];
             $value = is_null($this->valid_from) ? 0 : $this->valid_from;
             $minRand = 0;
         } else {

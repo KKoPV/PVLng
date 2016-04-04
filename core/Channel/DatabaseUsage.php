@@ -76,7 +76,7 @@ class DatabaseUsage extends Channel {
             if ($this->period[1] != self::ALL) {
                 // Time is only relevant for period != ALL
                 if ($this->start) {
-                    $q->filter('timestamp', array('min'=>$this->start-$this->GroupingPeriod[$this->period[1]]));
+                    $q->filter('timestamp', array('min'=>$this->start-self::$Grouping[$this->period[1]][0]));
                 }
                 if ($this->end < time()) {
                     $q->filter('timestamp', array('max'=>$this->end-1));
@@ -92,7 +92,7 @@ class DatabaseUsage extends Channel {
 
             if ($res = $this->db->query($q)) {
 
-                $last = ($this->GroupingPeriod[$this->period[1]] > 0)
+                $last = (self::$Grouping[$this->period[1]][0] > 0)
                       ? $res->fetch_assoc()
                       : FALSE;
 

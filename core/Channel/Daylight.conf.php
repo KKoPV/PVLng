@@ -32,7 +32,7 @@ return array(
         'visible'  => FALSE
     ),
 
-    // Removed, controlled by channel settings in chart, "Show all" flag
+    // Removed, controlled by channel settings in chart, "Show all" flag"
     'times' => array(
         'position' => 430,
         'type'     => 'bool;0:no;1:yes',

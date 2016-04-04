@@ -413,7 +413,7 @@ abstract class Channel {
 
             // Fetch last reading and set some data to 0 to get correct field order
             $q->get($q->FROM_UNIXTIME($q->MAX('timestamp')), 'datetime')
-              ->get($q->MAX('timestamp'))
+              ->get($q->MAX('timestamp'), 'timestamp')
               ->get('data')
               ->get($q->MIN('data'), 'min')
               ->get($q->MAX('data'), 'max')
@@ -552,6 +552,49 @@ abstract class Channel {
     // -------------------------------------------------------------------------
 
     /**
+     * Grouping
+     */
+    const NO        =  0;
+    const ASCHILD   =  1; // Required for grouping by at least 1 minute
+    const MINUTE    = 10;
+    const HOUR      = 20;
+    const DAY       = 30;
+    const WEEK      = 40;
+    const MONTH     = 50;
+    const QUARTER   = 60;
+    const YEAR      = 70;
+    const LAST      = 80;
+    const READLAST  = 81;
+    const ALL       = 90;
+
+    /**
+     * Period in seconds for each grouping period and SQL equivalent
+     * Hold static only once in memory
+     */
+    protected static $Grouping = array(
+        self::NO        => array(        0, '`timestamp`' ),
+        self::ASCHILD   => array(       60, '`timestamp` DIV 60' ),
+        self::MINUTE    => array(       60, '`timestamp` DIV (60 * %d)' ),
+        self::HOUR      => array(     3600, 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%H") DIV %d' ),
+        self::DAY       => array(    86400, 'FROM_UNIXTIME(`timestamp`, "%%Y%%j") DIV %d' ),
+        self::WEEK      => array(   604800, 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d' ),
+        self::MONTH     => array(  2678400, 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d' ),
+        self::QUARTER   => array(  7776000, 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)' ),
+        self::YEAR      => array( 31536000, 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d'),
+        self::LAST      => array(        0, '`timestamp`' ),
+        self::READLAST  => array(        0, '`timestamp`' ),
+        self::ALL       => array(        0, '`timestamp`' )
+    );
+
+    /**
+     *
+     */
+    protected $table = array(
+        'pvlng_reading_str', // numeric == 0
+        'pvlng_reading_num', // numeric == 1
+    );
+
+    /**
      *
      */
     protected static $cache;
@@ -565,14 +608,6 @@ abstract class Channel {
      *
      */
     protected $config;
-
-    /**
-     *
-     */
-    protected $table = array(
-        'pvlng_reading_str', // numeric == 0
-        'pvlng_reading_num', // numeric == 1
-    );
 
     /**
      *
@@ -610,40 +645,6 @@ abstract class Channel {
     protected $_tags = array();
 
     /**
-     * Grouping
-     */
-    const NO        =  0;
-    const ASCHILD   =  1; // Required for grouping by at least 1 minute
-    const MINUTE    = 10;
-    const HOUR      = 20;
-    const DAY       = 30;
-    const WEEK      = 40;
-    const MONTH     = 50;
-    const QUARTER   = 60;
-    const YEAR      = 70;
-    const LAST      = 80;
-    const READLAST  = 81;
-    const ALL       = 90;
-
-    /**
-     *
-     */
-    protected $GroupingPeriod = array(
-        self::NO        =>        0,
-        self::ASCHILD   =>       60,
-        self::MINUTE    =>       60,
-        self::HOUR      =>     3600,
-        self::DAY       =>    86400,
-        self::WEEK      =>   604800,
-        self::MONTH     =>  2678400,
-        self::QUARTER   =>  7776000,
-        self::YEAR      => 31536000,
-        self::LAST      =>        0,
-        self::READLAST  =>        0,
-        self::ALL       =>        0,
-    );
-
-    /**
      *
      */
     protected function __construct( ORM\Tree $channel ) {
@@ -667,21 +668,7 @@ abstract class Channel {
      *
      */
     protected function periodGrouping() {
-        static $GroupBy = array(
-            self::NO        => '`timestamp`',
-            self::ASCHILD   => '`timestamp` DIV 60',
-            self::MINUTE    => '`timestamp` DIV (60 * %d)',
-            self::HOUR      => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%H") DIV %d',
-            self::DAY       => 'FROM_UNIXTIME(`timestamp`, "%%Y%%j") DIV %d',
-            self::WEEK      => 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d',
-            self::MONTH     => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d',
-            self::QUARTER   => 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)',
-            self::YEAR      => 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d',
-            self::LAST      => '`timestamp`',
-            self::READLAST  => '`timestamp`',
-            self::ALL       => '`timestamp`',
-        );
-        return sprintf($GroupBy[$this->period[1]], $this->period[0]);
+        return sprintf(self::$Grouping[$this->period[1]][1], $this->period[0]);
     }
 
     /**
@@ -954,7 +941,7 @@ abstract class Channel {
         if ($this->period[1] == self::ALL) return;
 
         // Read one period before real start for meter calculation
-        $start = $this->start - $this->period[0] * $this->GroupingPeriod[$this->period[1]];
+        $start = $this->start - $this->period[0] * self::$Grouping[$this->period[1]][0];
         // End is midnight > minus 1 second
         $q->filter('timestamp', array('bt' => array($start, $this->end-1)));
     }
