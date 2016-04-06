@@ -27,7 +27,7 @@ class RS485 extends \Channel
         $data = explode(' ', $request['data']);
 
         // Something went wrong...
-        if (count($data) < 2) return 0;
+        if (count($data) < 5) return 0;
 
         // Timestamp is in $data[0] + $data[1]
         $datetime  = implode(' ', array_splice($data, 0, 2));

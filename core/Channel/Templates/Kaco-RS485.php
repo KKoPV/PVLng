@@ -122,7 +122,7 @@ return array(
             'channel'     => 2,
             'numeric'     => 0,
             'tags'        => 'The following JSON map object will translate the numeric reading value during write to textual representation (ALL IN ONE LINE).'."\n\n"
-                            .'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"MPP","5":"MPP","6":"Wait","7":"Wait","8":"Wait","10":"Overheated off","11":"Overheated","12":"Overload shutdown","13":"Overload shutdown L1","14":"Grid failure","15":"Transition for night","18":"RCD A off","19":"Insulation resistance","30":"Error measurement","31":"RCD B error","32":"Error self-test","33":"Error DC","34":"Error com."}'
+                            .'WRITEMAP::{"0":"Startup","1":"Startup","2":"Shutdown","3":"MPP","4":"MPP","5":"MPP","6":"Wait","7":"Wait","8":"Wait","10":"Overheated off","11":"Overheated","12":"Overload shutdown","13":"Overload shutdown L1","14":"Grid failure","15":"Transition for night","18":"RCD A off","19":"Insulation resistance","30":"Error measurement","31":"RCD B error","32":"Error self-test","33":"Error DC","34":"Error com."}'
         ),
 
         array(

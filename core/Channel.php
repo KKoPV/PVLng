@@ -477,45 +477,55 @@ abstract class Channel {
                   ->group('g');
             }
 
-            $this->filterReadTimestamp($q);
             $q->filter('id', $this->entity)->order('timestamp');
+
+            $this->filterReadTimestamp($q);
 
             // Use bufferd result set
             $this->db->setBuffered();
-            $last = 0;
 
             if ($res = $this->db->query($q)) {
 
-                if ($this->meter && ($first = $res->fetch_assoc())) {
-                    $offset = $first['data'];
-                } else {
-                    $first = true;
-                }
+                if ($this->meter) {
+                    // Fetch 1st row for reference
+                    if ($row = $res->fetch_assoc()) {
+                        // Remember offset for further readings
+                        $offset = $row['data'];
 
-                while ($first && ($row = $res->fetch_assoc())) {
+                        // If 1st reading is inside the selected period,
+                        // store a zero value at 1st position!
+                        if ($row['timestamp'] >= $this->start) {
+                            $row['data'] = 0;
+                            $this->writeReadingToBuffer($buffer, $row);
+                        }
 
-                    if ($this->meter) {
-                        $row['data'] -= $offset;
-                        $row['min']  -= $offset;
-                        $row['max']  -= $offset;
-                        // calc consumption from previous max value
-                        $row['consumption'] = $row['data'] - $last;
-                        $last = $row['data'];
-                    } else {
-                        $row['consumption'] = 0;
+                        // Read remaining rows
+                        $last = 0;
+                        while ($row = $res->fetch_assoc()) {
+                            // Correcvt reading values by offset
+                            $row['data'] -= $offset;
+                            $row['min']  -= $offset;
+                            $row['max']  -= $offset;
+
+                            // calc consumption from previous max value
+                            $row['consumption'] = $row['data'] - $last;
+                            $last = $row['data'];
+
+                            $this->writeReadingToBuffer($buffer, $row);
+                        }
                     }
-
-                    // remove grouping value and save
-                    $id = $row['g'];
-                    unset($row['g']);
-                    $buffer->write($row, $id);
+                } else {
+                    // Use all readings as is
+                    while ($row = $res->fetch_assoc()) {
+                        $this->writeReadingToBuffer($buffer, $row);
+                    }
                 }
 
                 // Don't forget to close for buffered results!
                 $res->close();
             }
 
-            $this->db->setBuffered(FALSE);
+            $this->db->setBuffered(false);
         }
 
         $this->SQLHeader($request, $q);
@@ -530,14 +540,14 @@ abstract class Channel {
         $tag = strtolower($tag);
         return array_key_exists($tag, $this->_tags)
              ? $this->_tags[$tag]
-             : NULL;
+             : null;
     }
 
     /**
      *
      */
     public function __destruct() {
-        $time = (microtime(TRUE) - $this->time) * 1000;
+        $time = (microtime(true) - $this->time) * 1000;
 
         if (!headers_sent()) Header(sprintf('X-Query-Time: %d ms', $time));
 
@@ -589,15 +599,15 @@ abstract class Channel {
     /**
      *
      */
-    protected $table = array(
-        'pvlng_reading_str', // numeric == 0
-        'pvlng_reading_num', // numeric == 1
-    );
+    protected static $cache;
 
     /**
      *
      */
-    protected static $cache;
+    protected $table = array(
+        'pvlng_reading_str', // numeric == 0
+        'pvlng_reading_num', // numeric == 1
+    );
 
     /**
      *
@@ -736,7 +746,7 @@ abstract class Channel {
             $this->value = preg_replace('~[^0-9.eE-]~', '', $this->value);
 
             // Interpret empty numeric value as invalid and ignore them
-            if ($this->value == '') throw new Exception(NULL, 200);
+            if ($this->value == '') throw new \Exception(null, 200);
 
             $this->value = +$this->value;
 
@@ -767,7 +777,7 @@ abstract class Channel {
             $this->value += $this->offset;
 
             if ($this->meter AND $this->value == $this->lastReading) {
-                throw new Exception('Ignore meter values which are equal last reading', 200);
+                throw new \Exception('Ignore meter values which are equal last reading', 200);
             }
         }
     }
@@ -958,9 +968,21 @@ abstract class Channel {
     }
 
     /**
+     * Shortcut method to save cleaned reading to buffer
+     */
+    protected function writeReadingToBuffer(&$buffer, array $data)
+    {
+        // Remember and remove grouping column and save
+        $id = $data['g'];
+        unset($data['g']);
+        $buffer->write($data, $id);
+    }
+
+    /**
      * Shortcut method for save array access
      */
-    protected function array_value(array $array, $key, $default=null) {
+    protected function array_value(array $array, $key, $default=null)
+    {
         return array_key_exists($key, $array) ? $array[$key] : $default;
     }
 
