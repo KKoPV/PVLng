@@ -165,10 +165,10 @@ $(function() {
 
     $('.language').click(function(e) {
         e.preventDefault();
-        /* Detect if there is already parameters in URL */
-        var sep = (window.location.search == '') ? '?' : '&';
-        window.location = window.location + sep + 'lang=' + $(this).data('lang');
-        return false;
+        location = '/' + location.search +
+                   // Detect if there are already parameters in URL
+                   (location.search == '' ? '?' : '&') +
+                   'lang=' + $(this).data('lang');
     });
 
     shortcut.add('Shift+F1', function() { window.location = '/'; });

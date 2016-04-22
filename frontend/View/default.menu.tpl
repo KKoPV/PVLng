@@ -88,7 +88,7 @@
                     <ul>
                         <!-- BEGIN LANGUAGES -->
                         <li>
-                        <a class="language" data-lang="{CODE}" href="?lang={CODE}">
+                        <a class="language" data-lang="{CODE}" href="/?lang={CODE}">
                             <img src="/images/pix.gif" class="flag flag-{ICON}" style="margin-right:10px">
                             {LABEL}
                         </a>

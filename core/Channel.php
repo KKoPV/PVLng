@@ -496,6 +496,7 @@ abstract class Channel {
                         // store a zero value at 1st position!
                         if ($row['timestamp'] >= $this->start) {
                             $row['data'] = 0;
+                            $row['consumption'] = 0;
                             $this->writeReadingToBuffer($buffer, $row);
                         }
 
