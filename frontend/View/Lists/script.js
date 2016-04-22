@@ -53,6 +53,9 @@ function updateList() {
             /* pop out 1st row with attributes */
             channel = data.shift();
 
+            /* Meter channel have an add. "empty" row at the beginning! */
+            if (channel.meter) data.shift();
+
             /* Only real channels allow deletion for readings */
             if (channel.childs == 0 && channel.write == 1) {
                 /* Prepare delete icon */
