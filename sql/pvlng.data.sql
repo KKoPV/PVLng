@@ -50,7 +50,8 @@ INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `descrip
 ('model', 'Daylight', 'SunsetIcon', '/images/sunset.png', 40, 'Sunset marker image', '', ''),
 ('model', 'Daylight', 'ZenitIcon', '/images/zenit.png', 50, 'Sun zenit marker image', '', ''),
 ('model', 'Estimate', 'Marker', '/images/energy.png', 0, 'Marker image', '', ''),
-('model', 'History', 'AverageDays', '5', 0, 'Build average over the last ? days', 'num', '');
+('model', 'History', 'AverageDays', '5', 0, 'Build average over the last ? days', 'num', ''),
+('model', 'InternalCalc', 'LifeTime', '60', 0, 'Buffer lifetime of calculated data in seconds<br /><small>(e.g. if your store most data each 5 minutes, set to 300 and so on)</small>', 'num', '');
 
 INSERT INTO `pvlng_tree` (`id`, `lft`, `rgt`, `entity`) VALUES
 (1, 1, 12, 1), (2, 2, 3, 2), (3, 4, 5, 3), (4, 6, 11, 4), (5, 7, 10, 5), (6, 8, 9, 2);

@@ -165,7 +165,9 @@ $(function() {
 
     $('.language').click(function(e) {
         e.preventDefault();
-        location = '/' + location.search +
+        /* Rebuild location string */
+        location = location.protocol + '//' + location.hostname +
+                   location.pathname + location.search +
                    // Detect if there are already parameters in URL
                    (location.search == '' ? '?' : '&') +
                    'lang=' + $(this).data('lang');

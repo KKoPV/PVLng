@@ -22,7 +22,8 @@ class Settings extends SettingsBase {
     /**
      *
      */
-    public function checkValueType( $scope, $name, $key, $value ) {
+    public function checkValueType($scope, $name, $key, $value)
+    {
         $this->reset()
              ->filterByScopeNameKey($scope, $name, $key)
              ->findOne();
@@ -37,28 +38,32 @@ class Settings extends SettingsBase {
     /**
      *
      */
-    public function getCoreValue( $name, $key ) {
-        return $this->getScopeValue('core', $name, $key);
+    public function getCoreValue($name, $key, $default=null)
+    {
+        return $this->getScopeValue('core', $name, $key, $default);
     }
 
     /**
      *
      */
-    public function getControllerValue( $name, $key ) {
-        return $this->getScopeValue('controller', $name, $key);
+    public function getControllerValue($name, $key, $default=null)
+    {
+        return $this->getScopeValue('controller', $name, $key, $default);
     }
 
     /**
      *
      */
-    public function getModelValue( $name, $key ) {
-        return $this->getScopeValue('model', $name, $key);
+    public function getModelValue($name, $key, $default=null)
+    {
+        return $this->getScopeValue('model', $name, $key, $default);
     }
 
     /**
      *
      */
-    public function getSunrise( $day ) {
+    public function getSunrise($day)
+    {
         $lat = $this->getScopeValue('core', '', 'Latitude');
         $lon = $this->getScopeValue('core', '', 'Longitude');
         $zenith = 90 + 5/6;
@@ -68,7 +73,8 @@ class Settings extends SettingsBase {
     /**
      *
      */
-    public function getSunset( $day ) {
+    public function getSunset($day)
+    {
         $lat = $this->getScopeValue('core', '', 'Latitude');
         $lon = $this->getScopeValue('core', '', 'Longitude');
         $zenith = 90 + 5/6;
@@ -78,12 +84,10 @@ class Settings extends SettingsBase {
     /**
      *
      */
-    protected function getScopeValue( $scope, $name, $key ) {
-        return $this->reset()
-                    ->filterByScopeNameKey($scope, $name, $key)
-                    ->findOne()
-                    ->getValue();
+    protected function getScopeValue($scope, $name, $key, $default=null)
+    {
+        $this->reset()->filterByScopeNameKey($scope, $name, $key)->findOne();
+        return $this->getKey() ? $this->getValue() : $default;
     }
-
 
 }
