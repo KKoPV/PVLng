@@ -52,9 +52,9 @@ class SensorToMeter extends InternalCalc {
 
             $child = $this->getChild(1);
 
-            if ($child->childs == 0) {
+            if (!$child->childs) {
                 // Calc direct inside database, if child is a real channel
-                $this->db->query('CALL pvlng_model_sensortometer({1}, {2})', $this->entity, $this->getChild(1)->entity);
+                $this->db->query('CALL pvlng_model_sensortometer({1}, {2})', $this->entity, $child->entity);
             } else {
                 // Calc in PHP
                 // Read out all data
@@ -62,7 +62,7 @@ class SensorToMeter extends InternalCalc {
 
                 $last = $sum = 0;
 
-                foreach ($this->getChild(1)->read($request) as $row) {
+                foreach ($child->read($request) as $row) {
                     $sum += $last ? ($row['timestamp'] - $last) / 3600 * $row['data'] : 0;
                     $last = $row['timestamp'];
                     $this->saveValue($last, $sum);

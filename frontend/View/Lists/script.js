@@ -53,9 +53,6 @@ function updateList() {
             /* pop out 1st row with attributes */
             channel = data.shift();
 
-            /* Meter channel have an add. "empty" row at the beginning! */
-            if (channel.meter) data.shift();
-
             /* Only real channels allow deletion for readings */
             if (channel.childs == 0 && channel.write == 1) {
                 /* Prepare delete icon */
@@ -80,7 +77,7 @@ function updateList() {
                         /* These 3 columns are hidden for non-numeric channels */
                         channel.numeric ? +row.min.toFixed(channel.decimals) : null,
                         channel.numeric ? +row.max.toFixed(channel.decimals) : null,
-                        channel.numeric ? +row.consumption.toFixed(channel.decimals) : null,
+                        channel.numeric && channel.meter ? +row.consumption.toFixed(channel.decimals) : null,
                         row.count,
                         delbtn
                     ],
