@@ -17,7 +17,8 @@ namespace ORM;
 /**
  *
  */
-class Settings extends SettingsBase {
+class Settings extends SettingsBase
+{
 
     /**
      *
@@ -31,63 +32,76 @@ class Settings extends SettingsBase {
         switch ($this->getType()) {
             case 'num':  return is_numeric($value);
             case 'bool': return (is_numeric($value) AND ($value == 0 OR $value == 1));
-            default:     return TRUE;
+            default:     return true;
         }
     }
 
     /**
      *
      */
-    public function getCoreValue($name, $key, $default=null)
+    public static function getCoreValue($name, $key, $default=null)
     {
-        return $this->getScopeValue('core', $name, $key, $default);
+        return self::getScopeValue('core', $name, $key, $default);
     }
 
     /**
      *
      */
-    public function getControllerValue($name, $key, $default=null)
+    public static function getControllerValue($name, $key, $default=null)
     {
-        return $this->getScopeValue('controller', $name, $key, $default);
+        return self::getScopeValue('controller', $name, $key, $default);
     }
 
     /**
      *
      */
-    public function getModelValue($name, $key, $default=null)
+    public static function getModelValue($name, $key, $default=null)
     {
-        return $this->getScopeValue('model', $name, $key, $default);
+        return self::getScopeValue('model', $name, $key, $default);
     }
 
     /**
      *
      */
-    public function getSunrise($day)
+    public static function getSunrise($day)
     {
-        $lat = $this->getScopeValue('core', '', 'Latitude');
-        $lon = $this->getScopeValue('core', '', 'Longitude');
-        $zenith = 90 + 5/6;
-        return date_sunrise($day, SUNFUNCS_RET_TIMESTAMP, +$lat, +$lon, $zenith, date('Z')/3600);
+        return date_sunrise(
+            $day,
+            SUNFUNCS_RET_TIMESTAMP,
+            +self::getScopeValue('core', '', 'Latitude'),
+            +self::getScopeValue('core', '', 'Longitude'),
+            90 + 5/6,
+            date('Z')/3600
+        );
     }
 
     /**
      *
      */
-    public function getSunset($day)
+    public static function getSunset($day)
     {
-        $lat = $this->getScopeValue('core', '', 'Latitude');
-        $lon = $this->getScopeValue('core', '', 'Longitude');
-        $zenith = 90 + 5/6;
-        return date_sunset($day, SUNFUNCS_RET_TIMESTAMP, +$lat, +$lon, $zenith, date('Z')/3600);
+        return date_sunset(
+            $day,
+            SUNFUNCS_RET_TIMESTAMP,
+            +self::getScopeValue('core', '', 'Latitude'),
+            +self::getScopeValue('core', '', 'Longitude'),
+            90 + 5/6,
+            date('Z')/3600
+        );
     }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
 
     /**
      *
      */
-    protected function getScopeValue($scope, $name, $key, $default=null)
+    protected static function getScopeValue($scope, $name, $key, $default=null)
     {
-        $this->reset()->filterByScopeNameKey($scope, $name, $key)->findOne();
-        return $this->getKey() ? $this->getValue() : $default;
+        $self = new self;
+        $self->filterByScopeNameKey($scope, $name, $key)->findOne();
+        return $self->getKey() ? $self->getValue() : $default;
     }
 
 }

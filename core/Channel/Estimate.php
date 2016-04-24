@@ -21,19 +21,12 @@ class Estimate extends InternalCalc {
     /**
      *
      */
-    protected $settings;
-
-    /**
-     *
-     */
     protected function __construct( \ORM\Tree $channel ) {
         parent::__construct($channel);
         // Fake as counter to get the sum of estiamtes for periods greater than day
         $this->counter = TRUE;
 
-        $this->settings = new \ORM\Settings;
-
-        if ($marker = $this->settings->getModelValue('Estimate', 'Marker')) {
+        if ($marker = \ORM\Settings::getModelValue('Estimate', 'Marker')) {
             $this->attributes['marker'] = $marker;
         }
     }
@@ -73,7 +66,7 @@ class Estimate extends InternalCalc {
             $month = date('n',   $timestamp);
             $day   = date('n-j', $timestamp);
 
-            if (!($ts = $this->settings->getSunset($timestamp))) {
+            if (!($ts = \ORM\Settings::getSunset($timestamp))) {
                 // Round between 16:00 and 21:30 during the year in seconds
                 $ts = (16 + sin((date('z', $timestamp)+10) * M_PI / 366) * 5.5) *60*60;
                 // Move into this day using date functions for server time offsets

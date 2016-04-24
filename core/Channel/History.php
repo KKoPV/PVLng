@@ -57,8 +57,7 @@ class History extends InternalCalc {
             $q->get($q->SUM('data'), 'data');
         } else {
 
-            $settings = new \ORM\Settings;
-            switch ($settings->getModelValue('History', 'Average')) {
+            switch (\ORM\Settings::getModelValue('History', 'Average')) {
                 default:
                     // Linear average
                     $q->get($q->AVG('data'), 'data');

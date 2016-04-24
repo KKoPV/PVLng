@@ -97,7 +97,7 @@ class Daylight extends InternalCalc {
                   ->filter('id', \Channel::byGUID($this->extra)->entity)
                   ->group('`timestamp` DIV 86400');
 
-            $mean = ($this->settings->getModelValue('Daylight', 'Average') == 0)
+            $mean = (\ORM\Settings::getModelValue('Daylight', 'Average') == 0)
                   ? /* Select harmonic mean   */ 'COUNT(`data`)/SUM(1/`data`)'
                   : /* Select arithmetic mean */ 'AVG(`data`)';
 
@@ -106,14 +106,14 @@ class Daylight extends InternalCalc {
                   ? $this->period[0] * $sec
                   : 60;
 
-            $timeback = $this->settings->getModelValue('Daylight', 'CurveDays')*24*60*60;
+            $timeback = \ORM\Settings::getModelValue('Daylight', 'CurveDays', 5)*24*60*60;
         }
 
         $day = $this->start;
 
         do {
-            $sunrise = $this->settings->getSunrise($day);
-            $sunset  = $this->settings->getSunset($day);
+            $sunrise = \ORM\Settings::getSunrise($day);
+            $sunset  = \ORM\Settings::getSunset($day);
             $noon    = ($sunrise + $sunset) / 2;
 
             if (!$this->numeric) {
@@ -121,17 +121,17 @@ class Daylight extends InternalCalc {
                 $this->saveValue(
                     $sunrise,
                     date('H:i', $sunrise) . '|'
-                  . $this->settings->getModelValue('Daylight', 'SunriseIcon')
+                  . \ORM\Settings::getModelValue('Daylight', 'SunriseIcon')
                 );
                 $this->saveValue(
                     $noon,
                     date('H:i', $noon) . '|'
-                  . $this->settings->getModelValue('Daylight', 'ZenitIcon')
+                  . \ORM\Settings::getModelValue('Daylight', 'ZenitIcon')
                 );
                 $this->saveValue(
                     $sunset,
                     date('H:i', $sunset) . '|'
-                  . $this->settings->getModelValue('Daylight', 'SunsetIcon')
+                  . \ORM\Settings::getModelValue('Daylight', 'SunsetIcon')
                 );
 
             } else {

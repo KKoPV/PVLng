@@ -88,7 +88,7 @@ abstract class InternalCalc extends Channel {
                            // Buffer data in the past (before today) for 1 day
                             ? 86400
                            // Use configration setting
-                            : \ORM::forge('Settings')->getModelValue('InternalCalc', 'LifeTime', 60);
+                            : \ORM\Settings::getModelValue('InternalCalc', 'LifeTime', 60);
         }
 
         $sql = $this->db->sql(

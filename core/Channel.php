@@ -809,7 +809,7 @@ abstract class Channel {
             // Start ? days backwards
             $request['start'] = 'midnight -'.$args[1].'days';
         } elseif (preg_match('~^sunrise(?:[;-](\d+))*~', $request['start'], $args)) {
-            $request['start'] = (new \ORM\Settings)->getSunrise($this->time);
+            $request['start'] = \ORM\Settings::getSunrise($this->time);
             if (isset($args[1])) $request['start'] -= $args[1]*60;
         }
         $this->start = is_numeric($request['start']) ? $request['start'] : strtotime($request['start']);
@@ -827,7 +827,7 @@ abstract class Channel {
         } elseif (preg_match('~^-(\d+)$~', $request['end'], $args)) {
             $request['end'] = 'midnight -'.$args[1].'days';
         } elseif (preg_match('~^sunset(?:[;+](\d+))*~', $request['end'], $args)) {
-            $request['end'] = (new \ORM\Settings)->getSunset($this->time);
+            $request['end'] = \ORM\Settings::getSunset($this->time);
             if (isset($args[1])) $request['end'] += $args[1]*60;
         }
         $this->end = is_numeric($request['end']) ? $request['end'] : strtotime($request['end']);
