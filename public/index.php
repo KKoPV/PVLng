@@ -258,25 +258,30 @@ $app->hook('slim.before.dispatch', function() use ($app) {
     if (isset($route->Language)) {
         $app->Language = $route->Language;
     } else {
-        // ---------------------------------------------------------------------------
+        // -------------------------------------------------------------------
         // Detect language to use
-        // ---------------------------------------------------------------------------
-        // 1st the default
-        $lang = $app->config->get('Core.Language', 'en');
-
-        // 2nd Check accepted languages
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            foreach (explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) as $l) {
-                $l = explode('-', $l);
-                if ($l[0] == 'en' OR $l[0] == 'de') {
-                    $lang = $l[0];
-                    break;
+        // -------------------------------------------------------------------
+        if ($lang = $app->request()->get('lang')) {
+            $app->Language = $lang;
+        } elseif (array_key_exists('language', $_COOKIE)) {
+            // Check cookie
+            $app->Language = $_COOKIE['language'];
+        } else {
+            $lang = '';
+            // Check accepted languages
+            if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+                foreach (explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) as $l) {
+                    $l = explode('-', $l);
+                    if ($l[0] == 'en' OR $l[0] == 'de') {
+                        $lang = $l[0];
+                        break;
+                    }
                 }
             }
+            $app->Language = $lang ?: $app->config->get('Core.Language', 'en');
         }
 
-        // 3rd check the request parameters
-        $app->Language = Session::checkRequest('lang', $lang) ?: 'en';
+        setcookie('language', $app->Language, time()+30*24*60*60);
     }
 
     I18N::setLanguage($app->Language);

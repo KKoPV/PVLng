@@ -64,6 +64,7 @@ class Admin extends \Controller {
     public function Logout_Action() {
         // Remember messages
         $msgs = \Session::get(\Messages::$SessionVar);
+        setcookie(\Session::token(), null, time()-4200, '/');
         \Session::destroy();
         \Session::start();
         \Session::regenerate();

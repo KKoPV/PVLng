@@ -156,12 +156,12 @@ abstract class Session {
         self::__dbg('Destroy "%s" = "%s"', session_name(), session_id());
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
-            setcookie(session_name(), '', time()-42000,
+            setcookie(session_name(), '', time()-4200,
                 $params["path"], $params["domain"],
                 $params["secure"], $params["httponly"]
             );
         }
-        $_SESSION = array(); //destroy all of the session variables
+        $_SESSION = array(); // destroy all of the session variables
         self::close();
         return @session_destroy();
     }
