@@ -185,6 +185,6 @@
 
 <br />
 
-<input type="submit" value="{{Save}}" />
+<button><i class="fa fa-floppy-o"></i> &nbsp; {{Save}}</button>
 
 </form>

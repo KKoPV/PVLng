@@ -63,9 +63,7 @@
         <th class="r">{{Maximum}}</th>
         <th class="r">{{Production}} / {{Consumption}}</th>
         <th class="r tip" title="{{RowCountHint}}">{{RowCount}}</th>
-        <th>
-            <img src="/images/ico/minus_circle.png" class="ico tip" style="margin-right:-7px" title="{{DeleteReading}}">
-        </th>
+        <th></th>
     </tr>
     </thead>
 
@@ -81,6 +79,12 @@
     </tr>
     </tfoot>
 </table>
+
+<!-- Legend -->
+
+<div class="icons legendtip">
+    <i class="fa fa-trash"></i>{{DeleteReading}}
+</div>
 
 <div style="display:none">
     <!-- Extra content for dataTable sDom -->

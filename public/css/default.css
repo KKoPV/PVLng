@@ -175,7 +175,8 @@ img.ico {
     height: 16px;
 }
 
-.icons img {
+.icons img,
+.icons .fa {
     width: 16px;
     height: 16px;
     margin-left: 3px;

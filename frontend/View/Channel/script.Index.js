@@ -149,7 +149,7 @@ $(function() {
     });
 
     /* Bind click listener to all GUID images */
-    $('.guid', '#entities tbody').click(function() {
+    $('.guid', '#entities tbody').addClass('btn').click(function() {
         $.alert(
             $('<input/>')
                 .addClass('guid')

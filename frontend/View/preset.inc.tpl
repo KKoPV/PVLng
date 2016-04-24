@@ -9,9 +9,8 @@
  */
 -->
 
-<img src="/images/pix.gif" data-src="/images/ico/arrow-switch.png"
-     class="def ico tipbtn" style="margin-right:.5em"
-     onclick="$('.p-select').toggle();" tip="{{UseOwnConsolidation}}" />
+<i class="fa fa-random tipbtn" style="margin-right:.5em"
+     onclick="$('.p-select').toggle();" tip="{{UseOwnConsolidation}}" /></i>
 <span class="p-select">{PRESETSELECT}</span>
 
 <span class="p-select" style="display:none">

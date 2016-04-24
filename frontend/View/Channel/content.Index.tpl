@@ -20,9 +20,9 @@
         <th class="l">{{Unit}}</th>
         <th class="l">{{Type}}</th>
         <th class="l">{{Serial}}</th>
-        <th><i class="ico node-select-all tip" title="Used # times in channel hierarchy"></i></th>
-        <th><i class="ico drive"></i></th>
-        <th><i class="ico information-frame tip" tip="#IconLegend"></i></th>
+        <th><i class="fa fa-list-ol" title="Used # times in channel hierarchy"></i></th>
+        <th><i class="fa fa-database"></i></th>
+        <th></th>
     </tr>
     </thead>
 
@@ -47,10 +47,10 @@
             <!-- INCLUDE channeltype.inc.tpl -->
         </td>
         <td>
-            <a href="/channel/edit/{ID}" class="ico node-design"></a>
-            <a href="/channel/add/{ID}" class="ico node-select-child"></a>
+            <a href="/channel/edit/{ID}" class="fa fa-fw fa-pencil btn"></a>
+            <a href="/channel/add/{ID}" class="fa fa-fw fa-clone btn"></a>
             <!-- IF {READ} -->
-                <a href="/list/{ID}" class="ico document-invoice"></a>
+                <a href="/list/{ID}" class="fa fa-fw fa-file-text btn"></a>
             <!-- ELSE -->
                 <i class="ico pix"></i>
             <!-- ENDIF -->
@@ -58,10 +58,10 @@
                 <!-- Can't delete channels assigned in channel hierarchy -->
                 <i class="ico pix"></i>
             <!-- ELSE -->
-                <i class="ico node-delete"></i>
+                <i class="node-delete fa fa-fw fa-trash"></i>
             <!-- ENDIF -->
             <!-- IF {GUID} -->
-                <i class="ico license-key guid btn" data-guid="{GUID}"></i>
+                <i class="guid fa fa-fw fa-key fa-rotate-90" data-guid="{GUID}"></i>
             <!-- ENDIF -->
         </td>
     </tr>
@@ -77,27 +77,24 @@
         <th></th>
         <th></th>
         <th></th>
-        <th></th>
-        <th class="icons" colspan="2">
-            <i class="ico information-frame tip" tip="#IconLegend"></i>
-        </th>
+        <th colspan="3"></th>
     </tr>
     </tfoot>
 </table>
 
 <!-- Legend -->
 
-<div id="IconLegend">
-    <div class="icons legendtip">
-        <i class="ico drive-globe"></i>{{ReadWritableEntity}}<br />
-        <i class="ico drive--pencil"></i>{{WritableEntity}}<br />
-        <i class="ico drive--arrow"></i>{{ReadableEntity}}<br />
-        <i class="ico node-design"></i>{{EditEntity}}<br />
-        <i class="ico node-select-child"></i>{{CloneEntity}}<br />
-        <i class="ico document-invoice"></i>{{ListHint}}<br />
-        <i class="ico node-delete"></i>{{DeleteEntityHint}}<br />
-        <i class="ico license-key"></i>{{ShowGUID}}
-    </div>
+<div class="icons legendtip">
+    <i class="fa fa-arrows-alt"></i>{{ReadWritableEntity}} &nbsp;
+    <i class="fa fa-download"></i>{{WritableEntity}} &nbsp;
+    <i class="fa fa-upload"></i>{{ReadableEntity}} &nbsp;
+
+    <i class="fa fa-pencil"></i>{{EditEntity}} &nbsp;
+    <i class="fa fa-clone"></i>{{CloneEntity}} &nbsp;
+    <i class="fa fa-trash"></i>{{DeleteEntityHint}} &nbsp;
+
+    <i class="fa fa-file-text"></i>{{ListHint}} &nbsp;
+    <i class="fa fa-key fa-rotate-90"></i>{{ShowGUID}}
 </div>
 
 <!-- Dialogs -->

@@ -28,10 +28,8 @@
             <tr>
                 <th>{{EntityType}}</th>
                 <th style="white-space:nowrap">{{ExampleUnit}}</th>
-                <th><i class="ico node-select-all tip" title="{{AcceptChildCount}}"></i></th>
-                <th class="icons">
-                    <i class="ico information-frame tip" style="margin-right:-5px" tip="#IconLegend"></i>
-                </th>
+                <th><i class="fa fa-list-ol" title="{{AcceptChildCount}}"></i></th>
+                <th></th>
                 <th>{{Description}}</th>
                 <th>{{Select}}</th>
             </tr>
@@ -71,6 +69,14 @@
 
         </table>
 
+        <!-- Legend -->
+
+        <div class="icons legendtip">
+            <i class="fa fa-arrows-alt"></i>{{ReadWritableEntity}} &nbsp;
+            <i class="fa fa-download"></i>{{WritableEntity}} &nbsp;
+            <i class="fa fa-upload"></i>{{ReadableEntity}} &nbsp;
+        </div>
+
     </div>
 
     <div id="template">
@@ -108,22 +114,16 @@
 
             <tfoot>
             <tr>
-                <th class="l i" colspan="3">{{AdjustTemplateAfterwards}}</th>
+                <th class="l i" colspan="3"></th>
             </tr>
             </tfoot>
 
         </table>
 
+        <div class="icons legendtip">
+            {{AdjustTemplateAfterwards}}
+        </div>
+
     </div>
 
-</div>
-
-<!-- Legend -->
-
-<div id="IconLegend">
-    <div class="icons legendtip">
-        <i class="ico drive-globe"></i>{{ReadWritableEntity}}<br />
-        <i class="ico drive--pencil"></i>{{WritableEntity}}<br />
-        <i class="ico drive--arrow"></i>{{ReadableEntity}}
-    </div>
 </div>

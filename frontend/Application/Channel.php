@@ -8,9 +8,10 @@
  */
 
 $app->hook('slim.before', function() use ($app) {
-    $app->menu->add('10.20',    '/channel',     'Channels',      !!$app->user, 'Shift+F3');
-    $app->menu->add('10.20.10', '/channel/add', 'CreateChannel', !!$app->user);
-    $app->menu->add('10.20.20', '/channel/template', 'CreateFromTemplate', !!$app->user);
+    $app->menu->add('10.20',    '#',                 'Channels',           !!$app->user);
+    $app->menu->add('10.20.10', '/channel',          'ChannelList',        !!$app->user, 'Shift+F3');
+    $app->menu->add('10.20.20', '/channel/add',      'CreateChannel',      !!$app->user);
+    $app->menu->add('10.20.30', '/channel/template', 'CreateFromTemplate', !!$app->user);
 });
 
 /**
