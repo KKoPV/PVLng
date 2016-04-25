@@ -9,7 +9,8 @@
 body {
     max-width: 1200px;
     margin: 0 auto;
-    font-family: Verdana, Arial, sans-serif;
+    /* Imprima load via font cache - https://jaicab.com/localFont/ */
+    font-family: Imprima, Arial, sans-serif;
     font-size: 90%;
 }
 

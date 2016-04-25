@@ -1,9 +1,9 @@
 <!--
 /**
- *
+ * Default page header
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
+ * @copyright   2012-2016 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
@@ -17,10 +17,12 @@
         </a>
         <div class="b" style="margin-left:120px">
             <!-- IF {VERSIONNEW} -->
-            v{VERSION}<br /><br />
-            <a href="https://github.com/KKoPV/PVLng/releases/tag/v{VERSIONNEW}" class="tip" style="color:red" title="Changelog">
-                v{VERSIONNEW}
-            </a>
+            <p>v{VERSION}</p>
+            <p>
+                <a href="https://github.com/KKoPV/PVLng/releases/tag/v{VERSIONNEW}" class="tip" style="color:red" title="Changelog">
+                    v{VERSIONNEW}
+                </a>
+            </p>
             <!-- ENDIF -->
         </div>
     </div>
