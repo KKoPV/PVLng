@@ -3,11 +3,12 @@
  * Translation class
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-abstract class I18N {
+abstract class I18N
+{
 
     /**
      * Namespace separator
@@ -17,44 +18,61 @@ abstract class I18N {
     /**
      *
      */
-    public static function setBabelKit( BabelKit $bk ) {
+    public static function setBabelKit(BabelKit $bk)
+    {
         self::$bk = $bk;
     }
 
     /**
      *
      */
-    public static function setBBCode( BBCode $bbcode ) {
+    public static function setBBCode(BBCode $bbcode)
+    {
         self::$bbcode = $bbcode;
-        self::$bbcode->SetEnableSmileys(FALSE);
+        self::$bbcode->SetEnableSmileys(false);
         self::$bbcode->ClearSmileys();
-        self::$bbcode->AddRule('tt', array(
-            'simple_start' => '<tt>',
-            'simple_end' => '</tt>',
-            'class' => 'inline',
-            'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link')
-        ));
+        self::$bbcode->AddRule(
+            'tt',
+            array(
+                'simple_start' => '<tt>',
+                'simple_end' => '</tt>',
+                'class' => 'inline',
+                'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link')
+            )
+        );
+        self::$bbcode->AddRule(
+            'small',
+            array(
+                'simple_start' => '<small>',
+                'simple_end' => '</small>',
+                'class' => 'inline',
+                'allow_in' => array('listitem', 'block', 'columns', 'inline', 'link')
+            )
+        );
     }
 
     /**
      *
      */
-    public static function setLanguage( $language ) {
+    public static function setLanguage($language)
+    {
         self::$language = $language;
     }
 
     /**
      *
      */
-    public static function setCodeSet() {
+    public static function setCodeSet()
+    {
         self::$code_sets = func_get_args();
     }
 
     /**
      *
      */
-    public static function setAddMissing( $add ) {
-        self::$add = $add;
+    public static function setAddMissing($add)
+    {
+        self::$add = !!$add;
     }
 
     /**
@@ -62,21 +80,24 @@ abstract class I18N {
      */
     public static function setMarkMissing(
         $mark='<span style="background-color:#FF9966">%s</span>'
-    ) {
+    )
+    {
         self::$mark = $mark;
     }
 
     /**
-     *
+     * Shortcut for translate()
      */
-    public static function _() {
+    public static function _()
+    {
         return call_user_func_array('I18N::translate', func_get_args());
     }
 
     /**
      *
      */
-    public static function translate( $str ) {
+    public static function translate($str)
+    {
         $fargs = func_get_args();
         $str = array_shift($fargs);
         $cnt = (isset($fargs[0]) AND intval($fargs[0]) == $fargs[0]) ? +$fargs[0] : FALSE;
