@@ -66,8 +66,14 @@ if (DEVELOP == 2) include CORE_DIR . DS . 'AOP.php';
 // ---------------------------------------------------------------------------
 // Let's go
 // ---------------------------------------------------------------------------
+Session::$tokenName = md5($_SERVER['HTTP_USER_AGENT']);
 Session::$debug = DEVELOP;
 Session::start();
+
+if (!Session::valid()) {
+    Session::destroy();
+    Session::start();
+}
 
 /**
  * Run in /public - fake SCRIPT_NAME for correct Slim routing
@@ -82,7 +88,7 @@ $app = new slimMVC\App(array(
 
 // If installed from GitHub, find branch and actual commit
 $head = file(ROOT_DIR.DS.'.git'.DS.'HEAD', FILE_IGNORE_NEW_LINES);
-if (!empty($head) AND preg_match('~: (.*?)([^/]+)$~', $head[0], $args)) {
+if (!empty($head) && preg_match('~: (.*?)([^/]+)$~', $head[0], $args)) {
     $app->view->PVLng_Branch = trim($args[2]);
     $app->view->PVLng_Commit = trim(file_get_contents(ROOT_DIR.DS.'.git'.DS.$args[1].$args[2]));
 }
@@ -158,12 +164,6 @@ $app->hook('slim.before', function() use ($app) {
         $app->cache->AppVersion = PVLNG_VERSION;
     }
 
-    if (isset($_COOKIE[Session::token()])) {
-        // Ok, remembered user
-        Session::set('user', (bool) $app->config->get('Core.Password'));
-        Controller\Admin::RememberLogin();
-    }
-
     I18N::setCodeSet('app');
     I18N::setAddMissing($app->config->get('I18N.Add'));
 
@@ -207,9 +207,9 @@ $app->hook('slim.before', function() use ($app) {
         return Localizer::toLocale($value);
     });
 
-    $app->user = Session::get('user');
+    $app->user = Session::loggedIn($app->config->get('Core.Password'));
 
-    $app->showStats = TRUE;
+    $app->showStats = true;
 
 }, 1);
 
@@ -224,23 +224,23 @@ $app->hook('slim.before.dispatch', function() use ($app) {
     /**
      * Check Admin config
      */
-    if ($app->config->get('Core.Password') == '' AND strpos($pattern, '/adminpass') === FALSE) {
+    if ($app->config->get('Core.Password') == '' && strpos($pattern, '/adminpass') === false) {
         $app->redirect('/adminpass');
     }
 
     /**
      * Check location
      */
-    if (($app->config->get('Core.Latitude') == '' OR $app->config->get('Core.Longitude') == '') AND
-        strpos($pattern, '/adminpass') === FALSE AND strpos($pattern, '/location') === FALSE) {
+    if (($app->config->get('Core.Latitude') == '' || $app->config->get('Core.Longitude') == '') &&
+        strpos($pattern, '/adminpass') === false && strpos($pattern, '/location') === false) {
         $app->redirect('/location');
     }
 
     /**
      * Check mobile client
      */
-    if (substr($pattern, 0,  2) != '/m' AND
-        substr($pattern, 0, 10) != '/infoframe' AND
+    if (substr($pattern, 0,  2) != '/m' &&
+        substr($pattern, 0, 10) != '/infoframe' &&
         $useragent = $app->request()->getUserAgent()) {
 
         // Remember User Agent and make not for every call the preg_match()...
@@ -272,7 +272,7 @@ $app->hook('slim.before.dispatch', function() use ($app) {
             if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                 foreach (explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']) as $l) {
                     $l = explode('-', $l);
-                    if ($l[0] == 'en' OR $l[0] == 'de') {
+                    if ($l[0] == 'en' || $l[0] == 'de') {
                         $lang = $l[0];
                         break;
                     }
@@ -280,7 +280,6 @@ $app->hook('slim.before.dispatch', function() use ($app) {
             }
             $app->Language = $lang ?: $app->config->get('Core.Language', 'en');
         }
-
         setcookie('language', $app->Language, time()+30*24*60*60);
     }
 
