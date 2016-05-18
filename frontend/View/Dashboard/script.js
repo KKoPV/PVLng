@@ -94,107 +94,98 @@ function updateCharts() {
         _log('Fetch: '+url);
 
 
-        $.getJSON(
-            url,
-            {
-                attributes: true,
-                full:       true,
-                period:     'last',
-                t:          date.getTime()
-            },
-            function(data) {
-                /* pop out 1st row with attributes */
-                var attr = data.shift();
+        $.getJSON(url, { attributes: true, full: true }, function(data) {
+            /* pop out 1st row with attributes */
+            var attr = data.shift();
 /*
-                _log('Attributes:', attr);
-                _log('Data:', data);
+            _log('Attributes:', attr);
+            _log('Data:', data);
 */
-                if (!data[0] || (date.getTime()/1000 - data[0].timestamp) > 600) {
-                    /* NO data row found or data older than 10 minuts */
-                    charts[chart_id] = undefined;
-                    $('#chart-'+chart_id)
-                        .empty()
-                        .append($('<div/>').addClass('chart-title').html(attr.name))
-                        .append($('<div/>').addClass('chart-subtitle').html(attr.description))
-                        .append($('<p />').addClass('chart-subtitle').html('{{NoDataAvailable}}'));
-                } else if (charts[chart_id] == undefined) {
-                    var options = $.extend({}, chartOptions, {
-                        chart:    { renderTo: 'chart-'+chart_id+'-chart', type: 'gauge' },
-                        title:    attr.unit, /* Suppress title */
-                        yAxis: {
-                            min: attr.valid_from,
-                            max: attr.valid_to,
-                            plotBands: []
+            if (!data[0] || (date.getTime()/1000 - data[0].timestamp) > 600) {
+                /* NO data row found or data older than 10 minuts */
+                charts[chart_id] = undefined;
+                $('#chart-'+chart_id)
+                    .empty()
+                    .append($('<div/>').addClass('chart-title').html(attr.name))
+                    .append($('<div/>').addClass('chart-subtitle').html(attr.description))
+                    .append($('<p />').addClass('chart-subtitle').html('{{NoDataAvailable}}'));
+            } else if (charts[chart_id] == undefined) {
+                var options = $.extend({}, chartOptions, {
+                    chart:    { renderTo: 'chart-'+chart_id+'-chart', type: 'gauge' },
+                    title:    attr.unit, /* Suppress title */
+                    yAxis: {
+                        min: attr.valid_from,
+                        max: attr.valid_to,
+                        plotBands: []
+                    },
+                    series: [{
+                        data: [null],
+                        dataLabels: {
+                            formatter: function() {
+                                var color = this.series.options.threshold !== ''
+                                    ? 'color:' + (this.y < this.series.options.threshold ? defaults.color.belowThreshold : defaults.color.aboveThreshold)
+                                    : '';
+                                return '<div style="text-align:center">' +
+                                       '<span style="font-size:125%;'+color+'">' +
+                                       Highcharts.numberFormat(this.y, attr.decimals, '{DSEP}', '{TSEP}') +
+                                       '</span><br/>' +
+                                       '<span style="font-size:110%;color:#A0A0A0">'+attr.unit+'</span>' +
+                                       '</div>';
+                            }
                         },
-                        series: [{
-                            data: [null],
-                            dataLabels: {
-                                formatter: function() {
-                                    var color = this.series.options.threshold !== ''
-                                        ? 'color:' + (this.y < this.series.options.threshold ? defaults.color.belowThreshold : defaults.color.aboveThreshold)
-                                        : '';
-                                    return '<div style="text-align:center">' +
-                                           '<span style="font-size:125%;'+color+'">' +
-                                           Highcharts.numberFormat(this.y, attr.decimals, '{DSEP}', '{TSEP}') +
-                                           '</span><br/>' +
-                                           '<span style="font-size:110%;color:#A0A0A0">'+attr.unit+'</span>' +
-                                           '</div>';
-                                }
-                            },
-                            threshold: attr.threshold /* Store threshold into options for formatter */
-                        }]
-                    });
+                        threshold: attr.threshold /* Store threshold into options for formatter */
+                    }]
+                });
 
-                    $('#chart-'+chart_id)
-                        .empty()
-                        .append($('<div/>').addClass('chart-title').html(attr.name))
-                        .append($('<div/>').addClass('chart-subtitle').html(attr.description))
-                        .append($('<div/>').prop('id', 'chart-'+chart_id+'-chart').addClass('chart-inner'));
+                $('#chart-'+chart_id)
+                    .empty()
+                    .append($('<div/>').addClass('chart-title').html(attr.name))
+                    .append($('<div/>').addClass('chart-subtitle').html(attr.description))
+                    .append($('<div/>').prop('id', 'chart-'+chart_id+'-chart').addClass('chart-inner'));
 
-                    if (attr.extra) {
-                        /* draw colored plot bands
-                           start > end : color
-                           > end : color
-                           start > : color
-                           missing <start> and <end> are replaced by valid_from and valid_to
-                        */
+                if (attr.extra) {
+                    /* draw colored plot bands
+                       start > end : color
+                       > end : color
+                       start > : color
+                       missing <start> and <end> are replaced by valid_from and valid_to
+                    */
 
-                        /* split into bands */
-                        $(attr.extra.split("\n")).each(function(id, band) {
-                            /* split into from-to and color */
-                            var fromto_color = band.trim().split(':');
+                    /* split into bands */
+                    $(attr.extra.split("\n")).each(function(id, band) {
+                        /* split into from-to and color */
+                        var fromto_color = band.trim().split(':');
 
-                            /* split from and to */
-                            var fromto = fromto_color[0].trim().split('>');
+                        /* split from and to */
+                        var fromto = fromto_color[0].trim().split('>');
 
-                            if (fromto[0] == '') {
-                                fromto[0] = attr.valid_from;
-                            } else if (fromto[0].indexOf('%') != -1) {
-                                fromto[0] = fromto[0].replace('%', '');
-                                fromto[0] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[0] / 100;
-                            }
+                        if (fromto[0] == '') {
+                            fromto[0] = attr.valid_from;
+                        } else if (fromto[0].indexOf('%') != -1) {
+                            fromto[0] = fromto[0].replace('%', '');
+                            fromto[0] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[0] / 100;
+                        }
 
-                            if (fromto[1] == '') {
-                                fromto[1] = attr.valid_to;
-                            } else if (fromto[1].indexOf('%') != -1) {
-                                fromto[1] = fromto[1].replace('%', '');
-                                fromto[1] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[1] / 100;
-                            }
+                        if (fromto[1] == '') {
+                            fromto[1] = attr.valid_to;
+                        } else if (fromto[1].indexOf('%') != -1) {
+                            fromto[1] = fromto[1].replace('%', '');
+                            fromto[1] = attr.valid_from + (attr.valid_to - attr.valid_from) * fromto[1] / 100;
+                        }
 
-                            options.yAxis.plotBands.push({
-                                from:  +fromto[0],
-                                to:    +fromto[1],
-                                color: fromto_color[1]
-                            });
+                        options.yAxis.plotBands.push({
+                            from:  +fromto[0],
+                            to:    +fromto[1],
+                            color: fromto_color[1]
                         });
-                    }
-
-                    charts[chart_id] = new Highcharts.Chart(options);
+                    });
                 }
 
-                charts[chart_id] && charts[chart_id].series[0].data[0].update(data[0].data);
+                charts[chart_id] = new Highcharts.Chart(options);
             }
-        );
+
+            charts[chart_id] && charts[chart_id].series[0].data[0].update(data[0].data);
+        });
     });
 
     timeout = setTimeout(updateCharts, defaults.refresh * 1000);

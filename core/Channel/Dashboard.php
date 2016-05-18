@@ -18,12 +18,16 @@ namespace Channel;
 /**
  *
  */
-class Dashboard extends Calculator {
+class Dashboard extends Calculator
+{
 
     /**
      *
      */
-    public function read( $request ) {
+    public function read($request)
+    {
+
+        $this->before_read($request);
 
         $channel = $this->getChild(1);
 
@@ -40,6 +44,9 @@ class Dashboard extends Calculator {
         $t = $this->valid_to;
 
         $channel->valid_from = $channel->vaild_to = $this->valid_from = $this->valid_to = NULL;
+
+        // Always fetch last reading for Dashboard channels
+        $request['period'] = 'last';
 
         $result = $this->after_read($channel->read($request));
 

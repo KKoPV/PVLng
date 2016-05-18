@@ -30,6 +30,8 @@ class Admin extends \Controller {
                 // Clear before redirect
                 \Session::set('returnto');
                 $this->app->redirect($r);
+            } elseif (isset($_SERVER['HTTP_REFERER'])) {
+                $this->app->redirect($_SERVER['HTTP_REFERER']);
             } else {
                 $this->app->redirect();
             }

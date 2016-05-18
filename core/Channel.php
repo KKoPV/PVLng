@@ -412,13 +412,13 @@ abstract class Channel {
             // Simply read last data set for sensor channels
 
             // Fetch last reading and set some data to 0 to get correct field order
-            $q->get($q->FROM_UNIXTIME($q->MAX('timestamp')), 'datetime')
-              ->get($q->MAX('timestamp'), 'timestamp')
+            $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
+              ->get('timestamp')
               ->get('data')
-              ->get($q->MIN('data'), 'min')
-              ->get($q->MAX('data'), 'max')
-              ->get($q->COUNT('id'), 'count')
-              ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
+              ->get(0, 'min')
+              ->get(0, 'max')
+              ->get(0, 'count')
+              ->get(0, 'timediff')
               ->get(0, 'consumption')
               ->filter('id', $this->entity)
               ->order('timestamp', true)

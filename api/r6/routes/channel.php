@@ -135,7 +135,7 @@ $api->get('/channel/:guid/:attribute', $accessibleChannel, function($guid, $attr
 /**
  *
  */
-$api->get('/channel/:guid/parent(/:attribute)', $accessibleChannel, function($guid, $attribute=NULL) use ($api) {
+$api->get('/channel/:guid/parent/:attribute', $accessibleChannel, function($guid, $attribute) use ($api) {
     $channel = (new ORM\Tree)->filterByGuid($guid)->findOne();
     if (($id = $channel->getId()) == '') {
         $api->stopAPI('No channel found for GUID: '.$guid, 400);
@@ -145,7 +145,10 @@ $api->get('/channel/:guid/parent(/:attribute)', $accessibleChannel, function($gu
         $api->stopAPI('Channel is on top level', 400);
     }
 
-    $api->render(Channel::byId($parent)->getAttributes($attribute));
+    $api->render(array_map(
+        function($a) { return html_entity_decode($a); },
+        Channel::byId($parent)->getAttributes($attribute)
+    ));
 })->conditions(array(
     'attribute' => '\w+'
 ))->name('GET /channel/:guid/parent(/:attribute)')->help = array(
