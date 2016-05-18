@@ -121,7 +121,10 @@ $api->get('/channel/:guid/stats', $accessibleChannel, function($guid) use ($api)
  *
  */
 $api->get('/channel/:guid/:attribute', $accessibleChannel, function($guid, $attribute) use ($api) {
-    $api->render(Channel::byGUID($guid)->getAttributes($attribute));
+    $api->render(array_map(
+        function($a) { return html_entity_decode($a); },
+        Channel::byGUID($guid)->getAttributes($attribute)
+    ));
 })->conditions(array(
     'attribute' => '\w+'
 ))->name('GET /channel/:guid/:attribute')->help = array(
