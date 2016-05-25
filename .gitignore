@@ -14,3 +14,4 @@ info.php
 composer.lock
 /tests
 /vendor
+/nbproject

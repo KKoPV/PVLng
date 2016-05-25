@@ -7,19 +7,19 @@
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
-return array(
+return [
 
     /**
      * Change the database credentials for your needs
      */
-    'Database' => array(
+    'Database' => [
         'Host'     => '<HOST>',
         'Socket'   => '<SOCKET>',
         'Port'     => '<PORT>',
         'Username' => '<USER>',
         'Password' => '<PASSWORD>',
         'Database' => '<DATABASE>'
-    ),
+    ],
 
     /**
      * Preferd cache mode, auto detect best one if empty
@@ -31,4 +31,4 @@ return array(
     # 'Cache' => 'APC'          // MUST BE ISTALLED AND ENABLED!
     # 'Cache' => 'Mock'         // Disable caching complete
 
-);
+];

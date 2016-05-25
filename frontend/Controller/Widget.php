@@ -64,7 +64,9 @@ class Widget extends \Controller {
                 $max    = max($row['data'], $max);
             }
             // Last row
-            if (isset($row)) $time2 = $row['timestamp'];
+            if (isset($row)) {
+                $time2 = $row['timestamp'];
+            }
 
             if ($time1 == $time2) {
                 // before 1st reading of day saved, at least 12 hours,
@@ -83,7 +85,7 @@ class Widget extends \Controller {
         }
 
         // Don't use a layout, render direct
-        $app->render('chart.js');
+        $app->render('chart.js.tpl');
 
     }
 }

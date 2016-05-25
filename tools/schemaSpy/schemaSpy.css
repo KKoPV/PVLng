@@ -9,7 +9,7 @@ body  {
 .content {
     margin: 0px;
     background: #FFFFFF;
-    border: 0 0;
+    border: 0;
     padding: .4em;
 }
 
@@ -202,7 +202,7 @@ div.spacer {
 }
 
 .preFormatted {
-    #FFFFFF-space: pre;
+    white-space: pre;
 }
 
 /* Tabs from http://www.alistapart.com/articles/slidingdoors/ */

@@ -27,6 +27,6 @@ class Index extends \Controller {
         // Timezone offset in seconds
         $this->view->tzOffset = date('Z');
 
-        $this->PresetAndPeriod();
+        $this->preparePresetAndPeriod();
     }
 }

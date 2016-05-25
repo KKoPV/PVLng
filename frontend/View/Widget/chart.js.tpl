@@ -11,7 +11,7 @@
 document.write('
     <div id="pvlng-widget-{raw:UID}">
         <div id="pvlng-chart-{raw:UID}" style="width:{WIDTH}px;height:{HEIGHT}px">
-            /* Will replaced with chart anyway if there was no error... */
+            <!-- Will replaced with chart anyway if there was no error... -->
             <i style="color:red;font-family:monospace">{ERROR}</i>
         </div>
     </div>
