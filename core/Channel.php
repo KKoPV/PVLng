@@ -812,6 +812,7 @@ abstract class Channel {
             $request['start'] = \ORM\Settings::getSunrise($this->time);
             if (isset($args[1])) $request['start'] -= $args[1]*60;
         }
+
         $this->start = is_numeric($request['start']) ? $request['start'] : strtotime($request['start']);
         if ($this->start === FALSE) {
             throw new \Exception('Invalid start timestamp: '.$request['start'], 400);
@@ -952,7 +953,9 @@ abstract class Channel {
         if ($this->period[1] == self::ALL) return;
 
         // Read one period before real start for meter calculation
-        $start = $this->start - $this->period[0] * self::$Grouping[$this->period[1]][0];
+        $start = $this->meter
+               ? $this->start - $this->period[0] * self::$Grouping[$this->period[1]][0]
+               : $this->start;
         // End is midnight > minus 1 second
         $q->filter('timestamp', array('bt' => array($start, $this->end-1)));
     }
