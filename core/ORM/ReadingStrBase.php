@@ -1,26 +1,27 @@
 <?php
 /**
- * Abstract base class for table 'pvlng_reading_str'
+ * Abstract base class for table "pvlng_reading_str"
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "ReadingStr.php"
+ * To extend the functionallity, edit "ReadingStr.php"!
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2015 Knut Kohl
+ * @copyright  2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.2.0 / 2015-03-18
+ * @version    1.4.0 / 2016-07-18
  */
 namespace ORM;
 
 /**
  *
  */
-abstract class ReadingStrBase extends \slimMVC\ORM {
+abstract class ReadingStrBase extends \slimMVC\ORM
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -31,66 +32,108 @@ abstract class ReadingStrBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Basic setter for field 'id'
+     * Basic setter for field "id"
      *
      * @param  mixed    $id Id value
      * @return Instance For fluid interface
      */
-    public function setId( $id ) {
+    public function setId($id)
+    {
         $this->fields['id'] = $id;
         return $this;
     }   // setId()
 
     /**
-     * Basic setter for field 'timestamp'
+     * Raw setter for field "id", for INSERT, REPLACE and UPDATE
+     *
+     * @param  mixed    $id Id value
+     * @return Instance For fluid interface
+     */
+    public function setIdRaw($id)
+    {
+        $this->raw['id'] = $id;
+        return $this;
+    }   // setIdRaw()
+
+    /**
+     * Basic setter for field "timestamp"
      *
      * @param  mixed    $timestamp Timestamp value
      * @return Instance For fluid interface
      */
-    public function setTimestamp( $timestamp ) {
+    public function setTimestamp($timestamp)
+    {
         $this->fields['timestamp'] = $timestamp;
         return $this;
     }   // setTimestamp()
 
     /**
-     * Basic setter for field 'data'
+     * Raw setter for field "timestamp", for INSERT, REPLACE and UPDATE
+     *
+     * @param  mixed    $timestamp Timestamp value
+     * @return Instance For fluid interface
+     */
+    public function setTimestampRaw($timestamp)
+    {
+        $this->raw['timestamp'] = $timestamp;
+        return $this;
+    }   // setTimestampRaw()
+
+    /**
+     * Basic setter for field "data"
      *
      * @param  mixed    $data Data value
      * @return Instance For fluid interface
      */
-    public function setData( $data ) {
+    public function setData($data)
+    {
         $this->fields['data'] = $data;
         return $this;
     }   // setData()
+
+    /**
+     * Raw setter for field "data", for INSERT, REPLACE and UPDATE
+     *
+     * @param  mixed    $data Data value
+     * @return Instance For fluid interface
+     */
+    public function setDataRaw($data)
+    {
+        $this->raw['data'] = $data;
+        return $this;
+    }   // setDataRaw()
 
     // -----------------------------------------------------------------------
     // Getter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Basic getter for field 'id'
+     * Basic getter for field "id"
      *
      * @return mixed Id value
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->fields['id'];
     }   // getId()
 
     /**
-     * Basic getter for field 'timestamp'
+     * Basic getter for field "timestamp"
      *
      * @return mixed Timestamp value
      */
-    public function getTimestamp() {
+    public function getTimestamp()
+    {
         return $this->fields['timestamp'];
     }   // getTimestamp()
 
     /**
-     * Basic getter for field 'data'
+     * Basic getter for field "data"
      *
      * @return mixed Data value
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->fields['data'];
     }   // getData()
 
@@ -99,53 +142,66 @@ abstract class ReadingStrBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for unique fields 'id', 'timestamp'
+     * Filter for unique fields "id', 'timestamp"
      *
      * @param  mixed    $id, $timestamp Filter values
      * @return Instance For fluid interface
      */
-    public function filterByIdTimestamp( $id, $timestamp ) {
-        $this->filter[] = '`id` = "'.$this->quote($id).'"';
-        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
+    public function filterByIdTimestamp($id, $timestamp)
+    {
+
+        $this->filter[] = '`id` = '.$this->quote($id).'';
+        $this->filter[] = '`timestamp` = '.$this->quote($timestamp).'';
         return $this;
     }   // filterByIdTimestamp()
 
     /**
-     * Filter for field 'timestamp'
+     * Filter for field "timestamp"
      *
      * @param  mixed    $timestamp Filter value
      * @return Instance For fluid interface
      */
-    public function filterByTimestamp( $timestamp ) {
-        $this->filter[] = '`timestamp` = "'.$this->quote($timestamp).'"';
+    public function filterByTimestamp($timestamp)
+    {
+        $this->filter[] = '`timestamp` = '.$this->quote($timestamp);
         return $this;
     }   // filterByTimestamp()
 
     /**
-     * Filter for field 'id'
+     * Filter for field "id"
      *
      * @param  mixed    $id Filter value
      * @return Instance For fluid interface
      */
-    public function filterById( $id ) {
-        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+    public function filterById($id)
+    {
+        $this->filter[] = '`id` = '.$this->quote($id);
         return $this;
     }   // filterById()
 
     /**
-     * Filter for field 'data'
+     * Filter for field "data"
      *
      * @param  mixed    $data Filter value
      * @return Instance For fluid interface
      */
-    public function filterByData( $data ) {
-        $this->filter[] = '`data` = "'.$this->quote($data).'"';
+    public function filterByData($data)
+    {
+        $this->filter[] = '`data` = '.$this->quote($data);
         return $this;
     }   // filterByData()
 
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
+
+    /**
+     * Update fields on insert on duplicate key
+     */
+    protected function onDuplicateKey()
+    {
+        return '`data` = '.$this->quote($this->fields['data']).'';
+    }   // onDuplicateKey()
 
     /**
      * Table name
@@ -169,5 +225,36 @@ abstract class ReadingStrBase extends \slimMVC\ORM {
           KEY `id` (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Alphanumeric readings\'
     ';
+
+    /**
+     *
+     */
+    protected $fields = array(
+        'id'        => '',
+        'timestamp' => '',
+        'data'      => ''
+    );
+
+    /**
+     *
+     */
+    protected $nullable = array(
+        'id'        => false,
+        'timestamp' => false,
+        'data'      => false
+    );
+
+    /**
+     *
+     */
+    protected $primary = array(
+        'id',
+        'timestamp'
+    );
+
+    /**
+     *
+     */
+    protected $autoinc = '';
 
 }

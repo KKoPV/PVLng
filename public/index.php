@@ -150,7 +150,6 @@ $app->hook('slim.before', function() use ($app) {
     Yryie::Debug('slim.before');
 
     slimMVC\ORM::setDatabase($app->db);
-    slimMVC\ORM::setCache($app->cache);
 
     foreach ((new ORM\SettingsKeys)->find() as $setting) {
         $app->config->set($setting->getKey(), $setting->getValue());

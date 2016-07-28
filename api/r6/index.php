@@ -101,7 +101,7 @@ $api->container->singleton('cache', function() use ($api) {
 $api->hook('slim.before', function() use ($api) {
 
     slimMVC\ORM::setDatabase($api->db);
-    slimMVC\ORM::setCache($api->cache);
+
     Channel::setCache($api->cache);
 
     foreach ((new ORM\SettingsKeys)->find() as $setting) {

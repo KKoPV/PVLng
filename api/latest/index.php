@@ -8,6 +8,6 @@
  * @version    1.0.0
  */
 
-$version = file_get_contents('..'.DIRECTORY_SEPARATOR.'.latest');
+$latest = 'r6';
 
-include '..'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.'index.php';
+include '..' . DIRECTORY_SEPARATOR . $latest . DIRECTORY_SEPARATOR . 'index.php';

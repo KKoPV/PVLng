@@ -1,26 +1,27 @@
 <?php
 /**
- * Abstract base class for table 'pvlng_reading_statistics'
+ * Abstract base class for table "pvlng_reading_statistics"
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "ReadingStatistics.php"
+ * To extend the functionallity, edit "ReadingStatistics.php"!
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2015 Knut Kohl
+ * @copyright  2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.2.0 / 2015-03-18
+ * @version    1.4.0 / 2016-07-18
  */
 namespace ORM;
 
 /**
  *
  */
-abstract class ReadingStatisticsBase extends \slimMVC\ORM {
+abstract class ReadingStatisticsBase extends \slimMVC\ORM
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -31,7 +32,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * 'pvlng_reading_statistics' is a view, no setters
+     * "pvlng_reading_statistics" is a view, no setters
      */
 
     // -----------------------------------------------------------------------
@@ -39,92 +40,102 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Basic getter for field 'guid'
+     * Basic getter for field "guid"
      *
      * @return mixed Guid value
      */
-    public function getGuid() {
+    public function getGuid()
+    {
         return $this->fields['guid'];
     }   // getGuid()
 
     /**
-     * Basic getter for field 'name'
+     * Basic getter for field "name"
      *
      * @return mixed Name value
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->fields['name'];
     }   // getName()
 
     /**
-     * Basic getter for field 'description'
+     * Basic getter for field "description"
      *
      * @return mixed Description value
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->fields['description'];
     }   // getDescription()
 
     /**
-     * Basic getter for field 'serial'
+     * Basic getter for field "serial"
      *
      * @return mixed Serial value
      */
-    public function getSerial() {
+    public function getSerial()
+    {
         return $this->fields['serial'];
     }   // getSerial()
 
     /**
-     * Basic getter for field 'channel'
+     * Basic getter for field "channel"
      *
      * @return mixed Channel value
      */
-    public function getChannel() {
+    public function getChannel()
+    {
         return $this->fields['channel'];
     }   // getChannel()
 
     /**
-     * Basic getter for field 'unit'
+     * Basic getter for field "unit"
      *
      * @return mixed Unit value
      */
-    public function getUnit() {
+    public function getUnit()
+    {
         return $this->fields['unit'];
     }   // getUnit()
 
     /**
-     * Basic getter for field 'type'
+     * Basic getter for field "type"
      *
      * @return mixed Type value
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->fields['type'];
     }   // getType()
 
     /**
-     * Basic getter for field 'icon'
+     * Basic getter for field "icon"
      *
      * @return mixed Icon value
      */
-    public function getIcon() {
+    public function getIcon()
+    {
         return $this->fields['icon'];
     }   // getIcon()
 
     /**
-     * Basic getter for field 'datetime'
+     * Basic getter for field "datetime"
      *
      * @return mixed Datetime value
      */
-    public function getDatetime() {
+    public function getDatetime()
+    {
         return $this->fields['datetime'];
     }   // getDatetime()
 
     /**
-     * Basic getter for field 'readings'
+     * Basic getter for field "readings"
      *
      * @return mixed Readings value
      */
-    public function getReadings() {
+    public function getReadings()
+    {
         return $this->fields['readings'];
     }   // getReadings()
 
@@ -133,112 +144,122 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field 'guid'
+     * Filter for field "guid"
      *
      * @param  mixed    $guid Filter value
      * @return Instance For fluid interface
      */
-    public function filterByGuid( $guid ) {
-        $this->filter[] = '`guid` = "'.$this->quote($guid).'"';
+    public function filterByGuid($guid)
+    {
+        $this->filter[] = '`guid` = '.$this->quote($guid);
         return $this;
     }   // filterByGuid()
 
     /**
-     * Filter for field 'name'
+     * Filter for field "name"
      *
      * @param  mixed    $name Filter value
      * @return Instance For fluid interface
      */
-    public function filterByName( $name ) {
-        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+    public function filterByName($name)
+    {
+        $this->filter[] = '`name` = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
     /**
-     * Filter for field 'description'
+     * Filter for field "description"
      *
      * @param  mixed    $description Filter value
      * @return Instance For fluid interface
      */
-    public function filterByDescription( $description ) {
-        $this->filter[] = '`description` = "'.$this->quote($description).'"';
+    public function filterByDescription($description)
+    {
+        $this->filter[] = '`description` = '.$this->quote($description);
         return $this;
     }   // filterByDescription()
 
     /**
-     * Filter for field 'serial'
+     * Filter for field "serial"
      *
      * @param  mixed    $serial Filter value
      * @return Instance For fluid interface
      */
-    public function filterBySerial( $serial ) {
-        $this->filter[] = '`serial` = "'.$this->quote($serial).'"';
+    public function filterBySerial($serial)
+    {
+        $this->filter[] = '`serial` = '.$this->quote($serial);
         return $this;
     }   // filterBySerial()
 
     /**
-     * Filter for field 'channel'
+     * Filter for field "channel"
      *
      * @param  mixed    $channel Filter value
      * @return Instance For fluid interface
      */
-    public function filterByChannel( $channel ) {
-        $this->filter[] = '`channel` = "'.$this->quote($channel).'"';
+    public function filterByChannel($channel)
+    {
+        $this->filter[] = '`channel` = '.$this->quote($channel);
         return $this;
     }   // filterByChannel()
 
     /**
-     * Filter for field 'unit'
+     * Filter for field "unit"
      *
      * @param  mixed    $unit Filter value
      * @return Instance For fluid interface
      */
-    public function filterByUnit( $unit ) {
-        $this->filter[] = '`unit` = "'.$this->quote($unit).'"';
+    public function filterByUnit($unit)
+    {
+        $this->filter[] = '`unit` = '.$this->quote($unit);
         return $this;
     }   // filterByUnit()
 
     /**
-     * Filter for field 'type'
+     * Filter for field "type"
      *
      * @param  mixed    $type Filter value
      * @return Instance For fluid interface
      */
-    public function filterByType( $type ) {
-        $this->filter[] = '`type` = "'.$this->quote($type).'"';
+    public function filterByType($type)
+    {
+        $this->filter[] = '`type` = '.$this->quote($type);
         return $this;
     }   // filterByType()
 
     /**
-     * Filter for field 'icon'
+     * Filter for field "icon"
      *
      * @param  mixed    $icon Filter value
      * @return Instance For fluid interface
      */
-    public function filterByIcon( $icon ) {
-        $this->filter[] = '`icon` = "'.$this->quote($icon).'"';
+    public function filterByIcon($icon)
+    {
+        $this->filter[] = '`icon` = '.$this->quote($icon);
         return $this;
     }   // filterByIcon()
 
     /**
-     * Filter for field 'datetime'
+     * Filter for field "datetime"
      *
      * @param  mixed    $datetime Filter value
      * @return Instance For fluid interface
      */
-    public function filterByDatetime( $datetime ) {
-        $this->filter[] = '`datetime` = "'.$this->quote($datetime).'"';
+    public function filterByDatetime($datetime)
+    {
+        $this->filter[] = '`datetime` = '.$this->quote($datetime);
         return $this;
     }   // filterByDatetime()
 
     /**
-     * Filter for field 'readings'
+     * Filter for field "readings"
      *
      * @param  mixed    $readings Filter value
      * @return Instance For fluid interface
      */
-    public function filterByReadings( $readings ) {
-        $this->filter[] = '`readings` = "'.$this->quote($readings).'"';
+    public function filterByReadings($readings)
+    {
+        $this->filter[] = '`readings` = '.$this->quote($readings);
         return $this;
     }   // filterByReadings()
 
@@ -261,5 +282,40 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM {
     protected $createSQL = '
         CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_reading_statistics` AS select `c`.`guid` AS `guid`,`c`.`name` AS `name`,`c`.`description` AS `description`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`unit` AS `unit`,`t`.`name` AS `type`,`t`.`icon` AS `icon`,from_unixtime(`u`.`timestamp`) AS `datetime`,ifnull(`u`.`readings`,0) AS `readings` from ((`pvlng_channel` `c` join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) left join `pvlng_reading_count` `u` on((`c`.`id` = `u`.`id`))) where ((`t`.`childs` = 0) and `t`.`write`)
     ';
+
+    /**
+     *
+     */
+    protected $fields = array(
+        'guid'        => '',
+        'name'        => '',
+        'description' => '',
+        'serial'      => '',
+        'channel'     => '',
+        'unit'        => '',
+        'type'        => '',
+        'icon'        => '',
+        'datetime'    => '',
+        'readings'    => ''
+    );
+
+    /**
+     *
+     */
+    protected $nullable = array(
+
+    );
+
+    /**
+     *
+     */
+    protected $primary = array(
+
+    );
+
+    /**
+     *
+     */
+    protected $autoinc = '';
 
 }

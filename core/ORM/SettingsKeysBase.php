@@ -1,26 +1,27 @@
 <?php
 /**
- * Abstract base class for table 'pvlng_settings_keys'
+ * Abstract base class for table "pvlng_settings_keys"
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "SettingsKeys.php"
+ * To extend the functionallity, edit "SettingsKeys.php"!
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2015 Knut Kohl
+ * @copyright  2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.2.0 / 2015-03-18
+ * @version    1.4.0 / 2016-07-18
  */
 namespace ORM;
 
 /**
  *
  */
-abstract class SettingsKeysBase extends \slimMVC\ORM {
+abstract class SettingsKeysBase extends \slimMVC\ORM
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -31,7 +32,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * 'pvlng_settings_keys' is a view, no setters
+     * "pvlng_settings_keys" is a view, no setters
      */
 
     // -----------------------------------------------------------------------
@@ -39,20 +40,22 @@ abstract class SettingsKeysBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Basic getter for field 'key'
+     * Basic getter for field "key"
      *
      * @return mixed Key value
      */
-    public function getKey() {
+    public function getKey()
+    {
         return $this->fields['key'];
     }   // getKey()
 
     /**
-     * Basic getter for field 'value'
+     * Basic getter for field "value"
      *
      * @return mixed Value value
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->fields['value'];
     }   // getValue()
 
@@ -61,24 +64,26 @@ abstract class SettingsKeysBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field 'key'
+     * Filter for field "key"
      *
      * @param  mixed    $key Filter value
      * @return Instance For fluid interface
      */
-    public function filterByKey( $key ) {
-        $this->filter[] = '`key` = "'.$this->quote($key).'"';
+    public function filterByKey($key)
+    {
+        $this->filter[] = '`key` = '.$this->quote($key);
         return $this;
     }   // filterByKey()
 
     /**
-     * Filter for field 'value'
+     * Filter for field "value"
      *
      * @param  mixed    $value Filter value
      * @return Instance For fluid interface
      */
-    public function filterByValue( $value ) {
-        $this->filter[] = '`value` = "'.$this->quote($value).'"';
+    public function filterByValue($value)
+    {
+        $this->filter[] = '`value` = '.$this->quote($value);
         return $this;
     }   // filterByValue()
 
@@ -101,5 +106,32 @@ abstract class SettingsKeysBase extends \slimMVC\ORM {
     protected $createSQL = '
         CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_settings_keys` AS select concat(`pvlng_settings`.`scope`,if((`pvlng_settings`.`name` <> \'\'),concat(\'.\',`pvlng_settings`.`name`),\'\'),\'.\',`pvlng_settings`.`key`) AS `key`,`pvlng_settings`.`value` AS `value` from `pvlng_settings`
     ';
+
+    /**
+     *
+     */
+    protected $fields = array(
+        'key'   => '',
+        'value' => ''
+    );
+
+    /**
+     *
+     */
+    protected $nullable = array(
+
+    );
+
+    /**
+     *
+     */
+    protected $primary = array(
+
+    );
+
+    /**
+     *
+     */
+    protected $autoinc = '';
 
 }
