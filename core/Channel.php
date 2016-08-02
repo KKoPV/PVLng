@@ -387,8 +387,8 @@ abstract class Channel {
 
         if ($this->period[1] == self::READLAST) {
 
-            // Use special table for last readings
-            $q = DBQuery::forge('pvlng_reading_last');
+            // Use special table for last readings for real channels
+            if (!$this->childs) $q = DBQuery::forge('pvlng_reading_last');
 
             // Fetch last reading and set some data to 0 to get correct field order
             $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
@@ -400,6 +400,7 @@ abstract class Channel {
               ->get(0, 'timediff')
               ->get(0, 'consumption')
               ->filter('id', $this->entity)
+              ->order('timestamp', true)
               ->limit(1);
 
             $row = $this->db->queryRow($q);
