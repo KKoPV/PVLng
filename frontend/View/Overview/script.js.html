@@ -233,7 +233,7 @@ $(function() {
     });
 
     /* Bind click listener to all create alias images */
-    $('#tree tbody').on('click', '.create-alias', function() {
+    $('#tree tbody').on('click', '.fa-code-fork', function() {
 
         /* Get tree table Id from parent <tr> */
         var node = $(this.parentNode.parentNode).data('tt-id'),
@@ -249,7 +249,7 @@ $(function() {
                 text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
             });
             /* Remove icon, unbind handler and reset cursor */
-            $(that).removeClass('arrow-split').removeClass('create-alias').removeClass('btn');
+            $(that).removeClass('arrow-split').removeClass('fa-code-fork').removeClass('btn');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             $.pnotify({
                 type: textStatus, hide: false, sticker: false, text: errorThrown
