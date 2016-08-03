@@ -124,8 +124,16 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
     $request['p2'] = $p2;
 
     $result = $api->readData($guid, $request);
+
+    $array = json_decode($result, true);
+    if ($array && json_last_error() == JSON_ERROR_NONE) {
+        $result = $array;
+    }
+
     $api->response->headers->set('X-Data-Rows', count($result));
-    $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+    if (is_object($result) && method_exists($result, 'size')) {
+        $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+    }
     $api->render($result);
 })->name('GET /data/:guid(/:p1(/:p2))')->help = array(
     'since'       => 'r2',

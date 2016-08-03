@@ -12,7 +12,8 @@ class View extends Slim\View {
     /**
      *
      */
-    public function render( $result, $data=NULL ) {
+    public function render( $result, $data=NULL )
+    {
 
         $this->app = API::getInstance();
         $response = $this->app->response;
@@ -57,19 +58,20 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asJSON( $result ) {
+    protected function asJSON( $result )
+    {
         if ($result instanceof Buffer) {
             echo '[';
             $count = count($result);
             $i = 0;
             foreach($result as $row) {
-                if ($i AND $i < $count) echo ',';
+                if ($i && $i < $count) echo ',';
                 echo json_encode($this->normalizeJSON($row));
                 $i++;
             }
             echo ']';
         } else {
-            if (is_scalar($result) && json_decode($result) !== FALSE) {
+            if (is_scalar($result) && json_decode($result, true) !== false) {
                 // Ok, is JSON
             } else {
                 $result = json_encode($this->normalizeJSON($result));
@@ -85,8 +87,9 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asCSV( $result, $sep ) {
-        if (!$result instanceof Buffer AND !is_array($result)) {
+    protected function asCSV( $result, $sep )
+    {
+        if (!$result instanceof Buffer && !is_array($result)) {
             $result = array($result);
         }
 
@@ -107,7 +110,8 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asXML( $result ) {
+    protected function asXML( $result )
+    {
 
         require_once LIB_DIR . DS . 'contrib' . DS . 'Array2XML.php';
 
@@ -145,7 +149,8 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asTXT( $result ) {
+    protected function asTXT( $result )
+    {
         if ($result instanceof Buffer OR is_array($result)) {
             // Reformat only iterable content
             $cnt = count($result);
@@ -170,7 +175,8 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asHTML( $result ) {
+    protected function asHTML( $result )
+    {
         echo '<html>
 <head>
     <title>'.$result['title'].'</title>
@@ -192,7 +198,8 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function normalizeJSON( $data ) {
+    protected function normalizeJSON( $data )
+    {
         if (is_array($data)) {
             foreach ($data as $key=>$value) {
                 $data[$key] = $this->normalizeJSON($value);

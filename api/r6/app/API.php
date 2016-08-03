@@ -67,7 +67,7 @@ class API extends Slim\Slim
             $return = $channel->GET($request);
             $filename = isset($request['filename']) ? $request['filename'] : null;
             $this->render($return, array('filename'=>$filename));
-            return;
+            exit;
         }
 
         $buffer = $channel->read($request);

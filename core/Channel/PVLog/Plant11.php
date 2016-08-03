@@ -47,6 +47,7 @@ class Plant11 extends BaseAbstract11 {
                 $this->getTaggedChildData($instance, $child, $request);
             }
         }
+
         return $instance
             ->setCreator(sprintf('%s for %s (%.1fs)', PVLNG_VERSION_FULL, $this->name, microtime(TRUE)-$time))
             ->setDeleteDayBeforeImport(1) // Send always all day data, so set delete flag...
