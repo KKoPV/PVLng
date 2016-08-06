@@ -2,7 +2,7 @@
 /**
  * deutsche sprachdatei
  */
-$msg = array ();
+$msg = array();
 
 $msg[100] = 'Datenbankabfrage fehlgeschlagen.';
 
@@ -29,3 +29,5 @@ $msg[401] = 'Knoten erfolgreich hinzugefügt.';
 $msg[402] = 'Knoten erfolgreich gelöscht.';
 $msg[403] = 'Knoten erfolgreich verschoben.';
 $msg[404] = 'Knoten erfolgreich umbenannt.';
+
+return $msg;

@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -28,8 +28,8 @@
             <tr>
                 <th>{{EntityType}}</th>
                 <th style="white-space:nowrap">{{ExampleUnit}}</th>
-                <th style="white-space:nowrap">{{Childs}}</th>
-                <th style="width:1%"></th>
+                <th><i class="fa fa-list-ol" title="{{AcceptChildCount}}"></i></th>
+                <th></th>
                 <th>{{Description}}</th>
                 <th>{{Select}}</th>
             </tr>
@@ -38,22 +38,19 @@
 
             <!-- BEGIN ENTITYTYPES -->
             <tr>
-                <td style="white-space:nowrap;font-weight:bold">
+                <td class="icons" style="white-space:nowrap;font-weight:bold">
                     <label for="type-{ID}">
-                        <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                             src="{ICON}" width="16" height="16" alt="" />
+                        <img src="/images/pix.gif" data-src="{ICON}" class="def"
+                             style="vertical-align:middle;margin-right:8px" alt="">
                         {NAME}
                     </label>
                 </td>
                 <td>{UNIT}</td>
                 <td class="c">
-                    <!-- IF {CHILDS} == 0 -->
-                        {{no}}
-                    <!-- ELSEIF {CHILDS} == -1 -->
-                        {{unlimited}}
-                    <!-- ELSE -->
-                        {CHILDS}
-                    <!-- ENDIF -->
+                    <!-- Add invisible spans for sorting -->
+                    <!-- IF {CHILDS} == -1 -->
+                        <i class="sort">X</i>&infin;
+                    <!-- ELSEIF {CHILDS} == 0 -->-<!-- ELSE -->{CHILDS}<!-- ENDIF -->
                 </td>
                 <td class="icons">
                     <!-- INCLUDE channeltype.inc.tpl -->
@@ -72,11 +69,12 @@
 
         </table>
 
-        <div id="legend" class="icons">
-            <strong>{{Legend}}</strong>:
-            <span><img src="/images/ico/read-write.png">{{ReadWritableEntity}}</span>,
-            <span><img src="/images/ico/write.png">{{WritableEntity}}</span>,
-            <span><img src="/images/ico/read.png">{{ReadableEntity}}</span>
+        <!-- Legend -->
+
+        <div class="icons legendtip">
+            <i class="fa fa-arrows-alt"></i>{{ReadWritableEntity}} &nbsp;
+            <i class="fa fa-download"></i>{{WritableEntity}} &nbsp;
+            <i class="fa fa-upload"></i>{{ReadableEntity}} &nbsp;
         </div>
 
     </div>
@@ -95,10 +93,10 @@
 
             <!-- BEGIN TEMPLATES -->
             <tr>
-                <td style="white-space:nowrap;font-weight:bold">
+                <td class="icons" style="white-space:nowrap;font-weight:bold">
                     <label for="{FILE}">
-                        <img style="vertical-align:middle;width:16px;height:16px;margin-right:8px"
-                             src="{ICON}" width="16" height="16" alt="" />
+                        <img src="/images/pix.gif" data-src="{ICON}" class="def"
+                             style="vertical-align:middle;margin-right:8px" alt="" />
                         {NAME}
                     </label>
                 </td>
@@ -116,11 +114,15 @@
 
             <tfoot>
             <tr>
-                <th class="l i" colspan="3">{{AdjustTemplateAfterwards}}</th>
+                <th class="l i" colspan="3"></th>
             </tr>
             </tfoot>
 
         </table>
+
+        <div class="icons legendtip">
+            {{AdjustTemplateAfterwards}}
+        </div>
 
     </div>
 

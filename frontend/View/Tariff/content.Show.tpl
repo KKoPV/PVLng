@@ -38,10 +38,8 @@
     <td>{TARIFF}</td>
     <td>{COMMENT}</td>
     <td>
-        <a href="/tariff/date/edit/{ID}/{DATE}?returnto=/tariff/{ID}" class="tipbtn imgbar wide" title="{{EditTariffDate}}">
-            <img src="/images/ico/node_design.png"
-                 class="imgbar wide" alt="e" width="16" height="16" />
-        </a>
+        <a href="/tariff/date/edit/{ID}/{DATE}?returnto=/tariff/{ID}"
+           class="ico node-design tip" title="{{EditTariffDate}}"></a>
     </td>
 </tr>
 

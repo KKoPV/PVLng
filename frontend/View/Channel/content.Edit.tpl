@@ -3,24 +3,20 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
 
 <h3>
-    <img src="{ICON}" class="channel-icon" style="width:24px;height:24px" alt="" />
+    <img src="{ICON}" class="channel-icon-large" alt="">
     <strong>{TYPENAME}</strong>
 </h3>
 
-<!-- IF {TYPEHELP} -->
 <p>
-    <strong><img src="/images/ico/exclamation-circle.png"
-        style="width:16px;height:16px;margin-right:8px" width="16" height="16" alt="!"/></strong>
-    <em>{TYPEHELP}</em>
+    <!-- IF !{TYPEHELP} -->{TYPEDESC}<!-- ELSE -->{TYPEHELP}<!-- ENDIF -->
 </p>
-<!-- ENDIF -->
 
 <form action="/channel/edit" method="post">
 
@@ -47,10 +43,10 @@
 
     <!-- IF {VISIBLE} -->
     <tr <!-- IF {ERROR} -->style="background-color:#FFE0E0;border-top:solid 1px white;border-bottom:solid 1px white"<!-- ENDIF -->>
-        <td style="vertical-align:top;padding-top:.75em">
+        <td style="vertical-align:top;padding-top:.75em;white-space:nowrap">
             <label for="{FIELD}">{NAME}</label>
             <!-- IF {REQUIRED} -->
-                <img class="ico" src="/images/required.gif" alt="*">
+                <img class="ico tip" src="/images/required.gif" title="{{required}}" alt="*">
             <!-- ENDIF -->
         </td>
         <td style="vertical-align:top;padding-top:.5em;padding-bottom:.5em">
@@ -92,8 +88,7 @@
                     <!-- END -->
                 </select>
             <!-- ELSEIF {TYPE} == "textarea" -->
-                <textarea id="{FIELD}" name="c[{FIELD}]" <!-- IF {CODE} -->class="code"<!-- ENDIF -->
-                          placeholder="{PLACEHOLDER}"
+                <textarea id="{FIELD}" name="c[{FIELD}]" class="code" placeholder="{PLACEHOLDER}"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                           <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
                 >{VALUE}</textarea>
@@ -103,6 +98,12 @@
                        <!-- IF {CODE} --> class="code"<!-- ENDIF -->
                        <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
+            <!-- ELSEIF {TYPE} == "icon" -->
+                <select id="icon-select" name="c[{FIELD}]">
+                    <!-- BEGIN ICONS -->
+                    <option id="{ICON}" value="{ICON}" <!-- IF {ACTUAL} -->selected="selected"<!-- ENDIF -->>{NAME}</option>
+                    <!-- END -->
+                </select>
             <!-- ELSE --><!-- Normal text field -->
                 <input type="text" id="{FIELD}" name="c[{FIELD}]" value="{VALUE}" size="50"
                        placeholder="{PLACEHOLDER}"
@@ -112,7 +113,7 @@
             <!-- ENDIF -->
             </div>
             <span style="color:red" class="xs">
-                <!-- BEGIN ERROR --><br class="clear" />{ERROR}<!-- END -->
+                <!-- BEGIN ERROR -->{ERROR}<br class="clear" /><!-- END -->
             </span>
         </td>
         <td class="hint">
@@ -131,11 +132,11 @@
         </td>
         <td>
             <div class="fl" style="margin:.5em 1em 0 0">
-                <input type="checkbox" id="add2tree" name="add2tree" class="iCheck" onchange="$('#tree').prop('disabled',!this.checked)" />
+                <input type="checkbox" id="add2tree" name="add2tree" class="iCheck" checked onchange="$('#tree').prop('disabled',!this.checked)" />
             </div>
-            <select id="tree" name="tree" disabled="disabled">
+            <select id="tree" name="tree">
                 <option value="1">{{TopLevel}} &nbsp; {{or}}</option>
-                <option value="0" disabled="disabled">{{AsChild}}</option>
+                <option value="0" disabled="disabled">{{AsChildOf}}</option>
                     <!-- BEGIN ADDTREE -->
                     <option value="{ID}" <!-- IF !{AVAILABLE} -->disabled="disabled"<!-- ENDIF -->>{INDENT}{NAME}</option>
                     <!-- END -->
@@ -184,6 +185,6 @@
 
 <br />
 
-<input type="submit" value="{{Save}}" />
+<button><i class="fa fa-floppy-o"></i> &nbsp; {{Save}}</button>
 
 </form>

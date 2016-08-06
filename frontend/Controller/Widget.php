@@ -17,53 +17,56 @@ class Widget extends \Controller {
     /**
      *
      */
-    public function before() {
-        parent::before();
+    public function Index_Action() {
 
-        $this->app->ContentType('text/javascript');
+        $app  = $this->app;
+        $view = $this->view;
 
-        // Switch layout
-        $this->Layout = 'widget';
+        $app->showStats = FALSE;
+        $app->ContentType('text/javascript');
 
         // Compress in any case!
         $this->config->set('View.Verbose', FALSE);
-    }
+        // Don't use layout, generate raw data
+        $this->Layout = FALSE;
 
-    /**
-     *
-     */
-    public function Inc_Action() {
-        // Apply content direct
-        $this->view->Content = $this->view->render('inc.js');
-    }
+        // init parameter was provided, can be empty
+        if ($app->request->get('init') !== NULL) {
+            // Don't use a layout, render direct
+            $app->render('init.js');
+            $app->stop();
+        }
 
-    /**
-     *
-     */
-    public function Chart_Action() {
+        $view->UID     = mt_rand(100000, 999999);
+        $view->Width   = $this->intParam('width', 320);
+        $view->Height  = $this->intParam('height', 200);
+        $view->Color   = $this->strParam('color', '#2F7ED8');
+        $view->Link    = $this->strParam('link');
+        // Need boolean parameters as integers, make numeric with +...
+        $view->Labels  = +$this->boolParam('labels', TRUE);
+        $view->Area    = +$this->boolParam('area', FALSE);
 
+        // Real chart data
         $data = array();
         $time1 = $time2 = time();
         $max = -PHP_INT_MAX;
 
         try {
 
-            $guid = $this->app->request->get('guid');
+            // Throws Exception for empty/not existsing channel
+            $channel = \Channel::byGUID($app->request->get('guid'));
 
-            if ($guid == '') throw new \Exception('Missing channel GUID!');
+            $request = array('period' => $this->intParam('period', 1).'i');
 
-            $channel = \Channel::byGUID($guid);
-
-            $period = $this->intParam('period', 0);
-            if ($period != 0) $period .= 'i';
-
-            foreach ($channel->read(array('period'=>$period)) as $row) {
+            foreach ($channel->read($request) as $row) {
                 $data[] = array( $row['timestamp']*1000, +$row['data'] );
                 $time1  = min($row['timestamp'], $time1);
                 $max    = max($row['data'], $max);
             }
             // Last row
-            if (isset($row)) $time2 = $row['timestamp'];
+            if (isset($row)) {
+                $time2 = $row['timestamp'];
+            }
 
             if ($time1 == $time2) {
                 // before 1st reading of day saved, at least 12 hours,
@@ -71,22 +74,18 @@ class Widget extends \Controller {
                 $time2 = min($time2 + 12*60*60, strtotime('24:00'));
             }
 
-            $this->view->GUID    = $channel->guid;
-            $this->view->Unit    = $channel->unit;
-            $this->view->Width   = $this->intParam('width', 320);
-            $this->view->Height  = $this->intParam('height', 200);
-            $this->view->Color   = $this->strParam('color', '#2F7ED8');
-            $this->view->Labels  = $this->boolParam('labels', TRUE);
-            $this->view->Area    = $this->boolParam('area', FALSE);
-            $this->view->Time1   = date('H:i', $time1);
-            $this->view->Time2   = date('H:i', $time2);
-            $this->view->Data    = json_encode($data);
-            $this->view->Max     = round($max, $channel->decimals);
-            // Apply content direct
-            $this->view->Content = $this->view->render('chart.js');
+            $view->Unit    = $channel->unit;
+            $view->Time1   = date('H:i', $time1);
+            $view->Time2   = date('H:i', $time2);
+            $view->Data    = json_encode($data);
+            $view->Max     = round($max, $channel->decimals);
 
         } catch (\Exception $e) {
-            $this->view->Content = $e->getMessage();
+          $view->error = $e->getMessage();
         }
+
+        // Don't use a layout, render direct
+        $app->render('chart.js.tpl');
+
     }
 }

@@ -13,18 +13,18 @@
 <input type="hidden" id="todate" />
 
 <div id="nav" class="ui-widget-header ui-corner-all"
-     style="padding:4px;height:34px;<!-- IF {EMBEDDED} == "2" -->;display:none<!-- ENDIF -->">
+     style="padding:4px;height:32px;<!-- IF {EMBEDDED} == "2" -->;display:none<!-- ENDIF -->">
 
     <div class="alpha grid_4">
         <!-- INCLUDE dateselect.inc.tpl -->
     </div>
     <div class="grid_2 c" style="margin:0 2%">
-        <img id="modified" src="/images/modified.png" width="24" height="24"
+        <img id="modified" src="/images/pix.gif" data-src="/images/modified.png" class="def tip"
              style="display:none;margin-top:6px;width:24px;height:24px" alt="[ unsaved changes ]"
-             class="tip" title="{{UnsavedChanges}}" />
+             title="{{UnsavedChanges}}" />
         &nbsp;
     </div>
-    <div class="r">
+    <div id="preset-wrapper" class="r">
         <!-- INCLUDE preset.inc.tpl -->
     </div>
 </div>
@@ -32,7 +32,7 @@
 <div class="clear"></div>
 
 <div id="chart">
-    <div id="top-select">{{NoChannelsSelectedYet}}</div>
+    <div id="top-select" style="display:none">{{NoChannelsSelectedYet}}</div>
 </div>
 
 <div class="clear"></div>

@@ -1,9 +1,13 @@
-#entities tr:hover {
+#entities tr:hover td {
     background-color: #C0FFC0 !important;
 }
 
 .ro {
     background-color: #E0E0E0 !important;
+}
+
+i.sort {
+    display: none;
 }
 
 td.hint {
@@ -23,21 +27,33 @@ textarea {
 input.code,
 textarea.code {
     font-family: monospace;
-    font-size: 120%;
+    font-size: larger;
 }
 
-.details {
-    background-color: #DDFFDD;
+/* Borders for opened details row */
+tr.shown {
+    border-left:  dashed gray 1px;
+    border-top:   dashed gray 1px;
+    border-right: dashed gray 1px;
+    background-color: #E8E8E8 !important;
+}
+
+td.details {
+    border-left:   dashed gray 1px;
+    border-right:  dashed gray 1px;
+    border-bottom: dashed gray 1px;
     padding: .5em 1em !important;
+    padding-left: 120px !important;
+    background-color: #E8E8E8;
 }
 
-.details div.attr {
+td.details div.attr {
     float: left;
     margin-right: 2em;
     margin-bottom: .5em;
 }
 
-.details label {
+td.details label {
     display: block;
     margin-bottom: .25em;
     font-weight: bold;

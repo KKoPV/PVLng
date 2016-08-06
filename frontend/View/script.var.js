@@ -17,11 +17,24 @@ var PVLngVersion = '{VERSION}',
     DecimalSeparator = '{DSEP}',
     ThousandSeparator = '{TSEP}',
 
+    CurrencyISO = '{CURRENCY}',
+    CurrencySymbol = '{CURRENCYSYMBOL}',
+    CurrencyDecimals = '{CURRENCYDECIMALS}',
+    CurrencyFormat = '{CURRENCYFORMAT}',
+
     language = '{LANGUAGE}',
 
     /* May be empty on 1st start */
-    latitude = +'{raw:LATITUDE}',
+    latitude  = +'{raw:LATITUDE}',
     longitude = +'{raw:LONGITUDE}',
 
     verbose = '{VERBOSE}',
     user = '{USER}';
+
+if (user) {
+    $(function($) {
+        $.ajaxSetup({
+            beforeSend: function setHeader(XHR) { XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey) }
+        });
+    });
+}

@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="pvlng" type="MySQL - 5.5.41-0+wheezy1-log">
+   <tables>
+      <table name="pvlng_babelkit" remarks="I18N" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="code_set" nullable="false" remarks="" size="16" type="VARCHAR">
+            <child column="code_set" foreignKey="pvlng_babelkit_desc_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_babelkit_desc"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="code_lang" nullable="false" remarks="" size="5" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="code_code" nullable="false" remarks="" size="50" type="VARCHAR">
+            <child column="code_code" foreignKey="pvlng_babelkit_desc_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_babelkit_desc"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="code_desc" nullable="false" remarks="" size="65535" type="TEXT"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="4" name="code_order" nullable="false" remarks="" size="5" type="SMALLINT"/>
+         <column autoUpdated="false" digits="0" id="5" name="code_flag" nullable="false" remarks="" size="1" type="CHAR"/>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="0" id="6" name="changed" nullable="false" remarks="" size="19" type="TIMESTAMP"/>
+         <primaryKey column="code_code" sequenceNumberInPK="1"/>
+         <primaryKey column="code_lang" sequenceNumberInPK="2"/>
+         <primaryKey column="code_set" sequenceNumberInPK="3"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="code_set"/>
+            <column ascending="true" name="code_lang"/>
+            <column ascending="true" name="code_code"/>
+         </index>
+         <index name="code_set_code_code" unique="false">
+            <column ascending="true" name="code_set"/>
+            <column ascending="true" name="code_code"/>
+         </index>
+      </table>
+      <table name="pvlng_babelkit_desc" remarks="I18N" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="code_set" nullable="false" remarks="" size="16" type="VARCHAR">
+            <parent column="code_set" foreignKey="pvlng_babelkit_desc_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_babelkit"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="code_code" nullable="false" remarks="" size="32" type="VARCHAR">
+            <parent column="code_code" foreignKey="pvlng_babelkit_desc_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_babelkit"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="code_desc" nullable="false" remarks="" size="65535" type="TEXT"/>
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="0" id="3" name="changed" nullable="false" remarks="" size="19" type="TIMESTAMP"/>
+         <primaryKey column="code_code" sequenceNumberInPK="1"/>
+         <primaryKey column="code_set" sequenceNumberInPK="2"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="code_set"/>
+            <column ascending="true" name="code_code"/>
+         </index>
+      </table>
+      <table name="pvlng_changes" remarks="Tracking data value changes" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="id" nullable="false" remarks="" size="20" type="BIGINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="1" name="table" nullable="false" remarks="Table name" size="15" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="2" name="key" nullable="false" remarks="Primary key value(s), for composed keys separated by &quot;::&quot;" size="50" type="VARCHAR">
+            <parent column="key" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_config"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="3" name="field" nullable="false" remarks="Field name" size="50" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="4" name="timestamp" nullable="false" remarks="When was changed" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="5" name="old" nullable="false" remarks="Old value" size="256" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="6" name="new" nullable="false" remarks="New value" size="256" type="VARCHAR"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="table" unique="false">
+            <column ascending="true" name="table"/>
+            <column ascending="true" name="key"/>
+            <column ascending="true" name="field"/>
+            <column ascending="true" name="timestamp"/>
+         </index>
+      </table>
+      <table name="pvlng_channel" remarks="Channels" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_channel_view"/>
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_reading_count"/>
+            <child column="id" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" table="pvlng_reading_num"/>
+            <child column="id" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" table="pvlng_reading_str"/>
+            <child column="entity" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" table="pvlng_tree"/>
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_tree"/>
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_tree_view"/>
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_type"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="guid" nullable="true" remarks="Unique GUID" size="39" type="CHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="false" remarks="Unique identifier" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="description" nullable="false" remarks="Longer description" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="4" name="serial" nullable="false" remarks="" size="30" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="5" name="channel" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="6" name="type" nullable="false" remarks="pvlng_type -&gt; id" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="pvlng_channel_ibfk_1" implied="false" onDeleteCascade="false" table="pvlng_type"/>
+         </column>
+         <column autoUpdated="false" defaultValue="1" digits="0" id="7" name="resolution" nullable="false" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="8" name="unit" nullable="false" remarks="" size="10" type="VARCHAR"/>
+         <column autoUpdated="false" defaultValue="2" digits="0" id="9" name="decimals" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="10" name="meter" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" defaultValue="1" digits="0" id="11" name="numeric" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="12" name="offset" nullable="false" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="13" name="adjust" nullable="false" remarks="allow auto adjustment of offset" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="14" name="cost" nullable="true" remarks="per unit or unit * h" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="15" name="tariff" nullable="true" remarks="" size="10" type="INT UNSIGNED">
+            <parent column="id" foreignKey="pvlng_channel_ibfk_2" implied="false" onDeleteCascade="false" table="pvlng_tariff"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="16" name="threshold" nullable="true" remarks="" size="22" type="DOUBLE UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="17" name="valid_from" nullable="true" remarks="Numeric min. acceptable value" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="18" name="valid_to" nullable="true" remarks="Numeric max. acceptable value" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" defaultValue="1" digits="0" id="19" name="public" nullable="false" remarks="Public channels don't need API key to read" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="20" name="extra" nullable="false" remarks="Not visible field for models to store extra info" size="65535" type="TEXT"/>
+         <column autoUpdated="false" digits="0" id="21" name="comment" nullable="false" remarks="Internal comment" size="65535" type="TEXT"/>
+         <column autoUpdated="false" digits="0" id="22" name="icon" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="GUID" unique="true">
+            <column ascending="true" name="guid"/>
+         </index>
+         <index name="tariff" unique="false">
+            <column ascending="true" name="tariff"/>
+         </index>
+         <index name="type" unique="false">
+            <column ascending="true" name="type"/>
+         </index>
+      </table>
+      <table name="pvlng_channel_view" remarks="" type="VIEW">
+         <column autoUpdated="false" defaultValue="0" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="guid" nullable="true" remarks="Unique GUID" size="39" type="CHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="name" nullable="true" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="serial" nullable="true" remarks="" size="30" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="4" name="channel" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="5" name="description" nullable="true" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="6" name="resolution" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="7" name="cost" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="8" name="numeric" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="9" name="offset" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="10" name="adjust" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="11" name="unit" nullable="true" remarks="" size="10" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="12" name="decimals" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="13" name="meter" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="14" name="threshold" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="15" name="valid_from" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="16" name="valid_to" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="17" name="public" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="18" name="type_id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="19" name="type" nullable="false" remarks="" size="60" type="VARCHAR"/>
+         <column autoUpdated="false" defaultValue="Group" digits="0" id="20" name="model" nullable="false" remarks="" size="30" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="21" name="childs" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="22" name="read" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="23" name="write" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="24" name="graph" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="25" name="icon" nullable="true" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="26" name="tree" nullable="true" remarks="" size="19" type="BIGINT"/>
+      </table>
+      <table name="pvlng_config" remarks="Configuration settings" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="key" nullable="false" remarks="" size="50" type="VARCHAR">
+            <child column="key" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_changes"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="value" nullable="false" remarks="" size="1000" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="comment" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <primaryKey column="key" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="key"/>
+         </index>
+      </table>
+      <table name="pvlng_dashboard" remarks="Dashboards" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="INT UNSIGNED">
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_log"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="Unique name" size="50" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="data" nullable="false" remarks="Selected channels in JSON" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="public" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="4" name="slug" nullable="false" remarks="Unique URL save slug" size="50" type="VARCHAR"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="name" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="slug" unique="true">
+            <column ascending="true" name="slug"/>
+         </index>
+      </table>
+      <table name="pvlng_log" remarks="Log entries" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="INT UNSIGNED">
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_dashboard"/>
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_tariff"/>
+            <child column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_tariff_view"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="timestamp" nullable="false" remarks="" size="19" type="DATETIME"/>
+         <column autoUpdated="false" digits="0" id="2" name="scope" nullable="false" remarks="" size="40" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="data" nullable="true" remarks="" size="65535" type="TEXT"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="timestamp" unique="false">
+            <column ascending="true" name="timestamp"/>
+         </index>
+      </table>
+      <table name="pvlng_performance" remarks="" type="TABLE">
+         <column autoUpdated="false" defaultValue="CURRENT_TIMESTAMP" digits="0" id="0" name="timestamp" nullable="false" remarks="" size="19" type="TIMESTAMP"/>
+         <column autoUpdated="false" digits="0" id="1" name="action" nullable="false" remarks="" size="5" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="2" name="time" nullable="false" remarks="ms" size="10" type="INT UNSIGNED"/>
+         <index name="timestamp" unique="false">
+            <column ascending="true" name="timestamp"/>
+         </index>
+      </table>
+      <table name="pvlng_performance_avg" remarks="" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="aggregation" nullable="false" remarks="" size="7" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="1" name="action" nullable="false" remarks="" size="5" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="2" name="year" nullable="false" remarks="" size="0" type="YEAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="month" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="4" name="day" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="5" name="hour" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="6" name="average" nullable="false" remarks="ms" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="7" name="count" nullable="false" remarks="" size="10" type="INT UNSIGNED"/>
+         <primaryKey column="action" sequenceNumberInPK="1"/>
+         <primaryKey column="aggregation" sequenceNumberInPK="2"/>
+         <primaryKey column="day" sequenceNumberInPK="3"/>
+         <primaryKey column="hour" sequenceNumberInPK="4"/>
+         <primaryKey column="month" sequenceNumberInPK="5"/>
+         <primaryKey column="year" sequenceNumberInPK="6"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="aggregation"/>
+            <column ascending="true" name="action"/>
+            <column ascending="true" name="year"/>
+            <column ascending="true" name="month"/>
+            <column ascending="true" name="day"/>
+            <column ascending="true" name="hour"/>
+         </index>
+      </table>
+      <table name="pvlng_performance_view" remarks="" type="VIEW">
+         <column autoUpdated="false" digits="0" id="0" name="aggregation" nullable="false" remarks="" size="7" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="1" name="action" nullable="false" remarks="" size="5" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="2" name="timestamp" nullable="true" remarks="" size="19" type="BIGINT"/>
+         <column autoUpdated="false" digits="0" id="3" name="average" nullable="false" remarks="ms" size="10" type="INT UNSIGNED"/>
+      </table>
+      <table name="pvlng_reading_count" remarks="" type="VIEW">
+         <column autoUpdated="false" defaultValue="0" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="timestamp" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="2" name="readings" nullable="false" remarks="" size="19" type="BIGINT"/>
+      </table>
+      <table name="pvlng_reading_num" remarks="Numeric readings" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="timestamp" nullable="false" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="4" id="2" name="data" nullable="false" remarks="" size="13" type="DECIMAL"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <primaryKey column="timestamp" sequenceNumberInPK="2"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+            <column ascending="true" name="timestamp"/>
+         </index>
+         <index name="id" unique="false">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="timestamp" unique="false">
+            <column ascending="true" name="timestamp"/>
+         </index>
+      </table>
+      <table name="pvlng_reading_statistics" remarks="" type="VIEW">
+         <column autoUpdated="false" digits="0" id="0" name="guid" nullable="true" remarks="Unique GUID" size="39" type="CHAR"/>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="Unique identifier" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="Longer description" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="serial" nullable="false" remarks="" size="30" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="4" name="channel" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="5" name="unit" nullable="false" remarks="" size="10" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="6" name="type" nullable="false" remarks="" size="60" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="7" name="icon" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="8" name="datetime" nullable="true" remarks="" size="19" type="DATETIME"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="9" name="readings" nullable="false" remarks="" size="19" type="BIGINT"/>
+      </table>
+      <table name="pvlng_reading_str" remarks="Non-numeric readings" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="timestamp" nullable="false" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="2" name="data" nullable="false" remarks="" size="50" type="VARCHAR"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <primaryKey column="timestamp" sequenceNumberInPK="2"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+            <column ascending="true" name="timestamp"/>
+         </index>
+         <index name="id" unique="false">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="timestamp" unique="false">
+            <column ascending="true" name="timestamp"/>
+         </index>
+      </table>
+      <table name="pvlng_settings" remarks="" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="scope" nullable="false" remarks="" size="10" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="100" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="key" nullable="false" remarks="" size="100" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="value" nullable="false" remarks="" size="100" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="4" name="order" nullable="false" remarks="" size="3" type="TINYINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="5" name="description" nullable="false" remarks="" size="1000" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="6" name="type" nullable="false" remarks="" size="6" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="7" name="data" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <primaryKey column="key" sequenceNumberInPK="1"/>
+         <primaryKey column="name" sequenceNumberInPK="2"/>
+         <primaryKey column="scope" sequenceNumberInPK="3"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="scope"/>
+            <column ascending="true" name="name"/>
+            <column ascending="true" name="key"/>
+         </index>
+      </table>
+      <table name="pvlng_settings_keys" remarks="" type="VIEW">
+         <column autoUpdated="false" digits="0" id="0" name="key" nullable="true" remarks="" size="212" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="1" name="value" nullable="false" remarks="" size="100" type="VARCHAR"/>
+      </table>
+      <table name="pvlng_statistics" remarks="" type="VIEW">
+         <column autoUpdated="false" defaultValue="" digits="0" id="0" name="database" nullable="false" remarks="" size="64" type="VARCHAR"/>
+         <column autoUpdated="false" defaultValue="" digits="0" id="1" name="table" nullable="false" remarks="" size="64" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="data_length" nullable="true" remarks="" size="20" type="BIGINT UNSIGNED"/>
+         <column autoUpdated="false" digits="8" id="3" name="data_length_mb" nullable="true" remarks="" size="29" type="DECIMAL"/>
+         <column autoUpdated="false" digits="0" id="4" name="index_length" nullable="true" remarks="" size="20" type="BIGINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="5" name="length" nullable="true" remarks="" size="20" type="BIGINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="6" name="data_free" nullable="true" remarks="" size="20" type="BIGINT UNSIGNED"/>
+      </table>
+      <table name="pvlng_tariff" remarks="Tariffs for feed in or used from grid" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="INT UNSIGNED">
+            <child column="tariff" foreignKey="pvlng_channel_ibfk_2" implied="false" onDeleteCascade="false" table="pvlng_channel"/>
+            <child column="id" foreignKey="pvlng_tariff_date_ibfk_2" implied="false" onDeleteCascade="true" table="pvlng_tariff_date"/>
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_log"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="50" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="comment" nullable="false" remarks="" size="250" type="VARCHAR"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="Tariff name" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+      </table>
+      <table name="pvlng_tariff_date" remarks="Tariffs time slots" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="pvlng_tariff -&gt; id" size="10" type="INT UNSIGNED">
+            <child column="id" foreignKey="pvlng_tariff_time_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_tariff_time"/>
+            <parent column="id" foreignKey="pvlng_tariff_date_ibfk_2" implied="false" onDeleteCascade="true" table="pvlng_tariff"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="date" nullable="false" remarks="Start date for this tariff (incl.)" size="10" type="DATE">
+            <child column="date" foreignKey="pvlng_tariff_time_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_tariff_time"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="cost" nullable="true" remarks="Fix costs per day, e.g. EUR / kWh" size="12" type="FLOAT"/>
+         <primaryKey column="date" sequenceNumberInPK="1"/>
+         <primaryKey column="id" sequenceNumberInPK="2"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+            <column ascending="true" name="date"/>
+         </index>
+         <index name="date" unique="false">
+            <column ascending="true" name="date"/>
+         </index>
+      </table>
+      <table name="pvlng_tariff_time" remarks="Tariffs on hourly basis" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="pvlng_tariff_date -&gt; id" size="10" type="INT UNSIGNED">
+            <parent column="id" foreignKey="pvlng_tariff_time_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_tariff_date"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="date" nullable="false" remarks="pvlng_tariff_date -&gt; date" size="10" type="DATE">
+            <parent column="date" foreignKey="pvlng_tariff_time_ibfk_1" implied="false" onDeleteCascade="true" table="pvlng_tariff_date"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="2" name="time" nullable="false" remarks="Starting time (incl.)" size="8" type="TIME"/>
+         <column autoUpdated="false" digits="0" id="3" name="days" nullable="false" remarks="1 Mo .. 7 Su" size="13" type="SET"/>
+         <column autoUpdated="false" digits="0" id="4" name="tariff" nullable="true" remarks="e.g. EUR / kWh" size="12" type="FLOAT"/>
+         <column autoUpdated="false" digits="0" id="5" name="comment" nullable="false" remarks="" size="250" type="VARCHAR"/>
+         <primaryKey column="date" sequenceNumberInPK="1"/>
+         <primaryKey column="days" sequenceNumberInPK="2"/>
+         <primaryKey column="id" sequenceNumberInPK="3"/>
+         <primaryKey column="time" sequenceNumberInPK="4"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+            <column ascending="true" name="date"/>
+            <column ascending="true" name="time"/>
+            <column ascending="true" name="days"/>
+         </index>
+         <index name="date" unique="false">
+            <column ascending="true" name="date"/>
+         </index>
+         <index name="days" unique="false">
+            <column ascending="true" name="days"/>
+         </index>
+         <index name="time" unique="false">
+            <column ascending="true" name="time"/>
+         </index>
+      </table>
+      <table name="pvlng_tariff_view" remarks="" type="VIEW">
+         <column autoUpdated="false" defaultValue="0" digits="0" id="0" name="id" nullable="false" remarks="" size="10" type="INT UNSIGNED">
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_log"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="50" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="tariff_comment" nullable="false" remarks="" size="250" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="date" nullable="true" remarks="Start date for this tariff (incl.)" size="10" type="DATE"/>
+         <column autoUpdated="false" digits="0" id="4" name="cost" nullable="true" remarks="Fix costs per day, e.g. EUR / kWh" size="12" type="FLOAT"/>
+         <column autoUpdated="false" digits="0" id="5" name="time" nullable="true" remarks="Starting time (incl.)" size="8" type="TIME"/>
+         <column autoUpdated="false" digits="0" id="6" name="days" nullable="true" remarks="1 Mo .. 7 Su" size="13" type="SET"/>
+         <column autoUpdated="false" digits="0" id="7" name="tariff" nullable="true" remarks="e.g. EUR / kWh" size="12" type="FLOAT"/>
+         <column autoUpdated="false" digits="0" id="8" name="time_comment" nullable="true" remarks="" size="250" type="VARCHAR"/>
+      </table>
+      <table name="pvlng_tree" remarks="Channel hierarchy" type="TABLE">
+         <column autoUpdated="true" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="lft" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="2" name="rgt" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="3" name="moved" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="4" name="entity" nullable="false" remarks="pvlng_channel -&gt; id" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="Defined in XML" implied="false" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="5" name="guid" nullable="true" remarks="" size="39" type="VARCHAR"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="entity" unique="false">
+            <column ascending="true" name="entity"/>
+         </index>
+         <index name="guid" unique="false">
+            <column ascending="true" name="guid"/>
+         </index>
+         <index name="lft_rgt" unique="false">
+            <column ascending="true" name="lft"/>
+            <column ascending="true" name="rgt"/>
+         </index>
+         <index name="rgt" unique="false">
+            <column ascending="true" name="rgt"/>
+         </index>
+      </table>
+      <table name="pvlng_tree_view" remarks="" type="VIEW">
+         <column autoUpdated="false" defaultValue="0" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="entity" nullable="false" remarks="pvlng_channel -&gt; id" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="2" name="guid" nullable="true" remarks="" size="39" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="3" name="name" nullable="true" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="4" name="serial" nullable="true" remarks="" size="30" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="5" name="channel" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="6" name="description" nullable="true" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="7" name="resolution" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="8" name="cost" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="9" name="meter" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="10" name="numeric" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="11" name="offset" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="12" name="adjust" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="13" name="unit" nullable="true" remarks="" size="10" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="14" name="decimals" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="15" name="threshold" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="16" name="valid_from" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="17" name="valid_to" nullable="true" remarks="" size="22" type="DOUBLE"/>
+         <column autoUpdated="false" digits="0" id="18" name="public" nullable="true" remarks="" size="10" type="INT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="19" name="extra" nullable="true" remarks="" size="65535" type="TEXT"/>
+         <column autoUpdated="false" digits="0" id="20" name="comment" nullable="true" remarks="" size="65535" type="TEXT"/>
+         <column autoUpdated="false" digits="0" id="21" name="type_id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" digits="0" id="22" name="type" nullable="false" remarks="" size="60" type="VARCHAR"/>
+         <column autoUpdated="false" defaultValue="Group" digits="0" id="23" name="model" nullable="false" remarks="" size="30" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="24" name="childs" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="25" name="read" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="26" name="write" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="27" name="graph" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="28" name="icon" nullable="true" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="29" name="alias" nullable="true" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="30" name="alias_of" nullable="true" remarks="" size="5" type="SMALLINT UNSIGNED"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="31" name="level" nullable="false" remarks="" size="19" type="BIGINT"/>
+         <column autoUpdated="false" digits="0" id="32" name="haschilds" nullable="true" remarks="" size="8" type="DECIMAL"/>
+         <column autoUpdated="false" digits="0" id="33" name="lower" nullable="true" remarks="" size="10" type="INT"/>
+         <column autoUpdated="false" digits="0" id="34" name="upper" nullable="true" remarks="" size="10" type="INT"/>
+      </table>
+      <table name="pvlng_type" remarks="Channel types" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="id" nullable="false" remarks="" size="5" type="SMALLINT UNSIGNED">
+            <child column="type" foreignKey="pvlng_channel_ibfk_1" implied="false" onDeleteCascade="false" table="pvlng_channel"/>
+            <parent column="id" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" table="pvlng_channel"/>
+         </column>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="false" remarks="" size="60" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="2" name="description" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" defaultValue="Group" digits="0" id="3" name="model" nullable="false" remarks="" size="30" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="4" name="unit" nullable="false" remarks="" size="10" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="5" name="type" nullable="false" remarks="" size="7" type="ENUM"/>
+         <column autoUpdated="false" digits="0" id="6" name="childs" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="7" name="read" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="8" name="write" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="9" name="graph" nullable="false" remarks="" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="10" name="icon" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <primaryKey column="id" sequenceNumberInPK="1"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="id"/>
+         </index>
+         <index name="childs" unique="false">
+            <column ascending="true" name="childs"/>
+         </index>
+         <index name="name" unique="true">
+            <column ascending="true" name="name"/>
+         </index>
+         <index name="read" unique="false">
+            <column ascending="true" name="read"/>
+         </index>
+         <index name="write" unique="false">
+            <column ascending="true" name="write"/>
+         </index>
+      </table>
+      <table name="pvlng_type_icons" remarks="" type="VIEW">
+         <column autoUpdated="false" digits="0" id="0" name="icon" nullable="false" remarks="" size="255" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="1" name="name" nullable="true" remarks="" size="65535" type="TEXT"/>
+      </table>
+      <table name="pvlng_view" remarks="Diagrams" type="TABLE">
+         <column autoUpdated="false" digits="0" id="0" name="name" nullable="false" remarks="Chart name" size="50" type="VARCHAR"/>
+         <column autoUpdated="false" digits="0" id="1" name="public" nullable="false" remarks="View type (private/public/mobile)" size="0" type="BIT"/>
+         <column autoUpdated="false" digits="0" id="2" name="data" nullable="false" remarks="Serialized channel data" size="65535" type="TEXT"/>
+         <column autoUpdated="false" digits="0" id="3" name="slug" nullable="false" remarks="URL-save slug" size="50" type="VARCHAR"/>
+         <primaryKey column="name" sequenceNumberInPK="1"/>
+         <primaryKey column="public" sequenceNumberInPK="2"/>
+         <index name="PRIMARY" unique="true">
+            <column ascending="true" name="name"/>
+            <column ascending="true" name="public"/>
+         </index>
+         <index name="public" unique="false">
+            <column ascending="true" name="public"/>
+         </index>
+         <index name="slug" unique="true">
+            <column ascending="true" name="slug"/>
+         </index>
+      </table>
+   </tables>
+</database>

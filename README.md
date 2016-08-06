@@ -1,28 +1,49 @@
 # PVLng
 
-[![Join the chat at https://gitter.im/KKoPV/PVLng](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/KKoPV/PVLng?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 PhotoVoltaic Logger new generation
 
-Please see http://pvlng.com for details
+Please see http://pvlng.com for details.
+
+A [demo installation](http://demo.pvlng.com/) is also available.
 
 # Installation
 
-If you want to use git für installing PVLng, you can simply execute from a shell in the directory to install PVLng into:
+If you want to use git für installing PVLng (recommended), you can simply execute from a shell
+in the directory to install PVLng into:
 
-```
-wget -qO - https://raw.github.com/KKoPV/PVLng/master/install | bash
-```
-
-The installer will ask for your MySQL credentials, install the basic SQL script and create a basic configuration file with this credentials.
-
-If you are interested in the latest development version, you can also direct install the development branch with:
-
-```
-wget -qO - https://raw.github.com/KKoPV/PVLng/develop/install | bash
+``` bash
+wget -qO - https://raw.githubusercontent.com/KKoPV/PVLng/master/tools/install | bash
 ```
 
-# Scripts for data acquisition
+The installer will ask for your MySQL credentials, install the basic SQL script and create
+a basic configuration file with this credentials.
+
+If you are interested in the latest development version, you can also direct install the development
+branch with:
+
+``` bash
+wget -qO - https://raw.githubusercontent.com/KKoPV/PVLng/develop/tools/install | bash
+```
+
+Answer to checkout development branch with yes
+
+## Upgrade
+
+If a new master (or development) release is out, you can upgrade your repository and database with
+
+``` bash
+tools/upgrade.git master
+```
+
+from your installation directory. This will checkout the latest changes from GitHub and
+apply all outstanding database patches. (The script will work also with the develop branch.)
+
+## Git hook
+
+To make sure to clear the temp. directory after each `git pull`, put this
+[Gist](https://gist.github.com/K-Ko/e7c01e0c7490ee4352fb) into `.git/hooks/post-merge` and make executable.
+
+## Scripts for data acquisition
 
 The scripts for data acquisition resides in its own repository: [PVLng-scripts](https://github.com/KKoPV/PVLng-scripts)
 
@@ -38,6 +59,13 @@ All code contributions and bug reports are much appreciated.
  - Please use soft tabs (four spaces) instead of hard tabs
  - Include commenting where appropriate and add a descriptive pull request message
 
-# Git hook
+## Branches
 
-To make sure to clear the temp. directory after each `git pull`, put this [Gist](https://gist.github.com/K-Ko/e7c01e0c7490ee4352fb) into `.git/hooks/post-merge` and make executable.
+- `master` is the latest deployed version
+- `develop` is the primary development branch
+
+## Publishing
+
+Release version numbers will follow the format:
+
+`<major>.<minor>.<patch>`

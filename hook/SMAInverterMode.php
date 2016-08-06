@@ -17,8 +17,9 @@ class SMAInverterMode extends Base {
      * Save mode in uppercase, set empty data to AUS
      *
      */
-    public static function data_save_before( &$channel, $config ) {
-        $channel->value = ($channel->value != '') ? strtoupper($channel->value) : 'AUS';
+    public static function data_save_before(&$channel, $config)
+    {
+        if ($channel->value == '') $channel->value = 'Off';
     }
 
 }

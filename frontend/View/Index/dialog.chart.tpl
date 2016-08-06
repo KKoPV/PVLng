@@ -12,7 +12,7 @@
 <div id="dialog-chart" style="display:none" title="{{ChartSettings}}">
     <table id="d-table">
         <tbody>
-        <tr class="odd">
+        <tr>
             <td style="max-width:35%">{{Axis}}</td>
             <td id="td-axis">
                 <input class="iCheck" type="radio" name="d-axis" value="9" />
@@ -29,26 +29,32 @@
                 <div class="fl nm"><input class="iCheck" type="radio" name="d-axis" value="10" />
             </td>
         </tr>
-        <tr class="even">
+        <tr>
             <td>
                 <label for="d-type">{{SeriesType}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{ChartTypeHint}}" />
-                <br />
-                <span id="scatter-candidate" class="s i">({{ScatterCandidate}})</span>
+                <i class="fa fa-question tip" title="{{ChartTypeHint}}"></i>
             </td>
             <td>
-                <select id="d-type">
-                    <option value="line">{{LineChart}}</option>
-                    <option value="spline">{{SplineChart}}</option>
-                    <option value="areasplinerange"> {{AreaSplineRangeChart}}</option>
-                    <option value="areaspline">{{AreaSplineChart}}</option>
-                    <option value="bar">{{BarChart}}</option>
-                    <option value="scatter">{{ScatterChart}}</option>
-                </select>
+                <table>
+                    <tr>
+                        <td>
+                            <select id="d-type">
+                                <option value="line">{{LineChart}}</option>
+                                <option value="spline">{{SplineChart}}</option>
+                                <option value="areasplinerange"> {{AreaSplineRangeChart}}</option>
+                                <option value="areaspline">{{AreaSplineChart}}</option>
+                                <option value="bar">{{BarChart}}</option>
+                                <option value="scatter">{{ScatterChart}}</option>
+                            </select>
+                        </td>
+                        <td id="scatter-candidate">
+                            {{ScatterCandidate}}
+                        </td>
+                    </tr>
+                </table>
             </td>
         </tr>
-        <tr class="odd">
+        <tr>
             <td><label for="d-style">{{dashStyle}}</label></td>
             <td class="not-bar not-scatter">
                 <select id="d-style">
@@ -74,7 +80,7 @@
                 </select>
             </td>
         </tr>
-        <tr class="even">
+        <tr>
             <td>{{LineWidth}}</td>
             <td>
                 <div class="fl not-bar not-scatter" style="margin-right:1em">
@@ -91,7 +97,7 @@
                 </div>
             </td>
         </tr>
-        <tr class="odd">
+        <tr>
             <td>{{MarkExtremes}}</td>
             <td>
                 <div class="fl not-bar not-scatter not-meter" style="margin-right:1em">
@@ -112,38 +118,43 @@
                 </div>
             </td>
         </tr>
-        <tr class="even">
+        <tr>
             <td>
-                <label for="d-cons">{{Presentation}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{ShowConsumptionHint}}" />
+                <label for="d-cons">{{ShowConsumption}}</label>
+                <i class="fa fa-question tip" title="{{ShowConsumptionHint}}"></i>
             </td>
-            <td>
-                <div class="fl not-scatter">
-                    <input type="checkbox" id="d-cons" class="iCheck" />
-                    <label for="d-cons">{{ShowConsumption}}</label>
-                </div>
+            <td class="not-scatter">
+                <input type="checkbox" id="d-cons" class="iCheck" />
             </td>
         </tr>
-        <tr class="odd">
+        <tr>
             <td>{{Color}}</td>
             <td><input id="d-color" type="color" class="spectrum" /></td>
         </tr>
-        <tr class="even">
-            <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
+        <tr>
             <td>
-                <!-- Align controls correct using a table ... -->
+                <label for="d-outline">{{DrawOutline}}</label>
+                <i class="fa fa-question tip" title="{{DrawOutlineHint}}"></i>
+            </td>
+            <td class="not-bar not-scatter">
+                <input type="checkbox" id="d-outline" class="iCheck not-scatter" />
+            </td>
+        </tr>
+        <tr>
+            <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
+            <td class="not-bar not-scatter">
+                <!-- Align controls correct using a simple table ... -->
                 <table><tr>
-                <td style="padding-left:0">
-                    <input id="d-color-use-diff" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="0" checked="checked">
+                <td style="padding-right:1em">
+                    <input id="d-color-use-diff" class="iCheck" type="radio" name="color-pos-neg" value="0" checked="checked">
                     <label for="d-color-use-diff">{{no}}</label>
                 </td>
-                <td>
-                    <input id="d-color-pos" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="1">
+                <td style="padding-right:1em">
+                    <input id="d-color-pos" class="iCheck" type="radio" name="color-pos-neg" value="1">
                     <label for="d-color-pos">{{above}}</label>
                 </td>
-                <td>
-                    <input id="d-color-neg" class="not-scatter iCheck" type="radio" name="color-pos-neg" value="-1">
+                <td style="padding-right:1em">
+                    <input id="d-color-neg" class="iCheck" type="radio" name="color-pos-neg" value="-1">
                     <label for="d-color-neg">{{below}}</label>
                 </td>
                 <td>
@@ -154,11 +165,10 @@
                 </tr></table>
             </td>
         </tr>
-        <tr class="odd">
+        <tr>
             <td>
                 <label for="d-time1">{{TimeRange}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{TimeRangeHint}}" />
+                <i class="fa fa-question tip" title="{{TimeRangeHint}}"></i>
             </td>
             <td>
                 <div class="fl">
@@ -166,33 +176,52 @@
                     <span style="padding:0 .5em;font-weight:bold">&mdash;</span>
                     <input id="d-time2" type="text" class="c" style="width:5em" />
                 </div>
-                <div id="d-time-slider" class="fl" style="margin-top:.5em;margin-left:1em;width:9em"></div>
+                <div id="d-time-slider"></div>
             </td>
         </tr>
-        <tr class="even">
-            <td><label for="d-legend">{{Legend}}</label></td>
-            <td><input id="d-legend" type="checkbox" class="iCheck" /></td>
+        <tr>
+            <td><label for="d-daylight">{{DuringDaylight}}</label></td>
+            <td>
+                <table><tr>
+                <td style="padding-right:1em">
+                    <input id="d-daylight" type="checkbox" class="iCheck">
+                </td>
+                <td>
+                    &plusmn;
+                    <input id="d-daylight-grace" type="number" style="text-align:right" size="3">
+                    &nbsp;{{Minutes}}
+                </td>
+                </tr></table>
+            </td>
         </tr>
-        <tr class="odd">
+        <tr>
+            <td><label for="d-legend">{{Legend}}</label></td>
+            <td><input id="d-legend" type="checkbox" class="iCheck"></td>
+        </tr>
+        <tr>
+            <td><label for="d-hidden">{{StartHidden}}</label></td>
+            <td><input id="d-hidden" type="checkbox" class="iCheck"></td>
+        </tr>
+        <tr>
             <td>
                 <label for="d-position">{{ChartPosition}}</label>
-                <img src="/images/ico/information_frame.png" class="ico tip"
-                     style="margin-left:.5em" title="{{ChartPositionHint}}" />
+                <i class="fa fa-question tip" title="{{ChartPositionHint}}"></i>
             </td>
             <td>
-                <table id="table-pos">
-                <tr>
+                <!-- Align layout with a table -->
+                <table id="table-pos"><tr>
                     <td class="xs" style="width:16px">
-                        <img src="/images/layers-stack-arrange-back.png" class="tip" title="{{MoreIntoBackground}}" alt="<<">
+                        <img src="/images/pix.gif" data-src="/images/layers-stack-arrange-back.png"
+                             class="def ico tip" title="{{MoreIntoBackground}}" alt="<<">
                     </td>
                     <td style="padding-left:1.4em;padding-right:1.4em">
                         <div id="d-position-slider" style="margin-top:5px"></div>
                     </td>
                     <td class="xs r" style="width:16px">
-                        <img src="/images/layers-stack-arrange.png" class="tip" title="{{MoreIntoForeground}}" alt=">>">
+                        <img src="/images/pix.gif" data-src="/images/layers-stack-arrange.png"
+                             class="def ico tip" title="{{MoreIntoForeground}}" alt=">>">
                     </td>
-                </tr>
-                </table>
+                </tr></table>
             </td>
         </tr>
         </tbody>

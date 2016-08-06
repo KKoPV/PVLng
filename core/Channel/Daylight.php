@@ -19,6 +19,7 @@ class Daylight extends InternalCalc {
      */
     public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
         parent::beforeEdit($channel, $fields);
+        // times no longer used but needed here to not break existing channels
         list($fields['times']['VALUE'], $fields['extra']['VALUE']) = $channel->extra;
     }
 
@@ -29,7 +30,8 @@ class Daylight extends InternalCalc {
     public static function checkData( Array &$fields, $add2tree ) {
         if ($ok = parent::checkData($fields, $add2tree)) {
             if ($fields['resolution']['VALUE'] == 1 AND $fields['extra']['VALUE'] == '') {
-                $fields['extra']['ERROR'][] = __('model::Daylight_IrradiationIsRequired');
+                $fields['resolution']['ERROR'][] = __('model::Daylight_IrradiationIsRequired');
+                $fields['extra']['ERROR'][]      = __('model::Daylight_seeAbove');
                 $ok = FALSE;
             }
         }
@@ -42,12 +44,18 @@ class Daylight extends InternalCalc {
      */
     public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
         parent::beforeSave($fields, $channel);
+        // times no longer used but needed here to not break existing channels
         $channel->extra = array(+$fields['times']['VALUE'], $fields['extra']['VALUE']);
     }
 
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected $settings;
 
     /**
      *
@@ -67,89 +75,93 @@ class Daylight extends InternalCalc {
             $this->numeric = 0;
             $this->data = new \ORM\ReadingStrMemory;
             $this->data->id = $this->entity;
-            // Clean up
-            $this->data->deleteById($this->entity);
         }
+
+        $this->settings = new \ORM\Settings;
     }
 
     /**
      *
      */
-    protected function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 
+        if ($this->dataExists(12*60*60)) return; // Buffer for 12h
+
         if ($this->numeric AND $this->extra) {
             // Fetch average of last x days of irradiation channel to buid curve
-            $channel = \Channel::byGUID($this->extra);
+            // Base query, clone afterwards for time ranges filter
+            $qBase = new \DBQuery('pvlng_reading_num');
+            $qBase->get($qBase->MAX('data'), 'data')
+                  ->filter('id', \Channel::byGUID($this->extra)->entity)
+                  ->group('`timestamp` DIV 86400');
 
-            $q = new \DBQuery('pvlng_reading_num');
+            $mean = (\ORM\Settings::getModelValue('Daylight', 'Average') == 0)
+                  ? /* Select harmonic mean   */ 'COUNT(`data`)/SUM(1/`data`)'
+                  : /* Select arithmetic mean */ 'AVG(`data`)';
 
-            $q->get($q->MAX('data'), 'data')
-              ->filter('id', $channel->entity)
-              ->filter('timestamp', array(
-                    'bt' => array(
-                        $this->start - $this->config->get('Model.Daylight.CurveDays')*24*60*60,
-                        $this->start-1
-                    )
-                ))
-              ->group('`timestamp` DIV 86400');
+            $step = ($sec = self::$Grouping[$this->period[1]][0])
+                    // Calculate exact stepping during daylight times
+                  ? $this->period[0] * $sec
+                  : 60;
 
-            // Select average of inner select
-            $q = 'SELECT '.$q->AVG('data').' FROM ('.$q->SQL().') t';
-
-            $this->resolution = $this->db->queryOne($q);
+            $timeback = \ORM\Settings::getModelValue('Daylight', 'CurveDays', 5)*24*60*60;
         }
-
-        // Get marker icons to $Icon_sunrise, $Icon_zenit, $Icon_sunset
-        extract($this->config->get('Model.Daylight.Icons'), EXTR_PREFIX_ALL, 'Icon');
 
         $day = $this->start;
 
         do {
-            $sunrise = $this->config->getSunrise($day);
-            $sunset  = $this->config->getSunset($day);
+            $sunrise = \ORM\Settings::getSunrise($day);
+            $sunset  = \ORM\Settings::getSunset($day);
+            $noon    = ($sunrise + $sunset) / 2;
 
             if (!$this->numeric) {
                 // Static sunrise / sunset marker with time label depending of "times" attribute
-                $this->setMarker($sunrise,             $Icon_sunrise);
-                $this->setMarker(($sunrise+$sunset)/2, $Icon_zenit);
-                $this->setMarker($sunset,              $Icon_sunset);
+                $this->saveValue(
+                    $sunrise,
+                    date('H:i', $sunrise) . '|'
+                  . \ORM\Settings::getModelValue('Daylight', 'SunriseIcon')
+                );
+                $this->saveValue(
+                    $noon,
+                    date('H:i', $noon) . '|'
+                  . \ORM\Settings::getModelValue('Daylight', 'ZenitIcon')
+                );
+                $this->saveValue(
+                    $sunset,
+                    date('H:i', $sunset) . '|'
+                  . \ORM\Settings::getModelValue('Daylight', 'SunsetIcon')
+                );
 
             } else {
+
+                $q = clone($qBase);
+                $q->filter('timestamp', array('bt' => array($day-$timeback, $day-1)));
+                // Fetch mean of inner sql
+                $resolution = $this->db->queryOne('SELECT '.$mean.' FROM ('.$q->SQL().') t');
+
                 // Daylight curve
                 $daylight = $sunset - $sunrise;
 
-                if ($this->TimestampMeterOffset[$this->period[1]]) {
-                    // Calculate exact stepping during daylight times
-                    $range = $this->period[0] * $this->TimestampMeterOffset[$this->period[1]];
-                    if ($range > $daylight) $range = $daylight;
-                    $step = floor($daylight / $range);
-                    $step = $daylight / $step;
-                } else {
-                    $step = 60;
-                }
-
-                do {
-                    $this->saveValue($sunrise, sin(($sunset-$sunrise) * M_PI / $daylight));
+                // Set start point
+                $this->saveValue($sunrise, 0);
+                // Align to step
+                $sunrise = floor($sunrise / $step) * $step + $step;
+                while ($sunrise < $sunset) {
+                    $this->saveValue($sunrise, sin(($sunset-$sunrise) * M_PI / $daylight) * $resolution);
                     $sunrise += $step;
-                } while ($sunrise <= $sunset+1);
+                }
+                // Set end point
+                $this->saveValue($sunset, 0);
             }
 
             $day += 24*60*60;
+
         } while ($day < $this->end);
 
-        // Fake period to read pre-calculated data as they are
-        $this->period = array(1, self::NO);
+        $this->dataCreated();
+
+        $this->resolution = 1;
     }
-
-    /**
-     *
-     */
-    protected function setMarker( $time, $icon ) {
-        if ($icon) $this->saveValue($time, ($this->times ? date('H:i', $time) : '') . '|' . $icon);
-    }
-
-
-
 }

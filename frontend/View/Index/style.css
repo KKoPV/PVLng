@@ -45,9 +45,16 @@
     background-color: #E8E8E8;
 }
 
-#d-table td {
+#d-table > tbody > tr > td {
     padding: .5em .5em;
     vertical-align: middle;
+}
+
+#d-time-slider {
+    float: left;
+    margin-left: 2em;
+    margin-top: .5em;
+    width: 9em;
 }
 
 #td-axis .iradio_flat {
@@ -96,6 +103,10 @@
     display: none;
 }
 
+.confirmed .ui-button-text {
+    color: red;
+}
+
 .disabled {
     color: #C0C0C0;
 }
@@ -117,4 +128,10 @@
 
 #table-pos td {
     padding: 0;
+}
+
+#scatter-candidate {
+    padding-left: 3em;
+    font-size: smaller;
+    font-style: italic;
 }

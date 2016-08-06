@@ -38,7 +38,7 @@ foreach ($section['channels'] as $id=>$channel) {
     $data[$id] = array_pop($d)['data'] * $channel['factor'];
 }
 
-out(1, 'Data: %s', print_r($data, TRUE));
+okv(1, 'Data', print_r($data, TRUE));
 
 // Check, that at least ONE of v1 .. v4 is set
 if (empty($data[1]) && empty($data[2]) && empty($data[3]) && empty($data[4])) {
@@ -47,8 +47,10 @@ if (empty($data[1]) && empty($data[2]) && empty($data[3]) && empty($data[4])) {
 }
 
 $data = http_build_query($data, 'v');
-out(1, 'URL       : %s', $StatusURL);
-out(1, 'Data      : %s', $data);
+okv(1, 'URL', $StatusURL);
+okv(1, 'Data', $data);
+
+if (TESTMODE) return;
 
 // Start curl sequence
 if (!curl(array(
@@ -63,9 +65,10 @@ if (!curl(array(
     CURLOPT_RETURNTRANSFER => 1,
 ), $response, $info)) return;
 
-if (TESTMODE) return;
-
-out(1, 'Response  : %s', $response);
+okv(1, 'Response', $response);
 
 // Anything went wrong?
-if ($info['http_code'] != 200) out(0, 'Response  : %s', $response);
+if ($info['http_code'] != 200) {
+    // Ignore "PVOutput is offline for maintenance"
+    if (!strstr($response, 'maintenance')) okv(0, 'Response', $response);
+}

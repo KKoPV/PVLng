@@ -1,4 +1,4 @@
-<?php /* // AOP // */
+<?php
 /**
  *
  *
@@ -32,18 +32,18 @@ class Description extends \Controller {
             /// \Yryie::Info('Build description from '.$fileMD);
 
             // Put a "back to top" icon behind each header
-            $top = '<a href="#top" style="margin-left:12px"><img src="/images/ico/arrow-stop-090.png" style="width:12px"></a>';
+            $top = '<a href="#top" class="fa fa-sort-asc btn" style="margin-left:12px" title="Go to top"></a>';
 
             $TOC = '';
             $content = file_get_contents($fileMD);
 
-            if (preg_match_all('~^(#+ +)(.*?)( *#*)$~m', $content, $headers, PREG_SET_ORDER)) {
+            if (preg_match_all('~^(#+ +)(.*?)#*\s*$~m', $content, $headers, PREG_SET_ORDER)) {
                 foreach ($headers as $header) {
                     $hash = urlencode($header[2]);
                     $TOC .= '<a href="#'.$hash.'">' . $header[2] . '</a>';
                     $anchor = '<a name="'.$hash.'"></a>';
                     // Move all headers 2 levels deeper
-                    $content = str_replace($header[0], '##'.$header[1].$anchor.$header[2].$header[3].$top, $content);
+                    $content = str_replace($header[0], '##'.$header[1].$anchor.$header[2].$top.PHP_EOL, $content);
                 }
             }
 

@@ -1,4 +1,4 @@
-<?php /* // AOP // */
+<?php
 /**
  *
  *
@@ -20,11 +20,13 @@ class Index extends \Controller {
     public function Index_Action() {
         $this->view->SubTitle = \I18N::_('Charts');
 
-        /// \Yryie::StartTimer('LoadTreeWithParents', 'Load tree with parents and aliases', 'db');
+        /// \Yryie::StartTimer('Load tree with parents and aliases', NULL, 'db');
         $this->view->Data = (new \ORM\Tree)->getWithParents();
-        /// \Yryie::StopTimer('LoadTreeWithParents');
+        /// \Yryie::StopTimer();
 
-        $this->view->NotifyLoad = $this->config->get('Controller.Chart.NotifyLoad');
-        $this->PresetAndPeriod();
+        // Timezone offset in seconds
+        $this->view->tzOffset = date('Z');
+
+        $this->preparePresetAndPeriod();
     }
 }

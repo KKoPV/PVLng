@@ -264,15 +264,23 @@ var lscache = function() {
         }
       }
     },
-    
+
     /**
      * Appends CACHE_PREFIX so lscache will partition data in to different buckets.
      * @param {string} bucket
      */
     setBucket: function(bucket) {
-      cacheBucket = bucket;
+      cacheBucket = bucket+'-';
     },
-    
+
+    /**
+     * Get actual CACHE_PREFIX
+     * @return {string} bucket
+     */
+    getBucket: function() {
+      return cacheBucket;
+    },
+
     /**
      * Resets the string being appended to CACHE_PREFIX so lscache will use the default storage behavior.
      */

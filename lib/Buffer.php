@@ -4,19 +4,20 @@
  *
  * @see         http://php.net/manual/class.iterator.php#96691
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 class Buffer implements Iterator, Countable {
 
     /**
      * Use PHPs internal temp stream, use file for data greater 5 MB
      */
-    public function __construct( $size=5 ) {
+    public function __construct( $data=array(), $size=5 ) {
         $this->fh = fopen('php://temp/maxmemory:'.(1024 * 1024 * $size), 'w+');
         $this->rowCount = 0;
+        foreach ($data as $key=>$row) $this->write($row, $key);
         $this->rewind();
     }
 

@@ -40,9 +40,15 @@
                 </td>
             </tr>
             <tr>
+                <td>{{LatestAPIVersion}}</td>
+                <td>
+                    <code id="latest" class="b"></code>
+                </td>
+            </tr>
+            <tr>
                 <td style="vertical-align:top">{{YourAPIcode}}</td>
                 <td>
-                    <form method="post" style="float:right">
+                    <form method="post" style="float:right;margin-left:1em;margin-bottom:1em">
                         <input type="hidden" name="regenerate" value="1" />
                         <input id="regenerate" type="submit" value="{{Regenerate}}" />
                     </form>
@@ -58,7 +64,11 @@
 
     <div id="tabs-2">
 
-        <div id="stats-chart"></div>
+        <div id="stats-chart">
+            <p class="c" style="padding:1.5em">
+                <i class="fa fa-circle-o-notch fa-spin fa-2x"></i>
+            </p>
+        </div>
 
         <table id="table-stats">
             <thead>
@@ -75,15 +85,12 @@
             <!-- BEGIN STATS -->
             <tr class="tip" tip="#tip-{GUID}">
                 <td class="icons">
-                    <img src="{ICON}" class="tip channel-icon" alt="" title="{TYPE}" />
+                    <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon tip" title="{TYPE}" alt="">
                     {NAME}
                 </td>
                 <td>{DESCRIPTION}</td>
-                <td class="r">
-                    <span style="display:none">{raw:READINGS}</span>
-                    {READINGS}
-                </td>
-                <td class="r last-reading" data-guid="{GUID}">?</td>
+                <td id="r-{GUID}" class="r">0</td>
+                <td id="d-{GUID}" class="r"></td>
                 <td>{UNIT}</td>
             </tr>
             <!-- END -->
@@ -92,7 +99,7 @@
             <tfoot>
             <tr>
                 <th class="l" colspan="2"></th>
-                <th class="r"></th>
+                <th id="sumReadings" class="r">0</th>
                 <th class="l" colspan="2"></th>
             </tr>
             </tfoot>
@@ -104,6 +111,35 @@
     <div id="tabs-3">
 
         <div id="db-chart" style="height:250px"></div>
+
+        <table id="table-db">
+            <thead>
+            <tr>
+                <th class="l">{{DatabaseTable}}</th>
+                <th class="l">{{Comment}}</th>
+                <th class="r">{{Rows}}</th>
+                <th class="r">{{Size}} [MB]</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- BEGIN TABLESIZE -->
+            <tr>
+                <td>{TABLE_NAME}</td>
+                <td>{TABLE_COMMENT}</td>
+                <td class="r">{TABLE_ROWS}</td>
+                <td class="r">{SIZE_MB}</td>
+            </tr>
+            <!-- END -->
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <th colspan="4"></th>
+            </tr>
+            </tfoot>
+
+        </table>
 
     </div>
 
@@ -123,7 +159,7 @@
             <!-- BEGIN CACHEINFO -->
             <tr>
                 <td>{strtolower:_LOOP}</td>
-                <td>{CACHEINFO}</td>
+                <td>{raw:CACHEINFO}</td>
             </tr>
             <!-- END -->
             </tbody>

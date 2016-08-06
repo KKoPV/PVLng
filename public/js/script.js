@@ -1,11 +1,10 @@
 /**
- *
+ * Some common scripts
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
- * @revision    $Rev$
  */
 
 console.time('Duration');
@@ -23,25 +22,31 @@ $.fn.autoWidth = function(options) {
     this.each(function() {
         maxWidth = Math.max($(this).width(), maxWidth);
     });
+
     this.css('display', 'inline-block').width(maxWidth + settings.marginRight);
 };
 
 /**
- * http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+ * Idea from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
  */
-$.extend({
-    parseQueryString: function() {
-        var qs = window.location.search.replace('?', '');
-        if (qs == '') return {};
-        result = {};
-        $.each(qs.split('&'), function(i, v){
-            var pair = v.split('=');
-            /* decodeURI doesn't work for the date strings :-( */
-            result[pair[0]] = (pair.length > 1) ? pair[1].replace(/%2F/g, '/') : '';
+$.parseQueryString = function() {
+    var qs = window.location.search.replace('?', ''), result = {}, v;
+    if (qs) {
+        $.each(qs.split('&'), function(id, data) {
+            v = data.split('=');
+            if (v.length == 2) result[v[0]] = decodeURIComponent(v[1]);
         });
-        return result;
     }
-});
+    return result;
+};
+
+/**
+ * Display wait cursor for whole page
+ */
+$.wait = function(show) {
+    if (!arguments.length) show = true; // Defaults to true
+    $('html, body').css('cursor', show ? 'progress' : 'default');
+};
 
 /**
  *
@@ -53,7 +58,9 @@ var lastModule, hideMenuTimer;
  */
 $(function() {
 
-    /* Inititilize Pines Notify */
+    $.datepicker.setDefaults($.datepicker.regional[$.datepicker.regional[language] ? language : '']);
+
+    // Inititilize Pines Notify
     $.pnotify.defaults.styling = 'jqueryui';
     $.pnotify.defaults.delay = 5000;
     $.pnotify.defaults.history = false;
@@ -71,9 +78,21 @@ $(function() {
         $.pnotify(msg);
     });
 
-    /* Inititilize Tooltips */
+    // Inititilize Tooltips
     $('.tip, .tipbtn').tipTip({
         attribute: 'tip',
+        maxWidth: '400px',
+        edgeOffset: 10
+    });
+    $('.tip-right, .tipbtn-right').tipTip({
+        attribute: 'tip',
+        defaultPosition: 'right',
+        maxWidth: '400px',
+        edgeOffset: 10
+    });
+    $('.tip-top, .tipbtn-top').tipTip({
+        attribute: 'tip',
+        defaultPosition: 'top',
         maxWidth: '400px',
         edgeOffset: 10
     });
@@ -126,40 +145,48 @@ $(function() {
 
     $('input[type=number]').prop('type', 'text').addClass('number-spinner').spinner();
 
-    /* Back to top */
+    // Back to top
     var fadeDuration = 500;
-    $(window).scroll(function() {
-        if ($(this).scrollTop()) {
-            $('.back-to-top').fadeIn(fadeDuration);
+    $(window).on('scroll', function() {
+        if ($(this).scrollTop() > 50) {
+            $('.go-top').fadeIn(fadeDuration);
         } else {
-            $('.back-to-top').fadeOut(fadeDuration);
+            $('.go-top').fadeOut(fadeDuration);
         }
     });
 
-    $('.language').click(function(e) {
-        e.preventDefault();
-        /* Detect if there is already parameters in URL */
-        var sep = (window.location.search == '') ? '?' : '&';
-        window.location = window.location + sep + 'lang=' + $(this).data('lang');
-        return false;
-    });
-
-    $('.back-to-top').click(function(e) {
+    $('.go-top').on('click', function(e) {
         e.preventDefault();
         jQuery('html, body').animate({scrollTop: 0}, fadeDuration);
         return false;
     });
 
+    $('.sm').smartmenus({ mainMenuSubOffsetY: 12 });
+
+    $('.language').click(function(e) {
+        e.preventDefault();
+        /* Rebuild location string */
+        location = location.protocol + '//' + location.hostname +
+                   location.pathname + location.search +
+                   // Detect if there are already parameters in URL
+                   (location.search == '' ? '?' : '&') +
+                   'lang=' + $(this).data('lang');
+    });
+
     shortcut.add('Shift+F1', function() { window.location = '/'; });
     shortcut.add('Shift+F2', function() { window.location = '/dashboard'; });
-    shortcut.add('Shift+F3', function() { window.location = '/list'; });
-    shortcut.add('Shift+F4', function() { window.location = '/channel'; });
-    shortcut.add('Shift+F5', function() { window.location = '/info'; });
-    shortcut.add('Shift+F6', function() { window.location = '/description'; });
+    shortcut.add('Shift+F3', function() { window.location = '/channel'; });
+    shortcut.add('Shift+F4', function() { window.location = '/overview'; });
+    shortcut.add('Shift+F5', function() { window.location = '/list'; });
+    shortcut.add('Shift+F6', function() { window.location = '/info'; });
+    shortcut.add('Shift+F7', function() { window.location = '/description'; });
+    shortcut.add('Shift+F8', function() { window.location = '/weather'; });
     shortcut.add('Alt+L',    function() { window.location = '/logout'; });
-
 });
 
+/**
+ *
+ */
 var timer, verbose = false;
 
 /**
@@ -193,7 +220,7 @@ function _log() {
 }
 
 /**
- *
+ * disabled, not used yet
  * /
 String.prototype.repeat = function(count) {
     if (count < 1) return '';

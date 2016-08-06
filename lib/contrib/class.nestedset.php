@@ -63,9 +63,7 @@ class NestedSet {
     $this->db     = $params['db'];
     $this->table  = $params['db_table'];
 
-    require_once $params['path'] . DIRECTORY_SEPARATOR . $this->lang . '.php';
-
-    $this->msg = $msg;
+    $this->msg = include $params['path'] . DIRECTORY_SEPARATOR . $this->lang . '.php';
   }
 
 /**

@@ -7,9 +7,10 @@
  * You can use any grid from http://960.gs - WITH 10 COLUMNS!
  */
 body {
-    font-family: Verdana, Arial, sans-serif;
     max-width: 1200px;
     margin: 0 auto;
+    /* Imprima load via font cache - https://jaicab.com/localFont/ */
+    font-family: Imprima, Arial, sans-serif;
     font-size: 90%;
 }
 
@@ -45,31 +46,35 @@ a:hover, a:active {
     color: black;
 }
 
-/* Back to top link
+/* Go back to top link
 --------------------------------------------------------------------------- */
-.back-to-top {
+.go-top {
     position: fixed;
     bottom: 1.5em;
     right: 0;
     padding: 1em;
-    display: none;
+    border-right: 0;
+    color: grey;
 }
 
-.back-to-top:hover {
+.go-top:hover {
     background-color: rgba(135, 135, 135, 0.50);
 }
 
 /* Tooltips
 --------------------------------------------------------------------------- */
-.tip {
+.tip,
+.tip-right,
+.tip-top {
     cursor: help;
 }
 
-a.tip,
-button.tip,
+a.tip, a.tip-right, a.tip-top,
+a .tip, a .tip-right, a .tip-top, /* For images inside a tags */
+button.tip, button.tip-right, button.tip-top,
+.tipbtn, .tipbtn-right, .tipbtn-top,
 input[type=image],
-.tipbtn,
-img.btn {
+.btn {
     cursor: pointer;
 }
 
@@ -78,7 +83,11 @@ img.btn {
 }
 
 a.tip img,
-img.tip {
+a.tip-right img,
+a.tip-top img,
+img.tip,
+img.tip-right,
+img.tip-top {
     border: 0;
 }
 
@@ -88,26 +97,20 @@ img.tip {
     padding: .5em 1em;
 }
 
-.select2-results {
-    /* Show about 12 rows below search input */
-    max-height: 20em;
-}
-
 /* Chart-Tooltips
 --------------------------------------------------------------------------- */
 .chart-tooltips {
     width: auto !important;
     padding: .3em !important;
+    background-color: rgb(255,255,200) !important;
     font-family: Verdana, Arial, sans-serif !important;
     font-size: 85% !important;
-    background-color: rgb(255,255,200) !important;
 }
 
 /* Header
 --------------------------------------------------------------------------- */
 #header {
     margin-top: .5em;
-    margin-bottom: .5em;
 }
 
 #title1 {
@@ -118,6 +121,8 @@ img.tip {
     color: black;
 }
 
+/* Menu
+--------------------------------------------------------------------------- */
 #menu {
     margin-top: .75em;
 }
@@ -125,6 +130,15 @@ img.tip {
 #menu div,
 #footer div {
     padding: 3px;
+}
+
+/* SmartMenu config - instance specific stuff not covered in the theme */
+.sm {
+  position: relative;
+  width: auto;
+}
+.sm ul {
+  width: 15em; /* fixed width only please - you can use the "subMenusMinWidth"/"subMenusMaxWidth" script options to override this if you like */
 }
 
 /* Footer
@@ -162,9 +176,15 @@ img.ico {
     height: 16px;
 }
 
-.icons img {
+.icons img,
+.icons .fa {
     width: 16px;
     height: 16px;
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.icons .ico {
     margin-left: 3px;
     margin-right: 3px;
 }
@@ -174,6 +194,7 @@ img.ico {
     height: 16px;
     padding-left: 3px;
     padding-right: 3px;
+    vertical-align: inherit;
 }
 
 img.channel-icon {
@@ -184,37 +205,56 @@ img.channel-icon {
     margin-right: 8px !important;
 }
 
+img.channel-icon-large {
+    width: 24px;
+    height: 24px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    margin-right: 12px !important;
+}
+
 td.imgbar {
     white-space: nowrap;
 }
 
 /* Other
 --------------------------------------------------------------------------- */
-#legend {
-    margin-top: .5em;
-    font-size: small;
-    line-height: 1.75;
+.fa-question.tip {
+    vertical-align: super;
+    margin-left: .5em;
 }
 
-#legend img {
-    vertical-align: text-bottom;
+.marked-for-deletion td {
+    background-color: #FFC0C0 !important;
 }
 
-#legend span {
-    margin-left: 8px;
-    white-space: nowrap;
+.select2-results {
+    /* Show about 12 rows below search input */
+    max-height: 20em;
 }
 
-.legendtip img {
-    padding: 2px;
-    margin-right: 8px;
-    margin-bottom: 2px;
+.icon-legend {
+    padding: .5em 0;
+    font-size: smaller;
+}
+
+.icon-legend i {
+    padding-right: .25em;
+    color: #404040;
+    font-size: initial;
+}
+
+.legendtip i {
+    padding: 1px;
+    margin: 2px;
     background-color: white;
+    color: #404040;
+    font-size: initial;
 }
 
 .wait,
 .wait * {
-    cursor: wait !important;
+    cursor: progress !important;
 }
 
 .textarea-transition {
@@ -230,12 +270,31 @@ textarea {
     background-color: white;
 }
 
+input.guid {
+    font-family: Courier New, monospace;
+    font-size: large;
+    text-align: center;
+    width: 100%;
+    border: 0;
+    outline: 0;
+}
+
 .clickable {
     cursor: pointer;
 }
 
 tt {
     font-size: 120%;
+}
+
+.fa.btn {
+    margin-left: 2px;
+    margin-right: 2px;
+    color: #404040;
+}
+
+a.fa.btn {
+    text-decoration: none;
 }
 
 .s {
@@ -279,7 +338,6 @@ tt {
 }
 
 .alias {
-    color: gray;
     font-style: italic;
 }
 

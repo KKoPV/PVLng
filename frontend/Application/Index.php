@@ -7,11 +7,33 @@
  * @version    1.0.0
  */
 
-PVLng::Menu(
-    'index', 10, '/',
-    I18N::translate('Charts'),
-    I18N::translate('ChartHint') . ' (Shift+F1)'
-);
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('20.10', '/', 'Charts', TRUE, 'Shift+F1');
+});
+
+// Add direct links to charts only if not chart controller is the active one
+$app->hook('slim.before.dispatch', function () use ($app) {
+    $tblView = new ORM\View;
+
+    if ($app->user) {
+        // Private charts
+        $app->menu->add('20.10.10', '#', 'private');
+        foreach ($tblView->filterByPublic(0)->find() as $view) {
+            $app->menu->add('20.10.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+        }
+
+        // Public charts
+        $app->menu->add('20.10.20', '#', 'public');
+        foreach ($tblView->reset()->filterByPublic(1)->find() as $view) {
+            $app->menu->add('20.10.20.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+        }
+    } else {
+        // Public charts only
+        foreach ($tblView->filterByPublic(1)->find() as $view) {
+            $app->menu->add('20.10.', '/chart/'.$view->getSlug(), ':'.$view->getName());
+        }
+    }
+});
 
 /**
  * Routes

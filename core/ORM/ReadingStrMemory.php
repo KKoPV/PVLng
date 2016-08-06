@@ -16,7 +16,7 @@ namespace ORM;
 /**
  *
  */
-class ReadingStrMemory extends ReadingMemory {
+class ReadingStrMemory extends ReadingStrMemoryBase {
 
     /**
      *
@@ -25,11 +25,11 @@ class ReadingStrMemory extends ReadingMemory {
      */
     public function __construct ( $id=NULL ) {
         if (self::$first) {
-            \slimMVC\App::getInstance()->db->query('
+            self::$db->query('
                 CREATE TABLE IF NOT EXISTS `pvlng_reading_str_tmp` (
-                    `id`        smallint unsigned NOT NULL,
-                    `timestamp` int               NOT NULL,
-                    `data`      varchar(50)       NOT NULL,
+                    `id`        smallint unsigned NOT NULL DEFAULT 0,
+                    `timestamp` int               NOT NULL DEFAULT 0,
+                    `data`      varchar(50)       NOT NULL DEFAULT "",
                     PRIMARY KEY (`id`, `timestamp`)
                 ) ENGINE=Memory PARTITION BY LINEAR KEY(`id`) PARTITIONS 10
             ');
@@ -41,17 +41,12 @@ class ReadingStrMemory extends ReadingMemory {
     }
 
     // -------------------------------------------------------------------------
-    // PROTECTED
+    // PRIVATE
     // -------------------------------------------------------------------------
 
     /**
      * First call
      */
-    protected static $first = TRUE;
-
-    /**
-     *
-     */
-    protected $table = 'pvlng_reading_str_tmp';
+    private static $first = TRUE;
 
 }

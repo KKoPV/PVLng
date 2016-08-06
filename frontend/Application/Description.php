@@ -7,20 +7,21 @@
  * @version    1.0.0
  */
 
-/**
- * Add menu and route only if description file exists
- */
-if (!file_exists(ROOT_DIR . DS . 'description.md')) return;
+if (file_exists(ROOT_DIR . DS . 'description.md')) {
+    // Add route only if description file exists
+    $app->hook('slim.before', function() use ($app) {
+        $app->menu->add(80, '/description', 'Description', TRUE, 'Shift+F7');
+    });
 
-PVLng::Menu(
-    'description', 70, '/description',
-    I18N::translate('Description'),
-    I18N::translate('PlantDescriptionHint') . ' (Shift+F6)'
-);
+    $app->get('/description', function() use ($app) {
+        $app->process('Description');
+    });
 
-/**
- * Route
- */
-$app->get('/description', function() use ($app) {
-    $app->process('Description');
-});
+} else {
+
+    $app->hook('slim.before', function() use ($app) {
+        $app->menu->add(80, '#', 'Description', TRUE,
+                        'Please create "description.md" first,<br />see "description.md.dist" for reference');
+    });
+
+}

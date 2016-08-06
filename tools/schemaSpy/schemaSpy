@@ -1,0 +1,67 @@
+#!/bin/bash
+###
+### Generate database schema
+###
+### http://schemaspy.sourceforge.net
+### http://dev.mysql.com/downloads/connector/j
+###
+### @author     Knut Kohl <github@knutkohl.de>
+### @copyright  2012-2014 Knut Kohl
+### @license    MIT License (MIT) http://opensource.org/licenses/MIT
+### @version    1.0.0
+###
+
+# set -x
+
+: ${java:=$(which java)}
+
+[ ! "$java" ] && echo "Can't find java executable" && exit 1
+
+[ $# -ne 1 ] && echo "Usage: $0 <config file>" && exit 1
+
+### Load configuration
+conf=$1
+[ ! -f "$conf" ] && echo "Missing configuration file: $conf" && exit 127
+. $conf
+
+### Let's go
+pwd=$(dirname $(readlink -f $0))
+
+### Output directory
+schema=$(cd $pwd/../../public/schema && pwd)
+
+### Force recreate schema directory
+rm -rf $schema 2>/dev/null
+
+### Non-empty password?
+[ "$PASSWORD" ] && PASSWORD="-p '$PASSWORD'"
+
+### Run schemaSpy
+(   cd $pwd/jar
+    $java -jar schemaSpy_5.0.0.jar $OPTS -meta pvlng.meta.xml \
+          -hq -norows -t mysql -host $HOST -u $USER $PASSWORD -db $DATABASE \
+          -i pvlng_.* -I '(pvlng_options)|(pvlng_reading_.*tmp)' -o $schema
+)
+
+if [ -d "$schema" ]; then
+
+    echo Patch files ...
+    ### Make some justifications, e.g. remove server name etc.
+    find $schema -name '*.html' -exec \
+    sed -i "s~<span title='Database'>.*</span>.<span title='Schema'>.*</span>\.~~g; \
+            s~<span title='Database'>.*</span>.<span title='Schema'>.*</span>~PVLng~g; \
+            s~<title>.*</title>~<title>PVLng database schema</title>~g" {} \;
+
+    echo Patch styles ...
+    ### Save generated styles and ...
+    mv $schema/schemaSpy.css $pwd/schemaSpy.css.org
+    ### replace with tuned ones
+    cp $pwd/schemaSpy.css $schema/
+
+    echo Fix unix line endings ...
+    find $schema -name '*.html' -exec dos2unix -q -o {} \;
+    find $schema -name '*.js' -exec dos2unix -q -o {} \;
+
+    [ -f "$pwd/schemaSpy.after" ] && . $pwd/schemaSpy.after
+
+fi

@@ -14,6 +14,10 @@ namespace Channel;
  */
 class Estimate extends InternalCalc {
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
@@ -21,7 +25,8 @@ class Estimate extends InternalCalc {
         parent::__construct($channel);
         // Fake as counter to get the sum of estiamtes for periods greater than day
         $this->counter = TRUE;
-        if ($marker = $this->config->get('Model.Estimate.Marker')) {
+
+        if ($marker = \ORM\Settings::getModelValue('Estimate', 'Marker')) {
             $this->attributes['marker'] = $marker;
         }
     }
@@ -29,12 +34,17 @@ class Estimate extends InternalCalc {
     /**
      *
      */
-    protected function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 
         $timestamp = max(strtotime(date('Y-m-d 12:00', $this->start)), $this->start);
         $this->end = min(strtotime(date('Y-m-d 12:00', $this->end)), $this->end);
+
+        if ($this->dataExists()) return;
+
+        // Read out all data
+        $request['period'] = '1i';
 
         $estimates = array();
         foreach (explode("\n", $this->extra) as $line) {
@@ -52,17 +62,11 @@ class Estimate extends InternalCalc {
         if (isset($estimates[1])) $estimates[13] = $estimates[1];
         if (isset($estimates[12])) $estimates[0] = $estimates[12];
 
-        $lat = $this->config->get('Location.Latitude');
-        $lon = $this->config->get('Location.Longitude');
-
         while ($timestamp <= $this->end) {
-            $day = date('n-j', $timestamp);
-            $month = date('n', $timestamp);
+            $month = date('n',   $timestamp);
+            $day   = date('n-j', $timestamp);
 
-            if ($lat != '' AND $lon != '') {
-                // Set to sunset time
-                $ts = date_sunset($timestamp, SUNFUNCS_RET_TIMESTAMP, $lat, $lon, 90, date('Z')/3600);
-            } else {
+            if (!($ts = \ORM\Settings::getSunset($timestamp))) {
                 // Round between 16:00 and 21:30 during the year in seconds
                 $ts = (16 + sin((date('z', $timestamp)+10) * M_PI / 366) * 5.5) *60*60;
                 // Move into this day using date functions for server time offsets
@@ -89,5 +93,7 @@ class Estimate extends InternalCalc {
             }
             $timestamp += 86400;
         }
+
+        $this->dataCreated();
     }
 }

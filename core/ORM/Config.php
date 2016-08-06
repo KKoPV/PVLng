@@ -1,15 +1,16 @@
 <?php
 /**
+ * Real access class for 'pvlng_config'
  *
+ * To extend the functionallity, edit here
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
- */
-
-/**
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  *
+ * 1.0.0
+ * - Initial creation
  */
 namespace ORM;
 
@@ -22,14 +23,21 @@ class Config extends ConfigBase {
      *
      */
     public function getAPIkey() {
-        return $this->app->db->queryOne('SELECT `getAPIkey`()');
+        return self::$db->queryOne('SELECT `getAPIkey`()');
+    }
+
+    /**
+     *
+     */
+    public function getInstallation() {
+        return self::$db->queryOne('SELECT `pvlng_id`()');
     }
 
     /**
      *
      */
     public function resetAPIkey() {
-        $this->app->db->query(
+        self::$db->query(
             'UPDATE `'.$this->table.'` SET `value` = UUID() WHERE `key` = "APIKey" LIMIT 1'
         );
     }

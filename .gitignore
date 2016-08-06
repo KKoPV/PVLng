@@ -3,10 +3,15 @@ prepend.php
 append.php
 config.php
 config.cron.php
-*.conf.php
 *.conf
 run/*
 tmp/*
 custom/
 description.md
 !.githold
+
+info.php
+composer.lock
+/tests
+/vendor
+/nbproject

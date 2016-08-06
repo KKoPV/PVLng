@@ -76,7 +76,7 @@ class MemCacheOne extends \Cache {
         return TRUE;
     }
 
-    public function write( $key, $data ) {
+    public function write( $key, $data, $ttl ) {
         $key = strtolower($key);
         $this->data[$key] = $data;
         $this->modified = TRUE;

@@ -19,9 +19,6 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
-    'threshold' => array(
-        'visible' => TRUE
-    ),
     'valid_from' => array(
         'type'     => 'integer',
         'required' => TRUE

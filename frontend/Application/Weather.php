@@ -7,16 +7,9 @@
  * @version    1.0.0
  */
 
-if (!Session::get('User')) return;
-
-/**
- *
- */
-PVLng::Menu(
-    'weather', 80, '/weather',
-    I18N::translate('Weather'),
-    I18N::translate('WeatherForecast')
-);
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add(70, '/weather', 'Weather', TRUE, 'Shift+F8');
+});
 
 /**
  * Routes

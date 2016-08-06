@@ -90,16 +90,10 @@ class Multiplier extends Calculator {
 
                 } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                    // take existing row as is
-                    $result->write($row1, $key1);
-
                     // Missing row 2, read only row 1
                     $row1 = $buffer->next()->current();
 
                 } else /* $key1 > $key2 */ {
-
-                    // take existing row as is
-                    $result->write($row2, $key2);
 
                     // Missing row 1, read only row 2
                     $row2 = $next->next()->current();

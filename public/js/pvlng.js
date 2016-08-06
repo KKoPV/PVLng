@@ -1,6 +1,11 @@
 /**
  *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
+
 var pvlng = new function() {
 
     /**
@@ -10,7 +15,7 @@ var pvlng = new function() {
      */
     this.cookie = new function() {
 
-        this.set = function (name, value, days) {
+        this.set = function(name, value, days) {
             var expires = '';
             if (days) {
                 var date = new Date();
@@ -20,7 +25,7 @@ var pvlng = new function() {
             document.cookie = escape(name) + '=' + escape(value) + expires + '; path=/';
         },
 
-        this.get = function (name) {
+        this.get = function(name) {
             var nameEQ = escape(name) + '=';
             var ca = document.cookie.split(';');
             for (var i=0; i<ca.length; i++) {
@@ -49,32 +54,6 @@ var pvlng = new function() {
             $.each(stack, function(i, func) { func() });
         }
     },
-
-    this.menu = new function() {
-        var that = this;
-        this.Timer = null;
-
-        this.setTimer = function() {
-            if (that.Timer) return;
-
-            that.Timer = setTimeout(
-                function() {
-                    $('#submenu').parent().hide();
-                    that.unsetTimer();
-                },
-                3000
-            );
-            /* console.log('Set MenuTimer: '+that.Timer); */
-        };
-
-        this.unsetTimer = function() {
-            if (!that.Timer) return;
-
-            /* console.log('Unset MenuTimer: '+that.Timer); */
-            that.Timer = clearTimeout(that.Timer);
-        };
-
-    }
 
     /**
      * Scroll to #top as top most visible element
@@ -109,46 +88,6 @@ var pvlng = new function() {
 
     /* Public */
     this.verbose = false;
-
-    this.Overlay = function() {
-        this.show = function() {
-            /*$('#container').hide();*/
-            this.overlay.show();
-        };
-
-        this.hide = function() {
-            this.overlay.hide();
-            $('#container').show();
-        };
-
-        /* Prepare overlay ... */
-        this.overlay = $('<div/>')
-            .height($(document).height())
-            .css({
-                display: 'none',
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                backgroundColor: '#FFF',
-                opacity: 0.8,
-                zIndex: 1000
-            })
-            .append(
-                /* ... and preload image */
-                $('<img/>')
-                    .prop('src', '/images/loading_dots.gif')
-                  /*  .prop('width', 64).prop('height', 21) */
-                    .css({
-                        width: '64px',
-                        height: '21px',
-                        position: 'fixed',
-                        top: (window.innerHeight/2-15)+'px',
-                        left: (window.innerWidth/2-32)+'px'
-                    })
-            )
-            .appendTo('body');
-    };
 
     /**
      * Add clear search button to table
@@ -194,14 +133,14 @@ var pvlng = new function() {
     /**
      *
      */
-    this.changeDates = function ( dir ) {
+    this.changeDates = function( dir ) {
         dir *= 24*60*60*1000;
 
         var from = new Date(Date.parse($('#from').datepicker('getDate')) + dir),
             to = new Date(Date.parse($('#to').datepicker('getDate')) + dir);
 
-        if (to > new Date) {
-            $.pnotify({ type: 'info', text: "Can't go beyond today." });
+        if (to > (new Date).getTime()+24*60*60*1000) {
+            $.pnotify({ type: 'info', text: "Can't go beyond tomorrow." });
             return;
         }
 
@@ -214,7 +153,7 @@ var pvlng = new function() {
     /**
      *
      */
-    this.changePreset = function () {
+    this.changePreset = function() {
         var preset = $('#preset').val().match(/(\d+)(\w+)/);
 
         if (!preset) {
@@ -279,12 +218,12 @@ $(function() {
                 close: function() { $(this).remove() }
             };
             /* Use given texts for buttons */
-            options.buttons[OkText] = function () {
+            options.buttons[OkText] = function() {
                 $(this).dialog('close');
                 d.resolve(true);
                 return true;
             };
-            options.buttons[CancelText] = function () {
+            options.buttons[CancelText] = function() {
                 $(this).dialog('close');
                 d.resolve(false);
                 return false;
@@ -295,31 +234,6 @@ $(function() {
             return d.promise();
         }
     });
-
-    /**
-     *
-     */
-    $('a.module').hover(
-        function() {
-            var submenu = submenus[$(this).data('module')];
-            if (!submenu) return;
-
-            pvlng.menu.unsetTimer();
-
-            var menu = $('#submenu').empty();
-            $.each(submenu, function(id, el) {
-                $('<a/>').prop('href', el.ROUTE).text(el.LABEL)
-                    .prop('title', el.HINT).tipTip()
-                    .appendTo(menu)
-                    .hover(
-                        pvlng.menu.unsetTimer,
-                        pvlng.menu.setTimer
-                    );
-            });
-            menu.buttonset().parent().show();
-        },
-        pvlng.menu.setTimer
-    );
 
     /**
      *

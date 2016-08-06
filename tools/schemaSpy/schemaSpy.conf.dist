@@ -1,0 +1,32 @@
+###
+### Copy this file to schemaSpy.conf and fill for your needs
+###
+
+###
+### MySQL address
+###
+### $ sudo grep bind-address /etc/mysql/my.cnf
+###
+HOST=192.168.1.244
+
+###
+### Database user
+###
+USER=pvlng
+
+###
+### Database users password
+###
+PASSWORD=
+
+###
+### Database
+###
+DATABASE=pvlng
+
+###
+### Additional schemaSpy options
+###
+### http://schemaspy.sourceforge.net/#Running_SchemaSpy
+###
+#OPTS="-loglevel info"

@@ -3,14 +3,14 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
+ * @copyright   2012-2015 Knut Kohl
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
 
 <!-- -------------------------------------------------------------------------
-PAGE 1
+PAGE 1 - Home
 -------------------------------------------------------------------------- -->
 <div data-role="page" id="page-home" data-theme="a" data-view="{VIEW1ST}">
 
@@ -58,7 +58,7 @@ PAGE 1
 </div>
 
 <!-- -------------------------------------------------------------------------
-PAGE 2
+PAGE 2 - Select chart
 -------------------------------------------------------------------------- -->
 <div data-role="page" id="page-select" data-theme="a">
 
@@ -85,12 +85,14 @@ PAGE 2
         </div>
     </div>
 
+    <a href="#page-home" data-role="button">{{Home}}</a>
+
     <!-- INCLUDE footer.inc.tpl -->
 
 </div>
 
 <!-- -------------------------------------------------------------------------
-PAGE 3
+PAGE 3 - Weather forecast
 -------------------------------------------------------------------------- -->
 <div data-role="page" id="page-weather" data-theme="a">
 
@@ -120,6 +122,8 @@ PAGE 3
         <!-- Hidden placeholder appended to #weather-chart during loading -->
         <div id="weather-wait">{{JustAMoment}}</div>
     </div>
+
+    <a href="#page-home" data-role="button">{{Home}}</a>
 
     <!-- INCLUDE footer.inc.tpl -->
 

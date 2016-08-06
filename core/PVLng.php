@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * Helper functions
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2014 Knut Kohl
@@ -12,78 +12,7 @@ abstract class PVLng {
     /**
      *
      */
-    public static function Menu( $module, $pos, $route, $label, $hint='' ) {
-        while (isset(self::$Menu[$pos])) $pos++;
-        self::$Menu[$pos] = array(
-            'MODULE' => $module,
-            'ROUTE'  => $route,
-            'LABEL'  => $label,
-            'HINT'   => $hint
-        );
-    }
-
-    /**
-     *
-     */
-    public static function getMenu() {
-        ksort(self::$Menu);
-        return self::$Menu;
-    }
-
-    /**
-     *
-     */
-    public static function SubMenu( $modules, $pos, $route, $label, $hint='' ) {
-
-        if (!is_array($modules)) $modules = array($modules);
-
-        foreach ($modules as $module) {
-            if (!isset(self::$SubMenu[$module])) self::$SubMenu[$module] = array();
-
-            $p = $pos;
-            while (isset(self::$SubMenu[$module][$p])) $p++;
-
-            self::$SubMenu[$module][$p] = array(
-                'ROUTE'  => $route,
-                'LABEL'  => $label,
-                'HINT'   => $hint
-            );
-        }
-    }
-
-    /**
-     *
-     */
-    public static function getSubMenu( $module=NULL ) {
-        foreach (self::$SubMenu as &$submenu) {
-            ksort($submenu);
-        }
-        if (isset(self::$SubMenu[$module])) {
-            return self::$SubMenu[$module];
-        } elseif ($module === NULL) {
-            return self::$SubMenu;
-        };
-    }
-
-    /**
-     *
-     */
-    public static function Language( $code, $label, $position=0 ) {
-        while (isset(self::$Language[$position])) $position++;
-        self::$Language[$position] = array(
-            'POSITION' => $position,
-            'CODE'     => $code,
-            'LABEL'    => $label
-        );
-    }
-
-    /**
-     *
-     */
-    public static function getLanguages() {
-        ksort(self::$Language);
-        return self::$Language;
-    }
+    const STATS_URL = 'http://stats.pvlng.com/index.php';
 
     /**
      *
@@ -98,23 +27,43 @@ abstract class PVLng {
         ));
     }
 
-    // -----------------------------------------------------------------------
-    // PROTECTED
-    // -----------------------------------------------------------------------
-
     /**
-     *
+     * Send anonymous statistics about channel & readings count
      */
-    protected static $Menu = array();
+    public static function sendStatistics() {
+        $db = slimMVC\App::getInstance()->db;
 
-    /**
-     *
-     */
-    protected static $SubMenu = array();
+        // Send statistic at all?
+        if (!$db->queryOne('
+            SELECT `value` FROM `pvlng_settings`
+             WHERE `scope` = "core"
+               AND `name`  = ""
+               AND `key`   = "SendStats"
+             LIMIT 1
+        ')) return;
 
-    /**
-     *
-     */
-    protected static $Language = array();
+        // Send once a day
+        if (time() < $db->LastStats + 24*60*60) return;
 
+        // This data will be send
+        $args = array(
+            // Unique installation id
+            $db->queryOne('SELECT `pvlng_id`()'),
+            // Real channels, writable and no childs allowed
+            (new ORM\ChannelView)->filterByChilds(0)->filterByWrite(1)->find()->count(),
+            // Row count in numeric and non-numeric readings tables
+            (new ORM\ReadingNum)->rowCount() + (new ORM\ReadingStr)->rowCount()
+        );
+
+        $ch = curl_init(self::STATS_URL);
+
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($args));
+        curl_exec($ch);
+
+        // On error, make next try in 1 hour
+        $db->LastStats = curl_errno($ch) ? time()-23*60*60 : time();
+
+        curl_close($ch);
+    }
 }

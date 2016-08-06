@@ -9,7 +9,9 @@
  */
 -->
 
-<small><img src="{ICON}" class="channel-icon tip" title="{TYPE}" alt="({TYPE})"></small>
+<small>
+    <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon tip" title="{TYPE}" alt="({TYPE})">
+</small>
 
 <strong class="tip" title="{GUID}">{NAME}</strong>
 
@@ -18,5 +20,5 @@
 <!-- ENDIF -->
 
 <!-- IF !{PUBLIC} -->
-    <small style="margin-left:1em"><img src="/images/ico/lock.png" class="ico" alt="[private]"></small>
+    <i class="fa fa-lock" style="margin-left:.5em"></i>
 <!-- ENDIF -->

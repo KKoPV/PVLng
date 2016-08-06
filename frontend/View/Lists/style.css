@@ -18,3 +18,7 @@
 #nav table td {
     vertical-align: middle;
 }
+
+#list tr:hover td {
+    background-color: #C0FFC0 !important;
+}

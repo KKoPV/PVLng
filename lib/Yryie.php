@@ -20,9 +20,10 @@ class Yryie {
     /**
      *
      */
-    const MAXSTRLEN    = 100;
-    const SECONDS      = 0;
-    const MICROSECONDS = 1;
+    const MAXSTRLEN         = 100;
+    const TIME_SECONDS      = 1;
+    const TIME_MICROSECONDS = 2;
+    const TIME_AUTO         = 3;
 
     /**
      * File to write the debug stack during each add()
@@ -56,7 +57,7 @@ class Yryie {
     /**
      *
      */
-    public static function transformCode( &$code, $functions=TRUE ) {
+    public static function transformCode( &$code, $functions=FALSE ) {
         // Single line comments: /// PHP code...
         $code = preg_replace('~^(\s*)///\s+([^*]*?)$~m', '$1$2 /// AOP', $code);
 
@@ -68,7 +69,7 @@ class Yryie {
         if ($functions AND
             preg_match_all('~function\s+(\w+)[^{]+?{~', $code, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $code = str_replace($match[0], $match[0] . ' \Yryie::Call(func_get_args()); /// AOP', $code);
+                $code = str_replace($match[0], $match[0] . ' \Yryie::Call(func_get_args()); /* AOP */ ', $code);
             }
         }
     }
@@ -132,7 +133,7 @@ class Yryie {
      * @param bool $active
      * @return void
      */
-    public static function Active( $active=NULL ) {
+    public static function Active( $active=null ) {
         self::Trace();
         if (isset($active)) self::$Active = (bool) $active;
         return self::$Active;
@@ -141,7 +142,7 @@ class Yryie {
     /**
      * Set TimeUnit...
      *
-     * @param int $TimeUnit (self::SECONDS|self::MIRCOSECONDS)
+     * @param int $TimeUnit (Yryie::TIME_SECONDS|Yryie::TIME_MICROSECONDS|Yryie::TIME_AUTO)
      * @return void
      */
     public static function TimeUnit( $TimeUnit ) {
@@ -158,6 +159,8 @@ class Yryie {
      * @return void
      */
     public static function Info( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -176,6 +179,8 @@ class Yryie {
      * @return void
      */
     public static function Code( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -194,6 +199,8 @@ class Yryie {
      * @return void
      */
     public static function State( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -212,6 +219,8 @@ class Yryie {
      * @return void
      */
     public static function SQL( $sql ) {
+        if (!self::$Active) return;
+
         if (is_array($sql)) {
             foreach ($sql as $q) self::add($q, 'sql');
         } else {
@@ -229,6 +238,8 @@ class Yryie {
      * @return void
      */
     public static function Debug( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -247,6 +258,8 @@ class Yryie {
      * @return void
      */
     public static function Warning( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -265,6 +278,8 @@ class Yryie {
      * @return void
      */
     public static function Error( $message ) {
+        if (!self::$Active) return;
+
         if (func_num_args() > 1) {
             $args = func_get_args();
             $message = array_shift($args);
@@ -283,6 +298,8 @@ class Yryie {
      * @return void
      */
     public static function Call( $args ) {
+        if (!self::$Active) return;
+
         $params = array();
         foreach($args as $arg) $params[] = is_scalar($arg) ? $arg : gettype($arg);
         self::add(implode(', ', $params), 'call');
@@ -394,9 +411,9 @@ class Yryie {
             $id = end($ids);
         }
         list($start, $name, $avg) = self::$Timer[$id];
-        $diff = self::timef(microtime(TRUE)-$start);
+        $diff = microtime(TRUE) - $start;
         self::$TimerLevel--;
-        self::add(sprintf('%s %s: %s', self::$TimerStop, $name, $diff), 'timer');
+        self::add(sprintf('%s %s: %s', self::$TimerStop, $name, self::timef($diff)), 'timer');
         unset(self::$Timer[$id]);
 
         if ($avg != '') {
@@ -440,7 +457,7 @@ class Yryie {
                 sprintf(
                     'avg. "%1$s": %4$s (%3$d in %2$s)',
                     $avg, self::timef($data[0]), $data[1],
-                    self::timef($data[0]/$data[1], self::MICROSECONDS)
+                    self::timef($data[0]/$data[1])
                 ),
                 'timer'
             );
@@ -454,11 +471,13 @@ class Yryie {
      */
     public static function finalize() {
         self::finalizeTimers();
-
-        self::Debug('%d files included', count(get_included_files()));
-        self::Debug('build in %.0f ms', (microtime(TRUE)-$_SERVER['REQUEST_TIME'])*1000);
-        self::Debug('%.0f kByte memory used', memory_get_peak_usage(TRUE)/1024);
-        self::Debug('%d Messages', count(self::$Data));
+        self::Debug(
+            'build in %s; %d kByte memory used; %d files included; %d messages collected',
+            self::timef((microtime(TRUE)-$_SERVER['REQUEST_TIME']), self::TIME_AUTO),
+            memory_get_peak_usage(TRUE)/1024,
+            count(get_included_files()),
+            count(self::$Data)
+        );
     } // function Finalize()
 
     /**
@@ -570,7 +589,7 @@ class Yryie {
         foreach (self::$Data as $row=>$data) $types[$data[1]] = $data[1];
         $sTypes = '';
         $cb = '<input type="checkbox" style="margin-left:1.5em" '
-                 .'onchange="YryieSwitch(\'%s\', this.checked)" checked> %s';
+             .'onchange="YryieSwitch(\'%s\', this.checked)" checked> %s';
         foreach ($types as $type) if ($type) $sTypes .= sprintf($cb, $type, ucwords($type));
         unset($types);
 
@@ -762,7 +781,7 @@ class Yryie {
      *
      * @var int
      */
-    private static $TimeUnit = 0;
+    private static $TimeUnit = self::TIME_SECONDS;
 
     /**
      * Active timer data
@@ -800,7 +819,10 @@ class Yryie {
                                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAIxSURBVHjaYvz//z8DJQAggBgDC1dm2ziYdL779p8bbNa/fwz/gfjvv79A+j/Dv/9A/t+/QPo/mP4LlONj+/31+vWn5ev6wqYCBBCLibXJJFYObiZxDpIs5v767e8kID0VIIBYvv3+z/Tt3ReSnf4dqA9EAwQQy/+//xlao1VINiCl4yGYBggglv9AP4JA2q7vDLPcOBn27dsHDIZ/DH/+/GFwcHZn2Ld7O4OFnTvDkX1bGUAB/hcYDkFBQeAwAgGAAGJhgMbCZEcOhh+//zNY2joCA/I/wx+ouLWjO1iJtZMX0GBQoEJc8O8PxACAAGKCmZS95ysDBysjw5EDexgOHdjNcGD3NrD4/p2bGRgZGRj2blsHxGsZ9m5dDTHgL8TlAAHEUDrvyn8Q+PXn3/+fv//9//ELgr8B8Xcg/vL9z/9PQPzh25//77/++f/uyx+w+qiaTSCKASCAmP5BXZCx4yMDGwsjw16gn3fv3MqwdeNasPiWjWsYmIFO2LRmGcP6lYsY1i6fD3HBP4gLAAKIIX/6GbCJv//++/8b6goQ/v4LFX/58ff/Z6ArQBgEQkrXgF0AEEBM/6F+Sd38loGFmZFh5/YtDFs3b2BYt3o5WHz1iiVgesmC2QyL5s9kmDd7Kpj/H+oCgABiyJl04j85ILBoJdgFAAHE8vT+w1WZ/b/D/oHSO9A1oHgG+e/v799gGpwHQPniLzRfgMQglq8CEQABxEhpbgQIICYGCgFAgAEAg5qXcfrnux4AAAAASUVORK5CYII=" />
                         Yryie %1$s
                     </th>
-                    <th colspan="4" class="hide">Visible types: %2$s</th>
+                    <th colspan="4" class="hide">
+                        Visible types: %2$s
+                        <a style="float:right" href="?debug=0">disable</a>
+                    </th>
                 </tr>
                 <tr class="hide">
                     <th colspan="2" class="time">Time</th>
@@ -838,10 +860,14 @@ class Yryie {
      * @return string
      */
     private static function timef( $time, $format=NULL ) {
-        if (!isset($format)) $format = self::$TimeUnit;
-        return $format == self::MICROSECONDS
-             ? sprintf('%.2fms', $time*1000)
-             : sprintf('%.5fs', $time);
+        switch ($format ?: self::$TimeUnit) {
+            case self::TIME_AUTO:
+                return $time < 1 ? sprintf('%.3fms', $time*1000) : sprintf('%.3fs', $time);
+            case self::TIME_MICROSECONDS:
+                return sprintf('%.3fms', $time*1000);
+            default:
+                return sprintf('%.3fs', $time);
+        }
     }
 
     /**
@@ -851,7 +877,7 @@ class Yryie {
      * @return array Array( class, function )
      */
     private static function called( $skip ) {
-        $bt = debug_backtrace();
+#        $bt = debug_backtrace();
         return array(@$bt[$skip]['class'], @$bt[$skip]['function']);
     }
 }

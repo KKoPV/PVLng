@@ -1,134 +1,146 @@
 <?php
 /**
+ * Buffering class loader
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2016 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 class Loader {
-
+private static $l = array();
     /**
      *
      */
-    public static function autoload( $className ) {
-        // Handle namespaced and PEAR named classes the same way
-        $className = str_replace(array('\\','_'), DIRECTORY_SEPARATOR, $className);
-        $classMap  = self::getClassMap();
-
-        if (isset($classMap[$className])) {
-            $callback = self::$callback;
-            $source = $callback ? $callback($classMap[$className]) : $classMap[$className];
-            require_once $source;
-            return TRUE;
-        }
-    }
-
-    /**
-     *
-     */
-    public static function register( $settings=array(), $cache=TRUE ) {
-        self::$settings = array_merge(self::$settings, array_change_key_case($settings));
-
-        if ($cache === TRUE) $cache = sys_get_temp_dir();
-
-        self::$ClassMapFile = $cache
-                            ? sprintf('%s%sclassmap.%s.php', $cache, DS,
-                              substr(md5(serialize(self::$settings)), -7))
-                            : FALSE;
-
-        spl_autoload_register('Loader::autoload');
-    }
-
-    /**
-     *
-     */
-    public static function registerCallback( $callback ) {
-        if (is_callable($callback)) {
-            self::$callback = $callback;
+    public static function autoload($class)
+    {
+        if (isset(self::$classMap[$class])) {
+            // Buffered file location found
+            $file = self::$classMap[$class];
         } else {
-            throw new Exception('Not a callable function provided for Loader::registerCallback()');
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
-    /**
-     *
-     */
-    protected static $callback;
-
-    /**
-     *
-     */
-    protected static $ClassMap = array();
-
-    /**
-     *
-     */
-    protected static $ClassMapFile;
-
-    /**
-     *
-     */
-    protected static $settings = array(
-        'path'    => array(),
-        'pattern' => array(
-            '%s.php',
-            '%s.class.php',
-            '%s.interface.php',
-            'class.%s.php',
-            '%s.inc'
-        ),
-        'exclude' => array(),
-    );
-
-    /**
-     *
-     */
-    protected static function getClassMap() {
-        if (empty(self::$ClassMap)) {
-            if (self::$ClassMapFile AND file_exists(self::$ClassMapFile)) {
-                self::$ClassMap = include self::$ClassMapFile;
-            } else {
-                // Build class map
-                foreach (self::$settings['path'] as $path) {
-                    // Iterator for the paths
-                    $files = new RecursiveIteratorIterator(
-                        new RecursiveDirectoryIterator($path)
-                    );
-                    // Load the list of files in the path
-                    foreach ($files as $name=>$file ) {
-                        foreach (self::$settings['exclude'] as $pattern) {
-                            // Skip 2 foreach!
-                            if (preg_match('~'.preg_quote($pattern, '~').'~', $name)) continue 2;
-                        }
-                        if (!$file->isDir() AND !preg_match('~'.DS.'\.\w+~', $name)) {
-                            $filename = str_replace($path.DS, '', $file->getPathname());
-                            foreach (self::$settings['pattern'] as $pattern) {
-                                $pattern = str_replace('%s', '([\w/]+)', $pattern);
-                                $pattern = str_replace('%s', '(\w+)', $pattern);
-                                if (preg_match('~'.$pattern.'~', $filename, $args)) {
-                                    self::$ClassMap[$args[1]] = $name;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                // Cache class map if allowed
-                if (self::$ClassMapFile) {
-                    ksort(self::$ClassMap);
-                    file_put_contents(self::$ClassMapFile,
-                                      '<?php return ' . var_export(self::$ClassMap, TRUE) . ';');
-                }
+            // Mark to save new class map at the end if a file was found
+            if ($file = self::$loader->findFile($class)) {
+                self::$classMap[$class] = $file;
+                self::$l[] = '//  ' . $class;
+                self::$classMapChanged = true;
             }
         }
 
-        return self::$ClassMap;
+        return $file ? self::load($file) : false;
     }
+
+    /**
+     *
+     */
+    public static function register($loader, $cache=true)
+    {
+        self::$loader = $loader;
+
+        // No real path provided
+        if ($cache === true) {
+            $cache = sys_get_temp_dir();
+        }
+
+        self::$classMapFile = $cache
+                            ? sprintf(
+                                  '%s%sclassmap.%s.php',
+                                   $cache, DS, substr(md5(serialize(self::$loader)), -7)
+                              )
+                            : false;
+
+        if (self::$classMapFile) {
+            // Class map exists and is a valid array?
+            if (file_exists(self::$classMapFile) &&
+                is_array($classMap = @include self::$classMapFile)) {
+                self::$classMap = $classMap;
+            }
+            // Save class map on exit
+            register_shutdown_function('Loader::shutdown');
+        }
+
+        // Switch autoload to self
+        spl_autoload_register('Loader::autoload');
+        self::$loader->unregister();
+    }
+
+    /**
+     * Cache class map
+     */
+    public static function shutdown()
+    {
+        if (!self::$classMapChanged) return;
+
+        // Cache class map if allowed
+        ksort(self::$classMap);
+
+        file_put_contents(
+            self::$classMapFile,
+            '<?php return ' . var_export(self::$classMap, true) . ';'
+            . PHP_EOL . PHP_EOL . implode(PHP_EOL, self::$l)
+        );
+    }
+
+    /**
+     * Manual file loading with callback
+     */
+    public static function load($file)
+    {
+        return require_once self::applyCallback($file);
+    }
+
+    /**
+     * Manual apply callback
+     */
+    public static function applyCallback($file)
+    {
+        foreach (self::$callbacks as $callback) {
+            $file = $callback($file);
+        }
+        return $file;
+    }
+
+    /**
+     * Register a loading callback callable
+     */
+    public static function registerCallback($callback, $position=0)
+    {
+        if (!is_callable($callback)) {
+            throw new Exception('Not a callable provided for Loader::registerCallback()');
+        }
+
+        // If position is occupied move behind
+        while (isset(self::$callbacks[$position])) $position++;
+        self::$callbacks[$position] = $callback;
+        return $position;
+    }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected static $loader;
+
+    /**
+     *
+     */
+    protected static $classMapFile;
+
+    /**
+     *
+     */
+    protected static $classMap = array();
+
+    /**
+     *
+     */
+    protected static $classMapChanged = false;
+
+    /**
+     *
+     */
+    protected static $callbacks = array();
 
 }

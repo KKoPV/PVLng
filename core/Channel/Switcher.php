@@ -17,19 +17,14 @@ class Switcher extends Channel {
     /**
      *
      */
-    public function write( $request, $timestamp=NULL ) {
+    protected function before_write(&$request) {
 
-        $this->before_write($request);
+        parent::before_write($request);
 
-        // Get last value and ...
-        $last = \ORM\Reading::factory($this->numeric)->getLastReading($this->entity);
-
-        // ... skip not changed value since last write
-        if ($this->numeric  AND (float)  $last == (float)  $this->value OR
-            !$this->numeric AND (string) $last == (string) $this->value) {
-            return 0;
+        if (($this->numeric  && ((float)  $this->lastReading == (float)  $this->value)) ||
+            (!$this->numeric && ((string) $this->lastReading == (string) $this->value))) {
+            // Skip not changed value since last write
+            throw new \Exception(null, 200);
         }
-
-        return parent::write($request, $timestamp);
     }
 }

@@ -23,4 +23,13 @@ class Channel extends ChannelBase {
         return json_decode(parent::getExtra());
     }
 
+    /**
+     * Get full name with description (if defined): Name (Description)
+     */
+    public function getFullName() {
+        $name = $this->getName();
+        if ($description = $this->getDescription) $name .= ' ('.$description.')';
+        return $name;
+    }
+
 }

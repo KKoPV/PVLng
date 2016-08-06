@@ -16,22 +16,13 @@ namespace ORM;
 /**
  *
  */
-abstract class ReadingMemory extends ReadingBase {
+abstract class ReadingMemory {
 
     /**
      *
      */
     public static function factory( $numeric ) {
         return $numeric ? new ReadingNumMemory : new ReadingStrMemory;
-    }
-
-    /**
-     *
-     */
-    public function deleteById( $id ) {
-        $db = $this->app->db;
-        $db->query('DELETE FROM `'.$this->table.'` WHERE `id` = {1}', $id);
-        return $db->affected_rows;
     }
 
 }

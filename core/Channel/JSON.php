@@ -53,7 +53,6 @@ class JSON extends Channel {
                     continue 2;
                 }
             }
-
             try {                    // Simulate $request['data']
                 $ok += $child->write(array('data' => $value), $timestamp);
             } catch (\Exception $e) {

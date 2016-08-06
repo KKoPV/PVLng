@@ -29,7 +29,7 @@ return array(
         array(
             'type'        => 48, // Solar Edge Inverter
             'name'        => 'Solar Edge Inverter',
-            'description' => 'FILL THE \'SERIAL NUMBER\' WITH YOURS',
+            'description' => 'FILL THE SERIAL NUMBER WITH YOURS',
         ),
 
         // Real channels
@@ -67,7 +67,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac1',
-            'description' => 'DC Current string 1',
+            'description' => 'AC Current phase 1',
             'channel'     => 'L1Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
@@ -77,7 +77,7 @@ return array(
         array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac1',
-            'description' => 'AC Voltage',
+            'description' => 'AC Voltage phase 1',
             'channel'     => 'L1Data->acVoltage',
             'unit'        => 'V',
             'decimals'    => 1,
@@ -87,7 +87,7 @@ return array(
         array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Freq1',
-            'description' => 'Mains frequency 1',
+            'description' => 'Mains frequency phase 1',
             'channel'     => 'L1Data->acFrequency',
             'unit'        => 'Hz',
             'decimals'    => 2,
@@ -98,7 +98,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac2',
-            'description' => 'DC Current string 2',
+            'description' => 'AC Current phase 2',
             'channel'     => 'L2Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
@@ -108,7 +108,7 @@ return array(
         array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac2',
-            'description' => 'AC Voltage 2',
+            'description' => 'AC Voltage phase 2',
             'channel'     => 'L2Data->acVoltage',
             'unit'        => 'V',
             'decimals'    => 1,
@@ -118,7 +118,7 @@ return array(
         array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Freq2',
-            'description' => 'Mains frequency 2',
+            'description' => 'Mains frequency phase 2',
             'channel'     => 'L2Data->acFrequency',
             'unit'        => 'Hz',
             'decimals'    => 2,
@@ -129,7 +129,7 @@ return array(
         array(
             'type'        => 53, // Current sensor
             'name'        => 'Iac3',
-            'description' => 'DC Current string 3',
+            'description' => 'AC Current phase 3',
             'channel'     => 'L3Data->acCurrent',
             'unit'        => 'A',
             'decimals'    => 1,
@@ -139,7 +139,7 @@ return array(
         array(
             'type'        => 52, // Voltage sensor
             'name'        => 'Uac3',
-            'description' => 'AC Voltage 3',
+            'description' => 'AC Voltage phase 3',
             'channel'     => 'L3Data->acVoltage',
             'unit'        => 'V',
             'decimals'    => 1,
@@ -149,7 +149,7 @@ return array(
         array(
             'type'        => 66, // Frequency sensor
             'name'        => 'Freq3',
-            'description' => 'Mains frequency 3',
+            'description' => 'Mains frequency phase 3',
             'channel'     => 'L3Data->acFrequency',
             'unit'        => 'Hz',
             'decimals'    => 2,

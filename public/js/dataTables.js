@@ -1,10 +1,9 @@
 /**
  *
- *
- * @author        Knut Kohl <github@knutkohl.de>
- * @copyright     2012-2013 Knut Kohl
- * @license       GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version       1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 
 $(function() {
@@ -21,9 +20,9 @@ $(function() {
         oLanguage: { sUrl: '/resources/dataTables.'+language+'.json' },
     });
 
-    /* dataTables sorting functions */
+    // dataTables sorting functions
 
-    /* Numerics with dot! as dec. separator */
+    // Numerics with dot! as dec. separator
     $.fn.dataTableExt.oSort['numeric-dot-asc'] = function(a, b) {
         var x = (a == '-') ? 0 : a.replace(/,/, '');
         x = parseFloat( x );
@@ -40,7 +39,7 @@ $(function() {
         return ((x < y) ?    1 : ((x > y) ? -1 : 0));
     };
 
-    /* Numerics with comma! as dec. separator */
+    // Numerics with comma! as dec. separator
     $.fn.dataTableExt.oSort['numeric-comma-asc'] = function(a, b) {
         var x = (a == '-') ? 0 : a.replace(/\./, '').replace(/,/, '.');
         x = parseFloat( x );

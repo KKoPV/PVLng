@@ -1,4 +1,4 @@
-<?php /* // AOP // */
+<?php
 /**
  *
  *
@@ -16,11 +16,14 @@ class Controller extends slimMVC\Controller {
         parent::__construct();
 
         // Shortcuts
-        $this->db = $this->app->db;
-        $this->cache = $this->app->cache;
-        $this->config = $this->app->config;
-        $this->request = $this->app->request;
-        $this->view = $this->app->view;
+        $app = $this->app;
+
+        $this->db = $app->db;
+        $this->cache = $app->cache;
+        $this->config = $app->config;
+        $this->request = $app->request;
+
+        $this->view = $app->view;
 
         $this->view->Helper->translate = function() {
             return call_user_func_array('I18N::translate', func_get_args());
@@ -28,20 +31,15 @@ class Controller extends slimMVC\Controller {
 
         $this->Layout = 'default';
 
-        if ($returnto = $this->app->request->get('returnto')) {
+        if ($returnto = $this->app->request->get('returnto') OR $returnto = $this->app->request->post('returnto')) {
             Session::set('returnto', $returnto);
-        }
-
-        if (Session::get('user') == $this->config->get('Admin.User')) {
-            // Ok, we have a validated user session
-            $this->User = Session::get('user');
         }
 
         $this->controller = str_replace('Controller\\', '', get_class($this));
 
         $this->view->Module = strtolower($this->controller);
-        $this->view->User = $this->User;
-        $this->view->Embedded = $this->app->request->get('embedded');
+        $this->view->User = $app->user;
+        $this->view->Embedded = $this->app->request->get('embedded') ?: 0;
 
         $this->view->BaseDir = array(
             APP_DIR . DS . 'View' . DS . $this->controller . DS . 'custom',
@@ -50,9 +48,18 @@ class Controller extends slimMVC\Controller {
             APP_DIR . DS . 'View'
         );
 
-        $this->view->Menu = PVLng::getMenu();
-        $this->view->SubMenus = json_encode(PVLng::getSubMenu());
-        $this->view->Languages = PVLng::getLanguages();
+        $this->view->Menu = $app->menu->get();
+        $this->view->Languages = $app->languages->get();
+    }
+
+    /**
+     *
+     */
+    public function __destruct() {
+        // Send statistics each 6 hours if activated
+        if ($this->config->SendStatistics) {
+            PVLng::SendStatistics();
+        }
     }
 
     /**
@@ -60,11 +67,12 @@ class Controller extends slimMVC\Controller {
      */
     public function after() {
         /* For Logout */
-        $this->view->User = $this->User;
-        if ($this->User) {
-            if ($this->config->get('TokenLogin')) {
+        $this->view->User = $this->app->user;
+        if ($this->app->user) {
+            if ($this->config->get('Core.TokenLogin')) {
                 $this->view->Token = \PVLng::getLoginToken();
             }
+            $APIkey = null;
             while ($this->cache->save('APIkey', $APIkey)) {
                 $APIkey = (new \ORM\Config)->getAPIkey();
             }
@@ -77,7 +85,8 @@ class Controller extends slimMVC\Controller {
      *
      */
     public function afterPOST() {
-        if ($returnto = Session::get('returnto')) {
+        $returnto = Session::get('returnto');
+        if ($returnto) {
             Session::set('returnto');
             $this->app->redirect($returnto);
         }
@@ -87,33 +96,22 @@ class Controller extends slimMVC\Controller {
      *
      */
     public function finalize( $action ) {
-        $this->view->DateTimeFormat      = $this->config->get('Locale.DateTime');
-        $this->view->DateTimeFormatShort = $this->config->get('Locale.DateTimeShort');
-        $this->view->DateFormat          = $this->config->get('Locale.Date');
-        $this->view->DateFormatShort     = $this->config->get('Locale.DateShort');
-        $this->view->TimeFormat          = $this->config->get('Locale.Time');
-        $this->view->TimeFormatShort     = $this->config->get('Locale.TimeShort');
-        $this->view->MonthFormat         = $this->config->get('Locale.MonthDefault');
-        $this->view->TSep                = $this->config->get('Locale.ThousandSeparator');
-        $this->view->DSep                = $this->config->get('Locale.DecimalPoint');
-        $this->view->DateFormatJS        = $this->config->get('Locale.DateJS');
-        $this->view->Year                = date('Y');
 
-        if ($this->config->get('develop')) {
-            $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
-            $this->view->Development = TRUE;
-            $this->config->set('View.Verbose', TRUE);
+        // If no layout is set, assume raw data was generated
+        if (!$this->Layout) {
+            return;
         }
 
-        $this->view->Language = $this->app->Language;
-        $this->view->CurrencyISO = $this->config->get('Currency.ISO');
-        $this->view->CurrencySymbol = $this->config->get('Currency.Symbol');
-        $this->view->CurrencyDecimals = $this->config->get('Currency.Decimals');
+        if ($this->app->config('mode') == 'development') {
+            $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
+            $this->view->Development = true;
+            $this->config->set('View.Verbose', true);
+        }
 
-        $this->view->Latitude = $this->config->get('Location.Latitude');
-        $this->view->Longitude = $this->config->get('Location.Longitude');
+        $this->view->Language  = $this->app->Language;
+        $this->view->Year                = date('Y');
 
-        $this->view->Title = $this->config->get('Title');
+        $this->config2Vview();
 
         $messages = array();
         foreach (Messages::getRaw() as $message) {
@@ -139,7 +137,9 @@ class Controller extends slimMVC\Controller {
 
         // Put all controller configurations into view
         foreach ($this->config->Controller as $c=>$cfg) {
-            foreach ($cfg as $key=>$value) $this->view->set($c.'_'.$key, $value);
+            foreach ($cfg as $key=>$value) {
+                $this->view->set($c.'_'.$key, $value);
+            }
         }
 
         // Check for new version once a hour
@@ -163,8 +163,8 @@ class Controller extends slimMVC\Controller {
         $this->view->assign('Content', 'content.tpl');
 
         // Scripts
-        $this->view->append('Scripts', $this->view->fetch('script.js'));
-        $this->view->append('Scripts', $this->view->fetch('script.'.$action.'.js'));
+        $this->view->append('Scripts', $this->view->fetch('script.js.html'));
+        $this->view->append('Scripts', $this->view->fetch('script.'.$action.'.js.html'));
 
         $this->view->display($this->Layout.'.tpl');
     }
@@ -214,16 +214,38 @@ class Controller extends slimMVC\Controller {
     protected $Layout;
 
     /**
-     *
+     * 
      */
-    protected $User;
+    protected function config2Vview() {
+        $this->view->Title               = $this->config->get('Core.Title');
+        $this->view->Latitude            = $this->config->get('Core.Latitude');
+        $this->view->Longitude           = $this->config->get('Core.Longitude');
+
+        $this->view->CurrencyISO         = $this->config->get('Core.Currency.ISO');
+        $this->view->CurrencySymbol      = $this->config->get('Core.Currency.Symbol');
+        $this->view->CurrencyDecimals    = $this->config->get('Core.Currency.Decimals');
+        $this->view->CurrencyFormat      = $this->config->get('Core.Currency.Format');
+
+        $this->view->DateTimeFormat      = $this->config->get('Locale.DateTime');
+        $this->view->DateTimeFormatShort = $this->config->get('Locale.DateTimeShort');
+        $this->view->DateFormat          = $this->config->get('Locale.Date');
+        $this->view->DateFormatShort     = $this->config->get('Locale.DateShort');
+        $this->view->TimeFormat          = $this->config->get('Locale.Time');
+        $this->view->TimeFormatShort     = $this->config->get('Locale.TimeShort');
+        $this->view->MonthFormat         = $this->config->get('Locale.MonthDefault');
+        $this->view->TSep                = $this->config->get('Locale.ThousandSeparator');
+        $this->view->DSep                = $this->config->get('Locale.DecimalPoint');
+        $this->view->DateFormatJS        = $this->config->get('Locale.DateJS');
+    }
 
     /**
      *
      */
-    protected function PresetAndPeriod() {
+    protected function preparePresetAndPeriod() {
 
         $bk = \BabelKitMySQLi::getInstance();
+
+        $preset = $period = null;
 
         /// \Yryie::StartTimer('LoadPreset', NULL, 'CacheDB');
         while ($this->app->cache->save('preset/'.$this->app->Language, $preset)) {

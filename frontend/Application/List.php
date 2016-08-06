@@ -6,16 +6,10 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-if (!Session::get('User')) return;
 
-/**
- *
- */
-PVLng::Menu(
-    'list', 30, '/list',
-    I18N::translate('List'),
-    I18N::translate('ListHint') . ' (Shift+F3)'
-);
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('20.30','/list', 'Lists', !!$app->user, 'Shift+F5');
+});
 
 /**
  * Routes

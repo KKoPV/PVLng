@@ -3,8 +3,8 @@
  *
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
 -->
@@ -20,31 +20,23 @@
         <th class="l">{{Unit}}</th>
         <th class="l">{{Type}}</th>
         <th class="l">{{Serial}}</th>
-        <th class="icons">
-            <img src="/images/ico/node_select_all.png" class="tip" title="Used # times in channel hierarchy" alt="#">
-        </th>
-        <th>
-            <img src="/images/ico/drive.png" alt="?">
-        </th>
-        <th class="icons">
-            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
-        </th>
+        <th><i class="fa fa-list-ol" title="Used # times in channel hierarchy"></i></th>
+        <th><i class="fa fa-database"></i></th>
+        <th></th>
     </tr>
     </thead>
 
     <tbody>
 
-    <!-- BEGIN ENTITIES -->
+    <!-- BEGIN CHANNELS -->
 
     <tr data-id="{ID}">
         <td>
             <a href="/channel/edit/{ID}" class="tip" title="{{EditEntity}}">
-                <img src="{ICON}" class="channel-icon" title="" alt="({TYPE})">
+                <img src="/images/pix.gif" data-src="{ICON}" class="def channel-icon" alt="({TYPE})">
             </a>
             {NAME}
-            <!-- IF !{PUBLIC} -->
-            <img src="/images/ico/lock.png" alt="[private]">
-            <!-- ENDIF -->
+            <!-- IF !{PUBLIC} --><i class="ico lock"></i><!-- ENDIF -->
         </td>
         <td>{DESCRIPTION}</td>
         <td>{UNIT}</td>
@@ -55,20 +47,21 @@
             <!-- INCLUDE channeltype.inc.tpl -->
         </td>
         <td>
-            <a href="/channel/edit/{ID}">
-                <img src="/images/ico/node_design.png" alt="e">
-            </a>
-            <a href="/channel/add/{ID}">
-                <img src="/images/ico/node_select_child.png" alt="c">
-            </a>
-            <!-- IF {TREE} -->
-            <!-- Can't delete channels assigned in channel hierarchy -->
-            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw" style="height:0px" alt="" />
+            <a href="/channel/edit/{ID}" class="fa fa-fw fa-pencil btn"></a>
+            <a href="/channel/add/{ID}" class="fa fa-fw fa-clone btn"></a>
+            <!-- IF {READ} -->
+                <a href="/list/{ID}" class="fa fa-fw fa-file-text btn"></a>
             <!-- ELSE -->
-            <img class="delete-channel" src="/images/ico/node_delete.png" alt="-">
+                <i class="ico pix"></i>
+            <!-- ENDIF -->
+            <!-- IF {TREE} -->
+                <!-- Can't delete channels assigned in channel hierarchy -->
+                <i class="ico pix"></i>
+            <!-- ELSE -->
+                <i class="node-delete fa fa-fw fa-trash"></i>
             <!-- ENDIF -->
             <!-- IF {GUID} -->
-            <img src="/images/ico/license-key.png" class="btn" onclick="$.alert('{GUID}', 'GUID'); return false" alt="G">
+                <i class="guid fa fa-fw fa-key fa-rotate-90" data-guid="{GUID}"></i>
             <!-- ENDIF -->
         </td>
     </tr>
@@ -84,26 +77,24 @@
         <th></th>
         <th></th>
         <th></th>
-        <th></th>
-        <th class="icons" colspan="2">
-            <img src="/images/ico/information_frame.png" class="tip" tip="#IconLegend" alt="?">
-        </th>
+        <th colspan="3"></th>
     </tr>
     </tfoot>
 </table>
 
 <!-- Legend -->
 
-<div id="IconLegend">
-    <div class="icons legendtip">
-        <img src="/images/ico/read-write.png">{{ReadWritableEntity}}<br />
-        <img src="/images/ico/write.png">{{WritableEntity}}<br />
-        <img src="/images/ico/read.png">{{ReadableEntity}}<br />
-        <img src="/images/ico/node_design.png">{{EditEntity}}<br />
-        <img src="/images/ico/node_select_child.png">{{CloneEntity}}<br />
-        <img src="/images/ico/node_delete.png">{{DeleteEntityHint}}<br />
-        <img src="/images/ico/license-key.png">{{ShowGUID}}
-    </div>
+<div class="icons legendtip">
+    <i class="fa fa-arrows-alt"></i>{{ReadWritableEntity}} &nbsp;
+    <i class="fa fa-download"></i>{{WritableEntity}} &nbsp;
+    <i class="fa fa-upload"></i>{{ReadableEntity}} &nbsp;
+
+    <i class="fa fa-pencil"></i>{{EditEntity}} &nbsp;
+    <i class="fa fa-clone"></i>{{CloneEntity}} &nbsp;
+    <i class="fa fa-trash"></i>{{DeleteEntityHint}} &nbsp;
+
+    <i class="fa fa-file-text"></i>{{ListHint}} &nbsp;
+    <i class="fa fa-key fa-rotate-90"></i>{{ShowGUID}}
 </div>
 
 <!-- Dialogs -->

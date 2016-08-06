@@ -19,17 +19,14 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
+    // Just a ratio without unit
+
+    'resolution' => array(
+        'visible'  => false
+    ),
+
     'unit' => array(
-        'readonly' => TRUE,
-        'default'  => '%',
-    ),
-
-    'valid_from' => array(
-        'default'  => '0',
-    ),
-
-    'valid_to' => array(
-        'default'  => '100',
+        'visible'  => false
     ),
 
 );

@@ -15,29 +15,30 @@ namespace Channel;
 abstract class InternalCalc extends Channel {
 
     /**
-     *
+     * Readings table object
      */
-    protected function __construct( \ORM\Tree $channel ) {
-        parent::__construct($channel);
-
-        $this->data = $this->numeric ? new \ORM\ReadingNumMemory :  new \ORM\ReadingStrMemory;
-
-        // If the same channel is used in one chart multiple times (also as
-        // Alias), we have a race condition and the instances deletes the data
-        // of the others ...
-        // So save for each instance its own data set
-        $this->entity = rand(64000, 65535);
-
-        // Clean up
-        $this->data->deleteById($this->entity);
-
-        $this->data->id = $this->entity;
-    }
+    protected $orgId;
 
     /**
      * Readings table object
      */
     protected $data;
+
+    /**
+     *
+     */
+    protected $LifeTime;
+
+    /**
+     *
+     */
+    protected function __construct( \ORM\Tree $channel ) {
+        parent::__construct($channel);
+
+        $this->orgId = $this->entity;
+
+        $this->data = \ORM\ReadingMemory::factory($this->numeric);
+    }
 
     /**
      * Overwrite default channel tables
@@ -51,8 +52,8 @@ abstract class InternalCalc extends Channel {
      *
      */
     protected function saveValue( $timestamp, $value ) {
-        $this->data->timestamp = $timestamp;
-        $this->data->data      = $value;
+        $this->data->setTimestamp($timestamp);
+        $this->data->setData($value);
         return $this->data->insert();
     }
 
@@ -78,10 +79,45 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
-    protected function after_read( \Buffer $buffer ) {
-        // Clean up
-        $this->data->deleteById($this->entity);
-        return parent::after_read($buffer);
+    protected function dataExists( $lifetime=NULL ) {
+
+        if (!is_null($lifetime)) {
+            $this->LifeTime = $lifetime;
+        } else {
+            $this->LifeTime = $this->end-1 < strtotime('midnight')
+                           // Buffer data in the past (before today) for 1 day
+                            ? 86400
+                           // Use configration setting
+                            : \ORM\Settings::getModelValue('InternalCalc', 'LifeTime', 60);
+        }
+
+        $sql = $this->db->sql(
+            'SELECT `pvlng_reading_tmp_start`({1}, {2}, {3}, {4})',
+            $this->orgId, $this->start, $this->end, $this->LifeTime
+        );
+
+        while (($uid = $this->db->queryOne($sql)) == 0) {
+            // Another instance is generating the data, wait some time before next check
+            usleep(200 * 1000);
+        }
+
+        // < 0 - This instance have to generate the data
+        // > 0 - temp. Id of data, reuse
+        if ($uid < 0) {
+            $this->entity = -$uid;
+            $this->data->setId($this->entity);
+            return FALSE;
+        } else {
+            $this->entity = $uid;
+            return TRUE;
+        }
     }
 
+    /**
+     *
+     */
+    protected function dataCreated() {
+        // Data was just created, mark
+        $this->db->query('CALL `pvlng_reading_tmp_done`({1})', $this->entity);
+    }
 }

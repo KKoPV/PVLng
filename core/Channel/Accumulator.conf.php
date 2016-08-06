@@ -27,7 +27,7 @@ return array(
 
     // Strict mode
     'extra' => array(
-        'visible' => TURE,
+        'visible' => TRUE,
         'type'    => 'bool;0:no;1:yes',
         'default' => 0
     ),

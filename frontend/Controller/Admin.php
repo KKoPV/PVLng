@@ -17,39 +17,23 @@ class Admin extends \Controller {
     /**
      *
      */
-    public static function RememberLogin() {
-        setcookie(\Session::token(), 1, time()+60*60*24*60, '/');
-    }
-
-    /**
-     *
-     */
     public function LoginPOST_Action() {
 
         $hasher = new \PasswordHash();
 
-        $user = $this->request->post('user');
-        $pass = $this->request->post('pass');
+        if ($hasher->CheckPassword($this->request->post('pass'), $this->config->get('Core.Password'))) {
+            \Session::login($this->config->get('Core.Password'));
 
-        $AdminUser = $this->config->get('Admin.User');
-        $AdminPass = $this->config->get('Admin.Password');
-
-        // Ignore case of user name input
-        if (strtolower($AdminUser) == strtolower($user) AND
-            $hasher->CheckPassword($pass, $AdminPass)) {
-
-            $this->User = $AdminUser;
-            \Session::set('user', $AdminUser);
-            \Messages::Success(__('Welcome', $this->User));
-
-            if ($this->request->post('save')) self::RememberLogin();
+            $this->request->post('save') && \Session::remember(7*24*60*60);
 
             if ($r = \Session::get('returnto')) {
                 // Clear before redirect
                 \Session::set('returnto');
                 $this->app->redirect($r);
+            } elseif (isset($_SERVER['HTTP_REFERER'])) {
+                $this->app->redirect($_SERVER['HTTP_REFERER']);
             } else {
-                $this->app->redirect('index');
+                $this->app->redirect();
             }
 
         } else {
@@ -61,53 +45,72 @@ class Admin extends \Controller {
      * Token login
      */
     public function LoginGET_Action() {
-        $AdminUser = $this->config->get('Admin.User');
-        $AdminPass = $this->config->get('Admin.Password');
-
-        if ($this->request->get('token') == md5($_SERVER['REMOTE_ADDR'].$AdminUser.$AdminPass)) {
-            \Session::set('user', $AdminUser);
-            \Messages::Success(__('Welcome', $this->User));
+        if ($this->app->params->get('token') == \PVLng::getLoginToken()) {
+            \Session::login($this->config->get('Core.Password'));
+            $this->app->redirect();
         }
-        $this->app->redirect('index');
     }
 
     /**
      *
      */
     public function Logout_Action() {
+        // Remember messages
+        $msgs = \Session::get(\Messages::$SessionVar);
+        \Session::logout();
         \Session::destroy();
-        setcookie(\Session::token(), '', time()-60*60*24, '/');
-        $this->app->redirect('index');
+        \Session::start();
+        \Session::set(\Messages::$SessionVar, $msgs);
+        $this->app->redirect();
     }
 
     /**
      *
      */
     public function AdminPasswordPOST_Action() {
-        if ($this->request->post('u') == '' OR
-            $this->request->post('p1') == '' OR
-            $this->request->post('p2') == '') {
+
+        $p1 = $this->request->post('p1');
+        $p2 = $this->request->post('p2');
+
+        if ($p1 == '' OR $p2 == '') {
             \Messages::Error(\I18N::_('AdminAndPasswordRequired'), TRUE);
+            $this->view->Ok = FALSE;
             return;
         }
 
-        if ($this->request->post('p1') != $this->request->post('p2')) {
+        if ($p1 != $p2) {
             \Messages::Error(__('PasswordsNotEqual'), TRUE);
+            $this->view->Ok = FALSE;
             return;
         }
 
-        $hasher = new \PasswordHash();
-        $this->view->AdminUser = $this->request->post('u');
-        $this->view->AdminPass = $hasher->HashPassword($this->request->post('p1'));
+        $hasher   = new \PasswordHash();
+        $settings = new \ORM\Settings;
+        $settings->setScope('core')
+                 ->setKey('Password')
+                 ->setDescription('Password')
+                 ->setValue($hasher->HashPassword($p1))
+                 ->replace();
+
+        $settings->filterByScopeNameKey('core', '', 'Password')->findOne();
+
+        $this->view->Ok = ($settings->getValue() != '');
+
+        if ($this->view->Ok) {
+            \Messages::Success(__('PasswordSaved'));
+            \Session::login($settings->getValue());
+            $this->app->user = TRUE;
+            $this->app->redirect('/');
+        }
     }
 
     /**
      *
      */
     public function AdminPassword_Action() {
-        if ($this->config->get('Admin.User') != '') {
-            \Messages::Error('Admin credentials still defined! You can\'t change them for security reasons without clearing the "Admin > User" entry in config/config.php');
-            $this->app->redirect('index');
+        if ($this->config->get('Core.Password')) {
+            \Messages::Error('Administration password still defined! Please change it via settings menu!');
+            $this->app->redirect('/');
         }
         $this->view->SubTitle = __('GenerateAdminHash');
     }
@@ -115,23 +118,24 @@ class Admin extends \Controller {
     /**
      *
      */
-    public function ConfigPOST_Action() {
-        foreach ($this->request->post('c') as $key=>$value) {
-            $q = \DBQuery::forge()->update('pvlng_config')
-                 ->set('value', $value)->whereEQ('key', $key)->limit(1);
-            $this->db->query($q);
+    public function LocationPOST_Action() {
+        if ($loc = $this->app->request->post('loc')) {
+            $settings = new \ORM\Settings;
+            foreach ($loc as $key=>$value) {
+                $settings->reset()
+                         ->filterByScopeNameKey('core', '', $key)->findOne()
+                         ->setValue($value)->update();
+            }
+            \Messages::Success(__('DataSaved'));
         }
-        \Messages::success(__('DataSaved'));
+        $this->app->redirect('/');
     }
 
     /**
      *
      */
-    public function Config_Action() {
-        $this->view->SubTitle = __('Configuration');
-
-        $q = \DBQuery::forge('pvlng_config')->whereNE('type');
-        $this->view->Data = $this->db->queryRows($q);
+    public function Location_Action() {
+        $this->view->SubTitle = __('FindYourLocation');
     }
 
     /**

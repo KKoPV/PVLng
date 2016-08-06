@@ -67,11 +67,11 @@ class MemCache extends \Cache {
      * @{
      */
     public function isAvailable() {
-        return $this->memcache->connect($this->host, $this->port);
+        return @$this->memcache->connect($this->host, $this->port);
     }
 
-    public function write( $key, $data ) {
-        return $this->memcache->set($this->key($key), $data);
+    public function write( $key, $data, $ttl ) {
+      return $this->memcache->set($this->key($key), $data, 0, $ttl ? $this->ts+$ttl : 0);
     }
 
     public function fetch( $key ) {
@@ -145,5 +145,17 @@ class MemCache extends \Cache {
      * @var MemCache $memcache
      */
     protected $memcache;
+
+    /**
+     * Build internal Id from external Id and the cache token
+     *
+     * Don't hash here, Memcache will do this anyway
+     *
+     * @param string $key Unique cache Id
+     * @return string
+     */
+    protected function key( $key ) {
+        return $this->settings['Token'].':'.$key;
+    } // function key()
 
 }

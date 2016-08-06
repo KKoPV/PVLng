@@ -41,22 +41,23 @@
 
     {CONTENT}
 
-    <script src="//code.jquery.com/jquery-2.0.0.js"></script>
+    <!-- IF {DEVELOPMENT} -->
+    <script src="//code.jquery.com/jquery-2.1.1.js"></script>
+    <script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.js"></script>
+    <!-- ELSE -->
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="//code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+    <!-- ENDIF -->
     <script src="/js/jquery-ui.min.js"></script>
+
+    <!-- INCLUDE highcharts.tpl -->
 
     <!-- IF {DEVELOPMENT} -->
     <script src="/js/mobile.js"></script>
     <script src="/js/chart.js"></script>
     <!-- ELSE -->
-    <script src="/js/mobile.min.js"></script>
-    <script src="/js/chart.min.js"></script>
+    <script src="/js/min.mobile.js"></script>
     <!-- ENDIF -->
-    <script src="/js/trmix.min.js"></script>
-
-    <!-- load Highcharts scripts direct from highcharts.com -->
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="http://code.highcharts.com/highcharts-more.js"></script>
 
     <script>
         <!-- INCLUDE script.var.js -->

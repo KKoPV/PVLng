@@ -32,7 +32,7 @@ class Files extends AbstractFile {
      * @param string $data
      * @return bool
      */
-    public function write( $key, $data ) {
+    public function write( $key, $data, $ttl ) {
         // Buffer for next read
         $this->data[$key] = $data;
         return $this->WriteFile($this->FileName($key, '.single.cache'), $data);

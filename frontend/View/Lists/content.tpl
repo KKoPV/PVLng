@@ -13,7 +13,7 @@
 <input type="hidden" id="todate" name="todate" />
 
 <div class="icons">
-    <select id="channel" data-placeholder="--- {{SelectChannel}} ---">
+    <select id="channel" class="fl" data-placeholder="--- {{SelectChannel}} ---">
         <option></option>
         <!-- BEGIN CHANNELS -->
         <option value="{GUID}"
@@ -30,14 +30,20 @@
         </option>
         <!-- END -->
     </select>
-    <img id="icon" src="/images/pix.gif" class="tip" style="margin-left:16px" data-none="/images/pix.gif" alt="">
-    <img id="icon-private" src="/images/ico/lock.png" class="tip" alt="[private]"
-         style="display:none" title="{{PrivateChannel}}"/>
-    <img id="editentity" src="/images/ico/node_design.png" class="tipbtn" title="{{EditEntity}}" alt="e">
+
+    <img id="icon" src="/images/pix.gif" class="fl tip" style="margin-left:16px;margin-top:5px" data-none="/images/pix.gif" alt="">
+
+    <div class="fl" style="padding-top:5px">
+        <i id="icon-private" class="ico lock tip" style="display:none" title="{{PrivateChannel}}"></i>
+        <i id="edit-entity" class="ico node-design tipbtn" style="display:none" title="{{EditEntity}}"></i>
+        <i id="guid" class="ico license-key guid tipbtn" style="display:none" title="{{ShowGUID}}"></i>
+    </div>
 
 </div>
 
-<div id="nav" class="ui-widget-header ui-corner-all" style="padding:4px;height:34px;margin:.5em 0">
+<div class="clear"></div>
+
+<div id="nav" class="ui-widget-header ui-corner-all" style="padding:4px;height:32px;margin:.5em 0">
     <div class="fl">
         <!-- INCLUDE dateselect.inc.tpl -->
     </div>
@@ -57,7 +63,7 @@
         <th class="r">{{Maximum}}</th>
         <th class="r">{{Production}} / {{Consumption}}</th>
         <th class="r tip" title="{{RowCountHint}}">{{RowCount}}</th>
-        <th><img src="/images/ico/minus_circle.png" /></th>
+        <th></th>
     </tr>
     </thead>
 
@@ -73,6 +79,12 @@
     </tr>
     </tfoot>
 </table>
+
+<!-- Legend -->
+
+<div class="icons legendtip">
+    <i class="fa fa-trash"></i>{{DeleteReading}}
+</div>
 
 <div style="display:none">
     <!-- Extra content for dataTable sDom -->

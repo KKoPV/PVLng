@@ -26,11 +26,11 @@
  *
  */
 
-return array(
+return [
 
     /**
      * For handler templates to insert as sections here, see cron/<handler>.config.php
      */
 
 
-);
+];

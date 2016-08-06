@@ -2,10 +2,10 @@
 /**
  * Main program file
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 namespace slimMVC;
 
@@ -31,10 +31,19 @@ class App extends \Slim\Slim {
     }
 
     /**
-     *
+     * Overwrite
      */
     public function foreward( $action ) {
         $this->action = $action;
+    }
+
+    /**
+     * Overwrite
+     */
+    public function redirect($url='/', $status=302)
+    {
+        \Session::close();
+        parent::redirect($url, $status);
     }
 
     /**

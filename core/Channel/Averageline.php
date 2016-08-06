@@ -17,33 +17,22 @@ namespace Channel;
  */
 class Averageline extends InternalCalc {
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
-    public function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 
-        $ts = $cnt = $sum = 0;
-
-        /**
-         * Calulated with the Hölder mean fomulas
-         * http://en.wikipedia.org/wiki/H%C3%B6lder_mean
-         */
-        $p = $this->extra;
-
-        foreach ($this->getChild(1)->read($request) as $row) {
-            if (!$ts) $ts = $row['timestamp'];
-            $sum += pow($row['data'], $p);
-            $cnt++;
-        }
-
-        if ($cnt) {
-            $avg = pow($sum / $cnt, 1/$p);
-
-            foreach ($this->getChild(1)->read($request) as $row) {
-                $this->saveValue($row['timestamp'], $avg);
-            }
+        if (!$this->dataExists()) {
+            (new \ORM\ChannelType)->calcAverageLine($this->entity, $this->getChild(1)->entity, $this->extra);
+#            $this->db->query('CALL `pvlng_model_averageline`({1}, {2}, {3})',
+#                             $this->entity, $this->getChild(1)->entity, $this->extra);
+            $this->dataCreated();
         }
     }
 }

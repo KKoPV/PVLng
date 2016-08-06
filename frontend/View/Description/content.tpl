@@ -15,7 +15,7 @@
 
 <p>
     <a href="http://pvlng.com">
-        <img src="http://pvlng.com/images/banner.gif" width="468" height="60" />
+        <img src="/images/pix.gif" data-src="http://pvlng.com/images/banner.gif" class="def" style="width:468px;height:60px" />
     </a>
 </p>
 

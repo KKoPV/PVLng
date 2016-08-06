@@ -60,6 +60,6 @@ return array(
     ),
     'valid_to' => array(
         'visible' => FALSE,
-    )
+    ),
 
 );

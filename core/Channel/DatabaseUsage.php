@@ -18,8 +18,6 @@ class DatabaseUsage extends Channel {
      */
     public function read( $request ) {
 
-        $logSQL = \slimMVC\Config::getInstance()->get('Log.SQL');
-
         $this->performance->setAction('read');
 
         $this->before_read($request);
@@ -78,7 +76,7 @@ class DatabaseUsage extends Channel {
             if ($this->period[1] != self::ALL) {
                 // Time is only relevant for period != ALL
                 if ($this->start) {
-                    $q->filter('timestamp', array('min'=>$this->start-$this->TimestampMeterOffset[$this->period[1]]));
+                    $q->filter('timestamp', array('min'=>$this->start-self::$Grouping[$this->period[1]][0]));
                 }
                 if ($this->end < time()) {
                     $q->filter('timestamp', array('max'=>$this->end-1));
@@ -90,11 +88,11 @@ class DatabaseUsage extends Channel {
             $consumption = 0;
 
             // Use bufferd result set
-            $this->db->Buffered = TRUE;
+            $this->db->setBuffered();
 
             if ($res = $this->db->query($q)) {
 
-                $last = ($this->TimestampMeterOffset[$this->period[1]] > 0)
+                $last = (self::$Grouping[$this->period[1]][0] > 0)
                       ? $res->fetch_assoc()
                       : FALSE;
 
@@ -115,10 +113,8 @@ class DatabaseUsage extends Channel {
                 $res->close();
             }
 
-            $this->db->Buffered = FALSE;
+            $this->db->setBuffered(FALSE);
         }
-
-        if ($logSQL) ORM\Log::save('Read data', $this->name . ' (' . $this->description . ")\n\n" . $q);
 
         if (array_key_exists('sql', $request) AND $request['sql']) {
             $sql = $this->name;

@@ -32,15 +32,17 @@ return array(
         'visible'  => FALSE
     ),
 
-    'resolution' => array(
-        'position' => 420,
-        'type'     => 'bool;0:Marker;1:Curve',
-        'required' => FALSE
-    ),
-
+    // Removed, controlled by channel settings in chart, "Show all" flag"
     'times' => array(
         'position' => 430,
         'type'     => 'bool;0:no;1:yes',
+        'visible'  => FALSE
+    ),
+
+    'resolution' => array(
+        'position' => 490,
+        'type'     => 'bool;0:Marker;1:Curve',
+        'required' => FALSE
     ),
 
     'extra' => array(

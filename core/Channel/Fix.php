@@ -14,22 +14,36 @@ namespace Channel;
  */
 class Fix extends InternalCalc {
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
-    protected function before_read( $request ) {
+    protected function before_read( &$request ) {
 
         parent::before_read($request);
 
+        if ($this->dataExists()) return;
+
+        // Read out all data
+        $request['period'] = '1i';
+
         $ts = $this->start;
 
-        // Show pseudo reading at each consolidation range point or at least each hour
-        $delta = $this->TimestampMeterOffset[$this->period[1]];
-        $delta = $delta ?: 3600; // 1hr
+        if ($this->isChild) {
+            $delta = 60;
+        } else {
+            // Show pseudo reading at each consolidation range point or at least each hour
+            $delta = self::$Grouping[$this->period[1]][0] ?: 3600; // 1hr
+        }
 
         while ($ts <= $this->end) {
             $this->saveValue($ts, 1);
             $ts += $delta;
         }
+
+        $this->dataCreated();
     }
 }

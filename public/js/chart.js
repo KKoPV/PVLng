@@ -1,4 +1,20 @@
 /**
+ * Helper functions for charting
+ *
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2015 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.1.0
+ *
+ * 1.1.0
+ * - Since HighCharts 4.1.1 have labels by default a text shadow,
+ *   disable for min/max/last labels
+ *
+ * 1.0.0
+ * - Initial creation
+ */
+
+/**
  *
  */
 var presentation_defaults = {
@@ -42,8 +58,12 @@ function presentation( data ) {
     this.all = false;
     this.time1 = '00:00';
     this.time2 = '24:00';
+    this.daylight = false;
+    this.daylight_grace = 0;
     this.legend = true;
     this.position = 0;
+    this.hidden = false;
+    this.outline = false;
 
     try {
         data = JSON.parse(data);
@@ -167,7 +187,7 @@ function setMinMax( serie, channel ) {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
             color: color,
-            style: { fontWeight: 'bold' },
+            style: { fontWeight: 'bold', textShadow: null },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,
@@ -192,7 +212,7 @@ function setMinMax( serie, channel ) {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
             color: color,
-            style: { fontWeight: 'bold' },
+            style: { fontWeight: 'bold', textShadow: null },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,
@@ -220,7 +240,7 @@ function setMinMax( serie, channel ) {
                 return Highcharts.numberFormat(+this.y, serie.decimals)
             },
             color: color,
-            style: { fontWeight: 'bold' },
+            style: { fontWeight: 'bold', textShadow: null },
             borderRadius: 3,
             backgroundColor: 'rgba(252, 255, 197, 0.7)',
             borderWidth: 1,

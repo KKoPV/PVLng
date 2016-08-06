@@ -40,6 +40,6 @@ class Lists extends \Controller {
             \Messages::Info('Unknown channel');
         }
 
-        $this->PresetAndPeriod();
+        $this->preparePresetAndPeriod();
     }
 }

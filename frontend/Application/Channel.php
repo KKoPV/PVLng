@@ -6,35 +6,13 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-if (!Session::get('User')) return;
 
-/**
- *
- */
-PVLng::Menu( 'channel', 50, '#', __('Channels') );
-
-/**
- *
- */
-PVLng::SubMenu(
-    'channel', 10, '/type', __('ChannelTypes')
-);
-
-PVLng::SubMenu(
-    'channel', 20, '/channel', __('Channels'), __('ChannelsHint') . ' (Shift+F4)'
-);
-
-PVLng::SubMenu(
-    'channel', 21, '/channel/add', __('CreateChannel')
-);
-
-PVLng::SubMenu(
-    'channel', 30, '/overview', __('Overview'), __('OverviewHint')
-);
-
-PVLng::SubMenu(
-    'channel', 40, '/tariff', __('Tariffs'), __('TariffsHint')
-);
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('10.20',    '#',                 'Channels',           !!$app->user);
+    $app->menu->add('10.20.10', '/channel',          'ChannelList',        !!$app->user, 'Shift+F3');
+    $app->menu->add('10.20.20', '/channel/add',      'CreateChannel',      !!$app->user);
+    $app->menu->add('10.20.30', '/channel/template', 'CreateFromTemplate', !!$app->user);
+});
 
 /**
  * Routes

@@ -23,6 +23,33 @@ class Optimizer extends JSON {
      * Recieve CSV data
      */
     public function write( $request, $timestamp=NULL ) {
+        $csv = array();
+        // Split CSV data nd transform to array of arrays
+        foreach (explode("\n", trim($request)) as $line) {
+            $csv[] = str_getcsv($line);
+        }
 
+        // Check for at least ONE data line
+        if (count($csv) < 2) return;
+
+        // Channel keys from 1st row
+        $keys = array_shift($csv);
+        // Remove "Time" from 1st position
+        array_shift($keys);
+
+        $cnt = 0;
+
+        foreach ($csv as $row) {
+            // Extract timestamp from 1st position
+            $timestamp = strtotime(array_shift($row));
+
+            $data = array();
+            foreach ($keys as $id=>$key) {
+                if ($row[$id] != '') $data[$key] = $row[$id];
+            }
+            $cnt += parent::write($data, $timestamp);
+        }
+
+        return $cnt;
     }
 }

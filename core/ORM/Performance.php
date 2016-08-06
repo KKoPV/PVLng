@@ -25,7 +25,7 @@ class Performance extends PerformanceBase {
         parent::__construct($id);
 
         if (self::$create) {
-            $this->app->db->query(self::$create);
+            self::$db->query(self::$create);
             // Free some memory and use also as "done" marker...
             self::$create = FALSE;
         }

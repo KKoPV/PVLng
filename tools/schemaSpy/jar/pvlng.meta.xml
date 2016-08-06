@@ -1,0 +1,45 @@
+<schemaMeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemaspy.sourceforge.net/xmlschema/2011/02/05/schemaspy.meta.xsd">
+
+    <comments>Photovoltaik Logger next generation</comments>
+
+    <tables>
+
+        <table name="pvlng_babelkit" comments="I18N"></table>
+        <table name="pvlng_babelkit_desc" comments="I18N"></table>
+
+        <table name="pvlng_tariff" comments="Tariffs for feed in or used from grid"></table>
+        <table name="pvlng_tariff_date" comments="Tariffs time slots"></table>
+        <table name="pvlng_tariff_time" comments="Tariffs on hourly basis"></table>
+
+        <table name="pvlng_type" comments="Channel types"></table>
+        <table name="pvlng_channel" comments="Channels"></table>
+
+        <table name="pvlng_reading_num" comments="Numeric readings">
+            <column name="id">
+                <foreignKey table="pvlng_channel" column="id"/>
+            </column>
+        </table>
+        <table name="pvlng_reading_str" comments="Non-numeric readings">
+            <column name="id">
+                <foreignKey table="pvlng_channel" column="id"/>
+            </column>
+        </table>
+
+        <table name="pvlng_performance" comments=""></table>
+        <table name="pvlng_performance_avg" comments=""></table>
+        <table name="pvlng_settings" comments=""></table>
+        <table name="pvlng_tree" comments="Channel hierarchy">
+            <column name="entity">
+                <foreignKey table="pvlng_channel" column="id"/>
+            </column>
+        </table>
+
+        <table name="pvlng_dashboard" comments="Dashboards"></table>
+        <table name="pvlng_changes" comments="Tracking data value changes"></table>
+        <table name="pvlng_config" comments="Configuration settings"></table>
+        <table name="pvlng_log" comments="Log entries"></table>
+        <table name="pvlng_view" comments="Diagrams"></table>
+
+    </tables>
+
+</schemaMeta>

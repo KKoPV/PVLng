@@ -1,26 +1,27 @@
 <?php
 /**
- * Abstract base class for table 'pvlng_tariff'
+ * Abstract base class for table "pvlng_tariff"
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "Tariff.php"
+ * To extend the functionallity, edit "Tariff.php"!
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2014 Knut Kohl
+ * @copyright  2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
- * @version    1.1.0 / 2014-06-04
+ * @version    1.4.0 / 2016-07-18
  */
 namespace ORM;
 
 /**
  *
  */
-abstract class TariffBase extends \slimMVC\ORM {
+abstract class TariffBase extends \slimMVC\ORM
+{
 
     // -----------------------------------------------------------------------
     // PUBLIC
@@ -31,59 +32,88 @@ abstract class TariffBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * 'id' is AutoInc, no setter
+     * "id" is AutoInc, no setter
      */
 
     /**
-     * Basic setter for field 'name'
+     * Basic setter for field "name"
      *
      * @param  mixed    $name Name value
      * @return Instance For fluid interface
      */
-    public function setName( $name ) {
+    public function setName($name)
+    {
         $this->fields['name'] = $name;
         return $this;
     }   // setName()
 
     /**
-     * Basic setter for field 'comment'
+     * Raw setter for field "name", for INSERT, REPLACE and UPDATE
+     *
+     * @param  mixed    $name Name value
+     * @return Instance For fluid interface
+     */
+    public function setNameRaw($name)
+    {
+        $this->raw['name'] = $name;
+        return $this;
+    }   // setNameRaw()
+
+    /**
+     * Basic setter for field "comment"
      *
      * @param  mixed    $comment Comment value
      * @return Instance For fluid interface
      */
-    public function setComment( $comment ) {
+    public function setComment($comment)
+    {
         $this->fields['comment'] = $comment;
         return $this;
     }   // setComment()
+
+    /**
+     * Raw setter for field "comment", for INSERT, REPLACE and UPDATE
+     *
+     * @param  mixed    $comment Comment value
+     * @return Instance For fluid interface
+     */
+    public function setCommentRaw($comment)
+    {
+        $this->raw['comment'] = $comment;
+        return $this;
+    }   // setCommentRaw()
 
     // -----------------------------------------------------------------------
     // Getter methods
     // -----------------------------------------------------------------------
 
     /**
-     * Basic getter for field 'id'
+     * Basic getter for field "id"
      *
      * @return mixed Id value
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->fields['id'];
     }   // getId()
 
     /**
-     * Basic getter for field 'name'
+     * Basic getter for field "name"
      *
      * @return mixed Name value
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->fields['name'];
     }   // getName()
 
     /**
-     * Basic getter for field 'comment'
+     * Basic getter for field "comment"
      *
      * @return mixed Comment value
      */
-    public function getComment() {
+    public function getComment()
+    {
         return $this->fields['comment'];
     }   // getComment()
 
@@ -92,35 +122,38 @@ abstract class TariffBase extends \slimMVC\ORM {
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for field 'id'
+     * Filter for field "id"
      *
      * @param  mixed    $id Filter value
      * @return Instance For fluid interface
      */
-    public function filterById( $id ) {
-        $this->filter[] = '`id` = "'.$this->quote($id).'"';
+    public function filterById($id)
+    {
+        $this->filter[] = '`id` = '.$this->quote($id);
         return $this;
     }   // filterById()
 
     /**
-     * Filter for field 'name'
+     * Filter for field "name"
      *
      * @param  mixed    $name Filter value
      * @return Instance For fluid interface
      */
-    public function filterByName( $name ) {
-        $this->filter[] = '`name` = "'.$this->quote($name).'"';
+    public function filterByName($name)
+    {
+        $this->filter[] = '`name` = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
     /**
-     * Filter for field 'comment'
+     * Filter for field "comment"
      *
      * @param  mixed    $comment Filter value
      * @return Instance For fluid interface
      */
-    public function filterByComment( $comment ) {
-        $this->filter[] = '`comment` = "'.$this->quote($comment).'"';
+    public function filterByComment($comment)
+    {
+        $this->filter[] = '`comment` = '.$this->quote($comment);
         return $this;
     }   // filterByComment()
 
@@ -134,5 +167,50 @@ abstract class TariffBase extends \slimMVC\ORM {
      * @var string $table Table name
      */
     protected $table = 'pvlng_tariff';
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    protected $createSQL = '
+        CREATE TABLE `pvlng_tariff` (
+          `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+          `name` varchar(50) NOT NULL DEFAULT \'\',
+          `comment` varchar(250) NOT NULL DEFAULT \'\',
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `Tariff name` (`name`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+    ';
+
+    /**
+     *
+     */
+    protected $fields = array(
+        'id'      => '',
+        'name'    => '',
+        'comment' => ''
+    );
+
+    /**
+     *
+     */
+    protected $nullable = array(
+        'id'      => false,
+        'name'    => false,
+        'comment' => false
+    );
+
+    /**
+     *
+     */
+    protected $primary = array(
+        'id'
+    );
+
+    /**
+     *
+     */
+    protected $autoinc = 'id';
 
 }

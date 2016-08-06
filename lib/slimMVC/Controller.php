@@ -1,20 +1,15 @@
 <?php
 /**
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2014 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version    1.0.0
  */
 namespace slimMVC;
 
 /**
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
 abstract class Controller {
 
@@ -28,32 +23,27 @@ abstract class Controller {
     /**
      *
      */
-    public function before() {
-    }
+    public function before() {}
 
     /**
      *
      */
-    public function beforeGET() {
-    }
+    public function beforeGET() {}
 
     /**
      *
      */
-    public function beforePOST() {
-    }
+    public function beforePOST() {}
 
     /**
      *
      */
-    public function afterGET() {
-    }
+    public function afterGET() {}
 
     /**
      *
      */
-    public function afterPOST() {
-    }
+    public function afterPOST() {}
 
     /**
      *
@@ -74,7 +64,7 @@ abstract class Controller {
      *
      */
     protected function strParam( $name, $default ) {
-        $value = trim($this->app->request->params($name));
+        $value = trim($this->app->Request()->params($name));
         return !is_null($value) ? $value : $default;
     }
 
@@ -82,7 +72,7 @@ abstract class Controller {
      *
      */
     protected function intParam( $name, $default ) {
-        $value = trim($this->app->request->params($name));
+        $value = trim($this->app->Request()->params($name));
         return $value != '' ? (int) $value : (int) $default;
     }
 
@@ -90,9 +80,9 @@ abstract class Controller {
      *
      */
     protected function boolParam( $name, $default ) {
-        $value = strtolower(trim($this->app->request->params($name)));
+        $value = strtolower(trim($this->app->Request()->params($name)));
         return $value != ''
-             ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
+             ? preg_match('~^(?:1|x|on|y|yes|true)$~', $value)
              : $default;
     }
 }

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo
+echo 'This will delete ALL readings from your database!'
+echo
+
+[ -z "$2" ] && echo "Usage: $0 <Database> <MySQL user> [MySQL Password]" && exit 1
+
+echo 'Are you really sure?'
+read -p 'Answer with "YES"  : ' ok <&1
+
+[ "$ok" == YES ] || exit
+
+echo 'Go ...'
+
+mysql --batch --user="$2" --password="$3" "$1" \
+      --execute='TRUNCATE `pvlng_reading_last`; TRUNCATE `pvlng_reading_num`; TRUNCATE `pvlng_reading_num_calc`; TRUNCATE `pvlng_reading_num_tmp`; TRUNCATE `pvlng_reading_str`; TRUNCATE `pvlng_reading_str_tmp`; TRUNCATE `pvlng_reading_tmp`; UPDATE `pvlng_channel` SET `offset` = 0 WHERE `adjust`'
+
+echo 'Done'

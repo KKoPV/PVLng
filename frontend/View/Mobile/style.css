@@ -52,6 +52,7 @@
 #weather div {
     margin: 7px;
     float: left;
+    width: 50px;
     height: 70px;
 }
 
@@ -63,4 +64,9 @@
 #weather div.mark {
     font-weight: bold;
     color: cyan;
+}
+
+#weather div.mark span {
+    margin-top: 10px;
+    display: block;
 }

@@ -23,20 +23,20 @@ class Average extends Calculator {
         $childs = $this->getChilds();
         $childCnt = count($childs);
 
-        // no childs, return empty file
+        // No childs, return empty file
         if ($childCnt == 0) {
             return $this->after_read(new \Buffer);
         }
 
         $buffer = $childs[0]->read($request);
 
-        // only one child, return as is
+        // Only one child, return as is
         if ($childCnt == 1) {
             return $this->after_read($buffer);
         }
 
-        // combine all data for same timestamp
-        for ($i=1; $i<$childCnt; $i++) {
+        // Combine all data for same timestamp
+        for ($i=1, $c=2; $i<$childCnt; $i++, $c++) {
 
             $next = $childs[$i]->read($request);
 
@@ -53,29 +53,23 @@ class Average extends Calculator {
                 if ($key1 === $key2) {
 
                     // Same timestamp, combine
-                    $row1['data']        = ($row1['data']*$i        + $row2['data'])        / ($i+1);
-                    $row1['min']         = ($row1['min']*$i         + $row2['min'])         / ($i+1);
-                    $row1['max']         = ($row1['max']*$i         + $row2['max'])         / ($i+1);
-                    $row1['consumption'] = ($row1['consumption']*$i + $row2['consumption']) / ($i+1);
+                    $row1['data']        = ($row1['data']*$i        + $row2['data'])        / $c;
+                    $row1['min']         = ($row1['min']*$i         + $row2['min'])         / $c;
+                    $row1['max']         = ($row1['max']*$i         + $row2['max'])         / $c;
+                    $row1['consumption'] = ($row1['consumption']*$i + $row2['consumption']) / $c;
 
                     $result->write($row1, $key1);
 
-                    // read both next rows
+                    // Read both next rows
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
 
                 } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
 
-                    // take existing row as is
-                    $result->write($row1, $key1);
-
                     // Missing row 2, read only row 1
                     $row1 = $buffer->next()->current();
 
                 } else /* $key1 > $key2 */ {
-
-                    // take existing row as is
-                    $result->write($row2, $key2);
 
                     // Missing row 1, read only row 2
                     $row2 = $next->next()->current();

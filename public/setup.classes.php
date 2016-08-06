@@ -7,12 +7,14 @@ namespace Setup;
 /**
  *
  */
-abstract class Setup {
+abstract class Setup
+{
 
     /**
      *
      */
-    public static function run( Array $config ) {
+    public static function run( Array $config )
+    {
 
         $i = 1;
 
@@ -23,8 +25,7 @@ abstract class Setup {
 
             echo '<h3>', $i++, '. ', $class->getTitle(), '</h3>';
 
-            $messages = array();
-            $class->process($params, $messages);
+            $class->process($params);
 
             echo '<ul>';
             foreach ($class->getMessages() as $msg) {
@@ -43,7 +44,8 @@ abstract class Setup {
 /**
  *
  */
-abstract class SetupTask {
+abstract class SetupTask
+{
 
     /**
      *
@@ -53,19 +55,21 @@ abstract class SetupTask {
     /**
      * Prepare result array
      */
-    abstract public function process( $params, &$messages );
+    abstract public function process( $params );
 
     /**
      *
      */
-    public function isError() {
+    public function isError()
+    {
         return ($this->error === TRUE);
     }
 
     /**
      *
      */
-    public function getMessages() {
+    public function getMessages()
+    {
         return $this->messages;
     }
 
@@ -82,29 +86,41 @@ abstract class SetupTask {
     /**
      *
      */
-    protected function info() {
+    protected function code($code)
+    {
+        return '<pre>' . $code . '</pre>';
+    }
+
+    /**
+     *
+     */
+    protected function info()
+    {
         $this->messages[] = implode(' ', func_get_args());
     }
 
     /**
      *
      */
-    protected function success() {
-        $this->messages[] = '<span style="color:green">' . implode(' ', func_get_args()) . ' - OK</span>';
+    protected function success()
+    {
+        $this->messages[] = '<span style="color:green">' . implode(' ', func_get_args()) . ' - <strong>OK</strong></span>';
     }
 
     /**
      *
      */
-    protected function error() {
+    protected function error()
+    {
         $this->error = TRUE;
-        $this->messages[] = '<span style="color:red">' . implode(' ', func_get_args()) . ' - FAILED</span>';
+        $this->messages[] = '<span style="color:red">' . implode(' ', func_get_args()) . ' - <strong>FAILED</strong></span>';
     }
 
     /**
      *
      */
-    protected function arrayPath2Key( $array, $key ) {
+    protected function arrayPath2Key( $array, $key )
+    {
         $p = &$array;
         $path = explode('.', $key);
         while ($key = array_shift($path)) {
@@ -118,24 +134,28 @@ abstract class SetupTask {
 /**
  *
  */
-class PHPVersion extends SetupTask {
+class PHPVersion extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check required PHP Version';
     }
 
     /**
      *
      */
-    public function process( $params, &$messages ) {
-        $this->info('Require at least PHP '.$params[0]);
-        if (version_compare(PHP_VERSION, $params[0], 'ge')) {
-            $this->success('PHP', PHP_VERSION);
+    public function process( $params )
+    {
+        // $params == min. version
+        $this->info('Require at least PHP', $params);
+        if (version_compare(PHP_VERSION, $params, 'ge')) {
+            $this->success('Found PHP', PHP_VERSION);
         } else {
-            $this->error('PHP', PHP_VERSION);
+            $this->error('Found PHP', PHP_VERSION);
         }
     }
 
@@ -144,46 +164,58 @@ class PHPVersion extends SetupTask {
 /**
  *
  */
-class PHPExtensions extends SetupTask {
+class PHPExtensions extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check required PHP Extensions';
     }
 
     /**
      *
      */
-    public function process( $params, &$messages ) {
-        foreach ($params as $ext=>$name) {
+    public function process( $params )
+    {
+        foreach ($params as $ext=>$data) {
             if (extension_loaded($ext)) {
-                $this->success($name);
+                $this->success($data[0]);
+            } elseif (!isset($data[1]) OR $data[1]) {
+                $this->error(sprintf($this->PHPLink, $ext, $data[0]), ' - Please install extension');
             } else {
-                $this->error($name, ': Please install extension:', $ext);
+                $this->info(sprintf($this->PHPLink, $ext, $data[0]), ' - <i>not installed, but recommended</i>');
             }
         }
     }
 
+    /**
+     *
+     */
+    protected $PHPLink = '<a href="http://php.net/manual/book.%s.php" target="_blank">%s</a>';
 }
 
 /**
  *
  */
-class Permissions extends SetupTask {
+class Permissions extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check file/directory permissions';
     }
 
     /**
      *
      */
-    public function process( $params, &$messages ) {
+    public function process( $params )
+    {
         foreach ($params as $test=>$func) {
             if ($func($test)) {
                 $this->success(str_replace('_', ' ', $func), '<tt>', $test, '</tt>');
@@ -198,19 +230,22 @@ class Permissions extends SetupTask {
 /**
  *
  */
-class Configuration extends SetupTask {
+class Configuration extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check configuration file';
     }
 
     /**
      *
      */
-    public function process( $params, &$messages ) {
+    public function process( $params )
+    {
         if (!file_exists($params['config'])) {
             $this->info('<tt>', $params['config'], '</tt> missing');
             $this->info('Try to create from <tt>', $params['default'], '</tt>');
@@ -222,9 +257,9 @@ class Configuration extends SetupTask {
         } else {
             $this->error('Can\'t create <tt>', basename($params['config']), '</tt>');
             $this->error('Please copy <tt>',
-                        basename($params['default']),
-                        '</tt> to <tt>',
-                        basename($params['config']), '</tt>');
+                         basename($params['default']),
+                         '</tt> to <tt>',
+                         basename($params['config']), '</tt>');
         }
     }
 
@@ -233,39 +268,81 @@ class Configuration extends SetupTask {
 /**
  *
  */
-class MySQLi extends SetupTask {
+class MySQLi extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check database configuration';
     }
 
     /**
      *
      */
-    public function process( $params, &$messages ) {
+    public function process( $params )
+    {
         $config = include $params['config'];
 
-        $db = new \MySQLi(
+        $db = @(new \MySQLi(
             self::arrayPath2Key($config, $params['host']),
             self::arrayPath2Key($config, $params['user']),
             self::arrayPath2Key($config, $params['pass']),
             self::arrayPath2Key($config, $params['db']),
-            self::arrayPath2Key($config, $params['port']),
+            (int) self::arrayPath2Key($config, $params['port']),
             self::arrayPath2Key($config, $params['socket'])
-        );
+        ));
 
         if (!$db->connect_error) {
-            $res = $db->query('SELECT version()');
-            $row = $res->fetch_array();
-            $this->success('MySQL', $row[0]);
+            $this->success('Connect to MySQL ( Version',
+                           $db->query('SELECT version()')->fetch_array(MYSQL_NUM)[0],
+                           ')');
         } else {
             $this->error(htmlspecialchars($db->connect_error));
-            $this->info('Please check your database settings');
+            $this->info('Please check your database settings!');
         }
 
+    }
+
+}
+
+/**
+ *
+ */
+class Composer extends SetupTask
+{
+
+    /**
+     *
+     */
+    public function getTitle()
+    {
+        return 'Check Composer dependencies';
+    }
+
+    /**
+     *
+     */
+    public function process( $params )
+    {
+        $lock = $params['root'].DIRECTORY_SEPARATOR.'composer.lock';
+
+        if (!file_exists($lock)) {
+            $this->info('<tt>composer.lock</tt> missing');
+            $this->info('Try to run Composer');
+            $cmd = 'composer --working-dir='.dirname($lock).' --no-dev update 2>&1';
+#            $this->info($this->code(shell_exec($cmd)));
+            exec($cmd);
+        }
+
+        if (file_exists($lock)) {
+            $this->success('Composer dependencies installed');
+        } else {
+            $this->error('Can\'t update Composer dependencies');
+            $this->error('Composer needs to be installed system wide');
+        }
     }
 
 }

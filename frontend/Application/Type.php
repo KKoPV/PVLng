@@ -6,7 +6,10 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-if (!Session::get('User')) return;
+
+$app->hook('slim.before', function() use ($app) {
+    $app->menu->add('10.30', '/type', 'ChannelTypes', !!$app->user);
+});
 
 /**
  * Routes

@@ -84,5 +84,13 @@ return array(
             'channel'     => 'current_observation->weather',
             'numeric'     => 0,
         ),
+
+        array(
+            'type'        => 80, // Percentage
+            'name'        => 'Sky cover',
+            'channel'     => 'sky',
+            'unit'        => '%',
+            'decimals'    => 0,
+        ),
     )
 );

@@ -1,6 +1,7 @@
 <?php
 /**
- * Mockup class with no functionality
+ * Mockup class with no persistent functionality, cache only for
+ * actual script run
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2010-2013 Knut Kohl
@@ -34,7 +35,7 @@ class Mock extends \Cache {
      * @param string $data
      * @return bool
      */
-    public function write( $key, $data ) {
+    public function write( $key, $data, $ttl ) {
         $this->data[$key] = $data;
         return TRUE;
     }

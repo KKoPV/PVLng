@@ -1,0 +1,36 @@
+// dot 2.26.3 on Linux 3.2.0-4-486
+// SchemaSpy rev 590
+digraph "pvlng_statistics" {
+  graph [
+    rankdir="RL"
+    bgcolor="#f7f7f7"
+    nodesep="0.18"
+    ranksep="0.46"
+    fontname="Helvetica"
+    fontsize="11"
+  ];
+  node [
+    fontname="Helvetica"
+    fontsize="11"
+    shape="plaintext"
+  ];
+  edge [
+    arrowsize="0.8"
+  ];
+  "pvlng_statistics" [
+    label=<
+    <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="#ffffff">
+      <TR><TD COLSPAN="3" BGCOLOR="#9bab96" ALIGN="CENTER">pvlng_statistics</TD></TR>
+      <TR><TD PORT="database" COLSPAN="3" ALIGN="LEFT">database</TD></TR>
+      <TR><TD PORT="table" COLSPAN="3" ALIGN="LEFT">table</TD></TR>
+      <TR><TD PORT="data_length" COLSPAN="3" ALIGN="LEFT">data_length</TD></TR>
+      <TR><TD PORT="data_length_mb" COLSPAN="3" ALIGN="LEFT">data_length_mb</TD></TR>
+      <TR><TD PORT="index_length" COLSPAN="3" ALIGN="LEFT">index_length</TD></TR>
+      <TR><TD PORT="length" COLSPAN="3" ALIGN="LEFT">length</TD></TR>
+      <TR><TD PORT="data_free" COLSPAN="3" ALIGN="LEFT">data_free</TD></TR>
+      <TR><TD ALIGN="LEFT" BGCOLOR="#f7f7f7">  </TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">view</TD><TD ALIGN="RIGHT" BGCOLOR="#f7f7f7">  </TD></TR>
+    </TABLE>>
+    URL="tables/pvlng_statistics.html"
+    tooltip="pvlng_statistics"
+  ];
+}
