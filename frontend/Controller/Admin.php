@@ -47,8 +47,8 @@ class Admin extends \Controller {
     public function LoginGET_Action() {
         if ($this->app->params->get('token') == \PVLng::getLoginToken()) {
             \Session::login($this->config->get('Core.Password'));
+            $this->app->redirect();
         }
-        $this->app->redirect();
     }
 
     /**
@@ -98,7 +98,7 @@ class Admin extends \Controller {
 
         if ($this->view->Ok) {
             \Messages::Success(__('PasswordSaved'));
-            \Session::set('user', TRUE);
+            \Session::login($settings->getValue());
             $this->app->user = TRUE;
             $this->app->redirect('/');
         }

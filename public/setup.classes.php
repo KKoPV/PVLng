@@ -7,12 +7,14 @@ namespace Setup;
 /**
  *
  */
-abstract class Setup {
+abstract class Setup
+{
 
     /**
      *
      */
-    public static function run( Array $config ) {
+    public static function run( Array $config )
+    {
 
         $i = 1;
 
@@ -42,7 +44,8 @@ abstract class Setup {
 /**
  *
  */
-abstract class SetupTask {
+abstract class SetupTask
+{
 
     /**
      *
@@ -57,14 +60,16 @@ abstract class SetupTask {
     /**
      *
      */
-    public function isError() {
+    public function isError()
+    {
         return ($this->error === TRUE);
     }
 
     /**
      *
      */
-    public function getMessages() {
+    public function getMessages()
+    {
         return $this->messages;
     }
 
@@ -81,21 +86,32 @@ abstract class SetupTask {
     /**
      *
      */
-    protected function info() {
+    protected function code($code)
+    {
+        return '<pre>' . $code . '</pre>';
+    }
+
+    /**
+     *
+     */
+    protected function info()
+    {
         $this->messages[] = implode(' ', func_get_args());
     }
 
     /**
      *
      */
-    protected function success() {
+    protected function success()
+    {
         $this->messages[] = '<span style="color:green">' . implode(' ', func_get_args()) . ' - <strong>OK</strong></span>';
     }
 
     /**
      *
      */
-    protected function error() {
+    protected function error()
+    {
         $this->error = TRUE;
         $this->messages[] = '<span style="color:red">' . implode(' ', func_get_args()) . ' - <strong>FAILED</strong></span>';
     }
@@ -103,7 +119,8 @@ abstract class SetupTask {
     /**
      *
      */
-    protected function arrayPath2Key( $array, $key ) {
+    protected function arrayPath2Key( $array, $key )
+    {
         $p = &$array;
         $path = explode('.', $key);
         while ($key = array_shift($path)) {
@@ -117,19 +134,22 @@ abstract class SetupTask {
 /**
  *
  */
-class PHPVersion extends SetupTask {
+class PHPVersion extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check required PHP Version';
     }
 
     /**
      *
      */
-    public function process( $params ) {
+    public function process( $params )
+    {
         // $params == min. version
         $this->info('Require at least PHP', $params);
         if (version_compare(PHP_VERSION, $params, 'ge')) {
@@ -144,19 +164,22 @@ class PHPVersion extends SetupTask {
 /**
  *
  */
-class PHPExtensions extends SetupTask {
+class PHPExtensions extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check required PHP Extensions';
     }
 
     /**
      *
      */
-    public function process( $params ) {
+    public function process( $params )
+    {
         foreach ($params as $ext=>$data) {
             if (extension_loaded($ext)) {
                 $this->success($data[0]);
@@ -177,19 +200,22 @@ class PHPExtensions extends SetupTask {
 /**
  *
  */
-class Permissions extends SetupTask {
+class Permissions extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check file/directory permissions';
     }
 
     /**
      *
      */
-    public function process( $params ) {
+    public function process( $params )
+    {
         foreach ($params as $test=>$func) {
             if ($func($test)) {
                 $this->success(str_replace('_', ' ', $func), '<tt>', $test, '</tt>');
@@ -204,19 +230,22 @@ class Permissions extends SetupTask {
 /**
  *
  */
-class Configuration extends SetupTask {
+class Configuration extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check configuration file';
     }
 
     /**
      *
      */
-    public function process( $params ) {
+    public function process( $params )
+    {
         if (!file_exists($params['config'])) {
             $this->info('<tt>', $params['config'], '</tt> missing');
             $this->info('Try to create from <tt>', $params['default'], '</tt>');
@@ -239,19 +268,22 @@ class Configuration extends SetupTask {
 /**
  *
  */
-class MySQLi extends SetupTask {
+class MySQLi extends SetupTask
+{
 
     /**
      *
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return 'Check database configuration';
     }
 
     /**
      *
      */
-    public function process( $params ) {
+    public function process( $params )
+    {
         $config = include $params['config'];
 
         $db = @(new \MySQLi(
@@ -272,6 +304,45 @@ class MySQLi extends SetupTask {
             $this->info('Please check your database settings!');
         }
 
+    }
+
+}
+
+/**
+ *
+ */
+class Composer extends SetupTask
+{
+
+    /**
+     *
+     */
+    public function getTitle()
+    {
+        return 'Check Composer dependencies';
+    }
+
+    /**
+     *
+     */
+    public function process( $params )
+    {
+        $lock = $params['root'].DIRECTORY_SEPARATOR.'composer.lock';
+
+        if (!file_exists($lock)) {
+            $this->info('<tt>composer.lock</tt> missing');
+            $this->info('Try to run Composer');
+            $cmd = 'composer --working-dir='.dirname($lock).' --no-dev update 2>&1';
+#            $this->info($this->code(shell_exec($cmd)));
+            exec($cmd);
+        }
+
+        if (file_exists($lock)) {
+            $this->success('Composer dependencies installed');
+        } else {
+            $this->error('Can\'t update Composer dependencies');
+            $this->error('Composer needs to be installed system wide');
+        }
     }
 
 }

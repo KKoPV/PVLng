@@ -1,4 +1,4 @@
-<?php
+<?php error_reporting(-1); ini_set('show_errors', 1);
 /**
  *
  *
@@ -59,6 +59,13 @@ $config = array(
     /**
      *
      */
+    'Composer' => array(
+        'root' => dirname(__DIR__)
+    ),
+
+    /**
+     *
+     */
     'Permissions' => array(
         '../tmp' => 'is_writable'
     ),
@@ -82,7 +89,7 @@ $config = array(
         'user'     => 'Database.Username',
         'pass'     => 'Database.Password',
         'db'       => 'Database.Database'
-     ),
+    ),
 
 );
 
