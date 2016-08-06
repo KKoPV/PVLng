@@ -20,11 +20,14 @@
     </p>
 
     <p>
-        <input id="text" type="text" size="50" placeholder="Street, City, Country">
+        <input id="text" type="text" size="60" placeholder="Street, City, Country">
         <button id="geoloc" style="margin-left:.5em" class="tipbtn" title="Serach by Google Maps API">Search</button>
     </p>
 
     <div id="map-wrapper" style="display:none">
+        <iframe id="map" class="map" width="100%" height="350" frameborder="0"
+                scrolling="no" marginheight="0" marginwidth="0"></iframe>
+
         <p>
             <form id="loc-form" action="/location" method="post">
             Latitude:<input id="lat" type="text" class="loc" name="loc[Latitude]" readonly="readonly">
@@ -32,9 +35,6 @@
             <button id="save-loc">Save</button>
             </form>
         </p>
-
-        <iframe id="map" class="map" width="100%" height="350" frameborder="0"
-                scrolling="no" marginheight="0" marginwidth="0"></iframe>
     </div>
 
 </div>
