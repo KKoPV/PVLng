@@ -231,7 +231,8 @@ $app->hook('slim.before.dispatch', function() use ($app) {
      * Check location
      */
     if (($app->config->get('Core.Latitude') == '' || $app->config->get('Core.Longitude') == '') &&
-        strpos($pattern, '/adminpass') === false && strpos($pattern, '/location') === false) {
+        strpos($pattern, '/login') === false && strpos($pattern, '/adminpass') === false &&
+        strpos($pattern, '/location') === false) {
         $app->redirect('/location');
     }
 
@@ -315,7 +316,8 @@ $checkAuth = function( Slim\Route $route ) use ($app) {
     // Check logged in user
     if (!$app->user) {
         Messages::Info(__('LoginRequired'));
-        $app->redirect('/');
+        \Session::set('returnto', $_SERVER['REQUEST_URI']);
+        $app->redirect('/login');
     }
 };
 

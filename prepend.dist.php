@@ -12,3 +12,8 @@
  * Example for monitored installation by Newrelic ()
  */
 # if (extension_loaded('newrelic')) newrelic_set_appname('PVLng');
+
+/**
+ * If you encounter problems, make PVLng more chatty
+ */
+# define('DEVELOP', true);
