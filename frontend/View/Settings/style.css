@@ -21,3 +21,8 @@
     margin-left: 1em;
     display: block;
 }
+
+#empty-database.confirm .ui-button-text {
+    color: red;
+    font-weight: bold;
+}

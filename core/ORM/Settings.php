@@ -47,6 +47,14 @@ class Settings extends SettingsBase
     /**
      *
      */
+    public static function setCoreValue($name, $key, $value)
+    {
+        return self::setScopeValue('core', $name, $key, $value);
+    }
+
+    /**
+     *
+     */
     public static function getControllerValue($name, $key, $default=null)
     {
         return self::getScopeValue('controller', $name, $key, $default);
@@ -102,6 +110,18 @@ class Settings extends SettingsBase
         $self = new self;
         $self->filterByScopeNameKey($scope, $name, $key)->findOne();
         return $self->getKey() ? $self->getValue() : $default;
+    }
+
+    /**
+     *
+     */
+    protected static function setScopeValue($scope, $name, $key, $value)
+    {
+        $self = new self;
+        $self->filterByScopeNameKey($scope, $name, $key)->findOne();
+        if ($self->getKey()) {
+            return $self->setValue($value)->update();
+        }
     }
 
 }

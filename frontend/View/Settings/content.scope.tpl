@@ -29,7 +29,7 @@
     <div class="grid_5 omega">
         <!-- IF {VAR} == "core--Password" -->
             <input id="p1" type="password" name="d[p1]">
-            <small style="margin-left:1em">Fill only to change it!</small>
+            &nbsp; &nbsp; Fill only to change it!
             <br />
             <input id="p2" type="password" name="d[p2]" style="margin-top:.5em">
         <!-- ELSEIF {TYPE} == "num" -->
@@ -42,6 +42,10 @@
             </select>
         <!-- ELSE -->
             <input id="{VAR}" type="text" name="d[{VAR}]" value="{VALUE}" style="width:100%">
+        <!-- ENDIF -->
+
+        <!-- IF {VAR} == "core--EmptyDatabaseAllowed" && {VALUE} -->
+            &nbsp; &nbsp; <button id="empty-database">Delete all data</button>
         <!-- ENDIF -->
     </div>
 

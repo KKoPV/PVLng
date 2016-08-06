@@ -11,9 +11,12 @@
 /**
  *
  */
-$api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
-
-    $request = json_decode($api->request->getBody(), TRUE);
+$api->put(
+    '/data/:guid',
+    $APIkeyRequired,
+    function($guid) use ($api)
+{
+    $request = json_decode($api->request->getBody(), true);
 
     // Check request for 'timestamp' attribute, take as is if numeric,
     // otherwise convert datetime to timestamp
@@ -31,11 +34,10 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
     }
 
     if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
-
 })->name('PUT /data/:guid')->help = array(
     'since'       => 'r2',
     'description' => 'Save a reading value',
-    'apikey'      => TRUE,
+    'apikey'      => true,
     'payload'     => array(
         '{"data":"<value>"}'                           => 'JSON encoded value, use server time',
         '{"data":"<value>","timestamp":"<timestamp>"}' => 'JSON encoded value, use provided timestamp',
@@ -46,8 +48,12 @@ $api->put('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
 /**
  *
  */
-$api->post('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
-    $request = json_decode($api->request->getBody(), TRUE);
+$api->post(
+    '/data/:guid',
+    $APIkeyRequired,
+    function($guid) use ($api)
+{
+    $request = json_decode($api->request->getBody(), true);
     // Check request for 'value' attribute
     if (!isset($request['data'])) $api->stopAPI('Data required for data update', 400);
     // Check request for 'timestamp' attribute, take as is if numeric,
@@ -57,7 +63,7 @@ $api->post('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
                  ? $request['timestamp']
                  : strtotime($request['timestamp'])
                  )
-               : FALSE;
+               : false;
     if (!$timestamp) $api->stopAPI('Timestamp required for data update', 400);
     if (!Channel::byGUID($guid)->update($request, $timestamp)) {
         $api->stopAPI('Invalid data', 405);
@@ -65,28 +71,35 @@ $api->post('/data/:guid', $APIkeyRequired, function($guid) use ($api) {
 })->name('POST /data/:guid')->help = array(
     'since'       => 'r4',
     'description' => 'Update a reading value, timestamp is required here',
-    'apikey'      => TRUE,
+    'apikey'      => true,
     'payload'     => array('{"data":"<value>","timestamp":"<timestamp>"}' => 'JSON encoded value'),
 );
 
 /**
  *
  */
-$api->put('/data/raw/:guid', $APIkeyRequired, function($guid) use ($api) {
+$api->put(
+    '/data/raw/:guid',
+    $APIkeyRequired,
+    function($guid) use ($api)
+{
     // Channel handles raw data
     $cnt = Channel::byGUID($guid)->write($api->request->getBody());
     if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
 })->name('PUT /data/raw/:guid')->help = array(
     'since'       => 'r4',
     'description' => 'Save raw data, channel decide what to do with them',
-    'apikey'      => TRUE,
+    'apikey'      => true,
     'payload'     => array('raw data in any format' => 'Channel have to handle it'),
 );
 
 /**
  *
  */
-$api->get('/data/:period/:guid', $accessibleChannel, function($period, $guid) use ($api)
+$api->get(
+    '/data/:period/:guid',
+    $accessibleChannel,
+    function($period, $guid) use ($api)
 {
     $request = $api->request->get();
     $request['period'] = $period;
@@ -117,7 +130,10 @@ $api->get('/data/:period/:guid', $accessibleChannel, function($period, $guid) us
 /**
  *
  */
-$api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='', $p2='') use ($api)
+$api->get(
+    '/data/:guid(/:p1(/:p2))',
+    $accessibleChannel,
+    function($guid, $p1='', $p2='') use ($api)
 {
     $request = $api->request->get();
     $request['p1'] = $p1;
@@ -182,7 +198,9 @@ $api->get('/data/:guid(/:p1(/:p2))', $accessibleChannel, function($guid, $p1='',
 /**
  *
  */
-$api->get('/data/actual/:guid+', function($guid) use ($api)
+$api->get(
+    '/data/actual/:guid+',
+    function($guid) use ($api)
 {
     $guids = $guid;
     $request = $api->request->get();
@@ -230,7 +248,10 @@ $api->get('/data/actual/:guid+', function($guid) use ($api)
 /**
  *
  */
-$api->get('/data/stats', function() use ($api) {
+$api->get(
+    '/data/stats',
+    function() use ($api)
+{
     $api->render($api->db->queryRowsArray(
         'SELECT c.`guid`, c.`name`, c.`description`, c.`numeric`, c.`decimals`,
                 t.*, IFNULL(n.`data`, s.`data`) AS `data`
@@ -248,7 +269,11 @@ $api->get('/data/stats', function() use ($api) {
 /**
  *
  */
-$api->delete('/data/:guid/:timestamp', $APIkeyRequired, function($guid, $timestamp) use ($api) {
+$api->delete(
+    '/data/:guid/:timestamp',
+    $APIkeyRequired,
+    function($guid, $timestamp) use ($api)
+{
     $channel = Channel::byGUID($guid);
     $tbl = $channel->numeric ? new \ORM\ReadingNum : new \ORM\ReadingStr;
     if ($tbl->filterByIdTimestamp($channel->entity, $timestamp)->findOne()->getId()) {
@@ -260,5 +285,34 @@ $api->delete('/data/:guid/:timestamp', $APIkeyRequired, function($guid, $timesta
 })->name('DELETE /data/:guid/:timestamp')->help = array(
     'since'       => 'r2',
     'description' => 'Delete a reading value',
-    'apikey'      => TRUE,
+    'apikey'      => true,
 );
+
+/**
+ * Undocumented
+ */
+$api->delete(
+    '/data',
+    $APIkeyRequired,
+    function() use ($api)
+{
+    if (!\ORM\Settings::getCoreValue(null, 'EmptyDatabaseAllowed')) {
+        $api->stopAPI('Delete all data is not allowed, '
+                     .'change the "Empty database allowed" flag first!');
+    }
+
+    $tables = array(
+        'pvlng_reading_last',
+        'pvlng_reading_num',      'pvlng_reading_str',
+        'pvlng_reading_num_tmp',  'pvlng_reading_str_tmp',
+        'pvlng_reading_num_calc', 'pvlng_reading_tmp'
+    );
+
+    foreach ($tables as $table) {
+        $api->db->truncate($table);
+    }
+
+    \ORM\Settings::setCoreValue(null, 'EmptyDatabaseAllowed', 0);
+
+    $api->stopAPI('All data deleted', 200);
+});

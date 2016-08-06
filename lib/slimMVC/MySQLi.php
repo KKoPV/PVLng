@@ -280,6 +280,17 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
+    public function truncate( $table, $optimize=true ) {
+        $rc = $this->query('TRUNCATE  `{1}`', $table);
+        if ($optimize) {
+            $rc += $this->query('OPTIMIZE  `{1}`', $table);
+        }
+        return $rc;
+    }
+
+    /**
+     *
+     */
     public function multi_query( $sql ) {
         foreach (explode(';', $sql) as $query) {
             $this->queries[] = preg_replace('~\s+~', ' ', $query);
