@@ -2,72 +2,78 @@
 
 # set -x
 
-if [ -z "$1" ]; then
-    echo "Usage $0 <branch>"
-    exit
-fi
+function e { echo; echo $@; }
+function usage {
+    [ "$1" ] && echo && echo $1
+    echo
+    echo Upgrade your installation to lastest state from Github.
+    echo
+    echo "Usage: $0 <branch>"
+    exit ${2:-0}
+}
 
-echo "Fetch last version from GitHub"
+[ -d .git ] || usage "ERROR: Script must run from installation directory (where the .git diretoy resides)" 1
+
+[ "$1" ] || usage
+
 echo
+echo -n 'Fetch last version from GitHub ... '
 
-git checkout $1
-[ $? ] && exit 128
-git pull
+git checkout $1 >/dev/null 2>&1
+rc=$?
+[ $rc -ne 0 ] && exit $rc
+git pull >/dev/null 2>&1
+
+echo -e \\b\\b\\b\\b- done
 
 ### Extract MySQL credentials
 function dbconf {
     sed -n 's/.*['\''"]'$1'['\''"] *=> *['\''"]*\([^'\''",]*\).*/\1/p' config/config.php | tail -n1
 }
-dbhost=$(dbconf Host)
-dbport=$(dbconf Port)
+
+# Batch silent mode
+params="-B -h $(dbconf Host) -P $(dbconf Port) -u $(dbconf Username) --password=$(dbconf Password)"
+
 dbsocket=$(dbconf Socket)
-dbuser=$(dbconf Username)
-dbpass=$(dbconf Password)
+[ "$dbsocket" ] && params="$params -S $dbsocket"
+
 dbname=$(dbconf Database)
 
-params="-h $dbhost -P $dbport -u $dbuser"
+level=$(mysql $params -Ne 'SELECT `value` FROM `pvlng_config` WHERE `key`="DBPatchLevel"' $dbname)
+level=$((${level:-0}+0))
 
-[ "$dbsocket" ] && params="$params -S $dbsocket"
-[ "$dbpass" ]   && params="$params -p$dbpass"
-
-level=$(mysql $params -BNe 'SELECT `value` FROM `pvlng_config` WHERE `key`="DBPatchLevel"' $dbname)
-level=${level:-0}
-
-echo
-echo "Actual data patch level is $level"
-
-path=$(dirname $0)/sql/patches
+e Actual database patch level is $level
 
 tmp=$(tempfile)
 trap "rm $tmp" 0
 
-ls $path >$tmp
+ls sql/patches >$tmp
 
 while read f; do
 
-    patch=$(echo $f | sed -n 's/^\([0-9]\+\)/\1/p')
+    patch=$(echo $f | cut -d. -f1)
 
     if [ $patch -gt $level ]; then
 
-        echo -n "Apply patch $f ... "
-        mysql $params $dbname <$path/$f
-        echo done
+        [ "$last" ] || echo
+
+        echo -n "- Apply patch $f ... "
+        mysql $params $dbname <sql/patches/$f >/dev/null 2>&1
+        echo -e \\b\\b\\b\\b- done
 
         ### Remember last patch
-        last=$patch
+        last=$((patch+0))
 
     fi
 
 done <$tmp
 
 if [ "$last" ]; then
-    mysql $params -Be 'REPLACE INTO `pvlng_config` (`key`, `value`) VALUES ("DBPatchLevel", "'$last'")' $dbname
-    echo "Patched database to level $last"
+    mysql $params -e 'REPLACE INTO `pvlng_config` (`key`, `value`) VALUES ("DBPatchLevel", "'$last'")' $dbname
+    e Patched database to level $last
+    e NEXT
+    e - Open http://your.domain.here/cc in your browser and clear the caches!
+    e - Clear also your browser cache!
 else
-    echo "No patches required"
+    e No patches required.
 fi
-
-echo
-echo "Open 'http://your.domain.here/cc' in your browser and clear the caches!"
-echo
-echo "Clear also your browser cache!"
