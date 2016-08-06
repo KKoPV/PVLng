@@ -141,9 +141,11 @@ $api->get(
 
     $result = $api->readData($guid, $request);
 
-    $array = json_decode($result, true);
-    if ($array && json_last_error() == JSON_ERROR_NONE) {
-        $result = $array;
+    if (is_string($result)) {
+        $array = json_decode($result, true);
+        if ($array && json_last_error() == JSON_ERROR_NONE) {
+            $result = $array;
+        }
     }
 
     $api->response->headers->set('X-Data-Rows', count($result));
