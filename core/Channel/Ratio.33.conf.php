@@ -19,14 +19,14 @@ return array(
      * - default  : Default value, works also for not visible attributes
      */
 
-    // Just a ratio without unit
-
     'resolution' => array(
+        'default'  => 100,
         'visible'  => false
     ),
 
     'unit' => array(
-        'visible'  => false
+        'default'  => '%',
+        'readonly'  => true
     ),
 
 );

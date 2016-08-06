@@ -549,8 +549,12 @@ class Channel extends \Controller {
             $fieldSettings[] = 'group';
         }
 
-        // Last apply model specific settings
-        $fieldSettings[] = str_replace('\\', DS, $type->getModel());
+        // Apply model specific settings
+        $model = str_replace('\\', DS, $type->getModel());
+        $fieldSettings[] = $model;
+
+        // Apply channel type specific settings
+        $fieldSettings[] = $model . '.' . $type->getId();
 
         // Apply settings only once
         foreach (array_unique($fieldSettings) as $conf) {

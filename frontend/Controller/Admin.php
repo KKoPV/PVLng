@@ -88,6 +88,7 @@ class Admin extends \Controller {
         $settings = new \ORM\Settings;
         $settings->setScope('core')
                  ->setKey('Password')
+                 ->setDescription('Password')
                  ->setValue($hasher->HashPassword($p1))
                  ->replace();
 
