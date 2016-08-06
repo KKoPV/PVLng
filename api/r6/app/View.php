@@ -76,9 +76,8 @@ class View extends Slim\View {
             } else {
                 $result = json_encode($this->normalizeJSON($result));
             }
-            $api = API::getInstance();
-            $callback = $api->request->get('callback');
-            if (!$callback) $callback = $api->request->get('jsonp');
+            $callback = $this->app->request->get('callback');
+            if (!$callback) $callback = $this->app->request->get('jsonp');
             if ($callback) $result = $callback.'('.$result.')';
             echo $result;
         }
@@ -112,14 +111,13 @@ class View extends Slim\View {
      */
     protected function asXML( $result )
     {
-
         require_once LIB_DIR . DS . 'contrib' . DS . 'Array2XML.php';
 
         if ($result instanceof Buffer) {
             echo '<?xml version="1.0" encoding="UTF-8" ?'.'>' . PHP_EOL;
             echo '<data lastUpdated="'.date('c').'">' . PHP_EOL;
 
-            $attr = $app->request->get('attributes');
+            $attr = $this->app->request->get('attributes');
 
             foreach ($result as $row) {
                 $node = $attr ? 'attributes' : 'reading';
@@ -140,9 +138,9 @@ class View extends Slim\View {
                 'data' => (array) $result,
             );
 
-            Array2XML::Init('1.0', 'UTF-8', $app->config('mode')=='development');
+            Array2XML::Init('1.0', 'UTF-8', $this->app->config('mode')=='development');
 
-            echo Array2XML::createXML($node, $result)->saveXML();
+            echo Array2XML::createXML('data', $result)->saveXML();
         }
     }
 
