@@ -14,9 +14,9 @@
 -->
 
 <!-- IF {DEVELOPMENT} -->
-<script src="http://code.highcharts.com/4.1.7/highcharts.src.js"></script>
-<script src="http://code.highcharts.com/4.1.7/highcharts-more.src.js"></script>
-<script src="http://code.highcharts.com/4.1.7/modules/exporting.src.js"></script>
+<script src="http://code.highcharts.com/4.2.6/highcharts.src.js"></script>
+<script src="http://code.highcharts.com/4.2.6/highcharts-more.src.js"></script>
+<script src="http://code.highcharts.com/4.2.6/modules/exporting.src.js"></script>
 <!-- ELSE -->
 <script src="http://code.highcharts.com/4.2.0/highcharts.js"></script>
 <script src="http://code.highcharts.com/4.2.0/highcharts-more.js"></script>
