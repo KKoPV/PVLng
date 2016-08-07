@@ -39,11 +39,7 @@ $(function() {
         return false;
     });
 
-    $('#table-stats').DataTable({
-        aoColumnDefs: [ { asSorting: ['asc'], aTargets: [0] } ]
-    });
-
-    $('#table-db').DataTable();
+    $('#table-stats, #table-db').DataTable();
 
     $('.ui-tabs').on('tabsactivate', function(e, ui) {
         if (ui.newPanel.hasClass('tab-loaded')) return;
@@ -70,9 +66,7 @@ $(function() {
                     function(data) {
                         $(data).each(function(id, data) {
                             sumReadings += data.readings;
-/*
-                            $('#r-'+data.guid+'-raw').text(data.readings).parent(/* td * /).addClass('ok');
-*/
+
                             $('#r-'+data.guid).number(data.readings, 0, '', ThousandSeparator).addClass('ok');
 
                             if (data.numeric) {
@@ -90,7 +84,7 @@ $(function() {
                         /* Re-create DataTable and apply sorting for changed readings column */
                         $('#table-stats').DataTable({
                             bDestroy: true,
-                            aoColumns: [ null, null, { sType: 'readings' }, { bSortable: false }, { sWidth: '1%' } ]
+                            aoColumns: [ null, null, { sType: 'readings' }, { bSortable: false }, null ]
                         });
 
                         if (options.series[0].data.length) {
