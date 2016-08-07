@@ -91,15 +91,15 @@ function updateCharts() {
         el = $(el);
 
         var t, url = PVLngAPI + 'data/' + el.data('guid') + '.json';
-        _log('Fetch: '+url);
+        pvlng.log('Fetch', url);
 
 
         $.getJSON(url, { attributes: true, full: true }, function(data) {
             /* pop out 1st row with attributes */
             var attr = data.shift();
 /*
-            _log('Attributes:', attr);
-            _log('Data:', data);
+            pvlng.log('Attributes', attr);
+            pvlng.log('Data', data);
 */
             if (!data[0] || (date.getTime()/1000 - data[0].timestamp) > 600) {
                 /* NO data row found or data older than 10 minuts */

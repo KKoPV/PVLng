@@ -61,6 +61,8 @@ $(function() {
                          + ' %'
                 };
 
+                pvlng.time('Load database statistics');
+
                 $.getJSON(
                     PVLngAPI + 'data/stats.json',
                     function(data) {
@@ -100,6 +102,10 @@ $(function() {
                     $('#stats-chart').html(jqXHR.responseJSON.message).addClass('fail');
                 }).always(function() {
                     $.wait(false);
+                    $.pnotify({
+                        type: 'success',
+                        text: 'Loaded in ' + (pvlng.timeEnd()/1000).toFixed(1) + 's'
+                    });
                 });
 
                 break;

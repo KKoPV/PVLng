@@ -186,12 +186,12 @@ $(function() {
 
 /**
  *
- */
+ * /
 var timer, verbose = false;
 
 /**
  *
- */
+ * /
 function _log() {
     if (!verbose) return;
 
@@ -209,7 +209,7 @@ function _log() {
 /*
                 } else if (typeof data == 'object') {
                     console.dir(data);
-*/
+* /
                 } else {
                     console.log(data);
                 }

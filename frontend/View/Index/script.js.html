@@ -499,8 +499,8 @@ function updateChart( force ) {
     /* Scroll to navigation as top most visible element */
     pvlng.scroll('#nav');
 
-    _log('Channels:', channels_new);
-    _log('yAxis:', yAxis);
+    pvlng.log('Channels', channels_new);
+    pvlng.log('yAxis', yAxis);
 
     /* check for changed channels */
     var changed = false, now = (new Date).getTime() / 1000 / 60;
@@ -565,11 +565,11 @@ function updateChart( force ) {
             end = toDate + '+1day';
 
         if (channel.daylight && today == toDate) {
-            start = 'sunrise;'+channel.daylight_grace;
-            end = 'sunset;'+channel.daylight_grace;
+            start = 'sunrise;' + channel.daylight_grace;
+            end   = 'sunset;'  + channel.daylight_grace;
         }
 
-        _log('Fetch', url);
+        pvlng.log('Fetch', channel.name, url);
 
         $.getJSON(
             url,
@@ -580,7 +580,7 @@ function updateChart( force ) {
                 end:        end,
                 period:     (channel.type != 'scatter') ? period_count + period : '',
                 _canAbort:  true,
-                _ts:        channel._ts
+                _ts:        channel._ts // Force fresh fetch
             },
             function(data) {
 
@@ -591,13 +591,11 @@ function updateChart( force ) {
                     attr = data.shift();
                 } catch(err) {
                     console.error(data);
-                    /* Set pseudo channel
-                    series[id] = {}; */
                     return;
                 }
 
-                _log('Attributes', attr);
-                _log('Data', data);
+                pvlng.log('Attributes', attr);
+                pvlng.log('Data', data);
 
                 if (attr.consumption) {
                     $('#cons'+channel._id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
@@ -716,13 +714,16 @@ function updateChart( force ) {
                         point.y = 0;
                         var n = (row.data+'|').split('|');
                         point.name = channel.all ? n[0] : '';
-                        if (n[1]) point.marker = { symbol: 'url('+n[1]+')' };
+                        if (n[1]) {
+                            // Own marker symbol
+                            point.marker = { symbol: 'url('+n[1]+')' };
+                        }
                     }
 
                     serie.data.push(point);
                 });
 
-                _log('Serie', serie);
+                pvlng.log('Serie', serie);
 
                 if (!channel.all && (channel.min || channel.max || channel.last)) {
                     serie = setMinMax(serie, channel);
@@ -780,8 +781,6 @@ function updateChart( force ) {
             });
 
             $('#costs').html(costs ? CurrencyFormat.replace('{}', Highcharts.numberFormat(costs, CurrencyDecimals)) : '');
-
-            _log('Apply series');
 
             if (changed) {
                 /* Remove all existing series */

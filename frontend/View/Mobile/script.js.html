@@ -153,8 +153,8 @@ function updateChart() {
         });
     }
 
-    _log('Channels:', channels_new);
-    _log('yAxis:', yAxis);
+    pvlng.log('Channels', channels_new);
+    pvlng.log('yAxis', yAxis);
 
     /* Check for changed channels */
     var changed = false;
@@ -185,7 +185,7 @@ function updateChart() {
     $(channels).each(function(id, channel) {
 
         var url = PVLngAPI + 'data/' + channel.guid + '.json';
-        _log('Fetch: ' + url);
+        pvlng.log('Fetch', url);
 
         $.getJSON(
             /* Fetch channel data with attributes */
@@ -200,8 +200,8 @@ function updateChart() {
             function(data) {
                 var attr = data.shift(), t;
 /*
-                _log('Attributes:', attr);
-                _log('Data:', data);
+                pvlng.log('Attributes', attr);
+                pvlng.log('Data', data);
 */
                 var serie = {     /* A trick to HTML-decode channel name */
                         name:     $('<div/>').html(attr.name).text(),
@@ -283,7 +283,7 @@ function updateChart() {
                     serie = setMinMax(serie, channel);
                 }
 
-                _log('Serie: ', serie);
+                pvlng.log('Serie', serie);
 
                 series[id] = serie;
             }
@@ -294,7 +294,7 @@ function updateChart() {
 
             /* Check real count of elements in series array! */
             var completed = series.filter(function(a){ return a !== undefined }).length;
-            _log(completed + ' completed');
+            pvlng.log(completed + ' completed');
 
             /* Check if all getJSON() calls finished, exit if not */
             if (completed !== channels.length) return;
