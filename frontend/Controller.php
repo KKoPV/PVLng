@@ -268,7 +268,7 @@ class Controller extends slimMVC\Controller {
      *
      */
     protected function checkVersion() {
-        $url = 'https://raw.github.com/KKoPV/PVLng/master/.version';
+        $url = 'https://raw.githubusercontent.com/KKoPV/PVLng/master/.version';
 
         $ch = curl_init($url);
 
