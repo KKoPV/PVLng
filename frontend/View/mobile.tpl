@@ -54,7 +54,9 @@
 
     <!-- IF {DEVELOPMENT} -->
     <script src="/js/mobile.js"></script>
+    <script src="/js/pvlng.js"></script>
     <script src="/js/chart.js"></script>
+    <script src="/js/trmix.min.js"></script>
     <!-- ELSE -->
     <script src="/js/min.mobile.js"></script>
     <!-- ENDIF -->
