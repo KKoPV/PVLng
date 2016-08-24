@@ -55,6 +55,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
 
     chartOptions = {
         chart: {
+            renderTo: 'chart',
             events: {
                 load: function () {
                     this.renderer
@@ -73,24 +74,26 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
                 }
             },
             panning: true,
-            panKey: 'shift',
-            renderTo: 'chart',
             resetZoomButton: {
                 relativeTo: 'chart',
-                position: { x: -40 }
+                position: {
+                    x: -2,
+                    y: 7
+                }
             },
-            style: { fontFamily: 'inherit' },
-            zoomType: 'x'
+            style: { fontFamily: 'inherit' }
         },
         credits: false,
         loading: {
             labelStyle: { top: '40%' },
             style: { opacity: 0.8 }
         },
+        mapNavigation: {
+            enabled: true,
+            enableButtons: false
+        },
         plotOptions: {
-            series: {
-                turboThreshold: 0
-            },
+            series: { turboThreshold: 0 },
             line: { marker: { enabled: false } },
             spline: { marker: { enabled: false } },
             areaspline: {
@@ -146,7 +149,21 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             crosshairs: true,
             shared: true
         },
-        xAxis : { type: 'datetime' }
+        xAxis: {
+            type: 'datetime',
+            events: {
+                afterSetExtremes: function(event) {
+                    var ex = this.getExtremes();
+                    if (ex.dataMax - ex.dataMin > event.max - event.min) {
+                        // Zoomed in
+                        if (!chart.resetZoomButton) chart.showResetZoom();
+                    } else {
+                        // Full zoomed out, but make sure all is reset correct
+                        chart.zoomOut();
+                    }
+                }
+            }
+        }
     };
 
 /**

@@ -14,11 +14,13 @@
 -->
 
 <!-- IF {DEVELOPMENT} -->
-<script src="http://code.highcharts.com/4.2.6/highcharts.src.js"></script>
-<script src="http://code.highcharts.com/4.2.6/highcharts-more.src.js"></script>
-<script src="http://code.highcharts.com/4.2.6/modules/exporting.src.js"></script>
+<script src="//code.highcharts.com/4.2.6/highcharts.src.js"></script>
+<script src="//code.highcharts.com/4.2.6/highcharts-more.src.js"></script>
+<script src="//code.highcharts.com/4.2.6/modules/exporting.src.js"></script>
+<script src="//code.highcharts.com/maps/4.2.6/modules/map.js"></script>
 <!-- ELSE -->
-<script src="http://code.highcharts.com/4.2.0/highcharts.js"></script>
-<script src="http://code.highcharts.com/4.2.0/highcharts-more.js"></script>
-<script src="http://code.highcharts.com/4.2.0/modules/exporting.js"></script>
+<script src="//code.highcharts.com/4.2.6/highcharts.src.js"></script>
+<script src="//code.highcharts.com/4.2.6/highcharts-more.src.js"></script>
+<script src="//code.highcharts.com/4.2.6/modules/exporting.src.js"></script>
+<script src="//code.highcharts.com/maps/4.2.6/modules/map.js"></script>
 <!-- ENDIF -->
