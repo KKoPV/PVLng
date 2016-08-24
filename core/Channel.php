@@ -881,7 +881,7 @@ abstract class Channel {
         $datafile = new Buffer;
 
         $last = 0;
-        $lastrow = FALSE;
+        $lastrow = false;
 
         foreach ($buffer as $id=>$row) {
 
@@ -913,17 +913,12 @@ abstract class Channel {
                     Hook::process('data.read.after', $this);
                     $row['data'] = $this->value;
 
-                    if ($this->isChild) {
-                        $row['data'] = round($this->value, $this->decimals);
-                        $row['min']  = round($row['min'], $this->decimals);
-                        $row['max']  = round($row['max'], $this->decimals);
-
-                        if ($this->meter AND $lastrow) {
-                            $row['consumption'] = round($row['data'] - $lastrow['data'], $this->decimals);
-                        } else {
-                            $row['consumption'] = 0;
-                        }
-                    }
+//                     if ($this->isChild) {
+//                         $row['data'] = round($this->value, $this->decimals);
+//                         $row['min']  = round($row['min'], $this->decimals);
+//                         $row['max']  = round($row['max'], $this->decimals);
+//                         $row['consumption'] = round($row['consumption'], $this->decimals);
+//                     }
 
                     $datafile->write($row, $id);
                     $lastrow = $row;

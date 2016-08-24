@@ -38,7 +38,7 @@ function updateList() {
         period = $('#period').val(),
         url = PVLngAPI + 'data/' + guid + '.json';
 
-    _log('Fetch', url);
+    pvlng.log('Fetch', url);
 
     $.getJSON(
         url,

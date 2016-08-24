@@ -1,3 +1,0 @@
---
--- For development branch only!
---

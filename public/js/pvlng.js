@@ -9,6 +9,11 @@
 var pvlng = new function() {
 
     /**
+     * Public property
+     */
+    this.verbose = false;
+
+    /**
      * Cookie handling with pure JS
      *
      * http://stackoverflow.com/a/1460174
@@ -82,13 +87,6 @@ var pvlng = new function() {
         .find('.ui-dialog-titlebar-close').remove();
     };
 
-    // Private Property
-    var internalVar = true;
-    var internalFunction = function() {};
-
-    /* Public */
-    this.verbose = false;
-
     /**
      * Add clear search button to table
      */
@@ -110,8 +108,6 @@ var pvlng = new function() {
     this.log = function() {
         if (!this.verbose) return;
 
-        console.timeEnd('Duration');
-        console.time('Duration');
         if (arguments.length == 1) {
             console.log(arguments[0]);
         } else {
@@ -179,6 +175,42 @@ var pvlng = new function() {
         }
         $('#period').trigger('change');
     };
+
+    /**
+     * Profile run time of callable
+     */
+    this.profile = function( callable ) {
+        var start = new Date();
+        callable();
+        return new Date() - start;
+    };
+
+    /**
+     * Rewrite console commands, verbose sensitive and
+     * return elapsed time on end
+     */
+    var _timers = [];
+
+    this.time = function( label ) {
+        _timers.push({
+            start: performance.now(),
+            label: label
+        });
+    };
+
+    this.timeEnd = function() {
+        var t = _timers.pop();
+        if (!t) return;
+        var d = performance.now() - t.start;
+        if (this.verbose) {
+            console.log(t.label + ': ' + (d/1000).toFixed(3) + 's');
+        }
+        return d;
+    };
+
+    // Private Property
+    // var internalVar = true;
+    // var internalFunction = function() {};
 
 };
 

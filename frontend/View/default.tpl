@@ -167,7 +167,7 @@
     <!-- ENDIF -->
 
     <script>
-        if (verbose) pvlng.verbose = true;
+        pvlng.verbose = development;
         <!-- INCLUDE hook.script.js -->
     </script>
 

@@ -10,4 +10,8 @@
 
 Header('Content-Type: text/plain');
 
-die(file_get_contents('..'.DIRECTORY_SEPARATOR.'.latest'));
+$c = file_get_contents('..'.DIRECTORY_SEPARATOR.'latest'.DIRECTORY_SEPARATOR.'index.php');
+
+preg_match('~latest.*(r\d+)~', $c, $args);
+
+die($args[1]);

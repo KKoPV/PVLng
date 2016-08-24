@@ -11,6 +11,8 @@
     padding-bottom: 1em !important;
 }
 
+table.dataTable { width: 100% !important; }
+
 table.dataTable tr.even td.ok { background-color: #BBFFBB; }
 table.dataTable tr.odd td.ok { background-color: #DDFFDD; }
 

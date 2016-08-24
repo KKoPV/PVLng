@@ -14,7 +14,6 @@ class View extends Slim\View {
      */
     public function render( $result, $data=NULL )
     {
-
         $this->app = API::getInstance();
         $response = $this->app->response;
 
@@ -24,9 +23,17 @@ class View extends Slim\View {
             $response['Content-Disposition'] = 'attachment; filename=' . $filename;
         }
 
+        $ContentType = $response['Content-Type'];
+
+        /**
+         * Adjust before real rendering
+         * e.g. JSON can switch for JSONP to text/javascript
+         */
+        $this->app->ContentType($ContentType.';charset=utf-8');
+
         ob_start();
 
-        switch ($response['Content-Type']) {
+        switch ($ContentType) {
             default:
                 $this->asJSON($result);
                 break;
@@ -60,6 +67,14 @@ class View extends Slim\View {
      */
     protected function asJSON( $result )
     {
+        $callback = $this->app->request->get('callback');
+        if (!$callback) $callback = $this->app->request->get('jsonp');
+
+        if ($callback) {
+            $this->app->ContentType('text/javascript;charset=utf-8');
+            echo $callback, '(';
+        }
+
         if ($result instanceof Buffer) {
             echo '[';
             $count = count($result);
@@ -73,15 +88,13 @@ class View extends Slim\View {
         } else {
             if (is_scalar($result) && json_decode($result, true) !== false) {
                 // Ok, is JSON
+                echo $result;
             } else {
-                $result = json_encode($this->normalizeJSON($result));
+                echo json_encode($this->normalizeJSON($result));
             }
-            $api = API::getInstance();
-            $callback = $api->request->get('callback');
-            if (!$callback) $callback = $api->request->get('jsonp');
-            if ($callback) $result = $callback.'('.$result.')';
-            echo $result;
         }
+
+        if ($callback) echo ')';
     }
 
     /**
@@ -112,14 +125,13 @@ class View extends Slim\View {
      */
     protected function asXML( $result )
     {
-
         require_once LIB_DIR . DS . 'contrib' . DS . 'Array2XML.php';
 
         if ($result instanceof Buffer) {
             echo '<?xml version="1.0" encoding="UTF-8" ?'.'>' . PHP_EOL;
             echo '<data lastUpdated="'.date('c').'">' . PHP_EOL;
 
-            $attr = $app->request->get('attributes');
+            $attr = $this->app->request->get('attributes');
 
             foreach ($result as $row) {
                 $node = $attr ? 'attributes' : 'reading';
@@ -140,9 +152,9 @@ class View extends Slim\View {
                 'data' => (array) $result,
             );
 
-            Array2XML::Init('1.0', 'UTF-8', $app->config('mode')=='development');
+            Array2XML::Init('1.0', 'UTF-8', $this->app->config('mode')=='development');
 
-            echo Array2XML::createXML($node, $result)->saveXML();
+            echo Array2XML::createXML('data', $result)->saveXML();
         }
     }
 

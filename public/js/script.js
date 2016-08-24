@@ -58,17 +58,16 @@ var lastModule, hideMenuTimer;
  */
 $(function() {
 
-    $.datepicker.setDefaults($.datepicker.regional[$.datepicker.regional[language] ? language : '']);
-
     // Inititilize Pines Notify
-    $.pnotify.defaults.styling = 'jqueryui';
-    $.pnotify.defaults.delay = 5000;
-    $.pnotify.defaults.history = false;
-    $.pnotify.defaults.sticker = false;
-    $.pnotify.defaults.stack.spacing1 = 5;
-    $.pnotify.defaults.stack.spacing2 = 15;
-    $.pnotify.defaults.labels.stick = pnotify_defaults_labels_stick;
-    $.pnotify.defaults.labels.close = pnotify_defaults_labels_close;
+    PNotify.prototype.options.styling        = 'jqueryui';
+    PNotify.prototype.options.delay          = 5000;
+    PNotify.prototype.options.history        = false;
+    PNotify.prototype.options.sticker        = false;
+    PNotify.prototype.options.stack.spacing1 = 5;
+    PNotify.prototype.options.stack.spacing2 = 15;
+
+    // Downward compatible shortcut
+    $.pnotify = function(msg) { new PNotify(msg) };
 
     $(messages).each(function(id, msg) {
         if (msg.type == 'error') {
@@ -77,6 +76,8 @@ $(function() {
         }
         $.pnotify(msg);
     });
+
+    $.datepicker.setDefaults($.datepicker.regional[$.datepicker.regional[language] ? language : '']);
 
     // Inititilize Tooltips
     $('.tip, .tipbtn').tipTip({
@@ -186,12 +187,12 @@ $(function() {
 
 /**
  *
- */
+ * /
 var timer, verbose = false;
 
 /**
  *
- */
+ * /
 function _log() {
     if (!verbose) return;
 
@@ -209,7 +210,7 @@ function _log() {
 /*
                 } else if (typeof data == 'object') {
                     console.dir(data);
-*/
+* /
                 } else {
                     console.log(data);
                 }

@@ -28,8 +28,8 @@ var PVLngVersion = '{VERSION}',
     latitude  = +'{raw:LATITUDE}',
     longitude = +'{raw:LONGITUDE}',
 
-    verbose = '{VERBOSE}',
-    user = '{USER}';
+    development = !!+'{DEVELOPMENT}',
+    user = !!+'{USER}';
 
 if (user) {
     $(function($) {
