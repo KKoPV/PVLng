@@ -38,6 +38,9 @@ class Accumulator extends Calculator {
             default:
                 $this->meter = $childs[0]->meter;
                 $lazy = !$this->extra;
+                if (empty($request['period'])) {
+                    $request['period'] = '1i';
+                }
                 $buffer = $childs[0]->read($request);
 
                 // Combine all data for same timestamp

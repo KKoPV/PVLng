@@ -48,8 +48,6 @@
                         <!-- ENDIF -->
                     </td>
                     <td <!-- IF {TYPE_ID} == "0" -->class="alias"<!-- ENDIF -->>
-                        <img id="s{raw:ID}" src="/images/pix.gif" data-src="/images/spinner.gif"
-                             class="def ico spinner" alt="o" />
                         <!-- INCLUDE channel-details.inc.tpl -->
                     </td>
                     <td id="cons{raw:ID}" class="consumption"></td>

@@ -16,16 +16,18 @@ class DatabaseUsage extends Channel {
     /**
      *
      */
-    public function read( $request ) {
+    public function __read( $request ) {
 
         $this->performance->setAction('read');
 
         $this->before_read($request);
 
+/*
         if ($this->period[1] == self::NO) {
             // Set period to at least 1 minute
             $this->period[1] = self::ASCHILD;
         }
+*/
 
         $q = new \DBQuery;
 

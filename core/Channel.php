@@ -9,6 +9,9 @@
  */
 abstract class Channel {
 
+    /**
+     *
+     */
     public static $Database;
 
     /**
@@ -404,6 +407,7 @@ abstract class Channel {
               ->limit(1);
 
             $row = $this->db->queryRow($q);
+
             if (!$row) return $this->after_read($buffer);
 
             $buffer->write((array) $row);
@@ -437,19 +441,22 @@ abstract class Channel {
 
             if ($this->period[1] == self::LAST OR $this->period[1] == self::ALL) {
 
+                // Select plain data
                 $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
                   ->get('timestamp')
                   ->get('data')
                   ->get('data', 'min')
                   ->get('data', 'max')
                   ->get(1, 'count')
-                  ->get(0, 'timediff')
-                  ->get('timestamp', 'g');
+                  ->get(0, 'timediff');
 
             } else {
 
-                $q->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
-                  ->get($q->MIN('timestamp'), 'timestamp');
+                // Select data grouped by period
+                $timestamp = $this->groupTimestampByPeriod();
+
+                $q->get($q->FROM_UNIXTIME($timestamp), 'datetime')
+                  ->get($timestamp, 'timestamp');
 
                 switch (TRUE) {
                     // Raw data for non-numeric channels
@@ -474,8 +481,7 @@ abstract class Channel {
                   ->get($q->MAX('data'), 'max')
                   ->get($q->COUNT('id'), 'count')
                   ->get($q->MAX('timestamp').'-'.$q->MIN('timestamp'), 'timediff')
-                  ->get($this->periodGrouping(), 'g')
-                  ->group('g');
+                  ->group($timestamp);
             }
 
             $q->filter('id', $this->entity)->order('timestamp');
@@ -498,7 +504,7 @@ abstract class Channel {
                         if ($row['timestamp'] >= $this->start) {
                             $row['data'] = 0;
                             $row['consumption'] = 0;
-                            $this->writeReadingToBuffer($buffer, $row);
+                            $buffer->write($row, $row['timestamp']);
                         }
 
                         // Read remaining rows
@@ -513,13 +519,13 @@ abstract class Channel {
                             $row['consumption'] = $row['data'] - $last;
                             $last = $row['data'];
 
-                            $this->writeReadingToBuffer($buffer, $row);
+                            $buffer->write($row, $row['timestamp']);
                         }
                     }
                 } else {
                     // Use all readings as is
                     while ($row = $res->fetch_assoc()) {
-                        $this->writeReadingToBuffer($buffer, $row);
+                        $buffer->write($row, $row['timestamp']);
                     }
                 }
 
@@ -567,35 +573,35 @@ abstract class Channel {
      * Grouping
      */
     const NO        =  0;
-    const ASCHILD   =  1; // Required for grouping by at least 1 minute
-    const MINUTE    = 10;
-    const HOUR      = 20;
-    const DAY       = 30;
-    const WEEK      = 40;
-    const MONTH     = 50;
-    const QUARTER   = 60;
+    const SECOND    = 10;
+    const MINUTE    = 20;
+    const HOUR      = 30;
+    const DAY       = 40;
+    const WEEK      = 50;
+    const MONTH     = 60;
+    const QUARTER   = 61;
     const YEAR      = 70;
     const LAST      = 80;
     const READLAST  = 81;
-    const ALL       = 90;
+    const ALL       = 99;
 
     /**
      * Period in seconds for each grouping period and SQL equivalent
      * Hold static only once in memory
      */
-    protected static $Grouping = array(
-        self::NO        => array(        0, '`timestamp`' ),
-        self::ASCHILD   => array(       60, '`timestamp` DIV 60' ),
-        self::MINUTE    => array(       60, '`timestamp` DIV (60 * %d)' ),
-        self::HOUR      => array(     3600, 'FROM_UNIXTIME(`timestamp`, "%%Y%%j%%H") DIV %d' ),
-        self::DAY       => array(    86400, 'FROM_UNIXTIME(`timestamp`, "%%Y%%j") DIV %d' ),
-        self::WEEK      => array(   604800, 'FROM_UNIXTIME(`timestamp`, "%%x%%v") DIV %d' ),
-        self::MONTH     => array(  2678400, 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV %d' ),
-        self::QUARTER   => array(  7776000, 'FROM_UNIXTIME(`timestamp`, "%%Y%%m") DIV (3 * %d)' ),
-        self::YEAR      => array( 31536000, 'FROM_UNIXTIME(`timestamp`, "%%Y") DIV %d'),
-        self::LAST      => array(        0, '`timestamp`' ),
-        self::READLAST  => array(        0, '`timestamp`' ),
-        self::ALL       => array(        0, '`timestamp`' )
+    protected static $secondsPerPeriod = array(
+        self::NO        =>        1,
+        self::SECOND    =>        1,
+        self::MINUTE    =>       60,
+        self::HOUR      =>     3600,
+        self::DAY       =>    86400,
+        self::WEEK      =>   604800,
+        self::MONTH     =>  2678400,
+        self::QUARTER   =>  7776000,
+        self::YEAR      => 31536000,
+        self::LAST      =>        1,
+        self::READLAST  =>        1,
+        self::ALL       =>        1
     );
 
     /**
@@ -679,8 +685,14 @@ abstract class Channel {
     /**
      *
      */
-    protected function periodGrouping() {
-        return sprintf(self::$Grouping[$this->period[1]][1], $this->period[0]);
+    protected function groupTimestampByPeriod() {
+        return $this->period[0] * self::$secondsPerPeriod[$this->period[1]] == 1
+             ? '`timestamp`'
+             : sprintf(
+                   '`timestamp` DIV (%1$d * %2$d) * %1$d * %2$d',
+                   $this->period[0],
+                   self::$secondsPerPeriod[$this->period[1]]
+               );
     }
 
     /**
@@ -839,7 +851,8 @@ abstract class Channel {
 
         // Normalize aggregation period
         if (preg_match(
-                '~^([.\d]*)(|l|last|r|readlast|i|min|minutes?|h|hours?|'.
+                '~^([.\d]*)(|l|last|r|readlast|'.
+                's|sec|seconds?|i|min|minutes?|h|hours?|'.
                 'd|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all)$~',
                 strtolower($request['period']),
                 $args
@@ -849,6 +862,7 @@ abstract class Channel {
 
             switch (substr($args[2], 0, 2)) {
                 default:              $this->period[1] = self::NO;       break;
+                case 's': case 'se':  $this->period[1] = self::SECOND;   break;
                 case 'i': case 'mi':  $this->period[1] = self::MINUTE;   break;
                 case 'h': case 'ho':  $this->period[1] = self::HOUR;     break;
                 case 'd': case 'da':  $this->period[1] = self::DAY;      break;
@@ -864,6 +878,8 @@ abstract class Channel {
             throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
         }
 
+/*      Obsolete with temp. table buffering
+
         // If no period is set for channels with childs, align child data at least to 1 min.
         if ($this->childs != 0 AND $this->period[1] == self::NO) {
             // Correct period for this channel
@@ -871,6 +887,7 @@ abstract class Channel {
             // Correct period for later child channel reads
             $request['period'] = '1min';
         }
+*/
     }
 
     /**
@@ -948,10 +965,11 @@ abstract class Channel {
     protected function filterReadTimestamp( &$q ) {
         if ($this->period[1] == self::ALL) return;
 
-        // Read one period before real start for meter calculation
+        // Read one period before real start for meter calculations
         $start = $this->meter
-               ? $this->start - $this->period[0] * self::$Grouping[$this->period[1]][0]
+               ? $this->start - $this->period[0] * self::$secondsPerPeriod[$this->period[1]]
                : $this->start;
+
         // End is midnight > minus 1 second
         $q->filter('timestamp', array('bt' => array($start, $this->end-1)));
     }
@@ -965,17 +983,6 @@ abstract class Channel {
         $sql = $this->name;
         if ($this->description) $sql .= ' (' . $this->description . ')';
         Header('X-SQL-' . uniqid() . ': ' . $sql . ': ' . preg_replace('~\n+~', ' ', $q));
-    }
-
-    /**
-     * Shortcut method to save cleaned reading to buffer
-     */
-    protected function writeReadingToBuffer(&$buffer, array $data)
-    {
-        // Remember and remove grouping column and save
-        $id = $data['g'];
-        unset($data['g']);
-        $buffer->write($data, $id);
     }
 
     /**

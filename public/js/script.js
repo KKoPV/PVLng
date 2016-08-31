@@ -67,7 +67,7 @@ $(function() {
     PNotify.prototype.options.stack.spacing2 = 15;
 
     // Downward compatible shortcut
-    $.pnotify = function(msg) { new PNotify(msg) };
+    $.pnotify = function(msg) { return new PNotify(msg) };
 
     $(messages).each(function(id, msg) {
         if (msg.type == 'error') {

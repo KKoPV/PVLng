@@ -30,7 +30,7 @@ $api->put(
     try {
         $cnt = Channel::byGUID($guid)->write($request, $timestamp);
     } catch (Exception $e) {
-        $api->stopAPI($e->getMessage(), 400);
+        $api->stopAPI($e->getMessage(), $e->getCode() ?: 400);
     }
 
     if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);

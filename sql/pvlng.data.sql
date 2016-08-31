@@ -39,7 +39,6 @@ INSERT INTO `pvlng_settings` (`scope`, `name`, `key`, `value`, `order`, `descrip
 ('core', 'Currency', 'Format', '{} €', 83, 'Output format, <strong><tt>{}</tt></strong> will be replaced with value', 'str', ''),
 ('controller', 'Index', 'ChartHeight', 528, 10, 'Default chart height', 'num', ''),
 ('controller', 'Index', 'NotifyAll', 1, 30, 'Notify overall loading time for all channels', 'bool', ''),
-('controller', 'Index', 'NotifyEach', 0, 40, 'Notify loading time for each channel', 'bool', ''),
 ('controller', 'Index', 'Refresh', 300, 20, 'Auto refresh chart each ? seconds, set 0 to disable', 'num', ''),
 ('controller', 'Mobile', 'ChartHeight', 320, 0, 'Default chart height', 'num', ''),
 ('controller', 'Tariff', 'TimesLines', 10, 0, 'Initial times lines for each taiff', 'num', ''),

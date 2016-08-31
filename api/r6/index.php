@@ -8,6 +8,8 @@
  * @version    1.0.0
  */
 
+set_time_limit(0);
+
 define('DEVELOP', (isset($_SERVER['HTTP_X_DEBUG']) AND $_SERVER['HTTP_X_DEBUG']));
 
 if (DEVELOP) {
