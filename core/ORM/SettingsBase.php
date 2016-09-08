@@ -152,30 +152,6 @@ abstract class SettingsBase extends \slimMVC\ORM
     }   // setOrderRaw()
 
     /**
-     * Basic setter for field "description"
-     *
-     * @param  mixed    $description Description value
-     * @return Instance For fluid interface
-     */
-    public function setDescription($description)
-    {
-        $this->fields['description'] = $description;
-        return $this;
-    }   // setDescription()
-
-    /**
-     * Raw setter for field "description", for INSERT, REPLACE and UPDATE
-     *
-     * @param  mixed    $description Description value
-     * @return Instance For fluid interface
-     */
-    public function setDescriptionRaw($description)
-    {
-        $this->raw['description'] = $description;
-        return $this;
-    }   // setDescriptionRaw()
-
-    /**
      * Basic setter for field "type"
      *
      * @param  mixed    $type Type value
@@ -278,16 +254,6 @@ abstract class SettingsBase extends \slimMVC\ORM
     }   // getOrder()
 
     /**
-     * Basic getter for field "description"
-     *
-     * @return mixed Description value
-     */
-    public function getDescription()
-    {
-        return $this->fields['description'];
-    }   // getDescription()
-
-    /**
      * Basic getter for field "type"
      *
      * @return mixed Type value
@@ -387,18 +353,6 @@ abstract class SettingsBase extends \slimMVC\ORM
     }   // filterByOrder()
 
     /**
-     * Filter for field "description"
-     *
-     * @param  mixed    $description Filter value
-     * @return Instance For fluid interface
-     */
-    public function filterByDescription($description)
-    {
-        $this->filter[] = '`description` = '.$this->quote($description);
-        return $this;
-    }   // filterByDescription()
-
-    /**
      * Filter for field "type"
      *
      * @param  mixed    $type Filter value
@@ -433,7 +387,6 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         return '`value` = '.$this->quote($this->fields['value']).'
               , `order` = '.$this->quote($this->fields['order']).'
-              , `description` = '.$this->quote($this->fields['description']).'
               , `type` = '.$this->quote($this->fields['type']).'
               , `data` = '.$this->quote($this->fields['data']).'';
     }   // onDuplicateKey()
@@ -457,7 +410,6 @@ abstract class SettingsBase extends \slimMVC\ORM
           `key` varchar(100) NOT NULL DEFAULT \'\',
           `value` varchar(100) NOT NULL DEFAULT \'\',
           `order` tinyint(3) unsigned NOT NULL DEFAULT \'0\',
-          `description` varchar(1000) NOT NULL DEFAULT \'\',
           `type` enum(\'str\',\'num\',\'bool\',\'option\') NOT NULL DEFAULT \'str\',
           `data` varchar(255) NOT NULL DEFAULT \'\',
           PRIMARY KEY (`scope`,`name`,`key`)
@@ -468,28 +420,26 @@ abstract class SettingsBase extends \slimMVC\ORM
      *
      */
     protected $fields = array(
-        'scope'       => '',
-        'name'        => '',
-        'key'         => '',
-        'value'       => '',
-        'order'       => '',
-        'description' => '',
-        'type'        => '',
-        'data'        => ''
+        'scope' => '',
+        'name'  => '',
+        'key'   => '',
+        'value' => '',
+        'order' => '',
+        'type'  => '',
+        'data'  => ''
     );
 
     /**
      *
      */
     protected $nullable = array(
-        'scope'       => false,
-        'name'        => false,
-        'key'         => false,
-        'value'       => false,
-        'order'       => false,
-        'description' => false,
-        'type'        => false,
-        'data'        => false
+        'scope' => false,
+        'name'  => false,
+        'key'   => false,
+        'value' => false,
+        'order' => false,
+        'type'  => false,
+        'data'  => false
     );
 
     /**

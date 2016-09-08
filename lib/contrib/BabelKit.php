@@ -467,8 +467,7 @@ class BabelKit {
         $lookup = array();
         foreach ( $other as $row ) $lookup[$row[0]] = $row[1];
         foreach ( $native as $ord => $row ) {
-            $code_desc = $lookup[$row[0]];
-            if (isset($code_desc)) $native[$ord][1] = $code_desc;
+            if (isset($lookup[$row[0]])) $native[$ord][1] = $lookup[$row[0]];
         }
         return $native;
     }

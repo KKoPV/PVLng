@@ -128,6 +128,23 @@ class BabelKitMySQLi extends BabelKit {
     }
 
     /**
+     * Get a language set array
+     *
+     * Buffer request results
+     */
+    public function full_set_assoc($code_set, $code_lang) {
+        $key = 'BabelKit.' . $code_set . '.' . $code_lang . '.assoc';
+        while (self::$cache->save($key, $data)) {
+            $data = array();
+            foreach ($this->full_set($code_set, $code_lang) as $row) {
+                $name = array_shift($row);
+                $data[$name] = $row;
+            }
+        }
+        return $data;
+    }
+
+    /**
      * Find the native language
      *
      * Buffer request results

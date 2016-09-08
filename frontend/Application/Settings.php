@@ -17,4 +17,4 @@ $app->hook('slim.before', function() use ($app) {
  */
 $app->map('/settings', $checkAuth, function() use ($app) {
     $app->process('Settings');
-})->via('GET', 'POST')->Language = 'en';
+})->via('GET', 'POST');

@@ -81,8 +81,9 @@ class Settings extends SettingsBase
     /**
      *
      */
-    public static function getSunrise($day)
+    public static function getSunrise($day=null)
     {
+        if (!$day) $day = time();
         return date_sunrise(
             $day,
             SUNFUNCS_RET_TIMESTAMP,
@@ -96,8 +97,9 @@ class Settings extends SettingsBase
     /**
      *
      */
-    public static function getSunset($day)
+    public static function getSunset($day=null)
     {
+        if (!$day) $day = time();
         return date_sunset(
             $day,
             SUNFUNCS_RET_TIMESTAMP,

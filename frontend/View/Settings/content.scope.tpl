@@ -20,7 +20,7 @@
         <!-- IF {VAR} == "core--Password" -->
             <label for="p1">{DESCRIPTION}</label>
             <br />
-            <label for="p2">repeat password</label>
+            <label for="p2">{{RepeatPassword}}</label>
         <!-- ELSE -->
             <label for="{VAR}">{DESCRIPTION}</label>
         <!-- ENDIF -->
@@ -29,7 +29,7 @@
     <div class="grid_5 omega">
         <!-- IF {VAR} == "core--Password" -->
             <input id="p1" type="password" name="d[p1]">
-            &nbsp; &nbsp; Fill only to change it!
+            &nbsp; &nbsp; {{RepeatPasswordForChange}}
             <br />
             <input id="p2" type="password" name="d[p2]" style="margin-top:.5em">
         <!-- ELSEIF {TYPE} == "num" -->

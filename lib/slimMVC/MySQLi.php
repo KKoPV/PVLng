@@ -88,8 +88,9 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function setBuffered( $buffered=TRUE ) {
-        $this->Buffered = (bool) $buffered;
+    public function setBuffered($buffered=true)
+    {
+        $this->Buffered = !!$buffered;
     }
 
     /**
@@ -127,7 +128,8 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function query( $query ) {
+    public function query($query)
+    {
         $args = func_get_args();
         $query = array_shift($args);
 
@@ -143,7 +145,10 @@ class MySQLi extends \MySQLi {
 
         $t = microtime(true);
 
-        $result = parent::query($query, $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT);
+        $result = parent::query(
+            $query,
+            $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT
+        );
 
         if ($this->errno && $this->dieOnError) {
             die(sprintf('MySQL ERROR [%d] %s', $this->errno, $this->error));
