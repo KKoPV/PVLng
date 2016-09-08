@@ -12,4 +12,18 @@ namespace Channel;
 /**
  *
  */
-class Channel extends \Channel {}
+class Channel extends \Channel {
+
+    /**
+     * Run additional code before existing data presented to user
+     */
+    public static function beforeEdit(\ORM\Channel $channel, Array &$fields)
+    {
+        if ($channel->type == 51) {
+            // Precalcutaion of meter values for power sensor
+            // is only avalable on channel creation
+            $fields['extra']['READONLY'] = true;
+        }
+    }
+
+}

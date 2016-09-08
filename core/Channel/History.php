@@ -17,16 +17,21 @@ class History extends InternalCalc {
     /**
      *
      */
-    public static function checkData( Array &$fields, $add2tree ) {
+    public static function checkData(Array &$fields, $add2tree)
+    {
         $ok = parent::checkData($fields, $add2tree);
 
         if ($fields['valid_from']['VALUE'] <= 0) {
             $fields['valid_from']['ERROR'][] = __('ValueMustGTzero');
-            $ok = FALSE;
+            $ok = false;
         }
         if ($fields['valid_to']['VALUE'] < 0) {
             $fields['valid_to']['ERROR'][] = __('ValueMustGEzero');
-            $ok = FALSE;
+            $ok = false;
+        }
+        if ($fields['valid_to']['VALUE'] != '' && $fields['extra']['VALUE'] == '') {
+            $fields['extra']['ERROR'][] = __('YearsToReadMissing');
+            $ok = false;
         }
 
         return $ok;
@@ -35,8 +40,8 @@ class History extends InternalCalc {
     /**
      *
      */
-    public function read( $request ) {
-
+    public function read($request)
+    {
         $this->before_read($request);
 
         $result = new \Buffer;
@@ -104,17 +109,6 @@ class History extends InternalCalc {
                      FROM_UNIXTIME(%2$s, "%%j"), FROM_UNIXTIME(%2$s, "%%j") + 365)',
                 $start, $start + $this->valid_from * 86400
             ));
-
-/*
-
-FROM_UNIXTIME(`timestamp`, '%j') BETWEEN
-IF (FROM_UNIXTIME(&1$s, '%j') < FROM_UNIXTIME(&2$s, '%j'), FROM_UNIXTIME(&1$s, '%j'), FROM_UNIXTIME(&1$s, '%j')-365)
-AND
-IF (FROM_UNIXTIME(&2$s, '%j') > FROM_UNIXTIME(&1$s, '%j'), FROM_UNIXTIME(&2$s, '%j'), FROM_UNIXTIME(&2$s, '%j')+365)
-
-*/
-
-
 
             $q = (new \DBQuery)->select('('.substr($h, 0, -1).') t');
             $q->get('hour')
@@ -198,8 +192,8 @@ IF (FROM_UNIXTIME(&2$s, '%j') > FROM_UNIXTIME(&1$s, '%j'), FROM_UNIXTIME(&2$s, '
     /**
      *
      */
-    protected function before_read( &$request ) {
-
+    protected function before_read(&$request)
+    {
         parent::before_read($request);
 
         if ($this->dataExists(12*60*60)) return; // Buffer for 12h
@@ -229,14 +223,14 @@ IF (FROM_UNIXTIME(&2$s, '%j') > FROM_UNIXTIME(&1$s, '%j'), FROM_UNIXTIME(&2$s, '
             // Clone request
             $r = array_merge(array(), $request);
 
-            for ($y=1970; $y<date('Y'); $y++) {
-                $r['start'] = date($y.'-m-d', $this->start) . ' -' . $this->valid_from . 'days';
-                $r['end']   = date($y.'-m-d', $this->start) . ' +' . $this->valid_to . 'days';
+            for ($year=date('Y')-$this->extra; $year<date('Y'); $year++) {
+                $r['start'] = date($year.'-m-d', $this->start) . ' -' . $this->valid_from . 'days';
+                $r['end']   = date($year.'-m-d', $this->start) . ' +' . $this->valid_to . 'days';
                 // Save data into temp. table
                 $this->saveValues($child->read($r));
             }
-
         }
+
         $this->dataCreated(true);
     }
 

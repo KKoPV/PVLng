@@ -106,7 +106,9 @@ $api->get(
 
     $result = $api->readData($guid, $request);
     $api->response->headers->set('X-Data-Rows', count($result));
-    $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+    if (is_object($result) && method_exists($result, 'size')) {
+        $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+    }
     $api->render($result);
 })->name('GET /data/:period/:guid')->help = array(
     'since'       => 'r6',

@@ -12,13 +12,13 @@ namespace Channel;
 /**
  *
  */
-class Accumulator extends Calculator {
-
+class Accumulator extends Calculator
+{
     /**
      *
      */
-    public function read( $request ) {
-
+    public function read($request)
+    {
         $this->before_read($request);
 
         $childs = $this->getChilds();
@@ -62,10 +62,18 @@ class Accumulator extends Calculator {
 
                         if ($key1 === $key2) {
 
-                            // same timestamp, combine
+                            // Same key, combine
+                            // Can have different timestamps in case of last or lastread,
+                            // check and get last one
+                            if ($row2['timestamp'] > $row1['timestamp']) {
+                                $row1['datetime']  = $row2['datetime'];
+                                $row1['timestamp'] = $row2['timestamp'];
+                            }
+
                             $row1['data']        += $row2['data'];
                             $row1['min']         += $row2['min'];
                             $row1['max']         += $row2['max'];
+
                             $row1['consumption']  = $lastRow ? $row1['data'] - $lastRow['data'] : $row1['data'];
 
                             $result->write($row1, $key1);

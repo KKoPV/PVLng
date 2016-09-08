@@ -105,6 +105,7 @@
 
 .confirmed .ui-button-text {
     color: red;
+    font-weight: bold;
 }
 
 .disabled {
@@ -130,7 +131,7 @@
     padding: 0;
 }
 
-#scatter-candidate {
+.dialog-hint {
     padding-left: 3em;
     font-size: smaller;
     font-style: italic;

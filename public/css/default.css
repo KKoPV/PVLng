@@ -11,7 +11,6 @@ body {
     margin: 0 auto;
     /* Imprima load via font cache - https://jaicab.com/localFont/ */
     font-family: Imprima, Arial, sans-serif;
-    font-size: 90%;
 }
 
 #content {
@@ -44,6 +43,16 @@ a:hover, a:active {
 
 .toolbar a {
     color: black;
+}
+
+.ui-button.icon {
+    border: 0;
+    background: transparent;
+}
+
+.ui-button.icon .ui-button-text {
+    padding-left: .4em;
+    padding-right: .4em;
 }
 
 /* Go back to top link

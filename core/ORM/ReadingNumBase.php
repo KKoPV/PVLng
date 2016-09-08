@@ -221,11 +221,10 @@ abstract class ReadingNumBase extends \slimMVC\ORM
           `timestamp` int(10) unsigned NOT NULL,
           `data` decimal(13,4) NOT NULL,
           PRIMARY KEY (`id`,`timestamp`),
-          KEY `timestamp` (`timestamp`),
-          KEY `id` (`id`)
+          KEY `timestamp` (`timestamp`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Numeric readings\'
         /*!50100 PARTITION BY LINEAR KEY (id)
-        PARTITIONS 10 */
+        PARTITIONS 25 */
     ';
 
     /**

@@ -22,12 +22,12 @@ return array(
 
     // Get from childs
     'meter' => array(
-        'visible' => FALSE
+        'visible' => false
     ),
 
     // Strict mode
     'extra' => array(
-        'visible' => TRUE,
+        'visible' => true,
         'type'    => 'bool;0:no;1:yes',
         'default' => 0
     ),

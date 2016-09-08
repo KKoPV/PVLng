@@ -31,13 +31,15 @@
         <!-- END -->
     </select>
 
-    <img id="icon" src="/images/pix.gif" class="fl tip" style="margin-left:16px;margin-top:5px" data-none="/images/pix.gif" alt="">
-
-    <div class="fl" style="padding-top:5px">
-        <i id="icon-private" class="ico lock tip" style="display:none" title="{{PrivateChannel}}"></i>
-        <i id="edit-entity" class="ico node-design tipbtn" style="display:none" title="{{EditEntity}}"></i>
-        <i id="guid" class="ico license-key guid tipbtn" style="display:none" title="{{ShowGUID}}"></i>
+    <div class="fl" style="margin-left:16px;margin-top:5px">
+        <img id="icon" src="/images/pix.gif" class="fl tip" data-none="/images/pix.gif" alt="">
+        <i id="icon-private" class="fa fa-lock fa-fw tip" style="display:none" title="{{PrivateChannel}}"></i>
     </div>
+
+    <span class="fr" style="margin-top:5px">
+        <i id="edit-entity" class="fa fa-pencil fa-fw tipbtn" style="display:none" title="{{EditEntity}}"></i>
+        <i id="guid" class="fa fa-key fa-rotate-90 fa-fw tipbtn" style="display:none" title="{{ShowGUID}}"></i>
+    </span>
 
 </div>
 

@@ -6,12 +6,36 @@
  * @version    1.0.0
  */
 
+/**
+ *
+ */
+var qs;
+
+/**
+ *
+ */
+var dFrom, dTo;
+
+/**
+ *
+ */
 var pvlng = new function() {
 
     /**
      * Public property
      */
     this.verbose = false;
+
+    /**
+     * Single date picker
+     */
+    this.dp;
+
+    /**
+     * Range date picker
+     */
+    this.dpFrom;
+    this.dpTo;
 
     /**
      * Cookie handling with pure JS
@@ -24,7 +48,7 @@ var pvlng = new function() {
             var expires = '';
             if (days) {
                 var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                date.setTime(date.getTime() + days*8.64e7);
                 expires = '; expires=' + date.toGMTString();
             }
             document.cookie = escape(name) + '=' + escape(value) + expires + '; path=/';
@@ -64,7 +88,7 @@ var pvlng = new function() {
      * Scroll to #top as top most visible element
      */
     this.scroll = function( top ) {
-        $('html, body').animate({ scrollTop: $(top).offset().top-3 }, 'fast');
+        $('html, body').stop().animate({ scrollTop: $(top).offset().top-3 }, 'fast');
     }
 
     /**
@@ -127,21 +151,94 @@ var pvlng = new function() {
     };
 
     /**
+     * Calculates the dates based on selected day and time range
+     */
+    this.calcDates = function(dir) {
+        dir = dir || 0;
+
+        var date = $.datepicker.parseDate('mm/dd/yy', $('#timerangedate').val()),
+            timerange = $('input[name="timerange"]:checked').val(),
+            from, to, format, preset = presetPeriods.split(';');
+
+        switch (timerange) {
+
+            case 'd':
+                from = new Date(date.getTime() + dir*8.64e7);
+                to   = new Date(from);
+                format = this.dp.data('dateFormat');
+                preset = typeof views != 'undefined' && views.preset ? views.preset : preset[0];
+                break;
+
+            case 'w':
+                var dow = date.getDay() - 1;
+                if (dow < 0) dow = 7 + dow;
+                from = new Date(date.getTime() + 7*dir*8.64e7 - dow*8.64e7);
+                to   = new Date(from.getTime() + 6*8.64e7);
+                format = this.dp.datepicker('option', 'weekHeader') + ' ' +
+                         $.datepicker.iso8601Week(from) + '.yy';
+                preset = preset[1];
+                break;
+
+            case 'm':
+                var y = date.getFullYear(), m = date.getMonth() + dir;
+                if (m < 0) { m = 12 + m; y -= 1; }
+                else if (m > 11) { m = 12 - m; y += 1; }
+                from = new Date(y, m,   1);
+                to   = new Date(y, m+1, 0);
+                format = 'MM yy';
+                preset = preset[2];
+                break;
+
+            case 'y':
+                var y = date.getFullYear() + dir;
+                from = new Date(y,   0, 1);
+                to   = new Date(y+1, 0, 0);
+                format = 'yy';
+                preset = preset[3];
+                break;
+        }
+
+        this.dp.setDate(from, format);
+
+        // Max. date is today + 3 days
+        to = new Date(Math.min(to, new Date(new Date().getTime() + 3*8.64e7)));
+
+        this.dpFrom.datepicker('option', 'maxDate', to).datepicker('setDate', from);
+        this.dpTo.datepicker('option', 'minDate', from).datepicker('setDate', to);
+
+        if ($('#dp1').is(':visible')) {
+            if ($('#preset').length) {
+                setTimeout(function() {
+                    $('#preset').val(preset).trigger('change');
+                }, 0);
+            } else if (typeof afterDatesCalculated === 'function') {
+                setTimeout(afterDatesCalculated, 0);
+            }
+        }
+    };
+
+    /**
+     *
+     */
+    this.changeDate = function( dir ) {
+        this.calcDates(dir);
+    };
+
+    /**
      *
      */
     this.changeDates = function( dir ) {
-        dir *= 24*60*60*1000;
+        var from = new Date(this.dpFrom.datepicker('getDate').getTime() + dir*8.64e7),
+            to   = new Date(this.dpTo.datepicker('getDate').getTime() + dir*8.64e7);
 
-        var from = new Date(Date.parse($('#from').datepicker('getDate')) + dir),
-            to = new Date(Date.parse($('#to').datepicker('getDate')) + dir);
-
-        if (to > (new Date).getTime()+24*60*60*1000) {
+        if (to > (new Date).getTime() + 8.64e7) {
             $.pnotify({ type: 'info', text: "Can't go beyond tomorrow." });
             return;
         }
 
-        $('#from').datepicker('option', 'maxDate', to).datepicker('setDate', from);
-        $('#to').datepicker('option', 'minDate', from).datepicker('setDate', to);
+        this.dpFrom.datepicker('option', 'maxDate', to).datepicker('setDate', from);
+        this.dpTo.datepicker('option', 'minDate', from).datepicker('setDate', to);
+        this.dp.setDate(from);
 
         updateOutput();
     };
@@ -156,20 +253,21 @@ var pvlng = new function() {
             $('#periodcnt').val(1);
             $('#period').val('');
         } else {
-            var from = new Date($("#from").datepicker('getDate'));
-            switch (preset[2]) {
-                case 'd': /* day - set start to 1st day of month */
-                    from.setDate(1);
-                    break;
-                case 'w': /* week - set start to 1st day of month */
-                    from.setDate(1);
-                    break;
-                case 'm': /* month - set start to 1st day of year */
-                    from.setDate(1);
-                    from.setMonth(0);
-                    break;
+            if ($('#dp2').is(':visible')) {
+                // Adjust start date only in days select view
+                var from = new Date(pvlng.dpFrom.datepicker('getDate'));
+                switch (preset[2]) {
+                    case 'd': /* day - set start to 1st day of month */
+                    case 'w': /* week - set start to 1st day of month */
+                        from.setDate(1);
+                        break;
+                    case 'm': /* month - set start to 1st day of year */
+                        from.setDate(1);
+                        from.setMonth(0);
+                        break;
+                }
+                pvlng.dpFrom.datepicker('setDate', from);
             }
-            $("#from").datepicker('setDate', from);
             $('#periodcnt').val(preset[1]);
             $('#period').val(preset[2]);
         }
@@ -212,6 +310,17 @@ var pvlng = new function() {
     // var internalVar = true;
     // var internalFunction = function() {};
 
+    /**
+     * Generate pseudo GUID
+     * http://stackoverflow.com/a/2117523
+     */
+    this.guid = function(prefix) {
+        prefix = prefix ? prefix + '-' : '';
+        return prefix + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        })
+    }
 };
 
 $(function() {
@@ -239,16 +348,17 @@ $(function() {
             if (!OkText) OkText = 'Ok';
             if (!CancelText) CancelText = 'Cancel';
 
-            var d = $.Deferred();
-            var options = {
-                modal: true,
-                resizable: false,
-                title: title,
-                width: 480,
-                open: function() { $('.ui-dialog-titlebar-close').hide() },
-                buttons: {},
-                close: function() { $(this).remove() }
-            };
+            var d = $.Deferred(),
+                options = {
+                    modal: true,
+                    resizable: false,
+                    title: title,
+                    width: 480,
+                    open: function() { $('.ui-dialog-titlebar-close').hide() },
+                    buttons: {},
+                    close: function() { $(this).remove() }
+                };
+
             /* Use given texts for buttons */
             options.buttons[OkText] = function() {
                 $(this).dialog('close');
@@ -267,28 +377,111 @@ $(function() {
         }
     });
 
+    qs = $.parseQueryString();
+
+    /* Refesh timeout */
+    if (qs.refresh) {
+        RefreshTimeout = qs.refresh;
+    }
+
+    /**
+     * Anylyse query string for date(s)
+     */
+    if (qs.from && qs.to) {
+        dFrom = new Date(qs.from.substr(0,1) != '-' ? qs.from : (new Date()).getTime() + qs.from * 8.64e7);
+        dTo   = new Date(qs.to.substr(0,1)   != '+' ? qs.to   : (new Date()).getTime() + qs.to   * 8.64e7);
+    } else if (qs.date) {
+        dFrom = dTo = new Date(qs.date);
+    } else {
+        dFrom = dTo = new Date();
+    }
+
     /**
      *
      */
-    $('#btn-reset').button({
-        icons: { primary: 'ui-icon-calendar' },
-        label: '&nbsp;',
-        text: false
-    }).click(function(e) {
-        e.preventDefault();
-        var d = new Date;
-        /* Set date ranges */
-        $('#from').datepicker('option', 'maxDate', d);
-        $('#to').datepicker('option', 'minDate', d);
-        /* Set date today */
-        $('#from').datepicker('setDate', d);
-        $('#to').datepicker('setDate', d);
-        updateOutput();
-        /* Reset zoom */
-        if (chart) chart.zoomOut();
+    pvlng.dp = $('#timerange').datepicker({
+        altField: '#timerangedate',
+        altFormat: 'mm/dd/yy',
+        maxDate: 3,
+        showButtonPanel: true,
+        showWeek: true,
+        changeMonth: true,
+        changeYear: true,
+        showOn: null,
+        onClose: function(dateText, inst) {
+            $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay));
+            pvlng.calcDates();
+        }
+    }).datepicker('setDate', dTo);
+
+    pvlng.dp.setDate = function(date, format) {
+        format && this.datepicker('option', 'dateFormat', format);
+        this.datepicker('setDate', date);
+    };
+
+    // Remember local day date format
+    pvlng.dp.data('dateFormat', pvlng.dp.datepicker('option', 'dateFormat'));
+
+    // Show datepicker
+    $('#dpCalendar').on('click', function() {
+        $($(this).data('input')).datepicker('show');
     });
 
-    $('#preset').change(function() {
+    // day, week, month, year
+    $('input[name="timerange"]').on('change', function() {
+        if ($(this).val() == 'd') $('#dpCalendar').show(); else $('#dpCalendar').hide();
+        pvlng.calcDates();
+    });
+
+    pvlng.dpFrom = $('#from').datepicker({
+        altField: '#fromdate',
+        altFormat: 'mm/dd/yy',
+        autoSize: true,
+        maxDate: 0,
+        showButtonPanel: true,
+        showWeek: true,
+        changeMonth: true,
+        changeYear: true,
+        onClose: function(selectedDate) {
+            pvlng.dpTo.datepicker('option', 'minDate', selectedDate);
+        }
+    }).datepicker('setDate', dFrom);
+
+    pvlng.dpTo = $('#to').datepicker({
+        altField: '#todate',
+        altFormat: 'mm/dd/yy',
+        autoSize: true,
+        maxDate: 3,
+        showButtonPanel: true,
+        showWeek: true,
+        changeMonth: true,
+        changeYear: true,
+        onClose: function(selectedDate) {
+            pvlng.dpFrom.datepicker('option', 'maxDate', selectedDate);
+        }
+    }).datepicker('setDate', dTo);
+
+    /**
+     *
+     */
+    $('#btn-reset').on('click', function(e) {
+        var d = new Date;
+        /* Set date ranges */
+        pvlng.dpFrom.datepicker('option', 'maxDate', d);
+        pvlng.dpTo.datepicker('option', 'minDate', d);
+        /* Reset zoom */
+        if (chart) chart.zoomOut();
+        /* Set date today */
+        pvlng.dp.setDate(d);
+        $('#timerange-day').prop('checked', true).trigger('change');
+        if ($('#dp2').is(':visible')) {
+            setTimeout(function() {
+                $('#preset').trigger('change');
+            }, 0);
+        }
+    });
+
+    $('#preset').on('change', function() {
         pvlng.changePreset();
         updateOutput();
     });

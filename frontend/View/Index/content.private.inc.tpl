@@ -14,6 +14,7 @@
     <ul>
         <li><a href="#tabs-1">{{Channels}}</a></li>
         <li><a href="#tabs-2">{{Variants}}</a></li>
+        <li data-action="reset"><a href="#">{{ResetAll}}</a></li>
     </ul>
 
     <div id="tabs-1">
@@ -91,15 +92,25 @@
                 <select id="load-delete-view" style="width:100%" data-placeholder="--- {{SelectChart}} ---"></select>
             </div>
             <div class="fl">
-                <button id="btn-load" class="tip" title="{{Load}}">{{Load}}</button>
-                <button id="btn-delete" class="tip" style="margin-left:1em" title="{{Delete}}">{{Delete}}</button>
+                <button id="btn-load" class="tip" style="margin-left:1em" title="{{Load}}">
+                    <i class="fa fa-folder-open-o"></i>
+                </button>
+                <button id="btn-delete" class="tip" style="margin-left:1em" title="{{Delete}}">
+                    <i class="fa fa-trash-o"></i>
+                </button>
             </div>
             <div class="r">
-                <a id="btn-bookmark" href="#" class="tip" title="{{DragBookmark}}">Bookmark</a>
+                <a id="btn-bookmark" href="#" class="tip icon" title="{{DragBookmark}}">
+                    <i class="fa fa-bookmark-o fa-fw"></i>
+                </a>
+                <a id="btn-permanent" href="#" class="tip icon" title="{{DragPermanent}}">
+                    <i class="fa fa-area-chart fa-fw"></i>
+                </a>
             </div>
         </div>
 
-        <div class="clear"></div><br />
+        <div class="clear"></div>
+        <br>
 
         <div>
             <div class="alpha grid_4">
@@ -112,10 +123,9 @@
                     <option value="2">{{MobileChart}}</option>
                 </select>
                 <i class="fa fa-question tip" title="{{publicHint}}"></i>
-                <button id="btn-save" class="tip"  style="margin-left:1em"title="{{Save}}">{{Save}}</button>
-            </div>
-            <div class="r">
-                <a id="btn-permanent" href="#" class="tip" title="{{DragPermanent}}">Permanent bookmark</a>
+                <button id="btn-save" class="tip"  style="margin-left:1em"title="{{Save}}">
+                    <i class="fa fa-floppy-o"></i>
+                </button>
             </div>
         </div>
 

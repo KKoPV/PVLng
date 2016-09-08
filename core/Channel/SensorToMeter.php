@@ -16,8 +16,8 @@ namespace Channel;
 /**
  *
  */
-class SensorToMeter extends InternalCalc {
-
+class SensorToMeter extends InternalCalc
+{
     /**
      * Accept only childs without meter attribute set
      */
@@ -44,33 +44,38 @@ class SensorToMeter extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
-
+    protected function before_read(&$request)
+    {
         parent::before_read($request);
 
-        if (!$this->dataExists()) {
+        $child = $this->getChild(1);
 
-            $child = $this->getChild(1);
+        if ($child->type_id == 51 && $child->extra == 1) {
+            $this->table[1] = 'pvlng_reading_num_calc';
+            $this->entity = $child->entity;
+            return;
+        }
 
-            if (!$child->childs) {
-                // Calc direct inside database, if child is a real channel
-                $this->db->query('CALL pvlng_model_sensortometer({1}, {2})', $this->entity, $child->entity);
-            } else {
-                // Calc in PHP
-                // Read out all data
-                unset($request['period']);
+        if ($this->dataExists()) return;
 
-                $last = $sum = 0;
+        if (!$child->childs) {
+            // Calc direct inside database, if child is a real channel
+            $this->db->query('CALL pvlng_model_sensortometer({1}, {2})', $this->entity, $child->entity);
+        } else {
+            // Calc in PHP
+            // Read out all data
+            unset($request['period']);
 
-                foreach ($child->read($request) as $row) {
-                    $sum += $last ? ($row['timestamp'] - $last) / 3600 * $row['data'] : 0;
-                    $last = $row['timestamp'];
-                    $this->saveValue($last, $sum);
-                }
+            $last = $sum = 0;
 
+            foreach ($child->read($request) as $row) {
+                $sum += $last ? ($row['timestamp'] - $last) / 3600 * $row['data'] : 0;
+                $last = $row['timestamp'];
+                $this->saveValue($last, $sum);
             }
 
-            $this->dataCreated();
         }
+
+        $this->dataCreated();
     }
 }

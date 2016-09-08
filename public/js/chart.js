@@ -36,34 +36,36 @@ var presentation_defaults = {
  */
 function presentation( data ) {
     /* Set defaults */
-    this.v = 2;
-    this.axis = 1;
-    this.type = presentation_defaults.line.type;
-    this.style = 'Solid';
-    this.width = presentation_defaults.line.width;
-    this.color = presentation_defaults.line.color;
+    this.v              = 2;
+    this.axis           = 1;
+    this.type           = presentation_defaults.line.type;
+    this.style          = 'Solid';
+    this.width          = presentation_defaults.line.width;
+    this.color          = presentation_defaults.line.color;
     /* Removed in v2
     this.coloruseneg = false;
     this.colorneg = presentation_defaults.line.color;
     */
     /* Added in v2 */
-    this.colorusediff = 0;
-    this.colordiff = presentation_defaults.line.color;
+    this.colorusediff   = 0;
+    this.colordiff      = presentation_defaults.line.color;
     /* --- */
-    this.consumption = false;
-    this.threshold = 0;
-    this.min = false;
-    this.max = false;
-    this.last = false;
-    this.all = false;
-    this.time1 = '00:00';
-    this.time2 = '24:00';
-    this.daylight = false;
+    this.consumption    = false;
+    this.threshold      = 0;
+    this.min            = false;
+    this.max            = false;
+    this.last           = false;
+    this.all            = false;
+    this.time1          = '00:00';
+    this.time2          = '24:00';
+    this.daylight       = false;
     this.daylight_grace = 0;
-    this.legend = true;
-    this.position = 0;
-    this.hidden = false;
-    this.outline = false;
+    this.legend         = true;
+    this.position       = 0;
+    this.hidden         = false;
+    this.outline        = false;
+    this.stack          = '';
+    this.decimals       = '';
 
     try {
         data = JSON.parse(data);
@@ -82,73 +84,6 @@ function presentation( data ) {
     } catch(e) {}
 
     this.toString = function() { return JSON.stringify(this) }
-}
-
-/**
- *
- * /
-function setExtremes() {
-
-    var i, e, extremes=[], p, pos=[], min=100, max=-100;
-
-    for (i=0; i<chart.yAxis.length; i++) {
-
-        /* Reset extremes * /
-        chart.yAxis[i].setExtremes(null, null);
-
-        /* Get extremes * /
-        e = chart.yAxis[i].getExtremes();
-
-        /* Calc rel. position of 0 value; 0 - top, 1 - bottom * /
-        p = e.max / (e.max-e.min);
-
-        /* Remember min/max positions * /
-        min = Math.min(min, p);
-        max = Math.max(max, p);
-
-        /* Remember extremes and positions * /
-        extremes.push( { min: e.min, max: e.max, height: e.max-e.min } );
-        pos.push(p);
-    }
-
-    /* Average to align to * /
-    var center = (max+min)/2;
-
-    for (i=0; i<chart.yAxis.length; i++) {
-
-        if (max <= 1) {
-            /* With neg. values * /
-            if (pos[i] < center) {
-                /* Add offset on top * /
-                extremes[i].max += (center-pos[i])*2 * extremes[i].height;
-            } else {
-                /* Add offset at bottom * /
-                extremes[i].min -= (pos[i]-center)*2 * extremes[i].height;
-            }
-        } else if (min >= 1) {
-            /* Add offset at bottom * /
-            extremes[i].min -= (pos[i]-min) * extremes[i].height;
-        } else {
-            /* ??? * /
-        }
-
-        extremes[i].min = Math.round(extremes[i].min * 100) / 100;
-        extremes[i].max = Math.round(extremes[i].max * 100) / 100;
-
-        /* Add 5% min padding only for "real" neg. data * /
-        if (extremes[i].min < -0.001) {
-            extremes[i].min -= (extremes[i].max-extremes[i].min) * 0.05;
-        }
-
-        /* Add 5% max padding only for "real" pos. data * /
-        if (extremes[i].max > 0.001) {
-            extremes[i].max += (extremes[i].max-extremes[i].min) * 0.05;
-        }
-
-        chart.yAxis[i].setExtremes(extremes[i].min, extremes[i].max, false);
-    }
-
-    chart.redraw();
 }
 
 /**
