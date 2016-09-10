@@ -26,21 +26,20 @@
       <label for="timerange-year">{{Year}}</label>
     </span>
 
-    <span style="padding:0 1em">
-        <button class="icon" onclick="pvlng.changeDate(-1)">
-            <i class="fa fa-chevron-left fa-fw"></i>
-        </button>
-        <!-- Remove all text input styling -->
-        <input id="timerange" class="c" type="text" size="17"
-               style="border:0; background:transparent" readonly="readonly">
-        <input id="timerangedate" style="display:none">
-        <button id="dpCalendar" class="icon" data-input="#timerange">
-            <i class="fa fa-calendar fa-fw"></i>
-        </button>
-        <button class="icon" onclick="pvlng.changeDate(1)">
-            <i class="fa fa-chevron-right fa-fw"></i>
-        </button>
-    </span>
+    <button class="icon" onclick="pvlng.changeDate(-1)">
+        <i class="fa fa-chevron-left fa-fw"></i>
+    </button>
+    <!-- Remove all text input styling -->
+    <input id="timerange" class="c" type="text" size="17"
+           style="border:0; background:transparent" readonly="readonly">
+    <input id="timerangedate" style="display:none">
+    <button id="dpCalendar" class="icon" data-input="#timerange">
+        <i class="fa fa-calendar fa-fw"></i>
+    </button>
+    <button class="icon" onclick="pvlng.changeDate(1)">
+        <i class="fa fa-chevron-right fa-fw"></i>
+    </button>
+
 </span>
 
 <span id="dp2" class="d-select" style="display:none">

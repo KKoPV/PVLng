@@ -9,6 +9,7 @@ function usage {
     echo Upgrade your installation to lastest state from Github.
     echo
     echo "Usage: $0 <branch>"
+    echo
     exit ${2:-0}
 }
 
