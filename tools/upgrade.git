@@ -62,14 +62,14 @@ while read f; do
         echo -e \\b\\b\\b\\b- done
 
         ### Remember last patch
-        last=$((patch+0))
+        last=$patch
 
     fi
 
 done <$tmp
 
 if [ "$last" ]; then
-    mysql $params -e 'REPLACE INTO `pvlng_config` (`key`, `value`) VALUES ("DBPatchLevel", "'$last'")' $dbname
+    mysql $params -e 'REPLACE INTO `pvlng_config` (`key`, `value`) VALUES ("DBPatchLevel", '$last')' $dbname >/dev/null 2>&1
     e Patched database to level $last
     e NEXT
     e - Open http://your.domain.here/cc in your browser and clear the caches!

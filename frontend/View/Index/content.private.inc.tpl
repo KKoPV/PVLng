@@ -92,7 +92,7 @@
                 <select id="load-delete-view" style="width:100%" data-placeholder="--- {{SelectChart}} ---"></select>
             </div>
             <div class="fl">
-                <button id="btn-load" class="tip" style="margin-left:1em" title="{{Load}}">
+                <button id="btn-load" class="tip" title="{{Load}}">
                     <i class="fa fa-folder-open-o"></i>
                 </button>
                 <button id="btn-delete" class="tip" style="margin-left:1em" title="{{Delete}}">

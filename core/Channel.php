@@ -47,11 +47,11 @@ abstract class Channel
     public static function byGUID($guid, $alias=true)
     {
         if ($guid == '') {
-            throw new \Exception('Missing channel GUID!');
+            throw new \Exception('Missing channel GUID!', 400);
         }
 
         $channel = new \ORM\Tree;
-        $channel->filterRaw('`guid` like "'.$guid.'%"')->findOne();
+        $channel->filter('guid', array('like' => $guid.'%'))->findOne();
         $aliasOf = $channel->getAliasOf();
 
         if ($aliasOf && $alias) {
@@ -75,7 +75,7 @@ abstract class Channel
             }
         }
 
-        throw new \Exception('No channel found for GUID: '.$guid, 400);
+        throw new \Exception('No channel found for GUID: '.$guid, 404);
     }
 
     /**
@@ -285,7 +285,8 @@ abstract class Channel
         // Default behavior
         $reading = \ORM\Reading::factory($this->numeric);
 
-        $this->lastReading = $reading->getLastReading($this->entity, $timestamp);
+        $this->lastReading = \ORM\ReadingLast::f($this->entity)->getData();
+#        $this->lastReading = $reading->getLastReading($this->entity, $timestamp);
 
         $this->before_write($request);
 
@@ -342,7 +343,7 @@ abstract class Channel
         // Default behavior
         $reading = \ORM\Reading::factory($this->numeric);
 
-        $this->lastReading = $reading->getLastReading($this->entity, $timestamp);
+        $this->lastReading = \ORM\ReadingLast::f($this->entity)->getData();
 
         $this->check_before_write($request, $timestamp);
 
@@ -905,7 +906,10 @@ abstract class Channel
         foreach ($buffer as $id=>$row) {
 
             // Filter out data produced by meter channels with large periods
-            if ($row['timestamp'] < $this->start || $row['timestamp'] > $this->end) continue;
+            if ($this->meter &&
+                ($row['timestamp'] < $this->start || $row['timestamp'] > $this->end)) {
+                continue;
+            }
 
             if ($checkMeter) {
                 /* check meter values raising */
@@ -1013,7 +1017,7 @@ abstract class Channel
            : DBQuery::forge($this->table[$this->numeric]);
 
         // Fetch last reading and set some data to 0 to get correct field order
-        $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
+        return $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
           ->get('timestamp')
           ->get('data')
           ->get(0, 'min')
@@ -1024,8 +1028,6 @@ abstract class Channel
           ->filter('id', $this->entity)
           ->orderDescending('timestamp')
           ->limit(1);
-
-        return $q;
     }
 
     /**

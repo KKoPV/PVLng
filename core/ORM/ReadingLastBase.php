@@ -1,10 +1,10 @@
 <?php
 /**
- * Abstract base class for table "pvlng_reading_str"
+ * Abstract base class for table "pvlng_reading_last"
  *
  * *** NEVER EVER EDIT THIS FILE! ***
  *
- * To extend the functionallity, edit "ReadingStr.php"!
+ * To extend the functionallity, edit "ReadingLast.php"!
  *
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
@@ -20,7 +20,7 @@ namespace ORM;
 /**
  *
  */
-abstract class ReadingStrBase extends \slimMVC\ORM
+abstract class ReadingLastBase extends \slimMVC\ORM
 {
 
     // -----------------------------------------------------------------------
@@ -142,18 +142,16 @@ abstract class ReadingStrBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for unique fields "id', 'timestamp"
+     * Filter for field "id"
      *
-     * @param  mixed    $id, $timestamp Filter values
+     * @param  mixed    $id Filter value
      * @return Instance For fluid interface
      */
-    public function filterByIdTimestamp($id, $timestamp)
+    public function filterById($id)
     {
-
-        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
-        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp).'';
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterByIdTimestamp()
+    }   // filterById()
 
     /**
      * Filter for field "timestamp"
@@ -166,18 +164,6 @@ abstract class ReadingStrBase extends \slimMVC\ORM
         $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
         return $this;
     }   // filterByTimestamp()
-
-    /**
-     * Filter for field "id"
-     *
-     * @param  mixed    $id Filter value
-     * @return Instance For fluid interface
-     */
-    public function filterById($id)
-    {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
-    }   // filterById()
 
     /**
      * Filter for field "data"
@@ -200,7 +186,8 @@ abstract class ReadingStrBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`data` = '.$this->quote($this->fields['data']).'';
+        return '`timestamp` = '.$this->quote($this->fields['timestamp']).'
+              , `data` = '.$this->quote($this->fields['data']).'';
     }   // onDuplicateKey()
 
     /**
@@ -208,7 +195,7 @@ abstract class ReadingStrBase extends \slimMVC\ORM
      *
      * @var string $table Table name
      */
-    protected $table = 'pvlng_reading_str';
+    protected $table = 'pvlng_reading_last';
 
     /**
      * SQL for creation
@@ -216,14 +203,12 @@ abstract class ReadingStrBase extends \slimMVC\ORM
      * @var string $createSQL
      */
     protected $createSQL = '
-        CREATE TABLE `pvlng_reading_str` (
+        CREATE TABLE `pvlng_reading_last` (
           `id` smallint(5) unsigned NOT NULL,
           `timestamp` int(10) unsigned NOT NULL,
           `data` varchar(50) NOT NULL,
-          PRIMARY KEY (`id`,`timestamp`),
-          KEY `timestamp` (`timestamp`),
-          KEY `id` (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Alphanumeric readings\'
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Numeric readings\'
     ';
 
     /**
@@ -248,8 +233,7 @@ abstract class ReadingStrBase extends \slimMVC\ORM
      *
      */
     protected $primary = array(
-        'id',
-        'timestamp'
+        'id'
     );
 
     /**

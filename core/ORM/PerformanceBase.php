@@ -149,7 +149,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
      */
     public function filterByTimestamp($timestamp)
     {
-        $this->filter[] = '`timestamp` = '.$this->quote($timestamp);
+        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
         return $this;
     }   // filterByTimestamp()
 
@@ -161,7 +161,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
      */
     public function filterByAction($action)
     {
-        $this->filter[] = '`action` = '.$this->quote($action);
+        $this->filter[] = $this->field('action').' = '.$this->quote($action);
         return $this;
     }   // filterByAction()
 
@@ -173,7 +173,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
      */
     public function filterByTime($time)
     {
-        $this->filter[] = '`time` = '.$this->quote($time);
+        $this->filter[] = $this->field('time').' = '.$this->quote($time);
         return $this;
     }   // filterByTime()
 

@@ -421,7 +421,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -433,7 +433,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -445,7 +445,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByChilds($childs)
     {
-        $this->filter[] = '`childs` = '.$this->quote($childs);
+        $this->filter[] = $this->field('childs').' = '.$this->quote($childs);
         return $this;
     }   // filterByChilds()
 
@@ -457,7 +457,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByRead($read)
     {
-        $this->filter[] = '`read` = '.$this->quote($read);
+        $this->filter[] = $this->field('read').' = '.$this->quote($read);
         return $this;
     }   // filterByRead()
 
@@ -469,7 +469,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByWrite($write)
     {
-        $this->filter[] = '`write` = '.$this->quote($write);
+        $this->filter[] = $this->field('write').' = '.$this->quote($write);
         return $this;
     }   // filterByWrite()
 
@@ -481,7 +481,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = '`description` = '.$this->quote($description);
+        $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
     }   // filterByDescription()
 
@@ -493,7 +493,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByModel($model)
     {
-        $this->filter[] = '`model` = '.$this->quote($model);
+        $this->filter[] = $this->field('model').' = '.$this->quote($model);
         return $this;
     }   // filterByModel()
 
@@ -505,7 +505,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = '`unit` = '.$this->quote($unit);
+        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
     }   // filterByUnit()
 
@@ -517,7 +517,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = '`type` = '.$this->quote($type);
+        $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
     }   // filterByType()
 
@@ -529,7 +529,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByGraph($graph)
     {
-        $this->filter[] = '`graph` = '.$this->quote($graph);
+        $this->filter[] = $this->field('graph').' = '.$this->quote($graph);
         return $this;
     }   // filterByGraph()
 
@@ -541,7 +541,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = '`icon` = '.$this->quote($icon);
+        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
     }   // filterByIcon()
 

@@ -29,7 +29,6 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
     updateActive = false,
     windowVisible = true,
     browserPrefix = null,
-    lastChanged = (new Date).getTime() / 1000 / 60,
     oTable,
     channels = {
         <!-- BEGIN DATA -->
@@ -525,13 +524,11 @@ function updateChart( force ) {
     pvlng.log('Channels', channels_new);
     pvlng.log('yAxis', yAxis);
 
-    /* check for changed channels */
-    var changed = false, now = (new Date).getTime() / 1000 / 60;
+    /* Check for changed channels */
+    var changed = false;
 
-    /* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
-    if (force || channels_new.length != channels_chart.length || now - lastChanged > 30) {
+    if (force || channels_new.length != channels_chart.length) {
         changed = true;
-        lastChanged = now;
     } else {
         for (var i=0, l=channels_new.length; i<l; i++) {
             if (channels_new[i]._hash != channels_chart[i]._hash) {
@@ -556,7 +553,7 @@ function updateChart( force ) {
         chartOptions.plotOptions.bar.stacking = stacked ? 'normal' : null;
 
         /* (Re)Create chart */
-        $('#'+chartOptions.chart.renderTo).css('height', ChartHeight);
+        $('#'+chartOptions.chart.renderTo).css('height', ChartHeight).show();
         chart = new Highcharts.Chart(chartOptions);
         /* Help chart with fluid layout to find its correct size */
         chart.reflow();
@@ -903,10 +900,12 @@ $(function() {
         });
         $('#tabs').on('tabsbeforeactivate', function(e, ui) {
             if (ui.newTab.data('action') == 'reset') {
+                $('#'+chartOptions.chart.renderTo).hide();
                 /* Uncheck all channels and ... */
                 $('input.channel').iCheck('uncheck').val('');
                 $('tr.channel').removeClass('checked');
                 /* Clear chart select and input */
+                views.actual.name = '';
                 $('#load-delete-view').val('').trigger('change');
                 $('#saveview').val('');
                 $('#visibility').val(0);
@@ -1025,7 +1024,6 @@ $(function() {
             })
             /* Put the hint onto parent div injected by iCheck around the checkbox */
             .parent().prop('title', '{{ChartAutoRefresh}}').tipTip();
-
     }
 
     /**

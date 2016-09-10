@@ -151,7 +151,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByGuid($guid)
     {
-        $this->filter[] = '`guid` = '.$this->quote($guid);
+        $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
         return $this;
     }   // filterByGuid()
 
@@ -163,7 +163,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -175,7 +175,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = '`description` = '.$this->quote($description);
+        $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
     }   // filterByDescription()
 
@@ -187,7 +187,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterBySerial($serial)
     {
-        $this->filter[] = '`serial` = '.$this->quote($serial);
+        $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
         return $this;
     }   // filterBySerial()
 
@@ -199,7 +199,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByChannel($channel)
     {
-        $this->filter[] = '`channel` = '.$this->quote($channel);
+        $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
         return $this;
     }   // filterByChannel()
 
@@ -211,7 +211,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = '`unit` = '.$this->quote($unit);
+        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
     }   // filterByUnit()
 
@@ -223,7 +223,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = '`type` = '.$this->quote($type);
+        $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
     }   // filterByType()
 
@@ -235,7 +235,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = '`icon` = '.$this->quote($icon);
+        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
     }   // filterByIcon()
 
@@ -247,7 +247,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByDatetime($datetime)
     {
-        $this->filter[] = '`datetime` = '.$this->quote($datetime);
+        $this->filter[] = $this->field('datetime').' = '.$this->quote($datetime);
         return $this;
     }   // filterByDatetime()
 
@@ -259,7 +259,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByReadings($readings)
     {
-        $this->filter[] = '`readings` = '.$this->quote($readings);
+        $this->filter[] = $this->field('readings').' = '.$this->quote($readings);
         return $this;
     }   // filterByReadings()
 

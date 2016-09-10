@@ -843,7 +843,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -855,7 +855,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByGuid($guid)
     {
-        $this->filter[] = '`guid` = '.$this->quote($guid);
+        $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
         return $this;
     }   // filterByGuid()
 
@@ -867,7 +867,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = '`type` = '.$this->quote($type);
+        $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
     }   // filterByType()
 
@@ -879,7 +879,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByTariff($tariff)
     {
-        $this->filter[] = '`tariff` = '.$this->quote($tariff);
+        $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
         return $this;
     }   // filterByTariff()
 
@@ -891,7 +891,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -903,7 +903,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = '`description` = '.$this->quote($description);
+        $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
     }   // filterByDescription()
 
@@ -915,7 +915,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterBySerial($serial)
     {
-        $this->filter[] = '`serial` = '.$this->quote($serial);
+        $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
         return $this;
     }   // filterBySerial()
 
@@ -927,7 +927,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByChannel($channel)
     {
-        $this->filter[] = '`channel` = '.$this->quote($channel);
+        $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
         return $this;
     }   // filterByChannel()
 
@@ -939,7 +939,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByResolution($resolution)
     {
-        $this->filter[] = '`resolution` = '.$this->quote($resolution);
+        $this->filter[] = $this->field('resolution').' = '.$this->quote($resolution);
         return $this;
     }   // filterByResolution()
 
@@ -951,7 +951,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = '`unit` = '.$this->quote($unit);
+        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
     }   // filterByUnit()
 
@@ -963,7 +963,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByDecimals($decimals)
     {
-        $this->filter[] = '`decimals` = '.$this->quote($decimals);
+        $this->filter[] = $this->field('decimals').' = '.$this->quote($decimals);
         return $this;
     }   // filterByDecimals()
 
@@ -975,7 +975,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByMeter($meter)
     {
-        $this->filter[] = '`meter` = '.$this->quote($meter);
+        $this->filter[] = $this->field('meter').' = '.$this->quote($meter);
         return $this;
     }   // filterByMeter()
 
@@ -987,7 +987,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByNumeric($numeric)
     {
-        $this->filter[] = '`numeric` = '.$this->quote($numeric);
+        $this->filter[] = $this->field('numeric').' = '.$this->quote($numeric);
         return $this;
     }   // filterByNumeric()
 
@@ -999,7 +999,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByOffset($offset)
     {
-        $this->filter[] = '`offset` = '.$this->quote($offset);
+        $this->filter[] = $this->field('offset').' = '.$this->quote($offset);
         return $this;
     }   // filterByOffset()
 
@@ -1011,7 +1011,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByAdjust($adjust)
     {
-        $this->filter[] = '`adjust` = '.$this->quote($adjust);
+        $this->filter[] = $this->field('adjust').' = '.$this->quote($adjust);
         return $this;
     }   // filterByAdjust()
 
@@ -1023,7 +1023,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = '`cost` = '.$this->quote($cost);
+        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
     }   // filterByCost()
 
@@ -1035,7 +1035,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByThreshold($threshold)
     {
-        $this->filter[] = '`threshold` = '.$this->quote($threshold);
+        $this->filter[] = $this->field('threshold').' = '.$this->quote($threshold);
         return $this;
     }   // filterByThreshold()
 
@@ -1047,7 +1047,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByValidFrom($valid_from)
     {
-        $this->filter[] = '`valid_from` = '.$this->quote($valid_from);
+        $this->filter[] = $this->field('valid_from').' = '.$this->quote($valid_from);
         return $this;
     }   // filterByValidFrom()
 
@@ -1059,7 +1059,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByValidTo($valid_to)
     {
-        $this->filter[] = '`valid_to` = '.$this->quote($valid_to);
+        $this->filter[] = $this->field('valid_to').' = '.$this->quote($valid_to);
         return $this;
     }   // filterByValidTo()
 
@@ -1071,7 +1071,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = '`public` = '.$this->quote($public);
+        $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
     }   // filterByPublic()
 
@@ -1083,7 +1083,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByTags($tags)
     {
-        $this->filter[] = '`tags` = '.$this->quote($tags);
+        $this->filter[] = $this->field('tags').' = '.$this->quote($tags);
         return $this;
     }   // filterByTags()
 
@@ -1095,7 +1095,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByExtra($extra)
     {
-        $this->filter[] = '`extra` = '.$this->quote($extra);
+        $this->filter[] = $this->field('extra').' = '.$this->quote($extra);
         return $this;
     }   // filterByExtra()
 
@@ -1107,7 +1107,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = '`comment` = '.$this->quote($comment);
+        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
     }   // filterByComment()
 
@@ -1119,7 +1119,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = '`icon` = '.$this->quote($icon);
+        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
     }   // filterByIcon()
 

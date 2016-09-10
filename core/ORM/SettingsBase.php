@@ -286,9 +286,9 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function filterByScopeNameKey($scope, $name, $key)
     {
 
-        $this->filter[] = '`scope` = '.$this->quote($scope).'';
-        $this->filter[] = '`name` = '.$this->quote($name).'';
-        $this->filter[] = '`key` = '.$this->quote($key).'';
+        $this->filter[] = $this->field('scope').' = '.$this->quote($scope).'';
+        $this->filter[] = $this->field('name').' = '.$this->quote($name).'';
+        $this->filter[] = $this->field('key').' = '.$this->quote($key).'';
         return $this;
     }   // filterByScopeNameKey()
 
@@ -300,7 +300,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByScope($scope)
     {
-        $this->filter[] = '`scope` = '.$this->quote($scope);
+        $this->filter[] = $this->field('scope').' = '.$this->quote($scope);
         return $this;
     }   // filterByScope()
 
@@ -312,7 +312,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -324,7 +324,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByKey($key)
     {
-        $this->filter[] = '`key` = '.$this->quote($key);
+        $this->filter[] = $this->field('key').' = '.$this->quote($key);
         return $this;
     }   // filterByKey()
 
@@ -336,7 +336,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByValue($value)
     {
-        $this->filter[] = '`value` = '.$this->quote($value);
+        $this->filter[] = $this->field('value').' = '.$this->quote($value);
         return $this;
     }   // filterByValue()
 
@@ -348,7 +348,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByOrder($order)
     {
-        $this->filter[] = '`order` = '.$this->quote($order);
+        $this->filter[] = $this->field('order').' = '.$this->quote($order);
         return $this;
     }   // filterByOrder()
 
@@ -360,7 +360,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = '`type` = '.$this->quote($type);
+        $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
     }   // filterByType()
 
@@ -372,7 +372,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = '`data` = '.$this->quote($data);
+        $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
     }   // filterByData()
 

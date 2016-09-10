@@ -71,7 +71,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
      */
     public function filterByKey($key)
     {
-        $this->filter[] = '`key` = '.$this->quote($key);
+        $this->filter[] = $this->field('key').' = '.$this->quote($key);
         return $this;
     }   // filterByKey()
 
@@ -83,7 +83,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
      */
     public function filterByValue($value)
     {
-        $this->filter[] = '`value` = '.$this->quote($value);
+        $this->filter[] = $this->field('value').' = '.$this->quote($value);
         return $this;
     }   // filterByValue()
 

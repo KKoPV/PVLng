@@ -149,7 +149,7 @@ abstract class ConfigBase extends \slimMVC\ORM
      */
     public function filterByKey($key)
     {
-        $this->filter[] = '`key` = '.$this->quote($key);
+        $this->filter[] = $this->field('key').' = '.$this->quote($key);
         return $this;
     }   // filterByKey()
 
@@ -161,7 +161,7 @@ abstract class ConfigBase extends \slimMVC\ORM
      */
     public function filterByValue($value)
     {
-        $this->filter[] = '`value` = '.$this->quote($value);
+        $this->filter[] = $this->field('value').' = '.$this->quote($value);
         return $this;
     }   // filterByValue()
 
@@ -173,7 +173,7 @@ abstract class ConfigBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = '`comment` = '.$this->quote($comment);
+        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
     }   // filterByComment()
 

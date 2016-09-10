@@ -252,9 +252,9 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     public function filterByIdStartEnd($id, $start, $end)
     {
 
-        $this->filter[] = '`id` = '.$this->quote($id).'';
-        $this->filter[] = '`start` = '.$this->quote($start).'';
-        $this->filter[] = '`end` = '.$this->quote($end).'';
+        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
+        $this->filter[] = $this->field('start').' = '.$this->quote($start).'';
+        $this->filter[] = $this->field('end').' = '.$this->quote($end).'';
         return $this;
     }   // filterByIdStartEnd()
 
@@ -266,7 +266,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByUid($uid)
     {
-        $this->filter[] = '`uid` = '.$this->quote($uid);
+        $this->filter[] = $this->field('uid').' = '.$this->quote($uid);
         return $this;
     }   // filterByUid()
 
@@ -278,7 +278,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByCreated($created)
     {
-        $this->filter[] = '`created` = '.$this->quote($created);
+        $this->filter[] = $this->field('created').' = '.$this->quote($created);
         return $this;
     }   // filterByCreated()
 
@@ -290,7 +290,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -302,7 +302,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByStart($start)
     {
-        $this->filter[] = '`start` = '.$this->quote($start);
+        $this->filter[] = $this->field('start').' = '.$this->quote($start);
         return $this;
     }   // filterByStart()
 
@@ -314,7 +314,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByEnd($end)
     {
-        $this->filter[] = '`end` = '.$this->quote($end);
+        $this->filter[] = $this->field('end').' = '.$this->quote($end);
         return $this;
     }   // filterByEnd()
 
@@ -326,7 +326,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByLifetime($lifetime)
     {
-        $this->filter[] = '`lifetime` = '.$this->quote($lifetime);
+        $this->filter[] = $this->field('lifetime').' = '.$this->quote($lifetime);
         return $this;
     }   // filterByLifetime()
 

@@ -421,7 +421,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -433,7 +433,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByEntity($entity)
     {
-        $this->filter[] = '`entity` = '.$this->quote($entity);
+        $this->filter[] = $this->field('entity').' = '.$this->quote($entity);
         return $this;
     }   // filterByEntity()
 
@@ -445,7 +445,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByGuid($guid)
     {
-        $this->filter[] = '`guid` = '.$this->quote($guid);
+        $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
         return $this;
     }   // filterByGuid()
 
@@ -457,7 +457,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -469,7 +469,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterBySerial($serial)
     {
-        $this->filter[] = '`serial` = '.$this->quote($serial);
+        $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
         return $this;
     }   // filterBySerial()
 
@@ -481,7 +481,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByChannel($channel)
     {
-        $this->filter[] = '`channel` = '.$this->quote($channel);
+        $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
         return $this;
     }   // filterByChannel()
 
@@ -493,7 +493,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = '`description` = '.$this->quote($description);
+        $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
     }   // filterByDescription()
 
@@ -505,7 +505,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByResolution($resolution)
     {
-        $this->filter[] = '`resolution` = '.$this->quote($resolution);
+        $this->filter[] = $this->field('resolution').' = '.$this->quote($resolution);
         return $this;
     }   // filterByResolution()
 
@@ -517,7 +517,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = '`cost` = '.$this->quote($cost);
+        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
     }   // filterByCost()
 
@@ -529,7 +529,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByMeter($meter)
     {
-        $this->filter[] = '`meter` = '.$this->quote($meter);
+        $this->filter[] = $this->field('meter').' = '.$this->quote($meter);
         return $this;
     }   // filterByMeter()
 
@@ -541,7 +541,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByNumeric($numeric)
     {
-        $this->filter[] = '`numeric` = '.$this->quote($numeric);
+        $this->filter[] = $this->field('numeric').' = '.$this->quote($numeric);
         return $this;
     }   // filterByNumeric()
 
@@ -553,7 +553,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByOffset($offset)
     {
-        $this->filter[] = '`offset` = '.$this->quote($offset);
+        $this->filter[] = $this->field('offset').' = '.$this->quote($offset);
         return $this;
     }   // filterByOffset()
 
@@ -565,7 +565,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByAdjust($adjust)
     {
-        $this->filter[] = '`adjust` = '.$this->quote($adjust);
+        $this->filter[] = $this->field('adjust').' = '.$this->quote($adjust);
         return $this;
     }   // filterByAdjust()
 
@@ -577,7 +577,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = '`unit` = '.$this->quote($unit);
+        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
     }   // filterByUnit()
 
@@ -589,7 +589,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByDecimals($decimals)
     {
-        $this->filter[] = '`decimals` = '.$this->quote($decimals);
+        $this->filter[] = $this->field('decimals').' = '.$this->quote($decimals);
         return $this;
     }   // filterByDecimals()
 
@@ -601,7 +601,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByThreshold($threshold)
     {
-        $this->filter[] = '`threshold` = '.$this->quote($threshold);
+        $this->filter[] = $this->field('threshold').' = '.$this->quote($threshold);
         return $this;
     }   // filterByThreshold()
 
@@ -613,7 +613,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByValidFrom($valid_from)
     {
-        $this->filter[] = '`valid_from` = '.$this->quote($valid_from);
+        $this->filter[] = $this->field('valid_from').' = '.$this->quote($valid_from);
         return $this;
     }   // filterByValidFrom()
 
@@ -625,7 +625,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByValidTo($valid_to)
     {
-        $this->filter[] = '`valid_to` = '.$this->quote($valid_to);
+        $this->filter[] = $this->field('valid_to').' = '.$this->quote($valid_to);
         return $this;
     }   // filterByValidTo()
 
@@ -637,7 +637,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = '`public` = '.$this->quote($public);
+        $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
     }   // filterByPublic()
 
@@ -649,7 +649,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByTags($tags)
     {
-        $this->filter[] = '`tags` = '.$this->quote($tags);
+        $this->filter[] = $this->field('tags').' = '.$this->quote($tags);
         return $this;
     }   // filterByTags()
 
@@ -661,7 +661,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByExtra($extra)
     {
-        $this->filter[] = '`extra` = '.$this->quote($extra);
+        $this->filter[] = $this->field('extra').' = '.$this->quote($extra);
         return $this;
     }   // filterByExtra()
 
@@ -673,7 +673,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = '`comment` = '.$this->quote($comment);
+        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
     }   // filterByComment()
 
@@ -685,7 +685,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByTypeId($type_id)
     {
-        $this->filter[] = '`type_id` = '.$this->quote($type_id);
+        $this->filter[] = $this->field('type_id').' = '.$this->quote($type_id);
         return $this;
     }   // filterByTypeId()
 
@@ -697,7 +697,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = '`type` = '.$this->quote($type);
+        $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
     }   // filterByType()
 
@@ -709,7 +709,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByModel($model)
     {
-        $this->filter[] = '`model` = '.$this->quote($model);
+        $this->filter[] = $this->field('model').' = '.$this->quote($model);
         return $this;
     }   // filterByModel()
 
@@ -721,7 +721,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByChilds($childs)
     {
-        $this->filter[] = '`childs` = '.$this->quote($childs);
+        $this->filter[] = $this->field('childs').' = '.$this->quote($childs);
         return $this;
     }   // filterByChilds()
 
@@ -733,7 +733,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByRead($read)
     {
-        $this->filter[] = '`read` = '.$this->quote($read);
+        $this->filter[] = $this->field('read').' = '.$this->quote($read);
         return $this;
     }   // filterByRead()
 
@@ -745,7 +745,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByWrite($write)
     {
-        $this->filter[] = '`write` = '.$this->quote($write);
+        $this->filter[] = $this->field('write').' = '.$this->quote($write);
         return $this;
     }   // filterByWrite()
 
@@ -757,7 +757,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByGraph($graph)
     {
-        $this->filter[] = '`graph` = '.$this->quote($graph);
+        $this->filter[] = $this->field('graph').' = '.$this->quote($graph);
         return $this;
     }   // filterByGraph()
 
@@ -769,7 +769,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = '`icon` = '.$this->quote($icon);
+        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
     }   // filterByIcon()
 
@@ -781,7 +781,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByAlias($alias)
     {
-        $this->filter[] = '`alias` = '.$this->quote($alias);
+        $this->filter[] = $this->field('alias').' = '.$this->quote($alias);
         return $this;
     }   // filterByAlias()
 
@@ -793,7 +793,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByAliasOf($alias_of)
     {
-        $this->filter[] = '`alias_of` = '.$this->quote($alias_of);
+        $this->filter[] = $this->field('alias_of').' = '.$this->quote($alias_of);
         return $this;
     }   // filterByAliasOf()
 
@@ -805,7 +805,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByEntityOf($entity_of)
     {
-        $this->filter[] = '`entity_of` = '.$this->quote($entity_of);
+        $this->filter[] = $this->field('entity_of').' = '.$this->quote($entity_of);
         return $this;
     }   // filterByEntityOf()
 
@@ -817,7 +817,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByLevel($level)
     {
-        $this->filter[] = '`level` = '.$this->quote($level);
+        $this->filter[] = $this->field('level').' = '.$this->quote($level);
         return $this;
     }   // filterByLevel()
 
@@ -829,7 +829,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByHaschilds($haschilds)
     {
-        $this->filter[] = '`haschilds` = '.$this->quote($haschilds);
+        $this->filter[] = $this->field('haschilds').' = '.$this->quote($haschilds);
         return $this;
     }   // filterByHaschilds()
 
@@ -841,7 +841,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByLower($lower)
     {
-        $this->filter[] = '`lower` = '.$this->quote($lower);
+        $this->filter[] = $this->field('lower').' = '.$this->quote($lower);
         return $this;
     }   // filterByLower()
 
@@ -853,7 +853,7 @@ abstract class TreeBase extends \slimMVC\ORM
      */
     public function filterByUpper($upper)
     {
-        $this->filter[] = '`upper` = '.$this->quote($upper);
+        $this->filter[] = $this->field('upper').' = '.$this->quote($upper);
         return $this;
     }   // filterByUpper()
 
@@ -874,7 +874,7 @@ abstract class TreeBase extends \slimMVC\ORM
      * @var string $createSQL
      */
     protected $createSQL = '
-        CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_tree_view` AS select `n`.`id` AS `id`,`n`.`entity` AS `entity`,ifnull(`n`.`guid`,`c`.`guid`) AS `guid`,if(`co`.`id`,`co`.`name`,`c`.`name`) AS `name`,if(`co`.`id`,`co`.`serial`,`c`.`serial`) AS `serial`,`c`.`channel` AS `channel`,if(`co`.`id`,`co`.`description`,`c`.`description`) AS `description`,if(`co`.`id`,`co`.`resolution`,`c`.`resolution`) AS `resolution`,if(`co`.`id`,`co`.`cost`,`c`.`cost`) AS `cost`,if(`co`.`id`,`co`.`meter`,`c`.`meter`) AS `meter`,if(`co`.`id`,`co`.`numeric`,`c`.`numeric`) AS `numeric`,if(`co`.`id`,`co`.`offset`,`c`.`offset`) AS `offset`,if(`co`.`id`,`co`.`adjust`,`c`.`adjust`) AS `adjust`,if(`co`.`id`,`co`.`unit`,`c`.`unit`) AS `unit`,if(`co`.`id`,`co`.`decimals`,`c`.`decimals`) AS `decimals`,if(`co`.`id`,`co`.`threshold`,`c`.`threshold`) AS `threshold`,if(`co`.`id`,`co`.`valid_from`,`c`.`valid_from`) AS `valid_from`,if(`co`.`id`,`co`.`valid_to`,`c`.`valid_to`) AS `valid_to`,if(`co`.`id`,`co`.`public`,`c`.`public`) AS `public`,if(`co`.`id`,`co`.`tags`,`c`.`tags`) AS `tags`,if(`co`.`id`,`co`.`extra`,`c`.`extra`) AS `extra`,if(`co`.`id`,`co`.`comment`,`c`.`comment`) AS `comment`,`t`.`id` AS `type_id`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`graph` AS `graph`,if(`co`.`id`,`co`.`icon`,`c`.`icon`) AS `icon`,`ca`.`id` AS `alias`,`ta`.`id` AS `alias_of`,`ta`.`entity` AS `entity_of`,(((count(0) - 1) + (`n`.`lft` > 1)) + 1) AS `level`,round((((`n`.`rgt` - `n`.`lft`) - 1) / 2),0) AS `haschilds`,((((min(`p`.`rgt`) - `n`.`rgt`) - (`n`.`lft` > 1)) / 2) > 0) AS `lower`,((`n`.`lft` - max(`p`.`lft`)) > 1) AS `upper` from ((((((`pvlng_tree` `n` join `pvlng_tree` `p`) join `pvlng_channel` `c` on((`n`.`entity` = `c`.`id`))) join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) left join `pvlng_channel` `ca` on(((if(`t`.`childs`,`n`.`guid`,`c`.`guid`) = `ca`.`channel`) and (`ca`.`type` = 0)))) left join `pvlng_tree` `ta` on((`c`.`channel` = `ta`.`guid`))) left join `pvlng_channel` `co` on(((`ta`.`entity` = `co`.`id`) and (`c`.`type` = 0)))) where ((`n`.`lft` between `p`.`lft` and `p`.`rgt`) and ((`p`.`id` <> `n`.`id`) or (`n`.`lft` = 1))) group by `n`.`id` order by `n`.`lft`
+        CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_tree_view` AS select `n`.`id` AS `id`,`n`.`entity` AS `entity`,ifnull(`n`.`guid`,`c`.`guid`) AS `guid`,if(`co`.`id`,`co`.`name`,`c`.`name`) AS `name`,if(`co`.`id`,`co`.`serial`,`c`.`serial`) AS `serial`,`c`.`channel` AS `channel`,if(`co`.`id`,`co`.`description`,`c`.`description`) AS `description`,if(`co`.`id`,`co`.`resolution`,`c`.`resolution`) AS `resolution`,if(`co`.`id`,`co`.`cost`,`c`.`cost`) AS `cost`,if(`co`.`id`,`co`.`meter`,`c`.`meter`) AS `meter`,if(`co`.`id`,`co`.`numeric`,`c`.`numeric`) AS `numeric`,if(`co`.`id`,`co`.`offset`,`c`.`offset`) AS `offset`,if(`co`.`id`,`co`.`adjust`,`c`.`adjust`) AS `adjust`,if(`co`.`id`,`co`.`unit`,`c`.`unit`) AS `unit`,if(`co`.`id`,`co`.`decimals`,`c`.`decimals`) AS `decimals`,if(`co`.`id`,`co`.`threshold`,`c`.`threshold`) AS `threshold`,if(`co`.`id`,`co`.`valid_from`,`c`.`valid_from`) AS `valid_from`,if(`co`.`id`,`co`.`valid_to`,`c`.`valid_to`) AS `valid_to`,if(`co`.`id`,`co`.`public`,`c`.`public`) AS `public`,if(`co`.`id`,`co`.`tags`,`c`.`tags`) AS `tags`,if(`co`.`id`,`co`.`extra`,`c`.`extra`) AS `extra`,if(`co`.`id`,`co`.`comment`,`c`.`comment`) AS `comment`,`t`.`id` AS `type_id`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,`t`.`read` AS `read`,`t`.`write` AS `write`,`t`.`graph` AS `graph`,if(`co`.`id`,`co`.`icon`,`c`.`icon`) AS `icon`,`ca`.`id` AS `alias`,`ta`.`id` AS `alias_of`,`ta`.`entity` AS `entity_of`,(((count(1) - 1) + (`n`.`lft` > 1)) + 1) AS `level`,round((((`n`.`rgt` - `n`.`lft`) - 1) / 2),0) AS `haschilds`,((((min(`p`.`rgt`) - `n`.`rgt`) - (`n`.`lft` > 1)) / 2) > 0) AS `lower`,((`n`.`lft` - max(`p`.`lft`)) > 1) AS `upper` from ((((((`pvlng_tree` `n` left join `pvlng_channel` `c` on((`n`.`entity` = `c`.`id`))) left join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) left join `pvlng_channel` `ca` on(((if(`t`.`childs`,`n`.`guid`,`c`.`guid`) = `ca`.`channel`) and (`ca`.`type` = 0)))) left join `pvlng_tree` `ta` on((`c`.`channel` = `ta`.`guid`))) left join `pvlng_channel` `co` on(((`ta`.`entity` = `co`.`id`) and (`c`.`type` = 0)))) join `pvlng_tree` `p`) where (((`n`.`lft` between `p`.`lft` and `p`.`rgt`) and (`p`.`id` <> `n`.`id`)) or (`n`.`lft` = 1)) group by `n`.`id` order by `n`.`lft`
     ';
 
     /**

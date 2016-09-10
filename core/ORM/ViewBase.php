@@ -184,8 +184,8 @@ abstract class ViewBase extends \slimMVC\ORM
     public function filterByNamePublic($name, $public)
     {
 
-        $this->filter[] = '`name` = '.$this->quote($name).'';
-        $this->filter[] = '`public` = '.$this->quote($public).'';
+        $this->filter[] = $this->field('name').' = '.$this->quote($name).'';
+        $this->filter[] = $this->field('public').' = '.$this->quote($public).'';
         return $this;
     }   // filterByNamePublic()
 
@@ -197,7 +197,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterBySlug($slug)
     {
-        $this->filter[] = '`slug` = '.$this->quote($slug);
+        $this->filter[] = $this->field('slug').' = '.$this->quote($slug);
         return $this;
     }   // filterBySlug()
 
@@ -209,7 +209,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = '`public` = '.$this->quote($public);
+        $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
     }   // filterByPublic()
 
@@ -221,7 +221,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -233,7 +233,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = '`data` = '.$this->quote($data);
+        $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
     }   // filterByData()
 
