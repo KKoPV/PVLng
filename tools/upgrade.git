@@ -20,10 +20,10 @@ function usage {
 echo
 echo -n 'Fetch last version from GitHub ... '
 
-git checkout $1 >/dev/null 2>&1
+git checkout $1
 rc=$?
 [ $rc -ne 0 ] && exit $rc
-git pull >/dev/null 2>&1
+git pull
 
 echo -e \\b\\b\\b\\b- done
 
@@ -40,7 +40,7 @@ dbsocket=$(dbconf Socket)
 
 dbname=$(dbconf Database)
 
-level=$(mysql $params -Ne 'SELECT `value` FROM `pvlng_config` WHERE `key`="DBPatchLevel"' $dbname)
+level=$(mysql $params -Ne 'SELECT `value` FROM `pvlng_config` WHERE `key` = "DBPatchLevel"' $dbname >/dev/null 2>&1)
 level=$((${level:-0}+0))
 
 e Actual database patch level is $level

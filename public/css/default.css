@@ -55,6 +55,30 @@ a:hover, a:active {
     padding-right: .4em;
 }
 
+.ui-resizable-s {
+    height: 4px;
+    border: 1px solid #aaaaaa;
+    border-radius: 4px;
+    background: #cccccc url(images/ui-bg_inset-hard_75_cccccc_1x100.png) 50% 50% repeat-x;
+}
+
+.ui-resizable-s div {
+    width: 30px;
+    position: absolute;
+    top: 1px;
+    left: 50%;
+    margin-left: -15px;
+    border-top: dotted 2px #333333;
+}
+
+#chart-wrapper {
+    margin-bottom: 1em;
+}
+
+#chart-wrapper .ui-resizable-handle {
+    display: none;
+}
+
 /* Go back to top link
 --------------------------------------------------------------------------- */
 .go-top {

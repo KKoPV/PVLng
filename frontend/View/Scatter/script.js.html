@@ -146,6 +146,8 @@ function updateChart(force) {
         /* (Re)Create chart */
         $('#'+chartOptions.chart.renderTo).css('height', ChartHeight);
         chart = new Highcharts.Chart(chartOptions);
+        /* Show splitter */
+        $('.ui-resizable-handle', '#chart-wrapper').show();
         /* Show zoom and pan help */
         $('#zoom-hint').show();
     }
@@ -377,17 +379,9 @@ var views = new function Views() {
  */
 $(function() {
 
-    /* If a chart height is provided as URL parameter "height", remember in cookie */
-    if (qs.height) {
-        /* A value of 0 will reset height and remove cookie */
-        if (qs.height == 0) {
-            pvlng.cookie.remove('ScatterHeight');
-        } else {
-            pvlng.cookie.set('ScatterHeight', ChartHeight = qs.height, 365);
-        }
-    } else {
-        if (h = pvlng.cookie.get('ScatterHeight')) ChartHeight = h;
-    }
+    var h = pvlng.cookie.get('ScatterHeight');
+
+    if (h) ChartHeight = h;
 
     /**
      * Highcharts localization defaults
@@ -530,6 +524,23 @@ $(function() {
         if (!qs.chart) $('#top-select').show();
         views.load(qs.chart, true);
     });
+
+    $('#chart-wrapper').resizable({
+        handles: 's',
+        grid: 25,
+        minHeight: 350,
+        resize: function( event, ui ) {
+            if (chart) {
+                $('#chart').css('height', ui.size.height);
+                chart.reflow();
+            }
+        },
+        stop: function( event, ui ) {
+            pvlng.cookie.set('ScatterHeight', ui.size.height, 365);
+        }
+    });
+
+    $('.ui-resizable-handle', '#chart-wrapper').hide().append($('<div/>')).prop('title', '{{DragToResize}}').tipTip();
 
     shortcut.add('Alt+P', function() { pvlng.changeDates(-1) });
     shortcut.add('Alt+N', function() { pvlng.changeDates(1) });

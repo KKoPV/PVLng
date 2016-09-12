@@ -557,13 +557,15 @@ function updateChart( force ) {
         chart = new Highcharts.Chart(chartOptions);
         /* Help chart with fluid layout to find its correct size */
         chart.reflow();
+        /* Show splitter */
+        $('.ui-resizable-handle', '#chart-wrapper').show();
         /* Show zoom and pan help */
         $('#zoom-hint').show();
 
         channels_chart = channels_new;
     }
 
-    chart.showLoading(chartLoading);
+    setTimeout(function() { chart.showLoading(chartLoading) }, 0);
 
     /* Scroll to navigation as top most visible element */
     pvlng.scroll('#nav');
@@ -944,21 +946,9 @@ $(function() {
         }
     );
 
-    if (!isEmbedded) {
-        /* If a chart height is provided as URL parameter "height", remember in cookie */
-        if (qs.height) {
-            /* A value of 0 will reset height and remove cookie */
-            if (qs.height == 0) {
-                pvlng.cookie.remove('ChartHeight');
-            } else {
-                pvlng.cookie.set('ChartHeight', ChartHeight = qs.height, 365);
-            }
-        } else {
-            if (h = pvlng.cookie.get('ChartHeight')) ChartHeight = h;
-        }
-    } else if (qs.height) {
-        ChartHeight = qs.height;
-    }
+    var h = pvlng.cookie.get('ChartHeight');
+
+    if (!isEmbedded && h) ChartHeight = h;
 
     /**
      * Highcharts localization defaults
@@ -1358,6 +1348,24 @@ $(function() {
             }
             return false;
         });
+    }
+
+    if (!isEmbedded) {
+        $('#chart-wrapper').resizable({
+            handles: 's',
+            grid: 25,
+            minHeight: 350,
+            resize: function( event, ui ) {
+                if (chart) {
+                    $('#chart').css('height', ui.size.height);
+                    chart.reflow();
+                }
+            },
+            stop: function( event, ui ) {
+                pvlng.cookie.set('ChartHeight', ChartHeight = ui.size.height, 365);
+            }
+        });
+        $('.ui-resizable-handle', '#chart-wrapper').hide().append($('<div/>')).prop('title', '{{DragToResize}}').tipTip();
     }
 
     shortcut.add('Alt+P', function() { pvlng.changeDates(-1) });

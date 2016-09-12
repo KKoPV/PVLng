@@ -29,7 +29,7 @@
 <input id="periodcnt" type="hidden" value="1">
 <input id="period" type="hidden" value="i">
 
-<div id="nav" class="ui-widget-header ui-corner-all" style="padding:.3em;height:2em">
+<div id="nav" class="ui-widget-header ui-corner-all" style="padding:.3em;height:2.2em">
 
     <!-- INCLUDE dateselect.inc.tpl -->
 
@@ -42,8 +42,10 @@
 
 <div class="clear"></div>
 
-<div id="chart">
-    <div id="top-select" style="display:none">{{NoChannelsSelectedYet}}</div>
+<div id="chart-wrapper">
+    <div id="chart">
+        <div id="top-select" style="display:none">{{NoChannelsSelectedYet}}</div>
+    </div>
 </div>
 
 <div class="clear"></div>

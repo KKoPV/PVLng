@@ -13,7 +13,7 @@
 <input type="hidden" id="todate" />
 
 <div id="nav" class="ui-widget-header ui-corner-all"
-     style="<!-- IF {EMBEDDED} < "2" -->padding:.3em;height:2em<!-- ELSE -->display:none<!-- ENDIF -->">
+     style="<!-- IF {EMBEDDED} < "2" -->padding:.3em;height:2.2em<!-- ELSE -->display:none<!-- ENDIF -->">
 
     <div class="alpha grid_6">
         <!-- INCLUDE dateselect.inc.tpl -->
@@ -31,8 +31,10 @@
 
 <div class="clear"></div>
 
-<div id="chart">
-    <div id="top-select" style="display:none">{{NoChannelsSelectedYet}}</div>
+<div id="chart-wrapper" style="margin-bottom:1em">
+    <div id="chart">
+        <div id="top-select" style="display:none">{{NoChannelsSelectedYet}}</div>
+    </div>
 </div>
 
 <div class="clear"></div>
