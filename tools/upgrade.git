@@ -78,3 +78,5 @@ if [ "$last" ]; then
 else
     e No patches required.
 fi
+
+echo

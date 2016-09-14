@@ -11,8 +11,11 @@
 /**
  *
  */
-$api->get('/status', $APIkeyRequired, function() use ($api) {
-
+$api->get(
+    '/status',
+    $APIkeyRequired,
+    function() use ($api)
+{
     $result = array(
         'version' => exec('cat /proc/version')
     );
@@ -22,7 +25,7 @@ $api->get('/status', $APIkeyRequired, function() use ($api) {
     // as well as the amount of time since then that the system has been idle.
     // Both are given as floating-point values, in seconds.
     $res = explode(' ', exec('cat /proc/uptime'));
-      if (!empty($res)) {
+        if (!empty($res)) {
             $result['uptime'] = array(
             'overall'         => +$res[0],
             'overall_minutes' => $res[0]/60,
@@ -41,8 +44,7 @@ $api->get('/status', $APIkeyRequired, function() use ($api) {
     // Total:        3676       1721       1955
     exec('free -mto', $res);
 
-    if (preg_match_all('~^(\w+): +(\S+) +(\S+) +(\S+)~m',
-                       implode("\n", $res), $args, PREG_SET_ORDER)) {
+    if (preg_match_all('~^(\w+): +(\S+) +(\S+) +(\S+)~m', implode("\n", $res), $args, PREG_SET_ORDER)) {
           foreach ($args as $arg) {
               $result['memory'][$arg[1]] = array(
                 'total_mb' => +$arg[2],
@@ -59,24 +61,24 @@ $api->get('/status', $APIkeyRequired, function() use ($api) {
     // These values represent the average system load in the last 1, 5 and 15 minutes,
     // the number of active and total scheduling entities (tasks) and
     // the PID of the last created process in the system.
-      $res = exec('cat /proc/loadavg');
-      if (preg_match('~([0-9.]+) ([0-9.]+) ([0-9.]+) (\d+)/(\d+)~', $res, $args)) {
-            $result['load'] = array(
-            'miutes_1'  => +$args[1],
-            'miutes_5'  => +$args[2],
-            'miutes_15' => +$args[3],
-            'active'    => +$args[4],
-            'total'     => +$args[5]
+    $res = exec('cat /proc/loadavg');
+    if (preg_match('~([0-9.]+) ([0-9.]+) ([0-9.]+) (\d+)/(\d+)~', $res, $args)) {
+        $result['load'] = array(
+            'minutes_1'  => +$args[1],
+            'minutes_5'  => +$args[2],
+            'minutes_15' => +$args[3],
+            'active'     => +$args[4],
+            'total'      => +$args[5]
         );
     }
 
     exec('cat /proc/cpuinfo', $res);
-    if (preg_match_all('~^([^\t]+)\s*:\s*(.+)$~m',
-                       implode("\n", $res), $args, PREG_SET_ORDER)) {
-          foreach ($args as $arg) {
-              $result['cpuinfo'][str_replace(' ', '_', $arg[1])] =
+
+    if (preg_match_all('~^([^\t]+)\s*:\s*(.+)$~m', implode("\n", $res), $args, PREG_SET_ORDER)) {
+        foreach ($args as $arg) {
+            $result['cpuinfo'][str_replace(' ', '_', $arg[1])] =
                 (string) +$arg[2] == $arg[2] ? +$arg[2] : $arg[2];
-          }
+        }
     }
 
     $api->response->headers->set('Content-Type', 'application/json');

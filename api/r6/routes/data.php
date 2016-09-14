@@ -310,6 +310,8 @@ $api->delete(
         $api->db->truncate($table);
     }
 
+    $this->db->query('UPDATE `pvlng_channel` SET `offset` = 0 WHERE `adjust`');
+
     \ORM\Settings::setCoreValue(null, 'EmptyDatabaseAllowed', 0);
 
     $api->stopAPI('All data deleted', 200);
