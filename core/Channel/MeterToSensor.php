@@ -45,10 +45,8 @@ class MeterToSensor extends Channel {
 
         $this->before_read($request);
 
-        if ($offset = self::$Grouping[$this->period[1]][0]) {
-            // Fetch additional row BEFORE start timestamp
-            $request['start'] = $this->start - $offset;
-        }
+        // Fetch additional row BEFORE start timestamp
+        $request['start'] = $this->start - self::$secondsPerPeriod[$this->period[1]];
 
         $buffer = $this->getChild(1)->read($request)->rewind();
         $last1 = $buffer->current();

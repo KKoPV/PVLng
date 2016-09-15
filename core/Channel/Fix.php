@@ -35,8 +35,8 @@ class Fix extends InternalCalc {
         if ($this->isChild) {
             $delta = 60;
         } else {
-            // Show pseudo reading at each consolidation range point or at least each hour
-            $delta = self::$Grouping[$this->period[1]][0] ?: 3600; // 1hr
+            // Show pseudo reading at each consolidation range point
+            $delta = self::$secondsPerPeriod[$this->period[1]];
         }
 
         while ($ts <= $this->end) {
