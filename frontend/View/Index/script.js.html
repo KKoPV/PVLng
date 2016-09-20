@@ -43,7 +43,7 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
     chartOptions = {
         /* Buffer some additional settings */
         common: {
-            scatter: { x: 0, y: -8 },
+            scatter: { x: -1, y: -8 },
             outline: { color: '#FFFFFF', opacity: 0.5, width: 3 /* px each side */ }
         },
         chart: {
@@ -152,8 +152,8 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
         },
         xAxis: {
             type: 'datetime',
-            minPadding: 0.01,
-            maxPadding: 0.01,
+            minPadding: 0.02,
+            maxPadding: 0.02,
             events: {
                 afterSetExtremes: function(event) {
                     var ex = this.getExtremes();
