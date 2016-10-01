@@ -56,13 +56,12 @@ while read f; do
 
         [ "$last" ] || echo
 
-        echo -n "- Apply patch $f ... "
+        echo "- Apply patch $f ... "
+        grep '^-- #' sql/patches/$f | cut -d' ' -f2-
         mysql $params $dbname <sql/patches/$f >/dev/null 2>&1
-        echo -e \\b\\b\\b\\b- done
 
         ### Remember last patch
         last=$patch
-
     fi
 
 done <$tmp
