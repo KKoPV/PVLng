@@ -890,6 +890,11 @@ abstract class Channel
         } else {
             throw new \Exception('Unknown aggregation period: ' . $request['period'], 400);
         }
+
+        // Childs without proper "grouping" can't calculated by parent channels
+        if ($this->isChild) {
+            self::$secondsPerPeriod[self::NO] = 10;
+        }
     }
 
     /**

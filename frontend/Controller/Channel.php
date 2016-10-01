@@ -591,7 +591,7 @@ class Channel extends \Controller {
 
                 // Boolean
                 case strpos($data['TYPE'], 'bool') === 0:
-                    /// Shortcuts without options
+                    // Shortcuts without options
                     if ($data['TYPE'] === 'bool' || $data['TYPE'] === 'bool-0' || $data['TYPE'] === 'boolean-0') {
                         // Defaults to 0
                         $data['TYPE'] = 'bool;0:no;1:yes';

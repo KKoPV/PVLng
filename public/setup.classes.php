@@ -332,9 +332,7 @@ class Composer extends SetupTask
         if (!file_exists($lock)) {
             $this->info('<tt>composer.lock</tt> missing');
             $this->info('Try to run Composer');
-            $cmd = 'composer --working-dir='.dirname($lock).' --no-dev update 2>&1';
-#            $this->info($this->code(shell_exec($cmd)));
-            exec($cmd);
+            exec('composer --working-dir='.dirname($lock).' --no-dev update 2>&1');
         }
 
         if (file_exists($lock)) {

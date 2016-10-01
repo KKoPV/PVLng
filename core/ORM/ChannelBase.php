@@ -1161,9 +1161,9 @@ abstract class ChannelBase extends \slimMVC\ORM
           `valid_from` double DEFAULT NULL COMMENT \'Numeric min. acceptable value\',
           `valid_to` double DEFAULT NULL COMMENT \'Numeric max. acceptable value\',
           `public` tinyint(1) unsigned NOT NULL DEFAULT \'1\' COMMENT \'Public channels don\'\'t need API key to read\',
-          `tags` text NOT NULL COMMENT \'scope:value tags, one per line\',
-          `extra` text NOT NULL COMMENT \'Not visible field for models to store extra info\',
-          `comment` text NOT NULL COMMENT \'Internal comment\',
+          `tags` text COMMENT \'scope:value tags, one per line\',
+          `extra` text COMMENT \'Not visible field for models to store extra info\',
+          `comment` text COMMENT \'Internal comment\',
           `icon` varchar(255) NOT NULL DEFAULT \'\',
           PRIMARY KEY (`id`),
           UNIQUE KEY `GUID` (`guid`),
@@ -1228,9 +1228,9 @@ abstract class ChannelBase extends \slimMVC\ORM
         'valid_from'  => true,
         'valid_to'    => true,
         'public'      => false,
-        'tags'        => false,
-        'extra'       => false,
-        'comment'     => false,
+        'tags'        => true,
+        'extra'       => true,
+        'comment'     => true,
         'icon'        => false
     );
 

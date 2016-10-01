@@ -217,14 +217,14 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     protected $createSQL = '
         CREATE TABLE `pvlng_reading_num` (
-          `id` smallint(5) unsigned NOT NULL,
-          `timestamp` int(10) unsigned NOT NULL,
-          `data` decimal(13,4) NOT NULL,
+          `id` smallint(5) unsigned NOT NULL DEFAULT \'0\',
+          `timestamp` int(10) unsigned NOT NULL DEFAULT \'0\',
+          `data` decimal(13,4) NOT NULL DEFAULT \'0.0000\',
           PRIMARY KEY (`id`,`timestamp`),
           KEY `timestamp` (`timestamp`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Numeric readings\'
         /*!50100 PARTITION BY LINEAR KEY (id)
-        PARTITIONS 25 */
+        PARTITIONS 50 */
     ';
 
     /**

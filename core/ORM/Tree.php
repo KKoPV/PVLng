@@ -127,8 +127,8 @@ class Tree extends TreeBase {
                    ROUND((`n`.`rgt` - `n`.`lft` - 1) / 2, 0)                AS `haschilds`,
                    ((MIN(`p`.`rgt`) - `n`.`rgt` - (`n`.`lft` > 1)) / 2) > 0 AS `lower`,
                    (`n`.`lft` - MAX(`p`.`lft`)) > 1                         AS `upper`
-              FROM `pvlng_tree` `n`
-              JOIN `pvlng_tree` `p` ON `n`.`lft` BETWEEN `p`.`lft` AND `p`.`rgt` AND (`p`.`id` <> `n`.`id` OR `n`.`lft` = 1)
+              FROM `pvlng_tree` `n` USE INDEX (PRIMARY) -- Force index for performance
+              JOIN `pvlng_tree` `p` ON `n`.`lft` >= `p`.`lft` AND `n`.`rgt` <= `p`.`rgt` AND (`p`.`id` <> `n`.`id` OR `n`.`lft` = 1)
               LEFT JOIN `pvlng_channel` `c` on `n`.`entity` = `c`.`id`
               LEFT JOIN `pvlng_type` `t` on `c`.`type` = `t`.`id`
               LEFT JOIN `pvlng_channel` `ca` on IF(`t`.`childs`,`n`.`guid`,`c`.`guid`) = `ca`.`channel` AND `ca`.`type` = 0

@@ -18,14 +18,12 @@ function usage {
 [ "$1" ] || usage
 
 echo
-echo -n 'Fetch last version from GitHub ... '
+echo 'Fetch last version from GitHub ... '
 
 git checkout $1
 rc=$?
 [ $rc -ne 0 ] && exit $rc
 git pull
-
-echo -e \\b\\b\\b\\b- done
 
 ### Extract MySQL credentials
 function dbconf {
@@ -40,7 +38,7 @@ dbsocket=$(dbconf Socket)
 
 dbname=$(dbconf Database)
 
-level=$(mysql $params -Ne 'SELECT `value` FROM `pvlng_config` WHERE `key` = "DBPatchLevel"' $dbname >/dev/null 2>&1)
+level=$(mysql $params -Ne 'SELECT `value` FROM `pvlng_config` WHERE `key` = "DBPatchLevel"' $dbname 2>/dev/null)
 level=$((${level:-0}+0))
 
 e Actual database patch level is $level

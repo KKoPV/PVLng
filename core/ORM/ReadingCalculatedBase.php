@@ -358,12 +358,12 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     protected $createSQL = '
         CREATE TABLE `pvlng_reading_tmp` (
-          `id` smallint(5) unsigned NOT NULL COMMENT \'pvlng_channel -> id\',
-          `start` int(10) unsigned NOT NULL COMMENT \'Generated for start .. end\',
-          `end` int(10) unsigned NOT NULL COMMENT \'Generated for start .. end\',
-          `lifetime` mediumint(8) unsigned NOT NULL COMMENT \'Lifetime of data\',
-          `uid` smallint(5) unsigned NOT NULL COMMENT \'Tempory data Id\',
-          `created` int(10) NOT NULL COMMENT \'Record created\',
+          `id` smallint(5) unsigned NOT NULL DEFAULT \'0\' COMMENT \'pvlng_channel -> id\',
+          `start` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'Generated for start .. end\',
+          `end` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'Generated for start .. end\',
+          `lifetime` mediumint(8) unsigned NOT NULL DEFAULT \'0\' COMMENT \'Lifetime of data\',
+          `uid` smallint(5) unsigned NOT NULL DEFAULT \'0\' COMMENT \'Tempory data Id\',
+          `created` int(10) NOT NULL DEFAULT \'0\' COMMENT \'Record created\',
           PRIMARY KEY (`id`,`start`,`end`),
           UNIQUE KEY `uid` (`uid`),
           KEY `created` (`created`)

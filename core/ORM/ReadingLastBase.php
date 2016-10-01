@@ -204,9 +204,9 @@ abstract class ReadingLastBase extends \slimMVC\ORM
      */
     protected $createSQL = '
         CREATE TABLE `pvlng_reading_last` (
-          `id` smallint(5) unsigned NOT NULL,
-          `timestamp` int(10) unsigned NOT NULL,
-          `data` varchar(50) NOT NULL,
+          `id` smallint(5) unsigned NOT NULL DEFAULT \'0\',
+          `timestamp` int(10) unsigned NOT NULL DEFAULT \'0\',
+          `data` varchar(50) NOT NULL DEFAULT \'\',
           PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Numeric readings\'
     ';

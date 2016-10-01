@@ -266,7 +266,7 @@ abstract class ViewBase extends \slimMVC\ORM
         CREATE TABLE `pvlng_view` (
           `name` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'Chart name\',
           `public` tinyint(1) unsigned NOT NULL DEFAULT \'0\' COMMENT \'View type (private/public/mobile)\',
-          `data` text NOT NULL COMMENT \'Serialized channel data\',
+          `data` text COMMENT \'Serialized channel data\',
           `slug` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'URL-save slug\',
           PRIMARY KEY (`name`,`public`),
           UNIQUE KEY `slug` (`slug`),
@@ -290,7 +290,7 @@ abstract class ViewBase extends \slimMVC\ORM
     protected $nullable = array(
         'name'   => false,
         'public' => false,
-        'data'   => false,
+        'data'   => true,
         'slug'   => false
     );
 
