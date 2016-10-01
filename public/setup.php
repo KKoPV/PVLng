@@ -44,16 +44,15 @@ $config = array(
      *
      */
     'PHPExtensions' => array(
-        'bcmath'   => array( 'BCMath support' ),
-        'curl'     => array( 'cURL support' ),
-        'gd'       => array( 'Image processing' ),
-        'json'     => array( 'JSON support' ),
-        'mbstring' => array( 'Multibyte Support' ),
-        'mysqli'   => array( 'MySQLi support' ),
-        'pcre'     => array( 'PCRE support' ),
-        'session'  => array( 'Session support' ),
-        'apc'      => array( 'Alternative PHP Cache (APC)', FALSE ), // not required, but recommended
-        'memcache' => array( 'Memcache', FALSE ), // not required, but recommended
+        'curl'     => array('cURL support'),
+        'gd'       => array('Image processing'),
+        'json'     => array('JSON support'),
+        'mbstring' => array('Multibyte Support'),
+        'mysqli'   => array('MySQLi support'),
+        'pcre'     => array('PCRE support'),
+        'session'  => array('Session support'),
+        'apc'      => array('Alternative PHP Cache (APC)', false), // not required, but recommended
+        'memcache' => array('Memcache', false), // not required, but recommended
     ),
 
     /**
