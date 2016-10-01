@@ -7,7 +7,7 @@
  * You can use any grid from http://960.gs - WITH 10 COLUMNS!
  */
 body {
-    max-width: 1200px;
+    max-width: 1260px;
     margin: 0 auto;
     /* Imprima load via font cache - https://jaicab.com/localFont/ */
     font-family: Imprima, Arial, sans-serif;
