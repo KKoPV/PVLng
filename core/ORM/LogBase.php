@@ -163,7 +163,7 @@ abstract class LogBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -175,7 +175,7 @@ abstract class LogBase extends \slimMVC\ORM
      */
     public function filterByTimestamp($timestamp)
     {
-        $this->filter[] = '`timestamp` = '.$this->quote($timestamp);
+        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
         return $this;
     }   // filterByTimestamp()
 
@@ -187,7 +187,7 @@ abstract class LogBase extends \slimMVC\ORM
      */
     public function filterByScope($scope)
     {
-        $this->filter[] = '`scope` = '.$this->quote($scope);
+        $this->filter[] = $this->field('scope').' = '.$this->quote($scope);
         return $this;
     }   // filterByScope()
 
@@ -199,7 +199,7 @@ abstract class LogBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = '`data` = '.$this->quote($data);
+        $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
     }   // filterByData()
 

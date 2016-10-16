@@ -9,9 +9,9 @@
  */
 -->
 
-<div id="footer" class="grid_10">
+<div id="footer" class="grid_10 xs">
 <div class="ui-widget-header ui-corner-all">
-    <div class="fl xs icons">
+    <div class="fl icons">
         &copy; 2012-{raw:YEAR} by
         <a href="http://pvlng.com/PhotoVoltaic_Logger_new_generation:About"
            class="tip" title="Knut Kohl PhotoVoltaics" target="_blank"
@@ -25,7 +25,9 @@
         v{VERSION}&nbsp;<span id="commit"></span>
     </div>
 
-    <div id="powered" class="s r">
+    <div class="extra fl"></div>
+
+    <div id="powered" class="r">
         <a href="http://php.net" target="_blank">
             <img src="/images/pix.gif" data-src="/images/php5-power-micro.png"
                  class="def tip" title="PHP {PHPVERSION}" alt="PHP {PHPVERSION}">

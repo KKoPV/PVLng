@@ -252,10 +252,10 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     public function filterByIdDateTimeDays($id, $date, $time, $days)
     {
 
-        $this->filter[] = '`id` = '.$this->quote($id).'';
-        $this->filter[] = '`date` = '.$this->quote($date).'';
-        $this->filter[] = '`time` = '.$this->quote($time).'';
-        $this->filter[] = '`days` = '.$this->quote($days).'';
+        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
+        $this->filter[] = $this->field('date').' = '.$this->quote($date).'';
+        $this->filter[] = $this->field('time').' = '.$this->quote($time).'';
+        $this->filter[] = $this->field('days').' = '.$this->quote($days).'';
         return $this;
     }   // filterByIdDateTimeDays()
 
@@ -267,7 +267,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByDays($days)
     {
-        $this->filter[] = '`days` = '.$this->quote($days);
+        $this->filter[] = $this->field('days').' = '.$this->quote($days);
         return $this;
     }   // filterByDays()
 
@@ -279,7 +279,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByDate($date)
     {
-        $this->filter[] = '`date` = '.$this->quote($date);
+        $this->filter[] = $this->field('date').' = '.$this->quote($date);
         return $this;
     }   // filterByDate()
 
@@ -291,7 +291,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByTime($time)
     {
-        $this->filter[] = '`time` = '.$this->quote($time);
+        $this->filter[] = $this->field('time').' = '.$this->quote($time);
         return $this;
     }   // filterByTime()
 
@@ -303,7 +303,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -315,7 +315,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByTariff($tariff)
     {
-        $this->filter[] = '`tariff` = '.$this->quote($tariff);
+        $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
         return $this;
     }   // filterByTariff()
 
@@ -327,7 +327,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = '`comment` = '.$this->quote($comment);
+        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
     }   // filterByComment()
 

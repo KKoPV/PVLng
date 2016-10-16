@@ -184,8 +184,8 @@ abstract class ViewBase extends \slimMVC\ORM
     public function filterByNamePublic($name, $public)
     {
 
-        $this->filter[] = '`name` = '.$this->quote($name).'';
-        $this->filter[] = '`public` = '.$this->quote($public).'';
+        $this->filter[] = $this->field('name').' = '.$this->quote($name).'';
+        $this->filter[] = $this->field('public').' = '.$this->quote($public).'';
         return $this;
     }   // filterByNamePublic()
 
@@ -197,7 +197,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterBySlug($slug)
     {
-        $this->filter[] = '`slug` = '.$this->quote($slug);
+        $this->filter[] = $this->field('slug').' = '.$this->quote($slug);
         return $this;
     }   // filterBySlug()
 
@@ -209,7 +209,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = '`public` = '.$this->quote($public);
+        $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
     }   // filterByPublic()
 
@@ -221,7 +221,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -233,7 +233,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = '`data` = '.$this->quote($data);
+        $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
     }   // filterByData()
 
@@ -266,7 +266,7 @@ abstract class ViewBase extends \slimMVC\ORM
         CREATE TABLE `pvlng_view` (
           `name` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'Chart name\',
           `public` tinyint(1) unsigned NOT NULL DEFAULT \'0\' COMMENT \'View type (private/public/mobile)\',
-          `data` text NOT NULL COMMENT \'Serialized channel data\',
+          `data` text COMMENT \'Serialized channel data\',
           `slug` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'URL-save slug\',
           PRIMARY KEY (`name`,`public`),
           UNIQUE KEY `slug` (`slug`),
@@ -290,7 +290,7 @@ abstract class ViewBase extends \slimMVC\ORM
     protected $nullable = array(
         'name'   => false,
         'public' => false,
-        'data'   => false,
+        'data'   => true,
         'slug'   => false
     );
 

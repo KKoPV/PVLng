@@ -9,9 +9,13 @@
  */
 -->
 
-<i class="fa fa-random tipbtn" style="margin-right:.5em"
-     onclick="$('.p-select').toggle();" tip="{{UseOwnConsolidation}}" /></i>
-<span class="p-select">{PRESETSELECT}</span>
+<button class="icon" onclick="$('.p-select').toggle();" tip="{{UseOwnConsolidation}}">
+    <i class="fa fa-random tipbtn"></i>
+</button>
+
+<span class="p-select">
+    {PRESETSELECT}
+</span>
 
 <span class="p-select" style="display:none">
     <input id="periodcnt" class="numbersOnly r" style="margin-right:.5em" type="text" value="1" size="2" />
@@ -19,5 +23,7 @@
 </span>
 
 <span style="margin-left:.5em">
-    <button id="btn-refresh" class="tip" title="{{ChartRefreshHint}}">{{Refresh}}</button>
+    <button id="btn-refresh" class="tip" title="{{ChartRefreshHint}}">
+        <i class="fa fa-refresh"></i>
+    </button>
 </span>

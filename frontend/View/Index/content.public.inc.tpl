@@ -34,7 +34,6 @@
             <td>
                 <input id="c{raw:ID}" class="channel" type="checkbox" style="display:none"
                        data-id="{raw:ID}" data-name="{NAME}" data-guid="{GUID}" data-unit="{UNIT}" />
-                <img id="s{raw:ID}" src="/images/spinner.gif" class="spinner" alt="o">
                 <!-- INCLUDE channel-details.inc.tpl -->
             </td>
             <td class="icons r">

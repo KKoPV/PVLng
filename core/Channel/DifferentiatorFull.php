@@ -28,7 +28,6 @@ class DifferentiatorFull extends Calculator {
         if ($childCnt == 0) {
             return $this->after_read(new \Buffer);
         }
-
         $this->meter = $childs[0]->meter;
         $buffer = $childs[0]->read($request);
 
@@ -42,6 +41,9 @@ class DifferentiatorFull extends Calculator {
 
             $next = $childs[$i]->read($request);
 
+            $cnt1 = count($buffer);
+            $cnt2 = count($next);
+
             $row1 = $buffer->rewind()->current();
             $row2 = $next->rewind()->current();
 
@@ -53,12 +55,13 @@ class DifferentiatorFull extends Calculator {
                 $key1 = $buffer->key();
                 $key2 = $next->key();
 
-                if ($key1 === $key2) {
+                if ($key1 === $key2 || $cnt1 == 1 && $cnt2 == 1) {
 
                     // Remember original row
                     $last = $row1;
 
-                    // same timestamp, combine
+                    // Same timestamp or only one row in both datasets
+                    // combine
                     $row1['data']        -= $row2['data'];
                     $row1['min']         -= $row2['min'];
                     $row1['max']         -= $row2['max'];
@@ -109,8 +112,6 @@ class DifferentiatorFull extends Calculator {
             // Set result to buffer for next loop
             $buffer = $result;
         }
-
-        $this->meter = FALSE;
 
         return $this->after_read($result);
     }

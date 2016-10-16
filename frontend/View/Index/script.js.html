@@ -15,11 +15,11 @@
 
 <script>
 
-var ChartHeight = {INDEX_CHARTHEIGHT},
-    RefreshTimeout = {INDEX_REFRESH},
-    isEmbedded = {EMBEDDED},
-    notifyLoadEach = {INDEX_NOTIFYEACH},
-    notifyLoadAll = {INDEX_NOTIFYALL},
+var ChartHeight = +'{INDEX_CHARTHEIGHT}',
+    RefreshTimeout = +'{INDEX_REFRESH}',
+    isEmbedded = +'{EMBEDDED}',
+    notifyLoadAll = +'{INDEX_NOTIFYALL}',
+    presetPeriods = '{INDEX_PRESETPERIODS}' || '--;1d;1d;1m',
     aborted = false,
     qs = {},
     chart = false,
@@ -29,7 +29,6 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
     updateActive = false,
     windowVisible = true,
     browserPrefix = null,
-    lastChanged = (new Date).getTime() / 1000 / 60,
     oTable,
     channels = {
         <!-- BEGIN DATA -->
@@ -39,21 +38,14 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
 
     tzOffset = {raw:TZOFFSET}, /* Timezone offset in seconds */
     tzOffsetToolTip = ((new Date()).getTimezoneOffset() * 60 + tzOffset) * 1000,
-
-    /**
-     * Scale timestamps down to full minute, hour, day, week, month, quarter or year
-     */
-    xResolution = {
-        i: 60,
-        h: 60 * 60,
-        d: 60 * 60 * 24,
-        w: 60 * 60 * 24 * 7,
-        m: 60 * 60 * 24 * 30,
-        q: 60 * 60 * 24 * 90,
-        y: 60 * 60 * 24 * 360
-    },
+    tooltipDate = new Date,
 
     chartOptions = {
+        /* Buffer some additional settings */
+        common: {
+            scatter: { x: -1, y: -8 },
+            outline: { color: '#FFFFFF', opacity: 0.5, width: 3 /* px each side */ }
+        },
         chart: {
             renderTo: 'chart',
             events: {
@@ -65,7 +57,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
                         .add();
                 },
                 redraw: function () {
-                    /* Date and time, but without seconds */
+                    /* Date and time without seconds */
                     this.renderer
                         .label((new Date).toLocaleString().slice(0,-3), 0, 16)
                         .attr({ fill: 'white', padding: 1 })
@@ -76,10 +68,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             panning: true,
             resetZoomButton: {
                 relativeTo: 'chart',
-                position: {
-                    x: -2,
-                    y: 7
-                }
+                position: { x: -2, y: 7 }
             },
             style: { fontFamily: 'inherit' }
         },
@@ -89,6 +78,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
             style: { opacity: 0.8 }
         },
         mapNavigation: {
+            /* For mouse wheel zoom */
             enabled: true,
             enableButtons: false
         },
@@ -106,13 +96,16 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
                 shadow: false,
                 fillOpacity: 0.2
             },
-            bar: { groupPadding: 0.1 }
+            bar: {
+                groupPadding: 0.1,
+                stacking: null
+            }
         },
-        title: { text: '' },
+        title: { text: '' /* Initial empty */ },
         tooltip: {
             useHTML: true,
             formatter: function() {
-                var body = '';
+                var title, body = '';
                 $.each(this.points, function(id, point) {
                     /* Show tooltip only for series with a unit */
                     if (point.series.tooltipOptions.valueSuffix == '') return;
@@ -138,11 +131,19 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
                           + '<td class="unit">' + point.series.tooltipOptions.valueSuffix
                           + '</td></tr>';
                 });
-                return (body)
-                     ? '<table id="chart-tooltip"><thead><tr><th colspan="3">' +
-                       (new Date(this.x+tzOffsetToolTip).toLocaleString()).replace(/:00$/, '') +
-                       '</th></tr></thead><tbody>' + body + '</tbody></table>'
-                     : null;
+                if (body) {
+                    tooltipDate.setTime(this.x + tzOffsetToolTip);
+                    title = tooltipDate.toLocaleString();
+                    if (period.value && period.value != 's') {
+                        /* At least full minute or more, remove the always :00 seconds */
+                        title = title.replace(/:00$/, '');
+                    }
+                    body = '<table id="chart-tooltip">' +
+                           '<thead><tr><th colspan="3">' + title + '</th></tr></thead>' +
+                           '<tbody>' + body + '</tbody>' +
+                           '</table>';
+                }
+                return body;
             },
             borderWidth: 0,
             shadow: true,
@@ -151,14 +152,16 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
         },
         xAxis: {
             type: 'datetime',
+            minPadding: 0.02,
+            maxPadding: 0.02,
             events: {
                 afterSetExtremes: function(event) {
                     var ex = this.getExtremes();
                     if (ex.dataMax - ex.dataMin > event.max - event.min) {
-                        // Zoomed in
+                        /* Zoomed in */
                         if (!chart.resetZoomButton) chart.showResetZoom();
                     } else {
-                        // Full zoomed out, but make sure all is reset correct
+                        /* Full zoomed out, but make sure all is reset correct */
                         chart.zoomOut();
                     }
                 }
@@ -172,6 +175,7 @@ var ChartHeight = {INDEX_CHARTHEIGHT},
 var views = new function Views() {
     this.views = {};
     this.actual = { slug: '', name: '', public: 0 };
+    this.preset = '';
 
     this.fetch = function( callback ) {
         this.views = {};
@@ -200,8 +204,8 @@ var views = new function Views() {
 
         /* Build optgroups */
         $.each(this.views, function(id, view) {
-            /* Collect in groups */
-            optgroups[view.public].push(view);
+            /* Collect in groups, ignore scatter charts */
+            if (optgroups[view.public]) optgroups[view.public].push(view);
         });
 
         $('<option/>').appendTo(el);
@@ -229,7 +233,7 @@ var views = new function Views() {
             PVLngAPI + 'view/'+slug+'.json',
             function(data) {
 
-                var expanded = tree.expanded, preset;
+                var expanded = tree.expanded;
                 if (!expanded) tree.toggle(true);
 
                 views.views[slug].data = data;
@@ -241,7 +245,7 @@ var views = new function Views() {
                 /* ... re-check all channels in view */
                 $.each(views.actual.data, function (id, p) {
                     if (id == 'p') {
-                        preset = p;
+                        views.preset = p;
                     } else {
                         $('#c'+id).val(p).iCheck('check');
                     }
@@ -254,7 +258,7 @@ var views = new function Views() {
                 $('#saveview').val(views.actual.name);
                 $('#visibility').val(views.actual.public).trigger('change');
                 $('#modified').hide();
-                $('#preset').val(preset).trigger('change'); /* Reloads chart */
+                $('#preset').val(views.preset).trigger('change'); /* Reloads chart */
             }
         ).fail(function( jqXHR, textStatus ) {
             alert( "Request failed: " + textStatus );
@@ -357,6 +361,8 @@ function ChartDialog( id ) {
     $('#d-position').text(p.position);
     $('#d-position-slider').slider('value', p.position);
     $('#d-outline').prop('checked', p.outline);
+    $('#d-stack').val(p.stack);
+    $('#d-decimals').val(p.decimals);
 
     /* Update only in context of dialog chart */
     $('input.iCheck', '#dialog-chart').iCheck('update').trigger('ifToggled');
@@ -378,8 +384,6 @@ function updateChart( force ) {
 
     updateActive = true;
 
-    $('.spinner').hide();
-
     var fromDate = $('#fromdate').val(),
         toDate = $('#todate').val(),
         period_count = +$('#periodcnt').val(),
@@ -387,8 +391,8 @@ function updateChart( force ) {
         ts = (new Date).getTime(),
         channels_new = [], yAxisMap = [], yAxis = [],
         channel, channel_clone, buffer = [],
-        res = xResolution[period] ? xResolution[period] : 1,
-        expanded = tree.expanded;
+        expanded = tree.expanded,
+        stacked = false;
 
     /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
     if ($.ajaxQ.abortAll() != 0) force = true;
@@ -400,15 +404,13 @@ function updateChart( force ) {
                  ? 'date=' + fromDate
                  : 'from=' + fromDate + '&to=' + toDate;
 
-        $('#btn-permanent').button({
-            label: views.actual.name + ' ' + from + ' | {strip_tags:TITLE}',
-            disabled: (views.actual.slug == '')
-        }).prop('href', '/chart/' + views.actual.slug + encodeURI('?' + date));
+        $('#btn-bookmark')
+            .button({ disabled: (views.actual.slug == '') })
+            .prop('href', '/chart/' + views.actual.slug);
 
-        $('#btn-bookmark').button({
-            label: views.actual.name + ' | {strip_tags:TITLE}',
-            disabled: (views.actual.slug == '')
-        }).prop('href', '/chart/' + views.actual.slug);
+        $('#btn-permanent')
+            .button({ disabled: (views.actual.slug == '') })
+            .prop('href', '/chart/' + views.actual.slug + encodeURI('?' + date));
     }
 
     /* Show all rows to reset consumption and cost columns */
@@ -503,6 +505,12 @@ function updateChart( force ) {
         if (!yAxis[channel.axis].title && channel.unit) {
             yAxis[channel.axis].title = { text: channel.unit };
         }
+
+        if (channel.type == 'bar') {
+            stacked = stacked || channel.stack;
+            /* If channel have no stack, set to unique pseudo stack */
+            if (!channel.stack) channel.stack = pvlng.guid('stack');
+        }
     });
 
     /* Any channels checked for drawing? */
@@ -513,19 +521,14 @@ function updateChart( force ) {
 
     $.wait();
 
-    /* Scroll to navigation as top most visible element */
-    pvlng.scroll('#nav');
-
     pvlng.log('Channels', channels_new);
     pvlng.log('yAxis', yAxis);
 
-    /* check for changed channels */
-    var changed = false, now = (new Date).getTime() / 1000 / 60;
+    /* Check for changed channels */
+    var changed = false;
 
-    /* renew chart at least each half hour to auto adjust axis ranges by Highcharts */
-    if (force || channels_new.length != channels_chart.length || now - lastChanged > 30) {
+    if (force || channels_new.length != channels_chart.length) {
         changed = true;
-        lastChanged = now;
     } else {
         for (var i=0, l=channels_new.length; i<l; i++) {
             if (channels_new[i]._hash != channels_chart[i]._hash) {
@@ -547,283 +550,302 @@ function updateChart( force ) {
         chartOptions.yAxis = yAxis;
         chartOptions.exporting = { filename: views.actual.slug };
 
+        chartOptions.plotOptions.bar.stacking = stacked ? 'normal' : null;
+
         /* (Re)Create chart */
+        $('#'+chartOptions.chart.renderTo).css('height', ChartHeight).show();
         chart = new Highcharts.Chart(chartOptions);
-        /* Help chart with fluid layout to find its correct size... */
+        /* Help chart with fluid layout to find its correct size */
         chart.reflow();
+        /* Show splitter */
+        $('.ui-resizable-handle', '#chart-wrapper').show();
         /* Show zoom and pan help */
         $('#zoom-hint').show();
 
         channels_chart = channels_new;
     }
 
+    setTimeout(function() { chart.showLoading(chartLoading) }, 0);
+
+    /* Scroll to navigation as top most visible element */
+    pvlng.scroll('#nav');
+
     var f = $('#from').val(), t = $('#to').val();
+
     if (f != t) f += ' - ' + t;
+
     chart.setTitle({ text: $('<div/>').html(views.actual.name).text() }, { text: f });
 
-    chart.showLoading(chartLoading);
+    var series = [],
+        costs = 0,
+        date = new Date(),
+        today = ('0'+(date.getMonth()+1)).substr(-2) + '/' +
+                ('0'+date.getDate()).substr(-2) + '/' +
+                date.getFullYear(),
+        deferred = [];
 
-    var series = [], costs = 0, date = new Date(), AJAXcount = 0,
-        today = ('0'+(date.getMonth()+1)).slice(-2) + '/' +
-                ('0'+date.getDate()).slice(-2) + '/' + date.getFullYear();
-
-    /* get data */
+    /* Build deferred array to get data */
     $(channels_chart).each(function(id, channel) {
 
-        channel._ts = date.getTime();
-
-        /* Count channel AJAX calls */
-        AJAXcount++;
-
-        $('#s'+channel._id).show();
-
-        var url = PVLngAPI + 'data/' + channel.guid + '.json',
-            start = fromDate,
-            end = toDate + '+1day';
-
-        if (channel.daylight && today == toDate) {
-            start = 'sunrise;' + channel.daylight_grace;
-            end   = 'sunset;'  + channel.daylight_grace;
-        }
+        var url = PVLngAPI + 'data/' + channel.guid + '.json', start, end;
 
         pvlng.log('Fetch', channel.name, url);
 
-        $.getJSON(
-            url,
-            {
+        if (channel.daylight && today == fromDate && today == toDate) {
+            /* Only today */
+            start = 'sunrise;' + channel.daylight_grace;
+            end   = 'sunset;'  + channel.daylight_grace;
+        } else {
+            start = fromDate;
+            end   = toDate + '+1day';
+        }
+
+        deferred.push(
+            $.getJSON(url, {
                 attributes: true,
                 full:       true,
                 start:      start,
                 end:        end,
                 period:     (channel.type != 'scatter') ? period_count + period : '',
                 _canAbort:  true,
-                _ts:        channel._ts // Force fresh fetch
-            },
-            function(data) {
+                _ts:        date.getTime() /* Force fresh fetch */
+            })
+        );
+    });
 
-                if (aborted) return;
+    console.time('Fetch data');
 
-                try {
-                    /* pop out 1st row with attributes */
-                    attr = data.shift();
-                } catch(err) {
-                    console.error(data);
-                    return;
-                }
+    /* Handle resoved deferred */
+    $.when.apply($, deferred).done(function() {
 
-                pvlng.log('Attributes', attr);
-                pvlng.log('Data', data);
+        if (aborted) return;
 
-                if (attr.consumption) {
-                    $('#cons'+channel._id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
-                }
+        if (channels_chart.length <= 1) {
+            arguments = [ arguments ];
+        }
 
-                if (attr.costs) {
-                    costs += +attr.costs.toFixed(CurrencyDecimals);
-                    $('#costs'+channel._id).html(CurrencyFormat.replace('{}', Highcharts.numberFormat(attr.costs, CurrencyDecimals)));
-                }
+        var data, textStatus, jqXHR, channel, t;
 
-                /* Add channel description if chart name NOT still contains it */
-                t = (String(views.actual.name).toLowerCase().indexOf(String(attr.description).toLowerCase()) == -1)
-                  ? ' (' + attr.description + ')'
-                  : '';
+        for (var arg = 0; arg < arguments.length; arg++) {
 
-                var serie = {
-                    color: channel.color,
-                    data: [],
-                    id: channel.id,
-                    /* Force legend color! */
-                    legendColor: channel.color,
-                    linkedTo: channel.linkedTo,
-                    /* HTML decode channel name */
-                    name: $('<div/>').html(attr.name + t).text(),
-                    showInLegend: channel.legend,
-                    type: channel.type,
-                    visible: !channel.hidden,
-                    yAxis: channel.axis,
-                    zIndex: channel.zIndex,
-                    /* Own properties */
-                    colorDiff: channel.colorusediff,
-                    decimals: attr.decimals,
-                    guid: channel.guid,
-                    unit: attr.unit,
-                    raw: (period == '')
-                };
+            /* Split argument */
+            data       = arguments[arg][0];
+            textStatus = arguments[arg][1];
+            jqXHR      = arguments[arg][2];
+            channel = channels_chart[arg];
 
-                if (channel.colorusediff !== 0) {
-                    if (channel.colorusediff === 1) {
-                        /* Other color for values above threshold > switch colors! */
-                        serie.color         = channel.colordiff;
-                        serie.negativeColor = channel.color;
-                    } else {
-                        /* Other color for values below threshold */
-                        serie.negativeColor = channel.colordiff;
-                    }
-                    serie.threshold = channel.threshold || 0;
-                }
-
-                serie.tooltip = { valueSuffix: attr.unit ? attr.unit : '' };
-
-                if (channel.type == 'scatter') {
-                    if (attr.marker) serie.marker = { symbol: 'url('+attr.marker+')' };
-                    serie.dataLabels = {
-                        enabled: true,
-                        formatter: function() {
-                            /* Switch for non-numeric / numeric channels */
-                            return typeof this.point.name != 'undefined'
-                                 ? this.point.name
-                                 : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
-                        }
-                    };
-                    if (attr.unit.trim() == '') {
-                        /* Mostly non-numeric channels */
-                        serie.dataLabels.align = 'left';
-                        serie.dataLabels.rotation = 270;
-                        serie.dataLabels.style = { textShadow: 0 };
-                        /* Move a bit */
-                        serie.dataLabels.y = -8;
-                    }
-                } else if (channel.type != 'bar') {
-                    if (channel.style != 'Solid') serie.dashStyle = channel.style;
-                    serie.lineWidth = channel.width;
-                }
-
-                if (channel.outline) {
-                    serie.shadow = {
-                        /* No offset, draw a semitransparent shadow
-                           of 3px on each side of serie */
-                        color: '#FFFFFF', offsetX: 0, offsetY: 0,
-                        opacity: 0.5, width: serie.lineWidth + 6
-                    };
-                }
-
-                $(data).each(function(id, row) {
-                    if (channel.type == 'scatter') {
-                        /* Show scatters at their real timestamps, ALSO for consolidated data */
-                        var point = { x: row.timestamp * 1000 };
-                    } else {
-                        var point = { x: Math.round(row.timestamp / res) * res * 1000 };
-                    }
-
-                    /* Check time range channels, only if not full day 00:00 .. 24:00 */
-                    if (channel.time2-channel.time1 < 86400 && fromDate == toDate) {
-                        /* Get todays seconds from timestamp */
-                        date.setTime(row.timestamp * 1000);
-                        var time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
-                        /* Skip data outside display time range */
-                        if (time < channel.time1 || time > channel.time2) return;
-                    }
-
-                    if ($.isNumeric(row.data)) {
-                        if (channel.type == 'areasplinerange') {
-                            point.low  = row.min;
-                            point.high = row.max;
-                        } else {
-                            if (!channel.all) {
-                                point.y = channel.consumption ? row.consumption : row.data;
-                            } else {
-                                /* Format data label */
-                                point.y = +(channel.consumption ? row.consumption : row.data).toFixed(attr.decimals);
-                                point.dataLabels = { enabled: true };
-                            }
-                        }
-                    } else {
-                        point.y = 0;
-                        var n = (row.data+'|').split('|');
-                        point.name = channel.all ? n[0] : '';
-                        if (n[1]) {
-                            // Own marker symbol
-                            point.marker = { symbol: 'url('+n[1]+')' };
-                        }
-                    }
-
-                    serie.data.push(point);
-                });
-
-                pvlng.log('Serie', serie);
-
-                if (!channel.all && (channel.min || channel.max || channel.last)) {
-                    serie = setMinMax(serie, channel);
-                }
-
-                if (!changed) {
-                    var s = chart.get(serie.id);
-                    /* Replace data direct in existing chart data */
-                    s.setData(serie.data, false);
-                    /* Do we have raw data? Only then deletion of reading value is possible */
-                    s.options.raw = (period == '');
-                } else {
-                    series[serie.id] = serie;
-                }
-
-                if (!isEmbedded && notifyLoadEach) $.pnotify({
-                    type: 'success',
-                    text: attr.name + ' loaded ' +
-                          '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
-                });
-            }
-        ).fail(function(jqXHR, textStatus, error) {
-            if (textStatus == 'abort' || (jqXHR.status == 404 && textStatus == 'error')) {
+            if (textStatus == 'abort') {
                 /* Aborted during loading */
                 aborted = true;
-            } else {
+                return;
+            } else if (jqXHR.status >= 400) {
+                console.error(jqXHR);
+/*
                 $.pnotify({
                     type: textStatus,
                     text: error + "\n" + (jqXHR.responseJSON ? jqXHR.responseJSON.message : jqXHR.responseText),
                     hide: false
                 });
+*/
                 /* Set pseudo channel */
-                series[id] = {};
-            }
-        }).always(function(data, status) {
-
-            /* Another AJAX call is done */
-            --AJAXcount;
-            if (aborted) {
-                updateActive = false;
+                series[channel.id] = {};
                 return;
             }
 
-            $('#s'+channel._id).hide();
+            try {
+                /* Pop out 1st row with attributes */
+                attr = data.shift();
+            } catch(err) {
+                console.error(data);
+                return;
+            }
+
+            pvlng.log('Attributes', attr);
+            pvlng.log('Data', data);
+
+            if (attr.consumption) {
+                $('#cons'+channel._id).html(Highcharts.numberFormat(attr.consumption, attr.decimals));
+            }
+
+            if (attr.costs) {
+                costs += +attr.costs.toFixed(CurrencyDecimals);
+                $('#costs'+channel._id).html(CurrencyFormat.replace('{}', Highcharts.numberFormat(attr.costs, CurrencyDecimals)));
+            }
+
+            /* Add channel description if chart name NOT still contains it */
+            t = (views.actual.name.toLowerCase().indexOf(attr.description.toLowerCase()) == -1)
+              ? attr.name + ' (' + attr.description + ')'
+              : attr.name;
+
+            var serie = {
+                data:           [],
+                color:          channel.color,
+                id:             channel.id,
+                legendColor:    channel.color, /* Force legend color! */
+                linkedTo:       channel.linkedTo,
+                name:           $('<div/>').html(t).text(), /* HTML decode channel name */
+                showInLegend:   channel.legend,
+                stack:          channel.stack,
+                type:           channel.type,
+                visible:        !channel.hidden,
+                yAxis:          channel.axis,
+                zIndex:         channel.zIndex,
+                /* Own properties */
+                colorDiff:      channel.colorusediff,
+                decimals:       channel.decimals == '' ? attr.decimals : +channel.decimals,
+                guid:           channel.guid,
+                unit:           attr.unit,
+                raw:            (period == '')
+            };
+
+            if (channel.colorusediff !== 0) {
+                if (channel.colorusediff === 1) {
+                    /* Color for values above threshold > switch colors! */
+                    serie.color         = channel.colordiff;
+                    serie.negativeColor = channel.color;
+                } else /* -1 */ {
+                    /* Color for values below threshold */
+                    serie.negativeColor = channel.colordiff;
+                }
+                serie.threshold = channel.threshold || 0;
+            }
+
+            serie.tooltip = { valueSuffix: attr.unit ? attr.unit : '' };
+
+            if (channel.type == 'scatter') {
+                if (attr.marker) serie.marker = { symbol: 'url('+attr.marker+')' };
+                serie.dataLabels = {
+                    enabled: true,
+                    formatter: function() {
+                        /* Switch for non-numeric / numeric channels */
+                        return typeof this.point.name != 'undefined'
+                             ? this.point.name
+                             : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
+                    }
+                };
+                if (attr.unit.trim() == '') {
+                    /* Mostly non-numeric channels */
+                    serie.dataLabels.align = 'left';
+                    serie.dataLabels.rotation = 270;
+                    serie.dataLabels.style = { textShadow: 0 };
+                    /* Move a bit */
+                    serie.dataLabels.x = chart.options.common.scatter.x;
+                    serie.dataLabels.y = chart.options.common.scatter.y;
+                }
+            } else if (channel.type != 'bar') {
+                if (channel.style != 'Solid') {
+                    serie.dashStyle = channel.style;
+                }
+                serie.lineWidth = channel.width;
+            }
+
+            if (channel.outline) {
+                serie.shadow = {
+                    color: chart.options.common.outline.color,
+                    offsetX: 0,
+                    offsetY: 0,
+                    opacity: chart.options.common.outline.opacity,
+                    width: serie.lineWidth + 2*chart.options.common.outline.width
+                };
+            }
+
+            /* Analyse data */
+            $(data).each(function(id, row) {
+                var point = { x: row.timestamp * 1000 };
+
+                /* Check time range channels, only if not full day 00:00 .. 24:00 */
+                if (channel.time2-channel.time1 < 86400 && fromDate == toDate) {
+                    /* Get todays seconds from timestamp */
+                    date.setTime(row.timestamp * 1000);
+                    var time = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds();
+                    /* Skip data outside display time range */
+                    if (time < channel.time1 || time > channel.time2) return;
+                }
+
+                if ($.isNumeric(row.data)) {
+                    if (channel.type == 'areasplinerange') {
+                        point.low  = row.min;
+                        point.high = row.max;
+                    } else {
+                        if (!channel.all) {
+                            point.y = channel.consumption ? row.consumption : row.data;
+                        } else {
+                            /* Format data label */
+                            point.y = +(channel.consumption ? row.consumption : row.data).toFixed(serie.decimals);
+                            point.dataLabels = { enabled: true };
+                        }
+                    }
+                } else {
+                    point.y = 0;
+                    var n = (row.data+'|').split('|');
+                    point.name = channel.all ? n[0] : '';
+                    if (n[1]) {
+                        /* Own marker symbol */
+                        point.marker = { symbol: 'url('+n[1]+')' };
+                    }
+                }
+
+                serie.data.push(point);
+            });
+
+            pvlng.log('Serie', serie);
+
+            if (!channel.all && (channel.min || channel.max || channel.last)) {
+                serie = setMinMax(serie, channel);
+            }
+
+            if (!changed) {
+                var s = chart.get(serie.id);
+                /* Replace data direct in existing chart data */
+                s.setData(serie.data, false);
+                /* Do we have raw data? Only then deletion of reading value is possible */
+                s.options.raw = (period == '');
+            } else {
+                series[serie.id] = serie;
+            }
 
             $('#cons'+channel._id).prop('title', 'loaded in ' + ((new Date).getTime() - channel._ts) + ' ms').tipTip();
 
-            /* All calls are done on AJAXcount == 0 */
-            if (AJAXcount > 0) return;
-
-            if (!isEmbedded && notifyLoadAll) $.pnotify({
-                type: 'success',
-                text: channels_chart.length + ' {{ChannelsLoaded}} ' +
-                      '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
-            });
-
             $('#costs').html(costs ? CurrencyFormat.replace('{}', Highcharts.numberFormat(costs, CurrencyDecimals)) : '');
+        }
 
-            if (changed) {
-                /* Remove all existing series */
-                for (var i=chart.series.length-1; i>=0; i--) {
-                    chart.series[i].remove(false);
-                }
-                /* Add new series */
-                $.each(series, function(i, serie) {
-                    /* Valid channel with id */
-                    if (serie) chart.addSeries(serie, false);
-                });
-            }
+    }).always(function(data, status) {
 
-            if ($('#cb-autorefresh').is(':checked') && RefreshTimeout > 0) {
-                updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
-            }
+        updateActive = false;
 
-            /* Redraw independent from other DOM changes via setTimeout */
-            setTimeout(function() {
-                chart.hideLoading();
-                chart.redraw();
-                $.wait(false);
-                updateActive = false;
-            }, 0);
+        if (aborted) {
+            chart.hideLoading();
+            $.wait(false);
+            return;
+        }
 
+        if (!isEmbedded && notifyLoadAll) $.pnotify({
+            type: 'success',
+            text: channels_chart.length + ' {{ChannelsLoaded}} ' +
+                  '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
         });
+
+        if (changed) {
+            /* Remove all existing series */
+            for (var i=chart.series.length-1; i>=0; i--) {
+                chart.series[i].remove(false);
+            }
+            /* Add new series */
+            $.each(series, function(i, serie) {
+                /* Valid channel with id */
+                if (serie) chart.addSeries(serie, false);
+            });
+        }
+
+        if ($('#cb-autorefresh').is(':checked') && RefreshTimeout > 0) {
+            updateTimeout = setTimeout(updateChart, RefreshTimeout*1000);
+        }
+
+        chart.redraw();
+        chart.hideLoading();
+        $.wait(false);
+
+        console.timeEnd('Fetch data');
     });
 }
 
@@ -878,6 +900,27 @@ $(function() {
             /* Scroll to tabs as top most visible element */
             if (ui.newPanel.length && ui.newPanel.prop('id') == 'tabs-1') pvlng.scroll('#tabs');
         });
+        $('#tabs').on('tabsbeforeactivate', function(e, ui) {
+            if (ui.newTab.data('action') == 'reset') {
+                $('#'+chartOptions.chart.renderTo).hide();
+                /* Uncheck all channels and ... */
+                $('input.channel').iCheck('uncheck').val('');
+                $('tr.channel').removeClass('checked');
+                /* Clear chart select and input */
+                views.actual.name = '';
+                $('#load-delete-view').val('').trigger('change');
+                $('#saveview').val('');
+                $('#visibility').val(0);
+                tree.toggle(true);
+                if (chart) {
+                    chart.destroy();
+                    $('#zoom-hint, #modified').hide();
+                }
+                /* Show channels tab */
+                $('.ui-tabs').tabs('option', 'active', 0);
+                return false;
+            }
+        });
     });
 
     /**
@@ -903,66 +946,9 @@ $(function() {
         }
     );
 
-    qs = $.parseQueryString();
+    var h = pvlng.cookie.get('ChartHeight');
 
-    /* Refesh timeout */
-    if (qs.refresh) {
-        RefreshTimeout = qs.refresh;
-    }
-
-    if (!isEmbedded) {
-        /* If a chart height is provided as URL parameter "height", remember in cookie */
-        if (qs.height) {
-            /* A value of 0 will reset height and remove cookie */
-            if (qs.height == 0) {
-                pvlng.cookie.remove('ChartHeight');
-            } else {
-                pvlng.cookie.set('ChartHeight', ChartHeight = qs.height);
-            }
-        } else {
-            if (h = pvlng.cookie.get('ChartHeight')) ChartHeight = h;
-        }
-    } else if (qs.height) {
-        ChartHeight = qs.height;
-    }
-
-    chartOptions.chart.height = ChartHeight;
-
-    var dFrom, dTo;
-    if (qs.from && qs.to) {
-        dFrom = new Date(qs.from.substr(0,1) != '-' ? qs.from : (new Date()).getTime() + qs.from * 24*60*60 * 1000);
-        dTo   = new Date(qs.to.substr(0,1)   != '+' ? qs.to   : (new Date()).getTime() + qs.to * 24*60*60 * 1000);
-    } else if (qs.date) {
-        dFrom = dTo = new Date(qs.date);
-    } else {
-        dFrom = dTo = new Date();
-    }
-
-    $("#from").datepicker({
-        altField: '#fromdate',
-        altFormat: 'mm/dd/yy',
-        maxDate: 0,
-        showButtonPanel: true,
-        showWeek: true,
-        changeMonth: true,
-        changeYear: true,
-        onClose: function( selectedDate ) {
-            $("#to").datepicker( "option", "minDate", selectedDate );
-        }
-    }).datepicker('setDate', dFrom);
-
-    $("#to").datepicker({
-        altField: '#todate',
-        altFormat: 'mm/dd/yy',
-        maxDate: 3,
-        showButtonPanel: true,
-        showWeek: true,
-        changeMonth: true,
-        changeYear: true,
-        onClose: function( selectedDate ) {
-            $("#from").datepicker( "option", "maxDate", selectedDate );
-        }
-    }).datepicker('setDate', dTo);
+    if (!isEmbedded && h) ChartHeight = h;
 
     /**
      * Highcharts localization defaults
@@ -1028,7 +1014,6 @@ $(function() {
             })
             /* Put the hint onto parent div injected by iCheck around the checkbox */
             .parent().prop('title', '{{ChartAutoRefresh}}').tipTip();
-
     }
 
     /**
@@ -1068,6 +1053,8 @@ $(function() {
                 p.hidden = $('#d-hidden').is(':checked');
                 p.position = +$('#d-position').text();
                 p.outline = $('#d-outline').is(':checked');
+                p.stack = p.type == 'bar' ? $('#d-stack').val() : '';
+                p.decimals = $('#d-decimals').val();
 
                 p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
                 p.time2 = SecToTimeStr(TimeStrToSec($('#d-time2').val(), 24));
@@ -1110,24 +1097,28 @@ $(function() {
      *
      */
     $('#d-type').change(function() {
-        var notBar = $('.not-bar'), notScatter = $('.not-scatter');
+        var onlyBar = $('.only-bar'),
+            notBar = $('.not-bar'),
+            notScatter = $('.not-scatter');
 
         /* Reset all */
-        notBar.removeClass('disabled');
+        notBar.show();
         notBar.find('input, select').prop('disabled', false);
+        onlyBar.hide();
 
-        notScatter.removeClass('disabled');
+        notScatter.show();
         notScatter.find('input, select').prop('disabled', false);
 
         /* Disable all invalid options for given type */
         if (this.value == 'bar') {
-            notBar.addClass('disabled');
+            onlyBar.show();
+            notBar.hide();
             notBar.find('input[type="checkbox"]').prop('checked', false);
             notBar.find('input, select').prop('disabled', true);
             /* Set different color flag no none */
             $('#d-color-use-diff').prop('checked', true);
         } else if (this.value == 'scatter') {
-            notScatter.addClass('disabled');
+            notScatter.hide();
             notScatter.find('input[type="checkbox"]').prop('checked', false);
             notScatter.find('input, select').prop('disabled', true);
             /* Set different color flag no none */
@@ -1187,20 +1178,11 @@ $(function() {
         updateChart(event.shiftKey);
     });
 
-    $('#btn-permanent').button({
-        icons: { primary: 'ui-icon-image' }, text: false
-    });
-
-    $('#btn-bookmark').button({
-        icons: { primary: 'ui-icon-bookmark' },
-        text: false
-    });
+    $('#btn-bookmark, #btn-permanent').button();
 
     $('#treetoggle').click(function() { tree.toggle() });
 
-    $('#btn-load').button({
-        icons: { primary: 'ui-icon-folder-open' }, text: false
-    }).click(function(event) {
+    $('#btn-load').on('click', function(event) {
         $.wait();
         $(this).button('disable');
         if (event.shiftKey) {
@@ -1212,49 +1194,54 @@ $(function() {
         $(this).button('enable');
     });
 
-    $('#btn-delete').button({
-        icons: { primary: 'ui-icon-trash' }, text: false
-    }).click(function(event) {
+    /* Remeber button label */
+    $('#btn-delete').data('label', $('#btn-delete').button('option', 'label'));
+
+    $('#btn-delete').on('click', function(event) {
         var option = $('#load-delete-view option:selected'), btn = $(this);
 
         if (option.val() == '') return;
 
-        if (btn.hasClass('confirmed') == 0) {
-            /* Replace text, make red and mark confirmed for next click */
-            btn.button({ label: '{{Sure}}?', text: true }).addClass('confirmed');
-            /* Reset after 5s */
-            setTimeout(function() {
-                $('#btn-delete').button({ label: '&nbsp;', text: false }).removeClass('confirmed');
-            }, 5000);
-        } else {
-            btn.button({ label: '&nbsp;', text: false, }).button('disable').removeClass('confirmed');
-            $.wait();
-
-            $.ajax({
-                type: 'DELETE',
-                dataType: 'json',
-                url: PVLngAPI + '/view/'+option.val()+'.json'
-            }).done(function(data, textStatus, jqXHR) {
-                $.pnotify({ type: 'success', text: option.text() + ' {{deleted}}' });
-                /* Just delete selected option and clear save name input */
-                option.remove();
-                $('#load-delete-view').val('').trigger('change');
-                $('#saveview').val('');
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                $.pnotify({
-                    type: textStatus, hide: false,
-                    text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
-                });
-            }).always(function() {
-                $.wait(false);
-                btn.button({ label: '&nbsp;', text: false }).data('confirmed', 0).button('enable');
-            });
+        if (!btn.hasClass('confirmed')) {
+            btn.button({ label: '{{AreYouSure}}' }).addClass('confirmed');
+            setTimeout(
+                function() {
+                    $('#btn-delete')
+                        .button({ label: $('#btn-delete').data('label') })
+                        .removeClass('confirmed');
+                }, 5000
+            );
+            return;
         }
-    }).css('font-weight', 'bold');
 
-    $('#btn-save').button({
-        icons: { primary: 'ui-icon-disk' }, text: false
-    }).click(function() {
+        $.wait();
+
+        btn.removeClass('confirmed')
+           .button({ label: $('#btn-delete').data('label') })
+           .button('disable');
+
+        $.ajax({
+            type: 'DELETE',
+            dataType: 'json',
+            url: PVLngAPI + '/view/'+option.val()+'.json'
+        }).done(function(data, textStatus, jqXHR) {
+            $.pnotify({ type: 'success', text: option.text() + ' {{deleted}}' });
+            /* Just delete selected option and clear save name input */
+            option.remove();
+            $('#load-delete-view').val('').trigger('change');
+            $('#saveview').val('');
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            $.pnotify({
+                type: textStatus, hide: false,
+                text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+            });
+        }).always(function() {
+            $.wait(false);
+            btn.button('enable');
+        });
+    });
+
+    $('#btn-save').on('click', function() {
         $(this).button('disable');
         $.wait();
 
@@ -1361,6 +1348,24 @@ $(function() {
             }
             return false;
         });
+    }
+
+    if (!isEmbedded) {
+        $('#chart-wrapper').resizable({
+            handles: 's',
+            grid: 25,
+            minHeight: 350,
+            resize: function( event, ui ) {
+                if (chart) {
+                    $('#chart').css('height', ui.size.height);
+                    chart.reflow();
+                }
+            },
+            stop: function( event, ui ) {
+                pvlng.cookie.set('ChartHeight', ChartHeight = ui.size.height, 365);
+            }
+        });
+        $('.ui-resizable-handle', '#chart-wrapper').hide().append($('<div/>')).prop('title', '{{DragToResize}}').tipTip();
     }
 
     shortcut.add('Alt+P', function() { pvlng.changeDates(-1) });

@@ -7,7 +7,7 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-class API extends Slim\Slim
+class Api extends Slim\Slim
 {
 
     /**
@@ -46,7 +46,10 @@ class API extends Slim\Slim
     {
         $this->status($code);
         $this->response()->header('X-Status-Reason', $message);
-        $this->render(array( 'status'=>$code<400?'success':'error', 'message'=>$message ));
+        $this->render(array(
+            'status'  => $code<400 ? 'success' : 'error',
+            'message' => $message
+        ));
         $this->stop();
     }
 
@@ -93,32 +96,45 @@ class API extends Slim\Slim
             $result->write($attr);
         }
 
-        // optimized flow 1st "if" then "loop"...
-        if ($full and $short) {
-            // passthrough all values as numeric based array
-            foreach ($buffer as $row) {
-                $result->write(array_values($row));
-            }
-        } elseif ($full) {
-            // do nothing, use as is
-            $result->append($buffer);
-        } elseif ($short) {
-            // default mobile result: only timestamp and data
-            foreach ($buffer as $row) {
-                $result->write(array(
-                    /* 0 */ $row['timestamp'],
-                    /* 1 */ $row['data']
-                ));
-            }
-        } else {
-            // default result: only timestamp and data
-            foreach ($buffer as $row) {
-                $result->write(array(
-                    'timestamp' => $row['timestamp'],
-                    'data'      => $row['data']
-                ));
-            }
-        }
+        // Optimized flow, 1st "if" then "loop" ...
+        switch (true) {
+
+            // Passthrough all values as numeric based array
+            case $full && $short:
+                foreach ($buffer as $row) {
+                    if (!$channel->meter) unset($row['consumption']);
+                    $result->write(array_values($row));
+                }
+                break;
+
+            // Do nothing, use as is
+            case $full:
+                foreach ($buffer as $row) {
+                    if (!$channel->meter) unset($row['consumption']);
+                    $result->write($row);
+                }
+                break;
+
+            // Default mobile result: only timestamp and data
+            case $short:
+                foreach ($buffer as $row) {
+                    $result->write(array(
+                        /* 0 */ $row['timestamp'],
+                        /* 1 */ $row['data']
+                    ));
+                }
+                break;
+
+            // Default result: only timestamp and data
+            default:
+                foreach ($buffer as $row) {
+                    $result->write(array(
+                        'timestamp' => $row['timestamp'],
+                        'data'      => $row['data']
+                    ));
+                }
+
+        } // switch
 
         return $result;
     }

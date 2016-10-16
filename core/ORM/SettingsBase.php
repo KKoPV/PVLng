@@ -152,30 +152,6 @@ abstract class SettingsBase extends \slimMVC\ORM
     }   // setOrderRaw()
 
     /**
-     * Basic setter for field "description"
-     *
-     * @param  mixed    $description Description value
-     * @return Instance For fluid interface
-     */
-    public function setDescription($description)
-    {
-        $this->fields['description'] = $description;
-        return $this;
-    }   // setDescription()
-
-    /**
-     * Raw setter for field "description", for INSERT, REPLACE and UPDATE
-     *
-     * @param  mixed    $description Description value
-     * @return Instance For fluid interface
-     */
-    public function setDescriptionRaw($description)
-    {
-        $this->raw['description'] = $description;
-        return $this;
-    }   // setDescriptionRaw()
-
-    /**
      * Basic setter for field "type"
      *
      * @param  mixed    $type Type value
@@ -278,16 +254,6 @@ abstract class SettingsBase extends \slimMVC\ORM
     }   // getOrder()
 
     /**
-     * Basic getter for field "description"
-     *
-     * @return mixed Description value
-     */
-    public function getDescription()
-    {
-        return $this->fields['description'];
-    }   // getDescription()
-
-    /**
      * Basic getter for field "type"
      *
      * @return mixed Type value
@@ -320,9 +286,9 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function filterByScopeNameKey($scope, $name, $key)
     {
 
-        $this->filter[] = '`scope` = '.$this->quote($scope).'';
-        $this->filter[] = '`name` = '.$this->quote($name).'';
-        $this->filter[] = '`key` = '.$this->quote($key).'';
+        $this->filter[] = $this->field('scope').' = '.$this->quote($scope).'';
+        $this->filter[] = $this->field('name').' = '.$this->quote($name).'';
+        $this->filter[] = $this->field('key').' = '.$this->quote($key).'';
         return $this;
     }   // filterByScopeNameKey()
 
@@ -334,7 +300,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByScope($scope)
     {
-        $this->filter[] = '`scope` = '.$this->quote($scope);
+        $this->filter[] = $this->field('scope').' = '.$this->quote($scope);
         return $this;
     }   // filterByScope()
 
@@ -346,7 +312,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -358,7 +324,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByKey($key)
     {
-        $this->filter[] = '`key` = '.$this->quote($key);
+        $this->filter[] = $this->field('key').' = '.$this->quote($key);
         return $this;
     }   // filterByKey()
 
@@ -370,7 +336,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByValue($value)
     {
-        $this->filter[] = '`value` = '.$this->quote($value);
+        $this->filter[] = $this->field('value').' = '.$this->quote($value);
         return $this;
     }   // filterByValue()
 
@@ -382,21 +348,9 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByOrder($order)
     {
-        $this->filter[] = '`order` = '.$this->quote($order);
+        $this->filter[] = $this->field('order').' = '.$this->quote($order);
         return $this;
     }   // filterByOrder()
-
-    /**
-     * Filter for field "description"
-     *
-     * @param  mixed    $description Filter value
-     * @return Instance For fluid interface
-     */
-    public function filterByDescription($description)
-    {
-        $this->filter[] = '`description` = '.$this->quote($description);
-        return $this;
-    }   // filterByDescription()
 
     /**
      * Filter for field "type"
@@ -406,7 +360,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = '`type` = '.$this->quote($type);
+        $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
     }   // filterByType()
 
@@ -418,7 +372,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = '`data` = '.$this->quote($data);
+        $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
     }   // filterByData()
 
@@ -433,7 +387,6 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         return '`value` = '.$this->quote($this->fields['value']).'
               , `order` = '.$this->quote($this->fields['order']).'
-              , `description` = '.$this->quote($this->fields['description']).'
               , `type` = '.$this->quote($this->fields['type']).'
               , `data` = '.$this->quote($this->fields['data']).'';
     }   // onDuplicateKey()
@@ -457,7 +410,6 @@ abstract class SettingsBase extends \slimMVC\ORM
           `key` varchar(100) NOT NULL DEFAULT \'\',
           `value` varchar(100) NOT NULL DEFAULT \'\',
           `order` tinyint(3) unsigned NOT NULL DEFAULT \'0\',
-          `description` varchar(1000) NOT NULL DEFAULT \'\',
           `type` enum(\'str\',\'num\',\'bool\',\'option\') NOT NULL DEFAULT \'str\',
           `data` varchar(255) NOT NULL DEFAULT \'\',
           PRIMARY KEY (`scope`,`name`,`key`)
@@ -468,28 +420,26 @@ abstract class SettingsBase extends \slimMVC\ORM
      *
      */
     protected $fields = array(
-        'scope'       => '',
-        'name'        => '',
-        'key'         => '',
-        'value'       => '',
-        'order'       => '',
-        'description' => '',
-        'type'        => '',
-        'data'        => ''
+        'scope' => '',
+        'name'  => '',
+        'key'   => '',
+        'value' => '',
+        'order' => '',
+        'type'  => '',
+        'data'  => ''
     );
 
     /**
      *
      */
     protected $nullable = array(
-        'scope'       => false,
-        'name'        => false,
-        'key'         => false,
-        'value'       => false,
-        'order'       => false,
-        'description' => false,
-        'type'        => false,
-        'data'        => false
+        'scope' => false,
+        'name'  => false,
+        'key'   => false,
+        'value' => false,
+        'order' => false,
+        'type'  => false,
+        'data'  => false
     );
 
     /**

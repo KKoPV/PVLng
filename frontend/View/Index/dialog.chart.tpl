@@ -35,28 +35,39 @@
                 <i class="fa fa-question tip" title="{{ChartTypeHint}}"></i>
             </td>
             <td>
-                <table>
-                    <tr>
-                        <td>
-                            <select id="d-type">
-                                <option value="line">{{LineChart}}</option>
-                                <option value="spline">{{SplineChart}}</option>
-                                <option value="areasplinerange"> {{AreaSplineRangeChart}}</option>
-                                <option value="areaspline">{{AreaSplineChart}}</option>
-                                <option value="bar">{{BarChart}}</option>
-                                <option value="scatter">{{ScatterChart}}</option>
-                            </select>
-                        </td>
-                        <td id="scatter-candidate">
-                            {{ScatterCandidate}}
-                        </td>
-                    </tr>
-                </table>
+                <table><tr>
+                <td>
+                    <select id="d-type">
+                        <option value="line">{{LineChart}}</option>
+                        <option value="spline">{{SplineChart}}</option>
+                        <option value="areasplinerange"> {{AreaSplineRangeChart}}</option>
+                        <option value="areaspline">{{AreaSplineChart}}</option>
+                        <option value="bar">{{BarChart}}</option>
+                        <option value="scatter">{{ScatterChart}}</option>
+                    </select>
+                </td>
+                <td id="scatter-candidate" class="dialog-hint">
+                    {{ScatterCandidate}}
+                </td>
+                </tr></table>
             </td>
         </tr>
-        <tr>
+        <tr class="only-bar">
+            <td>{{BarStack}}</td>
+            <td>
+                <table><tr>
+                <td>
+                    <input id="d-stack" type="text" style="width:5em">
+                </td>
+                <td class="dialog-hint">
+                    {{PutBarsToStackInSameStack}}
+                </td>
+                </tr></table>
+            </td>
+        </tr>
+        <tr class="not-bar not-scatter">
             <td><label for="d-style">{{dashStyle}}</label></td>
-            <td class="not-bar not-scatter">
+            <td>
                 <select id="d-style">
                     <option value="Solid">{{LineSolid}}</option>
                     <optgroup label="{{LinesDashed}}">
@@ -80,18 +91,18 @@
                 </select>
             </td>
         </tr>
-        <tr>
+        <tr class="not-bar not-scatter">
             <td>{{LineWidth}}</td>
             <td>
-                <div class="fl not-bar not-scatter" style="margin-right:1em">
+                <div class="fl" style="margin-right:1em">
                     <input id="d-width-1" type="radio" class="iCheck" name="d-width" value="1" />
                     <label for="d-width-1">{{ThinLine}}</label>
                 </div>
-                <div class="fl not-bar not-scatter" style="margin-right:1em">
+                <div class="fl" style="margin-right:1em">
                     <input id="d-width-2" type="radio" class="iCheck" name="d-width" value="2" />
                     <label for="d-width-2">{{LineNormal}}</label>
                 </div>
-                <div class="fl not-bar not-scatter">
+                <div class="fl">
                     <input id="d-width-3" type="radio" class="iCheck" name="d-width" value="4" />
                     <label for="d-width-3">{{LineBold}}</label>
                 </div>
@@ -118,12 +129,18 @@
                 </div>
             </td>
         </tr>
-        <tr>
+        <tr class="numeric">
+            <td>{{DecimalsForMarkers}}</td>
+            <td>
+                <input id="d-decimals" type="number" min="0" max="4" size="2">
+            </td>
+        </tr>
+        <tr class="not-scatter">
             <td>
                 <label for="d-cons">{{ShowConsumption}}</label>
                 <i class="fa fa-question tip" title="{{ShowConsumptionHint}}"></i>
             </td>
-            <td class="not-scatter">
+            <td>
                 <input type="checkbox" id="d-cons" class="iCheck" />
             </td>
         </tr>
@@ -131,18 +148,18 @@
             <td>{{Color}}</td>
             <td><input id="d-color" type="color" class="spectrum" /></td>
         </tr>
-        <tr>
+        <tr class="not-bar not-scatter">
             <td>
                 <label for="d-outline">{{DrawOutline}}</label>
                 <i class="fa fa-question tip" title="{{DrawOutlineHint}}"></i>
             </td>
-            <td class="not-bar not-scatter">
-                <input type="checkbox" id="d-outline" class="iCheck not-scatter" />
+            <td>
+                <input type="checkbox" id="d-outline" class="iCheck" />
             </td>
         </tr>
-        <tr>
+        <tr class="not-bar not-scatter">
             <td><label for="d-color-use-neg">{{UseDifferentColor}}</label></td>
-            <td class="not-bar not-scatter">
+            <td>
                 <!-- Align controls correct using a simple table ... -->
                 <table><tr>
                 <td style="padding-right:1em">

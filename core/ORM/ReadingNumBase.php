@@ -150,8 +150,8 @@ abstract class ReadingNumBase extends \slimMVC\ORM
     public function filterByIdTimestamp($id, $timestamp)
     {
 
-        $this->filter[] = '`id` = '.$this->quote($id).'';
-        $this->filter[] = '`timestamp` = '.$this->quote($timestamp).'';
+        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
+        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp).'';
         return $this;
     }   // filterByIdTimestamp()
 
@@ -163,7 +163,7 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     public function filterByTimestamp($timestamp)
     {
-        $this->filter[] = '`timestamp` = '.$this->quote($timestamp);
+        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
         return $this;
     }   // filterByTimestamp()
 
@@ -175,7 +175,7 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -187,7 +187,7 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = '`data` = '.$this->quote($data);
+        $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
     }   // filterByData()
 
@@ -217,15 +217,14 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     protected $createSQL = '
         CREATE TABLE `pvlng_reading_num` (
-          `id` smallint(5) unsigned NOT NULL,
-          `timestamp` int(10) unsigned NOT NULL,
-          `data` decimal(13,4) NOT NULL,
+          `id` smallint(5) unsigned NOT NULL DEFAULT \'0\',
+          `timestamp` int(10) unsigned NOT NULL DEFAULT \'0\',
+          `data` decimal(13,4) NOT NULL DEFAULT \'0.0000\',
           PRIMARY KEY (`id`,`timestamp`),
-          KEY `timestamp` (`timestamp`),
-          KEY `id` (`id`)
+          KEY `timestamp` (`timestamp`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Numeric readings\'
         /*!50100 PARTITION BY LINEAR KEY (id)
-        PARTITIONS 10 */
+        PARTITIONS 50 */
     ';
 
     /**

@@ -1,0 +1,552 @@
+<script>
+/**
+ *
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
+ */
+
+var ChartHeight = +'{INDEX_CHARTHEIGHT}',
+    presetPeriods = '{INDEX_PRESETPERIODS}' || '--;1d;1d;1m',
+    aborted = false,
+    chart = false,
+    chartLoading = '<img src="/images/loading_dots.gif" width="64" height="21">',
+    updateActive = false,
+    channels_last,
+    text,
+
+    tzOffset = {raw:TZOFFSET}, /* Timezone offset in seconds */
+    tzOffsetToolTip = ((new Date()).getTimezoneOffset() * 60 + tzOffset) * 1000,
+    tooltipDate = new Date,
+
+    chartOptions = {
+        chart: {
+            renderTo: 'chart',
+            type: 'bubble',
+            events: {
+                load: function () {
+                    this.renderer
+                        .label('PVLng v'+PVLngVersion)
+                        .attr('padding', 1)
+                        .css({ color: 'lightgray', fontSize: '11px' })
+                        .add();
+                },
+                redraw: function () {
+                    /* Date and time without seconds */
+                    this.renderer
+                        .label((new Date).toLocaleString().slice(0,-3), 0, 16)
+                        .attr({ fill: 'white', padding: 1 })
+                        .css({ color: 'lightgray', fontSize: '9px' })
+                        .add();
+                }
+            },
+            panning: true,
+            resetZoomButton: {
+                relativeTo: 'chart',
+                position: { x: -2, y: 7 }
+            },
+            style: { fontFamily: 'inherit' }
+        },
+        credits: false,
+        legend: { enabled: false },
+        loading: {
+            labelStyle: { top: '40%' },
+            style: { opacity: 0.8 }
+        },
+        mapNavigation: {
+            /* For mouse wheel zoom */
+            enabled: true,
+            enableButtons: false
+        },
+        plotOptions: {
+            bubble: { minSize: 4, maxSize: 12 },
+            series: { turboThreshold: 0 }
+        },
+        title: { text: '' /* Initial empty */ },
+        tooltip: {
+            useHTML: true,
+            formatter: function() {
+                var n = this.series.name.split('||');
+                return '<table>' +
+                       '<tr>' +
+                           '<td style="padding-right:2em"><strong>' + n[0] + '</strong></td>' +
+                           '<td class="r">' + this.x + '</td>' +
+                           '<td>' + this.series.options.unitX + '</td>' +
+                       '</tr>' +
+                       '<tr>' +
+                           '<td style="padding-right:2em"><strong>' + n[1] + '</strong></td>' +
+                           '<td class="r">' + this.y + '</td>' +
+                           '<td>' + this.series.options.unitY + '</td>' +
+                       '</tr>' +
+                       <!-- IF {DEVELOPMENT} -->
+                       '<tr>' +
+                           '<td style="padding-right:2em"><strong>Count</strong></td>' +
+                           '<td class="c" colspan="2">' + this.point.z + '</td>' +
+                       '</tr>' +
+                       <!-- ENDIF -->
+                       '<tr style="color:' + this.color + '">' +
+                           '<td style="padding-right:2em"><strong>{{Hour}}</strong></td>' +
+                           '<td colspan="2">' + this.point.hour + ':00 - ' + this.point.hour + ':59</td>' +
+                       '</tr>' +
+                       '</table>';
+            },
+            borderWidth: 0,
+            shadow: true,
+        },
+        xAxis: {
+            events: {
+                afterSetExtremes: function(event) {
+                    var ex = this.getExtremes();
+                    if (ex.dataMax - ex.dataMin > event.max - event.min) {
+                        /* Zoomed in */
+                        if (!chart.resetZoomButton) chart.showResetZoom();
+                    } else {
+                        /* Full zoomed out, but make sure all is reset correct */
+                        chart.zoomOut();
+                    }
+                }
+            }
+        }
+    };
+
+/**
+ *
+ */
+function updateChart(force) {
+
+    if (!force && updateActive) return;
+
+    var xChannel = $('#x-axis-channel').val(),
+        yChannel = $('#y-axis-channel').val();
+
+    if (!xChannel || !yChannel) return;
+
+    updateActive = true;
+
+    $.wait();
+
+    var fromDate = $('#fromdate').val(),
+        toDate = $('#todate').val(),
+        to = $('#to').val(),
+        ts = (new Date).getTime();
+
+    /* If any outstanding AJAX reqeust was killed, force rebuild of chart */
+    if ($.ajaxQ.abortAll() != 0) force = true;
+
+    Highcharts.setOptions({
+        global: {
+            /* timezone offset in minutes */
+            timezoneOffset: -tzOffset / 60
+        }
+    });
+
+    if (force || !chart || xChannel + yChannel != channels_last) {
+        /* (Re)Create chart */
+        $('#'+chartOptions.chart.renderTo).css('height', ChartHeight);
+        chart = new Highcharts.Chart(chartOptions);
+        /* Show splitter */
+        $('.ui-resizable-handle', '#chart-wrapper').show();
+        /* Show zoom and pan help */
+        $('#zoom-hint').show();
+    }
+
+    /* Scroll to navigation as top most visible element */
+    pvlng.scroll('#nav');
+
+    channels_last = xChannel + yChannel;
+
+    chart.showLoading(chartLoading);
+    chart.setTitle({ text: '.' });
+
+    /* Help chart with fluid layout to find its correct size */
+    chart.reflow();
+
+    text = $('#from').val();
+    if (text != to) text += ' - ' + to;
+
+    if (views.actual.name) {
+        chart.setTitle({ text: views.actual.name }, { text: text });
+    } else {
+        chart.setTitle({ text: text }, { text: '' });
+    }
+
+    $.getJSON(
+        PVLngAPI + 'data/scatter/' + xChannel + '/' + yChannel + '.json',
+        {
+            attributes: true,
+            start:      fromDate,
+            end:        toDate + '+1day',
+            _canAbort:  true,
+            _ts:        ts /* Force fresh fetch */
+        }
+    ).done(function(data, textStatus, jqXHR) {
+
+        if (textStatus == 'abort') {
+            /* Aborted during loading */
+            aborted = true;
+            return;
+        }
+
+        try {
+            /* Pop out 1st row with attributes */
+            attrX = data.shift();
+            attrY = data.shift();
+        } catch(err) {
+            console.error(data);
+            chart.hideLoading();
+            $.wait(false);
+            return;
+        }
+
+        text = attrX.name;
+        if (attrX.description) text += ' (' + attrX.description + ')';
+        if (attrX.unit) text += ' [' + attrX.unit + ']';
+        chart.xAxis[0].setTitle({ text: text });
+
+        text = attrY.name;
+        if (attrY.description) text += ' (' + attrY.description + ')';
+        if (attrY.unit) text += ' [' + attrY.unit + ']';
+        chart.yAxis[0].setTitle({ text: text });
+
+        pvlng.log('Attributes X', attrX);
+        pvlng.log('Attributes Y', attrY);
+        pvlng.log('Data', data);
+
+        var _data = [], colors = Highcharts.getOptions().colors, color;
+
+        /* data coontains arrays of [ x, y, count, month, hour ] */
+        for (var i=0; i<data.length; i++) {
+            color = Math.floor(data[i][4] * colors.length / 23);
+            _data.push({
+                x: data[i][0],
+                y: data[i][1],
+                z: data[i][2],
+                color: colors[color],
+                month: data[i][3],
+                hour: data[i][4]
+            });
+        }
+
+        if (chart.series.length) {
+            chart.series[0].setData(_data, false);
+        } else {
+            chart.addSeries({
+                unitX: attrX.unit,
+                unitY: attrY.unit,
+                name: attrX.name + '||' + attrY.name,
+                data: _data
+            }, false);
+        }
+
+        $.pnotify({
+            type: 'success',
+            text: '2 {{ChannelsLoaded}} [' + _data.length + '] ' +
+                  '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
+        });
+
+    }).fail(function(jqxhr, status, textStatus) {
+        console.error(jqxhr);
+        $.pnotify({ type: status, text: textStatus });
+    }).always(function(data, status) {
+
+        updateActive = false;
+
+        if (aborted) {
+            chart.hideLoading();
+            $.wait(false);
+            return;
+        }
+
+        chart.redraw();
+        chart.hideLoading();
+        $.wait(false);
+
+        console.timeEnd('Fetch data');
+    });
+}
+
+/**
+ * Idea from http://stackoverflow.com/a/11612641
+ */
+$.ajaxQ = (function() {
+
+    var id = 0, queue = {};
+
+    $(document).ajaxSend(function(e, jqXHR, settings) {
+        if (settings.url.indexOf('_canAbort') != -1) {
+            /* Queue only channel data requests! */
+            jqXHR._id = ++id;
+            queue[jqXHR._id] = jqXHR;
+        }
+    });
+
+    $(document).ajaxComplete(function(e, jqXHR) {
+        delete queue[jqXHR._id];
+    });
+
+    return {
+        abortAll: function() {
+            var cnt = 0;
+            $.each(queue, function(i, jqXHR) {
+                jqXHR.abort();
+                cnt++;
+            });
+            if (cnt) aborted = true;
+            return cnt;
+        }
+    };
+
+})();
+
+/**
+ *
+ */
+function updateOutput() {
+    updateActive = false;
+    updateChart(true);
+}
+
+/**
+ *
+ */
+function afterDatesCalculated() {
+    updateOutput();
+}
+
+/**
+ *
+ */
+var views = new function Views() {
+    this.views = {};
+    this.actual = { slug: '', name: '', public: 0 };
+
+    this.fetch = function( callback ) {
+        this.views = {};
+        var that = this;
+        $.getJSON(
+            PVLngAPI + 'views.json',
+            { empty: true, no_data: true, type: 3 },
+            function(data) {
+                for (var i=0; i<data.length; i++) {
+                    that.views[data[i].slug] = data[i];
+                }
+            }
+        ).always(function() {
+            if (typeof callback != 'undefined') callback(that);
+        });
+    };
+
+    this.buildSelect = function(el, selected) {
+        el = $(el).empty();
+
+        $.each(this.views, function(id, view) {
+            $('<option/>').text(view.name).val(view.slug).appendTo(el);
+        });
+
+        if (selected) el.val(selected);
+        el.trigger('change');
+    };
+
+    this.load = function( slug, collapse ) {
+
+        if (typeof this.views[slug] == 'undefined') return;
+        if (arguments.length < 2) collapse = false;
+
+        $.getJSON(
+            PVLngAPI + 'view/'+slug+'.json',
+            function(data) {
+
+                views.views[slug].data = data;
+                views.actual = views.views[slug];
+
+                $('#x-axis-channel').val(data[0]).trigger('change');
+                $('#y-axis-channel').val(data[1]).trigger('change');
+
+                $('#load-delete-view').val(views.actual.slug).trigger('change');
+                $('#saveview').val(views.actual.name);
+                updateOutput();
+            }
+        ).fail(function( jqXHR, textStatus ) {
+            alert( "Request failed: " + textStatus );
+        });
+    };
+};
+
+/**
+ *
+ */
+$(function() {
+
+    var h = pvlng.cookie.get('ScatterHeight');
+
+    if (h) ChartHeight = h;
+
+    /**
+     * Highcharts localization defaults
+     */
+    Highcharts.setOptions({
+        colors: [
+            "#3973AC", "#3939AC", "#7339AC", "#AC39AC", "#AC3973", "#AC3939", "#AC7339", "#ACAC39", "#73AC39", "#39AC39", "#39AC73", "#39ACAC", "#5B91C8", "#88B0D7", "#C8915B", "#D7B088"
+        ],
+        lang: {
+            thousandsSep: '{TSEP}',
+            decimalPoint: '{DSEP}',
+            resetZoom: '{{resetZoom}}',
+            resetZoomTitle: '{{resetZoomTitle}}'
+        }
+    });
+
+    $('input.iCheck').iCheck('update');
+
+    $('#btn-refresh').on('click', function(event) {
+        event.preventDefault();
+        updateChart(event.shiftKey);
+    });
+
+    $('#btn-exchange').on('click', function() {
+        var x = $('#x-axis-channel'),
+            y = $('#y-axis-channel'),
+            h = x.val();
+        x.val(y.val()).trigger('change');
+        y.val(h).trigger('change');
+        updateOutput();
+    });
+
+    $('#btn-load').on('click', function(event) {
+        $.wait();
+        $(this).button('disable');
+        if (event.shiftKey) {
+            /* Shift-Click sets display date to today AND reloads chart */
+            $('#btn-reset').trigger('click');
+        } else {
+            views.load($('#load-delete-view option:selected').val(), true);
+        }
+        $(this).button('enable');
+    });
+
+    /* Remeber button label */
+    $('#btn-delete').data('label', $('#btn-delete').button('option', 'label'));
+
+    $('#btn-delete').on('click', function(event) {
+        var option = $('#load-delete-view option:selected'), btn = $(this);
+
+        if (option.val() == '') return;
+
+        if (!btn.hasClass('confirmed')) {
+            btn.button({ label: '{{AreYouSure}}' }).addClass('confirmed');
+            setTimeout(
+                function() {
+                    $('#btn-delete')
+                        .button({ label: $('#btn-delete').data('label') })
+                        .removeClass('confirmed');
+                }, 5000
+            );
+            return;
+        }
+
+        $.wait();
+
+        btn.removeClass('confirmed')
+           .button({ label: $('#btn-delete').data('label') })
+           .button('disable');
+
+        $.ajax({
+            type: 'DELETE',
+            dataType: 'json',
+            url: PVLngAPI + '/view/'+option.val()+'.json'
+        }).done(function(data, textStatus, jqXHR) {
+            $.pnotify({ type: 'success', text: option.text() + ' {{deleted}}' });
+            option.remove();
+            $('#load-delete-view').val('').trigger('change');
+            $('#saveview').val('');
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            $.pnotify({
+                type: textStatus, hide: false,
+                text: jqXHR.responseJSON.message ? jqXHR.responseJSON.message : jqXHR.responseText
+            });
+        }).always(function() {
+            $.wait(false);
+            btn.button('enable');
+        });
+    });
+
+    $('#btn-save').on('click', function() {
+
+        var xChannel = $('#x-axis-channel').val(),
+            yChannel = $('#y-axis-channel').val();
+
+        if (!xChannel || !yChannel) return;
+
+        $(this).button('disable');
+        $.wait();
+
+        /* Save view */
+        var btn = this,
+            data = {
+                name: $('#saveview').val(),
+                data: [ xChannel, yChannel ],
+                public: 3
+            };
+
+        $.ajax({
+            type: 'PUT',
+            dataType: 'json',
+            url: PVLngAPI + '/view.json',
+            contentType: 'application/json',
+            processData: false, /* Send prepared JSON in body */
+            data: JSON.stringify(data)
+        }).done(function (data) {
+            views.fetch(function(views) {
+                /* Rebuild select */
+                views.buildSelect('#load-delete-view', data.slug);
+                views.load(data.slug);
+            });
+            $.pnotify({ type: 'success', text: data.name + ' saved' });
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            $.pnotify({
+                type: textStatus, hide: false, text: jqXHR.responseText
+            });
+        }).always(function() {
+            $.wait(false);
+            $(btn).button('enable');
+        });
+    });
+
+    views.fetch(function(views) {
+        views.buildSelect('#load-delete-view');
+        if (!user) {
+            $('#public-select').show();
+            $('#wrapper').show();
+        }
+        /* Chart slug provided by URL?, load and collapse tree */
+        if (!qs.chart) $('#top-select').show();
+        views.load(qs.chart, true);
+    });
+
+    $('#chart-wrapper').resizable({
+        handles: 's',
+        grid: 25,
+        minHeight: 350,
+        resize: function( event, ui ) {
+            if (chart) {
+                $('#chart').css('height', ui.size.height);
+                chart.reflow();
+            }
+        },
+        stop: function( event, ui ) {
+            pvlng.cookie.set('ScatterHeight', ChartHeight = ui.size.height, 365);
+        }
+    });
+
+    $('.ui-resizable-handle', '#chart-wrapper').hide().append($('<div/>')).prop('title', '{{DragToResize}}').tipTip();
+
+    shortcut.add('Alt+P', function() { pvlng.changeDates(-1) });
+    shortcut.add('Alt+N', function() { pvlng.changeDates(1) });
+    shortcut.add('F6',    function() { updateChart() });
+    shortcut.add('F7',    function() { updateChart(true) });
+
+});
+
+</script>

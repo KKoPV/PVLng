@@ -101,10 +101,7 @@ class Daylight extends InternalCalc {
                   ? /* Select harmonic mean   */ 'COUNT(`data`)/SUM(1/`data`)'
                   : /* Select arithmetic mean */ 'AVG(`data`)';
 
-            $step = ($sec = self::$Grouping[$this->period[1]][0])
-                    // Calculate exact stepping during daylight times
-                  ? $this->period[0] * $sec
-                  : 60;
+            $step = $this->period[0] * self::$secondsPerPeriod[$this->period[1]];
 
             $timeback = \ORM\Settings::getModelValue('Daylight', 'CurveDays', 5)*24*60*60;
         }

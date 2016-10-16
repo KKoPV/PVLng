@@ -129,7 +129,7 @@ abstract class TariffBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -141,7 +141,7 @@ abstract class TariffBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -153,7 +153,7 @@ abstract class TariffBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = '`comment` = '.$this->quote($comment);
+        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
     }   // filterByComment()
 

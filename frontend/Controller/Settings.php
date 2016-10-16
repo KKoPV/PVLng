@@ -69,13 +69,19 @@ class Settings extends \Controller {
      */
     public function Index_Action() {
         $this->view->SubTitle = __('Settings');
-        $tbl = new \ORM\Settings;
+
+        $t = \BabelKitMySQLi::getInstance()
+             ->full_set_assoc('settings', $this->app->Language);
+
+        $ORMSettings = new \ORM\Settings;
+        $ORMSettings->order('scope')->order('name')->order('order')->find();
 
         $data = array();
-        $last = NULL;
-        foreach ($tbl->order('scope')->order('name')->order('order')->find()->asAssoc() as $row) {
+        $last = null;
+
+        foreach ($ORMSettings->asAssoc() as $row) {
             $data[$row['scope']][$row['name']]['name'] = $row['name'];
-            $row['var'] = $row['scope'].'-'.$row['name'].'-'.$row['key'];
+
             if ($row['type'] == 'bool') {
                 // Transform to option
                 $row['type'] = 'option';
@@ -92,14 +98,22 @@ class Settings extends \Controller {
                     );
                 }
             }
+
+            $row['var']   = $row['scope'].'-'.$row['name'].'-'.$row['key'];
+            $row['value'] = htmlspecialchars($row['value']);
+
+            // Translate
+            $row['description'] = $t[$row['scope'].'_'.$row['name'].'_'.$row['key']][0];
+
             if ($last !== $row['name']) {
                 $last = $row['name'];
                 $i = 1;
             }
             $row['class'] = ($i++ % 2) ? 'odd' : 'even';
-            $row['value'] = htmlspecialchars($row['value']);
+
             $data[$row['scope']][$row['name']]['key'][] = $row;
         }
+
         /// \Yryie::Debug($data);
         $this->view->Core       = $data['core'];
         $this->view->Controller = $data['controller'];

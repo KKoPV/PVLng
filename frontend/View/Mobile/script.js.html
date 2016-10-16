@@ -10,6 +10,7 @@
 
 var Period      = '{MOBILE_PERIOD}',
     ChartHeight = '{MOBILE_CHARTHEIGHT}',
+    minWidthForYAxis = 640,
 
     views = {
         <!-- BEGIN VIEWS -->
@@ -17,17 +18,17 @@ var Period      = '{MOBILE_PERIOD}',
         <!-- END -->
     },
 
-    options = {
+    ChartOptions = {
         chart: {
             renderTo: 'chart',
             height: ChartHeight,
+            spacingTop: 15,
             spacingLeft: 5,
             spacingRight: 5,
-            spacingTop: 5,
-            spacingBottom: 5,
-            alignTicks: false
+            borderRadius: 16
         },
         credits: { enabled: false },
+        navigation: { buttonOptions: { enabled: false } },
         title: { text: '' },
         plotOptions: {
             line:   { marker: { enabled: false } },
@@ -46,7 +47,11 @@ var Period      = '{MOBILE_PERIOD}',
                 groupPadding: 0.1
             }
         },
-        xAxis :  { type: 'datetime' },
+        xAxis :  {
+            type: 'datetime',
+            minPadding: 0.025,
+            maxPadding: 0.025
+        },
         legend:  { enabled: false },
         tooltip: { enabled: false },
         loading: {
@@ -63,7 +68,14 @@ var Period      = '{MOBILE_PERIOD}',
 /**
  *
  */
-function updateChart() {
+window.onresize = function(event) {
+    updateChart(true);
+};
+
+/**
+ *
+ */
+function updateChart(changed) {
 
     if (lock) return;
     lock = true;
@@ -86,13 +98,15 @@ function updateChart() {
         return;
     }
 
-    var loading = view.length;
-    chart.showLoading('- ' + loading + ' -');
+    var options = $.extend(true, {}, ChartOptions), loading = view.length;
+    chart && chart.showLoading('- ' + loading + ' -');
 
     $('#table-cons tbody tr').remove();
 
     var channels_new = [], yAxisMap = [], yAxis = [],
         channel, buffer = [], channel_clone;
+
+    changed = changed || false;
 
     /* Find active channels, map and sort axis */
     $(view).each(function(id, view) {
@@ -132,7 +146,7 @@ function updateChart() {
         /* Prepare axis */
         if (!yAxis[channel.axis]) {
             yAxis[channel.axis] = {
-                title: null, /*{ text: channel.unit },*/
+                title: { text: channel.unit },
                 lineColor: channel.color,
                 showEmpty: false,
                 minPadding: 0,
@@ -140,14 +154,19 @@ function updateChart() {
                 opposite: is_right
             };
             /* Only 1st left axis shows grid lines */
-            if (channel.axis != 0) yAxis[channel.axis].gridLineWidth = 0;
+            if (channel.axis != 0) {
+                yAxis[channel.axis].gridLineWidth = 0;
+            }
         }
     });
 
-    if (yAxis.length > 1) {
-        /* Hide axes & labels when more than 1 axis is defined */
+    if (window.innerWidth < minWidthForYAxis) {
+        options.chart.spacingTop = 5;
+        options.chart.spacingBottom = 5;
+        options.chart.alignTicks = false;
+        /* Hide axes & labels on smaller screens */
         $.each(yAxis, function(i) {
-            /* yAxis[i].title = false; */
+            yAxis[i].title = { enabled: false };
             yAxis[i].labels = { enabled: false };
             yAxis[i].lineWidth = 0;
         });
@@ -155,9 +174,6 @@ function updateChart() {
 
     pvlng.log('Channels', channels_new);
     pvlng.log('yAxis', yAxis);
-
-    /* Check for changed channels */
-    var changed = false;
 
     if (channels_new.length != channels.length) {
         changed = true;
@@ -416,8 +432,6 @@ $(function() {
             resetZoomTitle: '{{resetZoomTitle}}'
         }
     });
-
-    chart = new Highcharts.Chart(options);
 
     updateChart();
 

@@ -7,12 +7,13 @@
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
-class Controller extends slimMVC\Controller {
-
+class Controller extends slimMVC\Controller
+{
     /**
      *
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         // Shortcuts
@@ -31,7 +32,8 @@ class Controller extends slimMVC\Controller {
 
         $this->Layout = 'default';
 
-        if ($returnto = $this->app->request->get('returnto') OR $returnto = $this->app->request->post('returnto')) {
+        if ($returnto = $this->app->request->get('returnto') ||
+            $returnto = $this->app->request->post('returnto')) {
             Session::set('returnto', $returnto);
         }
 
@@ -55,7 +57,8 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         // Send statistics each 6 hours if activated
         if ($this->config->SendStatistics) {
             PVLng::SendStatistics();
@@ -65,7 +68,8 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
-    public function after() {
+    public function after()
+    {
         /* For Logout */
         $this->view->User = $this->app->user;
         if ($this->app->user) {
@@ -84,7 +88,8 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
-    public function afterPOST() {
+    public function afterPOST()
+    {
         $returnto = Session::get('returnto');
         if ($returnto) {
             Session::set('returnto');
@@ -95,8 +100,8 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
-    public function finalize( $action ) {
-
+    public function finalize($action)
+    {
         // If no layout is set, assume raw data was generated
         if (!$this->Layout) {
             return;
@@ -145,10 +150,10 @@ class Controller extends slimMVC\Controller {
         // Check for new version once a hour
         if (Session::get('VersionCheck', 0)+3600 < time()) {
             $version = $this->checkVersion();
-            $this->db->VersionNew = isset($version[0]) ? $version[0] : FALSE;
+            $this->db->VersionNew = isset($version[0]) ? $version[0] : false;
             Session::set('VersionCheck', time());
         }
-        $this->view->VersionNew = ($this->db->VersionNew > PVLNG_VERSION) ? $this->db->VersionNew : NULL;
+        $this->view->VersionNew = ($this->db->VersionNew > PVLNG_VERSION) ? $this->db->VersionNew : null;
 
         // Missing files are ok
         // Head append
@@ -216,7 +221,8 @@ class Controller extends slimMVC\Controller {
     /**
      * 
      */
-    protected function config2Vview() {
+    protected function config2Vview()
+    {
         $this->view->Title               = $this->config->get('Core.Title');
         $this->view->Latitude            = $this->config->get('Core.Latitude');
         $this->view->Longitude           = $this->config->get('Core.Longitude');
@@ -241,8 +247,8 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
-    protected function preparePresetAndPeriod() {
-
+    protected function preparePresetAndPeriod()
+    {
         $bk = \BabelKitMySQLi::getInstance();
 
         $preset = $period = null;
@@ -267,15 +273,16 @@ class Controller extends slimMVC\Controller {
     /**
      *
      */
-    protected function checkVersion() {
+    protected function checkVersion()
+    {
         $url = 'https://raw.githubusercontent.com/KKoPV/PVLng/master/.version';
 
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
         curl_setopt($ch, CURLOPT_TIMEOUT, 2);
-        curl_setopt($ch, CURLOPT_HEADER, FALSE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         $version = curl_exec($ch);
 

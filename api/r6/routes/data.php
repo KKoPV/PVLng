@@ -30,7 +30,7 @@ $api->put(
     try {
         $cnt = Channel::byGUID($guid)->write($request, $timestamp);
     } catch (Exception $e) {
-        $api->stopAPI($e->getMessage(), 400);
+        $api->stopAPI($e->getMessage(), $e->getCode() ?: 400);
     }
 
     if ($cnt) $api->stopAPI($cnt.' reading(s) added', 201);
@@ -106,7 +106,9 @@ $api->get(
 
     $result = $api->readData($guid, $request);
     $api->response->headers->set('X-Data-Rows', count($result));
-    $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+    if (is_object($result) && method_exists($result, 'size')) {
+        $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
+    }
     $api->render($result);
 })->name('GET /data/:period/:guid')->help = array(
     'since'       => 'r6',
@@ -307,6 +309,8 @@ $api->delete(
     foreach ($tables as $table) {
         $api->db->truncate($table);
     }
+
+    $this->db->query('UPDATE `pvlng_channel` SET `offset` = 0 WHERE `adjust`');
 
     \ORM\Settings::setCoreValue(null, 'EmptyDatabaseAllowed', 0);
 

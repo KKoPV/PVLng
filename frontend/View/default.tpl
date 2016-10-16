@@ -192,6 +192,9 @@
             $('#container').show();
 
             $('select').select2();
+
+            $('.ui-buttonset').buttonset();
+
             $('.ui-tabs').tabs({
                 /* Selects on hidden tabs must recreated on tab activation */
                 activate: function( event, ui ) { $('select', this).select2() }

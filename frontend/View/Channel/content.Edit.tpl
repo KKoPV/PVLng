@@ -72,21 +72,31 @@
                 <!-- END -->
                 </span>
             <!-- ELSEIF {TYPE} == "bool" -->
-                <select id="{FIELD}" name="c[{FIELD}]" <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
-                        data-placeholder="<!-- IF {PLACEHOLDER} -->{PLACEHOLDER}<!-- ELSE -->--- {{Select}} ---<!-- ENDIF -->"
-                    >
-                    <!-- BEGIN OPTIONS -->
-                    <option value="{VALUE}" <!-- IF {CHECKED} -->selected="selected"<!-- ENDIF -->>{TEXT}</option>
-                    <!-- END -->
-                </select>
+                <!-- IF ! {READONLY} -->
+                    <select id="{FIELD}" name="c[{FIELD}]"
+                            data-placeholder="<!-- IF {PLACEHOLDER} -->{PLACEHOLDER}<!-- ELSE -->--- {{Select}} ---<!-- ENDIF -->"
+                        >
+                        <!-- BEGIN OPTIONS -->
+                        <option value="{VALUE}" <!-- IF {CHECKED} -->selected="selected"<!-- ENDIF -->>{TEXT}</option>
+                        <!-- END -->
+                    </select>
+                <!-- ELSE -->
+                    <input type="hidden" name="c[{FIELD}]" value="{VALUE}" />
+                    <!-- BEGIN OPTIONS --><!-- IF {CHECKED} -->{TEXT}<!-- ENDIF --><!-- END -->
+                <!-- ENDIF -->
             <!-- ELSEIF {TYPE} == "select" -->
-                <select id="{FIELD}" name="c[{FIELD}]" <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF -->
-                        data-placeholder="<!-- IF {PLACEHOLDER} -->{PLACEHOLDER}<!-- ELSE -->--- {{Select}} ---<!-- ENDIF -->"
-                    >
-                    <!-- BEGIN OPTIONS -->
-                    <option value="{VALUE}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>{TEXT}</option>
-                    <!-- END -->
-                </select>
+                <!-- IF ! {READONLY} -->
+                    <select id="{FIELD}" name="c[{FIELD}]"
+                            data-placeholder="<!-- IF {PLACEHOLDER} -->{PLACEHOLDER}<!-- ELSE -->--- {{Select}} ---<!-- ENDIF -->"
+                        >
+                        <!-- BEGIN OPTIONS -->
+                        <option value="{VALUE}" <!-- IF {SELECTED} -->selected="selected"<!-- ENDIF -->>{TEXT}</option>
+                        <!-- END -->
+                    </select>
+                <!-- ELSE -->
+                    <input type="hidden" name="c[{FIELD}]" value="{VALUE}" />
+                    <!-- BEGIN OPTIONS --><!-- IF {CHECKED} -->{TEXT}<!-- ENDIF --><!-- END -->
+                <!-- ENDIF -->
             <!-- ELSEIF {TYPE} == "textarea" -->
                 <textarea id="{FIELD}" name="c[{FIELD}]" class="code" placeholder="{PLACEHOLDER}"
                           <!-- IF {REQUIRED} --> required="required"<!-- ENDIF -->
@@ -112,7 +122,7 @@
                        <!-- IF {READONLY} --> class="ro" readonly="readonly"<!-- ENDIF --> />
             <!-- ENDIF -->
             </div>
-            <span style="color:red" class="xs">
+            <span style="color:red" class="s">
                 <!-- BEGIN ERROR -->{ERROR}<br class="clear" /><!-- END -->
             </span>
         </td>

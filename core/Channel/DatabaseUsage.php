@@ -16,16 +16,18 @@ class DatabaseUsage extends Channel {
     /**
      *
      */
-    public function read( $request ) {
+    public function __read( $request ) {
 
         $this->performance->setAction('read');
 
         $this->before_read($request);
 
+/*
         if ($this->period[1] == self::NO) {
             // Set period to at least 1 minute
             $this->period[1] = self::ASCHILD;
         }
+*/
 
         $q = new \DBQuery;
 
@@ -76,7 +78,7 @@ class DatabaseUsage extends Channel {
             if ($this->period[1] != self::ALL) {
                 // Time is only relevant for period != ALL
                 if ($this->start) {
-                    $q->filter('timestamp', array('min'=>$this->start-self::$Grouping[$this->period[1]][0]));
+                    $q->filter('timestamp', array('min'=>$this->start-self::$secondsPerPeriod[$this->period[1]]));
                 }
                 if ($this->end < time()) {
                     $q->filter('timestamp', array('max'=>$this->end-1));
@@ -92,9 +94,7 @@ class DatabaseUsage extends Channel {
 
             if ($res = $this->db->query($q)) {
 
-                $last = (self::$Grouping[$this->period[1]][0] > 0)
-                      ? $res->fetch_assoc()
-                      : FALSE;
+                $last = $res->fetch_assoc();
 
                 while ($row = $res->fetch_assoc()) {
 

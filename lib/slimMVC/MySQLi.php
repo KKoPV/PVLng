@@ -11,8 +11,8 @@ namespace slimMVC;
 /**
  *
  */
-class MySQLi extends \MySQLi {
-
+class MySQLi extends \MySQLi
+{
     /**
      *
      */
@@ -21,7 +21,8 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function __construct( $host, $username, $passwd, $dbname, $port, $socket ) {
+    public function __construct($host, $username, $passwd, $dbname, $port, $socket)
+    {
         @parent::__construct($host, $username, $passwd, $dbname, $port, $socket);
 
         $this->DBName = $dbname;
@@ -39,63 +40,72 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function getDatabase() {
+    public function getDatabase()
+    {
         return $this->DBName;
     }
 
     /**
      *
      */
-    public function setDieOnError( $die=TRUE ) {
+    public function setDieOnError($die=true)
+    {
         $this->dieOnError = (bool) $die;
     }
 
     /**
      *
      */
-    public function setSettingsTable( $name ) {
+    public function setSettingsTable($name)
+    {
         $this->Settings[0] = $name;
     }
 
     /**
      *
      */
-    public function setSettingsKey( $name ) {
+    public function setSettingsKey($name)
+    {
         $this->Settings[1] = $name;
     }
 
     /**
      *
      */
-    public function setSettingsValue( $name ) {
+    public function setSettingsValue($name)
+    {
         $this->Settings[2] = $name;
     }
 
     /**
      *
      */
-    public function getQueryCount() {
+    public function getQueryCount()
+    {
         return $this->QueryCount;
     }
 
     /**
      *
      */
-    public function getQueryTime() {
+    public function getQueryTime()
+    {
         return $this->QueryTime;
     }
 
     /**
      *
      */
-    public function setBuffered( $buffered=TRUE ) {
+    public function setBuffered($buffered=true)
+    {
         $this->Buffered = (bool) $buffered;
     }
 
     /**
      *
      */
-    public function debug( $debug=TRUE ) {
+    public function debug($debug=true)
+    {
         $this->debug = (bool) $debug;
         return $this;
     }
@@ -103,7 +113,8 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function sql( $query ) {
+    public function sql($query)
+    {
         $args  = func_get_args();
         $query = array_shift($args);
 
@@ -127,11 +138,12 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function query( $query ) {
-        $args = func_get_args();
+    public function query($query)
+    {
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+        if (isset($args[0]) && is_array($args[0])) $args = $args[0];
 
         $query = $this->sql($query, $args);
 
@@ -143,7 +155,10 @@ class MySQLi extends \MySQLi {
 
         $t = microtime(true);
 
-        $result = parent::query($query, $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT);
+        $result = parent::query(
+            $query,
+            $this->Buffered ? MYSQLI_USE_RESULT : MYSQLI_STORE_RESULT
+        );
 
         if ($this->errno && $this->dieOnError) {
             die(sprintf('MySQL ERROR [%d] %s', $this->errno, $this->error));
@@ -159,13 +174,14 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function queryRows( $query ) {
-        $args = func_get_args();
+    public function queryRows($query)
+    {
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+        if (isset($args[0]) && is_array($args[0])) $args = $args[0];
 
-        $this->Buffered = TRUE;
+        $this->Buffered = true;
         $rows = array();
         if ($result = $this->query($query, $args)) {
             /// $t = microtime(TRUE);
@@ -173,7 +189,7 @@ class MySQLi extends \MySQLi {
             /// $this->QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
-        $this->Buffered = FALSE;
+        $this->Buffered = false;
 
         return $rows;
     }
@@ -181,13 +197,14 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function queryRowsArray( $query ) {
-        $args = func_get_args();
+    public function queryRowsArray($query)
+    {
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+        if (isset($args[0]) && is_array($args[0])) $args = $args[0];
 
-        $this->Buffered = TRUE;
+        $this->Buffered = true;
         $rows = array();
         if ($result = $this->query($query, $args)) {
             /// $t = microtime(TRUE);
@@ -195,7 +212,7 @@ class MySQLi extends \MySQLi {
             /// $this->QueryTime += (microtime(TRUE) - $t) * 1000;
             $result->close();
         }
-        $this->Buffered = FALSE;
+        $this->Buffered = false;
 
         return $rows;
     }
@@ -203,19 +220,20 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function queryRow( $query ) {
-        $args = func_get_args();
+    public function queryRow($query)
+    {
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+        if (isset($args[0]) && is_array($args[0])) $args = $args[0];
 
-        $this->Buffered = TRUE;
+        $this->Buffered = true;
         $row = NULL;
         if ($result = $this->query($query, $args)) {
             $row = $result->fetch_object();
             $result->close();
         }
-        $this->Buffered = FALSE;
+        $this->Buffered = false;
 
         return $row;
     }
@@ -223,19 +241,20 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function queryRowArray( $query ) {
-        $args = func_get_args();
+    public function queryRowArray($query)
+    {
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+        if (isset($args[0]) && is_array($args[0])) $args = $args[0];
 
-        $this->Buffered = TRUE;
+        $this->Buffered = true;
         $row = NULL;
         if ($result = $this->query($query, $args)) {
             $row = $result->fetch_assoc();
             $result->close();
         }
-        $this->Buffered = FALSE;
+        $this->Buffered = false;
 
         return $row;
     }
@@ -243,11 +262,12 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function queryOne( $query ) {
-        $args = func_get_args();
+    public function queryOne($query)
+    {
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+        if (isset($args[0]) && is_array($args[0])) $args = $args[0];
 
         $rc = '';
         if ($result = $this->query($query, $args)) {
@@ -264,11 +284,12 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function queryCol( $query ) {
-        $args = func_get_args();
+    public function queryCol($query)
+    {
+        $args  = func_get_args();
         $query = array_shift($args);
 
-        if (isset($args[0]) AND is_array($args[0])) $args = $args[0];
+        if (isset($args[0]) && is_array($args[0])) $args = $args[0];
 
         $rows = array();
         if ($result = $this->query($query, $args)) {
@@ -280,18 +301,17 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function truncate( $table, $optimize=true ) {
-        $rc = $this->query('TRUNCATE  `{1}`', $table);
-        if ($optimize) {
-            $rc += $this->query('OPTIMIZE  `{1}`', $table);
-        }
-        return $rc;
+    public function truncate($table)
+    {
+        // Call direkt MySQLi::query()
+        return parent::query('TRUNCATE TABLE `'.$table.'`');
     }
 
     /**
      *
      */
-    public function multi_query( $sql ) {
+    public function multi_query($sql)
+    {
         foreach (explode(';', $sql) as $query) {
             $this->queries[] = preg_replace('~\s+~', ' ', $query);
         }
@@ -301,14 +321,16 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function __set( $key, $value ) {
+    public function __set($key, $value)
+    {
         $this->set($key, $value);
     }
 
     /**
      *
      */
-    public function set( $key, $value ) {
+    public function set($key, $value)
+    {
         $replace = sprintf('REPLACE `%s` (`%s`, `%s`) VALUES (LOWER("{1}"), "{2}")',
                            $this->Settings[0], $this->Settings[1], $this->Settings[2]);
 
@@ -318,14 +340,16 @@ class MySQLi extends \MySQLi {
     /**
      *
      */
-    public function __get( $key ) {
+    public function __get($key)
+    {
         return $this->get($key);
     }
 
     /**
      *
      */
-    public function get( $key ) {
+    public function get($key)
+    {
         $query = sprintf('SELECT `%s` FROM `%s` WHERE `%s` = LOWER("{1}") LIMIT 1',
                          $this->Settings[2], $this->Settings[0], $this->Settings[1]);
 

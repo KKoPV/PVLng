@@ -15,8 +15,8 @@ namespace Channel;
 /**
  *
  */
-class Baseline extends InternalCalc {
-
+class Baseline extends InternalCalc
+{
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
@@ -24,14 +24,16 @@ class Baseline extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
-
+    protected function before_read(&$request)
+    {
         parent::before_read($request);
 
-        if (!$this->dataExists()) {
-            // Calc direct inside database
-            $this->db->query('CALL pvlng_model_baseline({1}, {2})', $this->entity, $this->getChild(1)->entity);
-            $this->dataCreated();
-        }
+        if ($this->dataExists()) return;
+
+        // Calc direct inside database
+        $this->db->query('CALL pvlng_model_baseline({1}, {2})', $this->entity, $this->getChild(1)->entity);
+
+        $this->dataCreated();
     }
+
 }

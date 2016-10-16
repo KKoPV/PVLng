@@ -106,10 +106,10 @@ abstract class InternalCalc extends Channel {
         if ($uid < 0) {
             $this->entity = -$uid;
             $this->data->setId($this->entity);
-            return FALSE;
+            return false;
         } else {
             $this->entity = $uid;
-            return TRUE;
+            return true;
         }
     }
 

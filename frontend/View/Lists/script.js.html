@@ -10,7 +10,8 @@
 
 var channel = {},
     /* String length for Datetime column */
-    dtLen = { '': 19, i: 16, h: 13, d: 10, w: 10, m: 7, q: 7, y: 4 };
+    dtLen = { '': 19, i: 16, h: 13, d: 10, w: 10, m: 7, q: 7, y: 4 },
+    presetPeriods = '{LISTS_PRESETPERIODS}' || '--;1d;1d;1m';
 
 /**
  *

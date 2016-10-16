@@ -11,37 +11,46 @@
 /**
  *
  */
-$api->get('/views(/:language)', function( $language='en' ) use ($api) {
-
+$api->get(
+    '/views(/:language)',
+    function($language='en') use ($api)
+{
     $result = array();
 
     if ($api->request->get('select')) {
         I18N::setLanguage($language);
-        $result[] =array(
+        $result[] = array(
             'name'   => '--- ' . __('Select') . ' ---',
-            'data'   => NULL,
+            'data'   => null,
             'public' => 1,
-            'slug'   => NULL
+            'slug'   => null
         );
     }
 
     if ($api->request->get('empty')) {
         $result[] = array(
-            'name'   => NULL,
-            'data'   => NULL,
+            'name'   => null,
+            'data'   => null,
             'public' => 1,
-            'slug'   => NULL
+            'slug'   => null
         );
     }
 
     $noData = $api->request->get('no_data');
+    $type   = $api->request->get('type');
 
     $views = new ORM\View;
 
-    if ($api->request->get('sort_by_visibilty')) $views->order('public');
+    if ($api->request->get('sort_by_visibilty')) {
+        $views->order('public');
+    }
+
+    if ($type = $api->request->get('type')) {
+        $views->filterByPublic($type);
+    }
 
     foreach ($views->order('name')->find() as $view) {
-        if ($api->APIKeyValid == 1 OR $view->getPublic() == 1) {
+        if ($api->APIKeyValid == 1 || $view->getPublic() == 1) {
             $data = $view->asAssoc();
             if ($noData) unset($data['data']);
             $result[] = $data;
@@ -57,7 +66,11 @@ $api->get('/views(/:language)', function( $language='en' ) use ($api) {
 /**
  *
  */
-$api->put('/view', function() use ($api) {
+$api->put(
+    '/view',
+    $APIkeyRequired,
+    function() use ($api)
+{
     $request = json_decode($api->request->getBody(), TRUE);
 
     if (empty($request['name'])) return;
@@ -89,12 +102,15 @@ $api->put('/view', function() use ($api) {
 /**
  *
  */
-$api->get('/view/:slug', function( $slug ) use ($api) {
+$api->get(
+    '/view/:slug',
+    function($slug) use ($api)
+{
     $view = new ORM\View;
     $view->filterBySlug($slug)->findOne();
 
     if ($view->getName() == '') {
-        $api->stopAPI('No chart variant found for: '.$slug, 404);
+        $api->stopAPI('No chart found for: '.$slug, 404);
     }
 
     if ($view->getPublic() == 0 AND $api->APIKeyValid == 0) {
@@ -111,28 +127,18 @@ $api->get('/view/:slug', function( $slug ) use ($api) {
 );
 
 /**
- * @ToDo
- */
-$api->post('/view/:slug', $APIkeyRequired, function( $slug ) use ($api) {
-
-
-})->conditions(array(
-    'slug' => '[\w\d-]+'
-))->name('update view data')->help = array(
-    'since'       => 'r3',
-    'description' => 'Update chart view data via slug',
-    'apikey'      => TRUE,
-);
-
-/**
  *
  */
-$api->delete('/view/:slug', $APIkeyRequired, function( $slug ) use ($api) {
+$api->delete(
+    '/view/:slug',
+    $APIkeyRequired,
+    function($slug) use ($api)
+{
     $view = new ORM\View;
     $view->filterBySlug($slug)->findOne();
 
     if ($view->getName() == '') {
-        $api->stopAPI('No chart variant found for: '.$slug, 404);
+        $api->stopAPI('No chart found for: '.$slug, 404);
     }
 
     $view->delete();

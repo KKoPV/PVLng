@@ -21,12 +21,21 @@ return array(
 
     'valid_from' => array(
         'type'     => 'integer',
-        'required' => TRUE
+        'required' => true
     ),
+
     'valid_to' => array(
         'type'     => 'integer',
-        'required' => TRUE,
+        'required' => true,
         'default'  => 0
+    ),
+
+    // Years for average +- days last years
+    'extra' => array(
+        'visible'  => true,
+        'position' => 170,
+        'type'     => 'integer',
+        'default'  => 10
     )
 
 );

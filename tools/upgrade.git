@@ -9,6 +9,7 @@ function usage {
     echo Upgrade your installation to lastest state from Github.
     echo
     echo "Usage: $0 <branch>"
+    echo
     exit ${2:-0}
 }
 
@@ -17,14 +18,12 @@ function usage {
 [ "$1" ] || usage
 
 echo
-echo -n 'Fetch last version from GitHub ... '
+echo 'Fetch last version from GitHub ... '
 
-git checkout $1 >/dev/null 2>&1
+git checkout $1
 rc=$?
 [ $rc -ne 0 ] && exit $rc
-git pull >/dev/null 2>&1
-
-echo -e \\b\\b\\b\\b- done
+git pull
 
 ### Extract MySQL credentials
 function dbconf {
@@ -39,7 +38,7 @@ dbsocket=$(dbconf Socket)
 
 dbname=$(dbconf Database)
 
-level=$(mysql $params -Ne 'SELECT `value` FROM `pvlng_config` WHERE `key`="DBPatchLevel"' $dbname)
+level=$(mysql $params -Ne 'SELECT `value` FROM `pvlng_config` WHERE `key` = "DBPatchLevel"' $dbname 2>/dev/null)
 level=$((${level:-0}+0))
 
 e Actual database patch level is $level
@@ -57,19 +56,18 @@ while read f; do
 
         [ "$last" ] || echo
 
-        echo -n "- Apply patch $f ... "
+        echo "- Apply patch $f ... "
+        grep '^-- #' sql/patches/$f | cut -d' ' -f2-
         mysql $params $dbname <sql/patches/$f >/dev/null 2>&1
-        echo -e \\b\\b\\b\\b- done
 
         ### Remember last patch
-        last=$((patch+0))
-
+        last=$patch
     fi
 
 done <$tmp
 
 if [ "$last" ]; then
-    mysql $params -e 'REPLACE INTO `pvlng_config` (`key`, `value`) VALUES ("DBPatchLevel", "'$last'")' $dbname
+    mysql $params -e 'REPLACE INTO `pvlng_config` (`key`, `value`) VALUES ("DBPatchLevel", '$last')' $dbname >/dev/null 2>&1
     e Patched database to level $last
     e NEXT
     e - Open http://your.domain.here/cc in your browser and clear the caches!
@@ -77,3 +75,5 @@ if [ "$last" ]; then
 else
     e No patches required.
 fi
+
+echo

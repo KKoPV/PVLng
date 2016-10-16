@@ -512,8 +512,8 @@ class Channel extends \Controller {
      *
      * @param $entity integer|object Type Id or Channel object
      */
-    protected function prepareFields( $type, $entity=NULL ) {
-
+    protected function prepareFields($type, $entity=null)
+    {
         // Got channel type number to create new channel
         $type = new \ORM\ChannelType($type);
 
@@ -566,10 +566,10 @@ class Channel extends \Controller {
                 array(
                     'FIELD'    => $key,
                     'TYPE'     => 'text',
-                    'VISIBLE'  => TRUE,
-                    'REQUIRED' => FALSE,
-                    'READONLY' => FALSE,
-                    'DEFAULT'  => NULL,
+                    'VISIBLE'  => true,
+                    'REQUIRED' => false,
+                    'READONLY' => false,
+                    'DEFAULT'  => null,
                     'VALUE'    => ''
                 ),
                 $data
@@ -587,35 +587,50 @@ class Channel extends \Controller {
             // Set value in ADD mode to default
             if (is_null($entity)) $data['VALUE'] = trim($data['DEFAULT']);
 
-            switch (TRUE) {
+            switch (true) {
 
                 // Boolean
                 case strpos($data['TYPE'], 'bool') === 0:
-                    preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
-                    foreach ($matches as $option) {
-                        $data['OPTIONS'][] = array(
-                            'VALUE'   => trim($option[1]),
-                            'TEXT'    => __(trim($option[2])),
-                            'CHECKED' => (trim($option[1]) == $data['VALUE'])
-                        );
+                    // Shortcuts without options
+                    if ($data['TYPE'] === 'bool' || $data['TYPE'] === 'bool-0' || $data['TYPE'] === 'boolean-0') {
+                        // Defaults to 0
+                        $data['TYPE'] = 'bool;0:no;1:yes';
+                    } elseif ($data['TYPE'] === 'bool-1' || $data['TYPE'] === 'boolean-1') {
+                        // Defaults to 1
+                        $data['TYPE'] = 'bool;1:yes;0:no';
                     }
+
+                    if (preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER)) {
+                        foreach ($matches as $option) {
+                            $val = trim($option[1]);
+                            $data['OPTIONS'][] = array(
+                                'VALUE'   => $val,
+                                'TEXT'    => __(trim($option[2])),
+                                'CHECKED' => ($val == $data['VALUE'])
+                            );
+                        }
+                    }
+
                     // Set type for template compiler
                     $data['TYPE'] = 'bool';
-                  break;
+                    break;
 
                 // Select
                 case strpos($data['TYPE'], 'select') === 0:
-                    preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER);
-                    foreach ($matches as $option) {
-                        $data['OPTIONS'][] = array(
-                            'VALUE'    => trim($option[1]),
-                            'TEXT'     => __(trim($option[2])),
-                            'SELECTED' => (trim($option[1]) == $data['VALUE'])
-                        );
+                    if (preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER)) {
+                        foreach ($matches as $option) {
+                            $val = trim($option[1]);
+                            $data['OPTIONS'][] = array(
+                                'VALUE'    => $val,
+                                'TEXT'     => __(trim($option[2])),
+                                'SELECTED' => ($val == $data['VALUE'])
+                            );
+                        }
                     }
+
                     // Set type for template compiler
                     $data['TYPE'] = 'select';
-                  break;
+                    break;
 
                 // Range
                 case strpos($data['TYPE'], 'range') === 0:
@@ -629,26 +644,29 @@ class Channel extends \Controller {
                     }
                     // Set type for template compiler
                     $data['TYPE'] = 'select';
-                  break;
+                    break;
 
                 // SQL
                 case preg_match('~^sql:(.?):(.*?)$~i', $data['TYPE'], $matches):
                     // Tranform into select options
                     if ($matches[1] != '') {
                         // Empty option for select2 placeholder
-                        $data['OPTIONS'][] = NULL;
+                        $data['OPTIONS'][] = null;
                     }
+
                     foreach ($this->db->queryRowsArray($matches[2]) as $option) {
                         $option = array_values($option);
+                        $val    = trim($option[0]);
                         $data['OPTIONS'][] = array(
-                            'VALUE'    => trim($option[0]),
+                            'VALUE'    => $val,
                             'TEXT'     => __(trim($option[1])),
-                            'SELECTED' => (trim($option[0]) == $data['VALUE'])
+                            'SELECTED' => ($val == $data['VALUE'])
                         );
                     }
+
                     // Set type for template compiler
                     $data['TYPE'] = 'select';
-                  break;
+                    break;
 
                 // Detect icon by field name, not by type
                 case $key == 'icon':
@@ -674,7 +692,6 @@ class Channel extends \Controller {
                     }
                     // Set type for template compiler
                     $data['TYPE'] = 'icon';
-                  break;
 
             } // switch
         }

@@ -8,6 +8,8 @@
  * @version    1.0.0
  */
 
+set_time_limit(0);
+
 define('DEVELOP', (isset($_SERVER['HTTP_X_DEBUG']) AND $_SERVER['HTTP_X_DEBUG']));
 
 if (DEVELOP) {
@@ -24,9 +26,8 @@ if (DEVELOP) {
  * Directories
  */
 define('DS',       DIRECTORY_SEPARATOR);
-define('BASE_DIR', dirname(__FILE__));
-define('ROOT_DIR', dirname(dirname(BASE_DIR)));
-define('APP_DIR',  BASE_DIR . DS . 'app');
+define('BASE_DIR', __DIR__);
+define('ROOT_DIR', dirname(dirname(__DIR__)));
 define('CONF_DIR', ROOT_DIR . DS . 'config');
 define('CORE_DIR', ROOT_DIR . DS . 'core');
 define('LIB_DIR',  ROOT_DIR . DS . 'lib');
@@ -49,11 +50,11 @@ file_exists(BASE_DIR.DS.'prepend.php') && include BASE_DIR.DS.'prepend.php';
  * Initialize Loader
  */
 $loader = require_once ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
-$loader->addPsr4('', array(CORE_DIR, LIB_DIR, APP_DIR));
+$loader->addPsr4('', array(CORE_DIR, LIB_DIR, BASE_DIR));
 
 Loader::register($loader, TEMP_DIR);
 
-$api = new API(array(
+$api = new Api(array(
     'mode'      => DEVELOP ? 'development' : 'production',
     'log.level' => DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
     'debug'     => FALSE, // No debug mode at all
@@ -101,8 +102,6 @@ $api->container->singleton('cache', function() use ($api) {
 $api->hook('slim.before', function() use ($api) {
 
     slimMVC\ORM::setDatabase($api->db);
-
-    Channel::setCache($api->cache);
 
     foreach ((new ORM\SettingsKeys)->find() as $setting) {
         $api->config->set($setting->getKey(), $setting->getValue());

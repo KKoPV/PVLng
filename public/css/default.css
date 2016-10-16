@@ -7,11 +7,10 @@
  * You can use any grid from http://960.gs - WITH 10 COLUMNS!
  */
 body {
-    max-width: 1200px;
+    max-width: 1260px;
     margin: 0 auto;
     /* Imprima load via font cache - https://jaicab.com/localFont/ */
     font-family: Imprima, Arial, sans-serif;
-    font-size: 90%;
 }
 
 #content {
@@ -44,6 +43,40 @@ a:hover, a:active {
 
 .toolbar a {
     color: black;
+}
+
+.ui-button.icon {
+    border: 0;
+    background: transparent;
+}
+
+.ui-button.icon .ui-button-text {
+    padding-left: .4em;
+    padding-right: .4em;
+}
+
+.ui-resizable-s {
+    height: 4px;
+    border: 1px solid #aaaaaa;
+    border-radius: 4px;
+    background: #cccccc url(images/ui-bg_inset-hard_75_cccccc_1x100.png) 50% 50% repeat-x;
+}
+
+.ui-resizable-s div {
+    width: 30px;
+    position: absolute;
+    top: 1px;
+    left: 50%;
+    margin-left: -15px;
+    border-top: dotted 2px #333333;
+}
+
+#chart-wrapper {
+    margin-bottom: 1em;
+}
+
+#chart-wrapper .ui-resizable-handle {
+    display: none;
 }
 
 /* Go back to top link

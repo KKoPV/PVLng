@@ -10,5 +10,5 @@
 -->
 
 <div data-role="footer" data-id="footer">
-    <h1>{strip_tags:TITLE}</h1>
+    <h1>{TITLE}</h1>
 </div>

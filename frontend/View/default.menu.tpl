@@ -65,6 +65,8 @@
             </ul>
         </div>
 
+        <div class="extra fl"></div>
+
         <div class="fr">
             <ul class="sm sm-clean">
                 <!-- QR code for mobile view -->

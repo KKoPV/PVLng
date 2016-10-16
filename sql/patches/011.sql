@@ -1,0 +1,1 @@
+ALTER TABLE `pvlng_reading_num` PARTITION BY LINEAR KEY(`id`) PARTITIONS 50;

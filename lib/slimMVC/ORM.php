@@ -58,7 +58,6 @@ abstract class ORM implements \Iterator, \Countable {
         }
 
         $this->raw = $this->fields;
-
         if ($id !== null) $this->filter($this->primary, $id)->findOne();
     }
 
@@ -115,6 +114,10 @@ abstract class ORM implements \Iterator, \Countable {
                 if (array_key_exists('max', $value)) {
                     $this->filter[] = $field.' <= '.$this->quote($value['max']);
                     unset($value['max']);
+                }
+                if (array_key_exists('like', $value)) {
+                    $this->filter[] = $field.' like '.$this->quote($value['like']);
+                    unset($value['like']);
                 }
                 if (!empty($value)) {
                     // OR condition
@@ -178,13 +181,10 @@ abstract class ORM implements \Iterator, \Countable {
      */
     public function find()
     {
+        $sql = $this->_sql() . $this->_limit();
+
         $this->resultRows     = array();
         $this->resultPosition = 0;
-
-        $sql = 'SELECT * FROM `'.$this->table.'`'
-             . $this->_filter()
-             . $this->_order()
-             . $this->_limit();
 
         if ($res = $this->_query($sql)) {
             while ($row = $res->fetch_assoc()) {
@@ -205,13 +205,10 @@ abstract class ORM implements \Iterator, \Countable {
      */
     public function findOne()
     {
+        $sql = $this->_sql() . ' LIMIT 1';
+
         $this->resultRows     = array();
         $this->resultPosition = 0;
-
-        $sql = 'SELECT * FROM `'.$this->table.'`'
-             . $this->_filter()
-             . $this->_order()
-             . ' LIMIT 1';
 
         if (($res = $this->_query($sql)) && ($row = $res->fetch_assoc())) {
             foreach ($row as $key=>$value) {
@@ -721,6 +718,14 @@ abstract class ORM implements \Iterator, \Countable {
     protected function quote($value)
     {
         return '"' . self::$db->real_escape_string($value) . '"';
+    }
+
+    /**
+     *
+     */
+    protected function _sql()
+    {
+        return 'SELECT * FROM `'.$this->table.'`' . $this->_filter() . $this->_order();
     }
 
     /**

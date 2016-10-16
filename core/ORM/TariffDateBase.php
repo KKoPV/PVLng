@@ -150,8 +150,8 @@ abstract class TariffDateBase extends \slimMVC\ORM
     public function filterByIdDate($id, $date)
     {
 
-        $this->filter[] = '`id` = '.$this->quote($id).'';
-        $this->filter[] = '`date` = '.$this->quote($date).'';
+        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
+        $this->filter[] = $this->field('date').' = '.$this->quote($date).'';
         return $this;
     }   // filterByIdDate()
 
@@ -163,7 +163,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     public function filterByDate($date)
     {
-        $this->filter[] = '`date` = '.$this->quote($date);
+        $this->filter[] = $this->field('date').' = '.$this->quote($date);
         return $this;
     }   // filterByDate()
 
@@ -175,7 +175,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -187,7 +187,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = '`cost` = '.$this->quote($cost);
+        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
     }   // filterByCost()
 

@@ -197,7 +197,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -209,7 +209,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterBySlug($slug)
     {
-        $this->filter[] = '`slug` = '.$this->quote($slug);
+        $this->filter[] = $this->field('slug').' = '.$this->quote($slug);
         return $this;
     }   // filterBySlug()
 
@@ -221,7 +221,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -233,7 +233,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = '`data` = '.$this->quote($data);
+        $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
     }   // filterByData()
 
@@ -245,7 +245,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = '`public` = '.$this->quote($public);
+        $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
     }   // filterByPublic()
 

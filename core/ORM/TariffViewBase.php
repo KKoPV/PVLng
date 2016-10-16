@@ -141,7 +141,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = '`id` = '.$this->quote($id);
+        $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
     }   // filterById()
 
@@ -153,7 +153,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = '`name` = '.$this->quote($name);
+        $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
     }   // filterByName()
 
@@ -165,7 +165,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTariffComment($tariff_comment)
     {
-        $this->filter[] = '`tariff_comment` = '.$this->quote($tariff_comment);
+        $this->filter[] = $this->field('tariff_comment').' = '.$this->quote($tariff_comment);
         return $this;
     }   // filterByTariffComment()
 
@@ -177,7 +177,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByDate($date)
     {
-        $this->filter[] = '`date` = '.$this->quote($date);
+        $this->filter[] = $this->field('date').' = '.$this->quote($date);
         return $this;
     }   // filterByDate()
 
@@ -189,7 +189,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = '`cost` = '.$this->quote($cost);
+        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
     }   // filterByCost()
 
@@ -201,7 +201,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTime($time)
     {
-        $this->filter[] = '`time` = '.$this->quote($time);
+        $this->filter[] = $this->field('time').' = '.$this->quote($time);
         return $this;
     }   // filterByTime()
 
@@ -213,7 +213,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByDays($days)
     {
-        $this->filter[] = '`days` = '.$this->quote($days);
+        $this->filter[] = $this->field('days').' = '.$this->quote($days);
         return $this;
     }   // filterByDays()
 
@@ -225,7 +225,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTariff($tariff)
     {
-        $this->filter[] = '`tariff` = '.$this->quote($tariff);
+        $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
         return $this;
     }   // filterByTariff()
 
@@ -237,7 +237,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTimeComment($time_comment)
     {
-        $this->filter[] = '`time_comment` = '.$this->quote($time_comment);
+        $this->filter[] = $this->field('time_comment').' = '.$this->quote($time_comment);
         return $this;
     }   // filterByTimeComment()
 
