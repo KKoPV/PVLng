@@ -1,5 +1,21 @@
 #### Current
 
+* [`03fee92`](../../commit/03fee92) Add database patch level in initial SQL (Knut Kohl)
+* [`287084e`](../../commit/287084e) Adjust body output size (Knut Kohl)
+* [`7cc6d5b`](../../commit/7cc6d5b) Fix open_basedir restriction error (Knut Kohl)
+* [`cd3081f`](../../commit/cd3081f) Rework database default values (Knut Kohl)
+* [`374ad24`](../../commit/374ad24) Add pause function also to cron script (Knut Kohl)
+* [`c96fef5`](../../commit/c96fef5) Adjust label position in chart (Knut Kohl)
+* [`02bb574`](../../commit/02bb574) Fix wrong variable references (Knut Kohl)
+* [`a0a7fce`](../../commit/a0a7fce) Add example injecting system load into output (Knut Kohl)
+* [`cda16bb`](../../commit/cda16bb) Add splitter for chart resizing (Knut Kohl)
+* [`a50f2de`](../../commit/a50f2de) Add scatter plot (Knut Kohl)
+* [`696285e`](../../commit/696285e) Make settings multi language (Knut Kohl)
+* [`0f0eb15`](../../commit/0f0eb15) Add new date selection for charts (Knut Kohl)
+* [`71d8d3e`](../../commit/71d8d3e) Merge tag 'v2.14.0' into develop (Knut Kohl)
+
+#### v2.14.0
+
 * [`1fb8953`](../../commit/1fb8953) Change chart zoom to mouse scroll (Knut Kohl)
 * [`5dac0c3`](../../commit/5dac0c3) Upgrade PNotify to 3.0.0 (Knut Kohl)
 * [`a887632`](../../commit/a887632) Merge tag 'v2.13.2' into develop (Knut Kohl)
