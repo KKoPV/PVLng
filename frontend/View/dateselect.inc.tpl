@@ -26,7 +26,7 @@
       <label for="timerange-year">{{Year}}</label>
     </span>
 
-    <button class="icon" onclick="pvlng.changeDate(-1)">
+    <button class="icon scroll" onclick="pvlng.changeDate(-1)">
         <i class="fa fa-chevron-left fa-fw"></i>
     </button>
     <!-- Remove all text input styling -->
@@ -36,20 +36,20 @@
     <button id="dpCalendar" class="icon" data-input="#timerange">
         <i class="fa fa-calendar fa-fw"></i>
     </button>
-    <button class="icon" onclick="pvlng.changeDate(1)">
+    <button class="icon scroll" onclick="pvlng.changeDate(1)">
         <i class="fa fa-chevron-right fa-fw"></i>
     </button>
 
 </span>
 
 <span id="dp2" class="d-select" style="display:none">
-    <button class="icon tipbtn" onclick="pvlng.changeDates(-1)" title="{{PrevDay}} (Alt+P)">
+    <button class="icon scroll tipbtn" onclick="pvlng.changeDates(-1)" title="{{PrevDay}} (Alt+P)">
         <i class="fa fa-chevron-left fa-fw"></i>
     </button>
     <input class="c" type="text" id="from">
     &mdash;
     <input class="c" type="text" id="to">
-    <button class="icon tipbtn" onclick="pvlng.changeDates(1)" title="{{NextDay}} (Alt+N)">
+    <button class="icon scroll tipbtn" onclick="pvlng.changeDates(1)" title="{{NextDay}} (Alt+N)">
         <i class="fa fa-chevron-right fa-fw"></i>
     </button>
 </span>

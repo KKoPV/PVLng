@@ -136,3 +136,40 @@
     font-size: smaller;
     font-style: italic;
 }
+
+#chart-wrapper .btn {
+    position: absolute;
+    bottom: 0;
+    z-index: 10;
+    font-size: 2em;
+    display: none;
+}
+
+#chart-wrapper .btn i {
+    color: #aaaaaa;
+}
+
+#chart-wrapper .btn.left {
+    left: 0;
+    padding: .33em .33em .33em 0;
+}
+
+#chart-wrapper .btn.right {
+    right: 0;
+    padding: .33em 0 .33em .33em;
+}
+
+#chart-wrapper:hover .btn {
+    display: block;
+}
+
+/* Hide scroll buttons in header segment */
+#dp1 .icon.scroll,
+#dp2 .icon.scroll {
+    display: none;
+}
+
+#dp2 input[type=text] {
+    margin-left: .5em;
+    margin-right: .5em;
+}
