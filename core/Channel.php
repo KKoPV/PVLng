@@ -286,7 +286,6 @@ abstract class Channel
         $reading = \ORM\Reading::factory($this->numeric);
 
         $this->lastReading = \ORM\ReadingLast::f($this->entity)->getData();
-#        $this->lastReading = $reading->getLastReading($this->entity, $timestamp);
 
         $this->before_write($request);
 

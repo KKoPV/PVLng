@@ -7,36 +7,39 @@
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
-
 namespace Controller;
 
 /**
  *
  */
-class Settings extends \Controller {
+class Settings extends \Controller
+{
 
     /**
      *
      */
-    public function IndexPOST_Action() {
+    public function IndexPOST_Action()
+    {
         if (!($data = $this->app->request->post('d'))) return;
 
         /// \Yryie::Debug($data);
         $tbl = new \ORM\Settings;
-        $ok  = TRUE;
+        $ok  = true;
 
         // Handle password change separately
-        $p1 = $data['p1'];  $p2 = $data['p2'];  unset($data['p1'], $data['p2']);
+        $p1 = $data['p1'];
+        $p2 = $data['p2'];
+        unset($data['p1'], $data['p2']);
 
-        $pwChanged = FALSE;
+        $pwChanged = false;
 
         if ($p1 != '' OR $p2 != '') {
             if ($p1 == $p2) {
                 $data['core--Password'] = (new \PasswordHash)->HashPassword($p1);
-                $pwChanged = TRUE;
+                $pwChanged = true;
             } else {
                 \Messages::Error(__('PasswordsNotEqual'));
-                $ok = FALSE;
+                $ok = false;
             }
         }
 
@@ -67,7 +70,8 @@ class Settings extends \Controller {
     /**
      *
      */
-    public function Index_Action() {
+    public function Index_Action()
+    {
         $this->view->SubTitle = __('Settings');
 
         $t = \BabelKitMySQLi::getInstance()

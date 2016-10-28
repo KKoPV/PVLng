@@ -54,6 +54,6 @@
     </button>
 </span>
 
-<button id="btn-reset" class="tipbtn" title="{{ChartTodayHint}}">
-    <i class="fa fa-clock-o"></i>
+<button id="btn-reset" class="icon tipbtn" title="{{ChartTodayHint}}">
+    <i class="fa fa-dot-circle-o"></i>
 </button>

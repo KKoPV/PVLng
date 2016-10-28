@@ -32,11 +32,11 @@
 <div class="clear"></div>
 
 <div id="chart-wrapper" style="margin-bottom:1em">
-    <div class="btn left" onclick="pvlng.changeDate(-1)">
-        <i class="fa fa-chevron-left fa-fw"></i>
+    <div class="arrow left" onclick="pvlng.changeDate(-1)">
+        <i class="fa fa-chevron-left"></i>
     </div>
-    <div class="btn right" onclick="pvlng.changeDate(1)">
-        <i class="fa fa-chevron-right fa-fw"></i>
+    <div class="arrow right" onclick="pvlng.changeDate(1)">
+        <i class="fa fa-chevron-right"></i>
     </div>
     <div id="chart">
         <div id="top-select" style="display:none">{{NoChannelsSelectedYet}}</div>

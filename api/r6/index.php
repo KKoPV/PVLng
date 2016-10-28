@@ -166,17 +166,17 @@ $api->hook('slim.before', function() use ($api) {
 
     if ($key == '') {
         // Key was not given
-        $api->APIKeyValid = FALSE;
-    } elseif ($key == $api->db->queryOne('SELECT getAPIKey()')) {
+        $api->APIKeyValid = false;
+    } elseif ($key == $api->db->queryOne('SELECT `pvlng_api_key`()')) {
         // Key is given and valid
-        $api->APIKeyValid = TRUE;
+        $api->APIKeyValid = true;
     } else {
         // Key is invalid
         $api->stopAPI('Invalid API key given.', 403);
     }
 
     // Analyse X-PVLng-DryRun header
-    if ($api->dryrun = $headers->get('X-PVLng-DryRun', FALSE)) {
+    if ($api->dryrun = $headers->get('X-PVLng-DryRun', false)) {
         $api->contentType('text/plain');
         echo 'Dry run, no data will be saved.', PHP_EOL;
     }
@@ -234,82 +234,13 @@ $api->error(function($e) use ($api) {
     }
 });
 
-/**
- *
- */
-function SaveCSVdata( $guid, $rows, $sep ) {
-
-    // Ignore empty datasets
-    $rows = array_values(array_filter($rows));
-
-    if (empty($rows)) return;
-
-    try {
-        $api = API::getInstance();
-
-        // Disable AutoCommit in case of errors
-        $api->db->autocommit(FALSE);
-        $saved = 0;
-
-        $channel = Channel::byGUID($guid);
-
-        // Ignore empty datasets, track also row Id for error messages
-        foreach ($rows as $row=>$dataset) {
-            $data = explode($sep, $dataset);
-
-            switch (count($data)) {
-                case 2:
-                    // timestamp/datetime and data
-                    list($timestamp, $value) = $data;
-                    break;
-                case 3:
-                    // date, time and data
-                    $timestamp = $data[0] . ' ' . $data[1];
-                    $value     = $data[2];
-                    break;
-                default:
-                    throw new Exception('Invalid data: '.$dataset, 400);
-            } // switch
-
-            if (!is_numeric($timestamp)) $timestamp = strtotime($timestamp);
-
-            if ($timestamp === FALSE) {
-                throw new Exception('Invalid timestamp in row '.($row+1).': "'.$dataset.'"', 400);
-            }
-
-            if ($api->dryrun) {
-                echo $timestamp, $sep, $value,
-                     ' (', date('Y-m-d H:i:s', $timestamp), ' : ', $value, ')', PHP_EOL;
-            } else {
-                $saved += $channel->write(array('data'=>$value), $timestamp);
-            }
-        }
-        // All fine, commit changes
-        $api->db->commit();
-
-        if ($saved) $api->status(201);
-
-        $result = array(
-            'status'  => 'succes',
-            'message' => ($row+1) . ' valid row(s) sended, ' . $saved . ' row(s) inserted'
-        );
-
-        $api->render($result);
-
-    } catch (Exception $e) {
-        // Rollback all correct data
-        $api->db->rollback();
-        $api->stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
-    }
-}
-
 // ---------------------------------------------------------------------------
 // Declare default conditions before routes
 // ---------------------------------------------------------------------------
 Slim\Route::setDefaultConditions(array(
     'date'      => '\d{4}-\d{2}-\d{2}',
-#    'guid'      => '\w{4}(?:-\w{4}){7}',
-    'guid'      => '\w{4}-\w{4}(?:-\w{4}){0,6}',
+                   // At least the 1st and 2nd terms of a GUID are required
+    'guid'      => '[0-9a-f]{4}-[0-9a-f]{4}(?:-[0-9a-f]{4}){0,6}',
     'period'    => '(?:last|readlast|all)',
     'timestamp' => '\d+',
     'id'        => '\d+',

@@ -555,6 +555,7 @@ function updateChart( force ) {
         /* (Re)Create chart */
         $('#'+chartOptions.chart.renderTo).css('height', ChartHeight).show();
         chart = new Highcharts.Chart(chartOptions);
+        $('#chart-wrapper').addClass('chart-loaded');
         /* Help chart with fluid layout to find its correct size */
         chart.reflow();
         /* Show splitter */

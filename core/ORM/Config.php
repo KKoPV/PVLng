@@ -17,26 +17,30 @@ namespace ORM;
 /**
  *
  */
-class Config extends ConfigBase {
+class Config extends ConfigBase
+{
 
     /**
      *
      */
-    public function getAPIkey() {
-        return self::$db->queryOne('SELECT `getAPIkey`()');
+    public function getAPIkey()
+    {
+        return self::$db->queryOne('SELECT `pvlng_api_key`()');
     }
 
     /**
      *
      */
-    public function getInstallation() {
+    public function getInstallation()
+    {
         return self::$db->queryOne('SELECT `pvlng_id`()');
     }
 
     /**
      *
      */
-    public function resetAPIkey() {
+    public function resetAPIkey()
+    {
         self::$db->query(
             'UPDATE `'.$this->table.'` SET `value` = UUID() WHERE `key` = "APIKey" LIMIT 1'
         );

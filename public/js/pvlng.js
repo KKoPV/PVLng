@@ -22,6 +22,11 @@ var dFrom, dTo;
 var pvlng = new function() {
 
     /**
+     *
+     */
+    this.maxFutureDays = 2;
+
+    /**
      * Public property
      */
     this.verbose = false;
@@ -200,8 +205,8 @@ var pvlng = new function() {
 
         this.dp.setDate(from, format);
 
-        // Max. date is today + 3 days
-        to = new Date(Math.min(to, new Date(new Date().getTime() + 3*8.64e7)));
+        // Max. date is today + pvlng.maxFutureDays
+        to = new Date(Math.min(to, new Date(new Date().getTime() + this.maxFutureDays*8.64e7)));
 
         this.dpFrom.datepicker('option', 'maxDate', to).datepicker('setDate', from);
         this.dpTo.datepicker('option', 'minDate', from).datepicker('setDate', to);
@@ -402,21 +407,24 @@ $(function() {
     pvlng.dp = $('#timerange').datepicker({
         altField: '#timerangedate',
         altFormat: 'mm/dd/yy',
-        maxDate: 3,
+        maxDate: pvlng.maxFutureDays,
         showButtonPanel: true,
         showWeek: true,
         changeMonth: true,
         changeYear: true,
         showOn: null,
         onClose: function(dateText, inst) {
-            $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay));
-            pvlng.calcDates();
+            if (dateText != inst.lastVal) {
+                $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay));
+                pvlng.calcDates();
+            }
         }
     }).datepicker('setDate', dTo);
 
     pvlng.dp.setDate = function(date, format) {
         format && this.datepicker('option', 'dateFormat', format);
-        this.datepicker('setDate', date);
+        /* Set date and recalc new max. date */
+        this.datepicker('setDate', date).datepicker('option', 'maxDate', pvlng.maxFutureDays);
     };
 
     // Remember local day date format
@@ -451,7 +459,7 @@ $(function() {
         altField: '#todate',
         altFormat: 'mm/dd/yy',
         autoSize: true,
-        maxDate: 3,
+        maxDate: pvlng.maxFutureDays,
         showButtonPanel: true,
         showWeek: true,
         changeMonth: true,

@@ -150,9 +150,16 @@ abstract class ORM implements \Iterator, \Countable {
      *
      * @return instance
      */
-    public function order($field, $desc=false)
+    public function order($field)
     {
-        $this->order[] = $this->field($field) . ($desc ? ' DESC' : '');
+        $field = explode(',', $field);
+        foreach ($field as $f) {
+            if (substr($f, 0, 1) != '-') {
+                $this->order[] = $this->field($f);
+            } else {
+                $this->order[] = $this->field(substr($f, 1)) . ' DESC';
+            }
+        }
         return $this;
     }
 
@@ -160,18 +167,9 @@ abstract class ORM implements \Iterator, \Countable {
      *
      * @return instance
      */
-    public function orderDesc($field)
+    public function limit($limit, $offset=0)
     {
-        return $this->order($field, true);
-    }
-
-    /**
-     *
-     * @return instance
-     */
-    public function limit($limit)
-    {
-        $this->limit = $limit;
+        $this->limit = $offset . ', ' . $limit;
         return $this;
     }
 
@@ -759,10 +757,10 @@ abstract class ORM implements \Iterator, \Countable {
             }
         }
 
-        $sql = $mode.' INTO ' . $this->table
-             . ' (`' . implode('`, `', $keys) . '`) '
-             . 'VALUES'
-             . ' (' . implode(', ', $values) . ')';
+        $sql = sprintf(
+            '%s INTO `%s` (`%s`) VALUES (%s)',
+            $mode, $this->table, implode('`, `', $keys), implode(', ', $values)
+        );
 
         if (($mode == 'INSERT') && ($dup = $this->onDuplicateKey())) {
             $sql .= ' ON DUPLICATE KEY UPDATE ' . $dup;
@@ -773,7 +771,7 @@ abstract class ORM implements \Iterator, \Countable {
                 $this->set($this->autoinc, self::$db->insert_id);
             }
             return (self::$db->affected_rows <= 0) ? 0 : self::$db->affected_rows;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 0;
         }
     }

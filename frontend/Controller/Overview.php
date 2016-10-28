@@ -39,7 +39,7 @@ class Overview extends \Controller {
         $channels = array();
         $tblChannels = new \ORM\ChannelView;
         $tblChannels->filter('id', array('min'=>2))
-                    ->order('type')->order('name')->order('description')
+                    ->order('type,name,description')
                     ->find();
         foreach ($tblChannels->asAssoc() as $channel) {
             $type = $channel['type_id'];
