@@ -41,7 +41,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->fields['scope'] = $scope;
         return $this;
-    }   // setScope()
+    }
 
     /**
      * Raw setter for field "scope", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->raw['scope'] = $scope;
         return $this;
-    }   // setScopeRaw()
+    }
 
     /**
      * Basic setter for field "name"
@@ -65,7 +65,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->fields['name'] = $name;
         return $this;
-    }   // setName()
+    }
 
     /**
      * Raw setter for field "name", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->raw['name'] = $name;
         return $this;
-    }   // setNameRaw()
+    }
 
     /**
      * Basic setter for field "key"
@@ -89,7 +89,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->fields['key'] = $key;
         return $this;
-    }   // setKey()
+    }
 
     /**
      * Raw setter for field "key", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->raw['key'] = $key;
         return $this;
-    }   // setKeyRaw()
+    }
 
     /**
      * Basic setter for field "value"
@@ -113,7 +113,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->fields['value'] = $value;
         return $this;
-    }   // setValue()
+    }
 
     /**
      * Raw setter for field "value", for INSERT, REPLACE and UPDATE
@@ -125,7 +125,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->raw['value'] = $value;
         return $this;
-    }   // setValueRaw()
+    }
 
     /**
      * Basic setter for field "order"
@@ -137,7 +137,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->fields['order'] = $order;
         return $this;
-    }   // setOrder()
+    }
 
     /**
      * Raw setter for field "order", for INSERT, REPLACE and UPDATE
@@ -149,7 +149,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->raw['order'] = $order;
         return $this;
-    }   // setOrderRaw()
+    }
 
     /**
      * Basic setter for field "type"
@@ -161,7 +161,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->fields['type'] = $type;
         return $this;
-    }   // setType()
+    }
 
     /**
      * Raw setter for field "type", for INSERT, REPLACE and UPDATE
@@ -173,7 +173,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->raw['type'] = $type;
         return $this;
-    }   // setTypeRaw()
+    }
 
     /**
      * Basic setter for field "data"
@@ -185,7 +185,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->fields['data'] = $data;
         return $this;
-    }   // setData()
+    }
 
     /**
      * Raw setter for field "data", for INSERT, REPLACE and UPDATE
@@ -197,7 +197,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->raw['data'] = $data;
         return $this;
-    }   // setDataRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -211,7 +211,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function getScope()
     {
         return $this->fields['scope'];
-    }   // getScope()
+    }
 
     /**
      * Basic getter for field "name"
@@ -221,7 +221,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "key"
@@ -231,7 +231,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function getKey()
     {
         return $this->fields['key'];
-    }   // getKey()
+    }
 
     /**
      * Basic getter for field "value"
@@ -241,7 +241,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function getValue()
     {
         return $this->fields['value'];
-    }   // getValue()
+    }
 
     /**
      * Basic getter for field "order"
@@ -251,7 +251,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function getOrder()
     {
         return $this->fields['order'];
-    }   // getOrder()
+    }
 
     /**
      * Basic getter for field "type"
@@ -261,7 +261,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function getType()
     {
         return $this->fields['type'];
-    }   // getType()
+    }
 
     /**
      * Basic getter for field "data"
@@ -271,7 +271,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     public function getData()
     {
         return $this->fields['data'];
-    }   // getData()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -290,7 +290,7 @@ abstract class SettingsBase extends \slimMVC\ORM
         $this->filter[] = $this->field('name').' = '.$this->quote($name).'';
         $this->filter[] = $this->field('key').' = '.$this->quote($key).'';
         return $this;
-    }   // filterByScopeNameKey()
+    }
 
     /**
      * Filter for field "scope"
@@ -302,7 +302,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('scope').' = '.$this->quote($scope);
         return $this;
-    }   // filterByScope()
+    }
 
     /**
      * Filter for field "name"
@@ -314,7 +314,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "key"
@@ -326,7 +326,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('key').' = '.$this->quote($key);
         return $this;
-    }   // filterByKey()
+    }
 
     /**
      * Filter for field "value"
@@ -338,7 +338,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('value').' = '.$this->quote($value);
         return $this;
-    }   // filterByValue()
+    }
 
     /**
      * Filter for field "order"
@@ -350,7 +350,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('order').' = '.$this->quote($order);
         return $this;
-    }   // filterByOrder()
+    }
 
     /**
      * Filter for field "type"
@@ -362,7 +362,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
-    }   // filterByType()
+    }
 
     /**
      * Filter for field "data"
@@ -374,7 +374,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
-    }   // filterByData()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -385,11 +385,11 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`value` = '.$this->quote($this->fields['value']).'
-              , `order` = '.$this->quote($this->fields['order']).'
-              , `type` = '.$this->quote($this->fields['type']).'
-              , `data` = '.$this->quote($this->fields['data']).'';
-    }   // onDuplicateKey()
+        return '`value` = VALUES(`value`)
+              , `order` = VALUES(`order`)
+              , `type` = VALUES(`type`)
+              , `data` = VALUES(`data`)';
+    }
 
     /**
      * Table name

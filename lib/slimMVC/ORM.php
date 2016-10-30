@@ -762,8 +762,8 @@ abstract class ORM implements \Iterator, \Countable {
             $mode, $this->table, implode('`, `', $keys), implode(', ', $values)
         );
 
-        if (($mode == 'INSERT') && ($dup = $this->onDuplicateKey())) {
-            $sql .= ' ON DUPLICATE KEY UPDATE ' . $dup;
+        if ($mode == 'INSERT') {
+            $sql .= $this->_onDuplicateKey();
         }
 
         try {
@@ -801,6 +801,16 @@ abstract class ORM implements \Iterator, \Countable {
     protected function _limit()
     {
         return ($this->limit != '') ? ' LIMIT '.$this->limit : '';
+    }
+
+    /**
+     *
+     */
+    protected function _onDuplicateKey()
+    {
+        if ($dup = $this->onDuplicateKey()) {
+            return ' ON DUPLICATE KEY UPDATE ' . $dup;
+        }
     }
 
     /**

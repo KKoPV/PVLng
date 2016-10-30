@@ -41,7 +41,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->fields['timestamp'] = $timestamp;
         return $this;
-    }   // setTimestamp()
+    }
 
     /**
      * Raw setter for field "timestamp", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->raw['timestamp'] = $timestamp;
         return $this;
-    }   // setTimestampRaw()
+    }
 
     /**
      * Basic setter for field "action"
@@ -65,7 +65,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->fields['action'] = $action;
         return $this;
-    }   // setAction()
+    }
 
     /**
      * Raw setter for field "action", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->raw['action'] = $action;
         return $this;
-    }   // setActionRaw()
+    }
 
     /**
      * Basic setter for field "time"
@@ -89,7 +89,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->fields['time'] = $time;
         return $this;
-    }   // setTime()
+    }
 
     /**
      * Raw setter for field "time", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->raw['time'] = $time;
         return $this;
-    }   // setTimeRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -115,7 +115,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     public function getTimestamp()
     {
         return $this->fields['timestamp'];
-    }   // getTimestamp()
+    }
 
     /**
      * Basic getter for field "action"
@@ -125,7 +125,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     public function getAction()
     {
         return $this->fields['action'];
-    }   // getAction()
+    }
 
     /**
      * Basic getter for field "time"
@@ -135,7 +135,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     public function getTime()
     {
         return $this->fields['time'];
-    }   // getTime()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -151,7 +151,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
         return $this;
-    }   // filterByTimestamp()
+    }
 
     /**
      * Filter for field "action"
@@ -163,7 +163,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('action').' = '.$this->quote($action);
         return $this;
-    }   // filterByAction()
+    }
 
     /**
      * Filter for field "time"
@@ -175,7 +175,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('time').' = '.$this->quote($time);
         return $this;
-    }   // filterByTime()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -186,10 +186,10 @@ abstract class PerformanceBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`timestamp` = '.$this->quote($this->fields['timestamp']).'
-              , `action` = '.$this->quote($this->fields['action']).'
-              , `time` = '.$this->quote($this->fields['time']).'';
-    }   // onDuplicateKey()
+        return '`timestamp` = VALUES(`timestamp`)
+              , `action` = VALUES(`action`)
+              , `time` = VALUES(`time`)';
+    }
 
     /**
      * Table name

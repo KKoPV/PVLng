@@ -47,7 +47,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
     public function getKey()
     {
         return $this->fields['key'];
-    }   // getKey()
+    }
 
     /**
      * Basic getter for field "value"
@@ -57,7 +57,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
     public function getValue()
     {
         return $this->fields['value'];
-    }   // getValue()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -73,7 +73,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('key').' = '.$this->quote($key);
         return $this;
-    }   // filterByKey()
+    }
 
     /**
      * Filter for field "value"
@@ -85,7 +85,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('value').' = '.$this->quote($value);
         return $this;
-    }   // filterByValue()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

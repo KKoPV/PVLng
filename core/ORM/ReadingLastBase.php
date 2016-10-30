@@ -41,7 +41,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->fields['id'] = $id;
         return $this;
-    }   // setId()
+    }
 
     /**
      * Raw setter for field "id", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->raw['id'] = $id;
         return $this;
-    }   // setIdRaw()
+    }
 
     /**
      * Basic setter for field "timestamp"
@@ -65,7 +65,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->fields['timestamp'] = $timestamp;
         return $this;
-    }   // setTimestamp()
+    }
 
     /**
      * Raw setter for field "timestamp", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->raw['timestamp'] = $timestamp;
         return $this;
-    }   // setTimestampRaw()
+    }
 
     /**
      * Basic setter for field "data"
@@ -89,7 +89,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->fields['data'] = $data;
         return $this;
-    }   // setData()
+    }
 
     /**
      * Raw setter for field "data", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->raw['data'] = $data;
         return $this;
-    }   // setDataRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -115,7 +115,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "timestamp"
@@ -125,7 +125,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     public function getTimestamp()
     {
         return $this->fields['timestamp'];
-    }   // getTimestamp()
+    }
 
     /**
      * Basic getter for field "data"
@@ -135,7 +135,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     public function getData()
     {
         return $this->fields['data'];
-    }   // getData()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -151,7 +151,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "timestamp"
@@ -163,7 +163,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
         return $this;
-    }   // filterByTimestamp()
+    }
 
     /**
      * Filter for field "data"
@@ -175,7 +175,7 @@ abstract class ReadingLastBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
-    }   // filterByData()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -186,9 +186,9 @@ abstract class ReadingLastBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`timestamp` = '.$this->quote($this->fields['timestamp']).'
-              , `data` = '.$this->quote($this->fields['data']).'';
-    }   // onDuplicateKey()
+        return '`timestamp` = VALUES(`timestamp`)
+              , `data` = VALUES(`data`)';
+    }
 
     /**
      * Table name

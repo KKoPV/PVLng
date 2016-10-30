@@ -56,14 +56,13 @@ function saveBulkCSV($guid, $rows, $sep) {
         }
 
         // All fine, insert data
-        $ORMReadingNum = new ORM\ReadingNum;
-        $saved = $ORMReadingNum->insertBulk($channel->id, $bulkdata);
+        $saved = ORM\ReadingNum::f()->insertBulk($channel->entity, $bulkdata);
 
         if ($saved) $api->status(201);
 
         $result = array(
             'status'  => 'succes',
-            'message' => ($row+1) . ' valid row(s) sended, ' . $saved . ' row(s) inserted'
+            'message' => ($row+1) . ' valid row(s) sended, ' . $saved . ' row(s) inserted/updated'
         );
 
         $api->render($result);
@@ -130,7 +129,7 @@ function SaveCSV( $guid, $rows, $sep ) {
 
         $result = array(
             'status'  => 'succes',
-            'message' => ($row+1) . ' valid row(s) sended, ' . $saved . ' row(s) inserted'
+            'message' => ($row+1) . ' valid row(s) sended, ' . $saved . ' row(s) inserted/updated'
         );
 
         $api->render($result);

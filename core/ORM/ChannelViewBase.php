@@ -47,7 +47,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "guid"
@@ -57,7 +57,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getGuid()
     {
         return $this->fields['guid'];
-    }   // getGuid()
+    }
 
     /**
      * Basic getter for field "name"
@@ -67,7 +67,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "serial"
@@ -77,7 +77,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getSerial()
     {
         return $this->fields['serial'];
-    }   // getSerial()
+    }
 
     /**
      * Basic getter for field "channel"
@@ -87,7 +87,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getChannel()
     {
         return $this->fields['channel'];
-    }   // getChannel()
+    }
 
     /**
      * Basic getter for field "description"
@@ -97,7 +97,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getDescription()
     {
         return $this->fields['description'];
-    }   // getDescription()
+    }
 
     /**
      * Basic getter for field "resolution"
@@ -107,7 +107,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getResolution()
     {
         return $this->fields['resolution'];
-    }   // getResolution()
+    }
 
     /**
      * Basic getter for field "cost"
@@ -117,7 +117,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getCost()
     {
         return $this->fields['cost'];
-    }   // getCost()
+    }
 
     /**
      * Basic getter for field "numeric"
@@ -127,7 +127,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getNumeric()
     {
         return $this->fields['numeric'];
-    }   // getNumeric()
+    }
 
     /**
      * Basic getter for field "offset"
@@ -137,7 +137,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getOffset()
     {
         return $this->fields['offset'];
-    }   // getOffset()
+    }
 
     /**
      * Basic getter for field "adjust"
@@ -147,7 +147,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getAdjust()
     {
         return $this->fields['adjust'];
-    }   // getAdjust()
+    }
 
     /**
      * Basic getter for field "unit"
@@ -157,7 +157,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getUnit()
     {
         return $this->fields['unit'];
-    }   // getUnit()
+    }
 
     /**
      * Basic getter for field "decimals"
@@ -167,7 +167,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getDecimals()
     {
         return $this->fields['decimals'];
-    }   // getDecimals()
+    }
 
     /**
      * Basic getter for field "meter"
@@ -177,7 +177,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getMeter()
     {
         return $this->fields['meter'];
-    }   // getMeter()
+    }
 
     /**
      * Basic getter for field "threshold"
@@ -187,7 +187,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getThreshold()
     {
         return $this->fields['threshold'];
-    }   // getThreshold()
+    }
 
     /**
      * Basic getter for field "valid_from"
@@ -197,7 +197,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getValidFrom()
     {
         return $this->fields['valid_from'];
-    }   // getValidFrom()
+    }
 
     /**
      * Basic getter for field "valid_to"
@@ -207,7 +207,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getValidTo()
     {
         return $this->fields['valid_to'];
-    }   // getValidTo()
+    }
 
     /**
      * Basic getter for field "public"
@@ -217,7 +217,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getPublic()
     {
         return $this->fields['public'];
-    }   // getPublic()
+    }
 
     /**
      * Basic getter for field "type_id"
@@ -227,7 +227,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getTypeId()
     {
         return $this->fields['type_id'];
-    }   // getTypeId()
+    }
 
     /**
      * Basic getter for field "type"
@@ -237,7 +237,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getType()
     {
         return $this->fields['type'];
-    }   // getType()
+    }
 
     /**
      * Basic getter for field "model"
@@ -247,7 +247,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getModel()
     {
         return $this->fields['model'];
-    }   // getModel()
+    }
 
     /**
      * Basic getter for field "childs"
@@ -257,7 +257,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getChilds()
     {
         return $this->fields['childs'];
-    }   // getChilds()
+    }
 
     /**
      * Basic getter for field "read"
@@ -267,7 +267,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getRead()
     {
         return $this->fields['read'];
-    }   // getRead()
+    }
 
     /**
      * Basic getter for field "write"
@@ -277,7 +277,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getWrite()
     {
         return $this->fields['write'];
-    }   // getWrite()
+    }
 
     /**
      * Basic getter for field "graph"
@@ -287,7 +287,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getGraph()
     {
         return $this->fields['graph'];
-    }   // getGraph()
+    }
 
     /**
      * Basic getter for field "icon"
@@ -297,7 +297,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getIcon()
     {
         return $this->fields['icon'];
-    }   // getIcon()
+    }
 
     /**
      * Basic getter for field "tree"
@@ -307,7 +307,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     public function getTree()
     {
         return $this->fields['tree'];
-    }   // getTree()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -323,7 +323,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "guid"
@@ -335,7 +335,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
         return $this;
-    }   // filterByGuid()
+    }
 
     /**
      * Filter for field "name"
@@ -347,7 +347,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "serial"
@@ -359,7 +359,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
         return $this;
-    }   // filterBySerial()
+    }
 
     /**
      * Filter for field "channel"
@@ -371,7 +371,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
         return $this;
-    }   // filterByChannel()
+    }
 
     /**
      * Filter for field "description"
@@ -383,7 +383,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
-    }   // filterByDescription()
+    }
 
     /**
      * Filter for field "resolution"
@@ -395,7 +395,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('resolution').' = '.$this->quote($resolution);
         return $this;
-    }   // filterByResolution()
+    }
 
     /**
      * Filter for field "cost"
@@ -407,7 +407,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
-    }   // filterByCost()
+    }
 
     /**
      * Filter for field "numeric"
@@ -419,7 +419,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('numeric').' = '.$this->quote($numeric);
         return $this;
-    }   // filterByNumeric()
+    }
 
     /**
      * Filter for field "offset"
@@ -431,7 +431,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('offset').' = '.$this->quote($offset);
         return $this;
-    }   // filterByOffset()
+    }
 
     /**
      * Filter for field "adjust"
@@ -443,7 +443,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('adjust').' = '.$this->quote($adjust);
         return $this;
-    }   // filterByAdjust()
+    }
 
     /**
      * Filter for field "unit"
@@ -455,7 +455,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
-    }   // filterByUnit()
+    }
 
     /**
      * Filter for field "decimals"
@@ -467,7 +467,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('decimals').' = '.$this->quote($decimals);
         return $this;
-    }   // filterByDecimals()
+    }
 
     /**
      * Filter for field "meter"
@@ -479,7 +479,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('meter').' = '.$this->quote($meter);
         return $this;
-    }   // filterByMeter()
+    }
 
     /**
      * Filter for field "threshold"
@@ -491,7 +491,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('threshold').' = '.$this->quote($threshold);
         return $this;
-    }   // filterByThreshold()
+    }
 
     /**
      * Filter for field "valid_from"
@@ -503,7 +503,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('valid_from').' = '.$this->quote($valid_from);
         return $this;
-    }   // filterByValidFrom()
+    }
 
     /**
      * Filter for field "valid_to"
@@ -515,7 +515,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('valid_to').' = '.$this->quote($valid_to);
         return $this;
-    }   // filterByValidTo()
+    }
 
     /**
      * Filter for field "public"
@@ -527,7 +527,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
-    }   // filterByPublic()
+    }
 
     /**
      * Filter for field "type_id"
@@ -539,7 +539,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type_id').' = '.$this->quote($type_id);
         return $this;
-    }   // filterByTypeId()
+    }
 
     /**
      * Filter for field "type"
@@ -551,7 +551,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
-    }   // filterByType()
+    }
 
     /**
      * Filter for field "model"
@@ -563,7 +563,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('model').' = '.$this->quote($model);
         return $this;
-    }   // filterByModel()
+    }
 
     /**
      * Filter for field "childs"
@@ -575,7 +575,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('childs').' = '.$this->quote($childs);
         return $this;
-    }   // filterByChilds()
+    }
 
     /**
      * Filter for field "read"
@@ -587,7 +587,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('read').' = '.$this->quote($read);
         return $this;
-    }   // filterByRead()
+    }
 
     /**
      * Filter for field "write"
@@ -599,7 +599,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('write').' = '.$this->quote($write);
         return $this;
-    }   // filterByWrite()
+    }
 
     /**
      * Filter for field "graph"
@@ -611,7 +611,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('graph').' = '.$this->quote($graph);
         return $this;
-    }   // filterByGraph()
+    }
 
     /**
      * Filter for field "icon"
@@ -623,7 +623,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
-    }   // filterByIcon()
+    }
 
     /**
      * Filter for field "tree"
@@ -635,7 +635,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('tree').' = '.$this->quote($tree);
         return $this;
-    }   // filterByTree()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

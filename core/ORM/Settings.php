@@ -81,11 +81,18 @@ class Settings extends SettingsBase
     /**
      *
      */
+    public static function setModelValue($name, $key, $value)
+    {
+        return self::setScopeValue('model', $name, $key, $value);
+    }
+
+    /**
+     *
+     */
     public static function getSunrise($day=null)
     {
-        if (!$day) $day = time();
         return date_sunrise(
-            $day,
+            $day ?: time(),
             SUNFUNCS_RET_TIMESTAMP,
             +self::getScopeValue('core', '', 'Latitude'),
             +self::getScopeValue('core', '', 'Longitude'),
@@ -99,9 +106,8 @@ class Settings extends SettingsBase
      */
     public static function getSunset($day=null)
     {
-        if (!$day) $day = time();
         return date_sunset(
-            $day,
+            $day ?: time(),
             SUNFUNCS_RET_TIMESTAMP,
             +self::getScopeValue('core', '', 'Latitude'),
             +self::getScopeValue('core', '', 'Longitude'),

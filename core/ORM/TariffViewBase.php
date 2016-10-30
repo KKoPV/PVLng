@@ -47,7 +47,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "name"
@@ -57,7 +57,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "tariff_comment"
@@ -67,7 +67,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getTariffComment()
     {
         return $this->fields['tariff_comment'];
-    }   // getTariffComment()
+    }
 
     /**
      * Basic getter for field "date"
@@ -77,7 +77,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getDate()
     {
         return $this->fields['date'];
-    }   // getDate()
+    }
 
     /**
      * Basic getter for field "cost"
@@ -87,7 +87,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getCost()
     {
         return $this->fields['cost'];
-    }   // getCost()
+    }
 
     /**
      * Basic getter for field "time"
@@ -97,7 +97,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getTime()
     {
         return $this->fields['time'];
-    }   // getTime()
+    }
 
     /**
      * Basic getter for field "days"
@@ -107,7 +107,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getDays()
     {
         return $this->fields['days'];
-    }   // getDays()
+    }
 
     /**
      * Basic getter for field "tariff"
@@ -117,7 +117,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getTariff()
     {
         return $this->fields['tariff'];
-    }   // getTariff()
+    }
 
     /**
      * Basic getter for field "time_comment"
@@ -127,7 +127,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     public function getTimeComment()
     {
         return $this->fields['time_comment'];
-    }   // getTimeComment()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -143,7 +143,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "name"
@@ -155,7 +155,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "tariff_comment"
@@ -167,7 +167,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('tariff_comment').' = '.$this->quote($tariff_comment);
         return $this;
-    }   // filterByTariffComment()
+    }
 
     /**
      * Filter for field "date"
@@ -179,7 +179,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('date').' = '.$this->quote($date);
         return $this;
-    }   // filterByDate()
+    }
 
     /**
      * Filter for field "cost"
@@ -191,7 +191,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
-    }   // filterByCost()
+    }
 
     /**
      * Filter for field "time"
@@ -203,7 +203,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('time').' = '.$this->quote($time);
         return $this;
-    }   // filterByTime()
+    }
 
     /**
      * Filter for field "days"
@@ -215,7 +215,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('days').' = '.$this->quote($days);
         return $this;
-    }   // filterByDays()
+    }
 
     /**
      * Filter for field "tariff"
@@ -227,7 +227,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
         return $this;
-    }   // filterByTariff()
+    }
 
     /**
      * Filter for field "time_comment"
@@ -239,7 +239,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('time_comment').' = '.$this->quote($time_comment);
         return $this;
-    }   // filterByTimeComment()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

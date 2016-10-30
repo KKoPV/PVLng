@@ -41,7 +41,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->fields['id'] = $id;
         return $this;
-    }   // setId()
+    }
 
     /**
      * Raw setter for field "id", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->raw['id'] = $id;
         return $this;
-    }   // setIdRaw()
+    }
 
     /**
      * Basic setter for field "date"
@@ -65,7 +65,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->fields['date'] = $date;
         return $this;
-    }   // setDate()
+    }
 
     /**
      * Raw setter for field "date", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->raw['date'] = $date;
         return $this;
-    }   // setDateRaw()
+    }
 
     /**
      * Basic setter for field "time"
@@ -89,7 +89,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->fields['time'] = $time;
         return $this;
-    }   // setTime()
+    }
 
     /**
      * Raw setter for field "time", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->raw['time'] = $time;
         return $this;
-    }   // setTimeRaw()
+    }
 
     /**
      * Basic setter for field "days"
@@ -113,7 +113,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->fields['days'] = $days;
         return $this;
-    }   // setDays()
+    }
 
     /**
      * Raw setter for field "days", for INSERT, REPLACE and UPDATE
@@ -125,7 +125,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->raw['days'] = $days;
         return $this;
-    }   // setDaysRaw()
+    }
 
     /**
      * Basic setter for field "tariff"
@@ -137,7 +137,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->fields['tariff'] = $tariff;
         return $this;
-    }   // setTariff()
+    }
 
     /**
      * Raw setter for field "tariff", for INSERT, REPLACE and UPDATE
@@ -149,7 +149,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->raw['tariff'] = $tariff;
         return $this;
-    }   // setTariffRaw()
+    }
 
     /**
      * Basic setter for field "comment"
@@ -161,7 +161,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->fields['comment'] = $comment;
         return $this;
-    }   // setComment()
+    }
 
     /**
      * Raw setter for field "comment", for INSERT, REPLACE and UPDATE
@@ -173,7 +173,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->raw['comment'] = $comment;
         return $this;
-    }   // setCommentRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -187,7 +187,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "date"
@@ -197,7 +197,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     public function getDate()
     {
         return $this->fields['date'];
-    }   // getDate()
+    }
 
     /**
      * Basic getter for field "time"
@@ -207,7 +207,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     public function getTime()
     {
         return $this->fields['time'];
-    }   // getTime()
+    }
 
     /**
      * Basic getter for field "days"
@@ -217,7 +217,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     public function getDays()
     {
         return $this->fields['days'];
-    }   // getDays()
+    }
 
     /**
      * Basic getter for field "tariff"
@@ -227,7 +227,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     public function getTariff()
     {
         return $this->fields['tariff'];
-    }   // getTariff()
+    }
 
     /**
      * Basic getter for field "comment"
@@ -237,7 +237,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     public function getComment()
     {
         return $this->fields['comment'];
-    }   // getComment()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -257,7 +257,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
         $this->filter[] = $this->field('time').' = '.$this->quote($time).'';
         $this->filter[] = $this->field('days').' = '.$this->quote($days).'';
         return $this;
-    }   // filterByIdDateTimeDays()
+    }
 
     /**
      * Filter for field "days"
@@ -269,7 +269,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('days').' = '.$this->quote($days);
         return $this;
-    }   // filterByDays()
+    }
 
     /**
      * Filter for field "date"
@@ -281,7 +281,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('date').' = '.$this->quote($date);
         return $this;
-    }   // filterByDate()
+    }
 
     /**
      * Filter for field "time"
@@ -293,7 +293,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('time').' = '.$this->quote($time);
         return $this;
-    }   // filterByTime()
+    }
 
     /**
      * Filter for field "id"
@@ -305,7 +305,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "tariff"
@@ -317,7 +317,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
         return $this;
-    }   // filterByTariff()
+    }
 
     /**
      * Filter for field "comment"
@@ -329,7 +329,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
-    }   // filterByComment()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -340,9 +340,9 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`tariff` = '.$this->quote($this->fields['tariff']).'
-              , `comment` = '.$this->quote($this->fields['comment']).'';
-    }   // onDuplicateKey()
+        return '`tariff` = VALUES(`tariff`)
+              , `comment` = VALUES(`comment`)';
+    }
 
     /**
      * Table name

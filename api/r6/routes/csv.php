@@ -41,7 +41,7 @@ $api->put(
  *
  */
 $api->put(
-    '/csv/bulk/:guid',
+    '/csvbulk/:guid',
     $APIkeyRequired,
     function($guid) use ($api)
 {

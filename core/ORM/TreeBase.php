@@ -47,7 +47,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "entity"
@@ -57,7 +57,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getEntity()
     {
         return $this->fields['entity'];
-    }   // getEntity()
+    }
 
     /**
      * Basic getter for field "guid"
@@ -67,7 +67,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getGuid()
     {
         return $this->fields['guid'];
-    }   // getGuid()
+    }
 
     /**
      * Basic getter for field "name"
@@ -77,7 +77,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "serial"
@@ -87,7 +87,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getSerial()
     {
         return $this->fields['serial'];
-    }   // getSerial()
+    }
 
     /**
      * Basic getter for field "channel"
@@ -97,7 +97,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getChannel()
     {
         return $this->fields['channel'];
-    }   // getChannel()
+    }
 
     /**
      * Basic getter for field "description"
@@ -107,7 +107,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getDescription()
     {
         return $this->fields['description'];
-    }   // getDescription()
+    }
 
     /**
      * Basic getter for field "resolution"
@@ -117,7 +117,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getResolution()
     {
         return $this->fields['resolution'];
-    }   // getResolution()
+    }
 
     /**
      * Basic getter for field "cost"
@@ -127,7 +127,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getCost()
     {
         return $this->fields['cost'];
-    }   // getCost()
+    }
 
     /**
      * Basic getter for field "meter"
@@ -137,7 +137,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getMeter()
     {
         return $this->fields['meter'];
-    }   // getMeter()
+    }
 
     /**
      * Basic getter for field "numeric"
@@ -147,7 +147,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getNumeric()
     {
         return $this->fields['numeric'];
-    }   // getNumeric()
+    }
 
     /**
      * Basic getter for field "offset"
@@ -157,7 +157,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getOffset()
     {
         return $this->fields['offset'];
-    }   // getOffset()
+    }
 
     /**
      * Basic getter for field "adjust"
@@ -167,7 +167,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getAdjust()
     {
         return $this->fields['adjust'];
-    }   // getAdjust()
+    }
 
     /**
      * Basic getter for field "unit"
@@ -177,7 +177,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getUnit()
     {
         return $this->fields['unit'];
-    }   // getUnit()
+    }
 
     /**
      * Basic getter for field "decimals"
@@ -187,7 +187,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getDecimals()
     {
         return $this->fields['decimals'];
-    }   // getDecimals()
+    }
 
     /**
      * Basic getter for field "threshold"
@@ -197,7 +197,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getThreshold()
     {
         return $this->fields['threshold'];
-    }   // getThreshold()
+    }
 
     /**
      * Basic getter for field "valid_from"
@@ -207,7 +207,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getValidFrom()
     {
         return $this->fields['valid_from'];
-    }   // getValidFrom()
+    }
 
     /**
      * Basic getter for field "valid_to"
@@ -217,7 +217,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getValidTo()
     {
         return $this->fields['valid_to'];
-    }   // getValidTo()
+    }
 
     /**
      * Basic getter for field "public"
@@ -227,7 +227,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getPublic()
     {
         return $this->fields['public'];
-    }   // getPublic()
+    }
 
     /**
      * Basic getter for field "tags"
@@ -237,7 +237,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getTags()
     {
         return $this->fields['tags'];
-    }   // getTags()
+    }
 
     /**
      * Basic getter for field "extra"
@@ -247,7 +247,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getExtra()
     {
         return $this->fields['extra'];
-    }   // getExtra()
+    }
 
     /**
      * Basic getter for field "comment"
@@ -257,7 +257,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getComment()
     {
         return $this->fields['comment'];
-    }   // getComment()
+    }
 
     /**
      * Basic getter for field "type_id"
@@ -267,7 +267,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getTypeId()
     {
         return $this->fields['type_id'];
-    }   // getTypeId()
+    }
 
     /**
      * Basic getter for field "type"
@@ -277,7 +277,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getType()
     {
         return $this->fields['type'];
-    }   // getType()
+    }
 
     /**
      * Basic getter for field "model"
@@ -287,7 +287,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getModel()
     {
         return $this->fields['model'];
-    }   // getModel()
+    }
 
     /**
      * Basic getter for field "childs"
@@ -297,7 +297,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getChilds()
     {
         return $this->fields['childs'];
-    }   // getChilds()
+    }
 
     /**
      * Basic getter for field "read"
@@ -307,7 +307,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getRead()
     {
         return $this->fields['read'];
-    }   // getRead()
+    }
 
     /**
      * Basic getter for field "write"
@@ -317,7 +317,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getWrite()
     {
         return $this->fields['write'];
-    }   // getWrite()
+    }
 
     /**
      * Basic getter for field "graph"
@@ -327,7 +327,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getGraph()
     {
         return $this->fields['graph'];
-    }   // getGraph()
+    }
 
     /**
      * Basic getter for field "icon"
@@ -337,7 +337,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getIcon()
     {
         return $this->fields['icon'];
-    }   // getIcon()
+    }
 
     /**
      * Basic getter for field "alias"
@@ -347,7 +347,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getAlias()
     {
         return $this->fields['alias'];
-    }   // getAlias()
+    }
 
     /**
      * Basic getter for field "alias_of"
@@ -357,7 +357,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getAliasOf()
     {
         return $this->fields['alias_of'];
-    }   // getAliasOf()
+    }
 
     /**
      * Basic getter for field "entity_of"
@@ -367,7 +367,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getEntityOf()
     {
         return $this->fields['entity_of'];
-    }   // getEntityOf()
+    }
 
     /**
      * Basic getter for field "level"
@@ -377,7 +377,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getLevel()
     {
         return $this->fields['level'];
-    }   // getLevel()
+    }
 
     /**
      * Basic getter for field "haschilds"
@@ -387,7 +387,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getHaschilds()
     {
         return $this->fields['haschilds'];
-    }   // getHaschilds()
+    }
 
     /**
      * Basic getter for field "lower"
@@ -397,7 +397,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getLower()
     {
         return $this->fields['lower'];
-    }   // getLower()
+    }
 
     /**
      * Basic getter for field "upper"
@@ -407,7 +407,7 @@ abstract class TreeBase extends \slimMVC\ORM
     public function getUpper()
     {
         return $this->fields['upper'];
-    }   // getUpper()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -423,7 +423,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "entity"
@@ -435,7 +435,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('entity').' = '.$this->quote($entity);
         return $this;
-    }   // filterByEntity()
+    }
 
     /**
      * Filter for field "guid"
@@ -447,7 +447,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
         return $this;
-    }   // filterByGuid()
+    }
 
     /**
      * Filter for field "name"
@@ -459,7 +459,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "serial"
@@ -471,7 +471,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
         return $this;
-    }   // filterBySerial()
+    }
 
     /**
      * Filter for field "channel"
@@ -483,7 +483,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
         return $this;
-    }   // filterByChannel()
+    }
 
     /**
      * Filter for field "description"
@@ -495,7 +495,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
-    }   // filterByDescription()
+    }
 
     /**
      * Filter for field "resolution"
@@ -507,7 +507,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('resolution').' = '.$this->quote($resolution);
         return $this;
-    }   // filterByResolution()
+    }
 
     /**
      * Filter for field "cost"
@@ -519,7 +519,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
-    }   // filterByCost()
+    }
 
     /**
      * Filter for field "meter"
@@ -531,7 +531,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('meter').' = '.$this->quote($meter);
         return $this;
-    }   // filterByMeter()
+    }
 
     /**
      * Filter for field "numeric"
@@ -543,7 +543,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('numeric').' = '.$this->quote($numeric);
         return $this;
-    }   // filterByNumeric()
+    }
 
     /**
      * Filter for field "offset"
@@ -555,7 +555,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('offset').' = '.$this->quote($offset);
         return $this;
-    }   // filterByOffset()
+    }
 
     /**
      * Filter for field "adjust"
@@ -567,7 +567,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('adjust').' = '.$this->quote($adjust);
         return $this;
-    }   // filterByAdjust()
+    }
 
     /**
      * Filter for field "unit"
@@ -579,7 +579,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
-    }   // filterByUnit()
+    }
 
     /**
      * Filter for field "decimals"
@@ -591,7 +591,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('decimals').' = '.$this->quote($decimals);
         return $this;
-    }   // filterByDecimals()
+    }
 
     /**
      * Filter for field "threshold"
@@ -603,7 +603,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('threshold').' = '.$this->quote($threshold);
         return $this;
-    }   // filterByThreshold()
+    }
 
     /**
      * Filter for field "valid_from"
@@ -615,7 +615,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('valid_from').' = '.$this->quote($valid_from);
         return $this;
-    }   // filterByValidFrom()
+    }
 
     /**
      * Filter for field "valid_to"
@@ -627,7 +627,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('valid_to').' = '.$this->quote($valid_to);
         return $this;
-    }   // filterByValidTo()
+    }
 
     /**
      * Filter for field "public"
@@ -639,7 +639,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
-    }   // filterByPublic()
+    }
 
     /**
      * Filter for field "tags"
@@ -651,7 +651,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('tags').' = '.$this->quote($tags);
         return $this;
-    }   // filterByTags()
+    }
 
     /**
      * Filter for field "extra"
@@ -663,7 +663,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('extra').' = '.$this->quote($extra);
         return $this;
-    }   // filterByExtra()
+    }
 
     /**
      * Filter for field "comment"
@@ -675,7 +675,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
-    }   // filterByComment()
+    }
 
     /**
      * Filter for field "type_id"
@@ -687,7 +687,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type_id').' = '.$this->quote($type_id);
         return $this;
-    }   // filterByTypeId()
+    }
 
     /**
      * Filter for field "type"
@@ -699,7 +699,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
-    }   // filterByType()
+    }
 
     /**
      * Filter for field "model"
@@ -711,7 +711,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('model').' = '.$this->quote($model);
         return $this;
-    }   // filterByModel()
+    }
 
     /**
      * Filter for field "childs"
@@ -723,7 +723,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('childs').' = '.$this->quote($childs);
         return $this;
-    }   // filterByChilds()
+    }
 
     /**
      * Filter for field "read"
@@ -735,7 +735,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('read').' = '.$this->quote($read);
         return $this;
-    }   // filterByRead()
+    }
 
     /**
      * Filter for field "write"
@@ -747,7 +747,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('write').' = '.$this->quote($write);
         return $this;
-    }   // filterByWrite()
+    }
 
     /**
      * Filter for field "graph"
@@ -759,7 +759,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('graph').' = '.$this->quote($graph);
         return $this;
-    }   // filterByGraph()
+    }
 
     /**
      * Filter for field "icon"
@@ -771,7 +771,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
-    }   // filterByIcon()
+    }
 
     /**
      * Filter for field "alias"
@@ -783,7 +783,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('alias').' = '.$this->quote($alias);
         return $this;
-    }   // filterByAlias()
+    }
 
     /**
      * Filter for field "alias_of"
@@ -795,7 +795,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('alias_of').' = '.$this->quote($alias_of);
         return $this;
-    }   // filterByAliasOf()
+    }
 
     /**
      * Filter for field "entity_of"
@@ -807,7 +807,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('entity_of').' = '.$this->quote($entity_of);
         return $this;
-    }   // filterByEntityOf()
+    }
 
     /**
      * Filter for field "level"
@@ -819,7 +819,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('level').' = '.$this->quote($level);
         return $this;
-    }   // filterByLevel()
+    }
 
     /**
      * Filter for field "haschilds"
@@ -831,7 +831,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('haschilds').' = '.$this->quote($haschilds);
         return $this;
-    }   // filterByHaschilds()
+    }
 
     /**
      * Filter for field "lower"
@@ -843,7 +843,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('lower').' = '.$this->quote($lower);
         return $this;
-    }   // filterByLower()
+    }
 
     /**
      * Filter for field "upper"
@@ -855,7 +855,7 @@ abstract class TreeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('upper').' = '.$this->quote($upper);
         return $this;
-    }   // filterByUpper()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

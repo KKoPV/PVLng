@@ -41,7 +41,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->fields['id'] = $id;
         return $this;
-    }   // setId()
+    }
 
     /**
      * Raw setter for field "id", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->raw['id'] = $id;
         return $this;
-    }   // setIdRaw()
+    }
 
     /**
      * Basic setter for field "start"
@@ -65,7 +65,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->fields['start'] = $start;
         return $this;
-    }   // setStart()
+    }
 
     /**
      * Raw setter for field "start", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->raw['start'] = $start;
         return $this;
-    }   // setStartRaw()
+    }
 
     /**
      * Basic setter for field "end"
@@ -89,7 +89,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->fields['end'] = $end;
         return $this;
-    }   // setEnd()
+    }
 
     /**
      * Raw setter for field "end", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->raw['end'] = $end;
         return $this;
-    }   // setEndRaw()
+    }
 
     /**
      * Basic setter for field "lifetime"
@@ -113,7 +113,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->fields['lifetime'] = $lifetime;
         return $this;
-    }   // setLifetime()
+    }
 
     /**
      * Raw setter for field "lifetime", for INSERT, REPLACE and UPDATE
@@ -125,7 +125,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->raw['lifetime'] = $lifetime;
         return $this;
-    }   // setLifetimeRaw()
+    }
 
     /**
      * Basic setter for field "uid"
@@ -137,7 +137,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->fields['uid'] = $uid;
         return $this;
-    }   // setUid()
+    }
 
     /**
      * Raw setter for field "uid", for INSERT, REPLACE and UPDATE
@@ -149,7 +149,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->raw['uid'] = $uid;
         return $this;
-    }   // setUidRaw()
+    }
 
     /**
      * Basic setter for field "created"
@@ -161,7 +161,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->fields['created'] = $created;
         return $this;
-    }   // setCreated()
+    }
 
     /**
      * Raw setter for field "created", for INSERT, REPLACE and UPDATE
@@ -173,7 +173,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->raw['created'] = $created;
         return $this;
-    }   // setCreatedRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -187,7 +187,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "start"
@@ -197,7 +197,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     public function getStart()
     {
         return $this->fields['start'];
-    }   // getStart()
+    }
 
     /**
      * Basic getter for field "end"
@@ -207,7 +207,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     public function getEnd()
     {
         return $this->fields['end'];
-    }   // getEnd()
+    }
 
     /**
      * Basic getter for field "lifetime"
@@ -217,7 +217,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     public function getLifetime()
     {
         return $this->fields['lifetime'];
-    }   // getLifetime()
+    }
 
     /**
      * Basic getter for field "uid"
@@ -227,7 +227,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     public function getUid()
     {
         return $this->fields['uid'];
-    }   // getUid()
+    }
 
     /**
      * Basic getter for field "created"
@@ -237,7 +237,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     public function getCreated()
     {
         return $this->fields['created'];
-    }   // getCreated()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -256,7 +256,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
         $this->filter[] = $this->field('start').' = '.$this->quote($start).'';
         $this->filter[] = $this->field('end').' = '.$this->quote($end).'';
         return $this;
-    }   // filterByIdStartEnd()
+    }
 
     /**
      * Filter for field "uid"
@@ -268,7 +268,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('uid').' = '.$this->quote($uid);
         return $this;
-    }   // filterByUid()
+    }
 
     /**
      * Filter for field "created"
@@ -280,7 +280,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('created').' = '.$this->quote($created);
         return $this;
-    }   // filterByCreated()
+    }
 
     /**
      * Filter for field "id"
@@ -292,7 +292,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "start"
@@ -304,7 +304,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('start').' = '.$this->quote($start);
         return $this;
-    }   // filterByStart()
+    }
 
     /**
      * Filter for field "end"
@@ -316,7 +316,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('end').' = '.$this->quote($end);
         return $this;
-    }   // filterByEnd()
+    }
 
     /**
      * Filter for field "lifetime"
@@ -328,7 +328,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('lifetime').' = '.$this->quote($lifetime);
         return $this;
-    }   // filterByLifetime()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -339,10 +339,10 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`lifetime` = '.$this->quote($this->fields['lifetime']).'
-              , `uid` = '.$this->quote($this->fields['uid']).'
-              , `created` = '.$this->quote($this->fields['created']).'';
-    }   // onDuplicateKey()
+        return '`lifetime` = VALUES(`lifetime`)
+              , `uid` = VALUES(`uid`)
+              , `created` = VALUES(`created`)';
+    }
 
     /**
      * Table name

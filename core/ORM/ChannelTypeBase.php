@@ -41,7 +41,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['id'] = $id;
         return $this;
-    }   // setId()
+    }
 
     /**
      * Raw setter for field "id", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['id'] = $id;
         return $this;
-    }   // setIdRaw()
+    }
 
     /**
      * Basic setter for field "name"
@@ -65,7 +65,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['name'] = $name;
         return $this;
-    }   // setName()
+    }
 
     /**
      * Raw setter for field "name", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['name'] = $name;
         return $this;
-    }   // setNameRaw()
+    }
 
     /**
      * Basic setter for field "description"
@@ -89,7 +89,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['description'] = $description;
         return $this;
-    }   // setDescription()
+    }
 
     /**
      * Raw setter for field "description", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['description'] = $description;
         return $this;
-    }   // setDescriptionRaw()
+    }
 
     /**
      * Basic setter for field "model"
@@ -113,7 +113,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['model'] = $model;
         return $this;
-    }   // setModel()
+    }
 
     /**
      * Raw setter for field "model", for INSERT, REPLACE and UPDATE
@@ -125,7 +125,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['model'] = $model;
         return $this;
-    }   // setModelRaw()
+    }
 
     /**
      * Basic setter for field "unit"
@@ -137,7 +137,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['unit'] = $unit;
         return $this;
-    }   // setUnit()
+    }
 
     /**
      * Raw setter for field "unit", for INSERT, REPLACE and UPDATE
@@ -149,7 +149,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['unit'] = $unit;
         return $this;
-    }   // setUnitRaw()
+    }
 
     /**
      * Basic setter for field "type"
@@ -161,7 +161,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['type'] = $type;
         return $this;
-    }   // setType()
+    }
 
     /**
      * Raw setter for field "type", for INSERT, REPLACE and UPDATE
@@ -173,7 +173,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['type'] = $type;
         return $this;
-    }   // setTypeRaw()
+    }
 
     /**
      * Basic setter for field "childs"
@@ -185,7 +185,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['childs'] = $childs;
         return $this;
-    }   // setChilds()
+    }
 
     /**
      * Raw setter for field "childs", for INSERT, REPLACE and UPDATE
@@ -197,7 +197,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['childs'] = $childs;
         return $this;
-    }   // setChildsRaw()
+    }
 
     /**
      * Basic setter for field "read"
@@ -209,7 +209,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['read'] = $read;
         return $this;
-    }   // setRead()
+    }
 
     /**
      * Raw setter for field "read", for INSERT, REPLACE and UPDATE
@@ -221,7 +221,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['read'] = $read;
         return $this;
-    }   // setReadRaw()
+    }
 
     /**
      * Basic setter for field "write"
@@ -233,7 +233,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['write'] = $write;
         return $this;
-    }   // setWrite()
+    }
 
     /**
      * Raw setter for field "write", for INSERT, REPLACE and UPDATE
@@ -245,7 +245,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['write'] = $write;
         return $this;
-    }   // setWriteRaw()
+    }
 
     /**
      * Basic setter for field "graph"
@@ -257,7 +257,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['graph'] = $graph;
         return $this;
-    }   // setGraph()
+    }
 
     /**
      * Raw setter for field "graph", for INSERT, REPLACE and UPDATE
@@ -269,7 +269,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['graph'] = $graph;
         return $this;
-    }   // setGraphRaw()
+    }
 
     /**
      * Basic setter for field "icon"
@@ -281,7 +281,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->fields['icon'] = $icon;
         return $this;
-    }   // setIcon()
+    }
 
     /**
      * Raw setter for field "icon", for INSERT, REPLACE and UPDATE
@@ -293,7 +293,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->raw['icon'] = $icon;
         return $this;
-    }   // setIconRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -307,7 +307,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "name"
@@ -317,7 +317,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "description"
@@ -327,7 +327,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getDescription()
     {
         return $this->fields['description'];
-    }   // getDescription()
+    }
 
     /**
      * Basic getter for field "model"
@@ -337,7 +337,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getModel()
     {
         return $this->fields['model'];
-    }   // getModel()
+    }
 
     /**
      * Basic getter for field "unit"
@@ -347,7 +347,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getUnit()
     {
         return $this->fields['unit'];
-    }   // getUnit()
+    }
 
     /**
      * Basic getter for field "type"
@@ -357,7 +357,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getType()
     {
         return $this->fields['type'];
-    }   // getType()
+    }
 
     /**
      * Basic getter for field "childs"
@@ -367,7 +367,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getChilds()
     {
         return $this->fields['childs'];
-    }   // getChilds()
+    }
 
     /**
      * Basic getter for field "read"
@@ -377,7 +377,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getRead()
     {
         return $this->fields['read'];
-    }   // getRead()
+    }
 
     /**
      * Basic getter for field "write"
@@ -387,7 +387,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getWrite()
     {
         return $this->fields['write'];
-    }   // getWrite()
+    }
 
     /**
      * Basic getter for field "graph"
@@ -397,7 +397,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getGraph()
     {
         return $this->fields['graph'];
-    }   // getGraph()
+    }
 
     /**
      * Basic getter for field "icon"
@@ -407,7 +407,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     public function getIcon()
     {
         return $this->fields['icon'];
-    }   // getIcon()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -423,7 +423,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "name"
@@ -435,7 +435,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "childs"
@@ -447,7 +447,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('childs').' = '.$this->quote($childs);
         return $this;
-    }   // filterByChilds()
+    }
 
     /**
      * Filter for field "read"
@@ -459,7 +459,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('read').' = '.$this->quote($read);
         return $this;
-    }   // filterByRead()
+    }
 
     /**
      * Filter for field "write"
@@ -471,7 +471,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('write').' = '.$this->quote($write);
         return $this;
-    }   // filterByWrite()
+    }
 
     /**
      * Filter for field "description"
@@ -483,7 +483,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
-    }   // filterByDescription()
+    }
 
     /**
      * Filter for field "model"
@@ -495,7 +495,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('model').' = '.$this->quote($model);
         return $this;
-    }   // filterByModel()
+    }
 
     /**
      * Filter for field "unit"
@@ -507,7 +507,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
-    }   // filterByUnit()
+    }
 
     /**
      * Filter for field "type"
@@ -519,7 +519,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
-    }   // filterByType()
+    }
 
     /**
      * Filter for field "graph"
@@ -531,7 +531,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('graph').' = '.$this->quote($graph);
         return $this;
-    }   // filterByGraph()
+    }
 
     /**
      * Filter for field "icon"
@@ -543,7 +543,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
-    }   // filterByIcon()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -554,17 +554,17 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`name` = '.$this->quote($this->fields['name']).'
-              , `description` = '.$this->quote($this->fields['description']).'
-              , `model` = '.$this->quote($this->fields['model']).'
-              , `unit` = '.$this->quote($this->fields['unit']).'
-              , `type` = '.$this->quote($this->fields['type']).'
-              , `childs` = '.$this->quote($this->fields['childs']).'
-              , `read` = '.$this->quote($this->fields['read']).'
-              , `write` = '.$this->quote($this->fields['write']).'
-              , `graph` = '.$this->quote($this->fields['graph']).'
-              , `icon` = '.$this->quote($this->fields['icon']).'';
-    }   // onDuplicateKey()
+        return '`name` = VALUES(`name`)
+              , `description` = VALUES(`description`)
+              , `model` = VALUES(`model`)
+              , `unit` = VALUES(`unit`)
+              , `type` = VALUES(`type`)
+              , `childs` = VALUES(`childs`)
+              , `read` = VALUES(`read`)
+              , `write` = VALUES(`write`)
+              , `graph` = VALUES(`graph`)
+              , `icon` = VALUES(`icon`)';
+    }
 
     /**
      * Table name

@@ -45,7 +45,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->fields['name'] = $name;
         return $this;
-    }   // setName()
+    }
 
     /**
      * Raw setter for field "name", for INSERT, REPLACE and UPDATE
@@ -57,7 +57,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->raw['name'] = $name;
         return $this;
-    }   // setNameRaw()
+    }
 
     /**
      * Basic setter for field "data"
@@ -69,7 +69,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->fields['data'] = $data;
         return $this;
-    }   // setData()
+    }
 
     /**
      * Raw setter for field "data", for INSERT, REPLACE and UPDATE
@@ -81,7 +81,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->raw['data'] = $data;
         return $this;
-    }   // setDataRaw()
+    }
 
     /**
      * Basic setter for field "public"
@@ -93,7 +93,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->fields['public'] = $public;
         return $this;
-    }   // setPublic()
+    }
 
     /**
      * Raw setter for field "public", for INSERT, REPLACE and UPDATE
@@ -105,7 +105,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->raw['public'] = $public;
         return $this;
-    }   // setPublicRaw()
+    }
 
     /**
      * Basic setter for field "slug"
@@ -117,7 +117,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->fields['slug'] = $slug;
         return $this;
-    }   // setSlug()
+    }
 
     /**
      * Raw setter for field "slug", for INSERT, REPLACE and UPDATE
@@ -129,7 +129,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->raw['slug'] = $slug;
         return $this;
-    }   // setSlugRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -143,7 +143,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "name"
@@ -153,7 +153,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "data"
@@ -163,7 +163,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     public function getData()
     {
         return $this->fields['data'];
-    }   // getData()
+    }
 
     /**
      * Basic getter for field "public"
@@ -173,7 +173,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     public function getPublic()
     {
         return $this->fields['public'];
-    }   // getPublic()
+    }
 
     /**
      * Basic getter for field "slug"
@@ -183,7 +183,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     public function getSlug()
     {
         return $this->fields['slug'];
-    }   // getSlug()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -199,7 +199,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "slug"
@@ -211,7 +211,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('slug').' = '.$this->quote($slug);
         return $this;
-    }   // filterBySlug()
+    }
 
     /**
      * Filter for field "name"
@@ -223,7 +223,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "data"
@@ -235,7 +235,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
-    }   // filterByData()
+    }
 
     /**
      * Filter for field "public"
@@ -247,7 +247,7 @@ abstract class DashboardBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
-    }   // filterByPublic()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

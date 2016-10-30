@@ -47,7 +47,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getGuid()
     {
         return $this->fields['guid'];
-    }   // getGuid()
+    }
 
     /**
      * Basic getter for field "name"
@@ -57,7 +57,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "description"
@@ -67,7 +67,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getDescription()
     {
         return $this->fields['description'];
-    }   // getDescription()
+    }
 
     /**
      * Basic getter for field "serial"
@@ -77,7 +77,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getSerial()
     {
         return $this->fields['serial'];
-    }   // getSerial()
+    }
 
     /**
      * Basic getter for field "channel"
@@ -87,7 +87,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getChannel()
     {
         return $this->fields['channel'];
-    }   // getChannel()
+    }
 
     /**
      * Basic getter for field "unit"
@@ -97,7 +97,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getUnit()
     {
         return $this->fields['unit'];
-    }   // getUnit()
+    }
 
     /**
      * Basic getter for field "type"
@@ -107,7 +107,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getType()
     {
         return $this->fields['type'];
-    }   // getType()
+    }
 
     /**
      * Basic getter for field "icon"
@@ -117,7 +117,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getIcon()
     {
         return $this->fields['icon'];
-    }   // getIcon()
+    }
 
     /**
      * Basic getter for field "datetime"
@@ -127,7 +127,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getDatetime()
     {
         return $this->fields['datetime'];
-    }   // getDatetime()
+    }
 
     /**
      * Basic getter for field "readings"
@@ -137,7 +137,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     public function getReadings()
     {
         return $this->fields['readings'];
-    }   // getReadings()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -153,7 +153,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
         return $this;
-    }   // filterByGuid()
+    }
 
     /**
      * Filter for field "name"
@@ -165,7 +165,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "description"
@@ -177,7 +177,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
-    }   // filterByDescription()
+    }
 
     /**
      * Filter for field "serial"
@@ -189,7 +189,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
         return $this;
-    }   // filterBySerial()
+    }
 
     /**
      * Filter for field "channel"
@@ -201,7 +201,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
         return $this;
-    }   // filterByChannel()
+    }
 
     /**
      * Filter for field "unit"
@@ -213,7 +213,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
-    }   // filterByUnit()
+    }
 
     /**
      * Filter for field "type"
@@ -225,7 +225,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
-    }   // filterByType()
+    }
 
     /**
      * Filter for field "icon"
@@ -237,7 +237,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
-    }   // filterByIcon()
+    }
 
     /**
      * Filter for field "datetime"
@@ -249,7 +249,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('datetime').' = '.$this->quote($datetime);
         return $this;
-    }   // filterByDatetime()
+    }
 
     /**
      * Filter for field "readings"
@@ -261,7 +261,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('readings').' = '.$this->quote($readings);
         return $this;
-    }   // filterByReadings()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

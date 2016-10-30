@@ -41,7 +41,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->fields['key'] = $key;
         return $this;
-    }   // setKey()
+    }
 
     /**
      * Raw setter for field "key", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->raw['key'] = $key;
         return $this;
-    }   // setKeyRaw()
+    }
 
     /**
      * Basic setter for field "value"
@@ -65,7 +65,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->fields['value'] = $value;
         return $this;
-    }   // setValue()
+    }
 
     /**
      * Raw setter for field "value", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->raw['value'] = $value;
         return $this;
-    }   // setValueRaw()
+    }
 
     /**
      * Basic setter for field "comment"
@@ -89,7 +89,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->fields['comment'] = $comment;
         return $this;
-    }   // setComment()
+    }
 
     /**
      * Raw setter for field "comment", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->raw['comment'] = $comment;
         return $this;
-    }   // setCommentRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -115,7 +115,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     public function getKey()
     {
         return $this->fields['key'];
-    }   // getKey()
+    }
 
     /**
      * Basic getter for field "value"
@@ -125,7 +125,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     public function getValue()
     {
         return $this->fields['value'];
-    }   // getValue()
+    }
 
     /**
      * Basic getter for field "comment"
@@ -135,7 +135,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     public function getComment()
     {
         return $this->fields['comment'];
-    }   // getComment()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -151,7 +151,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('key').' = '.$this->quote($key);
         return $this;
-    }   // filterByKey()
+    }
 
     /**
      * Filter for field "value"
@@ -163,7 +163,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('value').' = '.$this->quote($value);
         return $this;
-    }   // filterByValue()
+    }
 
     /**
      * Filter for field "comment"
@@ -175,7 +175,7 @@ abstract class ConfigBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
-    }   // filterByComment()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -186,9 +186,9 @@ abstract class ConfigBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`value` = '.$this->quote($this->fields['value']).'
-              , `comment` = '.$this->quote($this->fields['comment']).'';
-    }   // onDuplicateKey()
+        return '`value` = VALUES(`value`)
+              , `comment` = VALUES(`comment`)';
+    }
 
     /**
      * Table name

@@ -41,7 +41,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->fields['id'] = $id;
         return $this;
-    }   // setId()
+    }
 
     /**
      * Raw setter for field "id", for INSERT, REPLACE and UPDATE
@@ -53,7 +53,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->raw['id'] = $id;
         return $this;
-    }   // setIdRaw()
+    }
 
     /**
      * Basic setter for field "date"
@@ -65,7 +65,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->fields['date'] = $date;
         return $this;
-    }   // setDate()
+    }
 
     /**
      * Raw setter for field "date", for INSERT, REPLACE and UPDATE
@@ -77,7 +77,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->raw['date'] = $date;
         return $this;
-    }   // setDateRaw()
+    }
 
     /**
      * Basic setter for field "cost"
@@ -89,7 +89,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->fields['cost'] = $cost;
         return $this;
-    }   // setCost()
+    }
 
     /**
      * Raw setter for field "cost", for INSERT, REPLACE and UPDATE
@@ -101,7 +101,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->raw['cost'] = $cost;
         return $this;
-    }   // setCostRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -115,7 +115,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "date"
@@ -125,7 +125,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     public function getDate()
     {
         return $this->fields['date'];
-    }   // getDate()
+    }
 
     /**
      * Basic getter for field "cost"
@@ -135,7 +135,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     public function getCost()
     {
         return $this->fields['cost'];
-    }   // getCost()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -153,7 +153,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
         $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
         $this->filter[] = $this->field('date').' = '.$this->quote($date).'';
         return $this;
-    }   // filterByIdDate()
+    }
 
     /**
      * Filter for field "date"
@@ -165,7 +165,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('date').' = '.$this->quote($date);
         return $this;
-    }   // filterByDate()
+    }
 
     /**
      * Filter for field "id"
@@ -177,7 +177,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "cost"
@@ -189,7 +189,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
-    }   // filterByCost()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -200,8 +200,8 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     protected function onDuplicateKey()
     {
-        return '`cost` = '.$this->quote($this->fields['cost']).'';
-    }   // onDuplicateKey()
+        return '`cost` = VALUES(`cost`)';
+    }
 
     /**
      * Table name

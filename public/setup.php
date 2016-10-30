@@ -38,7 +38,7 @@ $config = array(
     /**
      * Minimal required PHP version
      */
-    'PHPVersion' => '5.3',
+    'PHPVersion' => '5.5',
 
     /**
      *

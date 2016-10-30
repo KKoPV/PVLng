@@ -23,20 +23,19 @@ class ReadingNum extends ReadingNumBase
      * @param integer $id Channel Id
      * @param array $data Array of Array($timestamp => $value)
      */
-    public function insertBulk($id, $data) {
+    public function insertBulk($id, Array $data) {
+
+        if (empty($data)) return 0;
 
         $values = array();
 
         foreach ($data as $timestamp=>$value) {
-            $values[] = $id.','.$timestamp.','.$value;
+            $values[] = $id . ',' . $timestamp . ',' . $value;
         }
 
-        if (empty($values)) return 0;
-
         $sql = sprintf(
-            'INSERT INTO `%s` (`id`, `timestamp`, `data`) VALUES (%s) '.
-            'ON DUPLICATE KEY UPDATE `data` = VALUES(`data`)',
-            $this->table, implode('), (', $values)
+            'INSERT INTO `%s` (`id`, `timestamp`, `data`) VALUES (%s)'.$this->_onDuplicateKey(),
+            $this->table, implode('),(', $values)
         );
 
         try {

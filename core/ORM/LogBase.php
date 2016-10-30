@@ -45,7 +45,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->fields['timestamp'] = $timestamp;
         return $this;
-    }   // setTimestamp()
+    }
 
     /**
      * Raw setter for field "timestamp", for INSERT, REPLACE and UPDATE
@@ -57,7 +57,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->raw['timestamp'] = $timestamp;
         return $this;
-    }   // setTimestampRaw()
+    }
 
     /**
      * Basic setter for field "scope"
@@ -69,7 +69,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->fields['scope'] = $scope;
         return $this;
-    }   // setScope()
+    }
 
     /**
      * Raw setter for field "scope", for INSERT, REPLACE and UPDATE
@@ -81,7 +81,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->raw['scope'] = $scope;
         return $this;
-    }   // setScopeRaw()
+    }
 
     /**
      * Basic setter for field "data"
@@ -93,7 +93,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->fields['data'] = $data;
         return $this;
-    }   // setData()
+    }
 
     /**
      * Raw setter for field "data", for INSERT, REPLACE and UPDATE
@@ -105,7 +105,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->raw['data'] = $data;
         return $this;
-    }   // setDataRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -119,7 +119,7 @@ abstract class LogBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "timestamp"
@@ -129,7 +129,7 @@ abstract class LogBase extends \slimMVC\ORM
     public function getTimestamp()
     {
         return $this->fields['timestamp'];
-    }   // getTimestamp()
+    }
 
     /**
      * Basic getter for field "scope"
@@ -139,7 +139,7 @@ abstract class LogBase extends \slimMVC\ORM
     public function getScope()
     {
         return $this->fields['scope'];
-    }   // getScope()
+    }
 
     /**
      * Basic getter for field "data"
@@ -149,7 +149,7 @@ abstract class LogBase extends \slimMVC\ORM
     public function getData()
     {
         return $this->fields['data'];
-    }   // getData()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -165,7 +165,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "timestamp"
@@ -177,7 +177,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
         return $this;
-    }   // filterByTimestamp()
+    }
 
     /**
      * Filter for field "scope"
@@ -189,7 +189,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('scope').' = '.$this->quote($scope);
         return $this;
-    }   // filterByScope()
+    }
 
     /**
      * Filter for field "data"
@@ -201,7 +201,7 @@ abstract class LogBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('data').' = '.$this->quote($data);
         return $this;
-    }   // filterByData()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

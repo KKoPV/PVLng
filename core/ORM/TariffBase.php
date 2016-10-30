@@ -45,7 +45,7 @@ abstract class TariffBase extends \slimMVC\ORM
     {
         $this->fields['name'] = $name;
         return $this;
-    }   // setName()
+    }
 
     /**
      * Raw setter for field "name", for INSERT, REPLACE and UPDATE
@@ -57,7 +57,7 @@ abstract class TariffBase extends \slimMVC\ORM
     {
         $this->raw['name'] = $name;
         return $this;
-    }   // setNameRaw()
+    }
 
     /**
      * Basic setter for field "comment"
@@ -69,7 +69,7 @@ abstract class TariffBase extends \slimMVC\ORM
     {
         $this->fields['comment'] = $comment;
         return $this;
-    }   // setComment()
+    }
 
     /**
      * Raw setter for field "comment", for INSERT, REPLACE and UPDATE
@@ -81,7 +81,7 @@ abstract class TariffBase extends \slimMVC\ORM
     {
         $this->raw['comment'] = $comment;
         return $this;
-    }   // setCommentRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -95,7 +95,7 @@ abstract class TariffBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "name"
@@ -105,7 +105,7 @@ abstract class TariffBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "comment"
@@ -115,7 +115,7 @@ abstract class TariffBase extends \slimMVC\ORM
     public function getComment()
     {
         return $this->fields['comment'];
-    }   // getComment()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -131,7 +131,7 @@ abstract class TariffBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "name"
@@ -143,7 +143,7 @@ abstract class TariffBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "comment"
@@ -155,7 +155,7 @@ abstract class TariffBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
-    }   // filterByComment()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED

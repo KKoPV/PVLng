@@ -45,7 +45,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['guid'] = $guid;
         return $this;
-    }   // setGuid()
+    }
 
     /**
      * Raw setter for field "guid", for INSERT, REPLACE and UPDATE
@@ -57,7 +57,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['guid'] = $guid;
         return $this;
-    }   // setGuidRaw()
+    }
 
     /**
      * Basic setter for field "name"
@@ -69,7 +69,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['name'] = $name;
         return $this;
-    }   // setName()
+    }
 
     /**
      * Raw setter for field "name", for INSERT, REPLACE and UPDATE
@@ -81,7 +81,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['name'] = $name;
         return $this;
-    }   // setNameRaw()
+    }
 
     /**
      * Basic setter for field "description"
@@ -93,7 +93,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['description'] = $description;
         return $this;
-    }   // setDescription()
+    }
 
     /**
      * Raw setter for field "description", for INSERT, REPLACE and UPDATE
@@ -105,7 +105,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['description'] = $description;
         return $this;
-    }   // setDescriptionRaw()
+    }
 
     /**
      * Basic setter for field "serial"
@@ -117,7 +117,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['serial'] = $serial;
         return $this;
-    }   // setSerial()
+    }
 
     /**
      * Raw setter for field "serial", for INSERT, REPLACE and UPDATE
@@ -129,7 +129,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['serial'] = $serial;
         return $this;
-    }   // setSerialRaw()
+    }
 
     /**
      * Basic setter for field "channel"
@@ -141,7 +141,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['channel'] = $channel;
         return $this;
-    }   // setChannel()
+    }
 
     /**
      * Raw setter for field "channel", for INSERT, REPLACE and UPDATE
@@ -153,7 +153,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['channel'] = $channel;
         return $this;
-    }   // setChannelRaw()
+    }
 
     /**
      * Basic setter for field "type"
@@ -165,7 +165,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['type'] = $type;
         return $this;
-    }   // setType()
+    }
 
     /**
      * Raw setter for field "type", for INSERT, REPLACE and UPDATE
@@ -177,7 +177,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['type'] = $type;
         return $this;
-    }   // setTypeRaw()
+    }
 
     /**
      * Basic setter for field "resolution"
@@ -189,7 +189,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['resolution'] = $resolution;
         return $this;
-    }   // setResolution()
+    }
 
     /**
      * Raw setter for field "resolution", for INSERT, REPLACE and UPDATE
@@ -201,7 +201,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['resolution'] = $resolution;
         return $this;
-    }   // setResolutionRaw()
+    }
 
     /**
      * Basic setter for field "unit"
@@ -213,7 +213,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['unit'] = $unit;
         return $this;
-    }   // setUnit()
+    }
 
     /**
      * Raw setter for field "unit", for INSERT, REPLACE and UPDATE
@@ -225,7 +225,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['unit'] = $unit;
         return $this;
-    }   // setUnitRaw()
+    }
 
     /**
      * Basic setter for field "decimals"
@@ -237,7 +237,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['decimals'] = $decimals;
         return $this;
-    }   // setDecimals()
+    }
 
     /**
      * Raw setter for field "decimals", for INSERT, REPLACE and UPDATE
@@ -249,7 +249,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['decimals'] = $decimals;
         return $this;
-    }   // setDecimalsRaw()
+    }
 
     /**
      * Basic setter for field "meter"
@@ -261,7 +261,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['meter'] = $meter;
         return $this;
-    }   // setMeter()
+    }
 
     /**
      * Raw setter for field "meter", for INSERT, REPLACE and UPDATE
@@ -273,7 +273,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['meter'] = $meter;
         return $this;
-    }   // setMeterRaw()
+    }
 
     /**
      * Basic setter for field "numeric"
@@ -285,7 +285,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['numeric'] = $numeric;
         return $this;
-    }   // setNumeric()
+    }
 
     /**
      * Raw setter for field "numeric", for INSERT, REPLACE and UPDATE
@@ -297,7 +297,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['numeric'] = $numeric;
         return $this;
-    }   // setNumericRaw()
+    }
 
     /**
      * Basic setter for field "offset"
@@ -309,7 +309,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['offset'] = $offset;
         return $this;
-    }   // setOffset()
+    }
 
     /**
      * Raw setter for field "offset", for INSERT, REPLACE and UPDATE
@@ -321,7 +321,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['offset'] = $offset;
         return $this;
-    }   // setOffsetRaw()
+    }
 
     /**
      * Basic setter for field "adjust"
@@ -333,7 +333,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['adjust'] = $adjust;
         return $this;
-    }   // setAdjust()
+    }
 
     /**
      * Raw setter for field "adjust", for INSERT, REPLACE and UPDATE
@@ -345,7 +345,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['adjust'] = $adjust;
         return $this;
-    }   // setAdjustRaw()
+    }
 
     /**
      * Basic setter for field "cost"
@@ -357,7 +357,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['cost'] = $cost;
         return $this;
-    }   // setCost()
+    }
 
     /**
      * Raw setter for field "cost", for INSERT, REPLACE and UPDATE
@@ -369,7 +369,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['cost'] = $cost;
         return $this;
-    }   // setCostRaw()
+    }
 
     /**
      * Basic setter for field "tariff"
@@ -381,7 +381,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['tariff'] = $tariff;
         return $this;
-    }   // setTariff()
+    }
 
     /**
      * Raw setter for field "tariff", for INSERT, REPLACE and UPDATE
@@ -393,7 +393,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['tariff'] = $tariff;
         return $this;
-    }   // setTariffRaw()
+    }
 
     /**
      * Basic setter for field "threshold"
@@ -405,7 +405,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['threshold'] = $threshold;
         return $this;
-    }   // setThreshold()
+    }
 
     /**
      * Raw setter for field "threshold", for INSERT, REPLACE and UPDATE
@@ -417,7 +417,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['threshold'] = $threshold;
         return $this;
-    }   // setThresholdRaw()
+    }
 
     /**
      * Basic setter for field "valid_from"
@@ -429,7 +429,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['valid_from'] = $valid_from;
         return $this;
-    }   // setValidFrom()
+    }
 
     /**
      * Raw setter for field "valid_from", for INSERT, REPLACE and UPDATE
@@ -441,7 +441,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['valid_from'] = $valid_from;
         return $this;
-    }   // setValidFromRaw()
+    }
 
     /**
      * Basic setter for field "valid_to"
@@ -453,7 +453,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['valid_to'] = $valid_to;
         return $this;
-    }   // setValidTo()
+    }
 
     /**
      * Raw setter for field "valid_to", for INSERT, REPLACE and UPDATE
@@ -465,7 +465,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['valid_to'] = $valid_to;
         return $this;
-    }   // setValidToRaw()
+    }
 
     /**
      * Basic setter for field "public"
@@ -477,7 +477,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['public'] = $public;
         return $this;
-    }   // setPublic()
+    }
 
     /**
      * Raw setter for field "public", for INSERT, REPLACE and UPDATE
@@ -489,7 +489,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['public'] = $public;
         return $this;
-    }   // setPublicRaw()
+    }
 
     /**
      * Basic setter for field "tags"
@@ -501,7 +501,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['tags'] = $tags;
         return $this;
-    }   // setTags()
+    }
 
     /**
      * Raw setter for field "tags", for INSERT, REPLACE and UPDATE
@@ -513,7 +513,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['tags'] = $tags;
         return $this;
-    }   // setTagsRaw()
+    }
 
     /**
      * Basic setter for field "extra"
@@ -525,7 +525,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['extra'] = $extra;
         return $this;
-    }   // setExtra()
+    }
 
     /**
      * Raw setter for field "extra", for INSERT, REPLACE and UPDATE
@@ -537,7 +537,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['extra'] = $extra;
         return $this;
-    }   // setExtraRaw()
+    }
 
     /**
      * Basic setter for field "comment"
@@ -549,7 +549,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['comment'] = $comment;
         return $this;
-    }   // setComment()
+    }
 
     /**
      * Raw setter for field "comment", for INSERT, REPLACE and UPDATE
@@ -561,7 +561,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['comment'] = $comment;
         return $this;
-    }   // setCommentRaw()
+    }
 
     /**
      * Basic setter for field "icon"
@@ -573,7 +573,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->fields['icon'] = $icon;
         return $this;
-    }   // setIcon()
+    }
 
     /**
      * Raw setter for field "icon", for INSERT, REPLACE and UPDATE
@@ -585,7 +585,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->raw['icon'] = $icon;
         return $this;
-    }   // setIconRaw()
+    }
 
     // -----------------------------------------------------------------------
     // Getter methods
@@ -599,7 +599,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getId()
     {
         return $this->fields['id'];
-    }   // getId()
+    }
 
     /**
      * Basic getter for field "guid"
@@ -609,7 +609,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getGuid()
     {
         return $this->fields['guid'];
-    }   // getGuid()
+    }
 
     /**
      * Basic getter for field "name"
@@ -619,7 +619,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getName()
     {
         return $this->fields['name'];
-    }   // getName()
+    }
 
     /**
      * Basic getter for field "description"
@@ -629,7 +629,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getDescription()
     {
         return $this->fields['description'];
-    }   // getDescription()
+    }
 
     /**
      * Basic getter for field "serial"
@@ -639,7 +639,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getSerial()
     {
         return $this->fields['serial'];
-    }   // getSerial()
+    }
 
     /**
      * Basic getter for field "channel"
@@ -649,7 +649,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getChannel()
     {
         return $this->fields['channel'];
-    }   // getChannel()
+    }
 
     /**
      * Basic getter for field "type"
@@ -659,7 +659,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getType()
     {
         return $this->fields['type'];
-    }   // getType()
+    }
 
     /**
      * Basic getter for field "resolution"
@@ -669,7 +669,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getResolution()
     {
         return $this->fields['resolution'];
-    }   // getResolution()
+    }
 
     /**
      * Basic getter for field "unit"
@@ -679,7 +679,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getUnit()
     {
         return $this->fields['unit'];
-    }   // getUnit()
+    }
 
     /**
      * Basic getter for field "decimals"
@@ -689,7 +689,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getDecimals()
     {
         return $this->fields['decimals'];
-    }   // getDecimals()
+    }
 
     /**
      * Basic getter for field "meter"
@@ -699,7 +699,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getMeter()
     {
         return $this->fields['meter'];
-    }   // getMeter()
+    }
 
     /**
      * Basic getter for field "numeric"
@@ -709,7 +709,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getNumeric()
     {
         return $this->fields['numeric'];
-    }   // getNumeric()
+    }
 
     /**
      * Basic getter for field "offset"
@@ -719,7 +719,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getOffset()
     {
         return $this->fields['offset'];
-    }   // getOffset()
+    }
 
     /**
      * Basic getter for field "adjust"
@@ -729,7 +729,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getAdjust()
     {
         return $this->fields['adjust'];
-    }   // getAdjust()
+    }
 
     /**
      * Basic getter for field "cost"
@@ -739,7 +739,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getCost()
     {
         return $this->fields['cost'];
-    }   // getCost()
+    }
 
     /**
      * Basic getter for field "tariff"
@@ -749,7 +749,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getTariff()
     {
         return $this->fields['tariff'];
-    }   // getTariff()
+    }
 
     /**
      * Basic getter for field "threshold"
@@ -759,7 +759,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getThreshold()
     {
         return $this->fields['threshold'];
-    }   // getThreshold()
+    }
 
     /**
      * Basic getter for field "valid_from"
@@ -769,7 +769,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getValidFrom()
     {
         return $this->fields['valid_from'];
-    }   // getValidFrom()
+    }
 
     /**
      * Basic getter for field "valid_to"
@@ -779,7 +779,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getValidTo()
     {
         return $this->fields['valid_to'];
-    }   // getValidTo()
+    }
 
     /**
      * Basic getter for field "public"
@@ -789,7 +789,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getPublic()
     {
         return $this->fields['public'];
-    }   // getPublic()
+    }
 
     /**
      * Basic getter for field "tags"
@@ -799,7 +799,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getTags()
     {
         return $this->fields['tags'];
-    }   // getTags()
+    }
 
     /**
      * Basic getter for field "extra"
@@ -809,7 +809,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getExtra()
     {
         return $this->fields['extra'];
-    }   // getExtra()
+    }
 
     /**
      * Basic getter for field "comment"
@@ -819,7 +819,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getComment()
     {
         return $this->fields['comment'];
-    }   // getComment()
+    }
 
     /**
      * Basic getter for field "icon"
@@ -829,7 +829,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     public function getIcon()
     {
         return $this->fields['icon'];
-    }   // getIcon()
+    }
 
     // -----------------------------------------------------------------------
     // Filter methods
@@ -845,7 +845,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('id').' = '.$this->quote($id);
         return $this;
-    }   // filterById()
+    }
 
     /**
      * Filter for field "guid"
@@ -857,7 +857,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
         return $this;
-    }   // filterByGuid()
+    }
 
     /**
      * Filter for field "type"
@@ -869,7 +869,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('type').' = '.$this->quote($type);
         return $this;
-    }   // filterByType()
+    }
 
     /**
      * Filter for field "tariff"
@@ -881,7 +881,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
         return $this;
-    }   // filterByTariff()
+    }
 
     /**
      * Filter for field "name"
@@ -893,7 +893,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('name').' = '.$this->quote($name);
         return $this;
-    }   // filterByName()
+    }
 
     /**
      * Filter for field "description"
@@ -905,7 +905,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('description').' = '.$this->quote($description);
         return $this;
-    }   // filterByDescription()
+    }
 
     /**
      * Filter for field "serial"
@@ -917,7 +917,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
         return $this;
-    }   // filterBySerial()
+    }
 
     /**
      * Filter for field "channel"
@@ -929,7 +929,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
         return $this;
-    }   // filterByChannel()
+    }
 
     /**
      * Filter for field "resolution"
@@ -941,7 +941,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('resolution').' = '.$this->quote($resolution);
         return $this;
-    }   // filterByResolution()
+    }
 
     /**
      * Filter for field "unit"
@@ -953,7 +953,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
         return $this;
-    }   // filterByUnit()
+    }
 
     /**
      * Filter for field "decimals"
@@ -965,7 +965,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('decimals').' = '.$this->quote($decimals);
         return $this;
-    }   // filterByDecimals()
+    }
 
     /**
      * Filter for field "meter"
@@ -977,7 +977,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('meter').' = '.$this->quote($meter);
         return $this;
-    }   // filterByMeter()
+    }
 
     /**
      * Filter for field "numeric"
@@ -989,7 +989,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('numeric').' = '.$this->quote($numeric);
         return $this;
-    }   // filterByNumeric()
+    }
 
     /**
      * Filter for field "offset"
@@ -1001,7 +1001,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('offset').' = '.$this->quote($offset);
         return $this;
-    }   // filterByOffset()
+    }
 
     /**
      * Filter for field "adjust"
@@ -1013,7 +1013,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('adjust').' = '.$this->quote($adjust);
         return $this;
-    }   // filterByAdjust()
+    }
 
     /**
      * Filter for field "cost"
@@ -1025,7 +1025,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
         return $this;
-    }   // filterByCost()
+    }
 
     /**
      * Filter for field "threshold"
@@ -1037,7 +1037,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('threshold').' = '.$this->quote($threshold);
         return $this;
-    }   // filterByThreshold()
+    }
 
     /**
      * Filter for field "valid_from"
@@ -1049,7 +1049,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('valid_from').' = '.$this->quote($valid_from);
         return $this;
-    }   // filterByValidFrom()
+    }
 
     /**
      * Filter for field "valid_to"
@@ -1061,7 +1061,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('valid_to').' = '.$this->quote($valid_to);
         return $this;
-    }   // filterByValidTo()
+    }
 
     /**
      * Filter for field "public"
@@ -1073,7 +1073,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('public').' = '.$this->quote($public);
         return $this;
-    }   // filterByPublic()
+    }
 
     /**
      * Filter for field "tags"
@@ -1085,7 +1085,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('tags').' = '.$this->quote($tags);
         return $this;
-    }   // filterByTags()
+    }
 
     /**
      * Filter for field "extra"
@@ -1097,7 +1097,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('extra').' = '.$this->quote($extra);
         return $this;
-    }   // filterByExtra()
+    }
 
     /**
      * Filter for field "comment"
@@ -1109,7 +1109,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
         return $this;
-    }   // filterByComment()
+    }
 
     /**
      * Filter for field "icon"
@@ -1121,7 +1121,7 @@ abstract class ChannelBase extends \slimMVC\ORM
     {
         $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
         return $this;
-    }   // filterByIcon()
+    }
 
     // -----------------------------------------------------------------------
     // PROTECTED
