@@ -11,13 +11,16 @@
 
 <div id="tabs" class="ui-tabs">
 
-    <ul>
+    <ul class="no-print">
         <li><a href="#tabs-1">{{Channels}}</a></li>
         <li><a href="#tabs-2">{{Variants}}</a></li>
         <li data-action="reset"><a href="#">{{ResetAll}}</a></li>
     </ul>
 
-    <div id="tabs-1">
+    <div id="tabs-1" class="print">
+
+        <!-- EVENT index_channels_before_html -->
+
         <table id="data-table" class="dataTable treeTable">
             <thead>
                 <tr>
@@ -84,9 +87,14 @@
             <i class="fa fa-key fa-rotate-90"></i>{{ShowGUID}}
         </div>
 
+        <!-- EVENT index_channels_after_html -->
+
     </div>
 
-    <div id="tabs-2">
+    <div id="tabs-2" class="no-print">
+
+        <!-- EVENT index_charts_edit_before_html -->
+
         <div>
             <div class="alpha grid_4">
                 <select id="load-delete-view" style="width:100%" data-placeholder="--- {{SelectChart}} ---"></select>
@@ -108,7 +116,6 @@
                 </a>
             </div>
         </div>
-
         <div class="clear"></div>
         <br>
 
@@ -128,8 +135,10 @@
                 </button>
             </div>
         </div>
-
         <div class="clear"></div>
+
+        <!-- EVENT index_charts_edit_after_html -->
+
     </div>
 
 </div>

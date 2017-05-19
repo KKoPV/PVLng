@@ -21,11 +21,11 @@ Loader::registerCallback(function($filename) {
     $filenameAOP = implode('.', $parts);
 
     // Strip root directory and replace directory separators with ~ to get unique names
-    $filenameAOP = str_replace(TEMP_DIR, '', $filenameAOP);
-    $filenameAOP = str_replace(ROOT_DIR, '', $filenameAOP);
-    $filenameAOP = str_replace(DS, '~', $filenameAOP);
+    $filenameAOP = str_replace(__TEMP__, '', $filenameAOP);
+    $filenameAOP = str_replace(__ROOT__, '', $filenameAOP);
+    $filenameAOP = str_replace(DIRECTORY_SEPARATOR, '~', $filenameAOP);
     $filenameAOP = trim($filenameAOP, '~');
-    $filenameAOP = TEMP_DIR . DS . $filenameAOP;
+    $filenameAOP = PVLng::path(__TEMP__, $filenameAOP);
 
     if (!file_exists($filenameAOP) OR filemtime($filenameAOP) < filemtime($filename)) {
         // (Re-)Create AOP file
@@ -34,8 +34,8 @@ Loader::registerCallback(function($filename) {
         // Build file content hash to check if AOP relevant code was found
         $hash = md5($code);
 
-       # Yryie::Info('Compile: '.$filename);
-        Yryie::StartTimer('Compile '.str_replace(ROOT_DIR.DS, '', $filename).' to '.basename($filenameAOP));
+        # Yryie::Info('Compile: '.$filename);
+        Yryie::StartTimer('Compile '.str_replace(__ROOT__.DIRECTORY_SEPARATOR, '', $filename).' to '.basename($filenameAOP));
         Yryie::transformCode($code);
 
         if ($hash == md5($code)) $code = "<?php include '$filename';";
@@ -82,9 +82,13 @@ class YryieMiddleware extends Slim\Middleware {
         // Analyse queries to find missing indexes
         foreach ($db->queries as $sql) {
             Yryie::SQL($sql);
-            if ($res = $db->query('EXPLAIN '.$sql)) {
-                $res = $res->fetch_object();
-                Yryie::SQL('INDEX: '.$res->key.' ('.$res->possible_keys.')');
+            try {
+                if (($res = $db->query('EXPLAIN '.$sql)) &&
+                    ($res = $res->fetch_object()) && $res->possible_keys) {
+                    Yryie::SQL('INDEX: '.$res->key.' ('.$res->possible_keys.')');
+                }
+            } catch (Exception $e) {
+                Yryie::Error($e->getMessage());
             }
         }
 
@@ -105,7 +109,7 @@ class YryieMiddleware extends Slim\Middleware {
 
         if ($app->debug == 3) {
 
-            $file = TEMP_DIR . DS . 'trace.' . date('Y-m-d-H:i:s') . '.csv';
+            $file = PVLng::path(TEMP_DIR, 'trace.'.date('Y-m-d-H:i:s').'.csv');
             Yryie::$TraceDelimiter = ';';
             Yryie::Save($file);
             $body = str_replace($placeholder, '<p><b>Trace saved as <tt>'.$file.'</tt></b></p>', $body);

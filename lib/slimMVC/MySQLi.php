@@ -48,7 +48,7 @@ class MySQLi extends \MySQLi
         parent::query('SET CHARACTER SET '.self::$charset);
 
         // Avoid SQL error (1690): BIGINT UNSIGNED value is out of range
-        parent::query('SET sql_mode = NO_UNSIGNED_SUBTRACTION');
+        parent::query('SET sql_mode = \'NO_UNSIGNED_SUBTRACTION\'');
 
         mysqli_report(MYSQLI_REPORT_STRICT);
     }
@@ -178,7 +178,8 @@ class MySQLi extends \MySQLi
 
         $this->QueryTime += (microtime(true) - $t) * 1000;
         $this->QueryCount++;
-        $this->queries[] = preg_replace('~\s+~', ' ', $query);
+#        $this->queries[] = preg_replace('~\s+~', ' ', $query);
+        $this->queries[] = $query;
 
         return $res;
     }
@@ -291,6 +292,29 @@ class MySQLi extends \MySQLi
         $this->Buffered = false;
 
         return $result;
+    }
+
+    /**
+     *
+     */
+    public function call($procedure)
+    {
+        $args = func_get_args();
+        // Shift out proc. name
+        $procedure = array_shift($args);
+        // Quote proc. args
+        $args = array_map(array($this, 'quote'), $args);
+        return $this->query('CALL `{1}`({2})', $procedure, implode(', ', $args));
+    }
+
+    /**
+     *
+     */
+    public function quote($value)
+    {
+        return is_numeric($value)
+             ? $value
+             : '"' . $this->real_escape_strin($value) . '"';
     }
 
     /**

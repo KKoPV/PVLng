@@ -1,0 +1,86 @@
+##############################################################################
+###
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2017 Knut Kohl
+### @license     MIT License (MIT) http://opensource.org/licenses/MIT
+### @version     1.0.0
+###
+##############################################################################
+###
+### NGINX configuration file
+###
+### Set your API server_name and listen port
+###
+### Make a link in /etc/nginx/sites-enabled
+###
+
+##############################################################################
+###
+### Adjust paths
+###
+server {
+    ###
+    # Server name & port
+    #
+    server_name  api.example.com;
+    listen       *:80;
+
+    ###
+    # Prepare paths by
+    # $ mkdir -p /var/www/pvlng/{html,log}
+    #
+    root         /var/www/pvlng/html/api;
+    access_log   /var/www/pvlng/log/api.access.log;
+    error_log    /var/www/pvlng/log/api.error.log;
+
+    ###
+    # Enable gzip compression
+    #
+    gzip             on;
+    gzip_min_length  1100;
+    gzip_buffers     4 32k;
+    gzip_comp_level  9;
+    # All supported result types
+    gzip_types       application/json application/csv application/tsv application/xml text/plain;
+    gzip_vary        on;
+    gzip_static      on;
+    gzip_proxied     expired no-cache no-store private auth;
+    gzip_disable     "MSIE [1-6]\.";
+
+    ###
+    # Allows file uploads up to 500 megabytes
+    #
+    client_max_body_size 500M;
+
+    ###
+    # Rewrite API calls
+    #
+    rewrite /([^/]+)/?(.*)$ /$1/index.php?$2;
+
+    ###
+    # Handle calls to *.php files
+    #
+    location ~ \.php$ {
+        try_files $uri =404;
+
+        # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+
+        fastcgi_pass pvlng_php_upstream;
+
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME     $fastcgi_script_name;
+
+        ###################
+        # Up to Debian Wheezy:
+        #include fastcgi_params;
+
+        ###################
+        # From Debian Jessie:
+        include fastcgi.conf;
+
+        ###################
+        # With Ajenti:
+        #include fcgi.conf;
+    }
+}

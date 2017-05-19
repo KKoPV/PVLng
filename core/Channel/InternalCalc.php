@@ -12,8 +12,8 @@ namespace Channel;
 /**
  *
  */
-abstract class InternalCalc extends Channel {
-
+abstract class InternalCalc extends Channel
+{
     /**
      * Readings table object
      */
@@ -32,12 +32,27 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
-    protected function __construct( \ORM\Tree $channel ) {
+    protected $forceReCalc;
+
+    /**
+     *
+     */
+    protected function __construct(\ORM\Tree $channel)
+    {
         parent::__construct($channel);
 
         $this->orgId = $this->entity;
+        $this->data  = \ORM\ReadingMemory::factory($this->numeric);
+    }
 
-        $this->data = \ORM\ReadingMemory::factory($this->numeric);
+    /**
+     *
+     */
+    protected function before_read(&$request)
+    {
+        parent::before_read($request);
+        // Force recalculate, ignore buffered data
+        $this->forceReCalc = !empty($request['recalc']);
     }
 
     /**
@@ -51,7 +66,8 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
-    protected function saveValue( $timestamp, $value ) {
+    protected function saveValue($timestamp, $value)
+    {
         $this->data->setTimestamp($timestamp);
         $this->data->setData($value);
         return $this->data->insert();
@@ -60,7 +76,8 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
-    protected function saveValues( $values ) {
+    protected function saveValues($values)
+    {
         $cnt = 0;
         if ($values instanceof \Buffer) {
             foreach ($values as $row) {
@@ -79,9 +96,11 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
-    protected function dataExists( $lifetime=NULL ) {
-
-        if (!is_null($lifetime)) {
+    protected function dataExists($lifetime=null)
+    {
+        if ($this->forceReCalc) {
+            $this->LifeTime = 0;
+        } elseif (!is_null($lifetime)) {
             $this->LifeTime = $lifetime;
         } else {
             $this->LifeTime = $this->end-1 < strtotime('midnight')
@@ -116,8 +135,9 @@ abstract class InternalCalc extends Channel {
     /**
      *
      */
-    protected function dataCreated() {
+    protected function dataCreated()
+    {
         // Data was just created, mark
-        $this->db->query('CALL `pvlng_reading_tmp_done`({1})', $this->entity);
+        $this->db->call('pvlng_reading_tmp_done', $this->entity);
     }
 }

@@ -1,18 +1,19 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2016 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
-class View extends Slim\View {
+class View extends Slim\View
+{
 
     /**
      *
      */
-    public function render( $result, $data=NULL )
+    public function render($result, $data=null)
     {
         $this->app = API::getInstance();
         $response = $this->app->response;
@@ -29,7 +30,7 @@ class View extends Slim\View {
          * Adjust before real rendering
          * e.g. JSON can switch for JSONP to text/javascript
          */
-        $this->app->ContentType($ContentType.';charset=utf-8');
+        $this->app->ContentType($ContentType . '; charset=utf-8');
 
         ob_start();
 
@@ -54,6 +55,10 @@ class View extends Slim\View {
                 break;
         }
 
+        if ($result instanceof Buffer) {
+            // Free memory
+            $result->close();
+        }
         return ob_get_clean();
     }
 
@@ -65,7 +70,7 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asJSON( $result )
+    protected function asJSON($result)
     {
         $callback = $this->app->request->get('callback');
         if (!$callback) $callback = $this->app->request->get('jsonp');
@@ -86,7 +91,7 @@ class View extends Slim\View {
             }
             echo ']';
         } else {
-            if (is_scalar($result) && json_decode($result, true) !== false) {
+            if (is_scalar($result) && json_decode($result) && json_last_error() === JSON_ERROR_NONE)  {
                 // Ok, is JSON
                 echo $result;
             } else {
@@ -100,7 +105,7 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asCSV( $result, $sep )
+    protected function asCSV($result, $sep)
     {
         if (!$result instanceof Buffer && !is_array($result)) {
             $result = array($result);
@@ -123,10 +128,8 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asXML( $result )
+    protected function asXML($result)
     {
-        require_once LIB_DIR . DS . 'contrib' . DS . 'Array2XML.php';
-
         if ($result instanceof Buffer) {
             echo '<?xml version="1.0" encoding="UTF-8" ?'.'>' . PHP_EOL;
             echo '<data lastUpdated="'.date('c').'">' . PHP_EOL;
@@ -161,7 +164,7 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asTXT( $result )
+    protected function asTXT($result)
     {
         if ($result instanceof Buffer OR is_array($result)) {
             // Reformat only iterable content
@@ -187,7 +190,7 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function asHTML( $result )
+    protected function asHTML($result)
     {
         echo '<html>
 <head>
@@ -210,7 +213,7 @@ class View extends Slim\View {
     /**
      *
      */
-    protected function normalizeJSON( $data )
+    protected function normalizeJSON($data)
     {
         if (is_array($data)) {
             foreach ($data as $key=>$value) {

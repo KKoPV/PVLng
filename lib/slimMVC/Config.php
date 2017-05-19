@@ -21,8 +21,8 @@ class Config extends \Slim\Helper\Set {
     /**
      *
      */
-    public function load( $file, $required=TRUE, $namespace='' ) {
-        if ($required AND !file_exists($file)) {
+    public function load( $file, $required=true, $namespace='' ) {
+        if ($required && !file_exists($file)) {
             throw new \Exception('Missing reqiured configuration file: '.$file);
         }
         if (file_exists($file)) {
@@ -40,7 +40,7 @@ class Config extends \Slim\Helper\Set {
      *
      */
     public function loadNamespace( $namespace, $file, $required=TRUE ) {
-        if (isset($file) AND (file_exists($file) OR $required)) {
+        if (isset($file) && (file_exists($file) || $required)) {
             $data = include $file;
             $data = $this->array_change_key_case_deep($data);
             $this->set($namespace, $this->array_replace_deep($this->get($namespace), $data));

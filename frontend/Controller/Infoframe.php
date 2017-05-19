@@ -19,19 +19,19 @@ class Infoframe extends \Controller {
      */
     public function Index_Action() {
 
-        $dir   = APP_DIR . DS . 'View' . DS . 'Infoframe';
+        $dir   = \PVLng::path(ROOT_DIR, 'frontend', 'View', 'Infoframe');
         $frame = $this->app->params->get('frame');
 
-        $config = $dir . DS . $frame . '.php';
+        $config = \PVLng::path($dir, $frame) . '.php';
         if (!file_exists($config)) {
             \Messages::Error('Missing settings in '.$frame.'.php');
             $this->app->redirect('/');
         }
 
         foreach (array('png', 'jpg', 'jpeg', 'gif') as $ext) {
-            $file = $dir . DS . $frame . '.' . $ext;
+            $file = \PVLng::path($dir, $frame.'.'.$ext);
             if (file_exists($file)) break;
-            $file = NULL;
+            $file = null;
         }
         if (!$file) {
             \Messages::Error('Missing image: '.$frame.'.(png|jpg|jpeg|gif)');

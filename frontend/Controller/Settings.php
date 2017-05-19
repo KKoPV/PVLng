@@ -107,7 +107,8 @@ class Settings extends \Controller
             $row['value'] = htmlspecialchars($row['value']);
 
             // Translate
-            $row['description'] = $t[$row['scope'].'_'.$row['name'].'_'.$row['key']][0];
+            $k = $row['scope'].'_'.$row['name'].'_'.$row['key'];
+            $row['description'] = isset($t[$k][0]) ? $t[$k][0] : $k;
 
             if ($last !== $row['name']) {
                 $last = $row['name'];

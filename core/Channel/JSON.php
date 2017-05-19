@@ -13,8 +13,8 @@ namespace Channel;
 /**
  *
  */
-class JSON extends Channel {
-
+class JSON extends Channel
+{
     /**
      * Path separator in channel definition
      *
@@ -25,11 +25,11 @@ class JSON extends Channel {
     /**
      *
      */
-    public function write( $request, $timestamp=NULL ) {
-
+    public function write($request, $timestamp=null)
+    {
         $ok = 0;
 
-        // find valid child channels
+        // Find valid child channels
         foreach ($this->getChilds() as $child) {
 
             // Find only writable channels with filled "channel" attribute

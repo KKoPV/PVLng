@@ -285,7 +285,7 @@ abstract class Channel
         // Default behavior
         $reading = \ORM\Reading::factory($this->numeric);
 
-        $this->lastReading = \ORM\ReadingLast::f($this->entity)->getData();
+        $this->lastReading = $reading->getLastReading($this->entity);
 
         $this->before_write($request);
 
@@ -323,7 +323,24 @@ abstract class Channel
         // came to here and not returned earlier
         $this->performance->setAction('write');
 
-        $rc = $reading->setId($this->entity)->setTimestamp($timestamp)->setData($this->value)->insert();
+        // Overload timestamp with $request['timestamp'] if given
+        if (array_key_exists('timestamp', $request)) {
+            $timestamp = $request['timestamp'];
+        }
+
+        if (!is_null($timestamp) && !is_numeric($timestamp)) {
+            $timestamp = strtotime($timestamp);
+        }
+
+        $reading->setId($this->entity)
+                ->setTimestamp($timestamp)
+                ->setData($this->value);
+
+//         $rc = $this->numeric
+//             ? $reading->buffer($this->numeric)
+//             : $reading->insert();
+
+        $rc = $reading->insert();
 
         if ($rc == 0 && $timestamp > time()) {
             $rc = $this->update($request, $timestamp);
@@ -342,9 +359,10 @@ abstract class Channel
         // Default behavior
         $reading = \ORM\Reading::factory($this->numeric);
 
-        $this->lastReading = \ORM\ReadingLast::f($this->entity)->getData();
+#        $this->lastReading = \ORM\ReadingLast::f($this->entity)->getData();
+        $this->lastReading = $reading->getLastReading($this->entity);
 
-        $this->check_before_write($request, $timestamp);
+        $this->check_before_write($request);
 
         if ($this->numeric) {
             // Check that new value is inside the valid range
@@ -476,7 +494,7 @@ abstract class Channel
                   ->group($timestamp);
             }
 
-            $q->filter('id', $this->entity)->order('timestamp');
+            $q->whereEQ('id', $this->entity)->order('timestamp');
 
             $this->filterReadTimestamp($q);
 
@@ -639,7 +657,7 @@ abstract class Channel
         self::HOUR      =>     3600,
         self::DAY       =>    86400,
         self::WEEK      =>   604800,
-        self::MONTH     =>  2678400,
+        self::MONTH     =>  2592000, # 30 days
         self::QUARTER   =>  7776000,
         self::YEAR      => 31536000,
         self::LAST      =>        1,
@@ -978,7 +996,7 @@ abstract class Channel
                : $this->start;
 
         // End is midnight > minus 1 second
-        $q->filter('timestamp', array('bt' => array($start, $this->end-1)));
+        $q->whereBT('timestamp', $start, $this->end-1);
     }
 
     /**
@@ -1015,13 +1033,14 @@ abstract class Channel
      */
     private function read_LastRow()
     {
-        $q = $this->write && !$this->childs
-             // Use special table for last readings for real channels
-           ? DBQuery::forge('pvlng_reading_last')
-           : DBQuery::forge($this->table[$this->numeric]);
+#        $q = $this->write && !$this->childs
+#             // Use special table for last readings for real channels
+#           ? DBQuery::forge('pvlng_reading_last')
+#           : DBQuery::forge($this->table[$this->numeric]);
 
         // Fetch last reading and set some data to 0 to get correct field order
-        return $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
+#        return $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
+        return DBQuery::forge($this->table[$this->numeric])
           ->get('timestamp')
           ->get('data')
           ->get(0, 'min')
@@ -1029,7 +1048,8 @@ abstract class Channel
           ->get(0, 'count')
           ->get(0, 'timediff')
           ->get(0, 'consumption')
-          ->filter('id', $this->entity)
+          ->whereEQ('id', $this->entity)
+#          ->whereEQ('timestamp', '(SELECT MAX(`timestamp`) FROM `'.$tbl.'` WHERE `id` = '.$this->entity.')')
           ->orderDescending('timestamp')
           ->limit(1);
     }
@@ -1052,7 +1072,7 @@ abstract class Channel
           ->get(1, 'count')
           ->get($q->MAX('timestamp').' - '.$q->MIN('timestamp'), 'timediff')
           ->get($value, 'consumption')
-          ->filter('id', $this->entity);
+          ->whereEQ('id', $this->entity);
 
         $this->filterReadTimestamp($q);
 

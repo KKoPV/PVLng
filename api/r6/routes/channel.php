@@ -1,18 +1,21 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
  *
  */
-$api->put('/channel', $APIkeyRequired, function() use ($api) {
-
+$api->put(
+    '/channel',
+    $APIkeyRequired,
+    function() use ($api)
+{
     $attr = json_decode($api->request->getBody(), TRUE);
     if ($attr === NULL) throw new Exception('Invalid JSON data', 400);
 
@@ -47,7 +50,10 @@ $api->put('/channel', $APIkeyRequired, function() use ($api) {
 /**
  *
  */
-$api->get('/channels', function() use ($api) {
+$api->get(
+    '/channels',
+    function() use ($api)
+{
     $channels = array();
     foreach ((new ORM\ChannelView)->find() as $channel) {
         if (!$channel->guid OR (!$api->APIKeyValid AND !$channel->public)) continue;
@@ -65,7 +71,11 @@ $api->get('/channels', function() use ($api) {
 /**
  *
  */
-$api->get('/channel/:guid', $accessibleChannel, function($guid) use ($api) {
+$api->get(
+    '/channel/:guid',
+    $accessibleChannel,
+    function($guid) use ($api)
+{
     $api->render(Channel::byGUID($guid)->getAttributesShort());
 })->name('GET /channel/:guid')->help = array(
     'since'       => 'r3',
@@ -75,7 +85,11 @@ $api->get('/channel/:guid', $accessibleChannel, function($guid) use ($api) {
 /**
  *
  */
-$api->get('/channel/:guid/stats', $accessibleChannel, function($guid) use ($api) {
+$api->get(
+    '/channel/:guid/stats',
+    $accessibleChannel,
+    function($guid) use ($api)
+{
     $channel = Channel::byGUID($guid);
 
     $result = $api->boolParam('attributes', FALSE)
@@ -120,7 +134,11 @@ $api->get('/channel/:guid/stats', $accessibleChannel, function($guid) use ($api)
 /**
  *
  */
-$api->get('/channel/:guid/:attribute', $accessibleChannel, function($guid, $attribute) use ($api) {
+$api->get(
+    '/channel/:guid/:attribute',
+    $accessibleChannel,
+    function($guid, $attribute) use ($api)
+{
     $api->render(array_map(
         function($a) { return html_entity_decode($a); },
         Channel::byGUID($guid)->getAttributes($attribute)
@@ -135,7 +153,11 @@ $api->get('/channel/:guid/:attribute', $accessibleChannel, function($guid, $attr
 /**
  *
  */
-$api->get('/channel/:guid/parent/:attribute', $accessibleChannel, function($guid, $attribute) use ($api) {
+$api->get(
+    '/channel/:guid/parent/:attribute',
+    $accessibleChannel,
+    function($guid, $attribute) use ($api)
+{
     $channel = (new ORM\Tree)->filterByGuid($guid)->findOne();
     if (($id = $channel->getId()) == '') {
         $api->stopAPI('No channel found for GUID: '.$guid, 400);
@@ -163,7 +185,11 @@ $api->get('/channel/:guid/parent/:attribute', $accessibleChannel, function($guid
 /**
  *
  */
-$api->delete('/channel/:id', $APIkeyRequired, function($id) use ($api) {
+$api->delete(
+    '/channel/:id',
+    $APIkeyRequired,
+    function($id) use ($api)
+{
     $channel = new ORM\Channel($id);
 
     if ($channel->getId()) {

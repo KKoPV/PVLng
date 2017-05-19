@@ -12,7 +12,7 @@
 <input type="hidden" id="fromdate" name="fromdate" />
 <input type="hidden" id="todate" name="todate" />
 
-<div class="icons">
+<div>
     <select id="channel" class="fl" data-placeholder="--- {{SelectChannel}} ---">
         <option></option>
         <!-- BEGIN CHANNELS -->
@@ -31,12 +31,9 @@
         <!-- END -->
     </select>
 
-    <div class="fl" style="margin-left:16px;margin-top:5px">
+    <div id="channel-icons" class="fl icons">
         <img id="icon" src="/images/pix.gif" class="fl tip" data-none="/images/pix.gif" alt="">
         <i id="icon-private" class="fa fa-lock fa-fw tip" style="display:none" title="{{PrivateChannel}}"></i>
-    </div>
-
-    <span class="fr" style="margin-top:5px">
         <i id="edit-entity" class="fa fa-pencil fa-fw tipbtn" style="display:none" title="{{EditEntity}}"></i>
         <i id="guid" class="fa fa-key fa-rotate-90 fa-fw tipbtn" style="display:none" title="{{ShowGUID}}"></i>
     </span>

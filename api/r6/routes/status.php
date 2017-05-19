@@ -1,11 +1,11 @@
 <?php
 /**
- * System status
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**

@@ -1,0 +1,144 @@
+html, body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+/*
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', sans-serif;
+*/
+}
+
+html {
+    height: 100%;
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
+    opacity: 0;
+}
+
+table{
+    font-size: 62.5%;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+td {
+    text-align: center;
+    padding: 0;
+}
+
+.icons {
+    width: 512px;
+    height: 512px;
+}
+
+.icons.solar {
+    background: url(img/solar.png) no-repeat;
+}
+
+.icons.home {
+    background: url(img/home.png) no-repeat;
+}
+
+.icons.grid {
+    background: url(img/grid.png) no-repeat;
+}
+
+td.gray { background-color: #CCC; }
+td.green { background-color: #6E6; }
+td.red { background-color: #E66; }
+
+div.value {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding-top: 0.5em;
+}
+
+div.value.inactive {
+    display: none;
+}
+
+.icon {
+    padding: 2em 1em .5em 1em;
+}
+
+.icon img {
+    width: 12.8em;
+    height: 12.8em
+}
+
+tr.value td {
+    font-weight: bold;
+    font-size:   3em;
+    padding-top: .5em;
+    height: 1.75em;
+}
+
+tr.icon td.gray {
+    border-bottom: #CCC solid 1px;
+}
+
+tr.value td.gray,
+tr.unit td.gray {
+    border-top: #CCC solid 1px;
+    border-bottom: #CCC solid 1px;
+}
+
+tr.icon td.green {
+    border-bottom: #6E6 solid 1px;
+}
+
+tr.value td.green,
+tr.unit td.green {
+    border-top: #6E6 solid 1px;
+    border-bottom: #6E6 solid 1px;
+}
+
+tr.icon td.red {
+    border-bottom: #E66 solid 1px;
+}
+
+tr.value td.red,
+tr.unit td.red {
+    border-top: #E66 solid 1px;
+    border-bottom: #E66 solid 1px;
+}
+
+tr.unit td {
+    padding:   0 1em .5em 1em;
+    font-size: 2em;
+}
+
+td.icon {
+    border-top-left-radius: 2em;
+    border-top-right-radius: 2em;
+}
+
+td.last {
+    border-bottom-left-radius: 2em;
+    border-bottom-right-radius: 2em;
+}
+
+/* Arrows */
+td.arrow {
+    font-size: 10em;
+}
+
+i.fa-angle-double-right {
+    color: #6E6;
+    font-weight: bold;
+}
+
+i.fa-angle-double-left {
+    color: #E66;
+    font-weight: bold;
+}
+
+#clock {
+    padding-top: 2.5em;
+    font-size: 2em;
+    font-weight: bold;
+}

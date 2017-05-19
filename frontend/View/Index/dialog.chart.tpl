@@ -129,12 +129,6 @@
                 </div>
             </td>
         </tr>
-        <tr class="numeric">
-            <td>{{DecimalsForMarkers}}</td>
-            <td>
-                <input id="d-decimals" type="number" min="0" max="4" size="2">
-            </td>
-        </tr>
         <tr class="not-scatter">
             <td>
                 <label for="d-cons">{{ShowConsumption}}</label>
@@ -175,9 +169,9 @@
                     <label for="d-color-neg">{{below}}</label>
                 </td>
                 <td>
-                    <input id="d-color-threshold" type="number" style="width:4em" class="not-scatter tip" title="{{Threshold}}">
+                    <input id="d-color-threshold" type="number" style="width:4em" class="tip" title="{{Threshold}}">
                     &nbsp;
-                    <input id="d-color-diff" type="color" class="not-scatter spectrum" />
+                    <input id="d-color-diff" type="color" class="spectrum" />
                 </td>
                 </tr></table>
             </td>

@@ -60,10 +60,9 @@ var pvlng = new function() {
         },
 
         this.get = function(name) {
-            var nameEQ = escape(name) + '=';
-            var ca = document.cookie.split(';');
+            var nameEQ = escape(name) + '=', ca = document.cookie.split(';'), c;
             for (var i=0; i<ca.length; i++) {
-                var c = ca[i];
+                c = ca[i];
                 while (c.charAt(0) === ' ') c = c.substring(1, c.length);
                 if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
             }
@@ -163,7 +162,10 @@ var pvlng = new function() {
 
         var date = $.datepicker.parseDate('mm/dd/yy', $('#timerangedate').val()),
             timerange = $('input[name="timerange"]:checked').val(),
-            from, to, format, preset = presetPeriods.split(';');
+            from, to, dst, format, preset = presetPeriods.split(';');
+
+        // Remember DST before
+        dst  = date.dst();
 
         switch (timerange) {
 
@@ -203,10 +205,14 @@ var pvlng = new function() {
                 break;
         }
 
-        this.dp.setDate(from, format);
-
         // Max. date is today + pvlng.maxFutureDays
         to = new Date(Math.min(to, new Date(new Date().getTime() + this.maxFutureDays*8.64e7)));
+
+        // Adjust daylight savings time
+        if (dst != from.dst()) from.addTime(-dir * 3.6e6);
+        if (dst != to.dst())   to.addTime(-dir * 3.6e6);
+
+        this.dp.setDate(from, format);
 
         this.dpFrom.datepicker('option', 'maxDate', to).datepicker('setDate', from);
         this.dpTo.datepicker('option', 'minDate', from).datepicker('setDate', to);

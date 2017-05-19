@@ -12,18 +12,18 @@ namespace Channel\SMA;
 /**
  *
  */
-use \Channel\JSON;
+use \Channel\MultiChannel;
 
 /**
  *
  */
-class Webbox extends JSON {
-
+class Webbox extends MultiChannel
+{
     /**
      *
      */
-    public function write( $request, $timestamp=NULL ) {
-
+    public function write($request, $timestamp=null)
+    {
         // Check for request errors
         if (!isset($request['result']['devices'][0]['channels'])) {
             throw new \Exception(
@@ -39,7 +39,7 @@ class Webbox extends JSON {
         }
 
         return parent::write(
-            $channels,
+            array('data' => $channels),
             // Request timestamp to webbox is saved as request id,
             // used also for reload of failed files!
             is_numeric($request['id']) ? $request['id'] : strtotime($request['id'])

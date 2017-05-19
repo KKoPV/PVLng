@@ -23,5 +23,5 @@ $app->get('/infoframe', function() use ($app) {
  * Custom frames
  */
 $app->get('/infoframe/:frame', function($frame) use ($app) {
-    $app->process('Infoframe', 'Index', array('frame' => 'custom'.DS.$frame));
+    $app->process('Infoframe', 'Index', array('frame' => PVLng::path('custom', $frame)));
 });

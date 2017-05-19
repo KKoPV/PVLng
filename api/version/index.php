@@ -14,4 +14,4 @@ $c = file_get_contents('..'.DIRECTORY_SEPARATOR.'latest'.DIRECTORY_SEPARATOR.'in
 
 preg_match('~latest.*(r\d+)~', $c, $args);
 
-die($args[1]);
+echo $args[1];

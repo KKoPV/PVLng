@@ -21,8 +21,8 @@ function writedata( $topic, $msg )
     e(1, 'Message:', $msg);
 
     if ($data = json_decode($msg, true)) {
-        // pvlng/<API key>/<GUID>
-        list(,,$guid) = explode('/', $topic);
+        // pvlng/<API key>/data/<GUID>
+        list(,,,$guid) = explode('/', $topic);
 
         try {
             $rc = Channel::byGUID($guid)->write($data);
@@ -75,22 +75,25 @@ if ($verbose) {
     error_reporting(0);
 }
 
+/**
+ * Let's go
+ */
 require __DIR__ . implode(DIRECTORY_SEPARATOR, ['', '..', 'core', 'PVLng.php']);
 
+// Add path for autoloading
 PVLng::bootstrap(PVLng::path(__DIR__, 'phpMQTT'));
 
 $mqtt = new phpMQTT($server, $port, 'PVLng');
+$mqtt->debug = $verbose;
 
-if(!$mqtt->connect()){
-    exit(1);
-}
+if (!$mqtt->connect(false)) exit(1);
 
 /**
  * Listen only for messages for API key
  */
 $apikey = PVLng::getDatabase()->queryOne('SELECT `pvlng_api_key`()');
 
-$topic = 'pvlng/'.$apikey.'/#';
+$topic = 'pvlng/'.$apikey.'/data/#';
 
 e(1, 'Listen for', $topic, '...');
 

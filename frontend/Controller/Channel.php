@@ -25,7 +25,7 @@ class Channel extends \Controller {
 
         $this->fields = array();
 
-        foreach (include APP_DIR . DS . 'Controller' . DS . 'Channel' . DS . 'default.php' as $key=>$field) {
+        foreach (include PVLng::path(ROOT_DIR, 'frontend', 'Controller', 'Channel', 'default.php') as $key=>$field) {
             $this->fields[$key] = array_merge(array(
                 'FIELD'       => $key,
                 'TYPE'        => 'text',
@@ -290,7 +290,8 @@ class Channel extends \Controller {
 
             // Search for equipment templates
             $templates = array();
-            foreach (glob(CORE_DIR . DS . 'Channel' . DS . 'Templates' . DS . '*.php') as $file) {
+            $filemask = \PVLng::path(ROOT_DIR, 'core', 'Channel', 'Templates', '*.php');
+            foreach (glob($filemask) as $file) {
                 $template = include $file;
                 if (isset($template['channels'][0]['type'])) {
                     $type = new \ORM\ChannelType($template['channels'][0]['type']);
@@ -550,7 +551,7 @@ class Channel extends \Controller {
         }
 
         // Apply model specific settings
-        $model = str_replace('\\', DS, $type->getModel());
+        $model = str_replace('\\', DIRECTORY_SEPARATOR, $type->getModel());
         $fieldSettings[] = $model;
 
         // Apply channel type specific settings
@@ -712,10 +713,10 @@ class Channel extends \Controller {
      */
     protected function applyFieldSettings( $conf ) {
         // 1st try general config
-        $config = APP_DIR . DS . 'Controller' . DS . 'Channel' . DS . $conf . '.php';
+        $config = \PVLng::path(ROOT_DIR, 'frontend', 'Controller', 'Channel', $conf.'.php');
         if (!file_exists($config)) {
             // 2nd try model specific config
-            $config = CORE_DIR . DS . 'Channel' . DS . $conf . '.conf.php';
+            $config = \PVLng::path(ROOT_DIR, 'core', 'Channel', $conf.'.conf.php');
             if (!file_exists($config)) return;
         }
 

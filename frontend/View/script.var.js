@@ -7,7 +7,7 @@
  * @version     1.0.0
  */
 var PVLngVersion = '{VERSION}',
-    PVLngAPI = 'http://{SERVERNAME}/api/latest/',
+    PVLngAPI = '{APIURL}',
     PVLngAPIkey = '{APIKEY}',
 
     /* Inititilize Pines Notify labels here with I18N */
@@ -30,11 +30,3 @@ var PVLngVersion = '{VERSION}',
 
     development = !!+'{DEVELOPMENT}',
     user = !!+'{USER}';
-
-if (user) {
-    $(function($) {
-        $.ajaxSetup({
-            beforeSend: function setHeader(XHR) { XHR.setRequestHeader('X-PVLng-Key', PVLngAPIkey) }
-        });
-    });
-}

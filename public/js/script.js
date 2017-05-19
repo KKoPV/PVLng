@@ -10,6 +10,22 @@
 console.time('Duration');
 
 /**
+ * http://stackoverflow.com/a/11888430
+ */
+Date.prototype.stdTimezoneOffset = function() {
+    var jan = new Date(this.getFullYear(), 0, 1), jul = new Date(this.getFullYear(), 6, 1);
+    return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+}
+
+Date.prototype.dst = function() {
+    return this.getTimezoneOffset() < this.stdTimezoneOffset();
+}
+
+Date.prototype.addTime = function(ms) {
+    this.setTime(this.getTime() + ms);
+}
+
+/**
  * Idea from http://pastebin.com/jYqm9ZcQ
  */
 $.fn.autoWidth = function(options) {

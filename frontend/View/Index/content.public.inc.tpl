@@ -9,11 +9,15 @@
  */
 -->
 
+<!-- EVENT index_charts_select_before_html -->
+
 <div id="public-select" style="margin-bottom:1em;display:none">
     <label for="load-delete-view" style="margin-right:20px">{{VariantsPublic}}:</label>
     <select id="load-delete-view" style="margin:0 .5em" data-placeholder="--- {{SelectChart}} ---"></select>
     <button id="btn-load" style="margin:0 1em" class="tip" title="{{Load}}">{{Load}}</button>
 </div>
+
+<!-- EVENT index_charts_select_after_html -->
 
 <div id="wrapper" style="display:none">
 

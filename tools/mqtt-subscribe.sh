@@ -3,7 +3,7 @@
 #set -x
 
 pwd=$(dirname $0)
-pidfile=/tmp/mqtt-subscribe.pid
+pidfile=/run/mqtt-subscribe.pid
 
 ### --------------------------------------------------------------------------
 doStart () {
@@ -12,19 +12,19 @@ doStart () {
     ### Defaults
     local host=localhost
     local port=1883
-    local qos=0
+    local qos=1
     local log=
 
     ## Config file exists?
     [ -f $pwd/mqtt-subscribe.conf ] && . $pwd/mqtt-subscribe.conf
 
     if [ "$log" ]; then
-        verbose='-v'
+        v='-v'
     else
         log=/dev/null
     fi
 
-    php $pwd/mqtt-subscribe.php -s $host -p $port -q $qos $verbose >>$log 2>/dev/null &
+    php $pwd/mqtt-subscribe.php -s $host -p $port -q $qos $v >>$log 2>/dev/null &
 
     echo $! >$pidfile
 }

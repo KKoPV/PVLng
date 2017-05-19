@@ -52,9 +52,15 @@
                         <input type="hidden" name="regenerate" value="1" />
                         <input id="regenerate" type="submit" value="{{Regenerate}}" />
                     </form>
-                    <code class="b">X-PVLng-Key: {APIKEY}</code>
+                    <code class="b">{APIKEY}</code>
                     <br /><br />
                     {{DontForgetUpdateAPIKey}}
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align:top">Header</td>
+                <td>
+                    <code class="b">Authorization: Bearer {APIKEY}</code>
                 </td>
             </tr>
             </tbody>

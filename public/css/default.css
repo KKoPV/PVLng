@@ -13,6 +13,16 @@ body {
     font-family: Imprima, Arial, sans-serif;
 }
 
+#pageload {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 64px;
+    height: 21px;
+    margin-left: -32px;
+    margin-top: -15px;
+}
+
 #content {
     margin-top: 1em;
 }
@@ -404,4 +414,24 @@ form {
 
 .p50, .two-cols {
     width: 50%;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media print {
+    .print {
+        display: block !important;
+    }
+    .no-print {
+        display: none !important;
+    }
 }

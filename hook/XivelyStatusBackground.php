@@ -21,7 +21,7 @@ class XivelyStatusBackground extends Base {
         // Default format, if still set ignored
         $config[] = '%s';
 
-        $cmd = __DIR__ . DS . 'XivelyUpdate.php '
+        $cmd = 'timeout 30 ' . \PVLNG::path(__DIR__, 'XivelyUpdate.php ')
              . $config[0] . '.csv '
              . $config[1] . ' '
                // Xively CSV: "Channel,Value"

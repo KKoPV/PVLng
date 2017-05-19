@@ -20,7 +20,7 @@ abstract class Hook {
      */
     public static function process( $hook, &$channel ) {
         if (!self::$hooks) {
-            $file = ROOT_DIR . DS . 'hook' . DS . 'hook.conf.php';
+            $file = PVLng::path(ROOT_DIR, 'hook', 'hook.conf.php');
             self::$hooks = file_exists($file) ? include $file : array();
         }
 
@@ -28,7 +28,7 @@ abstract class Hook {
 
         foreach (self::$hooks[$hook] as $name=>$config) {
             if (isset($config[$channel->guid])) {
-                require_once ROOT_DIR . DS . 'hook' . DS . $name . '.php';
+                require_once PVLng::path(ROOT_DIR, 'hook', $name.'.php');
                 $class = '\Hook\\'.$name;
                 $hook = str_replace('.', '_', $hook);
                 $class::$hook($channel, $config[$channel->guid]);

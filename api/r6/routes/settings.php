@@ -1,11 +1,11 @@
 <?php
 /**
- * KEy - Value store routes for external use
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
@@ -23,5 +23,18 @@ $api->get(
 })->name('GET /settings/:scope/:name/:key')->help = array(
     'since'       => 'r6',
     'description' => 'Read an application setting value, if a part is empty, request with "null", e.g. /settings/core/null/Latitude',
-    'apikey'      => TRUE
+    'apikey'      => true
+);
+
+/**
+ *
+ */
+$api->get(
+    '/settings/title',
+    function() use ($api)
+{
+    $api->render(\ORM\Settings::getCoreValue(null, 'title'));
+})->name('GET /settings/title')->help = array(
+    'since'       => 'r6',
+    'description' => 'Read application title'
 );

@@ -7,11 +7,6 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-Loader::load(LIB_DIR . DS . 'contrib' . DS . 'BabelKit.php');
-
-/**
- *
- */
 class BabelKitMySQLi extends BabelKit {
 
     /**

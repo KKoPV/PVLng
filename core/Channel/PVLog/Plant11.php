@@ -37,8 +37,9 @@ class Plant11 extends BaseAbstract11 {
         $request['end']      = $date . '+1day';
         $request['period']   = '5min'; // PV-Log specific period
         $request['filename'] = $date.'.json';
+
         $instance = new Instance;
-        $plant = new Plant;
+        $plant    = new Plant;
 
         foreach ($this->getChilds() as $child) {
             if ($child instanceof Inverter11) {

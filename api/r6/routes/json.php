@@ -1,17 +1,20 @@
 <?php
 /**
- * JSON xPath parser
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
  *
  */
-$api->get('/json/:path+', function($path) use ($api) {
+$api->get(
+    '/json/:path+',
+    function($path) use ($api)
+{
     $api->render(JSONxPath($api, $path, $api->request->get('json')));
 })->name('GET /json/:path+')->help = array(
     'description' => 'Extract a section/value from given JSON data from query string',
@@ -21,7 +24,10 @@ $api->get('/json/:path+', function($path) use ($api) {
 /**
  *
  */
-$api->post('/json/:path+', function($path) use ($api) {
+$api->post(
+    '/json/:path+',
+    function($path) use ($api)
+{
     $api->render(JSONxPath($api, $path, $api->request->getBody()));
 })->name('POST /json/:path+')->help = array(
     'description' => 'Extract a section/value from given JSON data sended in request body e.g. from a file',
@@ -30,7 +36,10 @@ $api->post('/json/:path+', function($path) use ($api) {
 /**
  *
  */
-$api->post('/jsonencode', function() use ($api) {
+$api->post(
+    '/jsonencode',
+    function() use ($api)
+{
     // Set the response header to JSON
     $api->contentType('application/json');
     $api->render($api->request->getBody());

@@ -11,14 +11,20 @@
 var channel = {},
     /* String length for Datetime column */
     dtLen = { '': 19, i: 16, h: 13, d: 10, w: 10, m: 7, q: 7, y: 4 },
-    presetPeriods = '{LISTS_PRESETPERIODS}' || '--;1d;1d;1m';
+    presetPeriods = '{LISTS_PRESETPERIODS}' || '--;1d;1d;1m',
+    listTable;
 
 /**
  *
  */
 function updateList() {
 
-    var guid = $('#channel option:selected').val();
+    $(document.body).addClass('wait');
+
+    var guid = $('#channel option:selected').val(),
+        period_count = +$('#periodcnt').val(),
+        period = $('#period').val(),
+        url = PVLngAPI + 'data/' + guid + '.json';
 
     if (!guid) {
         var icon = $('#icon');
@@ -31,13 +37,7 @@ function updateList() {
         return;
     }
 
-    $(document.body).addClass('wait');
-
     listTable.fnClearTable(false);
-
-    var period_count = +$('#periodcnt').val(),
-        period = $('#period').val(),
-        url = PVLngAPI + 'data/' + guid + '.json';
 
     pvlng.log('Fetch', url);
 
@@ -51,20 +51,14 @@ function updateList() {
             period:     period_count + period
         },
         function(data) {
-            /* pop out 1st row with attributes */
+            /* Pop out 1st row with attributes */
             channel = data.shift();
 
             /* Only real channels allow deletion for readings */
             var canDelete = (channel.childs == 0 && channel.write == 1);
 
-            $('#icon').prop('src', channel.icon).prop('title', channel.type).tipTip();
-            $('#icon-private').toggle(!channel.public);
-            $('#edit-entity').data('guid',channel.guid).show();
-            $('#guid').data('guid',channel.guid).show();
-            $('.export').button('option', 'disabled', data.length == 0);
-
             $(data).each(function(id, row) {
-                var delbtn = null;
+                var delbtn = '';
                 if (canDelete) {
                     delbtn = '<i class="delete-reading fa fa-trash btn" data-timestamp="' +
                              row.timestamp + '" data-value="' + row.data + '"></i>';
@@ -74,9 +68,9 @@ function updateList() {
                         row.datetime.substr(0, dtLen[period]),
                         channel.numeric ? +row.data.toFixed(channel.decimals) : row.data,
                         /* These 3 columns are hidden for non-numeric channels */
-                        channel.numeric ? +row.min.toFixed(channel.decimals) : null,
-                        channel.numeric ? +row.max.toFixed(channel.decimals) : null,
-                        channel.numeric && channel.meter ? +row.consumption.toFixed(channel.decimals) : null,
+                        channel.numeric ? +row.min.toFixed(channel.decimals) : '',
+                        channel.numeric ? +row.max.toFixed(channel.decimals) : '',
+                        channel.numeric && channel.meter ? +row.consumption.toFixed(channel.decimals) : '',
                         row.count,
                         delbtn
                     ],
@@ -84,11 +78,17 @@ function updateList() {
                 );
             });
 
-            listTable.fnSetColumnVis( 2, channel.numeric && period && !channel.meter );
-            listTable.fnSetColumnVis( 3, channel.numeric && period && !channel.meter );
-            listTable.fnSetColumnVis( 4, channel.numeric && channel.meter );
-            listTable.fnSetColumnVis( 5, channel.numeric && period );
-            listTable.fnSetColumnVis( 6, !period );
+            listTable.fnSetColumnVis(2, channel.numeric && period && !channel.meter);
+            listTable.fnSetColumnVis(3, channel.numeric && period && !channel.meter);
+            listTable.fnSetColumnVis(4, channel.numeric && channel.meter);
+            listTable.fnSetColumnVis(5, channel.numeric && period);
+            listTable.fnSetColumnVis(6, !period);
+
+            $('#icon').prop('src', channel.icon).prop('title', channel.type).tipTip();
+            $('#icon-private').toggle(!channel.public);
+            $('#edit-entity').data('guid',channel.guid).show();
+            $('#guid').data('guid',channel.guid).show();
+            $('.export').button('option', 'disabled', data.length == 0);
         }
     ).fail(function (jqXHR, textStatus, error) {
         $.pnotify({
@@ -111,11 +111,6 @@ function updateList() {
 function updateOutput() {
     updateList();
 }
-
-/**
- *
- */
-var listTable;
 
 /**
  *

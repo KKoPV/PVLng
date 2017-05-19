@@ -9,35 +9,25 @@
  */
 
 /**
- * Directories
- */
-define('DS',       DIRECTORY_SEPARATOR);
-define('BASE_DIR', dirname(__FILE__));
-define('ROOT_DIR', dirname(BASE_DIR));
-define('CONF_DIR', ROOT_DIR . DS . 'config');
-define('CORE_DIR', ROOT_DIR . DS . 'core');
-define('LIB_DIR',  ROOT_DIR . DS . 'lib');
-define('APP_DIR',  ROOT_DIR . DS . 'frontend');
-define('TEMP_DIR', ROOT_DIR . DS . 'tmp'); // Outside document root!
-
-$version = file(ROOT_DIR . DS . '.version', FILE_IGNORE_NEW_LINES);
-define('PVLNG',              'PhotoVoltaic Logger new generation');
-define('PVLNG_VERSION',      $version[0]);
-define('PVLNG_VERSION_DATE', $version[1]);
-
-function _redirect( $route ) {
-    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']) ? 'https' : 'http';
-    die(Header('Location: '.$protocol.'://'.$_SERVER['HTTP_HOST'].$route));
-}
-
-/**
  * Initialize
  */
-file_exists(ROOT_DIR . DS . 'prepend.php') && include ROOT_DIR . DS . 'prepend.php';
-
 setlocale(LC_NUMERIC, 'C');
 mb_internal_encoding('UTF-8');
 clearstatcache();
+
+/**
+ * Bootstrap
+ */
+require __DIR__ . implode(DIRECTORY_SEPARATOR, ['', '..', 'core', 'PVLng.php']);
+
+$file = PVLng::path(ROOT_DIR, 'prepend.php');
+if (file_exists($file)) {
+    include $file;
+}
+
+if (!file_exists(PVLng::path(ROOT_DIR, 'config', 'config.php'))) {
+    die(Header('Location: /public/setup.php'));
+}
 
 defined('DEVELOP') || define('DEVELOP', false);
 
@@ -51,17 +41,12 @@ if (DEVELOP) {
     error_reporting(0);
 }
 
-file_exists(CONF_DIR . DS . 'config.php') || _redirect('/public/setup.php');
-
-/**
- * Initialize Auto-Loader
- */
-$loader = require_once ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
-$loader->addPsr4('', array(CORE_DIR, LIB_DIR, APP_DIR));
-
+$loader = PVLng::bootstrap(PVLng::path(ROOT_DIR, 'frontend'));
 Loader::register($loader, TEMP_DIR);
 
-if (DEVELOP == 2) include CORE_DIR . DS . 'AOP.php';
+if (DEVELOP == 2) {
+    include PVLng::path(ROOT_DIR, 'core', 'AOP.php');
+}
 
 // ---------------------------------------------------------------------------
 // Let's go
@@ -86,35 +71,48 @@ $app = new slimMVC\App(array(
     'debug'       => DEVELOP
 ));
 
+$app->container->singleton('JavaScriptPacker', function() {
+    return new JavaScriptPacker(0);
+});
+
+$app->view->Helper = new slimMVC\ViewHelper;
+$app->view->Helper->numf = function($number, $decimals=0) {
+    return number_format($number, $decimals, \I18N::translate('DSEP'), \I18N::translate('TSEP'));
+};
+
+$app->view->Helper->raw = function($value) {
+    return $value;
+};
+
 // If installed from GitHub, find branch and actual commit
-$head = file(ROOT_DIR.DS.'.git'.DS.'HEAD', FILE_IGNORE_NEW_LINES);
-if (!empty($head) && preg_match('~: (.*?)([^/]+)$~', $head[0], $args)) {
+$file = PVLng::path(ROOT_DIR, '.git', 'HEAD');
+if (file_exists($file) &&
+    ($head = file($file, FILE_IGNORE_NEW_LINES)) &&
+    preg_match('~: (.*?)([^/]+)$~', $head[0], $args))
+{
     $app->view->PVLng_Branch = trim($args[2]);
-    $app->view->PVLng_Commit = trim(file_get_contents(ROOT_DIR.DS.'.git'.DS.$args[1].$args[2]));
+    $file = PVLng::path(ROOT_DIR, '.git', $args[1].$args[2]);
+    $app->view->PVLng_Commit = trim(file_get_contents($file));
 }
 
-include CORE_DIR . DS . 'Hooks.php';
+include PVLng::path(ROOT_DIR, 'core', 'Hooks.php');
 
 /**
  * Configuration
  */
 $app->container->singleton('config', function() {
-    return (new \slimMVC\Config)
-           ->load(CONF_DIR . DS . 'config.default.php')
-           ->load(CONF_DIR . DS . 'config.php');
+    return PVLng::getConfig();
 });
 
 /**
  * Database
  */
 $app->container->singleton('db', function() use ($app) {
-    extract($app->config->get('Database'), EXTR_REFS);
     try {
-        $db = new \slimMVC\MySQLi($host, $username, $password, $database, $port, $socket);
+        $db = PVLng::getDatabase();
     } catch (Exception $e) {
         $app->redirect('/public/setup.php');
     }
-    $db->setSettingsTable('pvlng_config');
     return $db;
 });
 
@@ -122,10 +120,7 @@ $app->container->singleton('db', function() use ($app) {
  * Cache
  */
 $app->container->singleton('cache', function() use ($app) {
-    return \Cache::factory(
-        array('Directory' => TEMP_DIR, 'TTL' => 86400),
-        $app->config->get('Cache', 'MemCache,APC,File')
-    );
+    return PVLng::getCache();
 });
 
 /**
@@ -149,12 +144,6 @@ $app->container->singleton('languages', function() {
 $app->hook('slim.before', function() use ($app) {
     Yryie::Debug('slim.before');
 
-    slimMVC\ORM::setDatabase($app->db);
-
-    foreach ((new ORM\SettingsKeys)->find() as $setting) {
-        $app->config->set($setting->getKey(), $setting->getValue());
-    }
-
     /**
      * Check for upgrade and delete user cache if required
      */
@@ -162,44 +151,6 @@ $app->hook('slim.before', function() use ($app) {
         $app->cache->flush();
         $app->cache->AppVersion = PVLNG_VERSION;
     }
-
-    I18N::setCodeSet('app');
-    I18N::setAddMissing($app->config->get('I18N.Add'));
-
-    BabelKitMySQLi::setParams(array('table' => 'pvlng_babelkit'));
-    BabelKitMySQLi::setDB($app->db);
-    BabelKitMySQLi::setCache($app->cache);
-
-    try {
-        I18N::setBabelKit(BabelKitMySQLi::getInstance());
-    } catch (Exception $e) {
-        die('<p>Missing translations!</p><p>Did you loaded '
-           .'<tt><strong>sql/pvlng.sql</strong></tt> '
-           .'into your database?!</p>');
-    }
-
-    /**
-     * BBCode parser
-     */
-    include_once LIB_DIR . DS . 'contrib' . DS . 'nbbc.php';
-
-    I18N::setBBCode(new BBCode);
-
-    /**
-     * Nested set for channel tree
-     */
-    include_once LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
-
-    NestedSet::Init(array(
-        'db'       => $app->db,
-        'debug'    => TRUE,
-        'lang'     => 'en',
-        'path'     => LIB_DIR.DS.'contrib'.DS.'messages',
-        'db_table' => array (
-            'tbl' => 'pvlng_tree',
-            'nid' => 'id', 'l' => 'lft', 'r' => 'rgt', 'mov' => 'moved', 'pay' => 'entity'
-        )
-    ));
 
     // Transform data for view into local format
     $app->view->setRenderValueCallback(function($value) {
@@ -333,7 +284,10 @@ Slim\Route::setDefaultConditions(array(
 // ---------------------------------------------------------------------------
 // Modules: Menus and route definitions
 // ---------------------------------------------------------------------------
-foreach (glob(APP_DIR.DS.'Application'.DS.'*.php') as $file) include Loader::applyCallback($file);
+$filemask = PVLng::path(ROOT_DIR, 'frontend', 'Application', '*.php');
+foreach (glob($filemask) as $file) {
+    include_once Loader::applyCallback($file);
+}
 
 /**
  * Route not found, redirect to index instead
@@ -363,4 +317,7 @@ if ($app->showStats) {
            $app->db->getQueryCount(), $app->db->getQueryTime(), memory_get_peak_usage(TRUE)/1024);
 }
 
-file_exists(ROOT_DIR . DS . 'append.php') && include ROOT_DIR . DS . 'append.php';
+$file = PVLng::path(ROOT_DIR, 'append.php');
+if (file_exists($file)) {
+    include $file;
+}

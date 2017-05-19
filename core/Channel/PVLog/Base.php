@@ -17,7 +17,7 @@ use Channel;
 /**
  * Classes from PVLog
  */
-require_once CORE_DIR . DS . 'Yield.php';
+require_once \PVLng::path(__ROOT__, 'core', 'Yield.php');
 
 /**
  * Base class for generation PV-Log JSON response
@@ -110,7 +110,7 @@ class Base extends Channel {
   protected function __construct( $guid ) {
     parent::__construct($guid);
     $this->ts = microtime(TRUE);
-    $this->UTC_Offset = file_get_contents(__DIR__ . DS . 'utc_offset');
+    $this->UTC_Offset = file_get_contents(\PVLng::path(__DIR__, 'utc_offset'));
   }
 
   /**

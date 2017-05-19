@@ -21,17 +21,17 @@ class View extends \Slim\View {
     /**
      *
      */
+    const TPL_MAP_FILE = 'template.map.php';
+
+    /**
+     *
+     */
     public $filename;
 
     /**
      *
      */
     public $RegexVar = '\{([A-Z_][A-Z0-9_.]*)\}';
-
-    /**
-     *
-     */
-    public $BaseDir = array('.');
 
     /**
      *
@@ -46,54 +46,87 @@ class View extends \Slim\View {
 
         $this->app = App::getInstance();
 
-        $this->app->container->singleton('JavaScriptPacker', function() {
-            return new JavaScriptPacker(0);
-        });
-
         $this->dataPointer =& $this->data;
 
-        $this->Helper = new ViewHelper;
-        $this->Helper->numf = function( $number, $decimals=0 ) {
-            return number_format($number, $decimals, \I18N::translate('DSEP'), \I18N::translate('TSEP'));
-        };
-        $this->Helper->raw = function( $value ) {
-            return $value;
-        };
+        $this->cacheDirectory = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR);
+
+        $map = $this->cacheDirectory . DIRECTORY_SEPARATOR . self::TPL_MAP_FILE;
+        $this->templatesMap = file_exists($map) ? include $map : array();
+    }
+
+    /**
+     * Set the base directory that contains view templates
+     * @param string|array $directory
+     */
+    public function setTemplatesDirectory($directory)
+    {
+        $this->templatesDirectory = (array) $directory;
+    }
+
+    /**
+     * Get fully qualified path to template file using templates base directory
+     * @param string $file The template file pathname relative to templates base directory
+     * @return array
+     */
+    public function getTemplatePathname($file)
+    {
+        $files = array();
+        foreach ($this->templatesDirectory as $dir) {
+            $files[] = rtrim($dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($file, DIRECTORY_SEPARATOR);
+        }
+        return $files;
+    }
+
+    /**
+     * Set the cache directory that contains compiled templates
+     * @param string $directory
+     */
+    public function setCacheDirectory($directory)
+    {
+        $this->cacheDirectory = rtrim($directory, DIRECTORY_SEPARATOR);
     }
 
     /**
      *
      */
-    public function render( $template, $data=NULL ) {
+    public function render($template, $data=null)
+    {
         if (file_exists($template)) {
             // Concrete file
             $TplFile = $template;
         } else {
-            $TplFile = '';
-            // Search template in defined directories
-            foreach ((array)$this->BaseDir as $dir) {
-                if (file_exists($dir.'/'.$template)) {
-                    $TplFile = $dir.'/'.$template;
-                    break;
+            $hash = md5(serialize($this->templatesDirectory).$template);
+            if (isset($this->templatesMap[$hash])) {
+                $TplFile = $this->templatesMap[$hash];
+            } else {
+                $TplFile = '';
+                // Search template in defined directories
+                foreach ($this->getTemplatePathname($template) as $file) {
+                    if (file_exists($file)) {
+                        $TplFile = $file;
+                        break;
+                    }
                 }
+
+                if ($TplFile == '') return;
+
+                $this->templatesMap[$hash] = $TplFile;
             }
         }
 
-        if ($TplFile == '') return;
-
         $TplFile = realpath($TplFile);
-        $TplCompiled = str_replace(APP_DIR, '', $TplFile);
-        $TplCompiled = str_replace('/', '~', $TplCompiled);
-        $TplCompiled = trim($TplCompiled, '~');
-        $TplCompiled = TEMP_DIR . DS . $TplCompiled . '.php';
+        $TplCompiled = str_replace(\PVLng::path(ROOT_DIR, 'frontend'), '', $TplFile);
+        $TplCompiled = str_replace('/', '_', $TplCompiled);
+        $TplCompiled = trim($TplCompiled, '_');
+        $TplCompiled = $this->cacheDirectory . DIRECTORY_SEPARATOR . $TplCompiled . '.php';
 
         if (!file_exists($TplCompiled) OR filemtime($TplCompiled) < filemtime($TplFile)) {
-            #\Yryie::StartTimer($TplFile, 'Compile '.$TplFile, 'Compile template');
+            /// \Yryie::StartTimer($TplFile, 'Compile '.$TplFile, 'Compile template');
             file_put_contents($TplCompiled, $this->compile($TplFile));
-            #\Yryie::StopTimer();
+            /// \Yryie::StopTimer();
         }
 
-        // save data
+        // Save data
         $this->dataStack[] =& $this->data;
 
         ob_start();
@@ -184,6 +217,17 @@ class View extends \Slim\View {
         $this->renderValueCallback = $callback;
     }
 
+    /**
+     *
+     */
+    public function __destruct()
+    {
+        file_put_contents(
+            TEMP_DIR.'/'.self::TPL_MAP_FILE,
+            '<?php return '.var_export($this->templatesMap, true).';'
+        );
+    }
+
     // -------------------------------------------------------------------------
     // PROTECTED
     // -------------------------------------------------------------------------
@@ -196,7 +240,12 @@ class View extends \Slim\View {
     /**
      *
      */
-    protected $data = array();
+    protected $templatesMap;
+
+    /**
+     *
+     */
+    protected $cacheDirectory;
 
     /**
      *
@@ -221,17 +270,46 @@ class View extends \Slim\View {
     /**
      *
      */
+    protected $eventComment = array(
+        'html' => array('<!-- ', ' -->'),
+        'js'   => array('/* ', ' */'),
+        'css'  => array('/* ', ' */'),
+    );
+
+    /**
+     *
+     */
     protected function compile( $TplFile ) {
         $html = php_strip_whitespace($TplFile);
+        $verbose = $this->app->config->get('View.Verbose');
 
-        if (strpos($html, '<!-- COMPILE OFF -->') === FALSE) {
+        if (strpos($html, '<!-- COMPILE OFF -->') === false) {
 
             // <!-- INCLUDE template.tpl -->
             if (preg_match_all('~<!-- INCLUDE (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $inc) {
                     $html = str_replace(
                         $inc[0],
-                        '<?php /* INCLUDE */ $this->display("'.$inc[1].'"); ?'.'>',
+                        '<?php $this->display("'.$inc[1].'"); ?'.'>',
+                        $html
+                    );
+                }
+            }
+
+            // <!-- EVENT event_name -->
+            if (preg_match_all('~<!-- EVENT (([a-z_]+?)_(html|js|css)) -->~', $html, $args, PREG_SET_ORDER)) {
+                $c1 = $c2 = '';
+
+                foreach ($args as $e) {
+                    // Comment?
+                    if ($verbose) {
+                        $c = $this->eventComment[$e[3]];
+                        $c1 = PHP_EOL.$c[0].'EVENT '.$e[1].' >>>'.$c[1].PHP_EOL;
+                        $c2 = PHP_EOL.$c[0].'<<< EVENT '.$e[1].$c[1].PHP_EOL;
+                    }
+                    $html = str_replace(
+                        $e[0],
+                        $c1.'<?php $this->display("'.$e[2].'.'.$e[3].'"); ?'.'>'.$c2,
                         $html
                     );
                 }
@@ -331,7 +409,7 @@ class View extends \Slim\View {
 
         }
 
-        if (!$this->app->config->get('View.Verbose')) {
+        if (!$verbose) {
             if (substr(strtolower($TplFile), -4) == '.css') {
                 $html = $this->compressCSS($html);
             } elseif (substr(strtolower($TplFile), -3) == '.js') {
@@ -342,13 +420,14 @@ class View extends \Slim\View {
             $html = $this->compress($html);
         }
 
-        return trim($html);
+        return $html;
     }
 
     /**
      *
      */
-    protected function compressCSS( $html ) {
+    protected function compressCSS($html)
+    {
         return preg_replace(
             array(
                 /* remove whitespace on both sides of colons : , and ; */
@@ -364,14 +443,16 @@ class View extends \Slim\View {
     /**
      *
      */
-    protected function compressJS( $html ) {
-        return $this->app->JavaScriptPacker->pack($html);
+    protected function compressJS($js)
+    {
+        return $this->app->JavaScriptPacker->pack($js);
     }
 
     /**
      *
      */
-    protected function compressTemplate( $html ) {
+    protected function compressTemplate($html)
+    {
         // Remove empty pairs of <style></style>
         $html = preg_replace('~\s*<style>\s*</style>\s*~', '', $html);
         // Compress inline CSS
@@ -396,8 +477,8 @@ class View extends \Slim\View {
     /**
      *
      */
-    protected function compress( $html ) {
-
+    protected function compress($html)
+    {
         // Remember explicit spaces between variables
         $html = preg_replace('~ \?'.'> +<\?php ~', "\x01", $html);
 
@@ -429,13 +510,14 @@ class View extends \Slim\View {
         // Restore <pre>...</pre> sections
         $html = str_replace(array_keys($pre), array_values($pre), $html);
 
-        return $html;
+        return trim($html);
     }
 
     /**
      * Called from render()
      */
-    protected function renderValue( $name ) {
+    protected function renderValue($name)
+    {
         // Raw value requested, independent from locale etc.
         if (preg_match('~^(.*?)_RAW$~', $name, $args)) {
             $value = $this->get($args[1]);
@@ -445,6 +527,7 @@ class View extends \Slim\View {
                 $value = call_user_func($this->renderValueCallback, $value);
             }
         }
+
         return $value;
     }
 
@@ -458,6 +541,7 @@ class View extends \Slim\View {
             if (is_array($value)) $this->arrayChangeKeysUpperCase($array[$key]);
         }
     }
+
 
     // -------------------------------------------------------------------------
     // PRIVATE

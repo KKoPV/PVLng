@@ -12,12 +12,14 @@ namespace Channel;
 /**
  *
  */
-class Ratio extends Calculator {
+class Ratio extends Calculator
+{
 
     /**
      *
      */
-    public function read( $request ) {
+    public function read( $request )
+    {
 
         $this->before_read($request);
 

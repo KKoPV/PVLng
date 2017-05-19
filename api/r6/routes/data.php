@@ -1,11 +1,11 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
@@ -20,15 +20,15 @@ $api->put(
 
     // Check request for 'timestamp' attribute, take as is if numeric,
     // otherwise convert datetime to timestamp
-    $timestamp = isset($request['timestamp'])
-               ? ( is_numeric($request['timestamp'])
-                 ? $request['timestamp']
-                 : strtotime($request['timestamp'])
-                 )
-               : NULL;
+//     $timestamp = isset($request['timestamp'])
+//                ? ( is_numeric($request['timestamp'])
+//                  ? $request['timestamp']
+//                  : strtotime($request['timestamp'])
+//                  )
+//                : NULL;
 
     try {
-        $cnt = Channel::byGUID($guid)->write($request, $timestamp);
+        $cnt = Channel::byGUID($guid)->write($request);
     } catch (Exception $e) {
         $api->stopAPI($e->getMessage(), $e->getCode() ?: 400);
     }
@@ -54,7 +54,7 @@ $api->post(
     function($guid) use ($api)
 {
     $request = json_decode($api->request->getBody(), true);
-    // Check request for 'value' attribute
+    // Check request for 'data' attribute
     if (!isset($request['data'])) $api->stopAPI('Data required for data update', 400);
     // Check request for 'timestamp' attribute, take as is if numeric,
     // otherwise convert datetime to timestamp
@@ -102,13 +102,84 @@ $api->get(
     function($period, $guid) use ($api)
 {
     $request = $api->request->get();
-    $request['period'] = $period;
 
-    $result = $api->readData($guid, $request);
+    if ($period == 'monthly') {
+        if (empty($request['period'])) $request['period'] = 'last';
+
+        Channel::calcStartEnd($request);
+
+        // Remember originals
+        $start   = $request['start'];
+        $end     = $request['end'];
+
+        $_result = new Buffer;
+        $first   = true;
+        $attr    = isset($request['attributes']) && $request['attributes'];
+        $cons    = 0;
+
+        while ($request['start'] < $end) {
+            list($y, $m) = explode('-', date('Y-m', $request['start']));
+            $request['start'] = strtotime($y . '-' . $m . '-1');
+
+            if ($m < 12) $m++; else { $y++; $m = 1; }
+            $request['end'] = strtotime($y . '-' . $m . '-1') - 1;
+
+            $res = $api->readData($guid, $request);
+            $id = 0;
+
+            foreach ($res as $row) {
+                if (($id == 0) && $attr) {
+                    $cons += $row['consumption'];
+                }
+                if (($id > 0) || ($first && $attr)) {
+                    if ($id > 0) {
+                        $row['timestamp'] = $request['start'];
+                        $row['datetime']  = date('Y-m-d H:i:s', $request['start']);
+                    }
+                    $_result->write($row);
+                }
+
+                $id++;
+            }
+
+            $res->close();
+
+            // Move to next month
+            $request['start'] = $request['end'] + 1;
+
+            $first = false;
+        }
+
+        if ($attr) {
+            $result = new Buffer;
+            $id = 0;
+
+            foreach ($_result as $row) {
+                if ($id++ == 0) {
+                    // Adjust attributes row
+                    $row['consumption'] = $cons;
+                    $row['start'] = $start;
+                    $row['end']   = $end;
+                    $row['datetime_start'] = date('Y-m-d H:i:s', $start);
+                    $row['datetime_end']   = date('Y-m-d H:i:s', $end);
+                }
+                $result->write($row);
+            }
+            $_result->close();
+        } else {
+            $result = $_result;
+        }
+
+    } else {
+        $request['period'] = $period;
+        $result = $api->readData($guid, $request);
+    }
+
     $api->response->headers->set('X-Data-Rows', count($result));
     if (is_object($result) && method_exists($result, 'size')) {
         $api->response->headers->set('X-Data-Size', $result->size() . ' Bytes');
     }
+
     $api->render($result);
 })->name('GET /data/:period/:guid')->help = array(
     'since'       => 'r6',

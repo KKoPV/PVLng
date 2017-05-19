@@ -43,12 +43,17 @@ class Controller extends slimMVC\Controller
         $this->view->User = $app->user;
         $this->view->Embedded = $this->app->request->get('embedded') ?: 0;
 
-        $this->view->BaseDir = array(
-            APP_DIR . DS . 'View' . DS . $this->controller . DS . 'custom',
-            APP_DIR . DS . 'View' . DS . $this->controller,
-            APP_DIR . DS . 'View' . DS . 'custom',
-            APP_DIR . DS . 'View'
-        );
+        $this->view->setCacheDirectory(TEMP_DIR);
+
+        $basedir = PVLng::path(ROOT_DIR, 'frontend', 'View');
+
+        $this->view->setTemplatesDirectory(array(
+            PVLng::path($basedir, $this->controller, 'custom'),
+            PVLng::path($basedir, $this->controller, 'event'),
+            PVLng::path($basedir, $this->controller),
+            PVLng::path($basedir, 'event'),
+            $basedir
+        ));
 
         $this->view->Menu = $app->menu->get();
         $this->view->Languages = $app->languages->get();
@@ -140,6 +145,12 @@ class Controller extends slimMVC\Controller
         $this->view->ServerName = $_SERVER['HTTP_HOST'];
         $this->view->ServerVersion = $_SERVER['SERVER_SOFTWARE'];
 
+        if ($url = \ORM\Settings::getCoreValue('API', 'Host')) {
+            $this->view->ApiUrl = '//'.$url.'/latest/';
+        } else {
+            $this->view->ApiUrl = '//'.$this->view->ServerName.'/api/latest/';
+        }
+
         // Put all controller configurations into view
         foreach ($this->config->Controller as $c=>$cfg) {
             foreach ($cfg as $key=>$value) {
@@ -160,8 +171,9 @@ class Controller extends slimMVC\Controller
         $this->view->append('Head', $this->view->fetch('head.'.$action.'.tpl'));
 
         // Styles
-        $this->view->append('Styles', $this->view->fetch(APP_DIR . DS . 'View' . DS . $this->controller . DS . 'style.css'));
-        $this->view->append('Styles', $this->view->fetch(APP_DIR . DS . 'View' . DS . $this->controller . DS . 'style.' . $action . '.css'));
+        $basedir = PVLng::path(ROOT_DIR, 'frontend', 'View', $this->controller);
+        $this->view->append('Styles', $this->view->fetch(PVLng::path($basedir, 'style.css')));
+        $this->view->append('Styles', $this->view->fetch(PVLng::path($basedir, 'style.' . $action . '.css')));
 
         // Content
         $this->view->assign('Content', 'content.'.$action.'.tpl');

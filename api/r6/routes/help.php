@@ -1,11 +1,11 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 $version = preg_replace('~.*/(.*?)/routes~', '$1', __DIR__);
@@ -13,7 +13,10 @@ $version = preg_replace('~.*/(.*?)/routes~', '$1', __DIR__);
 /**
  *
  */
-$api->any('/help', function() use ($api, $version) {
+$api->any(
+    '/help',
+    function() use ($api, $version)
+{
     foreach ($api->router()->getNamedRoutes() as $route) {
         $pattern = $route->getPattern();
 
@@ -50,10 +53,11 @@ $api->any('/help', function() use ($api, $version) {
 /**
  *
  */
-$api->any('/helphtml', function() use ($api, $version) {
+$api->any(
+    '/helphtml',
+    function() use ($api, $version)
+{
     $content = array();
-
-#    $body = '';
 
     foreach ($api->router()->getNamedRoutes() as $route) {
         $pattern = $route->getPattern();
@@ -131,8 +135,10 @@ $api->any('/helphtml', function() use ($api, $version) {
 /**
  *
  */
-$api->any('/help/apiary', function() use ($api, $version) {
-
+$api->any(
+    '/help/apiary',
+    function() use ($api, $version)
+{
     $sep = str_repeat('#', 80);
 
     $parameters = [

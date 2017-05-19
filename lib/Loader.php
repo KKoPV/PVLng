@@ -8,7 +8,12 @@
  * @version    1.0.0
  */
 class Loader {
-private static $l = array();
+
+    /**
+     *
+     */
+    private static $l = array();
+
     /**
      *
      */
@@ -44,7 +49,7 @@ private static $l = array();
         self::$classMapFile = $cache
                             ? sprintf(
                                   '%s%sclassmap.%s.php',
-                                   $cache, DS, substr(md5(serialize(self::$loader)), -7)
+                                   $cache, DIRECTORY_SEPARATOR, substr(md5(serialize(self::$loader)), -7)
                               )
                             : false;
 

@@ -1,11 +1,11 @@
 <?php
 /**
- * Save from CSV files
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
@@ -20,7 +20,7 @@ $api->put(
     $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ';');
     if (strtoupper($sep) == 'TAB') $sep = "\t";
 
-    saveCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
+    $api->saveCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
 
 })->name('put data from file')->help = array(
     'since'       => 'r2',
@@ -49,7 +49,7 @@ $api->put(
     $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ';');
     if (strtoupper($sep) == 'TAB') $sep = "\t";
 
-    saveBulkCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
+    $api->saveBulkCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
 
 })->name('put bulk data from file')->help = array(
     'since'       => 'r6',

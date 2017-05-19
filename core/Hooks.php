@@ -16,11 +16,10 @@
  * @version    1.0.0
  */
 
-return;
-
 /**
  * Define Loader callback to manipulate file content to include
- */
+ *
+ /
 Loader::registerCallback( function($file) {
     // Insert .hook before file extension, so .../file.php becomes .../file.hook.php
     $parts = explode('.', realpath($file));
@@ -29,9 +28,9 @@ Loader::registerCallback( function($file) {
     // Strip root directory and replace directory separators with ~ to get unique names
     $filehook = str_replace(TEMP_DIR, '', $filehook);
     $filehook = str_replace(ROOT_DIR, '', $filehook);
-    $filehook = str_replace(DS, '~', $filehook);
+    $filehook = str_replace(DIRECTORY_SEPARATOR, '~', $filehook);
     $filehook = trim($filehook, '~');
-    $filehook = TEMP_DIR . DS . $filehook;
+    $filehook = PVLng::path(TEMP_DIR, $filehook);
 
     if (!file_exists($filehook) OR filemtime($filehook) < filemtime($file)) {
         // (Re-)Create hook file
@@ -40,10 +39,10 @@ Loader::registerCallback( function($file) {
         // Build file content hash to check if AOP relevant code was found
         $hash = md5($code);
 
-        if (preg_match_all('~^[ \t]*// (hook .*?) //\s*$~m', $code, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('~^[ \t]*'.'// (hook .*?) //\s*$~m', $code, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
               // Replace (mostly) namespace separators and spaces with a hyphen
-                $inc = DS.'hook'.DS . preg_replace('~[^\w]+~', '-', $match[1]) . '.php';
+                $inc = PVLng::path('hook', preg_replace('~[^\w]+~', '-', $match[1])) . '.php';
                 Yryie::Info('Look for '.$inc);
                 if (file_exists(ROOT_DIR.$inc)) {
                     // Comment line
@@ -75,3 +74,4 @@ Loader::registerCallback( function($file) {
 
     return $file;
 });
+*/

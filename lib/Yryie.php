@@ -222,9 +222,9 @@ class Yryie {
         if (!self::$Active) return;
 
         if (is_array($sql)) {
-            foreach ($sql as $q) self::add($q, 'sql');
+            foreach ($sql as $q) self::add($q, 'sql', true);
         } else {
-            self::add($sql, 'sql');
+            self::add($sql, 'sql', true);
         }
     } // function SQL()
 
@@ -245,7 +245,7 @@ class Yryie {
             $message = array_shift($args);
             $message = vsprintf($message, $args);
         }
-        self::add($message, 'debug');
+        self::add($message, 'debug', true);
     } // function Debug()
 
     /**
@@ -356,22 +356,26 @@ class Yryie {
      * @param string $type
      * @return void
      */
-    public static function add( $message='', $type='info' ) {
+    public static function add( $message='', $type='info', $raw=false ) {
         if (!self::$Active) return;
 
         $ts = microtime(TRUE);
         $call = self::called(3);
-        $data = array( $ts, $type, $call[0], $call[1], $message, self::$TimerLevel);
-        self::$Data[] = $data;
+
+        $data = array( $ts, $type, $call[0], $call[1], $message);
 
         if (self::$TraceFile AND $fh = fopen(self::$TraceFile, 'a')) {
             // overwrite locale settings!!
             $data[0] = sprintf('%.1f ms', ($data[0]-$_SERVER['REQUEST_TIME'])*1000);
-            // unset timer level
-            unset($data[5]);
             fwrite($fh, str_replace("\n", '\n', implode(self::$TraceDelimiter, $data))."\n");
             fclose($fh);
         }
+
+        $data[] = self::$TimerLevel;
+        $data[] = $raw;
+
+        self::$Data[] = $data;
+
         return $ts;
     } // function add()
 
@@ -556,7 +560,7 @@ class Yryie {
      * @return void
      */
     public static function Save( $file, $append=FALSE ) {
-        $fh = fopen($file, ($append?'a':'w'));
+        $fh = fopen($file, ($append ? 'a' : 'w'));
         if ($fh) {
             fwrite($fh, self::CSV());
             fclose($fh);
@@ -598,7 +602,7 @@ class Yryie {
         $lts = $_SERVER['REQUEST_TIME'];
 
         foreach (self::$Data as $row=>$data) {
-            @list($time, $type, $class, $func, $msg, $level) = $data;
+            @list($time, $type, $class, $func, $msg, $level, $raw) = $data;
             $cls = $row%2 ? 'even' : 'odd';
 
             if ($type == 'call' OR $msg) {
@@ -609,7 +613,7 @@ class Yryie {
                 $lts = $time;
                 $msg = is_array($msg)
                      ? '<pre>' . htmlspecialchars(print_r($msg, TRUE)) . '</pre>'
-                     : ( ($type != 'handler') ? htmlspecialchars($msg) : $msg );
+                     : ( $raw ? '<pre>'.$msg.'</pre>' : htmlspecialchars($msg) );
 
                 $utype = ucwords($type);
                 if (!$class) $class = '&nbsp;';
@@ -674,7 +678,7 @@ class Yryie {
 
         $str = isset($Err2Str[$errno]) ? $Err2Str[$errno] : 'Unknown error: '.$errno;
         $errmsg = sprintf('[%s] %s in %s (%d)'."\n", $str, $errstr, $errfile, $errline);
-        self::add($errmsg, 'handler');
+        self::add($errmsg, 'handler', true);
         self::Trace(2, TRUE, FALSE);
         self::Debug($errcontext);
         if ($errno & (E_ERROR|E_CORE_ERROR|E_USER_ERROR)) die(self::getCSS().self::HTML());

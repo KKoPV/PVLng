@@ -144,9 +144,12 @@ class Admin extends \Controller {
         $info = $this->app->cache->info();
         if ($this->request->post('tpl')) {
             $i = 0;
-            foreach (glob(TEMP_DIR.DS.'*') as $i=>$file) {
+            $filemask = \PVLng::path(TEMP_DIR, '*');
+            foreach (glob($filemask) as $i=>$file) {
                 // Don't delete .githold ...
-                if (strpos($file, '.githold') === FALSE) $i += (int) unlink($file); // Success == TRUE => 1
+                if (strpos($file, '.githold') === false) {
+                    $i += (int) unlink($file); // Success == TRUE => 1
+                }
             }
             \Messages::Success(sprintf('Removed %d files', $i));
             if ($info['class'] != 'Cache\APC' AND extension_loaded('apc') AND ini_get('apc.enabled')) {

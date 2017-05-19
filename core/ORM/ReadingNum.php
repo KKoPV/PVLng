@@ -19,7 +19,13 @@ namespace ORM;
 class ReadingNum extends ReadingNumBase
 {
     /**
+     * getLastReading()
+     */
+    use ReadingTrait;
+
+    /**
      * Mass insert/replace measuring data
+     *
      * @param integer $id Channel Id
      * @param array $data Array of Array($timestamp => $value)
      */

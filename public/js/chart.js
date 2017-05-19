@@ -36,7 +36,7 @@ var presentation_defaults = {
  */
 function presentation( data ) {
     /* Set defaults */
-    this.v              = 2;
+    this.v              = 3;
     this.axis           = 1;
     this.type           = presentation_defaults.line.type;
     this.style          = 'Solid';
@@ -65,7 +65,10 @@ function presentation( data ) {
     this.hidden         = false;
     this.outline        = false;
     this.stack          = '';
+    /* Removed in v3 */
+    /*
     this.decimals       = '';
+    */
 
     try {
         data = JSON.parse(data);
@@ -77,6 +80,8 @@ function presentation( data ) {
                 data.colorusediff = 0;
             }
             data.colordiff = data.colorneg;
+        } else if (data.v == 3) {
+            delete data.decimals;
         }
         delete data.coloruseneg;
         delete data.colorneg;

@@ -1,9 +1,20 @@
 <?php
+/**
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
+ *
+ * @link       https://github.com/KKoPV/PVLng
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012-2016 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ */
 
 /**
  *
  */
-$api->get('/tree', function() use ($api) {
+$api->get(
+    '/tree',
+    function() use ($api)
+{
     $channels = array();
     // Return without API key only public channels
     foreach ((new ORM\Tree)->getWithParents(!$api->APIKeyValid) as $channel) {
@@ -19,7 +30,10 @@ $api->get('/tree', function() use ($api) {
 /**
  *
  */
-$api->get('/tree/:id', function($id) use ($api) {
+$api->get(
+    '/tree/:id',
+    function($id) use ($api)
+{
     $channels = array();
     // Return without API key only public channels
     foreach ((new ORM\Tree)->getWithParents(!$api->APIKeyValid) as $channel) {
@@ -39,7 +53,8 @@ $api->get('/tree/:id', function($id) use ($api) {
 /**
  * Add channel to Tree
  */
-$api->put('/tree/:pguid/:cguid', $APIkeyRequired, function($pguid, $cguid) use ($api) {
+$api->put('/tree/:pguid/:cguid', $APIkeyRequired, function($pguid, $cguid) use ($api)
+{
     if ($pguid == '0000-0000-0000-0000-0000-0000-0000-0000') {
         // Interpret as "root node"
         $parent = Channel::byId(1);
@@ -69,7 +84,8 @@ $api->put('/tree/:pguid/:cguid', $APIkeyRequired, function($pguid, $cguid) use (
 /**
  * Create Alias
  */
-$api->put('/tree/alias/:id', $APIkeyRequired, function($id) use ($api) {
+$api->put('/tree/alias/:id', $APIkeyRequired, function($id) use ($api)
+{
     $channel = new \ORM\Tree($id);
 
     if (!$channel->getId())   $api->stopAPI('Unkown hierarchy Id: '.$id, 404);
@@ -99,8 +115,9 @@ $api->put('/tree/alias/:id', $APIkeyRequired, function($id) use ($api) {
 /**
  * Remove a node from channel tree
  */
-$api->delete('/tree/:id', $APIkeyRequired, function($id) use ($api) {
-    if (Channel::ById($id, FALSE)->removeFromTree()) {
+$api->delete('/tree/:id', $APIkeyRequired, function($id) use ($api)
+{
+    if (Channel::ById($id, false)->removeFromTree()) {
         $api->halt(204);
     } else {
         $api->stopAPI('Unable to delete node '.$id);
@@ -109,9 +126,7 @@ $api->delete('/tree/:id', $APIkeyRequired, function($id) use ($api) {
     'since'       => 'r4',
     'description' => 'Delete channel from channel hierarchy',
     'apikey'      => true,
-    'parameters'  => array(
-        'id'          => 'Tree Id of original channel',
-    )
+    'parameters'  => array('id' => 'Tree Id of original channel')
 );
 
 /**
@@ -121,7 +136,8 @@ $api->delete('/tree/:id', $APIkeyRequired, function($id) use ($api) {
 /**
  *
  */
-$api->get('/hierarchy', function() use ($api) {
+$api->get('/hierarchy', function() use ($api)
+{
     $api->redirect('tree', 301);
 })->name('GET /hierarchy')->help = array(
     'since'       => 'r5',

@@ -715,7 +715,7 @@ abstract class ORM implements \Iterator, \Countable {
      */
     protected function quote($value)
     {
-        return '"' . self::$db->real_escape_string($value) . '"';
+        return is_numeric($value) ? $value : '"' . self::$db->real_escape_string($value) . '"';
     }
 
     /**

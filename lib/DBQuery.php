@@ -7,26 +7,29 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-class DBQuery {
-
+class DBQuery
+{
     /**
      *
      */
-    public static function forge( $table=NULL, $fields=array() ) {
+    public static function forge($table=null, $fields=array())
+    {
         return new DBQuery($table, $fields);
     }
 
     /**
      *
      */
-    public function __construct( $table=NULL, $fields=array() ) {
+    public function __construct($table=null, $fields=array())
+    {
         return $this->select($table, $fields);
     }
 
     /**
      *
      */
-    public function select( $table, $fields=array() ) {
+    public function select($table, $fields=array())
+    {
         $this->reset();
         $this->sql = 'SELECT';
         $this->table = $table;
@@ -38,7 +41,8 @@ class DBQuery {
     /**
      *
      */
-    public function insert( $table ) {
+    public function insert($table)
+    {
         $this->reset();
         $this->sql = 'INSERT';
         $this->table = $table;
@@ -48,7 +52,8 @@ class DBQuery {
     /**
      *
      */
-    public function replace( $table ) {
+    public function replace($table)
+    {
         $this->reset();
         $this->sql = 'REPLACE';
         $this->table = $table;
@@ -58,7 +63,8 @@ class DBQuery {
     /**
      *
      */
-    public function update( $table ) {
+    public function update($table)
+    {
         $this->reset();
         $this->sql = 'UPDATE';
         $this->table = $table;
@@ -68,7 +74,8 @@ class DBQuery {
     /**
      *
      */
-    public function delete( $table ) {
+    public function delete($table)
+    {
         $this->sql = 'DELETE';
         $this->table = $table;
         return $this;
@@ -77,7 +84,8 @@ class DBQuery {
     /**
      *
      */
-    public function set( $field, $value, $raw=FALSE ) {
+    public function set($field, $value, $raw=false)
+    {
         if ($field != '') {
             $this->set[$field] = array($value, $raw);
         }
@@ -87,15 +95,17 @@ class DBQuery {
     /**
      *
      */
-    public function distinct() {
-        $this->distinct = TRUE;
+    public function distinct()
+    {
+        $this->distinct = true;
         return $this;
     }
 
     /**
      *
      */
-    public function get( $field, $as='' ) {
+    public function get($field, $as='')
+    {
         if (is_array($field)) {
             foreach ($field as $f) $this->get($f);
         } else {
@@ -110,7 +120,8 @@ class DBQuery {
     /**
      * Harmonic average: count(val) / sum(1/val)
      */
-    public function HAVG( $field ) {
+    public function HAVG($field)
+    {
         if ($field != '') {
             return sprintf('COUNT(%1$s)/SUM(1/%1$s)', $this->field($field));
         }
@@ -119,7 +130,8 @@ class DBQuery {
     /**
      * Geometric average: exp(avg(ln(val)))
      */
-    public function GAVG( $field ) {
+    public function GAVG($field)
+    {
         if ($field != '') {
             return sprintf('EXP(AVG(LN(%s)))', $this->field($field));
         }
@@ -128,7 +140,8 @@ class DBQuery {
     /**
      * @field string|array String => USING(...), array ==> ON $key = $value
      */
-    public function join( $table, $field, $dir='' ) {
+    public function join($table, $field, $dir='')
+    {
         $join = ($dir ? strtoupper($dir).' ' : '') . 'JOIN ' . $table . ' ';
         if (is_array($field)) {
             $join .= 'ON ';
@@ -159,6 +172,7 @@ class DBQuery {
         'lt'      => '%1$s <  "%2$s"',
         'bt'      => '%1$s BETWEEN "%2$s" AND "%3$s"',
         'notbt'   => 'NOT %1$s BETWEEN "%2$s" AND "%3$s"',
+        'find'    => '%1$s LIKE "%%%2$s%%"',
         'like'    => '%1$s LIKE "%2$s"',
         'notlike' => 'NOT %1$s LIKE "%2$s"',
         'null'    => '%1$s IS NULL',
@@ -168,7 +182,8 @@ class DBQuery {
     /**
      *
      */
-    public function filter( $field, $value=NULL ) {
+    public function filter($field, $value=null)
+    {
         if (!is_array($field)) {
             if (func_num_args() == 1) {
                 // Raw condition
@@ -177,17 +192,14 @@ class DBQuery {
                 $field = $this->field($field);
                 if (!is_array($value)) {
                     // Simple equal condition
-                    $this->where[] = $field.' = "'.$this->quote($value).'"';
+                    $this->where[] = $field.' = '.$this->quote($value);
                 } else {
                     // Complex conditions
                     foreach ($value as $k=>$v) {
                         $kl = strtolower($k);
                         if (array_key_exists($kl, self::$conditions)) {
-                            if (!is_array($v)) {
-                                $v = array($field, $v);
-                            } else {
-                                array_unshift($v, $field);
-                            }
+                            if (!is_array($v)) $v = array($v);
+                            array_unshift($v, $field);
                             $this->where[] = vsprintf(self::$conditions[$kl], $v);
                             unset($value[$k]);
                         } else {
@@ -200,13 +212,13 @@ class DBQuery {
             if (func_num_args() == 1) {
                 // Array with key=>value pairs
                 foreach ($field as $key=>$value) {
-                    $this->where[] = $this->field($key).' = "'.$this->quote($value).'"';
+                    $this->where[] = $this->field($key).' = '.$this->quote($value);
                 }
             } else {
                 if (!is_array($value)) $value = array($value);
                 foreach ($field as $key=>$f) {
                     if (array_key_exists($key, $value))
-                        $this->where[] = $this->field($f).' = "'.$this->quote($value[$key]).'"';
+                        $this->where[] = $this->field($f).' = '.$this->quote($value[$key]);
                 }
             }
         }
@@ -217,7 +229,8 @@ class DBQuery {
     /**
      *
      */
-    public function where( $field, $cond='', $value='' ) {
+    public function where($field, $cond='', $value='')
+    {
         if ($field != '') {
             if ($cond) $cond = ' ' . $cond . ' ' . $this->quote($value);
             $this->where[] = '`'.$field.'`' . $cond;
@@ -228,49 +241,56 @@ class DBQuery {
     /**
      *
      */
-    public function whereEQ( $field, $value='' ) {
+    public function whereEQ($field, $value='')
+    {
         return $this->where($field, '=', $value);
     }
 
     /**
      *
      */
-    public function whereNE( $field, $value='' ) {
+    public function whereNE($field, $value='')
+    {
         return $this->where($field, '<>', $value);
     }
 
     /**
      *
      */
-    public function whereLT( $field, $value='' ) {
+    public function whereLT($field, $value='')
+    {
         return $this->where($field, '<', $value);
     }
 
     /**
      *
      */
-    public function whereLE( $field, $value='' ) {
+    public function whereLE($field, $value='')
+    {
         return $this->where($field, '<=', $value);
     }
 
     /**
      *
      */
-    public function whereGT( $field, $value='' ) {
+    public function whereGT($field, $value='')
+    {
         return $this->where($field, '>', $value);
     }
 
     /**
      *
      */
-    public function whereGE( $field, $value='' ) {
+    public function whereGE($field, $value='')
+    {
         return $this->where($field, '>=', $value);
     }
 
     /**
      *
      */
-    public function whereBT( $field, $from, $to ) {
+    public function whereBT($field, $from, $to)
+    {
         $this->where[] = $field . ' BETWEEN '
                        . $this->quote($from) . ' AND ' . $this->quote($to);
         return $this;
@@ -279,28 +299,32 @@ class DBQuery {
     /**
      *
      */
-    public function whereNotBT( $field, $from, $to ) {
+    public function whereNotBT($field, $from, $to)
+    {
         return $this->whereBT('NOT '.$field, $from, $to);
     }
 
     /**
      *
      */
-    public function whereLIKE( $field, $value ) {
+    public function whereLIKE($field, $value)
+    {
         return $this->where($field, 'LIKE', $value);
     }
 
     /**
      *
      */
-    public function whereNotLIKE( $field, $value ) {
+    public function whereNotLIKE($field, $value)
+    {
         return $this->where($field, 'NOT LIKE', $value);
     }
 
     /**
      *
      */
-    public function whereNULL( $field ) {
+    public function whereNULL($field)
+    {
         $this->where[] = $field . ' IS NULL';
         return $this;
     }
@@ -308,16 +332,18 @@ class DBQuery {
     /**
      *
      */
-    public function whereNotNULL( $field ) {
+    public function whereNotNULL($field)
+    {
         return $this->whereNULL('NOT '.$field);
     }
 
     /**
      *
      */
-    public function where_or() {
+    public function where_or()
+    {
         if (($idx = count($this->where)) > 0) {
-            $this->whereExtra['or'][$idx] = TRUE;
+            $this->whereExtra['or'][$idx] = true;
         }
         return $this;
     }
@@ -325,32 +351,36 @@ class DBQuery {
     /**
      *
      */
-    public function where_open() {
-        $this->whereExtra['('][count($this->where)] = TRUE;
+    public function where_open()
+    {
+        $this->whereExtra['('][count($this->where)] = true;
         return $this;
     }
 
     /**
      *
      */
-    public function where_close() {
-        $this->whereExtra[')'][count($this->where)-1] = TRUE;
+    public function where_close()
+    {
+        $this->whereExtra[')'][count($this->where)-1] = true;
         return $this;
     }
 
     /**
      *
      */
-    public function where_close_open() {
-        $this->whereExtra[')'][count($this->where)-1] = TRUE;
-        $this->whereExtra['('][count($this->where)] = TRUE;
+    public function where_close_open()
+    {
+        $this->whereExtra[')'][count($this->where)-1] = true;
+        $this->whereExtra['('][count($this->where)] = true;
         return $this;
     }
 
     /**
      *
      */
-    public function groupBy( $field ) {
+    public function groupBy($field)
+    {
         $this->group[] = $this->field($field);
         return $this;
     }
@@ -358,14 +388,16 @@ class DBQuery {
     /**
      *
      */
-    public function group( $field ) {
+    public function group($field)
+    {
         return $this->groupBy($field);
     }
 
     /**
      *
      */
-    public function having( $field, $cond, $value ) {
+    public function having($field, $cond, $value)
+    {
         if ($cond) $cond = ' ' . $cond . ' ' . $this->quote($value);
         $this->having[] = $field . $cond;
         return $this;
@@ -374,7 +406,16 @@ class DBQuery {
     /**
      *
      */
-    public function orderBy( $field, $desc=FALSE ) {
+    public function orderBy($field, $desc=false)
+    {
+        return $this->order($field, $desc);
+    }
+
+    /**
+     *
+     */
+    public function order($field, $desc=false)
+    {
         $this->order[] = $this->field($field) . ($desc ? ' DESC' : '');
         return $this;
     }
@@ -382,31 +423,25 @@ class DBQuery {
     /**
      *
      */
-    public function order( $field, $desc=FALSE ) {
-        $this->order[] = $this->field($field) . ($desc ? ' DESC' : '');
+    public function orderDescending($field)
+    {
+        return $this->order($field, true);
+    }
+
+    /**
+     *
+     */
+    public function limit($rowCount, $offset=0)
+    {
+        $this->limit = $rowCount . ' OFFSET ' . $offset;
         return $this;
     }
 
     /**
      *
      */
-    public function orderDescending( $field ) {
-        return $this->order($field, TRUE);
-    }
-
-    /**
-     *
-     */
-    public function limit( $row_count, $offset=0 ) {
-        $this->limit = $row_count;
-        if ($offset) $this->limit .= ' OFFSET ' . $offset;
-        return $this;
-    }
-
-    /**
-     *
-     */
-    public function quote( $value ) {
+    public function quote($value)
+    {
         // Interpret values beginning with ! as raw data
         if (substr($value, 0, 1) == '!') return substr($value, 1);
 
@@ -422,7 +457,8 @@ class DBQuery {
      * $this->MAX('field')      => MAX(`field`)
      * $this->ROUND('field', 4) => ROUND(`field`, 4)
      */
-    public function __call( $method, $params ) {
+    public function __call($method, $params)
+    {
         if (stripos($method, 'filterby') === 0) {
             return $this->filter(substr($method, 8), $params[0]);
         } else {
@@ -433,7 +469,8 @@ class DBQuery {
     /**
      *
      */
-    public function SQL() {
+    public function SQL()
+    {
         switch ($this->sql) {
             case 'SELECT':  return $this->SelectSQL();
             case 'INSERT':
@@ -449,16 +486,18 @@ class DBQuery {
      *
      * @return string SQL query
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->SQL() . ';';
     }
 
     /**
      *
      */
-    public function reset() {
+    public function reset()
+    {
         $this->sql      = 'SELECT';
-        $this->distinct = FALSE;
+        $this->distinct = false;
         $this->get      = array();
         $this->set      = array();
         $this->where    = array();
@@ -531,7 +570,8 @@ class DBQuery {
     /**
      *
      */
-    protected function SelectSQL() {
+    protected function SelectSQL()
+    {
         return 'SELECT '
              . $this->_get()
              . "\n".'  FROM ' . $this->field($this->table)
@@ -546,7 +586,8 @@ class DBQuery {
     /**
      *
      */
-    protected function InsertSQL( $mode='INSERT' ) {
+    protected function InsertSQL($mode='INSERT')
+    {
         $sql = $this->sql . ' INTO `' . $this->table . '` (`'
              . implode('`,`', array_keys($this->set)) . '`) ';
         $sql .= 'VALUES (';
@@ -561,7 +602,8 @@ class DBQuery {
     /**
      *
      */
-    protected function UpdateSQL() {
+    protected function UpdateSQL()
+    {
         $sql = 'UPDATE `' . $this->table . '` SET ';
         foreach ($this->set as $key=>$value) {
             $sql .= '`' . $key . '` = '
@@ -578,7 +620,8 @@ class DBQuery {
     /**
      *
      */
-    protected function DeleteSQL() {
+    protected function DeleteSQL()
+    {
         return 'DELETE '
              . "\n".'    FROM `' . $this->table . '`'
              . $this->_where()
@@ -588,21 +631,24 @@ class DBQuery {
     /**
      *
      */
-    protected function field( $field ) {
+    protected function field($field)
+    {
         return preg_match('~^[[:alpha:]_]\w*$~', $field) ? '`' . $field . '`' : $field;
     }
 
     /**
      *
      */
-    protected function _table() {
+    protected function _table()
+    {
         return '`' . $this->table . '`';
     }
 
     /**
      *
      */
-    protected function _get() {
+    protected function _get()
+    {
         $s = ($this->distinct ? 'DISTINCT ' : '')
            . implode("\n".'      ,', $this->get);
         return $s ?: '*';
@@ -611,14 +657,16 @@ class DBQuery {
     /**
      *
      */
-    protected function _join() {
+    protected function _join()
+    {
         return implode("\n", $this->join);
     }
 
     /**
      *
      */
-    private function _whereGroup( $idx ) {
+    private function _whereGroup($idx)
+    {
         return (isset($this->whereExtra['('][$idx]) ? '( ' : '')
              . $this->where[$idx]
              . (isset($this->whereExtra[')'][$idx]) ? ' )' : '');
@@ -627,7 +675,8 @@ class DBQuery {
     /**
      *
      */
-    protected function _where() {
+    protected function _where()
+    {
         if (empty($this->where)) return;
 
         $s = $this->_whereGroup(0);
@@ -647,7 +696,8 @@ class DBQuery {
     /**
      *
      */
-    protected function _group() {
+    protected function _group()
+    {
         $s = implode("\n".'         ,', $this->group);
         return $s ? "\n" . ' GROUP BY ' . $s : '';
     }
@@ -655,7 +705,8 @@ class DBQuery {
     /**
      *
      */
-    protected function _having() {
+    protected function _having()
+    {
         $s = implode(' AND ', $this->having);
         return $s ? "\n" . 'HAVING ' . $s : '';
     }
@@ -663,7 +714,8 @@ class DBQuery {
     /**
      *
      */
-    protected function _order() {
+    protected function _order()
+    {
         $s = implode(', ', $this->order);
         return $s ? "\n" . ' ORDER BY ' . $s : '';
     }
@@ -671,7 +723,8 @@ class DBQuery {
     /**
      *
      */
-    protected function _limit() {
+    protected function _limit()
+    {
         return $this->limit ? "\n" . ' LIMIT ' . $this->limit : '';
     }
 

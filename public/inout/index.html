@@ -1,0 +1,80 @@
+<html>
+<head>
+    <title>Erzeugung / Verbrauch / Einspeisung / Bezug</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="custom.css" />
+</head>
+<body>
+
+<table cellspacing="0" border="0">
+<tbody>
+    <tr>
+        <td class="c1 icon"><div class="icons solar"></div></td>
+        <td class="arrow" rowspan="6">
+            <i id="arrow1" class="fa fa-fw"></i>
+        </td>
+        <td class="c2 icon"><div class="icons home"></div></td>
+        <td class="arrow" rowspan="6">
+            <i id="arrow2" class="fa fa-fw"></i>
+         </td>
+        <td class="c3 icon"><div class="icons grid"></div></td>
+    </tr>
+    <tr class="value">
+        <td class="Pgen c1" style="position:relative">
+            <div class="value active">?</div>
+            <div class="value inactive">?</div>
+        </td>
+        <td class="Puse c2" style="position:relative">
+            <div class="value active">?</div>
+            <div class="value inactive">?</div>
+        </td>
+        <td class="Pbal c3" style="position:relative">
+            <div class="value active">?</div>
+            <div class="value inactive">?</div>
+        </td>
+    </tr>
+    <tr class="unit">
+        <td class="c1">W</td>
+        <td class="c2">W</td>
+        <td class="c3">W</td>
+    </tr>
+    <tr class="value">
+        <td class="Egen c1" style="position:relative">
+            <div class="value active">?</div>
+            <div class="value inactive">?</div>
+        </td>
+        <td class="Euse c2" style="position:relative">
+            <div class="value active">?</div>
+            <div class="value inactive">?</div>
+        </td>
+        <td class="Ebal c4" style="position:relative">
+            <div class="value active">?</div>
+            <div class="value inactive">?</div>
+        </td>
+    </tr>
+    <tr class="kWh unit">
+        <td class="c1">kWh</td>
+        <td class="c2">kWh</td>
+        <td class="c4">kWh</td>
+    </tr>
+    <tr>
+        <td class="c1 last">&nbsp;</td>
+        <td class="c2 last">&nbsp;</td>
+        <td class="c4 last">&nbsp;</td>
+    </tr>
+    <tr>
+        <td id="clock" colspan="5"></td>
+    </tr>
+</tbody>
+</table>
+
+<script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+<script src="//code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+
+</body>
+
+</html>

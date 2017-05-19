@@ -19,9 +19,11 @@ namespace ORM;
 abstract class Reading {
 
     /**
+     * Factory for correct readings table
      *
+     * @param $numeric integer Numeric or alpha-numeric readings
      */
-    public static function factory( $numeric ) {
+    public static function factory($numeric) {
         return $numeric ? new ReadingNum : new ReadingStr;
     }
 

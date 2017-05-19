@@ -21,11 +21,11 @@ class Description extends \Controller {
 
         $this->view->SubTitle = __('Description');
 
-        $fileMD = ROOT_DIR . DS . 'description.md';
+        $fileMD = \PVLng::path(ROOT_DIR, 'description.md');
         if (!file_exists($fileMD)) $fileMD .= '.dist';
 
-        $fileTOC  = TEMP_DIR . DS . 'Frontend.Description.TOC.html';
-        $fileHTML = TEMP_DIR . DS . 'Frontend.Description.html';
+        $fileTOC  = \PVLng::path(TEMP_DIR, 'Frontend.Description.TOC.html');
+        $fileHTML = \PVLng::path(TEMP_DIR, 'Frontend.Description.html');
 
         // Is there an actual content file?
         if (!file_exists($fileHTML) OR filemtime($fileMD) > filemtime($fileHTML)) {

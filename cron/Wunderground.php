@@ -45,11 +45,15 @@ if (TESTMODE) return;
 
 // Anything went wrong?
 if ($info['http_code'] != 200) {
-    out(0, print_r($data, TRUE));
+    out(0, print_r($data, true));
     return;
 }
 
-$data = json_decode($data, TRUE);
+$data = json_decode($data, true);
+
+// Got no data
+if ($data == '') return;
+
 $cnt = Channel::byGUID($section['channel'])->write($data);
 
 // Forecast

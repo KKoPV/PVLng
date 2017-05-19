@@ -1,15 +1,14 @@
 <?php
 /**
- * API class
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 class Api extends Slim\Slim
 {
-
     /**
      * Get named parameter as string
      */
@@ -29,13 +28,23 @@ class Api extends Slim\Slim
     }
 
     /**
-     * Get named parameter as boolean, all of (true|on|yes|1) interpreted as TRUE
+     * Get named parameter as numeric value
+     */
+    public function numParam($name, $default=0)
+    {
+        $value = trim($this->request->params($name));
+        return is_numeric($value) ? +$value : +$default;
+    }
+
+    /**
+     * Get named parameter as boolean,
+     * all of (true|on|yes|y|x|1) interpreted as TRUE
      */
     public function boolParam($name, $default=false)
     {
         $value = strtolower(trim($this->request->params($name)));
         return $value != ''
-             ? (preg_match('~^(?:true|on|yes|1)$~', $value) === 1)
+             ? (preg_match('~^(?:true|on|yes|y|x|1)$~i', $value) === 1)
              : $default;
     }
 
@@ -67,57 +76,207 @@ class Api extends Slim\Slim
         // Special models can provide an own GET functionality
         // e.g. for special return formats like PVLog or Sonnenertrag
         if (method_exists($channel, 'GET')) {
-            $return = $channel->GET($request);
-            $filename = isset($request['filename']) ? $request['filename'] : null;
-            $this->render($return, array('filename'=>$filename));
-            exit;
+
+            $result = $channel->GET($request);
+
+        } else {
+
+            $data   = $channel->read($request);
+            $buffer = new Buffer;
+
+            if ($this->boolParam('attributes', false)) {
+                $attr = $channel->getAttributes();
+
+                if ($channel->meter && $this->boolParam('full', false)) {
+                    // Calculate overall consumption and costs
+                    $cons = ($last = $data->last()) ? $last['data'] : 0;
+                    $attr['consumption'] = round($cons, $channel->decimals);
+                    $attr['costs'] = round(
+                        $cons * $attr['cost'],
+                        $this->config->get('Core.Currency.Decimals')
+                    );
+                }
+                $buffer->write($attr);
+            }
+
+            $result = $this->formatResult(
+                $data, $buffer, $channel->meter, $channel->numeric, $channel->decimals
+            );
         }
 
-        $buffer = $channel->read($request);
-        $result = new Buffer;
+        if (isset($request['filename'])) {
+            $this->view->set('filename', $request['filename']);
+        }
 
+        return $result;
+    }
+
+    /**
+     *
+     */
+    public function saveBulkCSV($guid, $rows, $sep)
+    {
+
+        // Ignore empty datasets
+        $rows = array_values(array_filter($rows));
+
+        if (empty($rows)) return;
+
+        try {
+            $channel  = Channel::byGUID($guid);
+            $bulkdata = array();
+
+            // Ignore empty datasets, track also row Id for error messages
+            foreach ($rows as $row=>$dataset) {
+                $data = explode($sep, $dataset);
+
+                switch (count($data)) {
+                    case 2:
+                        // timestamp/datetime and data
+                        list($timestamp, $value) = $data;
+                        break;
+                    case 3:
+                        // date, time and data
+                        $timestamp = $data[0] . ' ' . $data[1];
+                        $value     = $data[2];
+                        break;
+                    default:
+                        throw new Exception('Invalid data: '.$dataset, 400);
+                } // switch
+
+                if (!is_numeric($timestamp)) $timestamp = strtotime($timestamp);
+
+                if ($timestamp === false) {
+                    throw new Exception('Invalid timestamp in row '.($row+1).': "'.$dataset.'"', 400);
+                }
+
+                if ($this->dryrun) {
+                    echo $timestamp, $sep, $value,
+                         ' (', date('Y-m-d H:i:s', $timestamp), ' : ', $value, ')', PHP_EOL;
+                } else {
+                    $bulkdata[$timestamp] = $value;
+                }
+            }
+
+            // All fine, insert data
+            $saved = ORM\ReadingNum::f()->insertBulk($channel->entity, $bulkdata);
+
+            if ($saved) $this->status(201);
+
+            $result = array(
+                'status'  => 'succes',
+                'message' => ($row+1) . ' valid row(s) sended, ' . $saved . ' row(s) inserted/updated'
+            );
+
+            $this->render($result);
+
+        } catch (Exception $e) {
+            $this->stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
+        }
+    }
+
+    /**
+     *
+     */
+    public function saveCSV($guid, $rows, $sep)
+    {
+
+        // Ignore empty datasets
+        $rows = array_values(array_filter($rows));
+
+        if (empty($rows)) return;
+
+        try {
+            // Disable AutoCommit in case of errors
+            $this->db->autocommit(false);
+            $saved = 0;
+
+            $channel = Channel::byGUID($guid);
+
+            // Ignore empty datasets, track also row Id for error messages
+            foreach ($rows as $row=>$dataset) {
+                $data = explode($sep, $dataset);
+
+                switch (count($data)) {
+                    case 2:
+                        // timestamp/datetime and data
+                        list($timestamp, $value) = $data;
+                        break;
+                    case 3:
+                        // date, time and data
+                        $timestamp = $data[0] . ' ' . $data[1];
+                        $value     = $data[2];
+                        break;
+                    default:
+                        throw new Exception('Invalid data: '.$dataset, 400);
+                } // switch
+
+                if (!is_numeric($timestamp)) $timestamp = strtotime($timestamp);
+
+                if ($timestamp === false) {
+                    throw new Exception('Invalid timestamp in row '.($row+1).': "'.$dataset.'"', 400);
+                }
+
+                if ($this->dryrun) {
+                    echo $timestamp, $sep, $value,
+                         ' (', date('Y-m-d H:i:s', $timestamp), ' : ', $value, ')', PHP_EOL;
+                } else {
+                    $saved += $channel->write(array('data'=>$value), $timestamp);
+                }
+            }
+            // All fine, commit changes
+            $this->db->commit();
+
+            if ($saved) $this->status(201);
+
+            $result = array(
+                'status'  => 'succes',
+                'message' => ($row+1) . ' valid row(s) sended, '
+                           . $saved . ' row(s) inserted/updated'
+            );
+
+            $this->render($result);
+
+        } catch (Exception $e) {
+            // Rollback all correct data
+            $this->db->rollback();
+            $this->stopAPI($e->getMessage() . '; No data saved!', $e->getCode());
+        }
+    }
+
+    /**
+     *
+     */
+    public function formatResult(Buffer $data, Buffer $result, $meter, $numeric, $decimals)
+    {
         $full  = $this->boolParam('full', false);
         $short = $this->boolParam('short', false);
 
-        if ($this->boolParam('attributes', false)) {
-            $attr = $channel->getAttributes();
-
-            if ($full && $channel->meter) {
-                // Calculate overall consumption and costs
-                $cons = 0;
-                // Loop all rows to get value from last row if exists
-                foreach ($buffer as $row) $cons = $row['data'];
-                $attr['consumption'] = round($cons, $attr['decimals']);
-                $attr['costs'] = round(
-                    $cons * $attr['cost'],
-                    $this->config->get('Core.Currency.Decimals')
-                );
-            }
-            $result->write($attr);
-        }
-
-        // Optimized flow, 1st "if" then "loop" ...
+        // Optimized flow, 1st "switch" then "loop" ...
         switch (true) {
 
             // Passthrough all values as numeric based array
             case $full && $short:
-                foreach ($buffer as $row) {
-                    if (!$channel->meter) unset($row['consumption']);
+                foreach ($data as $row) {
+                    $numeric && $this->roundData($row, $decimals);
+                    if (!$meter) unset($row['consumption']);
                     $result->write(array_values($row));
                 }
                 break;
 
-            // Do nothing, use as is
+            // Do nothing special, use as is
             case $full:
-                foreach ($buffer as $row) {
-                    if (!$channel->meter) unset($row['consumption']);
+                foreach ($data as $row) {
+                    $numeric && $this->roundData($row, $decimals);
+                    if (!$meter) unset($row['consumption']);
                     $result->write($row);
                 }
                 break;
 
             // Default mobile result: only timestamp and data
             case $short:
-                foreach ($buffer as $row) {
+                foreach ($data as $row) {
+                    $numeric && $this->roundData($row, $decimals);
                     $result->write(array(
                         /* 0 */ $row['timestamp'],
                         /* 1 */ $row['data']
@@ -127,15 +286,35 @@ class Api extends Slim\Slim
 
             // Default result: only timestamp and data
             default:
-                foreach ($buffer as $row) {
+                foreach ($data as $row) {
+                    $numeric && $this->roundData($row, $decimals);
                     $result->write(array(
                         'timestamp' => $row['timestamp'],
                         'data'      => $row['data']
                     ));
                 }
+                break;
 
         } // switch
 
+        // Free memory
+        $data->close();
+
         return $result;
     }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected function roundData(&$data, $decimals)
+    {
+        foreach (array('min', 'max', 'data', 'consumption') as $key) {
+            $data[$key] = round($data[$key], $decimals);
+        }
+    }
+
 }

@@ -1,0 +1,48 @@
+/**
+ *
+ */
+var InOut = {
+
+    // Fade duration
+    fade: 'slow',
+
+    // Your PVLng API key, required for private channels
+    PVLngAPIkey: '',
+
+    // Read data each ? seconds
+    Timeout: 60,
+
+    // Show average of last ? minutes
+    PowerAvg: 10,
+
+    /**
+     * Define the channel GUIDs here
+     */
+    // Actual generated power, Pac [W]
+    Pgen: {
+        GUID: '',
+        // Factor for this channel to get Watts
+        // Factor: 1
+    },
+
+    // Actual used power [W]
+    Puse: {
+        GUID: '',
+        // Factor for this channel to get Watts
+        // Factor: 1
+    },
+
+    // Generated energy [kWh]
+    Egen: {
+        GUID: '',
+        // Factor for this channel to get Kilo watt hours
+        // Factor: 0.001
+    },
+
+    // Used energy [kWh]
+    Euse: {
+        GUID: '',
+        // Factor for this channel to get Kilo watt hours
+        // Factor: 1
+    }
+}

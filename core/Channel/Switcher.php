@@ -12,16 +12,17 @@ namespace Channel;
 /**
  *
  */
-class Switcher extends Channel {
-
+class Switcher extends Channel
+{
     /**
      *
      */
-    protected function before_write(&$request) {
-
+    protected function before_write(&$request)
+    {
         parent::before_write($request);
 
-        if (($this->numeric  && ((float)  $this->lastReading == (float)  $this->value)) ||
+        if (($this->extra && $this->value == '') || // Check for empty values here
+            ($this->numeric  && ((float)  $this->lastReading == (float)  $this->value)) ||
             (!$this->numeric && ((string) $this->lastReading == (string) $this->value))) {
             // Skip not changed value since last write
             throw new \Exception(null, 200);

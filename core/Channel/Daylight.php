@@ -11,13 +11,14 @@ namespace Channel;
 /**
  *
  */
-class Daylight extends InternalCalc {
-
+class Daylight extends InternalCalc
+{
     /**
      * Run additional code before data saved to database
      * Read latitude / longitude from extra attribute
      */
-    public static function beforeEdit( \ORM\Channel $channel, Array &$fields ) {
+    public static function beforeEdit(\ORM\Channel $channel, Array &$fields)
+    {
         parent::beforeEdit($channel, $fields);
         // times no longer used but needed here to not break existing channels
         list($fields['times']['VALUE'], $fields['extra']['VALUE']) = $channel->extra;
@@ -27,7 +28,8 @@ class Daylight extends InternalCalc {
      *
      * @param $add2tree integer|null
      */
-    public static function checkData( Array &$fields, $add2tree ) {
+    public static function checkData(Array &$fields, $add2tree)
+    {
         if ($ok = parent::checkData($fields, $add2tree)) {
             if ($fields['resolution']['VALUE'] == 1 AND $fields['extra']['VALUE'] == '') {
                 $fields['resolution']['ERROR'][] = __('model::Daylight_IrradiationIsRequired');
@@ -42,7 +44,8 @@ class Daylight extends InternalCalc {
      * Run additional code before data saved to database
      * Save latitude / longitude to extra attribute
      */
-    public static function beforeSave( Array &$fields, \ORM\Channel $channel ) {
+    public static function beforeSave(Array &$fields, \ORM\Channel $channel)
+    {
         parent::beforeSave($fields, $channel);
         // times no longer used but needed here to not break existing channels
         $channel->extra = array(+$fields['times']['VALUE'], $fields['extra']['VALUE']);
@@ -65,7 +68,8 @@ class Daylight extends InternalCalc {
     /**
      *
      */
-    protected function __construct( \ORM\Tree $channel ) {
+    protected function __construct(\ORM\Tree $channel)
+    {
         parent::__construct($channel);
 
         list($this->times, $this->extra) = $this->extra;
@@ -83,11 +87,11 @@ class Daylight extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
-
+    protected function before_read(&$request)
+    {
         parent::before_read($request);
 
-        if ($this->dataExists(12*60*60)) return; // Buffer for 12h
+        if ($this->dataExists(60*60)) return; // Buffer 1 hour
 
         if ($this->numeric AND $this->extra) {
             // Fetch average of last x days of irradiation channel to buid curve

@@ -1,27 +1,30 @@
 <?php
 /**
- * Hash function
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
  *
  */
-$api->map('/hash', function() use ($api) {
-
+$api->map(
+    '/hash',
+    function() use ($api)
+{
     $text = $api->request->params('text');
+    $md5  = md5($text);
     $slug = Slug::encode($text);
 
     $api->render(array(
-        'text' => $text,
-        'hash' => substr(md5($text), 0, 8),
-        'md5'  => md5($text),
-        'sha1' => sha1($text),
-        'slug' => $slug,
+        'text'   => $text,
+        'hash'   => substr($md5, 0, 8),
+        'md5'    => $md5,
+        'sha1'   => sha1($text),
+        'slug'   => $slug,
         'unslug' => Slug::decode($slug)
     ));
 

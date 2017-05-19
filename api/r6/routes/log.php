@@ -1,11 +1,11 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
@@ -31,9 +31,12 @@ $checkLogId = function(Slim\Route $route) use ($api) {
 /**
  *
  */
-$api->put('/log', $APIkeyRequired, function() use ($api) {
-
-    $request = json_decode($api->request->getBody(), TRUE);
+$api->put(
+    '/log',
+    $APIkeyRequired,
+    function() use ($api)
+{
+    $request = json_decode($api->request->getBody(), true);
 
     $log = new ORM\Log;
 
@@ -52,15 +55,19 @@ $api->put('/log', $APIkeyRequired, function() use ($api) {
 })->name('put log')->help = array(
     'since'       => 'r2',
     'description' => 'Store new log entry, scope defaults to \'API '.$api->version.'\'',
-    'apikey'      => TRUE,
+    'apikey'      => true,
     'payload'     => array('{"scope":"...", "message":"..."}'=>'Message data'),
 );
 
 /**
  *
  */
-$api->get('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
-
+$api->get(
+    '/log/:id',
+    $APIkeyRequired,
+    $checkLogId,
+    function($id) use ($api)
+{
     $log = new ORM\Log($id);
 
     $result = array(
@@ -77,15 +84,18 @@ $api->get('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
     $api->render($result);
 })->name('read log entry')->help = array(
     'since'       => 'r2',
-    'apikey'      => TRUE,
+    'apikey'      => true,
     'description' => 'Read a log entry',
 );
 
 /**
  *
  */
-$api->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count=50) use ($api) {
-
+$api->get(
+    '/log/all(/:page(/:count))',
+    $APIkeyRequired,
+    function($page=1, $count=50) use ($api)
+{
     if ($page < 1)  $page  = 1;
     if ($count < 1) $count = 1;
 
@@ -113,15 +123,19 @@ $api->get('/log/all(/:page(/:count))', $APIkeyRequired, function($page=1, $count
 })->name('read log entries paginated')->help = array(
     'since'       => 'r2',
     'description' => 'Read all log entries, paginated for :page, :count entries',
-    'apikey'      => TRUE,
+    'apikey'      => true,
 );
 
 /**
  *
  */
-$api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
-
-    $request = json_decode($api->request->getBody(), TRUE);
+$api->post(
+    '/log/:id',
+    $APIkeyRequired,
+    $checkLogId,
+    function($id) use ($api)
+{
+    $request = json_decode($api->request->getBody(), true);
 
     $log = new ORM\Log($id);
 
@@ -146,18 +160,23 @@ $api->post('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
 })->name('post log')->help = array(
     'since'       => 'r2',
     'description' => 'Update a log entry',
-    'apikey'      => TRUE,
+    'apikey'      => true,
     'payload'     => array('{"scope":"...", "message":"..."}'=>'Message data'),
 );
 
 /**
  *
  */
-$api->delete('/log/:id', $APIkeyRequired, $checkLogId, function($id) use ($api) {
+$api->delete(
+    '/log/:id',
+    $APIkeyRequired,
+    $checkLogId,
+    function($id) use ($api)
+{
     $log = new ORM\Log($id);
     $api->status($log->delete() ? 204 : 400);
 })->name('delete log entry')->help = array(
     'since'       => 'r2',
     'description' => 'Delete a log entry',
-    'apikey'      => TRUE,
+    'apikey'      => true,
 );

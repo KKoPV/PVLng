@@ -1,17 +1,21 @@
 <?php
 /**
- * KEy - Value store routes for external use
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
  *
  */
-$api->put('/store/:key', $APIkeyRequired, function($key) use ($api) {
+$api->put(
+    '/store/:key',
+    $APIkeyRequired,
+    function($key) use ($api)
+{
     $request = json_decode($api->request->getBody(), TRUE);
     if ($err = JSON::check()) $api->stopAPI($err, 400);
     if (!count($request)) $api->stopAPI('Invalid JSON data', 400);
@@ -29,7 +33,11 @@ $api->put('/store/:key', $APIkeyRequired, function($key) use ($api) {
 /**
  *
  */
-$api->get('/store/:key', $APIkeyRequired, function($key) use ($api) {
+$api->get(
+    '/store/:key',
+    $APIkeyRequired,
+    function($key) use ($api)
+{
     $api->render(array($key => $api->db->get('API-'.strtolower($key))));
 })->name('GET /store/:key')->help = array(
     'since'       => 'r6',

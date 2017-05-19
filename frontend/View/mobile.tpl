@@ -13,6 +13,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
 
     <title>PVLng</title>
     <meta name="description" content="{PVLNG}" />
@@ -21,9 +22,8 @@
     <meta name="apple-mobile-web-app-title" content="PVLng">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <!-- INCLUDE favicon.inc.tpl -->
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <!-- INCLUDE favicon.inc.tpl -->
 
     <meta http-equiv="Content-Style-Type" content="text/css" />
     <meta http-equiv="Content-Script-Type" content="text/javascript">
@@ -50,7 +50,7 @@
     <!-- ENDIF -->
     <script src="/js/jquery-ui.min.js"></script>
 
-    <!-- INCLUDE highcharts.tpl -->
+    <!-- INCLUDE highcharts.inc.tpl -->
 
     <!-- IF {DEVELOPMENT} -->
     <script src="/js/mobile.js"></script>

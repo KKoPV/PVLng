@@ -9,6 +9,8 @@
  */
 -->
 
+<!-- EVENT channel_content_before_html -->
+
 <p><a href="/channel/add" class="button tip" title="Alt-N">{{CreateChannel}}</a></p>
 
 <table id="entities" class="dataTable">
@@ -81,6 +83,8 @@
     </tr>
     </tfoot>
 </table>
+
+<!-- EVENT channel_content_after_html -->
 
 <!-- Legend -->
 

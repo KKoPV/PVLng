@@ -1,18 +1,21 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
  *
  */
-$api->put('/batch/:guid', $APIkeyRequired, function($guid) use ($api) {
-
+$api->put(
+    '/batch/:guid',
+    $APIkeyRequired,
+    function($guid) use ($api)
+{
     // Analyse separator headers
     $sep1 = $api->request->headers->get('X-PVLng-CSV-RecordSeparator', ';');
     if (strtoupper($sep1) == 'TAB') $sep1 = "\t";
@@ -20,12 +23,11 @@ $api->put('/batch/:guid', $APIkeyRequired, function($guid) use ($api) {
     $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ',');
     if (strtoupper($sep) == 'TAB') $sep = "\t";
 
-    saveCSV($guid, explode($sep1, trim($api->request->getBody())), $sep);
-
+    $api->saveCSV($guid, explode($sep1, trim($api->request->getBody())), $sep);
 })->name('put batch data')->help = array(
     'since'       => 'r2',
     'description' => 'Save multiple reading values',
-    'apikey'      => TRUE,
+    'apikey'      => true,
     'header'      => array(
         'X-PVLng-CSV-RecordSeparator' => 'Set record separator (if not semicolon) since r5, '
                                        . 'TAB as string will be also accepted',

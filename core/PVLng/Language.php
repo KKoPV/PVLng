@@ -13,13 +13,17 @@ namespace PVLng;
 /**
  *
  */
-class Language {
+class Language
+{
 
     /**
      *
      */
-    public function add( $pos, $code, $label, $icon=NULL ) {
-        while (isset($this->lang[$pos])) $pos++;
+    public function add($pos, $code, $label, $icon = null)
+    {
+        while (isset($this->lang[$pos])) {
+            $pos++;
+        }
         $this->lang[$pos] = array(
             'CODE'     => $code,
             'ICON'     => $icon ?: $code,
@@ -30,7 +34,8 @@ class Language {
     /**
      *
      */
-    public function get() {
+    public function get()
+    {
         ksort($this->lang);
         return $this->lang;
     }
@@ -43,5 +48,4 @@ class Language {
      *
      */
     protected $lang = array();
-
 }

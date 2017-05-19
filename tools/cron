@@ -58,7 +58,7 @@ function out( $level ) {
  *
  */
 function okv( $level, $key, $value ) {
-    if ($level <= VERBOSE) out($level, '%-20s = %s', $key, print_r($value, TRUE));
+    out($level, '%-20s = %s', $key, print_r($value, true));
 }
 
 /**
@@ -108,25 +108,14 @@ $param_v = isset($param_v) ? (is_array($param_v)?count($param_v):1) : 0;
 TESTMODE && $param_v++;
 define('VERBOSE', $param_v);
 
+/**
+ * Initialize
+ */
 setlocale(LC_NUMERIC, 'C');
 iconv_set_encoding('internal_encoding', 'UTF-8');
 mb_internal_encoding('UTF-8');
 clearstatcache();
 
-/**
- * Directories
- */
-define('DS',       DIRECTORY_SEPARATOR);
-define('BASE_DIR', dirname(__FILE__));
-define('ROOT_DIR', dirname(BASE_DIR));
-define('CONF_DIR', ROOT_DIR . DS . 'config');
-define('CORE_DIR', ROOT_DIR . DS . 'core');
-define('LIB_DIR',  ROOT_DIR . DS . 'lib');
-define('TEMP_DIR', ROOT_DIR . DS . 'tmp'); // Outside document root!
-
-/**
- * Initialize
- */
 ini_set('display_startup_errors', !VERBOSE);
 ini_set('display_errors', !VERBOSE);
 error_reporting(!VERBOSE ? 0 : -1);
@@ -141,23 +130,21 @@ if (TESTMODE) {
 /**
  * Initialize Auto-Loader
  */
-$loader = require_once ROOT_DIR . DS . 'vendor' . DS . 'autoload.php';
-$loader->addPsr4('', array(CORE_DIR, LIB_DIR));
+require_once implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'core', 'PVLng.php']);
 
+$loader = PVLng::bootstrap();
 Loader::register($loader, TEMP_DIR);
 
 /**
  * Config file
  */
 $param_c = isset($param_c) ? $param_c : 'config.cron.php';
-okv( 1, 'Config file', CONF_DIR . DS . $param_c);
+$conffile = PVLng::path(ROOT_DIR, 'config', $param_c);
+okv(1, 'Config file', $conffile);
 
 try {
-    $config = (new slimMVC\Config)
-              ->load(CONF_DIR . DS . 'config.default.php')
-              ->load(CONF_DIR . DS . 'config.php', TRUE)
-              // Load into "Cron" namespace
-              ->load(CONF_DIR . DS . $param_c, TRUE, 'Cron');
+    // Load into "Cron" namespace
+    $config = PVLng::getConfig()->loadNamespace('Cron', $conffile);
 } catch (Exception $e) {
     die($e->getMessage());
 }
@@ -195,13 +182,16 @@ for ($i=0; $i<$cnt; $i++) {
 // parent process finished loop
 if ($id == -1) exit;
 
+// Child process, need to recreate database!
+PVLng::setDatabase(true);
+
 // Collect outputs to show at once
 ob_start();
 
 $section = array_merge(
     array(
         'handler' => '<handler unknown>',
-        'enabled' => FALSE,
+        'enabled' => false,
         'name'    => '<unknown>',
         'runeach' => 1
     ),
@@ -212,45 +202,13 @@ out(1);
 out(1, '[%d] %s (%s)', ($id+1), $section['name'], $section['handler']);
 out(1);
 
-/**
- * Database
- */
 try {
-    // Try connect to database
-    $c = $config->get('Database');
-    $db = new slimMVC\MySQLi($c['host'], $c['username'], $c['password'], $c['database'], $c['port'], $c['socket']);
-} catch (Exception $e) {
-    die('Unable to connect to database!');
-}
-
-$db->setSettingsTable('pvlng_config');
-
-slimMVC\ORM::setDatabase($db);
-
-foreach ((new ORM\SettingsKeys)->find() as $setting) {
-    $config->set($setting->getKey(), $setting->getValue());
-}
-
-/**
- * Init Nested set for channel tree
- */
-include LIB_DIR . DS . 'contrib' . DS . 'class.nestedset.php';
-
-NestedSet::Init(array(
-    'db'=>$db, 'debug'=>FALSE, 'lang'=>'en', 'path'=>LIB_DIR.DS.'contrib'.DS.'messages',
-    'db_table' => array (
-        'tbl'=>'pvlng_tree', 'nid'=>'id', 'l'=>'lft', 'r'=>'rgt', 'mov'=>'moved', 'pay'=>'entity'
-    )
-));
-
-try {
-    if ($section['enabled'] === TRUE OR
-        TESTMODE AND $section['enabled'] === 0) {
+    if ($section['enabled'] === true || TESTMODE && $section['enabled'] === 0) {
         // Run in test mode at any minute or if forced flag was set...
-        if (TESTMODE OR isset($param_i) OR $minute % $section['runeach'] == 0) {
-            $file = ROOT_DIR . DS . 'cron' . DS . $section['handler'] . '.php';
+        if (TESTMODE || isset($param_i) OR $minute % $section['runeach'] == 0) {
+            $file = PVLng::path(ROOT_DIR, 'cron', $section['handler'].'.php');
             // Check for file exists only during test, in live don't check anymore
-            if (TESTMODE AND !file_exists($file)) {
+            if (TESTMODE && !file_exists($file)) {
                 throw new Exception('Missing handler script: '.$file);
             }
             unset($section['enabled'], $section['name'], $section['handler']);

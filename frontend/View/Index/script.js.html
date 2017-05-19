@@ -1,4 +1,4 @@
-<script>
+<!--
 /**
  *
  *
@@ -7,7 +7,7 @@
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
-</script>
+-->
 
 <!--
 <script src="/js/palettes.js"></script>
@@ -23,7 +23,8 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
     aborted = false,
     qs = {},
     chart = false,
-    chartLoading = '<img src="/images/loading_dots.gif" width="64" height="21">',
+/*  chartLoading = '<img src="/images/loading_dots.gif" width="64" height="21">', */
+    chartLoading = '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw" style="opacity:0.25"></i>',
     channels_chart = [],
     updateTimeout,
     updateActive = false,
@@ -107,24 +108,24 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
             formatter: function() {
                 var title, body = '';
                 $.each(this.points, function(id, point) {
+                    var value, color, even = (id & 1) ? 'even' : ''; /* id starts by 0 */
+
                     /* Show tooltip only for series with a unit */
                     if (point.series.tooltipOptions.valueSuffix == '') return;
 
                     if (point.point.low != undefined && point.point.high != undefined) {
-                        var color = point.series.color;
-                        var value = Highcharts.numberFormat(+point.point.low, point.series.options.decimals) + ' - ' +
-                                    Highcharts.numberFormat(+point.point.high, point.series.options.decimals);
+                        color = point.series.color;
+                        value = point.point.low + ' - ' + point.point.high;
                     } else if (point.y != undefined) {
                         if (point.series.options.negativeColor && +point.y < point.series.options.threshold) {
-                            var color = point.series.options.negativeColor;
+                            color = point.series.options.negativeColor;
                         } else {
-                            var color = point.series.color;
+                            color = point.series.color;
                         }
-                        var value = Highcharts.numberFormat(+point.y, point.series.options.decimals);
+                        value = point.y;
                     } else {
                         return;
                     }
-                    var even = (id & 1) ? 'even' : ''; /* id starts by 0 */
                     body += '<tr style="color:' + color + '" class="' + even + '">'
                           + '<td class="name">' + point.series.name + '</td>'
                           + '<td class="value">' + value + '</td>'
@@ -362,7 +363,6 @@ function ChartDialog( id ) {
     $('#d-position-slider').slider('value', p.position);
     $('#d-outline').prop('checked', p.outline);
     $('#d-stack').val(p.stack);
-    $('#d-decimals').val(p.decimals);
 
     /* Update only in context of dialog chart */
     $('input.iCheck', '#dialog-chart').iCheck('update').trigger('ifToggled');
@@ -693,7 +693,7 @@ function updateChart( force ) {
                 zIndex:         channel.zIndex,
                 /* Own properties */
                 colorDiff:      channel.colorusediff,
-                decimals:       channel.decimals == '' ? attr.decimals : +channel.decimals,
+                decimals:       attr.decimals,
                 guid:           channel.guid,
                 unit:           attr.unit,
                 raw:            (period == '')
@@ -719,9 +719,7 @@ function updateChart( force ) {
                     enabled: true,
                     formatter: function() {
                         /* Switch for non-numeric / numeric channels */
-                        return typeof this.point.name != 'undefined'
-                             ? this.point.name
-                             : Highcharts.numberFormat(this.point.y, this.point.series.options.decimals);
+                        return typeof this.point.name != 'undefined' ? this.point.name : this.point.y;
                     }
                 };
                 if (attr.unit.trim() == '') {
@@ -772,7 +770,7 @@ function updateChart( force ) {
                             point.y = channel.consumption ? row.consumption : row.data;
                         } else {
                             /* Format data label */
-                            point.y = +(channel.consumption ? row.consumption : row.data).toFixed(serie.decimals);
+                            point.y = channel.consumption ? row.consumption : row.data;
                             point.dataLabels = { enabled: true };
                         }
                     }
@@ -1001,14 +999,10 @@ $(function() {
                                    '?returnto=' + (views.actual.slug ? '/chart/' + views.actual.slug : '/');
         });
 
-        /* Inject checkbox for chart auto refresh */
-        var cb_refresh = $('<input/>').prop('id', 'cb-autorefresh').prop('type', 'checkbox')
-            .prop('checked', !(lscache.get('chart-autorefresh') === false));
-        /* Wrapper div for iChecked checkbox */
-        $('<div/>').addClass('fr').css('margin', '6px 0 0 6px')
-            .append(cb_refresh).appendTo('#preset-wrapper');
-        /* iCheck after inserted into wrapper DIV */
-        cb_refresh.iCheck({ checkboxClass: 'icheckbox_flat' })
+        /* Checkbox for chart auto refresh */
+        var cb_refresh = $('#cb-autorefresh')
+            .prop('checked', !(lscache.get('chart-autorefresh') === false))
+            .iCheck({ checkboxClass: 'icheckbox_flat' })
             .on('ifToggled', function(e) {
                 /* Remember current state */
                 lscache.set('chart-autorefresh', $(this).is(':checked'))
@@ -1055,7 +1049,6 @@ $(function() {
                 p.position = +$('#d-position').text();
                 p.outline = $('#d-outline').is(':checked');
                 p.stack = p.type == 'bar' ? $('#d-stack').val() : '';
-                p.decimals = $('#d-decimals').val();
 
                 p.time1 = SecToTimeStr(TimeStrToSec($('#d-time1').val(), 0));
                 p.time2 = SecToTimeStr(TimeStrToSec($('#d-time2').val(), 24));

@@ -44,6 +44,15 @@ class NestedSet {
   /**
    *
    */
+  public static function setDatabase( $db, $id = 0 ) {
+    if (is_null(self::$Instance[$id]))
+      throw new Exception('Call NestedSet::Init() first!');
+    self::$Instance[$id]->db = $db;
+  }
+
+  /**
+   *
+   */
   public static function getInstance( $id = 0 ) {
     if (is_null(self::$Instance[$id]))
       throw new Exception('Call NestedSet::Init() first!');
@@ -58,6 +67,15 @@ class NestedSet {
    * @return   void
    */
   protected function __construct( $params ) {
+    $params = array_merge(
+        array(
+            'debug'    => false,
+            'lang'     => 'en',
+            'db'       => null,
+            'db_table' => null,
+            'path'     => 'messages'
+        ), $params
+    );
     $this->debug  = $params['debug'];
     $this->lang   = $params['lang'];
     $this->db     = $params['db'];
@@ -168,23 +186,26 @@ class NestedSet {
       return $this->_setError(202, 'deleteBranch("' . $branchId . '")');
     }
 
-    $sql = sprintf('DELETE FROM `%1$s` WHERE `%2$s` BETWEEN %4$d AND %5$d;
-                    UPDATE `%1$s` SET `%2$s` = `%2$s` - ROUND((%5$d - %4$d + %6$d)) WHERE `%2$s` > %5$d;
-                    UPDATE `%1$s` SET `%3$s` = `%3$s` - ROUND((%5$d - %4$d + %6$d)) WHERE `%3$s` > %5$d',
-                   $this->table['tbl'], $this->table['l'], $this->table['r'],
-                   $branchData[$this->table['l']], $branchData[$this->table['r']], 1);
+    extract($this->table);
+
+    $sql = sprintf(
+        'DELETE FROM `%1$s` WHERE `%2$s` BETWEEN %4$d AND %5$d;
+         UPDATE `%1$s` SET `%2$s` = `%2$s` - %5$d + %4$d - 1 WHERE `%2$s` > %5$d;
+         UPDATE `%1$s` SET `%3$s` = `%3$s` - %5$d + %4$d - 1 WHERE `%3$s` > %5$d',
+        $tbl, $l, $r, $branchData[$l], $branchData[$r]
+    );
 
     $this->_lock();
 
     if ($this->db->multi_query($sql)) {
-      while ($this->db->more_results() AND $this->db->next_result()) {;}
+      while ($this->db->more_results() && $this->db->next_result()) {;}
     } else {
       return $this->_setError(303, 'deleteBranch("' . $branchId . '")', $sql);
     }
 
     $this->_unlock();
 
-    return TRUE;
+    return true;
   }
 
   /**

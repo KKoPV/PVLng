@@ -12,17 +12,18 @@ namespace Channel\SE;
 /**
  *
  */
-use \Channel\JSON;
+use \Channel\MultiChannel;
 
 /**
  *
  */
-class Optimizer extends JSON {
-
+class Optimizer extends MultiChannel
+{
     /**
      * Recieve CSV data
      */
-    public function write( $request, $timestamp=NULL ) {
+    public function write($request, $timestamp=null)
+    {
         $csv = array();
         // Split CSV data nd transform to array of arrays
         foreach (explode("\n", trim($request)) as $line) {
@@ -37,7 +38,7 @@ class Optimizer extends JSON {
         // Remove "Time" from 1st position
         array_shift($keys);
 
-        $cnt = 0;
+        $ok = 0;
 
         foreach ($csv as $row) {
             // Extract timestamp from 1st position
@@ -47,9 +48,9 @@ class Optimizer extends JSON {
             foreach ($keys as $id=>$key) {
                 if ($row[$id] != '') $data[$key] = $row[$id];
             }
-            $cnt += parent::write($data, $timestamp);
+            $ok += parent::write(array('data' => $data), $timestamp);
         }
 
-        return $cnt;
+        return $ok;
     }
 }
