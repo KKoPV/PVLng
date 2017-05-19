@@ -1,0 +1,3 @@
+[submodule "tools/phpMQTT"]
+	path = tools/phpMQTT
+	url = https://github.com/bluerhinos/phpMQTT.git
