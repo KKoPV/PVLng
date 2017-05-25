@@ -14,8 +14,8 @@ namespace Frontend\Controller;
  */
 use Frontend\Controller;
 use ORM\Tree as ORMTree;
+use Yryie\Yryie;
 use I18N;
-use Yryie;
 
 /**
  *

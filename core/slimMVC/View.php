@@ -12,7 +12,7 @@ namespace slimMVC;
  *
  */
 use PVLng\PVLng;
-use Yryie;
+use Yryie\Yryie;
 
 /**
  *

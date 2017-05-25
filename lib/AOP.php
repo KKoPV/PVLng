@@ -9,7 +9,7 @@
  */
 use Core\Session;
 use PVLng\PVLng;
-use Yryie;
+use Yryie\Yryie;
 
 /**
  *
@@ -41,8 +41,11 @@ Loader::registerCallback(function ($filename) {
         $hash = md5($code);
 
         # Yryie::Info('Compile: '.$filename);
-        Yryie::StartTimer('Compile '.str_replace(__ROOT__.DIRECTORY_SEPARATOR, '', $filename)
-                        . ' to '.basename($filenameAOP));
+        Yryie::StartTimer(
+            'Compile '
+          . str_replace(PVLng::$RootDir.DIRECTORY_SEPARATOR, '', $filename)
+          . ' to '.basename($filenameAOP)
+        );
         Yryie::transformCode($code);
 
         if ($hash == md5($code)) {

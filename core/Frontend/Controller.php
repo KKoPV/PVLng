@@ -16,8 +16,8 @@ use slimMVC\Controller as SlimController;
 use Core\Messages;
 use Core\Session;
 use PVLng\PVLng;
+use Yryie\Yryie;
 use BabelKitMySQLi;
-use Yryie;
 
 /**
  *

@@ -135,7 +135,7 @@ $app->container->singleton('languages', function () {
 $app->hook(
     'slim.before.dispatch',
     function () use ($app) {
-        Yryie::Debug('slim.before.dispatch');
+        Yryie\Yryie::Debug('slim.before.dispatch');
         $route = $app->Router()->getCurrentRoute();
         $pattern = $route->getPattern();
 

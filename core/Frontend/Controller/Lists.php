@@ -16,9 +16,9 @@ use Channel\Channel as Channel;
 use Core\Messages;
 use Frontend\Controller;
 use PVLng\PVLng;
+use Yryie\Yryie;
 use DBQuery;
 use I18N;
-use Yryie;
 
 /**
  *

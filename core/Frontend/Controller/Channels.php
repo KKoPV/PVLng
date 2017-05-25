@@ -21,9 +21,9 @@ use ORM\ChannelType as ORMChannelType;
 use ORM\ChannelView as ORMChannelView;
 use ORM\Tree as ORMTree;
 use PVLng\PVLng;
+use Yryie\Yryie;
 use DBQuery;
 use I18n;
-use Yryie;
 
 /**
  *

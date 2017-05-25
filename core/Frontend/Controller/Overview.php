@@ -18,9 +18,9 @@ use Core\Session;
 use Frontend\Controller;
 use ORM\ChannelView as ORMChannelView;
 use ORM\Tree as ORMTree;
+use Yryie\Yryie;
 use DBQuery;
 use I18N;
-use Yryie;
 
 /**
  *

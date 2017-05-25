@@ -16,9 +16,9 @@ use Frontend\Controller;
 use Core\Messages;
 use ORM\Settings as ORMSettings;
 use BabelKitMySQLi;
+use Yryie\Yryie;
 use I18N;
 use PasswordHash;
-use Yryie;
 
 /**
  *

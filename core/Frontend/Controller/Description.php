@@ -14,9 +14,9 @@ namespace Frontend\Controller;
  */
 use Frontend\Controller;
 use PVLng\PVLng;
+use Yryie\Yryie;
 use I18N;
 use Markdown;
-use Yryie;
 
 /**
  *

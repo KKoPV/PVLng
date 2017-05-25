@@ -17,8 +17,8 @@ use Frontend\Controller;
 use ORM\Dashboard as ORMDashboard;
 use ORM\Tree as ORMTree;
 use PVLng\PVLng;
+use Yryie\Yryie;
 use I18N;
-use Yryie;
 
 /**
  *
