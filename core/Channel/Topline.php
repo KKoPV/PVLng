@@ -15,7 +15,8 @@ namespace Channel;
 /**
  *
  */
-class Topline extends InternalCalc {
+class Topline extends InternalCalc
+{
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -24,9 +25,10 @@ class Topline extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
+    protected function beforeRead(&$request)
+    {
 
-        parent::before_read($request);
+        parent::beforeRead($request);
 
         if (!$this->dataExists()) {
             // Calc direct inside database

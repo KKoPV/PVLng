@@ -18,10 +18,10 @@ return array(
      */
 
     'valid_from' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'valid_to' => array(
-        'visible' => FALSE,
+        'visible' => false,
     )
 
 );

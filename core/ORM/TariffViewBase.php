@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -141,8 +141,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -153,8 +152,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -165,8 +163,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTariffComment($tariff_comment)
     {
-        $this->filter[] = $this->field('tariff_comment').' = '.$this->quote($tariff_comment);
-        return $this;
+        return $this->filter('tariff_comment', $tariff_comment);
     }
 
     /**
@@ -177,8 +174,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByDate($date)
     {
-        $this->filter[] = $this->field('date').' = '.$this->quote($date);
-        return $this;
+        return $this->filter('date', $date);
     }
 
     /**
@@ -189,8 +185,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
-        return $this;
+        return $this->filter('cost', $cost);
     }
 
     /**
@@ -201,8 +196,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTime($time)
     {
-        $this->filter[] = $this->field('time').' = '.$this->quote($time);
-        return $this;
+        return $this->filter('time', $time);
     }
 
     /**
@@ -213,8 +207,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByDays($days)
     {
-        $this->filter[] = $this->field('days').' = '.$this->quote($days);
-        return $this;
+        return $this->filter('days', $days);
     }
 
     /**
@@ -225,8 +218,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTariff($tariff)
     {
-        $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
-        return $this;
+        return $this->filter('tariff', $tariff);
     }
 
     /**
@@ -237,8 +229,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
      */
     public function filterByTimeComment($time_comment)
     {
-        $this->filter[] = $this->field('time_comment').' = '.$this->quote($time_comment);
-        return $this;
+        return $this->filter('time_comment', $time_comment);
     }
 
     // -----------------------------------------------------------------------
@@ -246,20 +237,27 @@ abstract class TariffViewBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_tariff_view';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
         CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_tariff_view` AS select `t1`.`id` AS `id`,`t1`.`name` AS `name`,`t1`.`comment` AS `tariff_comment`,`t2`.`date` AS `date`,`t2`.`cost` AS `cost`,`t3`.`time` AS `time`,`t3`.`days` AS `days`,`t3`.`tariff` AS `tariff`,`t3`.`comment` AS `time_comment` from ((`pvlng_tariff` `t1` left join `pvlng_tariff_date` `t2` on((`t1`.`id` = `t2`.`id`))) left join `pvlng_tariff_time` `t3` on(((`t2`.`id` = `t3`.`id`) and (`t2`.`date` = `t3`.`date`))))
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_tariff_view';
 
     /**
      *
@@ -286,13 +284,10 @@ abstract class TariffViewBase extends \slimMVC\ORM
     /**
      *
      */
-    protected $primary = array(
-
-    );
+    protected $primary = array();
 
     /**
      *
      */
     protected $autoinc = '';
-
 }

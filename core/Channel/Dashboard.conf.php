@@ -27,21 +27,21 @@ return array(
      */
 
     'meter' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
     'threshold' => array(
-        'visible'  => TRUE
+        'visible'  => true
     ),
     'valid_from' => array(
-        'required' => TRUE
+        'required' => true
     ),
     'valid_to' => array(
-        'required' => TRUE
+        'required' => true
     ),
     'extra' => array(
         'type'     => 'textarea',
-        'code'     => TRUE,
-        'visible'  => TRUE
+        'code'     => true,
+        'visible'  => true
     )
 
 );

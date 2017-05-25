@@ -16,7 +16,7 @@
  * ),
  *
  * file: MyHook.class.php
- * function: data_save_after( &$entity, $config )
+ * function: dataSaveAfter( &$entity, $config )
  *
  * So multiple hook functions can be defined in file
  *

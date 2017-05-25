@@ -17,9 +17,9 @@ class Switcher extends Channel
     /**
      *
      */
-    protected function before_write(&$request)
+    protected function beforeWrite(&$request)
     {
-        parent::before_write($request);
+        parent::beforeWrite($request);
 
         if (($this->extra && $this->value == '') || // Check for empty values here
             ($this->numeric  && ((float)  $this->lastReading == (float)  $this->value)) ||

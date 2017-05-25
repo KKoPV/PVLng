@@ -25,5 +25,4 @@ class ReadingCalculated extends ReadingCalculatedBase
      *
      * Access table name with $this->table
      */
-
 }

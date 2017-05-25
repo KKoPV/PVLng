@@ -22,23 +22,26 @@ $request = array( 'period' => $section['runeach'] . 'i' );
 $data = array( 'd' => date('Ymd'), 't' => date('H:i') );
 
 // Loop channels
-foreach ($section['channels'] as $id=>$channel) {
-
+foreach ($section['channels'] as $id => $channel) {
     $channel = array_merge(array( 'guid' => '', 'factor' => 1 ), $channel);
 
     // Ignore channels without GUID
-    if ($channel['guid'] == '') continue;
+    if ($channel['guid'] == '') {
+        continue;
+    }
 
-    $d = Channel::byGUID($channel['guid'])->read($request);
+    $d = Channel\Channel::byGUID($channel['guid'])->read($request);
 
     // No data
-    if (!count($d)) continue;
+    if (!count($d)) {
+        continue;
+    }
 
     $d = $d->asArray();
     $data[$id] = array_pop($d)['data'] * $channel['factor'];
 }
 
-okv(1, 'Data', print_r($data, TRUE));
+okv(1, 'Data', print_r($data, true));
 
 // Check, that at least ONE of v1 .. v4 is set
 if (empty($data[1]) && empty($data[2]) && empty($data[3]) && empty($data[4])) {
@@ -50,7 +53,9 @@ $data = http_build_query($data, 'v');
 okv(1, 'URL', $StatusURL);
 okv(1, 'Data', $data);
 
-if (TESTMODE) return;
+if (TESTMODE) {
+    return;
+}
 
 // Start curl sequence
 if (!curl(array(
@@ -63,12 +68,16 @@ if (!curl(array(
     // Send POST
     CURLOPT_POSTFIELDS => $data,
     CURLOPT_RETURNTRANSFER => 1,
-), $response, $info)) return;
+), $response, $info)) {
+    return;
+}
 
 okv(1, 'Response', $response);
 
 // Anything went wrong?
 if ($info['http_code'] != 200) {
     // Ignore "PVOutput is offline for maintenance"
-    if (!strstr($response, 'maintenance')) okv(0, 'Response', $response);
+    if (!strstr($response, 'maintenance')) {
+        okv(0, 'Response', $response);
+    }
 }

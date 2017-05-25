@@ -13,22 +13,24 @@
  */
 $api->map(
     '/hash',
-    function() use ($api)
-{
-    $text = $api->request->params('text');
-    $md5  = md5($text);
-    $slug = Slug::encode($text);
+    function () use ($api) {
+        $text = $api->request->params('text');
+        $md5  = md5($text);
+        $slug = Core\Slug::encode($text);
 
-    $api->render(array(
+        $api->render(array(
         'text'   => $text,
         'hash'   => substr($md5, 0, 8),
         'md5'    => $md5,
         'sha1'   => sha1($text),
         'slug'   => $slug,
-        'unslug' => Slug::decode($slug)
-    ));
-
-})->via('GET', 'POST')->name('hash')->help = array(
+        'unslug' => Core\Slug::decode($slug)
+        ));
+    }
+)
+->via('GET', 'POST')
+->name('hash')
+->help = array(
     'since'       => 'r3',
     'description' => 'Create MD5 and SHA1 hashes and a slug for the given text',
     'payload'  => array(

@@ -22,31 +22,31 @@ return array(
         'default'  => 'W/m²'
     ),
     'decimals' => array(
-        'visible'  => FALSE,
+        'visible'  => false,
         'default'  => 0
     ),
     'valid_from' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
     'valid_to' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
 
     // Removed, controlled by channel settings in chart, "Show all" flag"
     'times' => array(
         'position' => 430,
         'type'     => 'bool;0:no;1:yes',
-        'visible'  => FALSE
+        'visible'  => false
     ),
 
     'resolution' => array(
         'position' => 490,
         'type'     => 'bool;0:Marker;1:Curve',
-        'required' => FALSE
+        'required' => false
     ),
 
     'extra' => array(
-        'visible'  => TRUE,
+        'visible'  => true,
         'type'     => 'sql:X:'
                      .'SELECT'
                      .'  `guid`,'

@@ -20,13 +20,13 @@ return array(
      */
 
     'threshold' => array(
-        'visible'  => TRUE,
-        'required' => TRUE,
+        'visible'  => true,
+        'required' => true,
         'default'  => 0,
     ),
 
     'valid_from' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
 
 );

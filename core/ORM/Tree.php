@@ -17,42 +17,51 @@ namespace ORM;
 /**
  *
  */
-class Tree extends TreeBase {
+class Tree extends TreeBase
+{
 
     /**
      *
      */
-    public function __construct ( $id=NULL ) {
+    public function __construct($id = null)
+    {
         /* Build WITHOUT $id lookup, views have no primary key */
         parent::__construct();
-        if ($id) $this->filterById($id)->findOne();
+        if ($id) {
+            $this->filterById($id)->findOne();
+        }
     }
 
     /**
      * Getter for 'extra'
      */
-    public function getExtra() {
+    public function getExtra()
+    {
         return json_decode(parent::getExtra());
     }
 
     /**
      *
      */
-    public function getModelClass() {
+    public function getModelClass()
+    {
         return 'Channel\\'.$this->getModel();
     }
 
     /**
      *
      */
-    public function getWithParents( $publicOnly=FALSE ) {
+    public function getWithParents($publicOnly = false)
+    {
         // Remember parents Id, init level 0
-        $parent = array( NULL );
+        $parent = array( null );
         $nodes = array();
 
         // Without root node
         $this->reset()->filter('id', array('min' => 2));
-        if ($publicOnly) $this->filterByPublic(1);
+        if ($publicOnly) {
+            $this->filterByPublic(1);
+        }
         $rows = $this->find()->asAssoc();
 
         foreach ($rows as $row) {
@@ -68,7 +77,8 @@ class Tree extends TreeBase {
     /**
      * Get full name with description (if defined): Name (Description)
      */
-    public function getFullName($format='%$1s (%$2s') {
+    public function getFullName($format = '%$1s (%$2s')
+    {
         $name = $this->getName();
         if ($desc = $this->getDescription()) {
             $name = sprintf($format, $name, $desc);
@@ -85,9 +95,9 @@ class Tree extends TreeBase {
     }
 
     /**
-     *
+     * Overwrite \slimMVC\ORM::buildSelectSql()
      */
-    protected function _sql()
+    protected function buildSelectSql()
     {
         return '
             SELECT `n`.`id`                                                 AS `id`,
@@ -128,13 +138,16 @@ class Tree extends TreeBase {
                    ((MIN(`p`.`rgt`) - `n`.`rgt` - (`n`.`lft` > 1)) / 2) > 0 AS `lower`,
                    (`n`.`lft` - MAX(`p`.`lft`)) > 1                         AS `upper`
               FROM `pvlng_tree` `n` USE INDEX (PRIMARY) -- Force index for performance
-              JOIN `pvlng_tree` `p` ON `n`.`lft` >= `p`.`lft` AND `n`.`rgt` <= `p`.`rgt` AND (`p`.`id` <> `n`.`id` OR `n`.`lft` = 1)
-              LEFT JOIN `pvlng_channel` `c` on `n`.`entity` = `c`.`id`
-              LEFT JOIN `pvlng_type` `t` on `c`.`type` = `t`.`id`
-              LEFT JOIN `pvlng_channel` `ca` on IF(`t`.`childs`,`n`.`guid`,`c`.`guid`) = `ca`.`channel` AND `ca`.`type` = 0
-              LEFT JOIN `pvlng_tree` `ta` on `c`.`channel` = `ta`.`guid`
-              LEFT JOIN `pvlng_channel` `co` on `ta`.`entity` = `co`.`id` AND `c`.`type` = 0
-             ' . $this->_filter() . '
+              JOIN `pvlng_tree` `p`          ON `n`.`lft` >= `p`.`lft`
+                                            AND `n`.`rgt` <= `p`.`rgt`
+                                            AND (`p`.`id` <> `n`.`id` OR `n`.`lft` = 1)
+              LEFT JOIN `pvlng_channel` `c`  ON `n`.`entity` = `c`.`id`
+              LEFT JOIN `pvlng_type` `t`     ON `c`.`type` = `t`.`id`
+              LEFT JOIN `pvlng_channel` `ca` ON IF(`t`.`childs`,`n`.`guid`,`c`.`guid`) = `ca`.`channel`
+                                            AND `ca`.`type` = 0
+              LEFT JOIN `pvlng_tree` `ta`    ON `c`.`channel` = `ta`.`guid`
+              LEFT JOIN `pvlng_channel` `co` ON `ta`.`entity` = `co`.`id` AND `c`.`type` = 0
+             ' . $this->buildFilter() . '
              GROUP BY `n`.`id`  -- Fixed grouping
              ORDER BY `n`.`lft` -- Fixed order
         ';
@@ -186,5 +199,4 @@ class Tree extends TreeBase {
         'lower'         => '((MIN(`p`.`rgt`) - `n`.`rgt` - (`n`.`lft` > 1)) / 2) > 0',
         'upper'         => '(`n`.`lft` - MAX(`p`.`lft`)) > 1'
     );
-
 }

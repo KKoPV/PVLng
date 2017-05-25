@@ -11,13 +11,18 @@ namespace Channel;
 /**
  *
  */
+use I18N;
+
+/**
+ *
+ */
 class Daylight extends InternalCalc
 {
     /**
      * Run additional code before data saved to database
      * Read latitude / longitude from extra attribute
      */
-    public static function beforeEdit(\ORM\Channel $channel, Array &$fields)
+    public static function beforeEdit(\ORM\Channel $channel, array &$fields)
     {
         parent::beforeEdit($channel, $fields);
         // times no longer used but needed here to not break existing channels
@@ -28,13 +33,13 @@ class Daylight extends InternalCalc
      *
      * @param $add2tree integer|null
      */
-    public static function checkData(Array &$fields, $add2tree)
+    public static function checkData(array &$fields, $add2tree)
     {
         if ($ok = parent::checkData($fields, $add2tree)) {
-            if ($fields['resolution']['VALUE'] == 1 AND $fields['extra']['VALUE'] == '') {
-                $fields['resolution']['ERROR'][] = __('model::Daylight_IrradiationIsRequired');
-                $fields['extra']['ERROR'][]      = __('model::Daylight_seeAbove');
-                $ok = FALSE;
+            if ($fields['resolution']['VALUE'] == 1 and $fields['extra']['VALUE'] == '') {
+                $fields['resolution']['ERROR'][] = I18N::translate('model::Daylight_IrradiationIsRequired');
+                $fields['extra']['ERROR'][]      = I18N::translate('model::Daylight_seeAbove');
+                $ok = false;
             }
         }
         return $ok;
@@ -44,7 +49,7 @@ class Daylight extends InternalCalc
      * Run additional code before data saved to database
      * Save latitude / longitude to extra attribute
      */
-    public static function beforeSave(Array &$fields, \ORM\Channel $channel)
+    public static function beforeSave(array &$fields, \ORM\Channel $channel)
     {
         parent::beforeSave($fields, $channel);
         // times no longer used but needed here to not break existing channels
@@ -87,18 +92,20 @@ class Daylight extends InternalCalc
     /**
      *
      */
-    protected function before_read(&$request)
+    protected function beforeRead(&$request)
     {
-        parent::before_read($request);
+        parent::beforeRead($request);
 
-        if ($this->dataExists(60*60)) return; // Buffer 1 hour
+        if ($this->dataExists(60*60)) {
+            return; // Buffer 1 hour
+        }
 
-        if ($this->numeric AND $this->extra) {
+        if ($this->numeric and $this->extra) {
             // Fetch average of last x days of irradiation channel to buid curve
             // Base query, clone afterwards for time ranges filter
             $qBase = new \DBQuery('pvlng_reading_num');
             $qBase->get($qBase->MAX('data'), 'data')
-                  ->filter('id', \Channel::byGUID($this->extra)->entity)
+                  ->filter('id', Channel::byGUID($this->extra)->entity)
                   ->group('`timestamp` DIV 86400');
 
             $mean = (\ORM\Settings::getModelValue('Daylight', 'Average') == 0)
@@ -134,9 +141,7 @@ class Daylight extends InternalCalc
                     date('H:i', $sunset) . '|'
                   . \ORM\Settings::getModelValue('Daylight', 'SunsetIcon')
                 );
-
             } else {
-
                 $q = clone($qBase);
                 $q->filter('timestamp', array('bt' => array($day-$timeback, $day-1)));
                 // Fetch mean of inner sql
@@ -158,7 +163,6 @@ class Daylight extends InternalCalc
             }
 
             $day += 24*60*60;
-
         } while ($day < $this->end);
 
         $this->dataCreated();

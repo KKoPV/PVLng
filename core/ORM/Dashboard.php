@@ -17,4 +17,6 @@ namespace ORM;
 /**
  *
  */
-class Dashboard extends DashboardBase {}
+class Dashboard extends DashboardBase
+{
+}

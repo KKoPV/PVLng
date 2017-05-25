@@ -12,12 +12,14 @@ namespace Channel;
 /**
  *
  */
-class InternalConsumption extends InternalCalc {
+class InternalConsumption extends InternalCalc
+{
 
     /**
      * Accept only childs of the same entity type
      */
-    public function addChild( $channel ) {
+    public function addChild($channel)
+    {
         // Check if the new child is a meter
         if ((new \ORM\ChannelView($channel))->getMeter()) {
             // ok, add new child
@@ -34,11 +36,14 @@ class InternalConsumption extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
+    protected function beforeRead(&$request)
+    {
 
-        parent::before_read($request);
+        parent::beforeRead($request);
 
-        if ($this->dataExists()) return;
+        if ($this->dataExists()) {
+            return;
+        }
 
         $childs = $this->getChilds();
 
@@ -56,7 +61,6 @@ class InternalConsumption extends InternalCalc {
         $last = 0;
 
         while (!empty($row1) || !empty($row2)) {
-
             $key1 = $child1->key();
             $key2 = $child2->key();
 
@@ -68,7 +72,6 @@ class InternalConsumption extends InternalCalc {
             }
 
             if ($key1 == $key2) {
-
                 // same timestamp, combine
                 if ($row1['consumption'] > $row2['consumption']) {
                     $row1['consumption'] -= $row2['consumption'];
@@ -82,9 +85,7 @@ class InternalConsumption extends InternalCalc {
 
                 $row1 = $child1->next()->current();
                 $row2 = $child2->next()->current();
-
             } elseif (is_null($key2) || !is_null($key1) && $key1 < $key2) {
-
                 if ($key2 == $FirstKey2) {
                     // Remember $last ONLY for timestamps before 2nd channel
                     // starts and NOT for data holes
@@ -93,9 +94,7 @@ class InternalConsumption extends InternalCalc {
                 }
 
                 $row1 = $child1->next()->current();
-
             } else /* $key1 > $key2 */ {
-
                 if ($key1 == $FirstKey1) {
                     $row2 = $child2->next()->current();
                 } else {

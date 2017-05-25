@@ -20,14 +20,14 @@ return array(
      */
 
     'threshold' => array(
-        'visible'  => TRUE,
-        'required' => TRUE
+        'visible'  => true,
+        'required' => true
     ),
     'valid_from' => array(
-        'required' => TRUE
+        'required' => true
     ),
     'valid_to' => array(
-        'required' => TRUE
+        'required' => true
     ),
 
 );

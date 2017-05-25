@@ -12,12 +12,14 @@ namespace Channel\PVLog;
 /**
  *
  */
-class Inverter extends Base {
+class Inverter extends Base
+{
 
     /**
      *
      */
-    public function read( $request, $attributes=TRUE ) {
+    public function read($request, $attributes = true)
+    {
 
         $inverter = new \YieldInverter;
         $this->fetch($inverter, $request);
@@ -30,5 +32,4 @@ class Inverter extends Base {
 
         return $this->finish($yield, $request);
     }
-
 }

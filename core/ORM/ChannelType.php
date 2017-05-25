@@ -12,7 +12,8 @@ class ChannelType extends ChannelTypeBase
     /**
      *
      */
-    public function getModelClass() {
+    public function getModelClass()
+    {
         return $this->model ? 'Channel\\'.$this->model : null;
     }
 }

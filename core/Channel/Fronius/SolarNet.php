@@ -22,12 +22,12 @@ class SolarNet extends MultiChannel
     /**
      *
      */
-    public function write($request, $timestamp=null)
+    public function write($request, $timestamp = null)
     {
         // Check for request errors
         if (!isset($request['Head']['Status']['Code'])) {
             throw new \Exception(
-                "Unknown SolarNet response:\n".print_r($request, TRUE),
+                "Unknown SolarNet response:\n".print_r($request, true),
                 400
             );
         }

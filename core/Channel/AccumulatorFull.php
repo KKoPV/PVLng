@@ -12,20 +12,21 @@ namespace Channel;
 /**
  *
  */
-class AccumulatorFull extends Calculator {
+class AccumulatorFull extends Calculator
+{
 
     /**
      *
      */
-    public function read( $request ) {
+    public function read($request)
+    {
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $childs = $this->getChilds();
         $childCnt = count($childs);
 
-        switch($childCnt) {
-
+        switch ($childCnt) {
             case 0: // No childs, return empty result
                 $result = new \Buffer;
                 break;
@@ -42,22 +43,19 @@ class AccumulatorFull extends Calculator {
 
                 // Combine all data for same timestamp
                 for ($i=1; $i<$childCnt; $i++) {
-
                     $next = $childs[$i]->read($request);
 
                     $row1 = $buffer->rewind()->current();
                     $row2 = $next->rewind()->current();
 
                     $result = new \Buffer;
-                    $last1 = $last2 = NULL;
+                    $last1 = $last2 = null;
 
-                    while (!empty($row1) OR !empty($row2)) {
-
+                    while (!empty($row1) || !empty($row2)) {
                         $key1 = $buffer->key();
                         $key2 = $next->key();
 
                         if ($key1 === $key2) {
-
                             if ($meter) {
                                 $last1 = $row1;
                                 $last2 = $row2;
@@ -74,29 +72,28 @@ class AccumulatorFull extends Calculator {
                             // read both next rows
                             $row1 = $buffer->next()->current();
                             $row2 = $next->next()->current();
-
-                        } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
-
+                        } elseif (is_null($key2) || !is_null($key1) && $key1 < $key2) {
                             if ($meter) {
                                 $last1 = $row1;
-                                if ($last2) $row1['data'] += $last2['data'];
+                                if ($last2) {
+                                    $row1['data'] += $last2['data'];
+                                }
                             }
                             $result->write($row1, $key1);
 
                             // read only row 1
                             $row1 = $buffer->next()->current();
-
                         } else /* $key1 > $key2 */ {
-
                             if ($meter) {
                                 $last2 = $row2;
-                                if ($last1) $row2['data'] += $last1['data'];
+                                if ($last1) {
+                                    $row2['data'] += $last1['data'];
+                                }
                             }
                             $result->write($row2, $key2);
 
                             // read only row 2
                             $row2 = $next->next()->current();
-
                         }
                     }
                     $next->close();
@@ -106,6 +103,6 @@ class AccumulatorFull extends Calculator {
                 }
         } // switch
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
 }

@@ -11,16 +11,18 @@ namespace Channel;
 /**
  *
  */
-class DatabaseUsage extends Channel {
+class DatabaseUsage extends Channel
+{
 
     /**
      *
      */
-    public function __read( $request ) {
+    public function readOld(&$request)
+    {
 
         $this->performance->setAction('read');
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
 /*
         if ($this->period[1] == self::NO) {
@@ -34,7 +36,6 @@ class DatabaseUsage extends Channel {
         $buffer = new \Buffer;
 
         if ($this->period[1] == self::READLAST) {
-
             $q->select($this->table[$this->extra])
               ->get($q->FROM_UNIXTIME($q->MAX('timestamp')), 'datetime')
               ->get($q->MAX('timestamp'), 'timestamp')
@@ -46,11 +47,8 @@ class DatabaseUsage extends Channel {
               ->limit(1);
 
             $buffer->write((array) $this->db->queryRow($q));
-
         } else {
-
-            if ($this->period[1] == self::LAST OR $this->period[1] == self::ALL) {
-
+            if ($this->period[1] == self::LAST || $this->period[1] == self::ALL) {
                 $q->select($this->table[$this->extra])
                   ->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
                   ->get('timestamp')
@@ -60,9 +58,7 @@ class DatabaseUsage extends Channel {
                   ->get(1, 'count')
                   ->get(0, 'timediff')
                   ->get('timestamp', 'g');
-
             } else {
-
                 $q->select($this->table[$this->extra])
                   ->get($q->FROM_UNIXTIME($q->MIN('timestamp')), 'datetime')
                   ->get($q->MIN('timestamp'), 'timestamp')
@@ -93,11 +89,9 @@ class DatabaseUsage extends Channel {
             $this->db->setBuffered();
 
             if ($res = $this->db->query($q)) {
-
                 $last = $res->fetch_assoc();
 
                 while ($row = $res->fetch_assoc()) {
-
                     $row['consumption'] = $row['data'];
                     $row['data'] = $last ? $last['data'] + $row['consumption'] : 0;
 
@@ -113,16 +107,17 @@ class DatabaseUsage extends Channel {
                 $res->close();
             }
 
-            $this->db->setBuffered(FALSE);
+            $this->db->setBuffered(false);
         }
 
-        if (array_key_exists('sql', $request) AND $request['sql']) {
+        if (array_key_exists('sql', $request) && $request['sql']) {
             $sql = $this->name;
-            if ($this->description) $sql .= ' (' . $this->description . ')';
+            if ($this->description) {
+                $sql .= ' (' . $this->description . ')';
+            }
             Header('X-SQL-'.substr(md5($sql), 8) . ': ' . $sql . ': ' . $q);
         }
 
-        return $this->after_read($buffer);
+        return $this->afterRead($buffer);
     }
-
 }

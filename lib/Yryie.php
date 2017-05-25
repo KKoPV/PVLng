@@ -9,9 +9,8 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    3.2.0
  */
-
-class Yryie {
-
+class Yryie
+{
     /**
      *
      */
@@ -57,7 +56,8 @@ class Yryie {
     /**
      *
      */
-    public static function transformCode( &$code, $functions=FALSE ) {
+    public static function transformCode(&$code, $functions = false)
+    {
         // Single line comments: /// PHP code...
         $code = preg_replace('~^(\s*)///\s+([^*]*?)$~m', '$1$2 /// AOP', $code);
 
@@ -66,7 +66,7 @@ class Yryie {
         // Multi line comments end: /// */
         $code = preg_replace('~^(\s*)///\s+\*/$~m', '$1/// <<< AOP', $code);
 
-        if ($functions AND
+        if ($functions &&
             preg_match_all('~function\s+(\w+)[^{]+?{~', $code, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $code = str_replace($match[0], $match[0] . ' \Yryie::Call(func_get_args()); /* AOP */ ', $code);
@@ -79,7 +79,8 @@ class Yryie {
      *
      * @return void
      */
-    public static function Versions() {
+    public static function versions()
+    {
         self::add(php_uname(), 'version');
         if (isset($_SERVER['SERVER_SOFTWARE'])) {
             self::add($_SERVER['SERVER_SOFTWARE'], 'version');
@@ -93,24 +94,25 @@ class Yryie {
      * @param string $vars List of variables to include
      * @return void
      */
-    public static function EnvVars( $vars='EGPCS' ) {
+    public static function envVars($vars = 'EGPCS')
+    {
         $l = strlen($vars);
         for ($i=0; $i<$l; $i++) {
             switch ($vars{$i}) {
                 case 'E':
-                    !empty($_ENV)    AND self::Debug('$_ENV : '.print_r($_ENV, TRUE));
+                    !empty($_ENV)    && self::Debug('$_ENV : '.print_r($_ENV, true));
                     break;
                 case 'G':
-                    !empty($_GET)    AND self::Debug('$_GET : '.print_r($_GET, TRUE));
+                    !empty($_GET)    && self::Debug('$_GET : '.print_r($_GET, true));
                     break;
                 case 'P':
-                    !empty($_POST)   AND self::Debug('$_POST : '.print_r($_POST, TRUE));
+                    !empty($_POST)   && self::Debug('$_POST : '.print_r($_POST, true));
                     break;
                 case 'C':
-                    !empty($_COOKIE) AND self::Debug('$_COOKIE : '.print_r($_COOKIE, TRUE));
+                    !empty($_COOKIE) && self::Debug('$_COOKIE : '.print_r($_COOKIE, true));
                     break;
                 case 'S':
-                    !empty($_SERVER) AND self::Debug('$_SERVER : '.print_r($_SERVER, TRUE));
+                    !empty($_SERVER) && self::Debug('$_SERVER : '.print_r($_SERVER, true));
                     break;
             }
         }
@@ -121,7 +123,8 @@ class Yryie {
      *
      * @return void
      */
-    public static function Register() {
+    public static function register()
+    {
         set_error_handler(array(__CLASS__, 'HandleError'));
     } // function Register()
 
@@ -133,9 +136,12 @@ class Yryie {
      * @param bool $active
      * @return void
      */
-    public static function Active( $active=null ) {
+    public static function active($active = null)
+    {
         self::Trace();
-        if (isset($active)) self::$Active = (bool) $active;
+        if (isset($active)) {
+            self::$Active = (bool) $active;
+        }
         return self::$Active;
     } // function Active()
 
@@ -145,7 +151,8 @@ class Yryie {
      * @param int $TimeUnit (Yryie::TIME_SECONDS|Yryie::TIME_MICROSECONDS|Yryie::TIME_AUTO)
      * @return void
      */
-    public static function TimeUnit( $TimeUnit ) {
+    public static function timeUnit($TimeUnit)
+    {
         self::$TimeUnit = (int) $TimeUnit;
     } // function TimeUnit()
 
@@ -158,8 +165,11 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function Info( $message ) {
-        if (!self::$Active) return;
+    public static function info($message)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         if (func_num_args() > 1) {
             $args = func_get_args();
@@ -178,8 +188,11 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function Code( $message ) {
-        if (!self::$Active) return;
+    public static function code($message)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         if (func_num_args() > 1) {
             $args = func_get_args();
@@ -198,8 +211,11 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function State( $message ) {
-        if (!self::$Active) return;
+    public static function state($message)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         if (func_num_args() > 1) {
             $args = func_get_args();
@@ -218,11 +234,16 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function SQL( $sql ) {
-        if (!self::$Active) return;
+    public static function SQL($sql)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         if (is_array($sql)) {
-            foreach ($sql as $q) self::add($q, 'sql', true);
+            foreach ($sql as $q) {
+                self::add($q, 'sql', true);
+            }
         } else {
             self::add($sql, 'sql', true);
         }
@@ -237,8 +258,11 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function Debug( $message ) {
-        if (!self::$Active) return;
+    public static function debug($message)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         if (func_num_args() > 1) {
             $args = func_get_args();
@@ -257,8 +281,11 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function Warning( $message ) {
-        if (!self::$Active) return;
+    public static function warning($message)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         if (func_num_args() > 1) {
             $args = func_get_args();
@@ -277,8 +304,11 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function Error( $message ) {
-        if (!self::$Active) return;
+    public static function error($message)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         if (func_num_args() > 1) {
             $args = func_get_args();
@@ -297,11 +327,16 @@ class Yryie {
      * @param string $message
      * @return void
      */
-    public static function Call( $args ) {
-        if (!self::$Active) return;
+    public static function call($args)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         $params = array();
-        foreach($args as $arg) $params[] = is_scalar($arg) ? $arg : gettype($arg);
+        foreach ($args as $arg) {
+            $params[] = is_scalar($arg) ? $arg : gettype($arg);
+        }
         self::add(implode(', ', $params), 'call');
     } // function Call()
 
@@ -314,14 +349,24 @@ class Yryie {
      * @param bool $params Include function parameters
      * @return void
      */
-    public static function Trace( $level=1, $full=FALSE, $params=TRUE ) {
-        if (!self::$Active) return;
+    public static function trace($level = 1, $full = false, $params = true)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
         $trace = debug_backtrace();
 
-        if (!isset($trace[$level])) while (!isset($trace[$level])) $level--;
+        if (!isset($trace[$level])) {
+            while (!isset($trace[$level])) {
+                $level--;
+            }
+        }
 
-        for ($i=$level; $i>0; $i--) array_shift($trace);
+        for ($i=$level; $i>0;
+        $i--) {
+            array_shift($trace);
+        }
 
         $traces = $full ? $trace : array($trace[0]);
 
@@ -329,20 +374,29 @@ class Yryie {
             $msg = isset($trace['file'])
                  ? str_replace(@$_SERVER['DOCUMENT_ROOT'].'/', '', $trace['file'])
                  : '[PHP Kernel]';
-            if (isset($trace['line'])) $msg .= ' [' . $trace['line'] . ']';
+            if (isset($trace['line'])) {
+                $msg .= ' [' . $trace['line'] . ']';
+            }
             $msg .= ' ';
 
-            if (isset($trace['object']))
-                $msg .= sprintf('%s[%s]%s%s', get_class($trace['object']), $trace['class'], $trace['type'], $trace['function']);
-            elseif (isset($trace['class']))
+            if (isset($trace['object'])) {
+                $msg .= sprintf(
+                    '%s[%s]%s%s',
+                    get_class($trace['object']), $trace['class'], $trace['type'], $trace['function']
+                );
+            } elseif (isset($trace['class'])) {
                 $msg .= sprintf('%s%s%s', $trace['class'], $trace['type'], $trace['function']);
-            elseif (isset($trace['function']))
+            } elseif (isset($trace['function'])) {
                 $msg .= $trace['function'];
+            }
 
             if ($params) {
                 $args = array();
-                if (!empty($trace['args']))
-                    foreach ($trace['args'] as $arg) $args[] = self::format($arg);
+                if (!empty($trace['args'])) {
+                    foreach ($trace['args'] as $arg) {
+                        $args[] = self::format($arg);
+                    }
+                }
                 $msg .= '(' . implode(', ', $args) . ')';
             }
             self::add($msg, 'trace');
@@ -356,15 +410,18 @@ class Yryie {
      * @param string $type
      * @return void
      */
-    public static function add( $message='', $type='info', $raw=false ) {
-        if (!self::$Active) return;
+    public static function add($message = '', $type = 'info', $raw = false)
+    {
+        if (!self::$Active) {
+            return;
+        }
 
-        $ts = microtime(TRUE);
+        $ts = microtime(true);
         $call = self::called(3);
 
         $data = array( $ts, $type, $call[0], $call[1], $message);
 
-        if (self::$TraceFile AND $fh = fopen(self::$TraceFile, 'a')) {
+        if (self::$TraceFile && $fh = fopen(self::$TraceFile, 'a')) {
             // overwrite locale settings!!
             $data[0] = sprintf('%.1f ms', ($data[0]-$_SERVER['REQUEST_TIME'])*1000);
             fwrite($fh, str_replace("\n", '\n', implode(self::$TraceDelimiter, $data))."\n");
@@ -386,17 +443,24 @@ class Yryie {
      * @param string $name
      * @return void
      */
-    public static function StartTimer( $id, $name='', $avg='' ) {
-        if (!self::$Active) return;
+    public static function startTimer($id, $name = '', $avg = '')
+    {
+        if (!self::$Active) {
+            return;
+        }
         if (isset(self::$Timer[$id])) {
-            throw new YryieException('Error: Timer "'.$id.'" ('.$name.') ist still started!');
+            throw new Yryie\Exception('Error: Timer "'.$id.'" ('.$name.') ist still started!');
         }
 
-        if ($name == '') $name = $id;
+        if ($name == '') {
+            $name = $id;
+        }
         $msg = self::$TimerStart . ' ' . $name;
-        if ($avg) $msg .= ' (' . $avg . ')';
+        if ($avg) {
+            $msg .= ' (' . $avg . ')';
+        }
         self::add($msg, 'timer');
-        self::$Timer[$id] = array(microtime(TRUE), $name, $avg);
+        self::$Timer[$id] = array(microtime(true), $name, $avg);
         self::$TimerLevel++;
     } // function StartTimer()
 
@@ -406,8 +470,11 @@ class Yryie {
      * @param string $id Stop last timer if empty
      * @return void
      */
-    public static function StopTimer( $id='' ) {
-        if (!count(self::$Timer)) return;
+    public static function stopTimer($id = '')
+    {
+        if (!count(self::$Timer)) {
+            return;
+        }
 
         if ($id == '') {
             // get last id from stack
@@ -415,13 +482,15 @@ class Yryie {
             $id = end($ids);
         }
         list($start, $name, $avg) = self::$Timer[$id];
-        $diff = microtime(TRUE) - $start;
+        $diff = microtime(true) - $start;
         self::$TimerLevel--;
         self::add(sprintf('%s %s: %s', self::$TimerStop, $name, self::timef($diff)), 'timer');
         unset(self::$Timer[$id]);
 
         if ($avg != '') {
-            if (!isset(self::$AVG[$avg])) self::$AVG[$avg] = array(0,0);
+            if (!isset(self::$AVG[$avg])) {
+                self::$AVG[$avg] = array(0,0);
+            }
             self::$AVG[$avg][0] += $diff;
             self::$AVG[$avg][1]++;
         }
@@ -435,11 +504,14 @@ class Yryie {
      * @param string $type Get only messages of this type
      * @return array
      */
-    public static function get( $type='' ) {
+    public static function get($type = '')
+    {
         if ($type != '') {
             $return = array();
             foreach (self::$Data as $data) {
-                if ($data[1] == $type) $return[] = $data;
+                if ($data[1] == $type) {
+                    $return[] = $data;
+                }
             }
         } else {
             $return = self::$Data;
@@ -452,11 +524,15 @@ class Yryie {
      *
      * @return void
      */
-    public static function finalizeTimers() {
+    public static function finalizeTimers()
+    {
         // stop all open timers
-        for ($i=count(self::$Timer); $i>0; $i--) self::StopTimer();
+        for ($i=count(self::$Timer); $i>0;
+        $i--) {
+            self::StopTimer();
+        }
 
-        foreach (self::$AVG as $avg=>$data) {
+        foreach (self::$AVG as $avg => $data) {
             self::add(
                 sprintf(
                     'avg. "%1$s": %4$s (%3$d in %2$s)',
@@ -473,12 +549,13 @@ class Yryie {
      *
      * @return void
      */
-    public static function finalize() {
+    public static function finalize()
+    {
         self::finalizeTimers();
         self::Debug(
             'build in %s; %d kByte memory used; %d files included; %d messages collected',
-            self::timef((microtime(TRUE)-$_SERVER['REQUEST_TIME']), self::TIME_AUTO),
-            memory_get_peak_usage(TRUE)/1024,
+            self::timef((microtime(true)-$_SERVER['REQUEST_TIME']), self::TIME_AUTO),
+            memory_get_peak_usage(true)/1024,
             count(get_included_files()),
             count(self::$Data)
         );
@@ -490,7 +567,8 @@ class Yryie {
      * @param bool $delta Show delta time since start, not absolut timestamp
      * @return string
      */
-    public static function loadFromSession() {
+    public static function loadFromSession()
+    {
         if (isset($_SESSION['Yryie'])) {
             self::$Data = $_SESSION['Yryie'];
             unset($_SESSION['Yryie']);
@@ -505,8 +583,11 @@ class Yryie {
      * @param bool $delta Show delta time since start, not absolut timestamp
      * @return string
      */
-    public static function saveToSession() {
-        if (!empty(self::$Data)) $_SESSION['Yryie'] = self::$Data;
+    public static function saveToSession()
+    {
+        if (!empty(self::$Data)) {
+            $_SESSION['Yryie'] = self::$Data;
+        }
     } // function saveToSession()
 
     /**
@@ -515,31 +596,40 @@ class Yryie {
      * @param bool $delta Show delta time since start, not absolut timestamp
      * @return string
      */
-    public static function CSV() {
-        while (count(self::$Timer)) self::StopTimer();
+    public static function CSV()
+    {
+        while (count(self::$Timer)) {
+            self::StopTimer();
+        }
 
         $csv = array(
             sprintf('Time%1$sType%1$sClass%1$sFunction%1$sMessage', self::$TraceDelimiter)
         );
 
         foreach (self::$Data as $data) {
-            if (!$data[0]) continue;
+            if (!$data[0]) {
+                continue;
+            }
 
             $data[0] -= $_SERVER['REQUEST_TIME'];
 
-            if (is_array($data[4])) $data[4] = self::format($data[4]);
+            if (is_array($data[4])) {
+                $data[4] = self::format($data[4]);
+            }
             // skip empty messages
-            if ($data[4] == '') continue;
+            if ($data[4] == '') {
+                continue;
+            }
 
             // remove timer level
             unset($data[5]);
 
             $fields = array();
             foreach ($data as $value) {
-                if (strpos($value, '"') !== FALSE) {
+                if (strpos($value, '"') !== false) {
                     $value = '"' . str_replace('"', '""', $value) . '"';
                 }
-                if (strpos($value, self::$TraceDelimiter) !== FALSE) {
+                if (strpos($value, self::$TraceDelimiter) !== false) {
                     $value = '"' . $value . '"';
                 }
                 // remove add. white spaces AND newlines
@@ -559,13 +649,14 @@ class Yryie {
      * @param bool $append Append to the file, if exists
      * @return void
      */
-    public static function Save( $file, $append=FALSE ) {
+    public static function save($file, $append = false)
+    {
         $fh = fopen($file, ($append ? 'a' : 'w'));
         if ($fh) {
             fwrite($fh, self::CSV());
             fclose($fh);
         } else {
-            throw new YryieException('Can\'t write to file: '.$file);
+            throw new Yryie\Exception('Can\'t write to file: '.$file);
         }
     } // function Save()
 
@@ -575,8 +666,11 @@ class Yryie {
      * @param bool $delta Show delta time since start, not absolut timestamp
      * @return void
      */
-    public static function Output( $delta=FALSE, $CssJs=FALSE ) {
-        if ($CssJs) echo self::getCSS(), self::getJS();
+    public static function output($delta = false, $CssJs = false)
+    {
+        if ($CssJs) {
+            echo self::getCSS(), self::getJS();
+        }
         echo self::Render($delta);
     } // function Output()
 
@@ -588,36 +682,47 @@ class Yryie {
      * @param bool $delta Show delta time since start, not absolut timestamp
      * @return string
      */
-    public static function Render( $delta=FALSE ) {
+    public static function render($delta = false)
+    {
         $types = array();
-        foreach (self::$Data as $row=>$data) $types[$data[1]] = $data[1];
+        foreach (self::$Data as $row => $data) {
+            $types[$data[1]] = $data[1];
+        }
         $sTypes = '';
         $cb = '<input type="checkbox" style="margin-left:1.5em" '
              .'onchange="YryieSwitch(\'%s\', this.checked)" checked> %s';
-        foreach ($types as $type) if ($type) $sTypes .= sprintf($cb, $type, ucwords($type));
+        foreach ($types as $type) {
+            if ($type) {
+                $sTypes .= sprintf($cb, $type, ucwords($type));
+            }
+        }
         unset($types);
 
         $aRows = array();
         // last time stamp
         $lts = $_SERVER['REQUEST_TIME'];
 
-        foreach (self::$Data as $row=>$data) {
+        foreach (self::$Data as $row => $data) {
             @list($time, $type, $class, $func, $msg, $level, $raw) = $data;
             $cls = $row%2 ? 'even' : 'odd';
 
-            if ($type == 'call' OR $msg) {
+            if ($type == 'call' || $msg) {
                 $ts = $delta
                     ? self::timef($time-$_SERVER['REQUEST_TIME'])
                     : date('H:i:s', $time) . substr(sprintf('%.5f', $data[0]), -6);
                 $dts = self::timef($time-$lts);
                 $lts = $time;
                 $msg = is_array($msg)
-                     ? '<pre>' . htmlspecialchars(print_r($msg, TRUE)) . '</pre>'
+                     ? '<pre>' . htmlspecialchars(print_r($msg, true)) . '</pre>'
                      : ( $raw ? '<pre>'.$msg.'</pre>' : htmlspecialchars($msg) );
 
                 $utype = ucwords($type);
-                if (!$class) $class = '&nbsp;';
-                if (!$func) $func = '&nbsp;';
+                if (!$class) {
+                    $class = '&nbsp;';
+                }
+                if (!$func) {
+                    $func = '&nbsp;';
+                }
 
                 $aRows[] = sprintf(self::$TplRow, $type, $cls, $ts, $dts, $utype, $class, $func, $level, $msg);
             } else {
@@ -633,7 +738,8 @@ class Yryie {
      *
      * @return void
      */
-    public static function reset() {
+    public static function reset()
+    {
         self::$Data = array();
     } // function reset()
 
@@ -646,19 +752,21 @@ class Yryie {
      * @param int $errline
      * @param array $errcontext
      */
-    public static function HandleError( $errno, $errstr, $errfile, $errline, $errcontext ) {
-
-        if (!$errno = $errno & error_reporting()) return;
+    public static function handleError($errno, $errstr, $errfile, $errline, $errcontext)
+    {
+        if (!$errno = $errno & error_reporting()) {
+            return;
+        }
 
         $errfile = str_replace(@$_SERVER['DOCUMENT_ROOT'].'/', '', $errfile);
 
         // from PHP 5
-        defined('E_STRICT')            || define('E_STRICT',             2048);
+        defined('E_STRICT')            || define('E_STRICT', 2048);
         // from PHP 5.2.0
-        defined('E_RECOVERABLE_ERROR') || define('E_RECOVERABLE_ERROR',  4096);
+        defined('E_RECOVERABLE_ERROR') || define('E_RECOVERABLE_ERROR', 4096);
         // from PHP 5.3.0
-        defined('E_DEPRECATED')        || define('E_DEPRECATED',         8192);
-        defined('E_USER_DEPRECATED')   || define('E_USER_DEPRECATED',   16384);
+        defined('E_DEPRECATED')        || define('E_DEPRECATED', 8192);
+        defined('E_USER_DEPRECATED')   || define('E_USER_DEPRECATED', 16384);
 
         static $Err2Str = array(
             E_ERROR             => 'Error',
@@ -679,9 +787,11 @@ class Yryie {
         $str = isset($Err2Str[$errno]) ? $Err2Str[$errno] : 'Unknown error: '.$errno;
         $errmsg = sprintf('[%s] %s in %s (%d)'."\n", $str, $errstr, $errfile, $errline);
         self::add($errmsg, 'handler', true);
-        self::Trace(2, TRUE, FALSE);
+        self::Trace(2, true, false);
         self::Debug($errcontext);
-        if ($errno & (E_ERROR|E_CORE_ERROR|E_USER_ERROR)) die(self::getCSS().self::HTML());
+        if ($errno & (E_ERROR|E_CORE_ERROR|E_USER_ERROR)) {
+            die(self::getCSS().self::HTML());
+        }
     } // function HandleError()
 
     /**
@@ -690,7 +800,8 @@ class Yryie {
      * @param bool $withTag With style tags around CSS
      * @return string
      */
-    public static function getCSS( $withTag=TRUE ) {
+    public static function getCSS($withTag = true)
+    {
         return ( $withTag ? '<style type="text/css">'."\n" : '' )
              . file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'Yryie'.DIRECTORY_SEPARATOR.'yryie.min.css')
              . ( $withTag ? '</style>' : '' );
@@ -702,7 +813,8 @@ class Yryie {
      * @param bool $withTag With script tags around script
      * @return string
      */
-    public static function getJS( $withTag=TRUE, $jquery=FALSE ) {
+    public static function getJS($withTag = true, $jquery = false)
+    {
         $file = $jquery ? 'yryie.jquery.min.js' : 'yryie.min.js';
         return ( $withTag ? '<script>' : '' )
              . file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'Yryie'.DIRECTORY_SEPARATOR.$file)
@@ -715,7 +827,8 @@ class Yryie {
      * @param array $value Value to format
      * @return string
      */
-    public static function format( $value, $truncate=TRUE ) {
+    public static function format($value, $truncate = true)
+    {
         $args = '';
         switch (gettype($value)) {
             case 'integer':
@@ -725,15 +838,20 @@ class Yryie {
             case 'string':
                 if ($truncate) {
                     $v = substr($value, 0, self::MAXSTRLEN);
-                    if ($v != $value) $v .= '...';
+                    if ($v != $value) {
+                        $v .= '...';
+                    }
                     $value = $v;
                 }
                 $args .= '\'' . $value . '\'';
                 break;
             case 'array':
                 $aa = array();
-                foreach ($value as $key=>$val)
-                    if ($key != 'GLOBALS') $aa[] = sprintf('\'%s\'=>%s', $key, self::format($val));
+                foreach ($value as $key => $val) {
+                    if ($key != 'GLOBALS') {
+                        $aa[] = sprintf('\'%s\'=>%s', $key, self::format($val));
+                    }
+                }
                 $args .= 'Array(' . implode(', ', $aa) . ')';
                 break;
             case 'object':
@@ -779,7 +897,7 @@ class Yryie {
      *
      * @var bool
      */
-    private static $Active = TRUE;
+    private static $Active = true;
 
     /**
      *
@@ -813,6 +931,7 @@ class Yryie {
      *
      * @var string
      */
+    // @codingStandardsIgnoreStart
     private static $TplTable = '
         <div id="Yryie">
             <table>
@@ -840,7 +959,9 @@ class Yryie {
                 %3$s
             </tbody>
             </table>
-        </div>';
+        </div>
+    ';
+    // @codingStandardsIgnoreEnd
 
     /**
      * Table row template
@@ -863,7 +984,8 @@ class Yryie {
      * @param int $time Timestamp
      * @return string
      */
-    private static function timef( $time, $format=NULL ) {
+    private static function timef($time, $format = null)
+    {
         switch ($format ?: self::$TimeUnit) {
             case self::TIME_AUTO:
                 return $time < 1 ? sprintf('%.3fms', $time*1000) : sprintf('%.3fs', $time);
@@ -880,19 +1002,9 @@ class Yryie {
      * @param int $skip Skip level
      * @return array Array( class, function )
      */
-    private static function called( $skip ) {
-#        $bt = debug_backtrace();
+    private static function called($skip)
+    {
+        $bt = debug_backtrace();
         return array(@$bt[$skip]['class'], @$bt[$skip]['function']);
     }
 }
-
-/**
- * Exception used by {link:Yryie}
- *
- * @ingroup        Yryie
- * @author         Knut Kohl <knutkohl@users.sourceforge.net>
- * @copyright    2006-2011 Knut Kohl
- * @license        http://www.gnu.org/licenses/gpl.txt GNU General Public License
- * @version        $Id$
- */
-class YryieException extends Exception {}

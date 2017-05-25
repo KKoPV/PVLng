@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -149,9 +149,8 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     public function filterByIdTimestamp($id, $timestamp)
     {
-
-        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
-        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp).'';
+        $this->filter('id', $id);
+        $this->filter('timestamp', $timestamp);
         return $this;
     }
 
@@ -163,8 +162,7 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     public function filterByTimestamp($timestamp)
     {
-        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
-        return $this;
+        return $this->filter('timestamp', $timestamp);
     }
 
     /**
@@ -175,8 +173,7 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -187,8 +184,7 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = $this->field('data').' = '.$this->quote($data);
-        return $this;
+        return $this->filter('data', $data);
     }
 
     // -----------------------------------------------------------------------
@@ -204,19 +200,18 @@ abstract class ReadingNumBase extends \slimMVC\ORM
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_reading_num';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_reading_num` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_reading_num` (
           `id` smallint(5) unsigned NOT NULL DEFAULT \'0\',
           `timestamp` int(10) unsigned NOT NULL DEFAULT \'0\',
           `data` decimal(13,4) NOT NULL DEFAULT \'0.0000\',
@@ -226,6 +221,14 @@ abstract class ReadingNumBase extends \slimMVC\ORM
         /*!50100 PARTITION BY LINEAR KEY (id)
         PARTITIONS 50 */
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_reading_num';
 
     /**
      *
@@ -257,5 +260,4 @@ abstract class ReadingNumBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

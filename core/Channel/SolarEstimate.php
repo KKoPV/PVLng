@@ -11,7 +11,8 @@ namespace Channel;
 /**
  *
  */
-class SolarEstimate extends InternalCalc {
+class SolarEstimate extends InternalCalc
+{
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -20,18 +21,25 @@ class SolarEstimate extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
+    protected function beforeRead(&$request)
+    {
 
-        parent::before_read($request);
+        parent::beforeRead($request);
 
         // Only for today possible, not backwards
-        if ($this->end < strtotime('midnight')) return;
+        if ($this->end < strtotime('midnight')) {
+            return;
+        }
 
         // Only during daylight times today
         $sunset = \ORM\Settings::getSunset($this->start);
-        if ($sunset < time()) return;
+        if ($sunset < time()) {
+            return;
+        }
 
-        if ($this->dataExists()) return;
+        if ($this->dataExists()) {
+            return;
+        }
 
         $child = $this->getChild(1);
         $days  = $this->extra;
@@ -50,7 +58,6 @@ class SolarEstimate extends InternalCalc {
 
         // Do we have still data today?
         if ($lastTimestampToday) {
-
             $ProductionToday = $ProductionLast - $Production1st;
 
             // Start average value to align data
@@ -66,7 +73,12 @@ class SolarEstimate extends InternalCalc {
                             AND `timestamp` > UNIX_TIMESTAMP(DATE_FORMAT(NOW() - INTERVAL {2} DAY, "%Y-%m-%d"))
                              -- Align to today 00:00
                             AND `timestamp` < UNIX_TIMESTAMP(DATE_FORMAT(NOW(), "%Y-%m-%d"))
-                            AND UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {3}
+                            AND UNIX_TIMESTAMP(
+                                    CONCAT(
+                                        DATE_FORMAT(NOW(), "%Y-%m-%d "),
+                                        DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i")
+                                    )
+                                ) >= {3}
                              -- Align to full minute
                           GROUP BY `timestamp` DIV 60
                      ) t1
@@ -99,7 +111,9 @@ class SolarEstimate extends InternalCalc {
                               -- Align to full minute
                            GROUP BY `timestamp` DIV 60
                         ) t
-                  WHERE UNIX_TIMESTAMP(CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))) >= {6}
+                  WHERE UNIX_TIMESTAMP(
+                            CONCAT(DATE_FORMAT(NOW(), "%Y-%m-%d "), DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H:%i"))
+                        ) >= {6}
                   GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
                  HAVING COUNT(*) = {2}',
                 $child->entity, $days, $Average1st, $scale, $ProductionToday, $lastTimestampToday
@@ -113,7 +127,7 @@ class SolarEstimate extends InternalCalc {
                         // Save 1st row to last reading timestamp from child channel
                         $this->saveValue($lastTimestampToday, $row->data);
                         // Unset timestamp as marker
-                        $lastTimestampToday = FALSE;
+                        $lastTimestampToday = false;
                     } else {
                         $this->saveValue($row->timestamp, $row->data);
                     }
@@ -140,20 +154,21 @@ class SolarEstimate extends InternalCalc {
     /**
      *
      */
-    protected function after_read( \Buffer $buffer ) {
+    protected function afterRead(\Buffer $buffer)
+    {
 
         $datafile = new \Buffer;
-        $last = FALSE;
+        $last = false;
 
         // Fake consumption
-        foreach (parent::after_read($buffer) as $id=>$row) {
+        foreach (parent::afterRead($buffer) as $id => $row) {
             $row['consumption'] = $last ? $row['data'] - $last : 0;
             $datafile->write($row, $id);
             $last = $row['data'];
         }
 
         // Now set to meter
-        $this->meter = TRUE;
+        $this->meter = true;
 
         return $datafile;
     }

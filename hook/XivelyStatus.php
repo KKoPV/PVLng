@@ -11,12 +11,14 @@ namespace Hook;
 /**
  *
  */
-class XivelyStatus extends Base {
+class XivelyStatus extends Base
+{
 
     /**
      *
      */
-    public static function data_save_after( &$channel, $config ) {
+    public static function dataSaveAfter(&$channel, $config)
+    {
 
         // Default format, if still set ignored
         $config[] = '%s';
@@ -31,20 +33,20 @@ class XivelyStatus extends Base {
 
         $ch = curl_init($config[0].'.csv');
 
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_HEADER, FALSE);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-ApiKey: '.$config[1]));
-        curl_setopt($ch, CURLINFO_HEADER_OUT, TRUE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_PUT, TRUE);
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_PUT, true);
         curl_setopt($ch, CURLOPT_INFILE, $fh);
         curl_setopt($ch, CURLOPT_INFILESIZE, strlen($value));
 
         $response = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        if ($response === FALSE || $code >= 400) {
+        if ($response === false || $code >= 400) {
             echo $response ? $response : sprintf('[%d] %s', $code, curl_error($ch));
             #print_r(curl_getinfo($ch));
         }
@@ -52,5 +54,4 @@ class XivelyStatus extends Base {
         curl_close($ch);
         fclose($fh);
     }
-
 }

@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -149,8 +149,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
      */
     public function filterByTimestamp($timestamp)
     {
-        $this->filter[] = $this->field('timestamp').' = '.$this->quote($timestamp);
-        return $this;
+        return $this->filter('timestamp', $timestamp);
     }
 
     /**
@@ -161,8 +160,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
      */
     public function filterByAction($action)
     {
-        $this->filter[] = $this->field('action').' = '.$this->quote($action);
-        return $this;
+        return $this->filter('action', $action);
     }
 
     /**
@@ -173,8 +171,7 @@ abstract class PerformanceBase extends \slimMVC\ORM
      */
     public function filterByTime($time)
     {
-        $this->filter[] = $this->field('time').' = '.$this->quote($time);
-        return $this;
+        return $this->filter('time', $time);
     }
 
     // -----------------------------------------------------------------------
@@ -182,14 +179,25 @@ abstract class PerformanceBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Update fields on insert on duplicate key
+     * Call create table sql on first run and set to false
      */
-    protected function onDuplicateKey()
-    {
-        return '`timestamp` = VALUES(`timestamp`)
-              , `action` = VALUES(`action`)
-              , `time` = VALUES(`time`)';
-    }
+    protected static $memory = true;
+
+    /**
+     * SQL for creation
+     *
+     * @var string $createSQL
+     */
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_performance` (
+          `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          `action` enum(\'read\',\'write\') NOT NULL DEFAULT \'read\',
+          `time` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'ms\',
+          KEY `timestamp` (`timestamp`)
+        ) ENGINE=MEMORY DEFAULT CHARSET=utf8 COMMENT=\'Gather system performance\'
+    ';
+    // @codingStandardsIgnoreEnd
 
     /**
      * Table name
@@ -197,20 +205,6 @@ abstract class PerformanceBase extends \slimMVC\ORM
      * @var string $table Table name
      */
     protected $table = 'pvlng_performance';
-
-    /**
-     * SQL for creation
-     *
-     * @var string $createSQL
-     */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_performance` (
-          `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          `action` enum(\'read\',\'write\') NOT NULL DEFAULT \'read\',
-          `time` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'ms\',
-          KEY `timestamp` (`timestamp`)
-        ) ENGINE=MEMORY DEFAULT CHARSET=utf8 COMMENT=\'Gather system performance\'
-    ';
 
     /**
      *
@@ -233,13 +227,10 @@ abstract class PerformanceBase extends \slimMVC\ORM
     /**
      *
      */
-    protected $primary = array(
-
-    );
+    protected $primary = array();
 
     /**
      *
      */
     protected $autoinc = '';
-
 }

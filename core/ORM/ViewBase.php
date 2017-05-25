@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -183,9 +183,8 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByNamePublic($name, $public)
     {
-
-        $this->filter[] = $this->field('name').' = '.$this->quote($name).'';
-        $this->filter[] = $this->field('public').' = '.$this->quote($public).'';
+        $this->filter('name', $name);
+        $this->filter('public', $public);
         return $this;
     }
 
@@ -197,8 +196,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterBySlug($slug)
     {
-        $this->filter[] = $this->field('slug').' = '.$this->quote($slug);
-        return $this;
+        return $this->filter('slug', $slug);
     }
 
     /**
@@ -209,8 +207,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = $this->field('public').' = '.$this->quote($public);
-        return $this;
+        return $this->filter('public', $public);
     }
 
     /**
@@ -221,8 +218,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -233,8 +229,7 @@ abstract class ViewBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = $this->field('data').' = '.$this->quote($data);
-        return $this;
+        return $this->filter('data', $data);
     }
 
     // -----------------------------------------------------------------------
@@ -251,19 +246,18 @@ abstract class ViewBase extends \slimMVC\ORM
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_view';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_view` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_view` (
           `name` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'Chart name\',
           `public` tinyint(1) unsigned NOT NULL DEFAULT \'0\' COMMENT \'View type (private/public/mobile)\',
           `data` text COMMENT \'Serialized channel data\',
@@ -273,6 +267,14 @@ abstract class ViewBase extends \slimMVC\ORM
           KEY `public` (`public`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'View variants\'
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_view';
 
     /**
      *
@@ -306,5 +308,4 @@ abstract class ViewBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

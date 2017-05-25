@@ -11,12 +11,14 @@ namespace Hook;
 /**
  *
  */
-class XivelyStatusBackground extends Base {
+class XivelyStatusBackground extends Base
+{
 
     /**
      *
      */
-    public static function data_save_after( &$channel, $config ) {
+    public static function dataSaveAfter(&$channel, $config)
+    {
 
         // Default format, if still set ignored
         $config[] = '%s';
@@ -31,5 +33,4 @@ class XivelyStatusBackground extends Base {
         // Fire and forget...
         exec($cmd);
     }
-
 }

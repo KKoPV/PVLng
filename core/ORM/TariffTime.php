@@ -17,15 +17,16 @@ namespace ORM;
 /**
  *
  */
-class TariffTime extends TariffTimeBase {
+class TariffTime extends TariffTimeBase
+{
 
     /**
      * Find all times for Id and a date
      *
      * @param mixed Field value(s)
      */
-    public function findByIdDate( $id, $date, $order=array(), $type=self::INSTANCE ) {
-        return $this->findMany(array('id', 'date'), array($id, $date), $order, $type=self::INSTANCE);
+    public function findByIdDate($id, $date, $order = array(), $type = self::INSTANCE)
+    {
+        return $this->findMany(array('id', 'date'), array($id, $date), $order, $type = self::INSTANCE);
     }
-
 }

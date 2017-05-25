@@ -13,12 +13,14 @@ namespace Channel;
  *
  */
 #class MeterToSensor extends InternalCalc {
-class MeterToSensor extends Channel {
+class MeterToSensor extends Channel
+{
 
     /**
      * Accept only childs with meter attribute set
      */
-    public function addChild( $channel ) {
+    public function addChild($channel)
+    {
         $childs = $this->getChilds();
         if (empty($childs)) {
             $new  = new \ORM\Channel($channel);
@@ -32,7 +34,6 @@ class MeterToSensor extends Channel {
             if ($new->getMeter() == 0) {
                 throw new \Exception('"SensorToMeter" accept only a meter channel as child!');
             }
-
         }
         // Add child or throw exception about only 1 child...
         return parent::addChild($channel);
@@ -41,9 +42,10 @@ class MeterToSensor extends Channel {
     /**
      *
      */
-    public function read( $request ) {
+    public function read($request)
+    {
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         // Fetch additional row BEFORE start timestamp
         $request['start'] = $this->start - self::$secondsPerPeriod[$this->period[1]];
@@ -79,6 +81,6 @@ class MeterToSensor extends Channel {
             $buffer->next();
         }
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
 }

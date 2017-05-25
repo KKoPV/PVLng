@@ -12,7 +12,8 @@ namespace Channel;
 /**
  *
  */
-class Estimate extends InternalCalc {
+class Estimate extends InternalCalc
+{
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -21,10 +22,11 @@ class Estimate extends InternalCalc {
     /**
      *
      */
-    protected function __construct( \ORM\Tree $channel ) {
+    protected function __construct(\ORM\Tree $channel)
+    {
         parent::__construct($channel);
         // Fake as counter to get the sum of estiamtes for periods greater than day
-        $this->counter = TRUE;
+        $this->counter = true;
 
         if ($marker = \ORM\Settings::getModelValue('Estimate', 'Marker')) {
             $this->attributes['marker'] = $marker;
@@ -34,14 +36,17 @@ class Estimate extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
+    protected function beforeRead(&$request)
+    {
 
-        parent::before_read($request);
+        parent::beforeRead($request);
 
         $timestamp = max(strtotime(date('Y-m-d 12:00', $this->start)), $this->start);
         $this->end = min(strtotime(date('Y-m-d 12:00', $this->end)), $this->end);
 
-        if ($this->dataExists()) return;
+        if ($this->dataExists()) {
+            return;
+        }
 
         // Read out all data
         $request['period'] = '1i';
@@ -59,11 +64,15 @@ class Estimate extends InternalCalc {
         }
 
         // Set also last month of last year and 1st month of next year
-        if (isset($estimates[1])) $estimates[13] = $estimates[1];
-        if (isset($estimates[12])) $estimates[0] = $estimates[12];
+        if (isset($estimates[1])) {
+            $estimates[13] = $estimates[1];
+        }
+        if (isset($estimates[12])) {
+            $estimates[0] = $estimates[12];
+        }
 
         while ($timestamp <= $this->end) {
-            $month = date('n',   $timestamp);
+            $month = date('n', $timestamp);
             $day   = date('n-j', $timestamp);
 
             if (!($ts = \ORM\Settings::getSunset($timestamp))) {

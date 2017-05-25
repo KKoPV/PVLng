@@ -21,7 +21,7 @@ return array(
 
     // Get from childs
     'meter' => array(
-        'visible' => FALSE
+        'visible' => false
     ),
 
 );

@@ -25,5 +25,4 @@ class ReadingLast extends ReadingLastBase
      *
      * Access table name with $this->table
      */
-
 }

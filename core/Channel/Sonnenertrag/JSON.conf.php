@@ -15,37 +15,37 @@ return array(
      * - default             : default value
      */
     'serial' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'channel' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'resolution' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'unit' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'decimals' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'meter' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'numeric' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'cost' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'threshold' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'valid_from' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
     'valid_to' => array(
-        'visible' => FALSE,
+        'visible' => false,
     )
 
 );

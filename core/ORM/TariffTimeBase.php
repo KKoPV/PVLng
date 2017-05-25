@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -251,11 +251,10 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByIdDateTimeDays($id, $date, $time, $days)
     {
-
-        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
-        $this->filter[] = $this->field('date').' = '.$this->quote($date).'';
-        $this->filter[] = $this->field('time').' = '.$this->quote($time).'';
-        $this->filter[] = $this->field('days').' = '.$this->quote($days).'';
+        $this->filter('id', $id);
+        $this->filter('date', $date);
+        $this->filter('time', $time);
+        $this->filter('days', $days);
         return $this;
     }
 
@@ -267,8 +266,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByDays($days)
     {
-        $this->filter[] = $this->field('days').' = '.$this->quote($days);
-        return $this;
+        return $this->filter('days', $days);
     }
 
     /**
@@ -279,8 +277,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByDate($date)
     {
-        $this->filter[] = $this->field('date').' = '.$this->quote($date);
-        return $this;
+        return $this->filter('date', $date);
     }
 
     /**
@@ -291,8 +288,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByTime($time)
     {
-        $this->filter[] = $this->field('time').' = '.$this->quote($time);
-        return $this;
+        return $this->filter('time', $time);
     }
 
     /**
@@ -303,8 +299,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -315,8 +310,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByTariff($tariff)
     {
-        $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
-        return $this;
+        return $this->filter('tariff', $tariff);
     }
 
     /**
@@ -327,8 +321,7 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
-        return $this;
+        return $this->filter('comment', $comment);
     }
 
     // -----------------------------------------------------------------------
@@ -345,19 +338,18 @@ abstract class TariffTimeBase extends \slimMVC\ORM
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_tariff_time';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_tariff_time` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_tariff_time` (
           `id` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'pvlng_tariff_date -> id\',
           `date` date NOT NULL DEFAULT \'2000-01-01\' COMMENT \'pvlng_tariff_date -> date\',
           `time` time NOT NULL DEFAULT \'00:00:00\' COMMENT \'Starting time (incl.)\',
@@ -371,6 +363,14 @@ abstract class TariffTimeBase extends \slimMVC\ORM
           CONSTRAINT `pvlng_tariff_time_ibfk_1` FOREIGN KEY (`id`, `date`) REFERENCES `pvlng_tariff_date` (`id`, `date`) ON DELETE CASCADE ON UPDATE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_tariff_time';
 
     /**
      *
@@ -410,5 +410,4 @@ abstract class TariffTimeBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

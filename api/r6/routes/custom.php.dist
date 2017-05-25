@@ -23,7 +23,7 @@
  *
  */
 // $api->post('/data/vz/:guid', function($guid) use ($api) {
-//     Channel::byGUID($guid)->write(
+//     Channel\Channel::byGUID($guid)->write(
 //         array( 'data' => $app->request->post('value') ),
 //         $api->request->post('ts')
 //     ) && $api->halt(201);

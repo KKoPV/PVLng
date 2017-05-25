@@ -12,7 +12,8 @@ namespace Channel;
 /**
  *
  */
-class Fix extends InternalCalc {
+class Fix extends InternalCalc
+{
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -21,11 +22,14 @@ class Fix extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
+    protected function beforeRead(&$request)
+    {
 
-        parent::before_read($request);
+        parent::beforeRead($request);
 
-        if ($this->dataExists()) return;
+        if ($this->dataExists()) {
+            return;
+        }
 
         // Read out all data
         $request['period'] = '1i';

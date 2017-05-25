@@ -13,10 +13,12 @@
  */
 $api->get(
     '/json/:path+',
-    function($path) use ($api)
-{
-    $api->render(JSONxPath($api, $path, $api->request->get('json')));
-})->name('GET /json/:path+')->help = array(
+    function ($path) use ($api) {
+        $api->render(Core\JSON::xPath($api->request->get('json'), $path));
+    }
+)
+->name('GET /json/:path+')
+->help = array(
     'description' => 'Extract a section/value from given JSON data from query string',
     'payload'     => array('json' => '<JSON data>')
 );
@@ -26,10 +28,12 @@ $api->get(
  */
 $api->post(
     '/json/:path+',
-    function($path) use ($api)
-{
-    $api->render(JSONxPath($api, $path, $api->request->getBody()));
-})->name('POST /json/:path+')->help = array(
+    function ($path) use ($api) {
+        $api->render(Core\JSON::xPath($api->request->getBody(), $path));
+    }
+)
+->name('POST /json/:path+')
+->help = array(
     'description' => 'Extract a section/value from given JSON data sended in request body e.g. from a file',
 );
 
@@ -38,35 +42,10 @@ $api->post(
  */
 $api->post(
     '/jsonencode',
-    function() use ($api)
-{
-    // Set the response header to JSON
-    $api->contentType('application/json');
-    $api->render($api->request->getBody());
-})->name('Encode posted data to JSON');
-
-/**
- * Helper function
- */
-function JSONxPath( $api, $path, $json ) {
-
-    $json = json_decode($json, TRUE);
-
-    if ($err = JSON::check()) $api->stopAPI($err, 400);
-
-    // Root pointer
-    $p = &$json;
-
-    foreach ($path as $key) {
-        if (is_array($p) AND isset($p[$key])) {
-            // Move pointer foreward ...
-            $p = &$p[$key];
-        } else {
-            // ... until key not more found
-            $api->halt(404);
-        }
+    function () use ($api) {
+        // Set the response header to JSON
+        $api->contentType('application/json');
+        $api->render(Core\JSON::encode($api->request->getBody()));
     }
-
-    // Key found, return its value
-    return $p;
-};
+)
+->name('POST /jsonencode');

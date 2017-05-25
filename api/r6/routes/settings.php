@@ -14,15 +14,24 @@
 $api->get(
     '/settings/:scope/:name/:key',
     $APIkeyRequired,
-    function($scope, $name, $key) use ($api)
-{
-    if ($scope == 'null') $scope = '';
-    if ($name  == 'null') $name  = '';
-    if ($key   == 'null') $key   = '';
-    $api->render(\ORM\Settings::getScopeValue($scope, $name, $key));
-})->name('GET /settings/:scope/:name/:key')->help = array(
+    function ($scope, $name, $key) use ($api) {
+        if ($scope == 'null') {
+            $scope = '';
+        }
+        if ($name  == 'null') {
+            $name  = '';
+        }
+        if ($key   == 'null') {
+            $key   = '';
+        }
+        $api->render(\ORM\Settings::getScopeValue($scope, $name, $key));
+    }
+)
+->name('GET /settings/:scope/:name/:key')
+->help = array(
     'since'       => 'r6',
-    'description' => 'Read an application setting value, if a part is empty, request with "null", e.g. /settings/core/null/Latitude',
+    'description' => 'Read an application setting value, if a part is empty, '
+                   . 'request with "null", e.g. /settings/core/null/Latitude',
     'apikey'      => true
 );
 
@@ -31,10 +40,12 @@ $api->get(
  */
 $api->get(
     '/settings/title',
-    function() use ($api)
-{
-    $api->render(\ORM\Settings::getCoreValue(null, 'title'));
-})->name('GET /settings/title')->help = array(
+    function () use ($api) {
+        $api->render(\ORM\Settings::getCoreValue(null, 'title'));
+    }
+)
+->name('GET /settings/title')
+->help = array(
     'since'       => 'r6',
     'description' => 'Read application title'
 );

@@ -7,33 +7,43 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-class BabelKitMySQLi extends BabelKit {
+use Cache\Cache;
+
+/**
+ *
+ */
+class BabelKitMySQLi extends BabelKit
+{
 
     /**
      *
      */
-    public static function setDB( MySQLi $db ) {
+    public static function setDB(MySQLi $db)
+    {
         self::$db = $db;
     }
 
     /**
      *
      */
-    public static function setParams( $params ) {
+    public static function setParams($params)
+    {
         self::$params = $params;
     }
 
     /**
      *
      */
-    public static function setCache( Cache $cache ) {
+    public static function setCache(Cache $cache)
+    {
         self::$cache = $cache;
     }
 
     /**
      *
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!self::$Instance) {
             self::$Instance = new BabelKitMySQLi(self::$db, self::$params);
         }
@@ -44,16 +54,18 @@ class BabelKitMySQLi extends BabelKit {
      * DON't call parent::__construct() to overcome the "new" database type!
      *
      */
-    public function __construct( $dbh, $param=array()) {
+    public function __construct($dbh, $param = array())
+    {
 
         $this->dbh = $dbh;
 
         $this->table = isset($param['table']) ? $param['table'] : 'bk_code';
 
         $this->native = $this->_find_native();
-        if (!$this->native)
+        if (!$this->native) {
             throw new Exception("BabelKitMySQLi(): unable to determine native language. "
                                ."Check table '$this->table' for code_admin/code_admin record.");
+        }
     }
 
     /**
@@ -61,7 +73,8 @@ class BabelKitMySQLi extends BabelKit {
      *
      * Buffer request results
      */
-    public function data($code_set, $code_lang, $code_code) {
+    public function data($code_set, $code_lang, $code_code)
+    {
         $key = 'BabelKit.' . $code_set . '.' . $code_lang . '.' . $code_code;
         while (self::$cache->save($key, $data)) {
             $result = $this->_query("
@@ -82,7 +95,8 @@ class BabelKitMySQLi extends BabelKit {
      *
      * Buffer request results
      */
-    public function get($code_set, $code_lang, $code_code) {
+    public function get($code_set, $code_lang, $code_code)
+    {
         $key = 'BabelKit.full.' . $code_set . '.' . $code_lang . '.' . $code_code;
         while (self::$cache->save($key, $data)) {
             $result = $this->_query("
@@ -105,7 +119,8 @@ class BabelKitMySQLi extends BabelKit {
      *
      * Buffer request results
      */
-    public function lang_set($code_set, $code_lang) {
+    public function lang_set($code_set, $code_lang)
+    {
         $key = 'BabelKit.' . $code_set . '.' . $code_lang;
         while (self::$cache->save($key, $data)) {
             $data = $this->_query("
@@ -127,7 +142,8 @@ class BabelKitMySQLi extends BabelKit {
      *
      * Buffer request results
      */
-    public function full_set_assoc($code_set, $code_lang) {
+    public function full_set_assoc($code_set, $code_lang)
+    {
         $key = 'BabelKit.' . $code_set . '.' . $code_lang . '.assoc';
         while (self::$cache->save($key, $data)) {
             $data = array();
@@ -144,7 +160,8 @@ class BabelKitMySQLi extends BabelKit {
      *
      * Buffer request results
      */
-    public function _find_native() {
+    public function _find_native()
+    {
         $key = 'BabelKit.native';
         while (self::$cache->save($key, $data)) {
             $result = $this->_query("
@@ -161,7 +178,8 @@ class BabelKitMySQLi extends BabelKit {
     /**
      * Implement only MySQLi query
      */
-    public function _query($query) {
+    public function _query($query)
+    {
         $result = array();
 
         $dbh = $this->dbh;
@@ -199,5 +217,4 @@ class BabelKitMySQLi extends BabelKit {
      *
      */
     protected static $cache;
-
 }

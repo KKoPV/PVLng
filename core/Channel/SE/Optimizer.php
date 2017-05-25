@@ -22,7 +22,7 @@ class Optimizer extends MultiChannel
     /**
      * Recieve CSV data
      */
-    public function write($request, $timestamp=null)
+    public function write($request, $timestamp = null)
     {
         $csv = array();
         // Split CSV data nd transform to array of arrays
@@ -31,7 +31,9 @@ class Optimizer extends MultiChannel
         }
 
         // Check for at least ONE data line
-        if (count($csv) < 2) return;
+        if (count($csv) < 2) {
+            return;
+        }
 
         // Channel keys from 1st row
         $keys = array_shift($csv);
@@ -45,8 +47,10 @@ class Optimizer extends MultiChannel
             $timestamp = strtotime(array_shift($row));
 
             $data = array();
-            foreach ($keys as $id=>$key) {
-                if ($row[$id] != '') $data[$key] = $row[$id];
+            foreach ($keys as $id => $key) {
+                if ($row[$id] != '') {
+                    $data[$key] = $row[$id];
+                }
             }
             $ok += parent::write(array('data' => $data), $timestamp);
         }

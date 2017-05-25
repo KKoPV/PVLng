@@ -24,9 +24,12 @@ doStart () {
         log=/dev/null
     fi
 
-    php $pwd/mqtt-subscribe.php -s $host -p $port -q $qos $v >>$log 2>/dev/null &
-
-    echo $! >$pidfile
+    if [ "$deamon" ]; then
+        php $pwd/mqtt-subscribe.php -s $host -p $port -q $qos $v >>$log 2>/dev/null &
+        echo $! >$pidfile
+    else
+        php $pwd/mqtt-subscribe.php -s $host -p $port -q $qos -v
+    fi
 }
 
 ### --------------------------------------------------------------------------
@@ -62,6 +65,8 @@ getPid () {
 }
 
 ### --------------------------------------------------------------------------
+[ "$2" == -f ] || deamon=y
+
 case "$1" in
    start)    doStart; showStatus  ;;
    stop)     doStop; showStatus  ;;

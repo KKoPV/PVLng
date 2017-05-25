@@ -22,5 +22,4 @@ class ReadingStr extends ReadingStrBase
      * getLastReading()
      */
     use ReadingTrait;
-
 }

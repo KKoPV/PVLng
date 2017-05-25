@@ -1,0 +1,111 @@
+#Yryie {
+    font-family: "Trebuchet MS", Helvetica, Arial, sans-serif;
+    margin-bottom: 1em;
+}
+
+#Yryie table {
+    width: 100%;
+    border-collapse: separate;
+    border: 1px solid white;
+    font-size: small;
+}
+
+#Yryie table tbody tr {
+    color: black;
+}
+
+#Yryie table tbody tr.info {
+    color: green;
+}
+
+#Yryie table tbody tr.trace {
+    color: #CC00FF;
+}
+
+#Yryie table tbody tr.sql {
+    color: #CF6B00;
+}
+
+#Yryie table tbody tr.warning {
+    color: blue;
+}
+
+#Yryie table tbody tr.error {
+    color: red;
+}
+
+#Yryie table tbody tr.handler {
+    color: red;
+}
+
+#Yryie table tbody tr.timer {
+    color: #884400;
+}
+
+#Yryie table tbody tr.odd {
+    background-color: rgb(224,224,224);
+}
+
+#Yryie table tbody tr.even {
+    background-color: rgb(192,192,192);
+}
+
+#Yryie table .hide {
+    display: none;
+}
+
+#Yryie table tbody tr.handler td.msg {
+    font-weight: bold;
+}
+
+#Yryie table tbody tr.debug td.msg,
+#Yryie table tbody tr.trace td.msg,
+#Yryie table tbody tr.version td.msg,
+#Yryie table tbody tr.call td.msg {
+    font-family: monospace;
+    font-size: 110%;
+    white-space: pre;
+}
+
+#Yryie table thead th {
+    padding: 3px 5px;
+    text-align: left;
+    background: #909090;
+    border: 1px solid white;
+}
+
+#Yryie table thead th.toggle {
+    cursor: hand;
+}
+
+#Yryie table thead th.time,
+#Yryie table thead th.type {
+    width: 1%;
+}
+
+#Yryie table tbody td {
+    padding: 2px 5px;
+    border: 1px solid white;
+    vertical-align: top;
+}
+
+#Yryie table tbody td.time {
+    font-family: monospace;
+    font-size: 110%;
+    text-align: right;
+}
+
+#Yryie table pre {
+    margin: 0;
+}
+
+#Yryie table tbody td.indent1    { padding-left:    10px }
+#Yryie table tbody td.indent2    { padding-left:    20px }
+#Yryie table tbody td.indent3    { padding-left:    30px }
+#Yryie table tbody td.indent4    { padding-left:    40px }
+#Yryie table tbody td.indent5    { padding-left:    50px }
+#Yryie table tbody td.indent6    { padding-left:    60px }
+#Yryie table tbody td.indent7    { padding-left:    70px }
+#Yryie table tbody td.indent8    { padding-left:    80px }
+#Yryie table tbody td.indent9    { padding-left:    90px }
+#Yryie table tbody td.indent10 { padding-left: 100px }

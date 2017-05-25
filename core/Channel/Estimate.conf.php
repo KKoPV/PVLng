@@ -17,15 +17,15 @@ return array(
      */
 
     'valid_from' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
     'valid_to' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
     'extra' => array(
-        'visible'  => TRUE,
+        'visible'  => true,
         'type'     => 'textarea',
-        'required' => TRUE
+        'required' => true
     ),
 
 );

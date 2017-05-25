@@ -7,7 +7,8 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
-class Loader {
+class Loader
+{
 
     /**
      *
@@ -37,7 +38,7 @@ class Loader {
     /**
      *
      */
-    public static function register($loader, $cache=true)
+    public static function register($loader, $cache = true)
     {
         self::$loader = $loader;
 
@@ -73,7 +74,9 @@ class Loader {
      */
     public static function shutdown()
     {
-        if (!self::$classMapChanged) return;
+        if (!self::$classMapChanged) {
+            return;
+        }
 
         // Cache class map if allowed
         ksort(self::$classMap);
@@ -107,14 +110,16 @@ class Loader {
     /**
      * Register a loading callback callable
      */
-    public static function registerCallback($callback, $position=0)
+    public static function registerCallback($callback, $position = 0)
     {
         if (!is_callable($callback)) {
             throw new Exception('Not a callable provided for Loader::registerCallback()');
         }
 
         // If position is occupied move behind
-        while (isset(self::$callbacks[$position])) $position++;
+        while (isset(self::$callbacks[$position])) {
+            $position++;
+        }
         self::$callbacks[$position] = $callback;
         return $position;
     }
@@ -147,5 +152,4 @@ class Loader {
      *
      */
     protected static $callbacks = array();
-
 }

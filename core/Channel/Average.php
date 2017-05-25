@@ -11,33 +11,34 @@ namespace Channel;
 /**
  *
  */
-class Average extends Calculator {
+class Average extends Calculator
+{
 
     /**
      *
      */
-    public function read( $request ) {
+    public function read($request)
+    {
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $childs = $this->getChilds();
         $childCnt = count($childs);
 
         // No childs, return empty file
         if ($childCnt == 0) {
-            return $this->after_read(new \Buffer);
+            return $this->afterRead(new \Buffer);
         }
 
         $buffer = $childs[0]->read($request);
 
         // Only one child, return as is
         if ($childCnt == 1) {
-            return $this->after_read($buffer);
+            return $this->afterRead($buffer);
         }
 
         // Combine all data for same timestamp
         for ($i=1, $c=2; $i<$childCnt; $i++, $c++) {
-
             $next = $childs[$i]->read($request);
 
             $row1 = $buffer->rewind()->current();
@@ -45,13 +46,11 @@ class Average extends Calculator {
 
             $result = new \Buffer;
 
-            while (!empty($row1) OR !empty($row2)) {
-
+            while (!empty($row1) || !empty($row2)) {
                 $key1 = $buffer->key();
                 $key2 = $next->key();
 
                 if ($key1 === $key2) {
-
                     // Same timestamp, combine
                     $row1['data']        = ($row1['data']*$i        + $row2['data'])        / $c;
                     $row1['min']         = ($row1['min']*$i         + $row2['min'])         / $c;
@@ -63,17 +62,12 @@ class Average extends Calculator {
                     // Read both next rows
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
-
-                } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
-
+                } elseif (is_null($key2) || !is_null($key1) && $key1 < $key2) {
                     // Missing row 2, read only row 1
                     $row1 = $buffer->next()->current();
-
                 } else /* $key1 > $key2 */ {
-
                     // Missing row 1, read only row 2
                     $row2 = $next->next()->current();
-
                 }
             }
             $next->close();
@@ -82,7 +76,6 @@ class Average extends Calculator {
             $buffer = $result;
         }
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
-
 }

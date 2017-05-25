@@ -12,12 +12,14 @@ namespace Channel\PVLog;
 /**
  *
  */
-class Plant extends Base {
+class Plant extends Base
+{
 
     /**
      *
      */
-    public function read( $request, $attributes=TRUE ) {
+    public function read($request, $attributes = true)
+    {
 
         $plant = new \YieldPlant;
 
@@ -32,5 +34,4 @@ class Plant extends Base {
 
         return $this->finish($yield, $request);
     }
-
 }

@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -295,6 +295,30 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
         return $this;
     }
 
+    /**
+     * Basic setter for field "obsolete"
+     *
+     * @param  mixed    $obsolete Obsolete value
+     * @return Instance For fluid interface
+     */
+    public function setObsolete($obsolete)
+    {
+        $this->fields['obsolete'] = $obsolete;
+        return $this;
+    }
+
+    /**
+     * Raw setter for field "obsolete", for INSERT, REPLACE and UPDATE
+     *
+     * @param  mixed    $obsolete Obsolete value
+     * @return Instance For fluid interface
+     */
+    public function setObsoleteRaw($obsolete)
+    {
+        $this->raw['obsolete'] = $obsolete;
+        return $this;
+    }
+
     // -----------------------------------------------------------------------
     // Getter methods
     // -----------------------------------------------------------------------
@@ -409,6 +433,16 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
         return $this->fields['icon'];
     }
 
+    /**
+     * Basic getter for field "obsolete"
+     *
+     * @return mixed Obsolete value
+     */
+    public function getObsolete()
+    {
+        return $this->fields['obsolete'];
+    }
+
     // -----------------------------------------------------------------------
     // Filter methods
     // -----------------------------------------------------------------------
@@ -421,8 +455,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -433,8 +466,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -445,8 +477,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByChilds($childs)
     {
-        $this->filter[] = $this->field('childs').' = '.$this->quote($childs);
-        return $this;
+        return $this->filter('childs', $childs);
     }
 
     /**
@@ -457,8 +488,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByRead($read)
     {
-        $this->filter[] = $this->field('read').' = '.$this->quote($read);
-        return $this;
+        return $this->filter('read', $read);
     }
 
     /**
@@ -469,8 +499,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByWrite($write)
     {
-        $this->filter[] = $this->field('write').' = '.$this->quote($write);
-        return $this;
+        return $this->filter('write', $write);
     }
 
     /**
@@ -481,8 +510,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = $this->field('description').' = '.$this->quote($description);
-        return $this;
+        return $this->filter('description', $description);
     }
 
     /**
@@ -493,8 +521,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByModel($model)
     {
-        $this->filter[] = $this->field('model').' = '.$this->quote($model);
-        return $this;
+        return $this->filter('model', $model);
     }
 
     /**
@@ -505,8 +532,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
-        return $this;
+        return $this->filter('unit', $unit);
     }
 
     /**
@@ -517,8 +543,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = $this->field('type').' = '.$this->quote($type);
-        return $this;
+        return $this->filter('type', $type);
     }
 
     /**
@@ -529,8 +554,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByGraph($graph)
     {
-        $this->filter[] = $this->field('graph').' = '.$this->quote($graph);
-        return $this;
+        return $this->filter('graph', $graph);
     }
 
     /**
@@ -541,8 +565,18 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
-        return $this;
+        return $this->filter('icon', $icon);
+    }
+
+    /**
+     * Filter for field "obsolete"
+     *
+     * @param  mixed    $obsolete Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByObsolete($obsolete)
+    {
+        return $this->filter('obsolete', $obsolete);
     }
 
     // -----------------------------------------------------------------------
@@ -563,23 +597,23 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
               , `read` = VALUES(`read`)
               , `write` = VALUES(`write`)
               , `graph` = VALUES(`graph`)
-              , `icon` = VALUES(`icon`)';
+              , `icon` = VALUES(`icon`)
+              , `obsolete` = VALUES(`obsolete`)';
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_type';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_type` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_type` (
           `id` smallint(5) unsigned NOT NULL DEFAULT \'0\',
           `name` varchar(60) NOT NULL DEFAULT \'\',
           `description` varchar(255) NOT NULL DEFAULT \'\',
@@ -591,6 +625,7 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
           `write` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
           `graph` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
           `icon` varchar(255) NOT NULL DEFAULT \'\',
+          `obsolete` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
           PRIMARY KEY (`id`),
           UNIQUE KEY `name` (`name`),
           KEY `childs` (`childs`),
@@ -598,6 +633,14 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
           KEY `write` (`write`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Channel types\'
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_type';
 
     /**
      *
@@ -613,7 +656,8 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
         'read'        => '',
         'write'       => '',
         'graph'       => '',
-        'icon'        => ''
+        'icon'        => '',
+        'obsolete'    => ''
     );
 
     /**
@@ -630,7 +674,8 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
         'read'        => false,
         'write'       => false,
         'graph'       => false,
-        'icon'        => false
+        'icon'        => false,
+        'obsolete'    => false
     );
 
     /**
@@ -644,5 +689,4 @@ abstract class ChannelTypeBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

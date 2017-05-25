@@ -12,34 +12,37 @@ namespace Channel;
 /**
  *
  */
-class Counter extends Channel {
+class Counter extends Channel
+{
 
     /**
      *
      */
-    protected function before_write( $request ) {
+    protected function beforeWrite($request)
+    {
         // Used as ticker/marker
-        if (!isset($request['data'])) $request['data'] = 1;
+        if (!isset($request['data'])) {
+            $request['data'] = 1;
+        }
 
-        parent::before_write($request);
+        parent::beforeWrite($request);
     }
 
     /**
      *
      */
-    public function read( $request ) {
+    public function read($request)
+    {
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $result = new \Buffer;
 
         $last = 0;
 
-        foreach (parent::read($request) as $id=>$row) {
-
+        foreach (parent::read($request) as $id => $row) {
             // skip 1st row for plain data
-            if ($row['timediff'] OR $last) {
-
+            if ($row['timediff'] || $last) {
                 if (!$row['timediff']) {
                     // no period calculations
                     // get time difference from row to row
@@ -60,7 +63,7 @@ class Counter extends Channel {
         // Switch resolution
         $this->resolution = 1 / $this->resolution;
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
 
     // -------------------------------------------------------------------------
@@ -71,5 +74,4 @@ class Counter extends Channel {
      *
      */
     protected $counter = 1;
-
 }

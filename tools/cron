@@ -108,14 +108,6 @@ $param_v = isset($param_v) ? (is_array($param_v)?count($param_v):1) : 0;
 TESTMODE && $param_v++;
 define('VERBOSE', $param_v);
 
-/**
- * Initialize
- */
-setlocale(LC_NUMERIC, 'C');
-iconv_set_encoding('internal_encoding', 'UTF-8');
-mb_internal_encoding('UTF-8');
-clearstatcache();
-
 ini_set('display_startup_errors', !VERBOSE);
 ini_set('display_errors', !VERBOSE);
 error_reporting(!VERBOSE ? 0 : -1);
@@ -130,21 +122,21 @@ if (TESTMODE) {
 /**
  * Initialize Auto-Loader
  */
-require_once implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'core', 'PVLng.php']);
+require_once implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'bootstrap.php']);
 
-$loader = PVLng::bootstrap();
-Loader::register($loader, TEMP_DIR);
+$loader = PVLng\PVLng::bootstrap();
+Loader::register($loader, PVLng::$TempDir);
 
 /**
  * Config file
  */
 $param_c = isset($param_c) ? $param_c : 'config.cron.php';
-$conffile = PVLng::path(ROOT_DIR, 'config', $param_c);
+$conffile = PVLng\PVLng::path(PVLng\PVLng::$RootDir, 'config', $param_c);
 okv(1, 'Config file', $conffile);
 
 try {
     // Load into "Cron" namespace
-    $config = PVLng::getConfig()->loadNamespace('Cron', $conffile);
+    $config = PVLng\PVLng::getConfig()->loadNamespace('Cron', $conffile);
 } catch (Exception $e) {
     die($e->getMessage());
 }
@@ -183,7 +175,7 @@ for ($i=0; $i<$cnt; $i++) {
 if ($id == -1) exit;
 
 // Child process, need to recreate database!
-PVLng::setDatabase(true);
+PVLng\PVLng::setDatabase(true);
 
 // Collect outputs to show at once
 ob_start();
@@ -206,7 +198,7 @@ try {
     if ($section['enabled'] === true || TESTMODE && $section['enabled'] === 0) {
         // Run in test mode at any minute or if forced flag was set...
         if (TESTMODE || isset($param_i) OR $minute % $section['runeach'] == 0) {
-            $file = PVLng::path(ROOT_DIR, 'cron', $section['handler'].'.php');
+            $file = PVLng\PVLng::path(PVLng\PVLng::$RootDir, 'cron', $section['handler'].'.php');
             // Check for file exists only during test, in live don't check anymore
             if (TESTMODE && !file_exists($file)) {
                 throw new Exception('Missing handler script: '.$file);

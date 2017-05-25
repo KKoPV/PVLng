@@ -22,24 +22,24 @@ return array(
         'default'  => 1
     ),
     'resolution' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
     'decimals' => array(
-        'visible'  => FALSE,
+        'visible'  => false,
         'default'  => 0
     ),
     'valid_from' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
     'valid_to' => array(
-        'visible'  => FALSE
+        'visible'  => false
     ),
     'public' => array(
         'default'  => 0,
     ),
     'extra' => array(
         'type'     => 'select;1:Numeric readings;0:Non-numeric readings',
-        'visible'  => TRUE
+        'visible'  => true
     ),
 
 );

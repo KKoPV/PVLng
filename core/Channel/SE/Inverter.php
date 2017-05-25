@@ -25,7 +25,7 @@ class Inverter extends MultiChannel
     /**
      * Have to detect if "overview" or "data" is 1st data key
      */
-    public function write($request, $timestamp=null)
+    public function write($request, $timestamp = null)
     {
         // /site/{siteId}/overview.json
         if (!empty($request['overview']) && is_array($request['overview'])) {

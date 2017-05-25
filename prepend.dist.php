@@ -16,4 +16,4 @@
 /**
  * If you encounter problems, make PVLng more chatty
  */
-# define('DEVELOP', true);
+# PVLng\PVLng::$DEVELOP = true;

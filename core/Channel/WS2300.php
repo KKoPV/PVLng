@@ -17,7 +17,7 @@ class WS2300 extends MultiChannel
     /**
      * Accept JSON fron json2300
      */
-    public function write($request, $timestamp=null)
+    public function write($request, $timestamp = null)
     {
         // Check for valid request
         if (!isset($request['Timestamp'])) {

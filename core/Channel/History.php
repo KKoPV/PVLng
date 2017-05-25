@@ -12,25 +12,31 @@ namespace Channel;
 /**
  *
  */
-class History extends InternalCalc {
+use I18N;
+
+/**
+ *
+ */
+class History extends InternalCalc
+{
 
     /**
      *
      */
-    public static function checkData(Array &$fields, $add2tree)
+    public static function checkData(array &$fields, $add2tree)
     {
         $ok = parent::checkData($fields, $add2tree);
 
         if ($fields['valid_from']['VALUE'] <= 0) {
-            $fields['valid_from']['ERROR'][] = __('ValueMustGTzero');
+            $fields['valid_from']['ERROR'][] = I18N::translate('ValueMustGTzero');
             $ok = false;
         }
         if ($fields['valid_to']['VALUE'] < 0) {
-            $fields['valid_to']['ERROR'][] = __('ValueMustGEzero');
+            $fields['valid_to']['ERROR'][] = I18N::translate('ValueMustGEzero');
             $ok = false;
         }
         if ($fields['valid_to']['VALUE'] != '' && $fields['extra']['VALUE'] == '') {
-            $fields['extra']['ERROR'][] = __('YearsToReadMissing');
+            $fields['extra']['ERROR'][] = I18N::translate('YearsToReadMissing');
             $ok = false;
         }
 
@@ -42,7 +48,7 @@ class History extends InternalCalc {
      */
     public function read($request)
     {
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $result = new \Buffer;
 
@@ -65,7 +71,6 @@ class History extends InternalCalc {
         } elseif ($this->counter) {
             $q->get($q->SUM('data'), 'data');
         } else {
-
             switch (\ORM\Settings::getModelValue('History', 'Average')) {
                 default:
                     // Linear average
@@ -172,17 +177,15 @@ class History extends InternalCalc {
                         'consumption' => 0
                     ), $ts+$secondsRange);
                 }
-
             }
 
             $day += 86400;
-
         } while ($day < $this->end);
 
-        // Skip validity handling of after_read!
+        // Skip validity handling of afterRead!
         $this->valid_from = $this->valid_to = null;
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
 
     // -----------------------------------------------------------------------
@@ -192,15 +195,19 @@ class History extends InternalCalc {
     /**
      *
      */
-    protected function before_read(&$request)
+    protected function beforeRead(&$request)
     {
-        parent::before_read($request);
+        parent::beforeRead($request);
 
-        if ($this->dataExists(12*60*60)) return; // Buffer for 12h
+        if ($this->dataExists(12*60*60)) {
+            return; // Buffer for 12h
+        }
 
         $child = $this->getChild(1);
 
-        if (!$child) return;
+        if (!$child) {
+            return;
+        }
 
         // Read out all data
         unset($request['period']);
@@ -233,5 +240,4 @@ class History extends InternalCalc {
 
         $this->dataCreated(true);
     }
-
 }

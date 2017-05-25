@@ -18,7 +18,8 @@ use PVLog\Classes\Json\Plant;
 /**
  *
  */
-class Plant11 extends BaseAbstract11 {
+class Plant11 extends BaseAbstract11
+{
 
     /**
      * Used by API
@@ -26,9 +27,10 @@ class Plant11 extends BaseAbstract11 {
      * @since r2
      * @return string Prettyfied JSON string
      */
-    public function GET( &$request ) {
+    public function GET(&$request)
+    {
         // Measure processing time
-        $time = microtime(TRUE);
+        $time = microtime(true);
 
         // transform request date into start - end
         $date = !empty($request['p1']) ? $request['p1'] : date('Y-m-d');
@@ -50,10 +52,9 @@ class Plant11 extends BaseAbstract11 {
         }
 
         return $instance
-            ->setCreator(sprintf('%s for %s (%.1fs)', PVLNG_VERSION_FULL, $this->name, microtime(TRUE)-$time))
+            ->setCreator(sprintf('%s for %s (%.1fs)', PVLNG_VERSION_FULL, $this->name, microtime(true)-$time))
             ->setDeleteDayBeforeImport(1) // Send always all day data, so set delete flag...
             ->setPlant($plant)
             ->asJson(isset($request['pretty']) && $request['pretty']);
     }
-
 }

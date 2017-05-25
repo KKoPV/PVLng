@@ -10,8 +10,10 @@
 namespace Channel\PVLog;
 
 /**
- * PV-Log generator classes
+ *
  */
+use Channel\Channel;
+// PV-Log generator classes
 use PVLog\Classes\Json\Json;
 use PVLog\Classes\Json\Set;
 use PVLog\Classes\Json\Strings;
@@ -19,12 +21,14 @@ use PVLog\Classes\Json\Strings;
 /**
  *
  */
-abstract class BaseAbstract11 extends \Channel {
+abstract class BaseAbstract11 extends Channel
+{
 
     /**
      *
      */
-    protected function getTaggedChildData( $parent, $child, $request ) {
+    protected function getTaggedChildData($parent, $child, $request)
+    {
         if ($property = $child->getTag('PV-Log JSON 1.1')) {
             if ($property == 'string') {
                 $data = new Strings;
@@ -55,5 +59,4 @@ abstract class BaseAbstract11 extends \Channel {
             throw new \Exception('Unkown/untagged channel in '.$this->name.': '.$child->name);
         }
     }
-
 }

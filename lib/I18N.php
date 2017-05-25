@@ -1,6 +1,6 @@
 <?php
 /**
- * Translation class
+ * Translation class based on BabelKit and BBCode
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012-2016 Knut Kohl
@@ -64,7 +64,7 @@ abstract class I18N
      */
     public static function setCodeSet()
     {
-        self::$code_sets = func_get_args();
+        self::$codeSets = func_get_args();
     }
 
     /**
@@ -79,9 +79,9 @@ abstract class I18N
      *
      */
     public static function setMarkMissing(
-        $mark='<span style="background-color:#FF9966">%s</span>'
-    )
-    {
+        $mark = '<span style="background-color:#FF9966">%s</span>'
+    ) {
+
         self::$mark = $mark;
     }
 
@@ -100,9 +100,9 @@ abstract class I18N
     {
         $fargs = func_get_args();
         $str = array_shift($fargs);
-        $cnt = (isset($fargs[0]) AND intval($fargs[0]) == $fargs[0]) ? +$fargs[0] : FALSE;
+        $cnt = (isset($fargs[0]) && intval($fargs[0]) == $fargs[0]) ? +$fargs[0] : false;
 
-        if (strpos($str, self::SEP) !== FALSE) {
+        if (strpos($str, self::SEP) !== false) {
             // Defined code set
             list($code_set, $code) = explode(self::SEP, $str, 2);
             $trans = self::$bk->render($code_set, self::$language, $code);
@@ -110,14 +110,16 @@ abstract class I18N
             $code_set = '';
             $code = substr($str, 0, 32);
             // Search all code sets
-            foreach (self::$code_sets as $cs) {
+            foreach (self::$codeSets as $cs) {
                 $trans = self::$bk->render($cs, self::$language, $code);
-                if ($trans !== $code) break;
+                if ($trans !== $code) {
+                    break;
+                }
             }
         }
 
         if ($trans !== $code) {
-            if (strpos($trans, '|') === FALSE) {
+            if (strpos($trans, '|') === false) {
                 $str = $trans;
             } else {
                 // Analyse translation for 0, 1 ... n markers
@@ -135,7 +137,9 @@ abstract class I18N
                 }
             }
         } elseif (self::$add) {
-            if ($code_set == '') $code_set = self::$code_sets[0];
+            if ($code_set == '') {
+                $code_set = self::$codeSets[0];
+            }
             self::$bk->slave($code_set, $code, $code);
         }
 
@@ -146,7 +150,7 @@ abstract class I18N
             error_reporting($e);
         }
 
-        if ($str === $code AND self::$mark != '') {
+        if ($str === $code && self::$mark != '') {
             // Possibly not found
             $str = '<span style="background-color:#FF9966">'.$str.'</span>';
         }
@@ -163,7 +167,7 @@ abstract class I18N
     /**
      *
      */
-    protected static $add = FALSE;
+    protected static $add = false;
 
     /**
      *
@@ -183,18 +187,10 @@ abstract class I18N
     /**
      *
      */
-    protected static $code_sets = array();
+    protected static $codeSets = array();
 
     /**
      *
      */
     protected static $language = 'en';
-
-}
-
-/**
- * Shortcut function
- */
-function __() {
-    return call_user_func_array('I18N::translate', func_get_args());
 }

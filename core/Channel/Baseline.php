@@ -24,16 +24,17 @@ class Baseline extends InternalCalc
     /**
      *
      */
-    protected function before_read(&$request)
+    protected function beforeRead(&$request)
     {
-        parent::before_read($request);
+        parent::beforeRead($request);
 
-        if ($this->dataExists()) return;
+        if ($this->dataExists()) {
+            return;
+        }
 
         // Calc direct inside database
         $this->db->query('CALL pvlng_model_baseline({1}, {2})', $this->entity, $this->getChild(1)->entity);
 
         $this->dataCreated();
     }
-
 }

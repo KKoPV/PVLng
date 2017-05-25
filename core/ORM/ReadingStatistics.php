@@ -17,6 +17,7 @@ namespace ORM;
 /**
  *
  */
-class ReadingStatistics extends ReadingStatisticsBase {
+class ReadingStatistics extends ReadingStatisticsBase
+{
 
 }

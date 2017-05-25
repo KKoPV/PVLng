@@ -20,12 +20,14 @@ namespace Channel\Sonnenertrag;
 /**
  *
  */
-class JSON extends \Channel {
+class JSON extends \Channel
+{
 
     /**
      * Accept only childs of the same entity type
      */
-    public function addChild( $guid ) {
+    public function addChild($guid)
+    {
         $childs = $this->getChilds();
         if (empty($childs)) {
             // Add 1st child
@@ -46,26 +48,29 @@ class JSON extends \Channel {
     /**
      *
      */
-    public function read( $request, $attributes=FALSE ) {
+    public function read($request, $attributes = false)
+    {
 
         $this->year  = date('Y');
-        $this->month = (array_key_exists('m', $request) AND $request['m'])
+        $this->month = (array_key_exists('m', $request) && $request['m'])
                      ? $request['m']
                      : date('n');
 
-        $this->factor = (array_key_exists('u', $request) AND $request['u'] == 'kWh')
+        $this->factor = (array_key_exists('u', $request) && $request['u'] == 'kWh')
                       ? 1000
                       : 1;
 
-        if ($this->month > date('n')) $this->year--;
+        if ($this->month > date('n')) {
+            $this->year--;
+        }
 
         $request['start']  = $this->year . '-' . $this->month . '-01';
         $request['end']    = $this->year . '-' . $this->month . '-01+1month';
         $request['period'] = '1day';
-        $request['full']   = TRUE;
+        $request['full']   = true;
         $request['format'] = 'json';
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $childs = $this->getChilds();
 
@@ -83,7 +88,6 @@ class JSON extends \Channel {
 
         // combine all data for same timestamp
         for ($i=1; $i<count($childs); $i++) {
-
             $next = $childs[$i]->read($request);
 
             $row1 = $buffer->rewind()->current();
@@ -91,10 +95,8 @@ class JSON extends \Channel {
 
             $result = new \Buffer;
 
-            while (!empty($row1) OR !empty($row2)) {
-
+            while (!empty($row1) || !empty($row2)) {
                 if ($buffer->key() == $next->key()) {
-
                     // same timestamp, combine
                     $row1['consumption'] += $row2['consumption'];
                     $result->write($row1, $buffer->key());
@@ -102,24 +104,19 @@ class JSON extends \Channel {
                     // read both next rows
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
-
-                } elseif ($buffer->key() AND $buffer->key() < $next->key() OR
+                } elseif ($buffer->key() && $buffer->key() < $next->key() ||
                           $next->key() == '') {
-
                     // missing row 2, save row 1 as is
                     $result->write($row1, $buffer->key());
 
                     // read only row 1
                     $row1 = $buffer->next()->current();
-
                 } else /* $buffer->key() > $next->key() */ {
-
                     // missing row 1, save row 2 as is
                     $result->write($row2, $next->key());
 
                     // read only row 2
                     $row2 = $next->next()->current();
-
                 }
             }
 
@@ -138,7 +135,8 @@ class JSON extends \Channel {
     /**
      * r2
      */
-    public function GET ( &$request ) {
+    public function GET(&$request)
+    {
         $request['format'] = 'json';
         return $this->read($request);
     }
@@ -147,7 +145,8 @@ class JSON extends \Channel {
     // PROTECTED
     // -----------------------------------------------------------------------
 
-    protected function finish( $data=array() ) {
+    protected function finish($data = array())
+    {
         // Provide full information...
         return array(
             'un'  => $this->factor == 1 ? 'Wh' : 'kWh',

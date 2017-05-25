@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -151,8 +151,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByGuid($guid)
     {
-        $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
-        return $this;
+        return $this->filter('guid', $guid);
     }
 
     /**
@@ -163,8 +162,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -175,8 +173,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = $this->field('description').' = '.$this->quote($description);
-        return $this;
+        return $this->filter('description', $description);
     }
 
     /**
@@ -187,8 +184,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterBySerial($serial)
     {
-        $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
-        return $this;
+        return $this->filter('serial', $serial);
     }
 
     /**
@@ -199,8 +195,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByChannel($channel)
     {
-        $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
-        return $this;
+        return $this->filter('channel', $channel);
     }
 
     /**
@@ -211,8 +206,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
-        return $this;
+        return $this->filter('unit', $unit);
     }
 
     /**
@@ -223,8 +217,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = $this->field('type').' = '.$this->quote($type);
-        return $this;
+        return $this->filter('type', $type);
     }
 
     /**
@@ -235,8 +228,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
-        return $this;
+        return $this->filter('icon', $icon);
     }
 
     /**
@@ -247,8 +239,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByDatetime($datetime)
     {
-        $this->filter[] = $this->field('datetime').' = '.$this->quote($datetime);
-        return $this;
+        return $this->filter('datetime', $datetime);
     }
 
     /**
@@ -259,8 +250,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     public function filterByReadings($readings)
     {
-        $this->filter[] = $this->field('readings').' = '.$this->quote($readings);
-        return $this;
+        return $this->filter('readings', $readings);
     }
 
     // -----------------------------------------------------------------------
@@ -268,20 +258,27 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_reading_statistics';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
         CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_reading_statistics` AS select `c`.`guid` AS `guid`,`c`.`name` AS `name`,`c`.`description` AS `description`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`unit` AS `unit`,`t`.`name` AS `type`,`t`.`icon` AS `icon`,from_unixtime(`u`.`timestamp`) AS `datetime`,ifnull(`u`.`readings`,0) AS `readings` from ((`pvlng_channel` `c` join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) left join `pvlng_reading_count` `u` on((`c`.`id` = `u`.`id`))) where ((`t`.`childs` = 0) and `t`.`write`)
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_reading_statistics';
 
     /**
      *
@@ -309,13 +306,10 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     /**
      *
      */
-    protected $primary = array(
-
-    );
+    protected $primary = array();
 
     /**
      *
      */
     protected $autoinc = '';
-
 }

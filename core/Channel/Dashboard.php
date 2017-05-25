@@ -27,7 +27,7 @@ class Dashboard extends Calculator
     public function read($request)
     {
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $channel = $this->getChild(1);
 
@@ -43,12 +43,12 @@ class Dashboard extends Calculator
         $f = $this->valid_from;
         $t = $this->valid_to;
 
-        $channel->valid_from = $channel->vaild_to = $this->valid_from = $this->valid_to = NULL;
+        $channel->valid_from = $channel->vaild_to = $this->valid_from = $this->valid_to = null;
 
         // Always fetch last reading for Dashboard channels
         $request['period'] = 'last';
 
-        $result = $this->after_read($channel->read($request));
+        $result = $this->afterRead($channel->read($request));
 
         // Reset this valid range, required for gauge axis limits
         $this->valid_from = $f;
@@ -56,5 +56,4 @@ class Dashboard extends Calculator
 
         return $result;
     }
-
 }

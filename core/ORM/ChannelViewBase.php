@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -321,8 +321,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -333,8 +332,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByGuid($guid)
     {
-        $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
-        return $this;
+        return $this->filter('guid', $guid);
     }
 
     /**
@@ -345,8 +343,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -357,8 +354,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterBySerial($serial)
     {
-        $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
-        return $this;
+        return $this->filter('serial', $serial);
     }
 
     /**
@@ -369,8 +365,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByChannel($channel)
     {
-        $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
-        return $this;
+        return $this->filter('channel', $channel);
     }
 
     /**
@@ -381,8 +376,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = $this->field('description').' = '.$this->quote($description);
-        return $this;
+        return $this->filter('description', $description);
     }
 
     /**
@@ -393,8 +387,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByResolution($resolution)
     {
-        $this->filter[] = $this->field('resolution').' = '.$this->quote($resolution);
-        return $this;
+        return $this->filter('resolution', $resolution);
     }
 
     /**
@@ -405,8 +398,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
-        return $this;
+        return $this->filter('cost', $cost);
     }
 
     /**
@@ -417,8 +409,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByNumeric($numeric)
     {
-        $this->filter[] = $this->field('numeric').' = '.$this->quote($numeric);
-        return $this;
+        return $this->filter('numeric', $numeric);
     }
 
     /**
@@ -429,8 +420,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByOffset($offset)
     {
-        $this->filter[] = $this->field('offset').' = '.$this->quote($offset);
-        return $this;
+        return $this->filter('offset', $offset);
     }
 
     /**
@@ -441,8 +431,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByAdjust($adjust)
     {
-        $this->filter[] = $this->field('adjust').' = '.$this->quote($adjust);
-        return $this;
+        return $this->filter('adjust', $adjust);
     }
 
     /**
@@ -453,8 +442,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
-        return $this;
+        return $this->filter('unit', $unit);
     }
 
     /**
@@ -465,8 +453,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByDecimals($decimals)
     {
-        $this->filter[] = $this->field('decimals').' = '.$this->quote($decimals);
-        return $this;
+        return $this->filter('decimals', $decimals);
     }
 
     /**
@@ -477,8 +464,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByMeter($meter)
     {
-        $this->filter[] = $this->field('meter').' = '.$this->quote($meter);
-        return $this;
+        return $this->filter('meter', $meter);
     }
 
     /**
@@ -489,8 +475,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByThreshold($threshold)
     {
-        $this->filter[] = $this->field('threshold').' = '.$this->quote($threshold);
-        return $this;
+        return $this->filter('threshold', $threshold);
     }
 
     /**
@@ -501,8 +486,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByValidFrom($valid_from)
     {
-        $this->filter[] = $this->field('valid_from').' = '.$this->quote($valid_from);
-        return $this;
+        return $this->filter('valid_from', $valid_from);
     }
 
     /**
@@ -513,8 +497,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByValidTo($valid_to)
     {
-        $this->filter[] = $this->field('valid_to').' = '.$this->quote($valid_to);
-        return $this;
+        return $this->filter('valid_to', $valid_to);
     }
 
     /**
@@ -525,8 +508,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = $this->field('public').' = '.$this->quote($public);
-        return $this;
+        return $this->filter('public', $public);
     }
 
     /**
@@ -537,8 +519,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByTypeId($type_id)
     {
-        $this->filter[] = $this->field('type_id').' = '.$this->quote($type_id);
-        return $this;
+        return $this->filter('type_id', $type_id);
     }
 
     /**
@@ -549,8 +530,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = $this->field('type').' = '.$this->quote($type);
-        return $this;
+        return $this->filter('type', $type);
     }
 
     /**
@@ -561,8 +541,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByModel($model)
     {
-        $this->filter[] = $this->field('model').' = '.$this->quote($model);
-        return $this;
+        return $this->filter('model', $model);
     }
 
     /**
@@ -573,8 +552,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByChilds($childs)
     {
-        $this->filter[] = $this->field('childs').' = '.$this->quote($childs);
-        return $this;
+        return $this->filter('childs', $childs);
     }
 
     /**
@@ -585,8 +563,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByRead($read)
     {
-        $this->filter[] = $this->field('read').' = '.$this->quote($read);
-        return $this;
+        return $this->filter('read', $read);
     }
 
     /**
@@ -597,8 +574,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByWrite($write)
     {
-        $this->filter[] = $this->field('write').' = '.$this->quote($write);
-        return $this;
+        return $this->filter('write', $write);
     }
 
     /**
@@ -609,8 +585,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByGraph($graph)
     {
-        $this->filter[] = $this->field('graph').' = '.$this->quote($graph);
-        return $this;
+        return $this->filter('graph', $graph);
     }
 
     /**
@@ -621,8 +596,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
-        return $this;
+        return $this->filter('icon', $icon);
     }
 
     /**
@@ -633,8 +607,7 @@ abstract class ChannelViewBase extends \slimMVC\ORM
      */
     public function filterByTree($tree)
     {
-        $this->filter[] = $this->field('tree').' = '.$this->quote($tree);
-        return $this;
+        return $this->filter('tree', $tree);
     }
 
     // -----------------------------------------------------------------------
@@ -642,20 +615,27 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_channel_view';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
         CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_channel_view` AS select `c`.`id` AS `id`,`c`.`guid` AS `guid`,if(`a`.`id`,`a`.`name`,`c`.`name`) AS `name`,if(`a`.`id`,`a`.`serial`,`c`.`serial`) AS `serial`,`c`.`channel` AS `channel`,if(`a`.`id`,`a`.`description`,`c`.`description`) AS `description`,if(`a`.`id`,`a`.`resolution`,`c`.`resolution`) AS `resolution`,if(`a`.`id`,`a`.`cost`,`c`.`cost`) AS `cost`,if(`a`.`id`,`a`.`numeric`,`c`.`numeric`) AS `numeric`,if(`a`.`id`,`a`.`offset`,`c`.`offset`) AS `offset`,if(`a`.`id`,`a`.`adjust`,`c`.`adjust`) AS `adjust`,if(`a`.`id`,`a`.`unit`,`c`.`unit`) AS `unit`,if(`a`.`id`,`a`.`decimals`,`c`.`decimals`) AS `decimals`,if(`a`.`id`,`a`.`meter`,`c`.`meter`) AS `meter`,if(`a`.`id`,`a`.`threshold`,`c`.`threshold`) AS `threshold`,if(`a`.`id`,`a`.`valid_from`,`c`.`valid_from`) AS `valid_from`,if(`a`.`id`,`a`.`valid_to`,`c`.`valid_to`) AS `valid_to`,if(`a`.`id`,`a`.`public`,`c`.`public`) AS `public`,`t`.`id` AS `type_id`,`t`.`name` AS `type`,`t`.`model` AS `model`,`t`.`childs` AS `childs`,if(`ta`.`id`,`ta`.`read`,`t`.`read`) AS `read`,`t`.`write` AS `write`,if(`ta`.`id`,`ta`.`graph`,`t`.`graph`) AS `graph`,if(`a`.`id`,`a`.`icon`,`c`.`icon`) AS `icon`,(select count(1) from `pvlng_tree` where (`pvlng_tree`.`entity` = `c`.`id`)) AS `tree` from ((((`pvlng_channel` `c` join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) left join `pvlng_tree` `tr` on((`c`.`channel` = `tr`.`guid`))) left join `pvlng_channel` `a` on((`tr`.`entity` = `a`.`id`))) left join `pvlng_type` `ta` on((`a`.`type` = `ta`.`id`))) where (`c`.`id` <> 1)
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_channel_view';
 
     /**
      *
@@ -700,13 +680,10 @@ abstract class ChannelViewBase extends \slimMVC\ORM
     /**
      *
      */
-    protected $primary = array(
-
-    );
+    protected $primary = array();
 
     /**
      *
      */
     protected $autoinc = '';
-
 }

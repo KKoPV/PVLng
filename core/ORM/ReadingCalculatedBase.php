@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -251,10 +251,9 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByIdStartEnd($id, $start, $end)
     {
-
-        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
-        $this->filter[] = $this->field('start').' = '.$this->quote($start).'';
-        $this->filter[] = $this->field('end').' = '.$this->quote($end).'';
+        $this->filter('id', $id);
+        $this->filter('start', $start);
+        $this->filter('end', $end);
         return $this;
     }
 
@@ -266,8 +265,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByUid($uid)
     {
-        $this->filter[] = $this->field('uid').' = '.$this->quote($uid);
-        return $this;
+        return $this->filter('uid', $uid);
     }
 
     /**
@@ -278,8 +276,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByCreated($created)
     {
-        $this->filter[] = $this->field('created').' = '.$this->quote($created);
-        return $this;
+        return $this->filter('created', $created);
     }
 
     /**
@@ -290,8 +287,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -302,8 +298,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByStart($start)
     {
-        $this->filter[] = $this->field('start').' = '.$this->quote($start);
-        return $this;
+        return $this->filter('start', $start);
     }
 
     /**
@@ -314,8 +309,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByEnd($end)
     {
-        $this->filter[] = $this->field('end').' = '.$this->quote($end);
-        return $this;
+        return $this->filter('end', $end);
     }
 
     /**
@@ -326,8 +320,7 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      */
     public function filterByLifetime($lifetime)
     {
-        $this->filter[] = $this->field('lifetime').' = '.$this->quote($lifetime);
-        return $this;
+        return $this->filter('lifetime', $lifetime);
     }
 
     // -----------------------------------------------------------------------
@@ -345,19 +338,18 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_reading_tmp';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_reading_tmp` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_reading_tmp` (
           `id` smallint(5) unsigned NOT NULL DEFAULT \'0\' COMMENT \'pvlng_channel -> id\',
           `start` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'Generated for start .. end\',
           `end` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'Generated for start .. end\',
@@ -369,6 +361,14 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
           KEY `created` (`created`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Buffer and remember internal calculated data\'
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_reading_tmp';
 
     /**
      *
@@ -407,5 +407,4 @@ abstract class ReadingCalculatedBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

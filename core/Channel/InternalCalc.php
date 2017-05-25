@@ -48,9 +48,9 @@ abstract class InternalCalc extends Channel
     /**
      *
      */
-    protected function before_read(&$request)
+    protected function beforeRead(&$request)
     {
-        parent::before_read($request);
+        parent::beforeRead($request);
         // Force recalculate, ignore buffered data
         $this->forceReCalc = !empty($request['recalc']);
     }
@@ -86,7 +86,7 @@ abstract class InternalCalc extends Channel
                 $cnt += $this->data->insert();
             }
         } else {
-            foreach ($values as $this->data->timestamp=>$this->data->data) {
+            foreach ($values as $this->data->timestamp => $this->data->data) {
                 $cnt += $this->data->insert();
             }
         }
@@ -96,7 +96,7 @@ abstract class InternalCalc extends Channel
     /**
      *
      */
-    protected function dataExists($lifetime=null)
+    protected function dataExists($lifetime = null)
     {
         if ($this->forceReCalc) {
             $this->LifeTime = 0;

@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -149,9 +149,8 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     public function filterByIdDate($id, $date)
     {
-
-        $this->filter[] = $this->field('id').' = '.$this->quote($id).'';
-        $this->filter[] = $this->field('date').' = '.$this->quote($date).'';
+        $this->filter('id', $id);
+        $this->filter('date', $date);
         return $this;
     }
 
@@ -163,8 +162,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     public function filterByDate($date)
     {
-        $this->filter[] = $this->field('date').' = '.$this->quote($date);
-        return $this;
+        return $this->filter('date', $date);
     }
 
     /**
@@ -175,8 +173,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -187,8 +184,7 @@ abstract class TariffDateBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
-        return $this;
+        return $this->filter('cost', $cost);
     }
 
     // -----------------------------------------------------------------------
@@ -204,19 +200,18 @@ abstract class TariffDateBase extends \slimMVC\ORM
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_tariff_date';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_tariff_date` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_tariff_date` (
           `id` int(10) unsigned NOT NULL DEFAULT \'0\' COMMENT \'pvlng_tariff -> id\',
           `date` date NOT NULL DEFAULT \'2000-01-01\' COMMENT \'Start date for this tariff (incl.) \',
           `cost` float DEFAULT \'0\' COMMENT \'Fix costs per day, e.g. EUR / kWh\',
@@ -225,6 +220,14 @@ abstract class TariffDateBase extends \slimMVC\ORM
           CONSTRAINT `pvlng_tariff_date_ibfk_2` FOREIGN KEY (`id`) REFERENCES `pvlng_tariff` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_tariff_date';
 
     /**
      *
@@ -256,5 +259,4 @@ abstract class TariffDateBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

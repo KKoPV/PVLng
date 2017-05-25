@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -129,8 +129,7 @@ abstract class TariffBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -141,8 +140,7 @@ abstract class TariffBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -153,8 +151,7 @@ abstract class TariffBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
-        return $this;
+        return $this->filter('comment', $comment);
     }
 
     // -----------------------------------------------------------------------
@@ -162,19 +159,18 @@ abstract class TariffBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_tariff';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_tariff` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_tariff` (
           `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
           `name` varchar(50) NOT NULL DEFAULT \'\',
           `comment` varchar(250) NOT NULL DEFAULT \'\',
@@ -182,6 +178,14 @@ abstract class TariffBase extends \slimMVC\ORM
           UNIQUE KEY `Tariff name` (`name`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_tariff';
 
     /**
      *
@@ -212,5 +216,4 @@ abstract class TariffBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = 'id';
-
 }

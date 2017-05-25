@@ -13,11 +13,11 @@
  */
 $api->get(
     '/time(/:format)',
-    function($format='U') use ($api)
-{
-    $api->contentType('text/plain');
-    $api->halt(200, date($format));
-})->name('GET /time')->help = array(
+    function ($format = 'U') use ($api) {
+        $api->contentType('text/plain');
+        $api->halt(200, date($format));
+    }
+)->name('GET /time')->help = array(
     'description' => 'Deliver actual server time',
     'since' => 'r4'
 );

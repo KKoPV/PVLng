@@ -30,16 +30,19 @@ class Settings extends SettingsBase
              ->findOne();
 
         switch ($this->getType()) {
-            case 'num':  return is_numeric($value);
-            case 'bool': return (is_numeric($value) AND ($value == 0 OR $value == 1));
-            default:     return true;
+            case 'num':
+                return is_numeric($value);
+            case 'bool':
+                return (is_numeric($value) and ($value == 0 or $value == 1));
+            default:
+                return true;
         }
     }
 
     /**
      *
      */
-    public static function getScopeValue($scope, $name, $key, $default=null)
+    public static function getScopeValue($scope, $name, $key, $default = null)
     {
         $self = new self;
         $self->filterByScopeNameKey($scope, $name, $key)->findOne();
@@ -49,7 +52,7 @@ class Settings extends SettingsBase
     /**
      *
      */
-    public static function getCoreValue($name, $key, $default=null)
+    public static function getCoreValue($name, $key, $default = null)
     {
         return self::getScopeValue('core', $name, $key, $default);
     }
@@ -65,7 +68,7 @@ class Settings extends SettingsBase
     /**
      *
      */
-    public static function getControllerValue($name, $key, $default=null)
+    public static function getControllerValue($name, $key, $default = null)
     {
         return self::getScopeValue('controller', $name, $key, $default);
     }
@@ -73,7 +76,7 @@ class Settings extends SettingsBase
     /**
      *
      */
-    public static function getModelValue($name, $key, $default=null)
+    public static function getModelValue($name, $key, $default = null)
     {
         return self::getScopeValue('model', $name, $key, $default);
     }
@@ -89,7 +92,7 @@ class Settings extends SettingsBase
     /**
      *
      */
-    public static function getSunrise($day=null)
+    public static function getSunrise($day = null)
     {
         return date_sunrise(
             $day ?: time(),
@@ -104,7 +107,7 @@ class Settings extends SettingsBase
     /**
      *
      */
-    public static function getSunset($day=null)
+    public static function getSunset($day = null)
     {
         return date_sunset(
             $day ?: time(),
@@ -131,5 +134,4 @@ class Settings extends SettingsBase
             return $self->setValue($value)->update();
         }
     }
-
 }

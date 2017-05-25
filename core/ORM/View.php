@@ -17,6 +17,7 @@ namespace ORM;
 /**
  *
  */
-class View extends ViewBase {
+class View extends ViewBase
+{
 
 }

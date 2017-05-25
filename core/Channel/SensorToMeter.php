@@ -21,7 +21,8 @@ class SensorToMeter extends InternalCalc
     /**
      * Accept only childs without meter attribute set
      */
-    public function addChild( $channel ) {
+    public function addChild($channel)
+    {
         $childs = $this->getChilds();
         if (empty($childs)) {
             $new  = new \ORM\Channel($channel);
@@ -35,7 +36,6 @@ class SensorToMeter extends InternalCalc
             if ($new->getMeter() == 1) {
                 throw new \Exception('"SensorToMeter" accept only a non-meter channel as child!');
             }
-
         }
         // Add child or throw exception about only 1 child...
         return parent::addChild($channel);
@@ -44,9 +44,9 @@ class SensorToMeter extends InternalCalc
     /**
      *
      */
-    protected function before_read(&$request)
+    protected function beforeRead(&$request)
     {
-        parent::before_read($request);
+        parent::beforeRead($request);
 
         $child = $this->getChild(1);
 
@@ -56,7 +56,9 @@ class SensorToMeter extends InternalCalc
             return;
         }
 
-        if ($this->dataExists()) return;
+        if ($this->dataExists()) {
+            return;
+        }
 
         if (!$child->childs) {
             // Calc direct inside database, if child is a real channel
@@ -73,7 +75,6 @@ class SensorToMeter extends InternalCalc
                 $last = $row['timestamp'];
                 $this->saveValue($last, $sum);
             }
-
         }
 
         $this->dataCreated();

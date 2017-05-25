@@ -7,4 +7,6 @@
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
  * @version     1.0.0
  */
-class Markdown extends Markdown_Parser {}
+class Markdown extends Markdown_Parser
+{
+}

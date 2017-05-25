@@ -1,45 +1,60 @@
 <?php
-
+/**
+ *
+ *
+ * $wb = new \Equipment\SMA\Webbox('192.168.1.168');
+ * echo $wb->test();
+ *
+ */
 namespace Equipment\SMA;
 
-class Webbox {
-
+/**
+ *
+ */
+class Webbox
+{
     /**
      *
      */
-    public function __construct( $host, $port=80 ) {
-        if (strstr($host, '://') == '') $host = 'http://' . $host;
+    public function __construct($host, $port = 80)
+    {
+        if (strstr($host, '://') == '') {
+            $host = 'http://' . $host;
+        }
         $this->url = $host . ':' . $port . '/rpc';
         $this->curl = curl_init($this->url);
-        curl_setopt($this->curl, CURLOPT_HEADER, FALSE);
-        curl_setopt($this->curl, CURLINFO_HEADER_OUT, FALSE);
+        curl_setopt($this->curl, CURLOPT_HEADER, false);
+        curl_setopt($this->curl, CURLINFO_HEADER_OUT, false);
         curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($this->curl, CURLOPT_POST, TRUE);
+        curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->curl, CURLOPT_POST, true);
         curl_setopt($this->curl, CURLOPT_TIMEOUT, 5);
-        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($this->curl, CURLOPT_USERAGENT, 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)');
     }
 
     /**
      *
      */
-    public function GetPlantOverview() {
+    public function getPlantOverview()
+    {
         return $this->call($this->initRPC('GetPlantOverview'));
     }
 
     /**
      *
      */
-    public function GetDevices() {
+    public function getDevices()
+    {
         return $this->call($this->initRPC('GetDevices'));
     }
 
     /**
      *
      */
-    public function GetProcessDataChannels( $device ) {
+    public function getProcessDataChannels($device)
+    {
         $rpc = $this->initRPC('GetProcessDataChannels');
         $rpc->params = new \StdClass;
         $rpc->params->device = $device;
@@ -49,11 +64,14 @@ class Webbox {
     /**
      *
      */
-    public function GetProcessData( $device, $channels=NULL ) {
+    public function getProcessData($device, $channels = null)
+    {
         $rpc = $this->initRPC('GetProcessData');
         $rpc->params = new \StdClass;
         $rpc->params->devices = array();
-        if (!is_null($channels) AND !is_array($channels)) $channels = array($channels);
+        if (!is_null($channels) and !is_array($channels)) {
+            $channels = array($channels);
+        }
         foreach ((array) $device as $key) {
             $d = new \StdClass;
             $d->key = $key;
@@ -66,7 +84,8 @@ class Webbox {
     /**
      *
      */
-    public function GetParameter( $device, $channels=NULL ) {
+    public function getParameter($device, $channels = null)
+    {
         $rpc = $this->initRPC('GetParameter');
         $rpc->params = new \StdClass;
         $rpc->params->devices = array();
@@ -82,49 +101,78 @@ class Webbox {
     /**
      *
      */
-    public function info( $opt='' ) {
-        return ($opt AND isset($this->info[$opt])) ? $this->info[$opt] : $this->info;
+    public function test()
+    {
+        ob_start();
+
+        $this->log($wb, $wb->getPlantOverview());
+
+        $result = $wb->getDevices();
+        $this->log($wb, $result);
+
+        foreach ($result->devices as $device) {
+            $this->log($wb, $wb->getProcessDataChannels($device->key));
+            $this->log($wb, $wb->getProcessData($device->key));
+            #    $this->log($wb, $wb->getProcessData($device->key, 'TmpMdul C'));
+            $this->log($wb, $wb->getParameter($device->key));
+        }
+
+        return ob_get_clean();
     }
 
     /**
      *
      */
-    public function verbose( $verbose ) {
+    public function info($opt = '')
+    {
+        return ($opt and isset($this->info[$opt])) ? $this->info[$opt] : $this->info;
+    }
+
+    /**
+     *
+     */
+    public function verbose($verbose)
+    {
         curl_setopt($this->curl, CURLOPT_VERBOSE, !!$verbose);
     }
 
     /**
      *
      */
-    public function isError() {
+    public function isError()
+    {
         return ($this->error != '');
     }
 
     /**
      *
      */
-    public function error() {
+    public function error()
+    {
         return $this->error;
     }
 
     /**
      *
      */
-    public function response() {
+    public function response()
+    {
         return $this->response;
     }
 
     /**
      *
      */
-    public function query() {
+    public function query()
+    {
         return $this->call;
     }
 
     /**
      *
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         curl_close($this->curl);
     }
 
@@ -165,7 +213,8 @@ class Webbox {
     /**
      *
      */
-    protected function initRPC( $proc ) {
+    protected function initRPC($proc)
+    {
         $rpc = new \StdClass;
         $rpc->version = '1.0';
         $rpc->id      = (string) rand(1000, 9999);
@@ -177,7 +226,8 @@ class Webbox {
     /**
      *
      */
-    protected function call( $rpc ) {
+    protected function call($rpc)
+    {
 
         $this->error = '';
 
@@ -194,7 +244,7 @@ class Webbox {
 
         if (!$this->response) {
             $this->error = 'Curl error (' . curl_errno($this->curl) . '): ' . curl_error($this->curl);
-            return FALSE;
+            return false;
         }
 
         // Got answer
@@ -204,7 +254,7 @@ class Webbox {
             case JSON_ERROR_NONE:
                 if (isset($result->result)) {
                     // Fine, return result
-                    $this->error = FALSE;
+                    $this->error = false;
                     return $result->result;
                 } else {
                     // Set error, return FALSE at end
@@ -231,35 +281,21 @@ class Webbox {
                 break;
         }
 
-        return FALSE;
+        return false;
+    }
+
+    /**
+     *
+     */
+    protected function log($wb, $result)
+    {
+        echo str_repeat('-', 78), PHP_EOL, $wb->query(), PHP_EOL;
+        if (!$wb->isError()) {
+            echo 'Response: ', $wb->response(), PHP_EOL;
+            echo 'Result: ', print_r($result, true);
+        } else {
+            echo 'ERROR: ', $wb->error();
+        }
+        echo PHP_EOL, PHP_EOL;
     }
 }
-
-/**
- *
- */
-function log($wb, $result) {
-    echo str_repeat('-', 78), PHP_EOL, $wb->query(), PHP_EOL;
-    if (!$wb->isError()) {
-        echo 'Response: ', $wb->response(), PHP_EOL;
-        echo 'Result: ', print_r($result, TRUE);
-    } else {
-        echo 'ERROR: ', $wb->error();
-    }
-    echo PHP_EOL, PHP_EOL;
-}
-
-$wb = new \Equipment\SMA\Webbox('192.168.1.168');
-
-log($wb, $wb->GetPlantOverview());
-
-$result = $wb->getDevices();
-log($wb, $result);
-
-foreach ($result->devices as $device) {
-    log($wb, $wb->GetProcessDataChannels($device->key));
-    log($wb, $wb->GetProcessData($device->key));
-#    log($wb, $wb->GetProcessData($device->key, 'TmpMdul C'));
-    log($wb, $wb->GetParameter($device->key));
-}
-/* */

@@ -6,46 +6,43 @@
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ *
+ * @codingStandardsIgnoreFile
  */
 
 /**
  * Initialize
  */
 set_time_limit(0);
-setlocale(LC_NUMERIC, 'C');
 
-require __DIR__ . implode(DIRECTORY_SEPARATOR, ['', '..', '..', 'core', 'PVLng.php']);
-
-$file = PVLng::path(__DIR__, 'prepend.php');
-if (file_exists($file)) {
-    include $file;
-}
-
-if (!defined('DEVELOP')) {
-    define('DEVELOP', (isset($_SERVER['HTTP_X_DEBUG']) && $_SERVER['HTTP_X_DEBUG']));
-}
-
-if (DEVELOP) {
-    ini_set('display_startup_errors', 1);
-    ini_set('display_errors', 1);
-    error_reporting(-1);
-} else {
-    ini_set('display_startup_errors', 0);
-    ini_set('display_errors', 0);
-    error_reporting(0);
-}
+require implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'bootstrap.php']);
 
 /**
  * Bootstrap
  */
-$loader = PVLng::bootstrap(__DIR__);
-Loader::register($loader, TEMP_DIR);
+$loader = PVLng\PVLng::bootstrap(__DIR__);
+Loader::register($loader, PVLng\PVLng::$TempDir);
 
-$api = new Api(array(
-    'mode'      => DEVELOP ? 'development' : 'production',
-    'log.level' => DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
+$file = PVLng\PVLng::path(__DIR__, 'prepend.php');
+if (file_exists($file)) {
+    include $file;
+}
+
+if (!PVLng\PVLng::$DEVELOP) {
+    PVLng\PVLng::$DEVELOP = (isset($_SERVER['HTTP_X_DEBUG']) && $_SERVER['HTTP_X_DEBUG']);
+}
+
+if (PVLng\PVLng::$DEVELOP) {
+    ini_set('display_startup_errors', 1);
+    ini_set('display_errors', 1);
+    error_reporting(-1);
+}
+
+$api = new Api\Api(array(
+    'mode'      => PVLng\PVLng::$DEVELOP ? 'development' : 'production',
+    'log.level' => PVLng\PVLng::$DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
     'debug'     => false, // No debug mode at all
-    'view'      => new View
+    'view'      => new Api\View
 ));
 
 /**
@@ -73,28 +70,28 @@ $api->version  = substr($api->request()->getRootUri(), 5);
 /**
  * Configuration
  */
-$api->container->singleton('config', function() {
-    return PVLng::getConfig();
+$api->container->singleton('config', function () {
+    return PVLng\PVLng::getConfig();
 });
 
 /**
  * Database
  */
-$api->container->singleton('db', function() use ($api) {
-    return PVLng::getDatabase();
+$api->container->singleton('db', function () use ($api) {
+    return PVLng\PVLng::getDatabase();
 });
 
 /**
  * Cache
  */
-$api->container->singleton('cache', function() use ($api) {
-    return PVLng::getCache();
+$api->container->singleton('cache', function () use ($api) {
+    return PVLng\PVLng::getCache();
 });
 
 // ---------------------------------------------------------------------------
 // Hooks
 // ---------------------------------------------------------------------------
-$api->hook('slim.before', function() use ($api) {
+$api->hook('slim.before', function () use ($api) {
 
     $headers = $api->Request()->Headers();
 
@@ -110,11 +107,21 @@ $api->hook('slim.before', function() use ($api) {
     if (!empty($args[2])) {
         // All supported content types
         switch (/* Extension */ $args[2]) {
-            case '.csv':   $type = 'application/csv';   break;
-            case '.tsv':   $type = 'application/tsv';   break;
-            case '.txt':   $type = 'text/plain';        break;
-            case '.xml':   $type = 'application/xml';   break;
-            case '.json':  $type = 'application/json';  break;
+            case '.csv':
+                $type = 'application/csv';
+                break;
+            case '.tsv':
+                $type = 'application/tsv';
+                break;
+            case '.txt':
+                $type = 'text/plain';
+                break;
+            case '.xml':
+                $type = 'application/xml';
+                break;
+            case '.json':
+                $type = 'application/json';
+                break;
             default:
                 $api->contentType('text/plain');
                 $api->halt(400, 'Unknown Accept content type: '.$args[2]);
@@ -140,7 +147,7 @@ $api->hook('slim.before', function() use ($api) {
     if ($key == '') {
         // Key was not given
         $api->APIKeyValid = false;
-    } elseif (PVLng::checkApiKey($key)) {
+    } elseif (PVLng\PVLng::checkApiKey($key)) {
         // Key is given and valid
         $api->APIKeyValid = true;
     } else {
@@ -158,8 +165,10 @@ $api->hook('slim.before', function() use ($api) {
 /**
  * Debugging middleware
  */
-if (DEVELOP) {
-    include PVLng::path(__DIR__, 'develop.php');
+if (PVLng\PVLng::$DEVELOP) {
+    include PVLng\PVLng::path(__DIR__, 'develop.php');
+    // Apply Middleware
+    $api->add(new DevTimerMiddleware);
 }
 
 // ---------------------------------------------------------------------------
@@ -169,19 +178,21 @@ if (DEVELOP) {
 /**
  *
  */
-$APIkeyRequired = function() use ($api) {
+$APIkeyRequired = function () use ($api) {
     $api->APIKeyValid || $api->stopAPI('Access only with valid API key!', 403);
 };
 
 /**
  *
  */
-$accessibleChannel = function(Slim\Route $route) use ($api) {
+$accessibleChannel = function (Slim\Route $route) use ($api) {
     // API key correct, access all channels
-    if ($api->APIKeyValid) return;
+    if ($api->APIKeyValid) {
+        return;
+    }
 
     // No API key given, check channel is public
-    if (!Channel::byGUID($route->getParam('guid'))->public) {
+    if (!Channel\Channel::byGUID($route->getParam('guid'))->public) {
         $api->stopAPI('Access to private channel only with valid API key!', 403);
     }
 };
@@ -189,11 +200,11 @@ $accessibleChannel = function(Slim\Route $route) use ($api) {
 /**
  *
  */
-$checkLocation = function() use ($api) {
+$checkLocation = function () use ($api) {
     $api->Latitude  = $api->config->get('Core.Latitude');
     $api->Longitude = $api->config->get('Core.Longitude');
 
-    if ($api->Latitude == '' OR $api->Longitude == '') {
+    if ($api->Latitude == '' || $api->Longitude == '') {
         $api->stopAPI('No valid location defined in settings', 404);
     }
 };
@@ -201,7 +212,7 @@ $checkLocation = function() use ($api) {
 /**
  *
  */
-$api->error(function($e) use ($api) {
+$api->error(function ($e) use ($api) {
     if ($api->Request()->Headers()->get('X-PVLng-Trace')) {
         echo $e;
     } else {
@@ -228,7 +239,7 @@ Slim\Route::setDefaultConditions(array(
 // ---------------------------------------------------------------------------
 // The routes
 // ---------------------------------------------------------------------------
-$filemask = PVLng::path(__DIR__, 'routes', '*.php');
+$filemask = PVLng\PVLng::path(__DIR__, 'routes', '*.php');
 foreach (glob($filemask) as $routes) {
     include_once $routes;
 }
@@ -236,7 +247,7 @@ foreach (glob($filemask) as $routes) {
 /**
  * Route not found, redirect to help instead
  */
-$api->notFound(function() use ($api) {
+$api->notFound(function () use ($api) {
     // Catch also /
     $api->redirect($api->request()->getRootUri() . '/help');
 });
@@ -246,10 +257,12 @@ $api->notFound(function() use ($api) {
  */
 $api->run();
 
-$file = PVLng::path(__DIR__, 'append.php');
+$file = PVLng\PVLng::path(__DIR__, 'append.php');
 if (file_exists($file)) {
     include $file;
 }
 
 // Send statistics each 6 hours if activated
-if ($api->config->SendStatistics) PVLng::SendStatistics();
+if ($api->config->SendStatistics) {
+    PVLng\PVLng::SendStatistics();
+}

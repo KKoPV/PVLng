@@ -17,14 +17,15 @@ namespace ORM;
 /**
  *
  */
-class TariffView extends TariffViewBase {
+class TariffView extends TariffViewBase
+{
 
     /**
      *
      * @return int
      */
-    public function getDateTS() {
+    public function getDateTS()
+    {
         return strtotime($this->fields['date']);
     } // getDateTS()
-
 }

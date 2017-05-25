@@ -17,6 +17,7 @@ namespace ORM;
 /**
  *
  */
-class TariffDate extends TariffDateBase {
+class TariffDate extends TariffDateBase
+{
 
 }

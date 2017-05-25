@@ -14,6 +14,20 @@
 var verbose = false;
 
 /**
+ * Idea from http://paulgueller.com/2011/04/26/parse-the-querystring-with-jquery/
+ */
+$.parseQueryString = function() {
+    var qs = window.location.search.replace('?', ''), result = {}, v;
+    if (qs) {
+        $.each(qs.split('&'), function(id, data) {
+            v = data.split('=');
+            if (v.length == 2) result[v[0]] = decodeURIComponent(v[1]);
+        });
+    }
+    return result;
+};
+
+/**
  *
  */
 function _log() {

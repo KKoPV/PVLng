@@ -13,30 +13,34 @@
  */
 $api->get(
     '/translation',
-    function() use ($api)
-{
-    $texts = array(array(
-        'Code'    => 'Code (don\'t touch!)',
-        'Content' => 'Translate this'
-    ));
+    function () use ($api) {
+        $texts = array(array(
+            'Code'    => 'Code (don\'t touch!)',
+            'Content' => 'Translate this'
+        ));
 
-    $q = new DBQuery('pvlng_babelkit');
+        $q = new DBQuery('pvlng_babelkit');
 
-    $q->get($q->CONCAT('code_set', '"/"', 'code_code'), 'Code')
-      ->get('code_desc', 'Content')
-      ->whereEQ('code_lang', 'en')
-      // Exclude administrative code sets
-      ->whereNotLIKE('code_set', 'code%');
+        $q->get($q->CONCAT('code_set', '"/"', 'code_code'), 'Code')
+          ->get('code_desc', 'Content')
+          ->whereEQ('code_lang', 'en')
+          // Exclude administrative code sets
+          ->whereNotLIKE('code_set', 'code%');
 
-    $api->db->setBuffered();
+        $api->db->setBuffered();
 
-    if ($res = $api->db->query($q)) {
-        while ($row = $res->fetch_assoc()) $texts[] = $row;
-        $res->close();
+        if ($res = $api->db->query($q)) {
+            while ($row = $res->fetch_assoc()) {
+                $texts[] = $row;
+            }
+            $res->close();
+        }
+
+        $api->render($texts);
     }
-
-    $api->render($texts);
-})->name('get translation')->help = array(
+)
+->name('GET /translation')
+->help = array(
     'since'       => 'r3',
     'description' => 'Extract english texts for translation'
 );
@@ -46,33 +50,36 @@ $api->get(
  */
 $api->get(
     '/translate/:language(/:set)',
-    function($language, $set=null) use ($api)
-{
-    $q = new DBQuery('pvlng_babelkit');
+    function ($language, $set = null) use ($api) {
+        $q = new DBQuery('pvlng_babelkit');
 
-    if ($set) {
-        $q->get('code_code', 'code')
-          ->whereEQ('code_set', $set);
-    } else {
-        $q->get($q->CONCAT('code_set', '"/"', 'code_code'), 'code')
+        if ($set) {
+            $q->get('code_code', 'code')
+              ->whereEQ('code_set', $set);
+        } else {
+            $q->get($q->CONCAT('code_set', '"/"', 'code_code'), 'code')
             // Exclude administrative code sets
-          ->whereNotLIKE('code_set', 'code%');
+              ->whereNotLIKE('code_set', 'code%');
+        }
+
+        $q->get('code_desc')->whereEQ('code_lang', $language);
+
+        $api->db->setBuffered();
+
+        $texts = array();
+
+        if ($res = $api->db->query($q)) {
+            while ($row = $res->fetch_object()) {
+                $texts[$row->code] = $row->code_desc;
+            }
+            $res->close();
+        }
+
+        $api->render($texts);
     }
-
-    $q->get('code_desc')
-      ->whereEQ('code_lang', $language);
-
-    $api->db->setBuffered();
-
-    $texts = array();
-
-    if ($res = $api->db->query($q)) {
-        while ($row = $res->fetch_object()) $texts[$row->code] = $row->code_desc;
-        $res->close();
-    }
-
-    $api->render($texts);
-})->name('get translate')->help = array(
+)
+->name('GET /translate/:language(/:set)')
+->help = array(
     'since'       => 'r6',
     'description' => 'Extract translations'
 );
@@ -82,20 +89,24 @@ $api->get(
  */
 $api->get(
     '/languages',
-    function() use ($api)
-{
-    $q = new DBQuery('pvlng_babelkit');
+    function () use ($api) {
+        $q = new DBQuery('pvlng_babelkit');
 
-    $q->get('DISTINCT code_lang');
+        $q->get('DISTINCT code_lang');
 
-    $languages = array();
+        $languages = array();
 
-    if ($res = $api->db->query($q)) {
-        while ($row = $res->fetch_object()) $languages[] = $row->code_lang;
+        if ($res = $api->db->query($q)) {
+            while ($row = $res->fetch_object()) {
+                $languages[] = $row->code_lang;
+            }
+        }
+
+        $api->render($languages);
     }
-
-    $api->render($languages);
-})->name('get translate/languages')->help = array(
+)
+->name('GET languages')
+->help = array(
     'since'       => 'r6',
     'description' => 'Get available languages'
 );

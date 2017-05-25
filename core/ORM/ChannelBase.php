@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -843,8 +843,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -855,8 +854,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByGuid($guid)
     {
-        $this->filter[] = $this->field('guid').' = '.$this->quote($guid);
-        return $this;
+        return $this->filter('guid', $guid);
     }
 
     /**
@@ -867,8 +865,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = $this->field('type').' = '.$this->quote($type);
-        return $this;
+        return $this->filter('type', $type);
     }
 
     /**
@@ -879,8 +876,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByTariff($tariff)
     {
-        $this->filter[] = $this->field('tariff').' = '.$this->quote($tariff);
-        return $this;
+        return $this->filter('tariff', $tariff);
     }
 
     /**
@@ -891,8 +887,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -903,8 +898,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByDescription($description)
     {
-        $this->filter[] = $this->field('description').' = '.$this->quote($description);
-        return $this;
+        return $this->filter('description', $description);
     }
 
     /**
@@ -915,8 +909,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterBySerial($serial)
     {
-        $this->filter[] = $this->field('serial').' = '.$this->quote($serial);
-        return $this;
+        return $this->filter('serial', $serial);
     }
 
     /**
@@ -927,8 +920,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByChannel($channel)
     {
-        $this->filter[] = $this->field('channel').' = '.$this->quote($channel);
-        return $this;
+        return $this->filter('channel', $channel);
     }
 
     /**
@@ -939,8 +931,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByResolution($resolution)
     {
-        $this->filter[] = $this->field('resolution').' = '.$this->quote($resolution);
-        return $this;
+        return $this->filter('resolution', $resolution);
     }
 
     /**
@@ -951,8 +942,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByUnit($unit)
     {
-        $this->filter[] = $this->field('unit').' = '.$this->quote($unit);
-        return $this;
+        return $this->filter('unit', $unit);
     }
 
     /**
@@ -963,8 +953,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByDecimals($decimals)
     {
-        $this->filter[] = $this->field('decimals').' = '.$this->quote($decimals);
-        return $this;
+        return $this->filter('decimals', $decimals);
     }
 
     /**
@@ -975,8 +964,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByMeter($meter)
     {
-        $this->filter[] = $this->field('meter').' = '.$this->quote($meter);
-        return $this;
+        return $this->filter('meter', $meter);
     }
 
     /**
@@ -987,8 +975,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByNumeric($numeric)
     {
-        $this->filter[] = $this->field('numeric').' = '.$this->quote($numeric);
-        return $this;
+        return $this->filter('numeric', $numeric);
     }
 
     /**
@@ -999,8 +986,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByOffset($offset)
     {
-        $this->filter[] = $this->field('offset').' = '.$this->quote($offset);
-        return $this;
+        return $this->filter('offset', $offset);
     }
 
     /**
@@ -1011,8 +997,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByAdjust($adjust)
     {
-        $this->filter[] = $this->field('adjust').' = '.$this->quote($adjust);
-        return $this;
+        return $this->filter('adjust', $adjust);
     }
 
     /**
@@ -1023,8 +1008,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByCost($cost)
     {
-        $this->filter[] = $this->field('cost').' = '.$this->quote($cost);
-        return $this;
+        return $this->filter('cost', $cost);
     }
 
     /**
@@ -1035,8 +1019,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByThreshold($threshold)
     {
-        $this->filter[] = $this->field('threshold').' = '.$this->quote($threshold);
-        return $this;
+        return $this->filter('threshold', $threshold);
     }
 
     /**
@@ -1047,8 +1030,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByValidFrom($valid_from)
     {
-        $this->filter[] = $this->field('valid_from').' = '.$this->quote($valid_from);
-        return $this;
+        return $this->filter('valid_from', $valid_from);
     }
 
     /**
@@ -1059,8 +1041,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByValidTo($valid_to)
     {
-        $this->filter[] = $this->field('valid_to').' = '.$this->quote($valid_to);
-        return $this;
+        return $this->filter('valid_to', $valid_to);
     }
 
     /**
@@ -1071,8 +1052,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = $this->field('public').' = '.$this->quote($public);
-        return $this;
+        return $this->filter('public', $public);
     }
 
     /**
@@ -1083,8 +1063,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByTags($tags)
     {
-        $this->filter[] = $this->field('tags').' = '.$this->quote($tags);
-        return $this;
+        return $this->filter('tags', $tags);
     }
 
     /**
@@ -1095,8 +1074,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByExtra($extra)
     {
-        $this->filter[] = $this->field('extra').' = '.$this->quote($extra);
-        return $this;
+        return $this->filter('extra', $extra);
     }
 
     /**
@@ -1107,8 +1085,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
-        return $this;
+        return $this->filter('comment', $comment);
     }
 
     /**
@@ -1119,8 +1096,7 @@ abstract class ChannelBase extends \slimMVC\ORM
      */
     public function filterByIcon($icon)
     {
-        $this->filter[] = $this->field('icon').' = '.$this->quote($icon);
-        return $this;
+        return $this->filter('icon', $icon);
     }
 
     // -----------------------------------------------------------------------
@@ -1128,19 +1104,18 @@ abstract class ChannelBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_channel';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_channel` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_channel` (
           `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
           `guid` char(39) DEFAULT NULL COMMENT \'Unique GUID\',
           `name` varchar(255) NOT NULL DEFAULT \'\' COMMENT \'Unique identifier\',
@@ -1173,6 +1148,14 @@ abstract class ChannelBase extends \slimMVC\ORM
           CONSTRAINT `pvlng_channel_ibfk_2` FOREIGN KEY (`tariff`) REFERENCES `pvlng_tariff` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'The channels defined\'
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_channel';
 
     /**
      *
@@ -1245,5 +1228,4 @@ abstract class ChannelBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = 'id';
-
 }

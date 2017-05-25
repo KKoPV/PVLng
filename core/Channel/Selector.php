@@ -12,13 +12,15 @@ namespace Channel;
 /**
  *
  */
-class Selector extends Channel {
+class Selector extends Channel
+{
 
     /**
      *
      */
-    public function read( $request ) {
-        $this->before_read($request);
+    public function read($request)
+    {
+        $this->beforeRead($request);
 
         $childs = $this->getChilds();
 
@@ -32,13 +34,11 @@ class Selector extends Channel {
 
         $result = new \Buffer;
 
-        while (!empty($row1) OR !empty($row2)) {
-
+        while (!empty($row1) || !empty($row2)) {
             $key1 = $child1->key();
             $key2 = $child2->key();
 
             if ($key1 === $key2) {
-
                 if ($row1['data'] <= $this->threshold) {
                     $row2['data'] = 0;
                     $row2['min']  = 0;
@@ -53,25 +53,20 @@ class Selector extends Channel {
                 // read both next rows
                 $row1 = $child1->next()->current();
                 $row2 = $child2->next()->current();
-
-            } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
-
+            } elseif (is_null($key2) || !is_null($key1) && $key1 < $key2) {
                 // read only row 1
                 $row1 = $child1->next()->current();
-
             } else /* $key1 > $key2 */ {
-
                 // read only row 2
                 $row2 = $child2->next()->current();
-
             }
         }
         $child1->close();
         $child2->close();
 
         // Overrule threshold logic
-        $this->threshold = NULL;
+        $this->threshold = null;
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
 }

@@ -21,16 +21,16 @@ return array(
 
     'extra' => array(
         'type'     => 'range;10;30;10', // 10, 20 or 30 days
-        'visible'  => TRUE,
+        'visible'  => true,
         'default'  => 5,
     ),
 
     'valid_from' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
 
     'valid_to' => array(
-        'visible' => FALSE,
+        'visible' => false,
     ),
 
 );

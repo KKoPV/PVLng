@@ -17,7 +17,8 @@ namespace ORM;
 /**
  *
  */
-class Tariff extends TariffBase {
+class Tariff extends TariffBase
+{
 
     const SECONDS = 0;
     const DAY     = 1;
@@ -26,9 +27,12 @@ class Tariff extends TariffBase {
     /**
      *
      */
-    public function cloneDatesTimes( $from ) {
+    public function cloneDatesTimes($from)
+    {
 
-        if (!$this->getId() OR !$from) return;
+        if (!$this->getId() or !$from) {
+            return;
+        }
 
         self::$db->query('
                 INSERT INTO `pvlng_tariff_date`
@@ -51,9 +55,12 @@ class Tariff extends TariffBase {
      * @param  int $mode Return times for date, as seconds or as string '00:00'
      * @return array
      */
-    public function getTariffDay( $date, $mode=self::DAY ) {
+    public function getTariffDay($date, $mode = self::DAY)
+    {
 
-        if (!$this->getId()) return array();
+        if (!$this->getId()) {
+            return array();
+        }
 
         $date = floor($date / 86400) * 86400;
 
@@ -97,11 +104,16 @@ class Tariff extends TariffBase {
      * @param  string $to Date exclusive
      * @return array
      */
-    public function getTariffTimes( $from, $to ) {
+    public function getTariffTimes($from, $to)
+    {
 
-        if (!$this->getId()) return array();
+        if (!$this->getId()) {
+            return array();
+        }
 
-        if (!$to) $to = $from + 1; // Force run once
+        if (!$to) {
+            $to = $from + 1; // Force run once
+        }
 
         $sql = '
           SELECT TIME_TO_SEC(`time`) AS `time`, `tariff`
@@ -117,8 +129,8 @@ class Tariff extends TariffBase {
         while ($from < $to) {
             foreach (self::$db->queryRows($sql, $this->getId(), date('Y-m-d', $from)) as $row) {
                 if ($last != $row->tariff) {
-                 $data[date('U', $from) + $row->time] = $row->tariff;
-                   $last = $row->tariff;
+                    $data[date('U', $from) + $row->time] = $row->tariff;
+                    $last = $row->tariff;
                 }
             }
             $from += 86400;
@@ -130,7 +142,8 @@ class Tariff extends TariffBase {
     /**
      *
      */
-    protected function formatTime( $date, $time, $mode ) {
+    protected function formatTime($date, $time, $mode)
+    {
         switch ($mode) {
             case self::SECONDS:
                 return $time;

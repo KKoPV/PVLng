@@ -22,12 +22,12 @@ class Webbox extends MultiChannel
     /**
      *
      */
-    public function write($request, $timestamp=null)
+    public function write($request, $timestamp = null)
     {
         // Check for request errors
         if (!isset($request['result']['devices'][0]['channels'])) {
             throw new \Exception(
-                "Invalid Webbox response:\n".print_r($request, TRUE),
+                "Invalid Webbox response:\n".print_r($request, true),
                 400
             );
         }

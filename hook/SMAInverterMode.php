@@ -11,15 +11,17 @@ namespace Hook;
 /**
  *
  */
-class SMAInverterMode extends Base {
+class SMAInverterMode extends Base
+{
 
     /**
      * Save mode in uppercase, set empty data to AUS
      *
      */
-    public static function data_save_before(&$channel, $config)
+    public static function dataSaveBefore(&$channel, $config)
     {
-        if ($channel->value == '') $channel->value = 'Off';
+        if ($channel->value == '') {
+            $channel->value = 'Off';
+        }
     }
-
 }

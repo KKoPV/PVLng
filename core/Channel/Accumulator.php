@@ -19,13 +19,12 @@ class Accumulator extends Calculator
      */
     public function read($request)
     {
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $childs = $this->getChilds();
         $childCnt = count($childs);
 
-        switch($childCnt) {
-
+        switch ($childCnt) {
             case 0: // No childs, return empty result
                 $result = new \Buffer;
                 break;
@@ -45,23 +44,20 @@ class Accumulator extends Calculator
 
                 // Combine all data for same timestamp
                 for ($i=1; $i<$childCnt; $i++) {
-
                     $next = $childs[$i]->read($request);
 
                     $row1 = $buffer->rewind()->current();
                     $row2 = $next->rewind()->current();
-                    $first1 = $first2 = TRUE;
+                    $first1 = $first2 = true;
 
                     $result = new \Buffer;
-                    $lastRow = FALSE;
+                    $lastRow = false;
 
-                    while (!empty($row1) OR !empty($row2)) {
-
+                    while (!empty($row1) || !empty($row2)) {
                         $key1 = $buffer->key();
                         $key2 = $next->key();
 
                         if ($key1 === $key2) {
-
                             // Same key, combine
                             // Can have different timestamps in case of last or lastread,
                             // check and get last one
@@ -82,32 +78,27 @@ class Accumulator extends Calculator
                             // read both next rows
                             $row1 = $buffer->next()->current();
                             $row2 = $next->next()->current();
-                            $first1 = $first2 = FALSE;
-
-                        } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
-
+                            $first1 = $first2 = false;
+                        } elseif (is_null($key2) || !is_null($key1) && $key1 < $key2) {
                             // write $row1 only, if not in strict mode and data set 2 is not yet started
-                            if ($first2 AND $lazy) {
+                            if ($first2 && $lazy) {
                                 $result->write($row1, $key1);
                                 $lastRow = $row1;
                             }
 
                             // read only row 1
                             $row1 = $buffer->next()->current();
-                            $first1 = FALSE;
-
+                            $first1 = false;
                         } else /* $key1 > $key2 */ {
-
                             // write $row2 only, if not in stric mode and data set 1 is not yet started
-                            if ($first1 AND $lazy) {
+                            if ($first1 && $lazy) {
                                 $result->write($row2, $key2);
                                 $lastRow = $row2;
                             }
 
                             // read only row 2
                             $row2 = $next->next()->current();
-                            $first2 = FALSE;
-
+                            $first2 = false;
                         }
                     }
                     $next->close();
@@ -117,6 +108,6 @@ class Accumulator extends Calculator
                 }
         } // switch
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
 }

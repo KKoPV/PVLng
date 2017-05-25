@@ -24,18 +24,19 @@ class MultiChannel extends Channel
     /**
      * Accepts data array in $request['data']
      */
-    public function write($request, $timestamp=null)
+    public function write($request, $timestamp = null)
     {
-        if (empty($request['data'])) { return 0;
+        if (empty($request['data'])) {
+            return 0;
         }
 
         $ok = 0;
 
         // Find valid child channels
         foreach ($this->getChilds() as $child) {
-
             // Find only writable channels with filled "channel" attribute
-            if (!$child->write OR $child->channel == '') { continue;
+            if (!$child->write || $child->channel == '') {
+                continue;
             }
 
             // Check all keys in lowercase
@@ -61,7 +62,8 @@ class MultiChannel extends Channel
                 $ok += $child->write(array('data' => $value), $timestamp);
             } catch (\Exception $e) {
                 $code = $e->getCode();
-                if ($code != 200 AND $code != 201 AND $code != 422) { throw $e;
+                if ($code != 200 && $code != 201 && $code != 422) {
+                    throw $e;
                 }
             }
         }

@@ -12,30 +12,39 @@ namespace Channel;
 /**
  *
  */
-class Calculator extends Channel {
+use Core\Messages;
+use ORM\Channel as ORMChannel;
+use ORM\Tree as ORMTree;
+
+/**
+ *
+ */
+class Calculator extends Channel
+{
 
     /**
      * Accept only childs of the same meter attribute and unit
      */
-    public function addChild( $channel ) {
-        $childs = $this->getChilds(TRUE);
+    public function addChild($channel)
+    {
+        $childs = $this->getChilds(true);
         if (empty($childs)) {
             // Add 1st child
             if ($child = parent::addChild($channel)) {
                 // Adopt meter
-                $self = new \ORM\Channel($this->entity);
+                $self = new ORMChannel($this->entity);
                 $self->setMeter($this->getRealChannel($channel)->getMeter())->update();
             }
         } else {
             // Check if the new child have the same type and unit as the 1st (and any other) child
             $first = $childs[0];
             $next  = $this->getRealChannel($channel);
-            if ($first->meter == $next->getMeter() AND $first->unit == $next->getUnit()) {
+            if ($first->meter == $next->getMeter() && $first->unit == $next->getUnit()) {
                 // ok, add new child
                 $child = parent::addChild($channel);
             } else {
                 $meter = $first->meter ? 'meter' : 'sensor';
-                \Messages::Error('"'.$this->name.'" accepts only '.$meter.' channels with unit '.$first->unit, 400);
+                Messages::error('"'.$this->name.'" accepts only '.$meter.' channels with unit '.$first->unit, 400);
                 return;
             }
         }
@@ -45,9 +54,9 @@ class Calculator extends Channel {
     /**
      *
      */
-    public function read( $request ) {
-
-        $this->before_read($request);
+    public function read($request)
+    {
+        $this->beforeRead($request);
 
         $child = $this->getChild(1);
 
@@ -55,7 +64,7 @@ class Calculator extends Channel {
         $this->meter = $child->meter;
 
         // Simply pass-through
-        return $this->after_read($child->read($request));
+        return $this->afterRead($child->read($request));
     }
 
     // -----------------------------------------------------------------------
@@ -65,12 +74,13 @@ class Calculator extends Channel {
     /**
      *
      */
-    protected function getRealChannel( $channel ) {
-        $channel = new \ORM\Channel($channel);
+    protected function getRealChannel($channel)
+    {
+        $channel = new ORMChannel($channel);
         if ($channel->getType() == 0) {
             // Is an alias, get real channel
             $guid = $channel->getChannel();
-            $channel = new \ORM\Tree;
+            $channel = new ORMTree;
             $channel->filterByGuid($guid)->findOne();
         }
         return $channel;

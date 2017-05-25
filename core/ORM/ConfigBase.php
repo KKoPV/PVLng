@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -149,8 +149,7 @@ abstract class ConfigBase extends \slimMVC\ORM
      */
     public function filterByKey($key)
     {
-        $this->filter[] = $this->field('key').' = '.$this->quote($key);
-        return $this;
+        return $this->filter('key', $key);
     }
 
     /**
@@ -161,8 +160,7 @@ abstract class ConfigBase extends \slimMVC\ORM
      */
     public function filterByValue($value)
     {
-        $this->filter[] = $this->field('value').' = '.$this->quote($value);
-        return $this;
+        return $this->filter('value', $value);
     }
 
     /**
@@ -173,8 +171,7 @@ abstract class ConfigBase extends \slimMVC\ORM
      */
     public function filterByComment($comment)
     {
-        $this->filter[] = $this->field('comment').' = '.$this->quote($comment);
-        return $this;
+        return $this->filter('comment', $comment);
     }
 
     // -----------------------------------------------------------------------
@@ -191,25 +188,32 @@ abstract class ConfigBase extends \slimMVC\ORM
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_config';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_config` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_config` (
           `key` varchar(50) NOT NULL DEFAULT \'\',
           `value` varchar(1000) NOT NULL DEFAULT \'\',
           `comment` varchar(255) NOT NULL DEFAULT \'\',
           PRIMARY KEY (`key`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Application settings\'
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_config';
 
     /**
      *
@@ -240,5 +244,4 @@ abstract class ConfigBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

@@ -16,37 +16,11 @@ namespace ORM;
 /**
  *
  */
-class ReadingNumMemory extends ReadingNumMemoryBase {
-
+class ReadingNumMemory extends ReadingNumMemoryBase
+{
     /**
+     * Insert your extensions here...
      *
-     * @param mixed $id Key describing one row, on primary keys
-     *                  with more than field, provide an array
+     * Access table name with $this->table
      */
-    public function __construct ( $id=NULL ) {
-        if (self::$first) {
-            self::$db->query('
-                CREATE TABLE IF NOT EXISTS `pvlng_reading_num_tmp` (
-                    `id`        smallint unsigned NOT NULL DEFAULT 0,
-                    `timestamp` int               NOT NULL DEFAULT 0,
-                    `data`      decimal(13,4)     NOT NULL DEFAULT 0,
-                    PRIMARY KEY (`id`, `timestamp`)
-                ) ENGINE=Memory PARTITION BY LINEAR KEY(`id`) PARTITIONS 10
-            ');
-
-            self::$first = FALSE;
-        }
-
-        parent::__construct($id);
-    }
-
-    // -------------------------------------------------------------------------
-    // PRIVATE
-    // -------------------------------------------------------------------------
-
-    /**
-     * First call
-     */
-    private static $first = TRUE;
-
 }

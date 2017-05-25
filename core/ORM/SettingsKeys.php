@@ -17,4 +17,6 @@ namespace ORM;
 /**
  *
  */
-class SettingsKeys extends SettingsKeysBase {}
+class SettingsKeys extends SettingsKeysBase
+{
+}

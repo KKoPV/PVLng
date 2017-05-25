@@ -29,27 +29,29 @@ class ReadingNum extends ReadingNumBase
      * @param integer $id Channel Id
      * @param array $data Array of Array($timestamp => $value)
      */
-    public function insertBulk($id, Array $data) {
+    public function insertBulk($id, array $data)
+    {
 
-        if (empty($data)) return 0;
+        if (empty($data)) {
+            return 0;
+        }
 
         $values = array();
 
-        foreach ($data as $timestamp=>$value) {
+        foreach ($data as $timestamp => $value) {
             $values[] = $id . ',' . $timestamp . ',' . $value;
         }
 
         $sql = sprintf(
-            'INSERT INTO `%s` (`id`, `timestamp`, `data`) VALUES (%s)'.$this->_onDuplicateKey(),
+            'INSERT INTO `%s` (`id`, `timestamp`, `data`) VALUES (%s)'.$this->buildOnDuplicateKey(),
             $this->table, implode('),(', $values)
         );
 
         try {
-            $this->_query($sql);
+            $this->runQuery($sql);
             return (self::$db->affected_rows <= 0) ? 0 : self::$db->affected_rows;
         } catch (\Exception $e) {
             return 0;
         }
     }
-
 }

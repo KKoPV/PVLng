@@ -12,7 +12,8 @@ namespace Channel;
 /**
  *
  */
-class Random extends InternalCalc {
+class Random extends InternalCalc
+{
 
     // -----------------------------------------------------------------------
     // PROTECTED
@@ -21,9 +22,10 @@ class Random extends InternalCalc {
     /**
      *
      */
-    protected function before_read( &$request ) {
+    protected function beforeRead(&$request)
+    {
 
-        parent::before_read($request);
+        parent::beforeRead($request);
 
         // Force recreation of data
         $this->dataExists(0);
@@ -57,5 +59,4 @@ class Random extends InternalCalc {
 
         $this->dataCreated();
     }
-
 }

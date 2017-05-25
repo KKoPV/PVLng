@@ -10,8 +10,8 @@
 return array(
 
     'serial' => array(
-        'visible'  => TRUE,
-        'required' => TRUE,
+        'visible'  => true,
+        'required' => true,
     )
 
 );

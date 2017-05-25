@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -285,10 +285,9 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByScopeNameKey($scope, $name, $key)
     {
-
-        $this->filter[] = $this->field('scope').' = '.$this->quote($scope).'';
-        $this->filter[] = $this->field('name').' = '.$this->quote($name).'';
-        $this->filter[] = $this->field('key').' = '.$this->quote($key).'';
+        $this->filter('scope', $scope);
+        $this->filter('name', $name);
+        $this->filter('key', $key);
         return $this;
     }
 
@@ -300,8 +299,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByScope($scope)
     {
-        $this->filter[] = $this->field('scope').' = '.$this->quote($scope);
-        return $this;
+        return $this->filter('scope', $scope);
     }
 
     /**
@@ -312,8 +310,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -324,8 +321,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByKey($key)
     {
-        $this->filter[] = $this->field('key').' = '.$this->quote($key);
-        return $this;
+        return $this->filter('key', $key);
     }
 
     /**
@@ -336,8 +332,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByValue($value)
     {
-        $this->filter[] = $this->field('value').' = '.$this->quote($value);
-        return $this;
+        return $this->filter('value', $value);
     }
 
     /**
@@ -348,8 +343,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByOrder($order)
     {
-        $this->filter[] = $this->field('order').' = '.$this->quote($order);
-        return $this;
+        return $this->filter('order', $order);
     }
 
     /**
@@ -360,8 +354,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByType($type)
     {
-        $this->filter[] = $this->field('type').' = '.$this->quote($type);
-        return $this;
+        return $this->filter('type', $type);
     }
 
     /**
@@ -372,8 +365,7 @@ abstract class SettingsBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = $this->field('data').' = '.$this->quote($data);
-        return $this;
+        return $this->filter('data', $data);
     }
 
     // -----------------------------------------------------------------------
@@ -392,22 +384,21 @@ abstract class SettingsBase extends \slimMVC\ORM
     }
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_settings';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_settings` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_settings` (
           `scope` enum(\'core\',\'controller\',\'model\') NOT NULL DEFAULT \'core\',
-          `name` varchar(100) NOT NULL DEFAULT \'\',
-          `key` varchar(100) NOT NULL DEFAULT \'\',
+          `name` char(100) NOT NULL DEFAULT \'\',
+          `key` char(100) NOT NULL DEFAULT \'\',
           `value` varchar(100) NOT NULL DEFAULT \'\',
           `order` tinyint(3) unsigned NOT NULL DEFAULT \'0\',
           `type` enum(\'str\',\'num\',\'bool\',\'option\') NOT NULL DEFAULT \'str\',
@@ -415,6 +406,14 @@ abstract class SettingsBase extends \slimMVC\ORM
           PRIMARY KEY (`scope`,`name`,`key`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Application settings\'
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_settings';
 
     /**
      *
@@ -455,5 +454,4 @@ abstract class SettingsBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = '';
-
 }

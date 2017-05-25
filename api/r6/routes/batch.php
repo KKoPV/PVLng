@@ -14,17 +14,23 @@
 $api->put(
     '/batch/:guid',
     $APIkeyRequired,
-    function($guid) use ($api)
-{
-    // Analyse separator headers
-    $sep1 = $api->request->headers->get('X-PVLng-CSV-RecordSeparator', ';');
-    if (strtoupper($sep1) == 'TAB') $sep1 = "\t";
+    function ($guid) use ($api) {
+        // Analyse separator headers
+        $sep1 = $api->request->headers->get('X-PVLng-CSV-RecordSeparator', ';');
+        if (strtoupper($sep1) == 'TAB') {
+            $sep1 = "\t";
+        }
 
-    $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ',');
-    if (strtoupper($sep) == 'TAB') $sep = "\t";
+        $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ',');
+        if (strtoupper($sep) == 'TAB') {
+            $sep = "\t";
+        }
 
-    $api->saveCSV($guid, explode($sep1, trim($api->request->getBody())), $sep);
-})->name('put batch data')->help = array(
+        $api->saveCSV($guid, explode($sep1, trim($api->request->getBody())), $sep);
+    }
+)
+->name('put batch data')
+->help = array(
     'since'       => 'r2',
     'description' => 'Save multiple reading values',
     'apikey'      => true,

@@ -17,23 +17,26 @@ use PVLog\Classes\Json\Inverter;
 /**
  *
  */
-class Inverter11 extends BaseAbstract11 {
+class Inverter11 extends BaseAbstract11
+{
 
     /**
      *
      */
-    public function read( $request, $attributes=TRUE ) {
+    public function read($request, $attributes = true)
+    {
         $inverter = new Inverter;
 
         $childs = $this->getChilds();
 
-        if (!count($childs)) return $inverter;
+        if (!count($childs)) {
+            return $inverter;
+        }
 
-        foreach ($childs as $id=>$child) {
+        foreach ($childs as $id => $child) {
             $this->getTaggedChildData($inverter, $child, $request);
         }
 
         return $inverter;
     }
-
 }

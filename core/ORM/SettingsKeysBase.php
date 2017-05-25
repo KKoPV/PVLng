@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -71,8 +71,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
      */
     public function filterByKey($key)
     {
-        $this->filter[] = $this->field('key').' = '.$this->quote($key);
-        return $this;
+        return $this->filter('key', $key);
     }
 
     /**
@@ -83,8 +82,7 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
      */
     public function filterByValue($value)
     {
-        $this->filter[] = $this->field('value').' = '.$this->quote($value);
-        return $this;
+        return $this->filter('value', $value);
     }
 
     // -----------------------------------------------------------------------
@@ -92,20 +90,27 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_settings_keys';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
         CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_settings_keys` AS select concat(`pvlng_settings`.`scope`,if((`pvlng_settings`.`name` <> \'\'),concat(\'.\',`pvlng_settings`.`name`),\'\'),\'.\',`pvlng_settings`.`key`) AS `key`,`pvlng_settings`.`value` AS `value` from `pvlng_settings`
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_settings_keys';
 
     /**
      *
@@ -125,13 +130,10 @@ abstract class SettingsKeysBase extends \slimMVC\ORM
     /**
      *
      */
-    protected $primary = array(
-
-    );
+    protected $primary = array();
 
     /**
      *
      */
     protected $autoinc = '';
-
 }

@@ -20,12 +20,14 @@ class Averageline extends InternalCalc
     /**
      *
      */
-    protected function before_read(&$request)
+    protected function beforeRead(&$request)
     {
 
-        parent::before_read($request);
+        parent::beforeRead($request);
 
-        if ($this->dataExists()) return;
+        if ($this->dataExists()) {
+            return;
+        }
 
         $this->db->call('pvlng_model_averageline', $this->entity, $this->getChild(1)->entity, $this->extra);
 

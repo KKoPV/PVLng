@@ -16,39 +16,11 @@ namespace ORM;
 /**
  *
  */
-class Performance extends PerformanceBase {
-
+class Performance extends PerformanceBase
+{
     /**
+     * Insert your extensions here...
      *
+     * Access table name with $this->table
      */
-    public function __construct ( $id=NULL ) {
-        parent::__construct($id);
-
-        if (self::$create) {
-            self::$db->query(self::$create);
-            // Free some memory and use also as "done" marker...
-            self::$create = FALSE;
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
-    /**
-     * Create table on 1st call
-     */
-    protected static $create = '
-        CREATE TABLE IF NOT EXISTS `pvlng_performance` (
-          `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          `action`    enum("read","write") NOT NULL,
-          `time`      int(10) unsigned NOT NULL
-        ) ENGINE=MEMORY
-    ';
-
-    /**
-     *
-     */
-    protected $table = 'pvlng_performance';
-
 }

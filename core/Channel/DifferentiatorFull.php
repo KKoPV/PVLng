@@ -12,33 +12,34 @@ namespace Channel;
 /**
  *
  */
-class DifferentiatorFull extends Calculator {
+class DifferentiatorFull extends Calculator
+{
 
     /**
      *
      */
-    public function read( $request ) {
+    public function read($request)
+    {
 
-        $this->before_read($request);
+        $this->beforeRead($request);
 
         $childs = $this->getChilds();
         $childCnt = count($childs);
 
         // no childs, return empty file
         if ($childCnt == 0) {
-            return $this->after_read(new \Buffer);
+            return $this->afterRead(new \Buffer);
         }
         $this->meter = $childs[0]->meter;
         $buffer = $childs[0]->read($request);
 
         // only one child, return as is
         if ($childCnt == 1) {
-            return $this->after_read($buffer);
+            return $this->afterRead($buffer);
         }
 
         // combine all data for same timestamp
         for ($i=1; $i<$childCnt; $i++) {
-
             $next = $childs[$i]->read($request);
 
             $cnt1 = count($buffer);
@@ -48,15 +49,13 @@ class DifferentiatorFull extends Calculator {
             $row2 = $next->rewind()->current();
 
             $result = new \Buffer;
-            $last = NULL;
+            $last = null;
 
-            while (!empty($row1) OR !empty($row2)) {
-
+            while (!empty($row1) || !empty($row2)) {
                 $key1 = $buffer->key();
                 $key2 = $next->key();
 
                 if ($key1 === $key2 || $cnt1 == 1 && $cnt2 == 1) {
-
                     // Remember original row
                     $last = $row1;
 
@@ -72,9 +71,7 @@ class DifferentiatorFull extends Calculator {
                     // read both next rows
                     $row1 = $buffer->next()->current();
                     $row2 = $next->next()->current();
-
-                } elseif (is_null($key2) OR !is_null($key1) AND $key1 < $key2) {
-
+                } elseif (is_null($key2) || !is_null($key1) && $key1 < $key2) {
                     // Remember original row
                     $last = $row1;
 
@@ -83,11 +80,9 @@ class DifferentiatorFull extends Calculator {
 
                     // read only row 1
                     $row1 = $buffer->next()->current();
-
                 } else /* $key1 > $key2 */ {
-
                     // missing row 1
-                    if ($this->meter AND $last) {
+                    if ($this->meter && $last) {
                         $row2['data']        = $last['data'] - $row2['data'];
                         $row2['min']         = $last['min'] - $row2['min'];
                         $row2['max']         = $last['max'] - $row2['max'];
@@ -103,9 +98,7 @@ class DifferentiatorFull extends Calculator {
 
                     // read only row 2
                     $row2 = $next->next()->current();
-
                 }
-
             }
             $next->close();
 
@@ -113,6 +106,6 @@ class DifferentiatorFull extends Calculator {
             $buffer = $result;
         }
 
-        return $this->after_read($result);
+        return $this->afterRead($result);
     }
 }

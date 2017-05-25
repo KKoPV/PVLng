@@ -1,5 +1,7 @@
 <?php
 /**
+ * Memory buffer for results
+ *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012-2016 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
@@ -10,11 +12,13 @@ class Buffer implements Iterator, Countable
     /**
      * Use PHPs internal temp stream, use file for data greater 5 MB
      */
-    public function __construct($data=array(), $size=5)
+    public function __construct($data = array(), $size = 5)
     {
         $this->fh = fopen('php://temp/maxmemory:'.(1024 * 1024 * $size), 'w+');
         $this->rowCount = 0;
-        foreach ($data as $key=>$row) $this->write($row, $key);
+        foreach ($data as $key => $row) {
+            $this->write($row, $key);
+        }
         $this->rewind();
     }
 
@@ -24,7 +28,9 @@ class Buffer implements Iterator, Countable
     public function __destruct()
     {
         // Not yet closed
-        if (is_resource($this->fh)) fclose($this->fh);
+        if (is_resource($this->fh)) {
+            fclose($this->fh);
+        }
     }
 
     /**
@@ -41,6 +47,7 @@ class Buffer implements Iterator, Countable
     public function rewind()
     {
         rewind($this->fh);
+        // NOT part of Iterator interface
         return $this->next();
     }
 
@@ -79,7 +86,6 @@ class Buffer implements Iterator, Countable
             $this->id   = null;
             $this->data = array();
         }
-
         // NOT part of Iterator interface
         return $this;
     }
@@ -87,10 +93,12 @@ class Buffer implements Iterator, Countable
     /**
      *
      */
-    public function write(Array $data, $id=null)
+    public function write(array $data, $id = null)
     {
         // Skip empty data sets
-        if (empty($data)) return 0;
+        if (empty($data)) {
+            return 0;
+        }
 
         $this->rowCount++;
 
@@ -131,7 +139,7 @@ class Buffer implements Iterator, Countable
      */
     public function append(Buffer $buffer)
     {
-        foreach ($buffer as $id=>$row) {
+        foreach ($buffer as $id => $row) {
             $this->write($row, $id);
         }
         return $this;
@@ -143,7 +151,7 @@ class Buffer implements Iterator, Countable
     public function asArray()
     {
         $result = array();
-        foreach ($this as $id=>$row) {
+        foreach ($this as $id => $row) {
             $result[$id] = $row;
         }
         return $result;
@@ -207,7 +215,9 @@ class Buffer implements Iterator, Countable
      */
     protected function decode($data)
     {
-        if (!$data) return;
+        if (!$data) {
+            return;
+        }
 
         list($id, $keys, $values) = explode(self::SEP1, trim($data));
 
@@ -219,5 +229,4 @@ class Buffer implements Iterator, Countable
 
         return array($id, array_combine($keys, $values));
     }
-
 }

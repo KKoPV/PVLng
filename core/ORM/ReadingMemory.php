@@ -16,13 +16,14 @@ namespace ORM;
 /**
  *
  */
-abstract class ReadingMemory {
+abstract class ReadingMemory
+{
 
     /**
      *
      */
-    public static function factory( $numeric ) {
+    public static function factory($numeric)
+    {
         return $numeric ? new ReadingNumMemory : new ReadingStrMemory;
     }
-
 }

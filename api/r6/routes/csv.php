@@ -14,15 +14,18 @@
 $api->put(
     '/csv/:guid',
     $APIkeyRequired,
-    function($guid) use ($api)
-{
-    // Analyse X-PVLng-CSV-Separator header
-    $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ';');
-    if (strtoupper($sep) == 'TAB') $sep = "\t";
+    function ($guid) use ($api) {
+        // Analyse X-PVLng-CSV-Separator header
+        $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ';');
+        if (strtoupper($sep) == 'TAB') {
+            $sep = "\t";
+        }
 
-    $api->saveCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
-
-})->name('put data from file')->help = array(
+        $api->saveCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
+    }
+)
+->name('PUT /csv/:guid')
+->help = array(
     'since'       => 'r2',
     'description' => 'Save multiple reading values from CSV',
     'apikey'      => true,
@@ -43,15 +46,18 @@ $api->put(
 $api->put(
     '/csvbulk/:guid',
     $APIkeyRequired,
-    function($guid) use ($api)
-{
-    // Analyse X-PVLng-CSV-Separator header
-    $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ';');
-    if (strtoupper($sep) == 'TAB') $sep = "\t";
+    function ($guid) use ($api) {
+        // Analyse X-PVLng-CSV-Separator header
+        $sep = $api->request->headers->get('X-PVLng-CSV-Separator', ';');
+        if (strtoupper($sep) == 'TAB') {
+            $sep = "\t";
+        }
 
-    $api->saveBulkCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
-
-})->name('put bulk data from file')->help = array(
+        $api->saveBulkCSV($guid, explode(PHP_EOL, trim($api->request->getBody())), $sep);
+    }
+)
+->name('PUT /csvbulk/:guid')
+->help = array(
     'since'       => 'r6',
     'description' => 'Save multiple reading values from CSV as bulk',
     'apikey'      => true,

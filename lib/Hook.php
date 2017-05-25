@@ -13,25 +13,38 @@
  * - 1.0.0
  * Inital creation
  */
-abstract class Hook {
+use PVLng\PVLng;
+
+/**
+ *
+ */
+abstract class Hook
+{
 
     /**
      *
      */
-    public static function process( $hook, &$channel ) {
+    public static function process($hook, &$channel)
+    {
         if (!self::$hooks) {
-            $file = PVLng::path(ROOT_DIR, 'hook', 'hook.conf.php');
+            $file = PVLng::path(PVLng::$RootDir, 'hook', 'hook.conf.php');
             self::$hooks = file_exists($file) ? include $file : array();
         }
 
-        if (!isset(self::$hooks[$hook])) return;
+        if (!isset(self::$hooks[$hook])) {
+            return;
+        }
 
-        foreach (self::$hooks[$hook] as $name=>$config) {
+        foreach (self::$hooks[$hook] as $name => $config) {
             if (isset($config[$channel->guid])) {
-                require_once PVLng::path(ROOT_DIR, 'hook', $name.'.php');
-                $class = '\Hook\\'.$name;
-                $hook = str_replace('.', '_', $hook);
-                $class::$hook($channel, $config[$channel->guid]);
+                require_once PVLng::path(PVLng::$RootDir, 'hook', $name.'.php');
+                $class  = '\Hook\\'.$name;
+                $method = str_replace('.', '', $hook);
+                if (method_exists($class, $method)) {
+                    $class::$method($channel, $config[$channel->guid]);
+                } else {
+                    throw new Exception('Missing method \Hook\\'.$name.'::'.$method.'()');
+                }
             }
         }
 
@@ -46,5 +59,4 @@ abstract class Hook {
      *
      */
     protected static $hooks;
-
 }

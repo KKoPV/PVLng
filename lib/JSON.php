@@ -11,14 +11,16 @@
 /**
  *
  */
-abstract class JSON {
-
+abstract class JSON
+{
     /**
      *
      */
-    public static function check( $error=NULL ) {
-
-        if (is_null($error)) $error = json_last_error();
+    public static function check($error = null)
+    {
+        if (is_null($error)) {
+            $error = json_last_error();
+        }
 
         switch ($error) {
             case JSON_ERROR_NONE:
@@ -43,40 +45,43 @@ abstract class JSON {
                 return 'JSON ERROR ('.$error.') - Unknown error';
                 break;
         }
-
     }
 
     /**
      *
      */
-    public static function prettyPrint( $json, $indent="\t" ) {
+    public static function prettyPrint($json, $indent = "\t")
+    {
         $result = '';
         $level = 0;
         $prev_char = '';
         $in_quotes = false;
-        $ends_line_level = NULL;
+        $ends_line_level = null;
         $json_length = strlen( $json );
 
-        for ( $i = 0; $i < $json_length; $i++ ) {
+        for ($i = 0; $i < $json_length; $i++) {
             $char = $json[$i];
-            $new_line_level = NULL;
+            $new_line_level = null;
             $post = "";
-            if( $ends_line_level !== NULL ) {
+            if ($ends_line_level !== null) {
                 $new_line_level = $ends_line_level;
-                $ends_line_level = NULL;
+                $ends_line_level = null;
             }
-            if( $char === '"' && $prev_char != '\\' ) {
+            if ($char === '"' && $prev_char != '\\') {
                 $in_quotes = !$in_quotes;
-            } else if( ! $in_quotes ) {
-                switch( $char ) {
-                    case '}': case ']':
+            } elseif (! $in_quotes) {
+                switch ($char) {
+                    case '}':
+                    case ']':
                         $level--;
-                        $ends_line_level = NULL;
+                        $ends_line_level = null;
                         $new_line_level = $level;
                         break;
 
-                    case '{': case '[':
+                    case '{':
+                    case '[':
                         $level++;
+                        // fall-through
                     case ',':
                         $ends_line_level = $level;
                         break;
@@ -85,14 +90,17 @@ abstract class JSON {
                         $post = " ";
                         break;
 
-                    case " ": case "\t": case "\n": case "\r":
+                    case " ":
+                    case "\t":
+                    case "\n":
+                    case "\r":
                         $char = "";
                         $ends_line_level = $new_line_level;
-                        $new_line_level = NULL;
+                        $new_line_level = null;
                         break;
                 }
             }
-            if ( $new_line_level !== NULL ) {
+            if ($new_line_level !== null) {
                 $result .= "\n".str_repeat( $indent, $new_line_level );
             }
             $result .= $char.$post;
@@ -101,5 +109,4 @@ abstract class JSON {
 
         return $result;
     }
-
 }

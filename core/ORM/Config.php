@@ -45,5 +45,4 @@ class Config extends ConfigBase
             'UPDATE `'.$this->table.'` SET `value` = UUID() WHERE `key` = "APIKey" LIMIT 1'
         );
     }
-
 }

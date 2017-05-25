@@ -11,7 +11,9 @@
  * @version    1.0.0
  */
 
-if (!isset($_SERVER['argc']) || $_SERVER['argc'] != 4) exit(1);
+if (!isset($_SERVER['argc']) || $_SERVER['argc'] != 4) {
+    exit(1);
+}
 
 list($_self, $URL, $APIkey, $value) = $_SERVER['argv'];
 
@@ -22,13 +24,13 @@ rewind($fh);
 
 $ch = curl_init($URL);
 
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-curl_setopt($ch, CURLOPT_HEADER,         FALSE);
-curl_setopt($ch, CURLOPT_HTTPHEADER,     array('X-ApiKey: '.$APIkey));
-curl_setopt($ch, CURLOPT_PUT,            TRUE);
-curl_setopt($ch, CURLOPT_INFILE,         $fh);
-curl_setopt($ch, CURLOPT_INFILESIZE,     strlen($value));
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_HEADER, false);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-ApiKey: '.$APIkey));
+curl_setopt($ch, CURLOPT_PUT, true);
+curl_setopt($ch, CURLOPT_INFILE, $fh);
+curl_setopt($ch, CURLOPT_INFILESIZE, strlen($value));
 
 curl_exec($ch);
 

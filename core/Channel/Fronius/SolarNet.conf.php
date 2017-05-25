@@ -10,12 +10,12 @@
 return array(
 
     'serial' => array( // used for DeviceId
-        'visible'  => TRUE,
-        'required' => TRUE,
+        'visible'  => true,
+        'required' => true,
         'type'     => 'integer'
     ),
     'channel' => array( // used for device type
-        'visible'  => TRUE,
+        'visible'  => true,
                    // select;<key>:<text>[;<key>:<text>]...
         'type'     => 'select;1:Inverter;2:InverterWithStrings;3:SensorBox',
         'default'  => 1

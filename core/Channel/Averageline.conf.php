@@ -19,7 +19,7 @@ return array(
      */
 
     'extra' => array(
-        'visible'  => TRUE,
+        'visible'  => true,
         'type'     => 'select;1:ArithmeticMean;-1:HarmonicMean',
         'default'  => -1
     ),

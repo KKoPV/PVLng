@@ -9,7 +9,7 @@
  * If you make changes here, they will be lost on next upgrade PVLng!
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2016 Knut Kohl
+ * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
  * @author     PVLng ORM class builder
@@ -197,8 +197,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterById($id)
     {
-        $this->filter[] = $this->field('id').' = '.$this->quote($id);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -209,8 +208,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterBySlug($slug)
     {
-        $this->filter[] = $this->field('slug').' = '.$this->quote($slug);
-        return $this;
+        return $this->filter('slug', $slug);
     }
 
     /**
@@ -221,8 +219,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterByName($name)
     {
-        $this->filter[] = $this->field('name').' = '.$this->quote($name);
-        return $this;
+        return $this->filter('name', $name);
     }
 
     /**
@@ -233,8 +230,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterByData($data)
     {
-        $this->filter[] = $this->field('data').' = '.$this->quote($data);
-        return $this;
+        return $this->filter('data', $data);
     }
 
     /**
@@ -245,8 +241,7 @@ abstract class DashboardBase extends \slimMVC\ORM
      */
     public function filterByPublic($public)
     {
-        $this->filter[] = $this->field('public').' = '.$this->quote($public);
-        return $this;
+        return $this->filter('public', $public);
     }
 
     // -----------------------------------------------------------------------
@@ -254,19 +249,18 @@ abstract class DashboardBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Table name
-     *
-     * @var string $table Table name
+     * Call create table sql on first run and set to false
      */
-    protected $table = 'pvlng_dashboard';
+    protected static $memory = false;
 
     /**
      * SQL for creation
      *
      * @var string $createSQL
      */
-    protected $createSQL = '
-        CREATE TABLE `pvlng_dashboard` (
+    // @codingStandardsIgnoreStart
+    protected static $createSQL = '
+        CREATE TABLE IF NOT EXISTS `pvlng_dashboard` (
           `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
           `name` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'Unique name\',
           `data` varchar(255) NOT NULL DEFAULT \'\' COMMENT \'Selected channels in JSON\',
@@ -277,6 +271,14 @@ abstract class DashboardBase extends \slimMVC\ORM
           UNIQUE KEY `name` (`name`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8
     ';
+    // @codingStandardsIgnoreEnd
+
+    /**
+     * Table name
+     *
+     * @var string $table Table name
+     */
+    protected $table = 'pvlng_dashboard';
 
     /**
      *
@@ -311,5 +313,4 @@ abstract class DashboardBase extends \slimMVC\ORM
      *
      */
     protected $autoinc = 'id';
-
 }

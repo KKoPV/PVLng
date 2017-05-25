@@ -20,16 +20,17 @@ $rpc = array(
     'proc'    => 'GetProcessData',
     'id'      => (string) time(),
     'format'  => 'JSON',
-    'params' => NULL
+    'params' => null
 );
 
-if ($section['password']) $rpc['passwd'] = md5($section['password']);
+if ($section['password']) {
+    $rpc['passwd'] = md5($section['password']);
+}
 
 /**
  *
  */
 foreach ($section['equipments'] as $equipment) {
-
     list($serial, $guid) = array_values($equipment);
 
     okv(1, 'Serial / Channel', $serial . ' / ' . $guid);
@@ -43,24 +44,25 @@ foreach ($section['equipments'] as $equipment) {
     // Start curl sequence
     if (!curl(array(
         CURLOPT_URL => 'http://'.$ip.'/rpc',
-        CURLOPT_POST => TRUE,
+        CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => 'RPC='.$r,
         CURLOPT_RETURNTRANSFER => 1
-    ), $data, $info)) continue;
+    ), $data, $info)) {
+        continue;
+    }
 
     okv(2, 'Received', $data);
 
     // Anything went wrong?
     if ($info['http_code'] != 200) {
-        out(0, print_r($data, TRUE));
+        out(0, print_r($data, true));
         continue;
     }
 
     if (!TESTMODE) {
-        $cnt = Channel::byGUID($guid)->write(json_decode($data, TRUE));
+        $cnt = Channel\Channel::byGUID($guid)->write(json_decode($data, true));
         okv(1, 'Channels updated', $cnt);
     }
 
     out(1);
-
 }

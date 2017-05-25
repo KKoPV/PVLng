@@ -52,7 +52,8 @@ return array(
             'unit'        => 'Wh',
             'decimals'    => 0,
             'meter'       => 1,
-            'comment'     => 'Fill the "cost" with the amount of money you get for each watt hour (e.g. cent / 1000 / 1000 to get EUR).',
+            'comment'     => 'Fill the "cost" with the amount of money you get for each watt hour'
+                           . ' (e.g. cent / 1000 / 1000 to get EUR).',
         ),
         array(
             'type'        => 51, // Power sensor
@@ -114,8 +115,10 @@ return array(
             'name'        => 'State',
             'channel'     => 'Body->Data->DeviceStatus->StatusCode',
             'numeric'     => 0,
-            'comment'     => 'The following JSON map object will translate the numeric reading value during write to textual representation (ALL IN ONE LINE).'."\n\n"
-                            .'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"Startup","5":"Startup","6":"Startup","7":"Running","8":"Standby","9":"Boot loading","19":"Error"}'
+            'comment'     => 'The following JSON map object will translate the numeric reading value '
+                           . 'during write to textual representation (ALL IN ONE LINE).'."\n\n"
+                           . 'WRITEMAP::{"0":"Startup","1":"Startup","2":"Startup","3":"Startup","4":"Startup",'
+                           . '"5":"Startup","6":"Startup","7":"Running","8":"Standby","9":"Boot loading","19":"Error"}'
         ),
         array(
             'type'        => 91, // Switch, numeric
