@@ -15,7 +15,12 @@ namespace Channel\Kaco;
 /**
  *
  */
-class RS485 extends \Channel
+use Channel\Channel;
+
+/**
+ *
+ */
+class RS485 extends Channel
 {
 
     /**
@@ -23,7 +28,6 @@ class RS485 extends \Channel
      */
     public function write($request, $timestamp = null)
     {
-
         $data = explode(' ', $request['data']);
 
         // Something went wrong...

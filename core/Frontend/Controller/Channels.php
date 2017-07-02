@@ -40,21 +40,8 @@ class Channels extends Controller
         $tblChannel = new ORMChannelView;
         $this->view->Channels = $tblChannel->filter('type_id', array('min'=>1))->find()->asAssoc();
 
-        $fields = include PVLng::path(PVLng::$RootDir, 'core', 'Frontend', 'Channel', 'default.php');
         $this->fields = array();
-
-        foreach ($fields as $key => $field) {
-            $this->fields[$key] = array_merge(array(
-                'FIELD'       => $key,
-                'TYPE'        => 'text',
-                'VISIBLE'     => true,
-                'REQUIRED'    => false,
-                'READONLY'    => false,
-                'PLACEHOLDER' => null,
-                'DEFAULT'     => null,
-                'VALUE'       => ''
-            ), array_change_key_case($field, CASE_UPPER));
-        }
+        $this->applyFieldSettings('default');
 
         if ($guid = $this->app->params->get('guid')) {
             // Call with GUID to edit, find channel
@@ -141,16 +128,16 @@ class Channels extends Controller
 
         $add = $this->request->post('a');
 
-        /// Yryie::StartTimer('template', 'Create template', 'db');
+        /// Yryie::startTimer('template', 'Create template', 'db');
         try {
             $aSubChannels = array();
             $cnt = 0;
 
             foreach ($channels as $id => $channel) {
                 if ($id == 0 || isset($add[$id])) {
-                    $oChannel
-                        ->reset()
-                        ->setIcon($oChannelType->reset()->filterById($channel['type'])->findOne()->getIcon());
+                    $oChannel->reset()->setIcon(
+                        $oChannelType->reset()->filterById($channel['type'])->findOne()->getIcon()
+                    );
                     foreach ($channel as $key => $value) {
                         if ($key == '_') {
                             // Act as grouping channel, e.g. accumulate string powers
@@ -181,21 +168,21 @@ class Channels extends Controller
                 }
             }
 
-            $this->app->redirect('/channel');
+            $this->app->redirect('/channels');
         }
-        /// Yryie::StopTimer('template');
+        /// Yryie::stopTimer('template');
 
         // Build hierarchy
-        /// Yryie::StartTimer('hierarchy', 'Create hierarchy', 'db');
+        /// Yryie::startTimer('hierarchy', 'Create hierarchy', 'db');
         // Remember Grouping Id for templates without own grouping channel (index 0)
         $groupId = $this->request->post('tree') ?: 1;
 
         foreach ($channels as $id => $channel) {
             if ($id == 0) {
-                $groupId = $this->app->tree->insertChildNode($channel['id'], $groupId);
+                $groupId = $this->tree->insertChildNode($channel['id'], $groupId);
             } elseif ($channel['id']) {
                 // Remember tree position
-                $channels[$id]['tree'] = $this->app->tree->insertChildNode($channel['id'], $groupId);
+                $channels[$id]['tree'] = $this->tree->insertChildNode($channel['id'], $groupId);
             } else {
                 $channels[$id]['tree'] = 0;
             }
@@ -211,7 +198,7 @@ class Channels extends Controller
                 }
             }
         }
-        /// Yryie::StopTimer('hierarchy');
+        /// Yryie::stopTimer('hierarchy');
 
         Messages::success(I18N::translate('HierarchyCreated', count($channels)));
 
@@ -547,13 +534,13 @@ class Channels extends Controller
 
         if ($type->getId() == '') {
             Messages::error('Unknown channel type');
-            $this->app->redirect('/channel');
+            $this->app->redirect('/channels');
         }
 
         // Get general field settings from channel type itself
         $fieldSettings = array($type->getType());
 
-        if ($entity) { // NULL or 0
+        if ($entity) { // null or 0
             $entity = new ORMChannel($entity);
             if ($entity->getNumeric()) {
                 $fieldSettings[] = 'numeric';
@@ -620,8 +607,6 @@ class Channels extends Controller
             switch (true) {
                 // Boolean
                 case strpos($data['TYPE'], 'bool') === 0:
-                    // Set type for template compiler
-                    $data['TYPE'] = 'bool';
                     // Shortcuts without options
                     if ($data['TYPE'] === 'bool' || $data['TYPE'] === 'bool-0' || $data['TYPE'] === 'boolean-0') {
                         // Defaults to 0
@@ -641,12 +626,12 @@ class Channels extends Controller
                             );
                         }
                     }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'bool';
                     break;
 
                 // Select
                 case strpos($data['TYPE'], 'select') === 0:
-                    // Set type for template compiler
-                    $data['TYPE'] = 'select';
                     if (preg_match_all('~;([^:;]+):([^:;]+)~i', $data['TYPE'], $matches, PREG_SET_ORDER)) {
                         foreach ($matches as $option) {
                             $val = trim($option[1]);
@@ -657,12 +642,12 @@ class Channels extends Controller
                             );
                         }
                     }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'select';
                     break;
 
                 // Range
                 case strpos($data['TYPE'], 'range') === 0:
-                    // Set type for template compiler
-                    $data['TYPE'] = 'select';
                     list(, $start, $end, $step) = explode(';', $data['TYPE'].';1', 4); // step of 1 as default
                     for ($i=$start; $i<=$end; $i+=$step) {
                         $data['OPTIONS'][] = array(
@@ -671,12 +656,12 @@ class Channels extends Controller
                             'SELECTED' => ($i == $data['VALUE'])
                         );
                     }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'select';
                     break;
 
                 // SQL
                 case preg_match('~^sql:(.?):(.*?)$~i', $data['TYPE'], $matches):
-                    // Set type for template compiler
-                    $data['TYPE'] = 'select';
                     // Tranform into select options
                     if ($matches[1] != '') {
                         // Empty option for select2 placeholder
@@ -692,12 +677,12 @@ class Channels extends Controller
                             'SELECTED' => ($val == $data['VALUE'])
                         );
                     }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'select';
                     break;
 
                 // Detect icon by field name, not by type
                 case $key == 'icon':
-                    // Set type for template compiler
-                    $data['TYPE'] = 'icon';
                     // In ADD mode the value is empty, preset from type
                     if (empty($data['VALUE'])) {
                         $data['VALUE'] = $type->getIcon();
@@ -719,6 +704,9 @@ class Channels extends Controller
                             'ACTUAL' => ($data['VALUE'] == $row->icon)
                         );
                     }
+                    // Set type for template compiler
+                    $data['TYPE'] = 'icon';
+                    break;
             } // switch
         }
 
@@ -748,6 +736,7 @@ class Channels extends Controller
             }
         }
 
+        /// Yryie::debug('Load channel config: '.basename($config));
         $attr = include $config;
 
         // check all fields

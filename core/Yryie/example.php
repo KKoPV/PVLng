@@ -2,8 +2,7 @@
 /**
  * Yryie example
  *
- * @ingroup    Yryie
- * @author     Knut Kohl <knutkohl@users.sourceforge.net>
+ * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2011 Knut Kohl
  * @license    http://www.gnu.org/licenses/gpl.txt GNU General Public License
  *
@@ -12,88 +11,89 @@
 ?>
 <html>
 <head>
-  <title>Yryie example</title>
-  <style type="text/css">
-  .linenum{
-      text-align:right;
-      background:#FDECE1;
-      border:1px solid #cc6666;
-      padding:0px 1px 0px 1px;
-      font-family:Courier New, Courier;
-      float:left;
-      width:17px;
-      margin:3px 0px 30px 0px;
-      }
-  code    {/* safari/konq hack */
-      font-family:Courier New, Courier;
-  }
-  .linetext{
-      width:700px;
-      text-align:left;
-      background:white;
-      border:1px solid #cc6666;
-      border-left:0px;
-      padding:0px 1px 0px 8px;
-      font-family:Courier New, Courier;
-      float:left;
-      margin:3px 0px 30px 0px;
-  }
-  br.clear    {
-      clear:both;
-  }
-  </style>
+    <title>Yryie example</title>
+    <style>
+        .linenum {
+            text-align:right;
+            background:#FDECE1;
+            border:1px solid #cc6666;
+            padding:0px 1px 0px 1px;
+            font-family:Courier New, Courier;
+            float:left;
+            width:17px;
+            margin:3px 0px 30px 0px;
+        }
+        code {
+            font-family: Courier New, Courier;
+        }
+        .linetext{
+            width:700px;
+            text-align:left;
+            background:white;
+            border:1px solid #cc6666;
+            border-left:0px;
+            padding:0px 1px 0px 8px;
+            font-family:Courier New, Courier;
+            float:left;
+            margin:3px 0px 30px 0px;
+        }
+        br.clear    {
+            clear:both;
+        }
+    </style>
 </head>
 <body>
 <pre>
 <?php
-$html = file_get_contents(__FILE__);
-preg_match('~^// >>(.*)^// <<~ms', $html, $args);
-highlight_string('<?php'."\n".trim($args[1]));
-
+    preg_match('~^// >>(.*)^// <<~ms', file_get_contents(__FILE__), $args);
+    highlight_string('<?php'.PHP_EOL.trim($args[1]));
+?>
+</pre>
+<?php
 // >>
-
 // Handle all errors by Yryie
 error_reporting(-1);
 
-require_once '../Yryie.php';
+require_once 'Yryie.php';
 
 // Add version infos, set BEFORE include!
-Yryie::Versions();
+Yryie::versions();
 
 // Register error handler
-Yryie::Register();
+Yryie::register();
 
-Yryie::Info('An information...');
-Yryie::Code('<b>code example</b>');
-Yryie::State('State');
+Yryie::info('An information...');
+Yryie::code('<b>code example</b>');
+Yryie::state('State');
 Yryie::SQL('SELECT * FROM table');
-Yryie::Debug(array( 1, 2 ));
-Yryie::Warning('A Warning.');
-Yryie::Error('An ERROR!');
+Yryie::debug(array( 1, 2 ));
+Yryie::warning('A Warning.');
+Yryie::error('An ERROR!');
 
 function DoTrace($level = 1, $full = false)
 {
-    Yryie::Trace($level, $full);
+    Yryie::trace($level, $full);
 }
 
-Yryie::Info('Trace 1:');
+Yryie::info('Trace 1:');
 DoTrace();
-Yryie::Info('Trace 2:');
+Yryie::info('Trace 2:');
 DoTrace(0, true);
 
 function Error(&$a)
 {
-  // Force an error to capture
+    // Force an error to capture
     $a = $b;
 }
-Error($a);
+error($a);
 
 // Let's output all
 // 1st finalize it
-Yryie::Finalize();
+Yryie::finalize();
 // Output with the default script and CSS
-Yryie::Output(true, true);
+Yryie::output(true, true);
 // <<
+
 ?>
 </body>
 </html>

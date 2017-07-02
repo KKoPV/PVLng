@@ -48,6 +48,6 @@ return array(
     /**
      * To exclude a channel at all, set to NULL
      */
-    '0000-0000-0000-0000-0000-0000-0000-0000' => NULL,
+    '0000-0000-0000-0000-0000-0000-0000-0000' => null,
 
 );

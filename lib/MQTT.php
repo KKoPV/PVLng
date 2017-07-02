@@ -7,7 +7,8 @@
  * @license   MIT License (MIT) http://opensource.org/licenses/MIT
  */
 use Channel\Channel;
-use PVLng\PVLng;
+use Core\JSON;
+use Core\PVLng;
 
 /**
  *
@@ -17,53 +18,39 @@ class MQTT
     /**
      *
      */
-    public $qos = 0;
-
-    /**
-     *
-     */
-    public $verbose = 0;
-
-    /**
-     *
-     */
-    private $phpMQTT;
-
-    /**
-     *
-     */
     public function __construct($server, $port)
     {
         $this->phpMQTT = new phpMQTT($server, $port, 'PVLng');
-        if (!$this->phpMQTT->connect(false)) {
+
+        if (!$this->phpMQTT->connect(true)) {
             exit(1);
         }
     }
 
     /**
-     *
+     * Loop
      */
-    public function run()
+    public function run($verbose = false)
     {
+        $this->verbose = $verbose;
+
         /**
          * Listen only for messages for API key
          */
-        $topic  = 'pvlng/'.PVLng::getApiKey().'/data/#';
+        $topic = 'pvlng/'.PVLng::getApiKey().'/data/#';
 
         $this->dbg('Listen for', $topic, '...');
-
-        $this->phpMQTT->debug = $this->verbose;
 
         $this->phpMQTT->subscribe(array(
             $topic => array(
                 'function' => array($this, 'saveData'),
-                'qos'      => $this->qos
+                'qos'      => 0
             )
         ));
 
+        // Endless loop
         while ($this->phpMQTT->proc()) {
-            // Wait a bit
-            sleep(1);
+            usleep(200000);
         }
     }
 
@@ -72,26 +59,37 @@ class MQTT
      */
     public function saveData($topic, $msg)
     {
-        $this->dbg('Topic:', $topic);
+        try {
+            // Sometimes there is a \000 at the begin of the message...
+            if (strpos($msg, '{') !== false) {
+                $msg = preg_replace('~^[^{]+~', '', $msg);
+            }
 
-        if ($data = json_decode($msg, true)) {
+            $this->dbg('Topic:', $topic);
             $this->dbg('Message:', $msg);
 
-            // pvlng/<API key>/data/<GUID>
-            list(,,,$guid) = explode('/', $topic);
+            // pvlng/<API key>/data/<GUID>[/<timestamp>]
+            $topic = array_slice(explode('/', $topic), 3);
+
+            $guid = array_shift($topic);
+
+            if (empty($topic)) {
+                // Assume JSON data send
+                $data = JSON::decode($msg, true);
+            } else {
+                // Assume raw data send
+                $data = array('data' => $msg, 'timestamp' => $topic[0]);
+            }
 
             if (!array_key_exists($guid, $this->channels)) {
                 $this->channels[$guid] = Channel::byGUID($guid);
             }
 
-            try {
-                $rows = $this->channels[$guid]->write($data);
-                $this->dbg(1, 'Result:', $rows, 'row(s) added');
-            } catch (Exception $e) {
-                $this->dbg('ERROR:', $e->getMessage());
-            }
-        } else {
-            $this->dbg('INVALID:', $msg);
+            $rows = $this->channels[$guid]->write($data);
+
+            $this->dbg('Result:', $rows, 'row(s) added');
+        } catch (Exception $e) {
+            $this->dbg('ERROR: '.$e->getMessage());
         }
     }
 
@@ -106,6 +104,16 @@ class MQTT
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
+
+    /**
+     *
+     */
+    protected $phpMQTT;
+
+    /**
+     *
+     */
+    protected $verbose = 0;
 
     /**
      *

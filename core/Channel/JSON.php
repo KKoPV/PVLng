@@ -56,7 +56,7 @@ class JSON extends Channel
             }
             try {                    // Simulate $request['data']
                 $ok += $child->write(array('data' => $value), $timestamp);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $code = $e->getCode();
                 if ($code != 200 && $code != 201 && $code != 422) {
                     throw $e;

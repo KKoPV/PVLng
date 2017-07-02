@@ -15,7 +15,7 @@ namespace Channel\SE;
 /**
  *
  */
-use \Channel\MultiChannel;
+use Channel\MultiChannel;
 
 /**
  *

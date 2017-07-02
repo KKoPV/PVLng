@@ -106,7 +106,7 @@ $api->get(
 
         $result = $api->boolParam('attributes', false)
                 ? $channel->getAttributes()
-                : array('guid' => $channel->guid);
+                : ['guid' => $channel->guid, 'name' => $channel->name];
 
         if ($channel->numeric) {
             $q = new DBQuery('pvlng_reading_num');
@@ -124,10 +124,12 @@ $api->get(
               ->get($q->COUNT('id'), 'readings')
               ->whereEQ('id', $channel->entity);
         }
+
         $result = $result + $api->db->queryRowArray($q);
+
         if ($result['timestamp_last']) {
-            $q->reset();
-            $q->get('data', 'last')
+            $q->reset()
+              ->get('data', 'last')
               ->whereEQ('id', $channel->entity)
               ->whereEQ('timestamp', $result['timestamp_last']);
             $result = $result + $api->db->queryRowArray($q);
@@ -177,11 +179,11 @@ $api->get(
     '/channel/:guid/parent/:attribute',
     $accessibleChannel,
     function ($guid, $attribute) use ($api) {
-        $channel = (new ORM\Tree)->filterByGuid($guid)->findOne();
+        $channel = ORM\Tree::f()->filterByGuid($guid)->findOne();
         if (($id = $channel->getId()) == '') {
             $api->stopAPI('No channel found for GUID: '.$guid, 400);
         }
-        $parent = NestedSet::getInstance()->getParent($id)['id'];
+        $parent = Core\PVLng::getNestedSet()->getParent($id)['id'];
         if ($parent == 1) {
             $api->stopAPI('Channel is on top level', 400);
         }
@@ -199,13 +201,13 @@ $api->get(
 ->conditions(array(
     'attribute' => '\w+'
 ))
-->name('GET /channel/:guid/parent(/:attribute)')
+->name('GET /channel/:guid/parent/:attribute')
 ->help = array(
     'since'       => 'r4',
     'description' => 'Fetch all attributes or a specific attribute from parent channel',
     'error'       => array(
         'No channel found for GUID' => 400,
-        'Channel is on top level' => 400
+        'Channel is on top level'   => 400
     )
 );
 

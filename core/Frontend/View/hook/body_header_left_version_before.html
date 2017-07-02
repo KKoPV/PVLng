@@ -1,0 +1,13 @@
+<!-- IF {USER} -->
+<p>
+<!-- IF {DEBUG} -->
+    <!-- IF {BRANCH} -->
+        {BRANCH}<br>
+    <!-- ENDIF -->
+    <a href="/?develop=">off</a> / <a href="/?develop=-1">&nbsp;!&nbsp;</a>
+<!-- ELSE -->
+    <a href="/?develop=-1">&nbsp;!&nbsp;</a>
+<!-- ENDIF -->
+/ <a href="/?develop=1">1</a> / <a href="/?develop=2">2</a>
+</p>
+<!-- ENDIF -->

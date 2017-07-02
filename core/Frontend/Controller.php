@@ -14,10 +14,11 @@ namespace Frontend;
  */
 use slimMVC\Controller as SlimController;
 use Core\Messages;
+use Core\PVLng;
 use Core\Session;
-use PVLng\PVLng;
+use ORM\Config as ORMConfig;
+use ORM\Settings as ORMSettings;
 use Yryie\Yryie;
-use BabelKitMySQLi;
 
 /**
  *
@@ -39,6 +40,7 @@ class Controller extends SlimController
         $this->config  = $app->config;
         $this->request = $app->request;
         $this->view    = $app->view;
+        $this->tree    = PVLng::getNestedSet();
 
         $this->view->Helper->translate = function () {
             return call_user_func_array('\I18N::translate', func_get_args());
@@ -53,18 +55,17 @@ class Controller extends SlimController
 
         // Need last part of class name
         $this->controller = preg_replace('~^.*\\\~', '', get_class($this));
-        $this->viewdir    = PVLng::path(PVLng::$RootDir, 'core', 'View');
+        $this->ViewDir    = PVLng::path(PVLng::$RootDir, 'core', 'Frontend', 'View');
 
         $this->view->Module = strtolower($this->controller);
         $this->view->User = $app->user;
         $this->view->Embedded = $this->app->request->get('embedded') ?: 0;
 
         $this->view->setTemplatesDirectory(array(
-            PVLng::path($this->viewdir, $this->controller, 'custom'),
-            PVLng::path($this->viewdir, $this->controller, 'event'),
-            PVLng::path($this->viewdir, $this->controller),
-            PVLng::path($this->viewdir, 'event'),
-            $this->viewdir
+            PVLng::path($this->ViewDir, $this->controller, 'custom'),
+            PVLng::path($this->ViewDir, $this->controller),
+            PVLng::path($this->ViewDir, 'hook'),
+            $this->ViewDir
         ));
 
         $this->view->Menu = $app->menu->get();
@@ -90,14 +91,10 @@ class Controller extends SlimController
         /* For Logout */
         $this->view->User = $this->app->user;
         if ($this->app->user) {
+            $this->view->APIkey = (new ORMConfig)->getAPIkey();
             if ($this->config->get('Core.TokenLogin')) {
                 $this->view->Token = PVLng::getLoginToken();
             }
-            $APIkey = null;
-            while ($this->cache->save('APIkey', $APIkey)) {
-                $APIkey = (new \ORM\Config)->getAPIkey();
-            }
-            $this->view->APIkey = $APIkey;
         }
         parent::after();
     }
@@ -130,6 +127,7 @@ class Controller extends SlimController
             $this->config->set('View.Verbose', true);
         }
 
+        $this->view->Debug     = PVLng::$DEBUG;
         $this->view->Language  = $this->app->Language;
         $this->view->Year      = date('Y');
 
@@ -152,12 +150,12 @@ class Controller extends SlimController
         $this->view->Version       = PVLNG_VERSION;
         $this->view->VersionDate   = PVLNG_VERSION_DATE;
         $this->view->PHPVersion    = PHP_VERSION;
-        $this->view->MySQLVersion  = $this->db->queryOne('SELECT version()');
+        $this->view->MySQLVersion  = $this->db->queryOne('SELECT `pvlng_mysql_version`()');
         $this->view->ServerName    = $_SERVER['HTTP_HOST'];
         $this->view->ServerVersion = $_SERVER['SERVER_SOFTWARE'];
 
-        if ($url = \ORM\Settings::getCoreValue('API', 'Host')) {
-            $this->view->ApiUrl = '//'.$url.'/latest/';
+        if ($domain = ORMSettings::getCoreValue('API', 'Domain')) {
+            $this->view->ApiUrl = '//'.$domain.'/latest/';
         } else {
             $this->view->ApiUrl = '//'.$this->view->ServerName.'/api/latest/';
         }
@@ -185,13 +183,13 @@ class Controller extends SlimController
         $this->view->append(
             'Styles',
             $this->view->fetch(
-                PVLng::path($this->viewdir, $this->controller, 'style.css')
+                PVLng::path($this->ViewDir, $this->controller, 'style.css')
             )
         );
         $this->view->append(
             'Styles',
             $this->view->fetch(
-                PVLng::path($this->viewdir, $this->controller, 'style.' . $action . '.css')
+                PVLng::path($this->ViewDir, $this->controller, 'style.' . $action . '.css')
             )
         );
 
@@ -200,6 +198,19 @@ class Controller extends SlimController
         $this->view->assign('Content', 'content.tpl');
 
         // Scripts
+        $this->view->append(
+            'InlineJS',
+            $this->view->fetch(
+                PVLng::path($this->ViewDir, $this->controller, 'script.js')
+            )
+        );
+        $this->view->append(
+            'InlineJS',
+            $this->view->fetch(
+                PVLng::path($this->ViewDir, $this->controller, 'script.'.$action.'.js')
+            )
+        );
+
         $this->view->append('Scripts', $this->view->fetch('script.js.html'));
         $this->view->append('Scripts', $this->view->fetch('script.'.$action.'.js.html'));
 
@@ -243,7 +254,7 @@ class Controller extends SlimController
     /**
      *
      */
-    protected $viewdir;
+    protected $ViewDir;
 
     /**
      *
@@ -254,6 +265,11 @@ class Controller extends SlimController
      *
      */
     protected $Layout;
+
+    /**
+     * NestedSet
+     */
+    protected $tree;
 
     /**
      *
@@ -286,14 +302,12 @@ class Controller extends SlimController
      */
     protected function preparePresetAndPeriod()
     {
-        $bk = BabelKitMySQLi::getInstance();
-
         $preset = $period = null;
 
         /// Yryie::StartTimer('LoadPreset', NULL, 'CacheDB');
         while ($this->app->cache->save('preset/'.$this->app->Language, $preset)) {
             /// Yryie::Info('Load preset from Database');
-            $preset = $bk->select('preset', $this->app->Language);
+            $preset = $this->app->BabelKit->select('preset', $this->app->Language);
         }
         /// Yryie::StopTimer('LoadPreset');
         $this->view->PresetSelect = $preset;
@@ -301,7 +315,7 @@ class Controller extends SlimController
         /// Yryie::StartTimer('LoadPeriod', NULL, 'CacheDB');
         while ($this->app->cache->save('period/'.$this->app->Language, $period)) {
             /// Yryie::Info('Load period from Database');
-            $period = $bk->select('period', $this->app->Language);
+            $period = $this->app->BabelKit->select('period', $this->app->Language);
         }
         /// Yryie::StopTimer('LoadPeriod');
         $this->view->PeriodSelect = $period;

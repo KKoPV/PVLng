@@ -57,8 +57,7 @@ class MultiChannel extends Channel
                     continue 2;
                 }
             }
-            try {
-                // Simulate $request['data']
+            try {                    // Simulate $request['data']
                 $ok += $child->write(array('data' => $value), $timestamp);
             } catch (\Exception $e) {
                 $code = $e->getCode();

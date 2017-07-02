@@ -12,6 +12,11 @@ namespace Core;
 /**
  *
  */
+use Exception;
+
+/**
+ *
+ */
 abstract class JSON
 {
     /**
@@ -19,10 +24,10 @@ abstract class JSON
      */
     public static function decode($json, $asArray = false)
     {
-        $data = json_decode($json, $asArray);
+        $data = json_decode(trim($json), $asArray);
 
-        if ($err = self::check(json_last_error())) {
-            throw new \exception($err);
+        if ($err = self::check()) {
+            throw new Exception($err);
         }
 
         return $data;
@@ -79,7 +84,7 @@ abstract class JSON
                 $p = &$p[$key];
             } else {
                 // Invalid key
-                throw new \Exception('Invalid JSON xPath: '.implode('->', $path));
+                throw new Exception('Invalid JSON xPath: '.implode('->', $path));
             }
         }
 

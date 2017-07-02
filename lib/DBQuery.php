@@ -115,7 +115,7 @@ class DBQuery
                 $this->get($f);
             }
         } else {
-            if ($field == '0' or $field != '') {
+            if ($field == '0' || $field != '') {
                 if ($as != '') {
                     $as = ' AS `' . $as . '`';
                 }

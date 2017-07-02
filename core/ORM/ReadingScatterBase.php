@@ -20,7 +20,12 @@ namespace ORM;
 /**
  *
  */
-abstract class ReadingScatterBase extends \slimMVC\ORM
+use Core\ORM;
+
+/**
+ *
+ */
+abstract class ReadingScatterBase extends ORM
 {
 
     // -----------------------------------------------------------------------
@@ -200,7 +205,7 @@ abstract class ReadingScatterBase extends \slimMVC\ORM
     }
 
     /**
-     * Call create table sql on first run and set to false
+     * Call create table sql on class creation and set to false
      */
     protected static $memory = true;
 
@@ -217,7 +222,7 @@ abstract class ReadingScatterBase extends \slimMVC\ORM
           `data` decimal(13,4) NOT NULL DEFAULT \'0.0000\',
           PRIMARY KEY (`id`,`timestamp`),
           KEY `timestamp` (`timestamp`)
-        ) ENGINE=MEMORY DEFAULT CHARSET=utf8
+        ) ENGINE=MEMORY DEFAULT CHARSET=utf8 COMMENT=\'Buffer for calculated data\'
     ';
     // @codingStandardsIgnoreEnd
 

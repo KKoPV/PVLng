@@ -151,7 +151,7 @@ class Overview extends Controller
 
         // Correct position below new target
         while ($offset-- > 0) {
-            if (!$this->app->tree->moveLft($id)) {
+            if (!$this->tree->moveLft($id)) {
                 break;
             }
         }
@@ -166,7 +166,7 @@ class Overview extends Controller
             // Set an off-wall high value, loop breaks anyway if can't move anymore...
             $count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
             while ($count--) {
-                if (!$this->app->tree->moveLft($id)) {
+                if (!$this->tree->moveLft($id)) {
                     break;
                 }
             }
@@ -182,7 +182,7 @@ class Overview extends Controller
             // Set an off-wall high value, loop breaks anyway if can't move anymore...
             $count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
             while ($count--) {
-                if (!$this->app->tree->moveRgt($id)) {
+                if (!$this->tree->moveRgt($id)) {
                     break;
                 }
             }
@@ -195,7 +195,7 @@ class Overview extends Controller
     public function moveUpPostAction()
     {
         if ($id = $this->request->post('id')) {
-            $this->app->tree->moveUp($id);
+            $this->tree->moveUp($id);
         }
     }
 
@@ -205,7 +205,7 @@ class Overview extends Controller
     public function moveDownPostAction()
     {
         if ($id = $this->request->post('id')) {
-            $this->app->tree->moveDown($id);
+            $this->tree->moveDown($id);
         }
     }
 
@@ -242,12 +242,12 @@ class Overview extends Controller
             $real_target = $target;
         } else {
             // Target accept NO childs, so find parent and calculate offset for later move
-            $real_target = $this->app->tree->getParent($target);
+            $real_target = $this->tree->getParent($target);
             $real_target = $real_target['id'];
 
             // Search position of drop target in existing childs
             $holdsSelf = false;
-            $childs = $this->app->tree->getChilds($real_target);
+            $childs = $this->tree->getChilds($real_target);
             foreach ($childs as $pos => $child) {
                 if ($child['id'] == $id) {
                     $holdsSelf = $pos;

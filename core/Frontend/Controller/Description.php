@@ -12,8 +12,8 @@ namespace Frontend\Controller;
 /**
  *
  */
+use Core\PVLng;
 use Frontend\Controller;
-use PVLng\PVLng;
 use Yryie\Yryie;
 use I18N;
 use Markdown;
@@ -30,24 +30,24 @@ class Description extends Controller
     {
         $this->view->SubTitle = I18N::translate('Description');
 
-        $fileMD = PVLng::path(PVLng::$RootDir, 'description.md');
+        $mdFile = PVLng::pathRoot('config', 'description.md');
 
-        if (!file_exists($fileMD)) {
-            $fileMD .= '.dist';
+        if (!file_exists($mdFile)) {
+            $mdFile .= '.dist';
         }
 
-        $fileTOC  = PVLng::path(PVLng::$TempDir, 'Frontend.Description.TOC.html');
-        $fileHTML = PVLng::path(PVLng::$TempDir, 'Frontend.Description.html');
+        $fileTOC  = PVLng::pathTemp('Frontend.Description.TOC.html');
+        $fileHTML = PVLng::pathTemp('Frontend.Description.html');
 
         // Is there an actual content file?
-        if (!file_exists($fileHTML) || filemtime($fileMD) > filemtime($fileHTML)) {
-            /// Yryie::Info('Build description from '.$fileMD);
+        if (!file_exists($fileHTML) || filemtime($mdFile) > filemtime($fileHTML)) {
+            /// Yryie::Info('Build description from '.$mdFile);
 
             // Put a "back to top" icon behind each header
             $top = '<a href="#top" class="fa fa-sort-asc btn" style="margin-left:12px" title="Go to top"></a>';
 
             $TOC = '';
-            $content = file_get_contents($fileMD);
+            $content = file_get_contents($mdFile);
 
             if (preg_match_all('~^(#+ +)(.*?)#*\s*$~m', $content, $headers, PREG_SET_ORDER)) {
                 foreach ($headers as $header) {

@@ -52,6 +52,6 @@ return array(
     /**
      * To exclude a channel, set the data to a non-array, e.g. NULL
      */
-    '0000-0000-0000-0000-0000-0000-0000-0000' => NULL,
+    '0000-0000-0000-0000-0000-0000-0000-0000' => null,
 
 );

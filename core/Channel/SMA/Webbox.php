@@ -12,7 +12,7 @@ namespace Channel\SMA;
 /**
  *
  */
-use \Channel\MultiChannel;
+use Channel\MultiChannel;
 
 /**
  *
@@ -26,7 +26,7 @@ class Webbox extends MultiChannel
     {
         // Check for request errors
         if (!isset($request['result']['devices'][0]['channels'])) {
-            throw new \Exception(
+            throw new Exception(
                 "Invalid Webbox response:\n".print_r($request, true),
                 400
             );

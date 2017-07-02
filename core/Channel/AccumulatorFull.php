@@ -12,6 +12,11 @@ namespace Channel;
 /**
  *
  */
+use Buffer;
+
+/**
+ *
+ */
 class AccumulatorFull extends Calculator
 {
 
@@ -28,7 +33,7 @@ class AccumulatorFull extends Calculator
 
         switch ($childCnt) {
             case 0: // No childs, return empty result
-                $result = new \Buffer;
+                $result = new Buffer;
                 break;
 
             case 1: // Only one child, return as is
@@ -48,7 +53,7 @@ class AccumulatorFull extends Calculator
                     $row1 = $buffer->rewind()->current();
                     $row2 = $next->rewind()->current();
 
-                    $result = new \Buffer;
+                    $result = new Buffer;
                     $last1 = $last2 = null;
 
                     while (!empty($row1) || !empty($row2)) {

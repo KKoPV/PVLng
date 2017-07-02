@@ -18,74 +18,79 @@ set_time_limit(0);
 require implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'bootstrap.php']);
 
 /**
- * Bootstrap
+ *
  */
-$loader = PVLng\PVLng::bootstrap(__DIR__);
-Loader::register($loader, PVLng\PVLng::$TempDir);
-
-$file = PVLng\PVLng::path(__DIR__, 'prepend.php');
-if (file_exists($file)) {
-    include $file;
-}
-
-if (!PVLng\PVLng::$DEVELOP) {
-    PVLng\PVLng::$DEVELOP = (isset($_SERVER['HTTP_X_DEBUG']) && $_SERVER['HTTP_X_DEBUG']);
-}
-
-if (PVLng\PVLng::$DEVELOP) {
-    ini_set('display_startup_errors', 1);
-    ini_set('display_errors', 1);
-    error_reporting(-1);
-}
-
-$api = new Api\Api(array(
-    'mode'      => PVLng\PVLng::$DEVELOP ? 'development' : 'production',
-    'log.level' => PVLng\PVLng::$DEVELOP ? Slim\Log::INFO : Slim\Log::ALERT,
-    'debug'     => false, // No debug mode at all
-    'view'      => new Api\View
-));
+use Api\Api;
+use Api\View;
+use Channel\Channel;
+use Core\NestedSet;
+use Core\Hook;
+use Core\PVLng;
+use Slim\Log;
+use Slim\Route;
 
 /**
- * If API run over different (sub)domain, allow CORS
+ * Bootstrap
  */
-$CORS = false;
+$loader = PVLng::bootstrap(__DIR__);
+Loader::register($loader, PVLng::$TempDir);
 
+PVLng::$DEBUG = (isset($_SERVER['HTTP_X_DEBUG']) && $_SERVER['HTTP_X_DEBUG']);
+
+include PVLng::pathRoot('config', 'hook.php');
+
+Hook::run('api.load');
+
+$api = new Api(array(
+    'mode'      => PVLng::$DEBUG ? 'development' : 'production',
+    'log.level' => PVLng::$DEBUG ? Log::INFO : Log::ALERT,
+    'debug'     => false, // No debug mode at all
+    'view'      => new View
+));
+
+Hook::run('api.init', $api);
+
+/**
+ * Cross origin requests
+ */
 if ($api->environment['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']) {
     $api->response['Access-Control-Allow-Headers'] = $api->environment['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'];
-    $CORS = true;
 }
-
 if ($api->environment['HTTP_ACCESS_CONTROL_REQUEST_METHOD']) {
-    $api->response['Access-Control-Allow-Method'] = 'POST, GET, OPTIONS, PUT, DELETE';
-    $CORS = true;
+    $api->response['Access-Control-Allow-Methods'] = $api->environment['HTTP_ACCESS_CONTROL_REQUEST_METHOD'];
 }
+$api->response['Access-Control-Allow-Origin'] = $api->environment['HTTP_ORIGIN'] ?: '*';
 
-if ($CORS) {
-    $api->response['Access-Control-Allow-Origin'] = '*';
-}
-
+/**
+ * Environment
+ */
 $api->Language = 'en';
-$api->version  = substr($api->request()->getRootUri(), 5);
+$p = explode(DIRECTORY_SEPARATOR, __DIR__);
+$api->version = array_pop($p);
+
+if (extension_loaded('newrelic')) {
+    newrelic_set_appname('PVLng-API-'.$api->version);
+}
 
 /**
  * Configuration
  */
 $api->container->singleton('config', function () {
-    return PVLng\PVLng::getConfig();
+    return PVLng::getConfig();
 });
 
 /**
  * Database
  */
 $api->container->singleton('db', function () use ($api) {
-    return PVLng\PVLng::getDatabase();
+    return PVLng::getDatabase();
 });
 
 /**
  * Cache
  */
 $api->container->singleton('cache', function () use ($api) {
-    return PVLng\PVLng::getCache();
+    return PVLng::getCache();
 });
 
 // ---------------------------------------------------------------------------
@@ -147,7 +152,7 @@ $api->hook('slim.before', function () use ($api) {
     if ($key == '') {
         // Key was not given
         $api->APIKeyValid = false;
-    } elseif (PVLng\PVLng::checkApiKey($key)) {
+    } elseif (PVLng::checkApiKey($key)) {
         // Key is given and valid
         $api->APIKeyValid = true;
     } else {
@@ -162,15 +167,6 @@ $api->hook('slim.before', function () use ($api) {
     }
 });
 
-/**
- * Debugging middleware
- */
-if (PVLng\PVLng::$DEVELOP) {
-    include PVLng\PVLng::path(__DIR__, 'develop.php');
-    // Apply Middleware
-    $api->add(new DevTimerMiddleware);
-}
-
 // ---------------------------------------------------------------------------
 // The helper functions
 // ---------------------------------------------------------------------------
@@ -179,20 +175,22 @@ if (PVLng\PVLng::$DEVELOP) {
  *
  */
 $APIkeyRequired = function () use ($api) {
-    $api->APIKeyValid || $api->stopAPI('Access only with valid API key!', 403);
+    if (!$api->APIKeyValid) {
+        $api->stopAPI('Access only with valid API key!', 403);
+    }
 };
 
 /**
  *
  */
-$accessibleChannel = function (Slim\Route $route) use ($api) {
+$accessibleChannel = function (Route $route) use ($api) {
     // API key correct, access all channels
     if ($api->APIKeyValid) {
         return;
     }
 
     // No API key given, check channel is public
-    if (!Channel\Channel::byGUID($route->getParam('guid'))->public) {
+    if (!Channel::byGUID($route->getParam('guid'))->public) {
         $api->stopAPI('Access to private channel only with valid API key!', 403);
     }
 };
@@ -223,7 +221,7 @@ $api->error(function ($e) use ($api) {
 // ---------------------------------------------------------------------------
 // Declare default conditions before routes
 // ---------------------------------------------------------------------------
-Slim\Route::setDefaultConditions(array(
+Route::setDefaultConditions(array(
     'date'      => '\d{4}-\d{2}-\d{2}',
                    // At least the 1st and 2nd terms of a GUID are required
     'guid'      => '[0-9a-f]{4}-[0-9a-f]{4}(?:-[0-9a-f]{4}){0,6}',
@@ -236,13 +234,22 @@ Slim\Route::setDefaultConditions(array(
     'slug'      => '[@\w\d-]+',
 ));
 
-// ---------------------------------------------------------------------------
-// The routes
-// ---------------------------------------------------------------------------
-$filemask = PVLng\PVLng::path(__DIR__, 'routes', '*.php');
-foreach (glob($filemask) as $routes) {
-    include_once $routes;
+/**
+ * The routes, compile into one cached file
+ */
+$routesCache = PVLng::pathTemp('routes.api.'.$api->version.'.php');
+
+if (PVLng::$DEBUG || !file_exists($routesCache)) {
+    $content = '';
+    foreach (glob(PVLng::path(__DIR__, 'routes', '*.php')) as $file) {
+        $content .= file_get_contents($file) . PHP_EOL;
+    }
+    $content = str_replace('<?php', '', $content);
+    $content = preg_replace('~\s*/\*.*?\*/\s*~s', PHP_EOL, $content);
+    file_put_contents($routesCache, '<?php ' . $content);
 }
+
+include $routesCache;
 
 /**
  * Route not found, redirect to help instead
@@ -255,14 +262,13 @@ $api->notFound(function () use ($api) {
 /**
  * Run application
  */
+Hook::run('api.run', $api);
+
 $api->run();
 
-$file = PVLng\PVLng::path(__DIR__, 'append.php');
-if (file_exists($file)) {
-    include $file;
-}
+Hook::run('api.teardown', $api);
 
 // Send statistics each 6 hours if activated
 if ($api->config->SendStatistics) {
-    PVLng\PVLng::SendStatistics();
+    PVLng::SendStatistics();
 }

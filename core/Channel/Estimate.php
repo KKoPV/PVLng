@@ -12,6 +12,11 @@ namespace Channel;
 /**
  *
  */
+use ORM\Settings as ORMSettings;
+
+/**
+ *
+ */
 class Estimate extends InternalCalc
 {
 
@@ -28,7 +33,7 @@ class Estimate extends InternalCalc
         // Fake as counter to get the sum of estiamtes for periods greater than day
         $this->counter = true;
 
-        if ($marker = \ORM\Settings::getModelValue('Estimate', 'Marker')) {
+        if ($marker = ORMSettings::getModelValue('Estimate', 'Marker')) {
             $this->attributes['marker'] = $marker;
         }
     }

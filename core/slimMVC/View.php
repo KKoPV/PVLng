@@ -2,29 +2,23 @@
 /**
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
+ * @copyright   2012 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
 namespace slimMVC;
 
 /**
  *
  */
-use PVLng\PVLng;
+use Core\PVLng;
+use Slim\View as SlimView;
 use Yryie\Yryie;
 
 /**
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
-class View extends \Slim\View
+class View extends SlimView
 {
-
     /**
      *
      */
@@ -99,6 +93,8 @@ class View extends \Slim\View
      */
     public function render($template, $data = null)
     {
+        $this->verbose = $this->app->config->get('View.Verbose');
+
         if (file_exists($template)) {
             // Concrete file
             $TplFile = $template;
@@ -130,7 +126,7 @@ class View extends \Slim\View
         $TplCompiled = trim($TplCompiled, '_');
         $TplCompiled = $this->cacheDirectory . DIRECTORY_SEPARATOR . $TplCompiled . '.php';
 
-        if (!file_exists($TplCompiled) or filemtime($TplCompiled) < filemtime($TplFile)) {
+        if (!file_exists($TplCompiled) || filemtime($TplCompiled) < filemtime($TplFile)) {
             /// Yryie::StartTimer($TplFile, 'Compile '.$TplFile, 'Compile template');
             file_put_contents($TplCompiled, $this->compile($TplFile));
             /// Yryie::StopTimer();
@@ -291,46 +287,74 @@ class View extends \Slim\View
     /**
      *
      */
-    protected $eventComment = array(
-        'html' => array('<!-- ', ' -->'),
-        'js'   => array('/* ', ' */'),
-        'css'  => array('/* ', ' */'),
-    );
+    protected $verbose;
+
+    /**
+     *
+     */
+    protected function displayAvailableVariables($called, $comment = '')
+    {
+        $vlen = 0;
+        foreach ($this->dataPointer as $key => &$value) {
+            $vlen = max($vlen, strlen($key));
+        }
+
+        preg_match('~\.([^.]+)$~', $called, $matches);
+        switch ($matches[1]) {
+            case 'css':
+            case 'js':
+                $c1 = '/*';
+                $c2 = '*/';
+                break;
+            default:
+                $c1 = '<!--';
+                $c2 = '-->';
+        }
+
+        // Output
+        echo "\n$c1 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n",
+             "### $called\n### $comment\n";
+
+        $fmt = "%-{$vlen}s : %s\n";
+        foreach ($this->dataPointer as $key => &$value) {
+            $v = (is_scalar($value) && (strpos($value, '<!--') === false) && (strpos($value, '/*') === false))
+               ? (strlen($value) < 75 ? $value : substr($value, 0, 75) . ' ...')
+               : (is_null($value) ? 'NULL' : '('. gettype($value) . ')');
+            printf($fmt, $key, str_replace(['---', '--'], ['\\-\\-\\-', '\\-\\-'], $v));
+        }
+
+        echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - $c2\n";
+    }
 
     /**
      *
      */
     protected function compile($TplFile)
     {
-        $html = php_strip_whitespace($TplFile);
-        $verbose = $this->app->config->get('View.Verbose');
+        $html = file_get_contents($TplFile);
 
         if (strpos($html, '<!-- COMPILE OFF -->') === false) {
+            $html = '<?php $this->verbose && $this->displayAvailableVariables(\''.$TplFile.'\') ?'.'>' . $html;
+
             // <!-- INCLUDE template.tpl -->
             if (preg_match_all('~<!-- INCLUDE (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
-                foreach ($args as $inc) {
+                foreach ($args as $arg) {
                     $html = str_replace(
-                        $inc[0],
-                        '<?php $this->display("'.$inc[1].'"); ?'.'>',
+                        $arg[0],
+                        '<?php $this->display(\''.$arg[1].'\') /* INCLUDE */ ?'.'>',
                         $html
                     );
                 }
             }
 
-            // <!-- EVENT event_name -->
-            if (preg_match_all('~<!-- EVENT (([a-z_]+?)_(html|js|css)) -->~', $html, $args, PREG_SET_ORDER)) {
-                $c1 = $c2 = '';
-
-                foreach ($args as $e) {
-                    // Comment?
-                    if ($verbose) {
-                        $c = $this->eventComment[$e[3]];
-                        $c1 = PHP_EOL.$c[0].'EVENT '.$e[1].' >>>'.$c[1].PHP_EOL;
-                        $c2 = PHP_EOL.$c[0].'<<< EVENT '.$e[1].$c[1].PHP_EOL;
-                    }
+            // <!-- HOOK hook_name.ext -->
+            if (preg_match_all(
+                '~<!-- HOOK ([a-z_]+\.(html|js|css)) -->~', $html, $args, PREG_SET_ORDER
+            )) {
+                foreach ($args as $arg) {
                     $html = str_replace(
-                        $e[0],
-                        $c1.'<?php $this->display("'.$e[2].'.'.$e[3].'"); ?'.'>'.$c2,
+                        $arg[0],
+                        '<?php $this->display(\''.$arg[1].'\') /* HOOK */ ?'.'>',
                         $html
                     );
                 }
@@ -352,7 +376,9 @@ class View extends \Slim\View
             $html = str_replace(array('\{', '\}'), array("\x01", "\x02"), $html);
 
             // <!-- (ELSE)?IF ... -->...<!-- ELSE -->...<!-- ENDIF -->
-            if (preg_match_all('~<!-- (ELSE)?IF (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
+            if (preg_match_all(
+                '~<!-- (ELSE)?IF (.*?) -->~', $html, $args, PREG_SET_ORDER
+            )) {
                 foreach ($args as $if) {
                     if (preg_match_all('~'.$this->RegexVar.'~', $if[2], $matches, PREG_SET_ORDER)) {
                         foreach ($matches as $match) {
@@ -362,7 +388,7 @@ class View extends \Slim\View
                     $html = str_replace($if[0], '<?php '.$if[1].'IF ('.$if[2].'): ?'.'>', $html);
                 }
                 $html = str_replace('<!-- ELSE -->', '<?php ELSE: ?'.'>', $html);
-                $html = str_replace('<!-- ENDIF -->', '<?php ENDIF; ?'.'>', $html);
+                $html = str_replace('<!-- ENDIF -->', '<?php ENDIF ?'.'>', $html);
             }
 
             // Translations {{...}} are shortcuts to helper function "translate", which have to be defined!
@@ -402,17 +428,22 @@ class View extends \Slim\View
 
                     $html = str_replace(
                         $match[0],
-                        '<?php echo '.$func.'('.substr($args, 1).'); ?'.'>',
+                        '<?php echo '.$func.'('.substr($args, 1).') ?'.'>',
                         $html
                     );
                 }
             }
 
             // Loops
-            if (preg_match_all('~<!-- BEGIN ([A-Z][A-Z0-9_]*) -->~', $html, $args, PREG_SET_ORDER)) {
+            if (preg_match_all(
+                '~<!-- BEGIN ([A-Z][A-Z0-9_]*) -->~', $html, $args, PREG_SET_ORDER
+            )) {
                 foreach ($args as $match) {
-                    $id = rand(10000, 99999);
-                    $html = str_replace($match[0], sprintf($this->LoopStart, $id, $match[1]), $html);
+                    $html = str_replace(
+                        $match[0],
+                        sprintf($this->LoopStart, rand(100000, 999999), $match[1], $TplFile),
+                        $html
+                    );
                 }
             }
 
@@ -422,7 +453,7 @@ class View extends \Slim\View
             $html = preg_replace_callback(
                 '~'.$this->RegexVar.'~',
                 function ($m) {
-                    return '<?php echo $this->renderValue(\''.$m[1].'\'); ?'.'>';
+                    return '<?php echo $this->renderValue(\''.$m[1].'\') ?'.'>';
                 },
                 $html
             );
@@ -433,7 +464,7 @@ class View extends \Slim\View
             $html = str_replace(array("\x01", "\x02"), array('{', '}'), $html);
         }
 
-        if (!$verbose) {
+        if (!$this->verbose) {
             if (substr(strtolower($TplFile), -4) == '.css') {
                 $html = $this->compressCSS($html);
             } elseif (substr(strtolower($TplFile), -3) == '.js') {
@@ -503,8 +534,8 @@ class View extends \Slim\View
      */
     protected function compress($html)
     {
-        // Remember explicit spaces between variables
-        $html = preg_replace('~ \?'.'> +<\?php ~', "\x01", $html);
+        // Preserve explicit spaces between variables
+        $html = preg_replace('~\s+\?'.'>\s+<\?php\s+~s', '; echo \' \'; ', $html);
 
         $pre = array();
         // mask <pre>, <code> and <tt> sequences
@@ -526,10 +557,7 @@ class View extends \Slim\View
         $html = preg_replace('~>\s+<~s', '><', $html);
 
         // Remove pairs of ?><?php
-        $html = preg_replace('~\s*\?'.'><\?php\s*~', ' ', $html);
-
-        // Restore explicit spaces between variables
-        $html = str_replace("\x01", '?'.'> <?php ', $html);
+        $html = preg_replace('~\s*\?'.'><\?php\s*~', '; ', $html);
 
         // Restore <pre>...</pre> sections
         $html = str_replace(array_keys($pre), array_values($pre), $html);
@@ -560,13 +588,12 @@ class View extends \Slim\View
      */
     protected function arrayChangeKeysUpperCase(&$array)
     {
-        if (!is_array($array)) {
-            return;
-        }
-        $array = array_change_key_case($array, CASE_UPPER);
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $this->arrayChangeKeysUpperCase($array[$key]);
+        if (is_array($array)) {
+            $array = array_change_key_case($array, CASE_UPPER);
+            foreach ($array as $key => $value) {
+                if (is_array($value)) {
+                    $this->arrayChangeKeysUpperCase($array[$key]);
+                }
             }
         }
     }
@@ -581,17 +608,18 @@ class View extends \Slim\View
      */
     private $LoopStart = '
 <?php
-    if ($_%1$d = $this->__get("%2$s")):
+    if ($_%1$d = $this->__get(\'%2$s\')):
         array_push($this->dataStack, $this->dataPointer);
         $_f%1$d = TRUE; $_c%1$d = count($_%1$d); $_i%1$d = 1;
         foreach ($_%1$d as $_k%1$d => &$this->dataPointer):
             if (!is_array($this->dataPointer)):
                 $this->dataPointer = array("\x00" => $this->dataPointer, "%2$s" => $this->dataPointer);
             endif;
-            $this->dataPointer["_LOOP"] = $_k%1$d;
-            $this->dataPointer["_LOOP_FIRST"] = $_f%1$d; $_f%1$d = FALSE;
-            $this->dataPointer["_LOOP_LAST"] = ($_i%1$d == $_c%1$d);
-            $this->dataPointer["_LOOP_ID"] = $_i%1$d++;
+            $this->dataPointer[\'_LOOP\']       = $_k%1$d;
+            $this->dataPointer[\'_LOOP_FIRST\'] = $_f%1$d; $_f%1$d = FALSE;
+            $this->dataPointer[\'_LOOP_LAST\']  = ($_i%1$d == $_c%1$d);
+            $this->dataPointer[\'_LOOP_ID\']    = $_i%1$d++;
+            $this->verbose && $this->displayAvailableVariables(\'%3$s\', \'Loop: %2$s\');
 ?'.'>';
 
     /**
@@ -603,10 +631,10 @@ class View extends \Slim\View
                 $this->dataPointer = $this->dataPointer["\x00"];
             else:
                 unset(
-                    $this->dataPointer["_LOOP"],
-                    $this->dataPointer["_LOOP_FIRST"],
-                    $this->dataPointer["_LOOP_LAST"],
-                    $this->dataPointer["_LOOP_ID"]
+                    $this->dataPointer[\'_LOOP\'],
+                    $this->dataPointer[\'_LOOP_FIRST\'],
+                    $this->dataPointer[\'_LOOP_LAST\'],
+                    $this->dataPointer[\'_LOOP_ID\']
                 );
             endif;
         endforeach;

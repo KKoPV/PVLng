@@ -20,7 +20,12 @@ namespace ORM;
 /**
  *
  */
-abstract class ReadingNumMemoryBase extends \slimMVC\ORM
+use Core\ORM;
+
+/**
+ *
+ */
+abstract class ReadingNumMemoryBase extends ORM
 {
 
     // -----------------------------------------------------------------------
@@ -200,7 +205,7 @@ abstract class ReadingNumMemoryBase extends \slimMVC\ORM
     }
 
     /**
-     * Call create table sql on first run and set to false
+     * Call create table sql on class creation and set to false
      */
     protected static $memory = true;
 
@@ -216,9 +221,7 @@ abstract class ReadingNumMemoryBase extends \slimMVC\ORM
           `timestamp` int(11) NOT NULL DEFAULT \'0\',
           `data` decimal(13,4) NOT NULL DEFAULT \'0.0000\',
           PRIMARY KEY (`id`,`timestamp`)
-        ) ENGINE=MEMORY DEFAULT CHARSET=utf8
-        /*!50100 PARTITION BY LINEAR KEY (id)
-        PARTITIONS 10 */
+        ) ENGINE=MEMORY DEFAULT CHARSET=utf8 COMMENT=\'Buffer for calculated data\'
     ';
     // @codingStandardsIgnoreEnd
 

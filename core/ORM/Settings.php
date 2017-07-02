@@ -33,7 +33,7 @@ class Settings extends SettingsBase
             case 'num':
                 return is_numeric($value);
             case 'bool':
-                return (is_numeric($value) and ($value == 0 or $value == 1));
+                return (is_numeric($value) && ($value == 0 || $value == 1));
             default:
                 return true;
         }

@@ -20,7 +20,12 @@ namespace ORM;
 /**
  *
  */
-abstract class SettingsBase extends \slimMVC\ORM
+use Core\ORM;
+
+/**
+ *
+ */
+abstract class SettingsBase extends ORM
 {
 
     // -----------------------------------------------------------------------
@@ -384,7 +389,7 @@ abstract class SettingsBase extends \slimMVC\ORM
     }
 
     /**
-     * Call create table sql on first run and set to false
+     * Call create table sql on class creation and set to false
      */
     protected static $memory = false;
 
@@ -401,7 +406,7 @@ abstract class SettingsBase extends \slimMVC\ORM
           `key` char(100) NOT NULL DEFAULT \'\',
           `value` varchar(100) NOT NULL DEFAULT \'\',
           `order` tinyint(3) unsigned NOT NULL DEFAULT \'0\',
-          `type` enum(\'str\',\'num\',\'bool\',\'option\') NOT NULL DEFAULT \'str\',
+          `type` enum(\'str\',\'short\',\'num\',\'bool\',\'option\') NOT NULL DEFAULT \'str\',
           `data` varchar(255) NOT NULL DEFAULT \'\',
           PRIMARY KEY (`scope`,`name`,`key`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Application settings\'

@@ -10,10 +10,10 @@
 namespace Frontend\Controller;
 
 use Core\Messages;
+use Core\PVLng;
 use Core\Session;
 use Frontend\Controller;
 use ORM\Settings as ORMSettings;
-use PVLng\PVLng;
 use I18N;
 use PasswordHash;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Accept JSON data from SMA Webboxes
+ * Accept JSON data from WS-2300 weather station
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2014 Knut Kohl
@@ -15,13 +15,13 @@ namespace Channel;
 class WS2300 extends MultiChannel
 {
     /**
-     * Accept JSON fron json2300
+     * Accept JSON fron WS-2300
      */
     public function write($request, $timestamp = null)
     {
         // Check for valid request
         if (!isset($request['Timestamp'])) {
-            throw new \Exception(
+            throw new Exception(
                 "Invalid WS2300 response:\n".print_r($request, true),
                 400
             );

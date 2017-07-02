@@ -12,8 +12,8 @@ namespace Channel\PVLog;
 /**
  *
  */
-use PVLng\PVLng;
 use Channel\Channel;
+use Core\PVLng;
 
 /**
  * Base class for generation PV-Log JSON response

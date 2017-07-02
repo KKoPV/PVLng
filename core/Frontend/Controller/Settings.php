@@ -15,7 +15,6 @@ namespace Frontend\Controller;
 use Frontend\Controller;
 use Core\Messages;
 use ORM\Settings as ORMSettings;
-use BabelKitMySQLi;
 use Yryie\Yryie;
 use I18N;
 use PasswordHash;
@@ -86,8 +85,7 @@ class Settings extends Controller
     {
         $this->view->SubTitle = I18N::translate('Settings');
 
-        $t = BabelKitMySQLi::getInstance()
-             ->full_set_assoc('settings', $this->app->Language);
+        $t = $this->app->BabelKit->fullSetAssoc('settings', $this->app->Language);
 
         $ORMSettings = new ORMSettings;
         $ORMSettings->order('scope,name,order')->find();
@@ -121,6 +119,9 @@ class Settings extends Controller
             // Translate
             $k = $row['scope'].'_'.$row['name'].'_'.$row['key'];
             $row['description'] = isset($t[$k][0]) ? $t[$k][0] : $k;
+            if (strpos($row['description'], '||') > 0) {
+                list($row['description'], $row['hint']) = explode('||', $row['description'], 2);
+            }
 
             if ($last !== $row['name']) {
                 $last = $row['name'];

@@ -1,0 +1,29 @@
+###
+###
+###
+### @author      Knut Kohl <github@knutkohl.de>
+### @copyright   2012-2014 Knut Kohl
+### @license     MIT License (MIT) http://opensource.org/licenses/MIT
+###
+
+### --------------------------------------------------------------------------
+### Database configuration
+###
+database:
+    host:       <HOST>
+    socket:     <SOCKET>
+    port:       <PORT>
+    username:   <USERNAME>
+    password:   <PASSWORD>
+    database:   <DATABASE>
+
+### --------------------------------------------------------------------------
+### Cache configuration
+### Auto detect
+###
+cache:  null
+
+### Force one, if you like, MemCache is best tested and recommended!
+#cache:  MemCache     # MUST BE ISTALLED AND ENABLED!
+#cache:  APC          # MUST BE ISTALLED AND ENABLED!
+#cache:  Mock         # Disable caching complete

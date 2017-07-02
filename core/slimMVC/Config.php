@@ -11,7 +11,14 @@ namespace slimMVC;
 /**
  *
  */
-class Config extends \Slim\Helper\Set
+use Slim\Helper\Set;
+use Exception;
+use Spyc;
+
+/**
+ *
+ */
+class Config extends Set
 {
     /**
      *
@@ -21,21 +28,18 @@ class Config extends \Slim\Helper\Set
     /**
      *
      */
-    public function load($file, $required = true, $namespace = '')
+    public function load($file, $required = true)
     {
         if ($required && !file_exists($file)) {
-            throw new \Exception('Missing reqiured configuration file: '.$file);
+            throw new Exception('Missing reqiured configuration file: '.$file);
         }
+
         if (file_exists($file)) {
-            $data = include $file;
+            $data = Spyc::YAMLLoad($file);
             $data = $this->arrayChangeKeyCaseDeep($data);
-            $p =& $this->data;
-            $key = explode($this->NamespaceSeparator, mb_strtolower($namespace));
-            while ($k = array_shift($key)) {
-                $p =& $p[$k];
-            }
-            $p = $this->arrayReplaceDeep($p, $data);
+            $this->data = $this->arrayReplaceDeep($this->data, $data);
         }
+
         return $this;
     }
 
@@ -44,11 +48,16 @@ class Config extends \Slim\Helper\Set
      */
     public function loadNamespace($namespace, $file, $required = true)
     {
-        if (isset($file) && (file_exists($file) || $required)) {
-            $data = include $file;
+        if ($required && !file_exists($file)) {
+            throw new Exception('Missing reqiured configuration file: '.$file);
+        }
+
+        if (file_exists($file)) {
+            $data = Spyc::YAMLLoad($file);
             $data = $this->arrayChangeKeyCaseDeep($data);
             $this->set($namespace, $this->arrayReplaceDeep($this->get($namespace), $data));
         }
+
         return $this;
     }
 

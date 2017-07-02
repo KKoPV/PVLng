@@ -12,10 +12,10 @@ namespace Frontend\Controller;
 /**
  *
  */
-use Channel\Channel as Channel;
+use Channel\Channel;
 use Core\Messages;
+use Core\PVLng;
 use Frontend\Controller;
-use PVLng\PVLng as PVLng;
 
 /**
  *
@@ -27,10 +27,11 @@ class Infoframe extends Controller
      */
     public function indexAction()
     {
-        $dir   = PVLng::path(PVLng::$RootDir, 'frontend', 'View', 'Infoframe');
+        $dir   = PVLng::pathRoot('core', 'Frontend', 'View', 'Infoframe');
         $frame = $this->app->params->get('frame');
 
         $config = PVLng::path($dir, $frame) . '.php';
+
         if (!file_exists($config)) {
             Messages::error('Missing settings in '.$frame.'.php');
             $this->app->redirect('/');

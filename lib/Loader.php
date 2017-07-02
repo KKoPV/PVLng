@@ -20,15 +20,15 @@ class Loader
      */
     public static function autoload($class)
     {
-        if (isset(self::$classMap[$class])) {
+        if (isset(static::$classMap[$class])) {
             // Buffered file location found
-            $file = self::$classMap[$class];
+            $file = static::$classMap[$class];
         } else {
             // Mark to save new class map at the end if a file was found
-            if ($file = self::$loader->findFile($class)) {
-                self::$classMap[$class] = $file;
-                self::$l[] = '//  ' . $class;
-                self::$classMapChanged = true;
+            if ($file = static::$loader->findFile($class)) {
+                static::$classMap[$class] = $file;
+                #static::$l[] = '//  ' . $class;
+                static::$classMapChanged = true;
             }
         }
 
@@ -40,25 +40,22 @@ class Loader
      */
     public static function register($loader, $cache = true)
     {
-        self::$loader = $loader;
+        static::$loader = $loader;
 
         // No real path provided
         if ($cache === true) {
             $cache = sys_get_temp_dir();
         }
 
-        self::$classMapFile = $cache
-                            ? sprintf(
-                                  '%s%sclassmap.%s.php',
-                                   $cache, DIRECTORY_SEPARATOR, substr(md5(serialize(self::$loader)), -7)
-                              )
-                            : false;
-
-        if (self::$classMapFile) {
+        if ($cache) {
+            static::$classMapFile = sprintf(
+                '%s%sclassmap.%s.php',
+                $cache, DIRECTORY_SEPARATOR, substr(md5(serialize(static::$loader)), -7)
+            );
             // Class map exists and is a valid array?
-            if (file_exists(self::$classMapFile) &&
-                is_array($classMap = @include self::$classMapFile)) {
-                self::$classMap = $classMap;
+            if (file_exists(static::$classMapFile) &&
+                is_array($classMap = @include static::$classMapFile)) {
+                static::$classMap = $classMap;
             }
             // Save class map on exit
             register_shutdown_function('Loader::shutdown');
@@ -66,7 +63,7 @@ class Loader
 
         // Switch autoload to self
         spl_autoload_register('Loader::autoload');
-        self::$loader->unregister();
+        static::$loader->unregister();
     }
 
     /**
@@ -74,17 +71,17 @@ class Loader
      */
     public static function shutdown()
     {
-        if (!self::$classMapChanged) {
+        if (!static::$classMapChanged) {
             return;
         }
 
         // Cache class map if allowed
-        ksort(self::$classMap);
+        ksort(static::$classMap);
 
         file_put_contents(
-            self::$classMapFile,
-            '<?php return ' . var_export(self::$classMap, true) . ';'
-            . PHP_EOL . PHP_EOL . implode(PHP_EOL, self::$l)
+            static::$classMapFile,
+            '<?php return ' . var_export(static::$classMap, true) . ';'
+            #. PHP_EOL . PHP_EOL . implode(PHP_EOL, static::$l)
         );
     }
 
@@ -101,7 +98,7 @@ class Loader
      */
     public static function applyCallback($file)
     {
-        foreach (self::$callbacks as $callback) {
+        foreach (static::$callbacks as $callback) {
             $file = $callback($file);
         }
         return $file;
@@ -117,10 +114,11 @@ class Loader
         }
 
         // If position is occupied move behind
-        while (isset(self::$callbacks[$position])) {
+        while (isset(static::$callbacks[$position])) {
             $position++;
         }
-        self::$callbacks[$position] = $callback;
+        static::$callbacks[$position] = $callback;
+
         return $position;
     }
 
@@ -136,7 +134,7 @@ class Loader
     /**
      *
      */
-    protected static $classMapFile;
+    protected static $classMapFile = false;
 
     /**
      *

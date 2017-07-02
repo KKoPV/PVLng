@@ -11,6 +11,11 @@ namespace Channel;
 /**
  *
  */
+use ORM\Channel as ORMChannel;
+use ORM\ReadingStrMemory as ORMReadingStrMemory;
+use ORM\Settings as ORMSettings;
+use ORM\Tree as ORMTree;
+use DBQuery;
 use I18N;
 
 /**
@@ -22,7 +27,7 @@ class Daylight extends InternalCalc
      * Run additional code before data saved to database
      * Read latitude / longitude from extra attribute
      */
-    public static function beforeEdit(\ORM\Channel $channel, array &$fields)
+    public static function beforeEdit(ORMChannel $channel, array &$fields)
     {
         parent::beforeEdit($channel, $fields);
         // times no longer used but needed here to not break existing channels
@@ -49,10 +54,11 @@ class Daylight extends InternalCalc
      * Run additional code before data saved to database
      * Save latitude / longitude to extra attribute
      */
-    public static function beforeSave(array &$fields, \ORM\Channel $channel)
+    public static function beforeSave(array &$fields, ORMChannel $channel)
     {
         parent::beforeSave($fields, $channel);
-        // times no longer used but needed here to not break existing channels
+
+        // Times no longer used but needed here to not break existing channels
         $channel->extra = array(+$fields['times']['VALUE'], $fields['extra']['VALUE']);
     }
 
@@ -73,7 +79,7 @@ class Daylight extends InternalCalc
     /**
      *
      */
-    protected function __construct(\ORM\Tree $channel)
+    protected function __construct(ORMTree $channel)
     {
         parent::__construct($channel);
 
@@ -82,11 +88,11 @@ class Daylight extends InternalCalc
         // Switch data table
         if ($this->resolution == 0) {
             $this->numeric = 0;
-            $this->data = new \ORM\ReadingStrMemory;
+            $this->data = new ORMReadingStrMemory;
             $this->data->id = $this->entity;
         }
 
-        $this->settings = new \ORM\Settings;
+        $this->settings = new ORMSettings;
     }
 
     /**
@@ -103,44 +109,37 @@ class Daylight extends InternalCalc
         if ($this->numeric and $this->extra) {
             // Fetch average of last x days of irradiation channel to buid curve
             // Base query, clone afterwards for time ranges filter
-            $qBase = new \DBQuery('pvlng_reading_num');
+            $qBase = new DBQuery('pvlng_reading_num');
             $qBase->get($qBase->MAX('data'), 'data')
                   ->filter('id', Channel::byGUID($this->extra)->entity)
                   ->group('`timestamp` DIV 86400');
 
-            $mean = (\ORM\Settings::getModelValue('Daylight', 'Average') == 0)
+            $mean = (ORMSettings::getModelValue('Daylight', 'Average') == 0)
                   ? /* Select harmonic mean   */ 'COUNT(`data`)/SUM(1/`data`)'
                   : /* Select arithmetic mean */ 'AVG(`data`)';
 
             $step = $this->period[0] * self::$secondsPerPeriod[$this->period[1]];
 
-            $timeback = \ORM\Settings::getModelValue('Daylight', 'CurveDays', 5)*24*60*60;
+            $timeback = ORMSettings::getModelValue('Daylight', 'CurveDays', 5)*24*60*60;
         }
+
+        // Get icons
+        $SunriseIcon = ORMSettings::getModelValue('Daylight', 'SunriseIcon');
+        $ZenitIcon   = ORMSettings::getModelValue('Daylight', 'ZenitIcon');
+        $SunsetIcon  = ORMSettings::getModelValue('Daylight', 'SunsetIcon');
 
         $day = $this->start;
 
         do {
-            $sunrise = \ORM\Settings::getSunrise($day);
-            $sunset  = \ORM\Settings::getSunset($day);
+            $sunrise = ORMSettings::getSunrise($day);
+            $sunset  = ORMSettings::getSunset($day);
             $noon    = ($sunrise + $sunset) / 2;
 
             if (!$this->numeric) {
                 // Static sunrise / sunset marker with time label depending of "times" attribute
-                $this->saveValue(
-                    $sunrise,
-                    date('H:i', $sunrise) . '|'
-                  . \ORM\Settings::getModelValue('Daylight', 'SunriseIcon')
-                );
-                $this->saveValue(
-                    $noon,
-                    date('H:i', $noon) . '|'
-                  . \ORM\Settings::getModelValue('Daylight', 'ZenitIcon')
-                );
-                $this->saveValue(
-                    $sunset,
-                    date('H:i', $sunset) . '|'
-                  . \ORM\Settings::getModelValue('Daylight', 'SunsetIcon')
-                );
+                $this->saveValue($sunrise, date('H:i', $sunrise) . '|' . $SunriseIcon);
+                $this->saveValue($noon, date('H:i', $noon) . '|' . $ZenitIcon);
+                $this->saveValue($sunset, date('H:i', $sunset) . '|' . $SunsetIcon);
             } else {
                 $q = clone($qBase);
                 $q->filter('timestamp', array('bt' => array($day-$timeback, $day-1)));
@@ -162,7 +161,7 @@ class Daylight extends InternalCalc
                 $this->saveValue($sunset, 0);
             }
 
-            $day += 24*60*60;
+            $day += 86400;
         } while ($day < $this->end);
 
         $this->dataCreated();

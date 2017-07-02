@@ -12,12 +12,22 @@ namespace Channel;
 /**
  *
  */
+use Core\Hook;
 use Core\Messages;
+use Core\PVLng;
+use ORM\Channel as ORMChannel;
+use ORM\Config as ORMConfig;
+use ORM\ChannelView as ORMChannelView;
+use ORM\Log as ORMLog;
+use ORM\Performance as ORMPerformance;
+use ORM\Reading as ORMReading;
+use ORM\ReadingCalculated as ORMReadingCalculated;
+use ORM\Settings as ORMSettings;
+use ORM\Tree as ORMTree;
+use slimMVC\App;
 use Buffer;
 use DBQuery;
-use Hook;
 use I18N;
-use NestedSet;
 
 /**
  *
@@ -27,7 +37,12 @@ class Channel
     /**
      *
      */
-    public static $Database;
+    public $timestamp;
+
+    /**
+     *
+     */
+    public $value;
 
     /**
      * Mark that a channel is used as sub channel for readout
@@ -39,7 +54,7 @@ class Channel
      */
     public static function byId($id, $alias = true)
     {
-        $channel = new \ORM\Tree($id);
+        $channel = new ORMTree($id);
 
         if (!$channel->getId()) {
             throw new Exception('No channel found for Id: '.$id, 400);
@@ -49,7 +64,7 @@ class Channel
 
         if ($aliasOf && $alias) {
             // Is an alias channel, switch direct to the original channel
-            return self::byId($aliasOf);
+            return static::byId($aliasOf);
         }
 
         $model = $channel->getModelClass();
@@ -65,20 +80,20 @@ class Channel
             throw new Exception('Missing channel GUID!', 400);
         }
 
-        $channel = new \ORM\Tree;
+        $channel = new ORMTree;
         $channel->filter('guid', array('like' => $guid.'%'))->findOne();
         $aliasOf = $channel->getAliasOf();
 
         if ($aliasOf && $alias) {
             // Is an alias channel, switch direct to the original channel
-            return self::byId($aliasOf);
+            return static::byId($aliasOf);
         } elseif ($channel->getModel()) {
             // Channel is in tree
             $model = $channel->getModelClass();
             return new $model($channel);
         } else {
             // NOT in tree, may be a real writable channel?! "Fake" a tree entry
-            $c = new \ORM\ChannelView;
+            $c = new ORMChannelView;
             $c->filterByGuid($guid)->findOne();
             if ($c->getId() && $c->getWrite()) {
                 $data = $c->asAssoc();
@@ -89,6 +104,7 @@ class Channel
                 return new $model($channel);
             }
         }
+
         throw new Exception('No channel found for GUID: '.$guid, 404);
     }
 
@@ -97,10 +113,10 @@ class Channel
      */
     public static function byChannel($id, $alias = true)
     {
-        $channel = new \ORM\ChannelView($id);
+        $channel = new ORMChannelView($id);
 
         if ($channel->getGuid()) {
-            return self::byGUID($channel->getGuid(), $alias);
+            return static::byGUID($channel->getGuid(), $alias);
         }
 
         throw new Exception('No channel found for ID: '.$id, 400);
@@ -116,7 +132,7 @@ class Channel
     /**
      * Run additional code before existing data presented to user
      */
-    public static function beforeEdit(\ORM\Channel $channel, array &$fields)
+    public static function beforeEdit(ORMChannel $channel, array &$fields)
     {
         if ($channel->type == 51) {
             // Precalcutaion of meter values for power sensor
@@ -175,7 +191,7 @@ class Channel
     /**
      * Run additional code before data saved to database
      */
-    public static function beforeSave(array&$fields, \ORM\Channel $channel)
+    public static function beforeSave(array&$fields, ORMChannel $channel)
     {
         foreach ($fields as $name => $data) {
             $channel->set($name, $data['VALUE']);
@@ -195,9 +211,9 @@ class Channel
      * Run additional code after channel was created / changed
      * If $tree is set, channel was just created
      */
-    public static function afterSave(\ORM\Channel $channel, $tree = null)
+    public static function afterSave(ORMChannel $channel, $tree = null)
     {
-        $ORMReadingCalculated = new \ORM\ReadingCalculated;
+        $ORMReadingCalculated = new ORMReadingCalculated;
         $ORMReadingCalculated->filterById($channel->id)->delete();
     }
 
@@ -210,14 +226,15 @@ class Channel
 
         // Root node (id == 1) accept always childs
         if ($this->id == 1 || $this->childs == -1 || count($childs) < $this->childs) {
-            $c = new \ORM\ChannelView($channel);
+            $c = new ORMChannelView($channel);
             $model = $c->getModelClass();
             if ($model::beforeAdd2Tree($this) !== false) {
-                return NestedSet::getInstance()->insertChildNode($channel, $this->id);
+                return PVLng::getNestedSet()->insertChildNode($channel, $this->id);
             }
         } else {
             Messages::error(I18N::translate('AcceptChild', $this->childs, $this->name), 400);
         }
+
         return false;
     }
 
@@ -226,7 +243,7 @@ class Channel
      */
     public function removeFromTree()
     {
-        return NestedSet::getInstance()->DeleteBranch($this->id);
+        return PVLng::getNestedSet()->DeleteBranch($this->id);
     }
 
     /**
@@ -299,29 +316,30 @@ class Channel
     }
 
     /**
-     *
+     * Default behavior
      */
     public function write($request, $timestamp = null)
     {
-        // Default behavior
-        $reading = \ORM\Reading::factory($this->numeric);
-
-        $this->lastReading = $reading->getLastReading($this->entity);
+        // Use $timestamp parameter only if not yet exists in $request
+        if (!array_key_exists('timestamp', $request)) {
+            $request['timestamp'] = $timestamp;
+        }
 
         $this->beforeWrite($request);
 
         if ($this->numeric) {
             // Check that new value is inside the valid range
-
             if ((!is_null($this->valid_from) && $this->value < $this->valid_from) ||
                 (!is_null($this->valid_to)   && $this->value > $this->valid_to)) {
-                $msg = sprintf('Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
-                               $this->value, $this->valid_from, $this->valid_to);
+                $msg = sprintf(
+                    'Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
+                    $this->value, $this->valid_from, $this->valid_to
+                );
 
-                $cfg = new \ORM\Config('LogInvalid');
+                $cfg = new ORMConfig('LogInvalid');
 
                 if ($cfg->value != 0) {
-                    \ORM\Log::save($this->name, $msg);
+                    ORMLog::save($this->name, $msg);
                 }
 
                 throw new Exception($msg, 200);
@@ -329,8 +347,9 @@ class Channel
 
             // Check that new reading value is inside the threshold range,
             // except 1st reading at all ($this->lastreading == null)
-            if ($this->threshold > 0 && !is_null($this->lastReading) &&
-                abs($this->value-$this->lastReading) > $this->threshold) {
+            if ($this->threshold > 0 &&
+                !is_null($this->lastReading) &&
+                abs($this->value - $this->lastReading) > $this->threshold) {
                 // Throw away invalid reading value
                 throw new Exception('Ignore invalid reading value: '.$this->value, 200);
             }
@@ -345,31 +364,20 @@ class Channel
         // came to here and not returned earlier
         $this->performance->setAction('write');
 
-        // Overload timestamp with $request['timestamp'] if given
-        if (array_key_exists('timestamp', $request)) {
-            $timestamp = $request['timestamp'];
-        }
-
-        if (!is_null($timestamp) && !is_numeric($timestamp)) {
-            $timestamp = strtotime($timestamp);
-        }
-
-        $reading->setId($this->entity)
-                ->setTimestamp($timestamp)
-                ->setData($this->value);
+        $this->ORMReading->setId($this->entity)->setTimestamp($this->timestamp)->setData($this->value);
 
 //         $rc = $this->numeric
-//             ? $reading->buffer($this->numeric)
-//             : $reading->insert();
+//             ? $this->ORMReading->buffer($this->numeric)
+//             : $this->ORMReading->insert();
 
-        $rc = $reading->insert();
+        $rc = $this->ORMReading->insert();
 
         if ($rc == 0 && $timestamp > time()) {
-            $rc = $this->update($request, $timestamp);
+            $rc = $this->update($request, $this->timestamp);
         }
 
         if ($rc) {
-            Hook::process('data.save.after', $this);
+            Hook::run('data.save.after', $this);
         }
 
         return $rc;
@@ -380,13 +388,11 @@ class Channel
      */
     public function update($request, $timestamp)
     {
-        // Default behavior
-        $reading = \ORM\Reading::factory($this->numeric);
-
-#        $this->lastReading = \ORM\ReadingLast::f($this->entity)->getData();
-        $this->lastReading = $reading->getLastReading($this->entity);
-
         $this->checkBeforeWrite($request);
+
+        Hook::run('data.update.before', $this);
+
+        $this->lastReading = $this->ORMReading->getLastReading($this->entity);
 
         if ($this->numeric) {
             // Check that new value is inside the valid range
@@ -395,10 +401,10 @@ class Channel
                 $msg = sprintf('Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
                                $this->value, $this->valid_from, $this->valid_to);
 
-                $cfg = new \ORM\Config('LogInvalid');
+                $cfg = new ORMConfig('LogInvalid');
 
                 if ($cfg->value != 0) {
-                    \ORM\Log::save($this->name, $msg);
+                    ORMLog::save($this->name, $msg);
                 }
 
                 throw new Exception($msg, 200);
@@ -422,19 +428,20 @@ class Channel
         // can to here and not returned earlier
         $this->performance->setAction('update');
 
-        $reading->filterByIdTimestamp($this->entity, $timestamp)->findOne();
-        $rc = $reading->getId() ? $reading->setData($this->value)->update() : 0;
+        $this->ORMReading->reset()
+             ->filterByIdTimestamp($this->entity, $timestamp)->findOne();
+        $rc = $this->ORMReading->getId() ? $this->ORMReading->setData($this->value)->update() : 0;
 /*
         if ($rc) {
             // Log successful updates only
             $msg = isset($this->lastReading)
                  ? sprintf('%s: %f > %f', date('Y-m-d H:i:s', $timestamp), $this->lastReading, $request['data'])
                  : sprintf('%s: %f', date('Y-m-d H:i:s', $timestamp), $request['data']);
-            \ORM\Log::save($this->name, $msg);
+            ORMLog::save($this->name, $msg);
         }
 */
         if ($rc) {
-            Hook::process('data.update.after', $this);
+            Hook::run('data.update.after', $this);
         }
 
         return $rc;
@@ -598,7 +605,7 @@ class Channel
             // Start ? days backwards
             $request['start'] = 'midnight -'.$args[1].'days';
         } elseif (preg_match('~^sunrise(?:[;-](\d+))*~', $request['start'], $args)) {
-            $request['start'] = \ORM\Settings::getSunrise();
+            $request['start'] = ORMSettings::getSunrise();
             if (isset($args[1])) {
                 $request['start'] -= $args[1]*60;
             }
@@ -619,7 +626,7 @@ class Channel
             } elseif (preg_match('~^-(\d+)$~', $request['end'], $args)) {
                 $request['end'] = 'midnight -'.$args[1].'days';
             } elseif (preg_match('~^sunset(?:[;+](\d+))*~', $request['end'], $args)) {
-                $request['end'] = \ORM\Settings::getSunset();
+                $request['end'] = ORMSettings::getSunset();
                 if (isset($args[1])) {
                     $request['end'] += $args[1]*60;
                 }
@@ -641,7 +648,7 @@ class Channel
         $time = (microtime(true) - $this->time) * 1000;
 
         if (!headers_sent()) {
-            Header(sprintf('X-Query-Time: %d ms', $time));
+            Header(sprintf('X-Channel-Time: %d ms', $time));
         }
 
         // Check for real action to log
@@ -700,6 +707,11 @@ class Channel
     /**
      *
      */
+    protected $app;
+
+    /**
+     *
+     */
     protected $db;
 
     /**
@@ -725,7 +737,7 @@ class Channel
     /**
      *
      */
-    protected $period = array( 0, self::NO );
+    protected $period = [0, self::NO];
 
     /**
      *
@@ -735,20 +747,25 @@ class Channel
     /**
      * Extra attributes
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      *
      */
-    protected $bufferedTags = array();
+    protected $bufferedTags = [];
 
     /**
      *
      */
-    protected function __construct(\ORM\Tree $channel)
+    protected $ORMReading;
+
+    /**
+     *
+     */
+    protected function __construct(ORMTree $channel)
     {
         $this->time   = microtime(true);
-        $this->db     = $channel::getDatabase();
+        $this->db     = PVLng::getDatabase();
 
         foreach ($channel->asAssoc() as $key => $value) {
             $this->$key = $value;
@@ -762,7 +779,8 @@ class Channel
             }
         }
 
-        $this->performance = new \ORM\Performance;
+        $this->ORMReading  = ORMReading::factory($this->numeric);
+        $this->performance = new ORMPerformance;
     }
 
     /**
@@ -770,12 +788,12 @@ class Channel
      */
     protected function groupTimestampByPeriod()
     {
-        return $this->period[0] * self::$secondsPerPeriod[$this->period[1]] == 1
+        return $this->period[0] * static::$secondsPerPeriod[$this->period[1]] == 1
              ? '`timestamp`'
              : sprintf(
                    '`timestamp` DIV (%1$d * %2$d) * %1$d * %2$d',
                    $this->period[0],
-                   self::$secondsPerPeriod[$this->period[1]]
+                   static::$secondsPerPeriod[$this->period[1]]
                );
     }
 
@@ -786,8 +804,8 @@ class Channel
     {
         if ($refresh || is_null($this->bufferedChilds)) {
             $this->bufferedChilds = array();
-            foreach (\NestedSet::getInstance()->getChilds($this->id) as $child) {
-                $child = self::byID($child['id']);
+            foreach (PVLng::getNestedSet()->getChilds($this->id) as $child) {
+                $child = static::byID($child['id']);
                 $child->isChild = true;
                 $this->bufferedChilds[] = $child;
             }
@@ -816,6 +834,14 @@ class Channel
             );
         }
 
+        // Handle timestamp
+        if (!is_null($request['timestamp']) && !is_numeric($request['timestamp'])) {
+            $request['timestamp'] = strtotime($request['timestamp']);
+        }
+
+        $this->timestamp = $request['timestamp'];
+
+        // Handle data
         if (!isset($request['data']) || !is_scalar($request['data'])) {
             throw new Exception($this->guid.' - Missing data value', 400);
         }
@@ -839,7 +865,9 @@ class Channel
     {
         $this->checkBeforeWrite($request);
 
-        Hook::process('data.save.before', $this);
+        Hook::run('data.save.before', $this);
+
+        $this->lastReading = $this->ORMReading->getLastReading($this->entity);
 
         if ($this->numeric) {
             // Remove all non-numeric characters
@@ -861,14 +889,14 @@ class Channel
                     $this->value + $this->offset < $this->lastReading &&
                     $this->adjust) {
                     // Auto-adjust channel offset
-                    \ORM\Log::save(
+                    ORMLog::save(
                         $this->name,
                         sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
                                 $this->offset, $this->lastReading, $this->value)
                     );
 
                     // Update channel in database
-                    $t = new \ORM\Channel($this->entity);
+                    $t = new ORMChannel($this->entity);
                     $t->offset = $this->lastReading;
                     $t->update();
 
@@ -902,7 +930,7 @@ class Channel
             throw new Exception($this->name.' MUST have '.$this->childs.' child(s)', 400);
         }
 
-        self::calcStartEnd($request);
+        static::calcStartEnd($request);
 
         $this->start = $request['start'];
         $this->end   = $request['end'];
@@ -974,14 +1002,14 @@ class Channel
 
         // Childs without proper "grouping" can't calculated by parent channels
         if ($this->isChild) {
-            self::$secondsPerPeriod[self::NO] = 10;
+            static::$secondsPerPeriod[self::NO] = 10;
         }
     }
 
     /**
      *
      */
-    protected function afterRead(\Buffer $buffer)
+    protected function afterRead(Buffer $buffer)
     {
         $datafile = new Buffer;
 
@@ -1020,7 +1048,7 @@ class Channel
                     ((is_null($this->valid_from) || $row['data'] >= $this->valid_from) &&
                      (is_null($this->valid_to)   || $row['data'] <= $this->valid_to))) {
                     $this->value = $row['data'];
-                    Hook::process('data.read.after', $this);
+                    Hook::run('data.read.after', $this);
                     $row['data'] = $this->value;
 
                     $datafile->write($row, $id);
@@ -1028,7 +1056,7 @@ class Channel
                 }
             } else {
                 $this->value = $row['data'];
-                Hook::process('data.read.after', $this);
+                Hook::run('data.read.after', $this);
                 $row['data'] = $this->value;
 
                 $datafile->write($row, $id);
@@ -1056,7 +1084,7 @@ class Channel
 
         // Read one period before real start for meter calculations
         $start = $this->meter
-               ? $this->start - $this->period[0] * self::$secondsPerPeriod[$this->period[1]]
+               ? $this->start - $this->period[0] * static::$secondsPerPeriod[$this->period[1]]
                : $this->start;
 
         // End is midnight > minus 1 second
@@ -1101,14 +1129,15 @@ class Channel
      */
     private function readLastRow()
     {
-#        $q = $this->write && !$this->childs
-#             // Use special table for last readings for real channels
-#           ? DBQuery::forge('pvlng_reading_last')
-#           : DBQuery::forge($this->table[$this->numeric]);
+        if ($this->write && !$this->childs) {
+             // Use special table for last readings for real channels
+             $q = DBQuery::forge('pvlng_reading_last');
+        } else {
+             $q = DBQuery::forge($this->table[$this->numeric])
+                  ->orderDescending('timestamp')->limit(1);
+        }
 
-        // Fetch last reading and set some data to 0 to get correct field order
-#        return $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
-        return DBQuery::forge($this->table[$this->numeric])
+        $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
           ->get('timestamp')
           ->get('data')
           ->get(0, 'min')
@@ -1116,10 +1145,9 @@ class Channel
           ->get(0, 'count')
           ->get(0, 'timediff')
           ->get(0, 'consumption')
-          ->whereEQ('id', $this->entity)
-#          ->whereEQ('timestamp', '(SELECT MAX(`timestamp`) FROM `'.$tbl.'` WHERE `id` = '.$this->entity.')')
-          ->orderDescending('timestamp')
-          ->limit(1);
+          ->whereEQ('id', $this->entity);
+
+        return $q;
     }
 
     /**
@@ -1130,7 +1158,7 @@ class Channel
     {
         $q = DBQuery::forge($this->table[$this->numeric]);
 
-        $value = $q->MAX('data') . ' - ' . $q->MIN('data');
+        $value = $q->MAX('data') . '-' . $q->MIN('data');
 
         $q->get($q->FROM_UNIXTIME($q->MAX('timestamp')), 'datetime')
           ->get($q->MAX('timestamp'), 'timestamp')

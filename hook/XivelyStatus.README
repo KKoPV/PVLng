@@ -1,2 +1,0 @@
-- XivelyStatus           - calls PHPs curl_* functions
-- XivelyStatusBackground - calls curl via command line (exec()), don't blocks script

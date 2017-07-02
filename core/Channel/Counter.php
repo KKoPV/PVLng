@@ -12,16 +12,21 @@ namespace Channel;
 /**
  *
  */
+use Buffer;
+
+/**
+ *
+ */
 class Counter extends Channel
 {
 
     /**
      *
      */
-    protected function beforeWrite($request)
+    protected function beforeWrite(&$request)
     {
         // Used as ticker/marker
-        if (!isset($request['data'])) {
+        if (!array_key_exists('data', $request)) {
             $request['data'] = 1;
         }
 
@@ -33,10 +38,9 @@ class Counter extends Channel
      */
     public function read($request)
     {
-
         $this->beforeRead($request);
 
-        $result = new \Buffer;
+        $result = new Buffer;
 
         $last = 0;
 

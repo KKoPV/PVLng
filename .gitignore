@@ -1,13 +1,6 @@
 .docheader
 *.develop
 
-prepend.php
-append.php
-
-config.php
-config.cron.php
-phpcs.sh
-
 *.conf
 
 run/*
@@ -22,4 +15,5 @@ composer.lock
 
 /tests
 /vendor
-/nbproject
+
+/phpc*

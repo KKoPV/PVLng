@@ -8,14 +8,16 @@
  * @version    1.0.0
  */
 use Core\Session;
-use PVLng\PVLng;
+use Core\PVLng;
 use Yryie\Yryie;
 
 /**
  *
  */
-Yryie::TimeUnit(Yryie::TIME_AUTO);
-Yryie::Versions();
+Yryie::setTimeUnit(Yryie::TIME_AUTO);
+Yryie::versions(
+    'MySQL '.PVLng::getDatabase()->queryOne('SELECT `pvlng_mysql_version`()')
+);
 
 /**
  * Define Loader callback to manipulate file content to include
@@ -30,39 +32,40 @@ Loader::registerCallback(function ($filename) {
     $filenameAOP = str_replace(PVLng::$TempDir, '', $filenameAOP);
     $filenameAOP = str_replace(PVLng::$RootDir, '', $filenameAOP);
     $filenameAOP = str_replace(DIRECTORY_SEPARATOR, '~', $filenameAOP);
-    $filenameAOP = trim($filenameAOP, '~');
-    $filenameAOP = PVLng::path(PVLng::$TempDir, $filenameAOP);
+    $filenameAOP = PVLng::path(PVLng::$TempDir, trim($filenameAOP, '~'));
 
-    if (!file_exists($filenameAOP) or filemtime($filenameAOP) < filemtime($filename)) {
+    if (!file_exists($filenameAOP) || filemtime($filenameAOP) < filemtime($filename)) {
         // (Re-)Create AOP file
         $code = file_get_contents($filename);
 
         // Build file content hash to check if AOP relevant code was found
         $hash = md5($code);
 
-        # Yryie::Info('Compile: '.$filename);
-        Yryie::StartTimer(
+        Yryie::startTimer(
             'Compile '
           . str_replace(PVLng::$RootDir.DIRECTORY_SEPARATOR, '', $filename)
           . ' to '.basename($filenameAOP)
         );
+
         Yryie::transformCode($code);
 
         if ($hash == md5($code)) {
+            // No Yryie commands found, use original file content
             $code = "<?php include '$filename';";
         }
 
         if (file_put_contents($filenameAOP, $code)) {
-            // File content was changed and AOP file could created
+            // File content was changed and AOP file could created, strip down
+            file_put_contents($filenameAOP, php_strip_whitespace($filenameAOP));
             $filename = $filenameAOP;
-            #Yryie::Info('Created: '.$filename);
         }
-        Yryie::StopTimer();
+        Yryie::stopTimer(); // Compile
     } else {
         // AOP file still exists and is up-to-date
         $filename = $filenameAOP;
-        Yryie::Info('reuse '.basename($filename));
+        Yryie::info('Reuse %s', basename($filename));
     }
+
     return $filename;
 });
 
@@ -81,7 +84,7 @@ class YryieMiddleware extends Slim\Middleware
 
         Yryie::loadFromSession();
 
-        Yryie::Call(func_get_args());
+        Yryie::call(func_get_args());
 
         // Run inner middleware and application
         $this->next->call();
@@ -103,15 +106,15 @@ class YryieMiddleware extends Slim\Middleware
                     Yryie::SQL('INDEX: '.$res->key.' ('.$res->possible_keys.')');
                 }
             } catch (Exception $e) {
-                Yryie::Error($e->getMessage());
+                Yryie::error($e->getMessage());
             }
         }
 
-        Yryie::Debug('%d queries in %.3fms (%.3fms each)', $qCnt, $qTime, $qTime/$qCnt);
+        Yryie::debug('%d queries in %.3fms (~%.0fms each)', $qCnt, $qTime, $qTime/$qCnt);
 
         if ($app->Response()->headers['Location']) {
             // Redirection
-            Yryie::Debug('Redirect to %s', $app->Response()->headers['Location']);
+            Yryie::debug('Redirect to %s', $app->Response()->headers['Location']);
             Yryie::finalizeTimers();
             Yryie::saveToSession();
             return;
@@ -125,7 +128,7 @@ class YryieMiddleware extends Slim\Middleware
         if ($app->debug == 3) {
             $file = PVLng::path(PVLng::$TempDir, 'trace.'.date('Y-m-d-H:i:s').'.csv');
             Yryie::$TraceDelimiter = ';';
-            Yryie::Save($file);
+            Yryie::saveToFile($file);
             $body = str_replace($placeholder, '<p><b>Trace saved as <tt>'.$file.'</tt></b></p>', $body);
 
             // Trace only once, reset debug state
@@ -134,7 +137,7 @@ class YryieMiddleware extends Slim\Middleware
             // Replace placeholder with debug data
             $body = str_replace(
                 $placeholder,
-                Yryie::getCSS() . Yryie::getJS(true, true) . Yryie::Render(),
+                Yryie::getCSS() . Yryie::getJS(true, true) . Yryie::render(),
                 $body
             );
         }

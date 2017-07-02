@@ -1,0 +1,110 @@
+-   enabled:    true
+    name:       Blockhaus
+    handler:    PVOutput
+    each:       5               ### Minutes
+
+    apikey:     b6321c98e6088928600a85258d31fa0305c22e1a
+    systemid:   5241
+
+    channels:
+        ### v1 - Energy Generation, watt hours
+        1:
+            guid:       8797-e6b4-9560-7e75-744f-e3de-4bfe-ba4b
+            factor:     1
+        ### v2 - Power Generation, watts
+        2:
+            guid:       fc0d-af98-ab12-cf7b-021d-dac2-9284-b925
+            factor:     1
+        ### v3 - Energy Consumption, watt hours
+        3:
+            guid:       1f0c-8bd8-8b82-cef4-f3bd-fd57-22be-3eb0
+            factor:     1000
+        ### v4 - Power Consumption, watts
+        4:
+            guid:       bf87-5e5e-ffc4-32d9-7dfd-58fd-a5ea-4242
+            factor:     1
+            ]
+        ### v5 - Temperature, celsius
+        5:
+            guid:       2ee2-1dd6-f45d-a6b4-1394-d8e3-66c9-a75b
+            factor:     1
+            ]
+        ### v6 - Voltage, volts
+        6:
+            guid:       e377-49a8-99c0-a91d-3575-0d22-d87c-873f
+            factor:     1
+
+        ### Values 7 .. 12 are available in donation mode
+        ### http://pvoutput.org/help.html#donations
+
+        ### v7 - Extended Value 1
+        ### Irradiation
+        7:
+            guid:       1e1d-9e34-9e32-96aa-fa6a-7faa-f807-ab45
+            factor:     1
+        ### v8 - Extended Value 2
+        ### Module temperature
+        8:
+            guid:       a28c-e02f-fc9c-99a5-01c7-9162-8ae7-cd40
+            factor:     1
+        ### v9 - Extended Value 3
+        ### Outside temperature
+        9:
+            guid:       e78d-9435-1f6c-bd36-23de-182f-2e8e-ebf3
+            factor:     1
+        ### v10 - Extended Value 4
+        ### Inverter temperature
+        10:
+            guid:       2ee2-1dd6-f45d-a6b4-1394-d8e3-66c9-a75b
+            factor:     1
+        ### v11 - Extended Value 5
+        11:
+            guid:
+            factor:     1
+        ### v12 - Extended Value 6
+        12:
+            guid:
+            factor:     1
+
+---
+
+-   enabled:    true
+    name:       Carport
+    handler:    PVOutput
+    each:       5               ### Minutes
+
+    apikey:     b6321c98e6088928600a85258d31fa0305c22e1a
+    systemid:   7367
+
+    channels:
+            ### v1 - Energy Generation, watt hours
+            1:
+                guid:   95a7-4af4-e338-92ed-2288-a5f8-ab8d-cbff
+                factor: 1
+            ### v2 - Power Generation, watts
+            2:
+                guid:   1f4c-582c-c0d6-f454-8f43-fa89-2370-8468
+                factor: 1
+            ### v5 - Temperature, celsius
+            5:
+                guid:   762f-c2af-39c5-3c01-9c42-c7d9-65a1-98d1
+                factor: 1
+            ### v6 - Voltage, volts
+            6:
+                guid:   1166-89bd-97d7-b886-b7fc-acfb-e4d5-6c10
+                factor: 1
+            ### v7 - Extended Value 1
+            ### Outside temperature
+            7:
+                guid:   e78d-9435-1f6c-bd36-23de-182f-2e8e-ebf3
+                factor: 1
+            ### v8 - Extended Value 2
+            ### Inverter temperature
+            8:
+                guid:   762f-c2af-39c5-3c01-9c42-c7d9-65a1-98d1
+                factor: 1
+            ### v9 - Extended Value 3
+            ### Inside temperature
+            9:
+                guid:   b00e-6b15-29a1-e8a3-41f9-529b-8d68-3bdb
+                factor: 1

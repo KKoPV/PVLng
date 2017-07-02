@@ -12,7 +12,8 @@
     "prefer-stable": true,
     "require": {
         "slim/slim": "~2",
-        "pv-log/json11": "^1.5"
+        "pv-log/json11": "^1.5",
+        "mustangostang/spyc": "^0.6.2"
     },
     "require-dev": {
         "malukenho/docheader": "^0.1.5",

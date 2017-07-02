@@ -12,7 +12,7 @@
 #Yryie table tbody tr.handler td.msg{font-weight:700}
 #Yryie table tbody tr.debug td.msg,#Yryie table tbody tr.trace td.msg,#Yryie table tbody tr.version td.msg,#Yryie table tbody tr.call td.msg{font-family:monospace;font-size:110%;white-space:pre}
 #Yryie table thead th{text-align:left;background:#909090;border:1px solid #FFF;padding:3px 5px}
-#Yryie table thead th.time,#Yryie table thead th.type{width:1%}
+#Yryie table thead th.type{width:1%}
 #Yryie table tbody td{border:1px solid #FFF;vertical-align:top;padding:2px 5px}
 #Yryie table tbody td.time{font-family:monospace;font-size:110%;text-align:right}
 #Yryie table pre{margin:0}

@@ -7,6 +7,11 @@
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  * @version    1.0.0
  */
+use Core\BabelKit;
+
+/**
+ *
+ */
 abstract class I18N
 {
 

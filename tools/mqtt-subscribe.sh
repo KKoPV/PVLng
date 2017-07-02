@@ -12,23 +12,23 @@ doStart () {
     ### Defaults
     local host=localhost
     local port=1883
-    local qos=1
     local log=
 
     ## Config file exists?
     [ -f $pwd/mqtt-subscribe.conf ] && . $pwd/mqtt-subscribe.conf
 
     if [ "$log" ]; then
+        rm $log 2>/dev/null
         v='-v'
     else
         log=/dev/null
     fi
 
     if [ "$deamon" ]; then
-        php $pwd/mqtt-subscribe.php -s $host -p $port -q $qos $v >>$log 2>/dev/null &
+        php $pwd/mqtt-subscribe.php -s $host -p $port $v >>$log 2>&1 &
         echo $! >$pidfile
     else
-        php $pwd/mqtt-subscribe.php -s $host -p $port -q $qos -v
+        php $pwd/mqtt-subscribe.php -s $host -p $port -v
     fi
 }
 

@@ -20,7 +20,12 @@ namespace ORM;
 /**
  *
  */
-abstract class TariffViewBase extends \slimMVC\ORM
+use Core\ORM;
+
+/**
+ *
+ */
+abstract class TariffViewBase extends ORM
 {
 
     // -----------------------------------------------------------------------
@@ -237,7 +242,7 @@ abstract class TariffViewBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Call create table sql on first run and set to false
+     * Call create table sql on class creation and set to false
      */
     protected static $memory = false;
 

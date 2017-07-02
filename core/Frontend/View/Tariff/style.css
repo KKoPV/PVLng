@@ -1,0 +1,21 @@
+/**
+ *
+ *
+ * @author      Knut Kohl <github@knutkohl.de>
+ * @copyright   2012-2014 Knut Kohl
+ * @license     MIT License (MIT) http://opensource.org/licenses/MIT
+ * @version     1.0.0
+ */
+
+.datatable tr:hover {
+    background-color: #C0FFC0 !important;
+}
+
+td.icons .ui-button-text {
+    /* Delete forms */
+    padding: 0 !important;
+}
+
+div.wd {
+    padding: .25em .5em .25em 0;
+}

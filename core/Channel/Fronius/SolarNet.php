@@ -12,7 +12,7 @@ namespace Channel\Fronius;
 /**
  *
  */
-use \Channel\MultiChannel;
+use Channel\MultiChannel;
 
 /**
  *

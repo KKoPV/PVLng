@@ -49,21 +49,58 @@ trait ReadingTrait
     }
 
     /**
-      * Read last measuring value for channel
-      *
-      * @param integer $id Channel Id
+     * Read last measuring value for channel
+     *
+     * @param integer $id Channel Id
      */
     public function getLastReading($id)
     {
-
-        $sql = sprintf('
+        $sql = '
             SELECT `data`
-              FROM `%1$s`
-             WHERE `id` = %2$d
-               AND `timestamp` = (SELECT MAX(`timestamp`) FROM `%1$s` WHERE `id` = %2$d)',
-            $this->table, $id
-        );
+              FROM `{1}`
+             WHERE `id` = {2}
+               AND `timestamp` = (
+                       SELECT MAX(`timestamp`)
+                         FROM `{1}`
+                        WHERE `id` = {2}
+                   )';
 
-        return self::$db->queryOne($sql);
+        return self::$db->queryOne($sql, $this->table, $id);
+    }
+
+    /**
+     * Read last measuring value for channel but before given timestamp
+     *
+     * @param integer $id Channel Id
+     * @param integer $timestamp Timestamp to read before
+     */
+    public function getLastReadingBeforeTimestamp($id, $timestamp)
+    {
+        $sql = '
+            SELECT `data`
+              FROM `{1}`
+             WHERE `id` = {2}
+               AND `timestamp` < {3}
+            OERDER BY `timestamp` DESC
+             LIMIT 1';
+
+        return self::$db->queryOne($sql, $this->table, $id, $timestamp);
+    }
+
+    /**
+     * Remove all future values from reading table
+     *
+     * @param integer $id Channel Id
+     */
+    public function deleteFutureReadings($id, $timestamp = null)
+    {
+        if ($timestamp == '') {
+            $timestamp = 'UNIX_TIMESTAMP()';
+        }
+
+        return self::$db->query(
+            'DELETE FROM `{1}` WHERE `id` = {2} AND `timestamp` > {3}',
+            $this->table, $id, $timestamp
+        );
     }
 }

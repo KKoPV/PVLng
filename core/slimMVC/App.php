@@ -12,9 +12,10 @@ namespace slimMVC;
 /**
  *
  */
-use Slim\Slim;
-use Slim\Helper\Set;
+use Core\Hook;
 use Core\Session;
+use Slim\Helper\Set;
+use Slim\Slim;
 
 /**
  *
@@ -44,6 +45,7 @@ class App extends Slim
      */
     public function foreward($action)
     {
+        Hook::run('frontend.foreward', $this);
         $this->action = $action;
     }
 
@@ -52,6 +54,7 @@ class App extends Slim
      */
     public function redirect($url = '/', $status = 302)
     {
+        Hook::run('frontend.redirect', $this);
         Session::close();
         parent::redirect($url, $status);
     }
@@ -59,49 +62,53 @@ class App extends Slim
     /**
      * Process controller action
      *
-     * @param  string $class Controller class
-     * @param  string $action Controller action
+     * @param  string $controller Controller class
+     * @param  string $action     Controller action
      * @return void
      */
-    public function process($class = 'Index', $action = 'Index', $params = array())
+    public function process($controller = 'Index', $action = 'Index', $params = array())
     {
         $this->params->replace($params);
 
-        $class = '\Frontend\Controller\\' . $class;
-
         // Don't check existance, app. error is ok here
-        $controller = new $class;
+        $class = '\Frontend\Controller\\' . $controller;
+        $oController = new $class;
 
-        $reqMethod = strtoupper($this->request->getMethod());
+        $requestMethod = strtoupper($this->request->getMethod());
 
-        $controller->before();
+        $oController->before();
+        Hook::run('Controller.' . $controller . '.' . $action . '.before', $this);
 
-        $method = 'before' . $reqMethod;
-        $controller->$method();
+        $method = 'before' . $requestMethod;
+        $oController->$method();
+        Hook::run('Controller.' . $controller . '.' . $action . '.before.' . $requestMethod, $this);
 
         $this->action = $action;
 
         do {
+            // Remember actual action to detect forwarding
             $action = $this->action;
 
-            $method = $action . $reqMethod . 'Action';
-            if (method_exists($controller, $method)) {
-                $controller->$method();
+            $method = $action . $requestMethod . 'Action';
+            if (method_exists($oController, $method)) {
+                $oController->$method();
             }
 
             // Display only actions
             $method = $action . 'Action';
-            if (method_exists($controller, $method)) {
-                $controller->$method();
+            if (method_exists($oController, $method)) {
+                $oController->$method();
             }
         } while ($action != $this->action);
 
-        $method = 'after' . $reqMethod;
-        $controller->$method();
+        $method = 'after' . $requestMethod;
+        $oController->$method();
+        Hook::run('Controller.' . $controller . '.' . $action . '.after.' . $requestMethod, $this);
 
-        $controller->after();
+        $oController->after();
+        Hook::run('Controller.' . $controller . '.' . $action . '.after', $this);
 
-        $controller->finalize($action);
+        $oController->finalize($action);
     }
 
     // -----------------------------------------------------------------------

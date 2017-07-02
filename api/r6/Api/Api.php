@@ -23,6 +23,11 @@ use Buffer;
 class Api extends Slim
 {
     /**
+     *
+     */
+    public $formatter;
+
+    /**
      * Get named parameter as string
      */
     public function strParam($name, $default = '')
@@ -126,7 +131,6 @@ class Api extends Slim
      */
     public function saveBulkCSV($guid, $rows, $sep)
     {
-
         // Ignore empty datasets
         $rows = array_values(array_filter($rows));
 
@@ -195,7 +199,6 @@ class Api extends Slim
      */
     public function saveCSV($guid, $rows, $sep)
     {
-
         // Ignore empty datasets
         $rows = array_values(array_filter($rows));
 
@@ -269,8 +272,18 @@ class Api extends Slim
      */
     public function formatResult(Buffer $data, Buffer $result, $meter, $numeric, $decimals)
     {
-        $full  = $this->boolParam('full', false);
-        $short = $this->boolParam('short', false);
+        if ($formatter = $this->strParam('formatter')) {
+            $formatter = '\Formatter\Special\\'.$formatter;
+            if (!class_exists($formatter)) {
+                $this->stopAPI('Missing formatter: '.$formatter, 404);
+            }
+            $this->formatter = $formatter;
+            $full  = true;
+            $short = false;
+        } else {
+            $full  = $this->boolParam('full', false);
+            $short = $this->boolParam('short', false);
+        }
 
         // Optimized flow, 1st "switch" then "loop" ...
         switch (true) {

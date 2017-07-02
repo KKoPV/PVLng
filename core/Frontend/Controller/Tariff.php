@@ -80,6 +80,7 @@ class Tariff extends Controller
             $tariff[] = array(
                 'id'      => $row->getId(),
                 'date'    => date($fmtDate, $row->getDateTS()),
+                'dateraw' => date('Y-m-d', $row->getDateTS()),
                 'time'    => $row->getTime(),
                 'days'    => implode(', ', array_map(
                                     function ($a) {

@@ -20,7 +20,14 @@ namespace Channel\Sonnenertrag;
 /**
  *
  */
-class JSON extends \Channel
+use Channel\Channel;
+use Channel\Exception;
+use Buffer;
+
+/**
+ *
+ */
+class JSON extends Channel
 {
 
     /**
@@ -50,7 +57,6 @@ class JSON extends \Channel
      */
     public function read($request, $attributes = false)
     {
-
         $this->year  = date('Y');
         $this->month = (array_key_exists('m', $request) && $request['m'])
                      ? $request['m']
@@ -93,7 +99,7 @@ class JSON extends \Channel
             $row1 = $buffer->rewind()->current();
             $row2 = $next->rewind()->current();
 
-            $result = new \Buffer;
+            $result = new Buffer;
 
             while (!empty($row1) || !empty($row2)) {
                 if ($buffer->key() == $next->key()) {

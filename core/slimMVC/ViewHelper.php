@@ -2,19 +2,13 @@
 /**
  *
  * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
+ * @copyright   2012 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
 namespace slimMVC;
 
 /**
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
 class ViewHelper
 {
@@ -43,6 +37,10 @@ class ViewHelper
             return call_user_func_array($this->closures[$method], $args);
         }
     }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
 
     /**
      *

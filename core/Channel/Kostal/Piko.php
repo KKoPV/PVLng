@@ -12,15 +12,18 @@ namespace Channel\Kostal;
 /**
  *
  */
-class Piko extends \Channel
-{
+use Channel\Channel;
 
+/**
+ *
+ */
+class Piko extends Channel
+{
     /**
      *
      */
     public function write($request, $timestamp = null)
     {
-
         // DON'T call beforeWrite() here, will be called inside each
         // child->write() for each real reding value
 
@@ -70,7 +73,7 @@ class Piko extends \Channel
 
             try { // Simulate $request['data'], timestamp is in row[0]
                 $ok += $child->write(array('data' => $value), $data[0]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $code = $e->getCode();
                 if ($code != 200 && $code != 201 && $code != 422) {
                     throw $e;

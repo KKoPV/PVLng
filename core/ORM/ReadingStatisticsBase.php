@@ -20,7 +20,12 @@ namespace ORM;
 /**
  *
  */
-abstract class ReadingStatisticsBase extends \slimMVC\ORM
+use Core\ORM;
+
+/**
+ *
+ */
+abstract class ReadingStatisticsBase extends ORM
 {
 
     // -----------------------------------------------------------------------
@@ -258,7 +263,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Call create table sql on first run and set to false
+     * Call create table sql on class creation and set to false
      */
     protected static $memory = false;
 
@@ -269,7 +274,7 @@ abstract class ReadingStatisticsBase extends \slimMVC\ORM
      */
     // @codingStandardsIgnoreStart
     protected static $createSQL = '
-        CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_reading_statistics` AS select `c`.`guid` AS `guid`,`c`.`name` AS `name`,`c`.`description` AS `description`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`unit` AS `unit`,`t`.`name` AS `type`,`t`.`icon` AS `icon`,from_unixtime(`u`.`timestamp`) AS `datetime`,ifnull(`u`.`readings`,0) AS `readings` from ((`pvlng_channel` `c` join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) left join `pvlng_reading_count` `u` on((`c`.`id` = `u`.`id`))) where ((`t`.`childs` = 0) and `t`.`write`)
+        CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_reading_statistics` AS select `c`.`guid` AS `guid`,`c`.`name` AS `name`,`c`.`description` AS `description`,`c`.`serial` AS `serial`,`c`.`channel` AS `channel`,`c`.`unit` AS `unit`,`t`.`name` AS `type`,`t`.`icon` AS `icon`,from_unixtime(`u`.`timestamp`) AS `datetime`,ifnull(`u`.`readings`,0) AS `readings` from ((`pvlng_channel` `c` join `pvlng_type` `t` on((`c`.`type` = `t`.`id`))) left join `pvlng_reading_count` `u` on((`c`.`id` = `u`.`id`))) where ((`t`.`childs` = 0) and (`t`.`write` <> 0))
     ';
     // @codingStandardsIgnoreEnd
 

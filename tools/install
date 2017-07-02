@@ -3,16 +3,15 @@
 ### Install script
 ###
 ### @author      Knut Kohl <github@knutkohl.de>
-### @copyright   2012-2016 Knut Kohl
-### @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
-### @version     1.1.0
+### @copyright   2012 Knut Kohl
+### @license     MIT License (MIT) http://opensource.org/licenses/MIT
 #############################################################################
 
 ### echo ...
 function es { echo =========================================================; }
 function e { es; echo "= $*"; es; }
 
-### return default value $2, if $1 was empty
+### Return default value $2, if $1 was empty
 function d { [ "$1" ] && echo "$1" || echo "$2"; }
 
 e 'Clone PVLng Github repository'
@@ -20,20 +19,21 @@ git clone https://github.com/KKoPV/PVLng.git .
 [ $? -eq 0 ] || exit 1
 
 es
+
 read -p "Checkout 'develop' branch for testing [y/N] " input <&1
+
 [ "$input" == Y -o "$input" == y ]  && git checkout develop
 
-if [ -f composer.json ]; then
-    e 'Check for Composer ...'
-    if [ -z "$(which composer)" ]; then
-        e 'Missing Composer, please follow https://getcomposer.org/download/ for details'
-        exit 1
-    fi
-
-    composer update --no-dev
+e 'Check for Composer ...'
+if [ -z "$(which composer)" ]; then
+    e 'Missing Composer, please follow https://getcomposer.org/download/ for details'
+    exit 1
 fi
 
+composer update --no-dev
+
 while [ "$ok" != Y ]; do
+
     e 'Setup MySQL database'
 
     dbhost=$(d "$dbhost" localhost)
@@ -73,6 +73,7 @@ while [ "$ok" != Y ]; do
     echo "Database : $dbname"
     read -p 'All correct? [Y/n] ' ok <&1
     [ -z "$ok" -o "$ok" == y ] && ok=Y
+
 done
 
 params="-h $dbhost -P $dbport -u $dbuser"
@@ -80,14 +81,15 @@ params="-h $dbhost -P $dbport -u $dbuser"
 [ "$dbsocket" ] && params="$params -S $dbsocket"
 
 e 'Import SQL definitions from sql/pvlng.sql ...'
+
 mysql $params --password="$dbpass" $dbname <$PWD/sql/pvlng.sql
 
-e 'Prepare config/config.php and set database credentials'
+e 'Prepare config/config.yaml and set database credentials'
 
 sed -e "s~<HOST>~$dbhost~g"     -e "s~<PORT>~$dbport~g" \
-    -e "s~<SOCKET>~$dbsocket~g" -e "s~<USER>~$dbuser~g" \
+    -e "s~<SOCKET>~$dbsocket~g" -e "s~<USERNAME>~$dbuser~g" \
     -e "s~<PASSWORD>~$dbpass~g" -e "s~<DATABASE>~$dbname~g" \
-    $PWD/config/config.default.php >$PWD/config/config.php
+    $PWD/config/config.default.yaml >$PWD/config/config.yaml
 
 e 'All done.'
 
