@@ -16,12 +16,6 @@ namespace Core;
 /**
  *
  */
-use Exception;
-use MySQLi;
-
-/**
- *
- */
 class NestedSet
 {
     /**

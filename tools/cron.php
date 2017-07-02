@@ -99,13 +99,13 @@ function curl($options, &$result, &$info=[])
 ##############################################################################
 
 // Command line parameters
-// -i is undocumentd and ignore minutes interval, run always
-extract(getopt('c:ivth'), EXTR_PREFIX_ALL, 'param');
+// -f is undocumentd and ignore minutes interval, run always
+extract(getopt('c:fvth'), EXTR_PREFIX_ALL, 'param');
 
 if (isset($param_h)) usage();
 
 $TESTMODE = isset($param_t);
-
+$param_f = isset($param_f);
 $param_v = isset($param_v) ? (is_array($param_v)?count($param_v):1) : 0;
 
 // Increase verbosity by 1 in test mode
@@ -198,7 +198,7 @@ out(1);
 try {
     if ($section['enabled'] === true || $TESTMODE && $section['enabled'] === 0) {
         // Run in test mode at any minute or if forced flag was set...
-        if ($TESTMODE || isset($param_i) OR $minute % $section['each'] == 0) {
+        if ($TESTMODE || isset($param_f) || $minute % $section['each'] == 0) {
             $file = PVLng::pathRoot('tools', 'cron', $section['handler'].'.php');
             // Check for file exists only during test, in live don't check anymore
             if ($TESTMODE && !file_exists($file)) {
