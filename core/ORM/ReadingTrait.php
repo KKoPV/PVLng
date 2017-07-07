@@ -1,7 +1,23 @@
 <?php
-
+/**
+ * PVLng - PhotoVoltaic Logger new generation
+ *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ */
 namespace ORM;
 
+/**
+ *
+ */
+use Exception;
+
+/**
+ *
+ */
 trait ReadingTrait
 {
     /**
@@ -15,13 +31,11 @@ trait ReadingTrait
     public function setTimestamp($timestamp)
     {
         if (!is_null($timestamp)) {
-            $ts = is_numeric($timestamp)
-                ? $timestamp
-                : strtotime($timestamp);
+            $ts = is_numeric($timestamp) ? $timestamp : strtotime($timestamp);
 
             if ($ts <= 0) {
                 // Throw away invalid timestamps
-                throw new \Exception('Ignore invalid timestamp: '.$timestamp, 200);
+                throw new Exception('Ignore invalid timestamp: '.$timestamp, 200);
             }
 
             $timestamp = $ts;
@@ -37,13 +51,16 @@ trait ReadingTrait
     {
         $sql = sprintf(
             'INSERT INTO `pvlng_reading_buffer` VALUES (%d, %d, %d, "%s")',
-            $numeric, $this->fields['id'], $this->fields['timestamp'] ?: time(), $this->fields['data']
+            $numeric,
+            $this->fields['id'],
+            $this->fields['timestamp'] ?: time(),
+            $this->fields['data']
         );
 
         try {
             $this->runQuery($sql);
-            return (self::$db->affected_rows <= 0) ? 0 : self::$db->affected_rows;
-        } catch (\Exception $e) {
+            return (static::$db->affected_rows <= 0) ? 0 : static::$db->affected_rows;
+        } catch (Exception $e) {
             return 0;
         }
     }
@@ -65,7 +82,7 @@ trait ReadingTrait
                         WHERE `id` = {2}
                    )';
 
-        return self::$db->queryOne($sql, $this->table, $id);
+        return static::$db->queryOne($sql, $this->table, $id);
     }
 
     /**
@@ -84,7 +101,7 @@ trait ReadingTrait
             OERDER BY `timestamp` DESC
              LIMIT 1';
 
-        return self::$db->queryOne($sql, $this->table, $id, $timestamp);
+        return static::$db->queryOne($sql, $this->table, $id, $timestamp);
     }
 
     /**
@@ -98,9 +115,11 @@ trait ReadingTrait
             $timestamp = 'UNIX_TIMESTAMP()';
         }
 
-        return self::$db->query(
+        return static::$db->query(
             'DELETE FROM `{1}` WHERE `id` = {2} AND `timestamp` > {3}',
-            $this->table, $id, $timestamp
+            $this->table,
+            $id,
+            $timestamp
         );
     }
 }

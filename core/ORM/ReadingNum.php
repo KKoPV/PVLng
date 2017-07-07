@@ -1,15 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2015 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
- */
-
-/**
- *
  */
 namespace ORM;
 
@@ -43,13 +40,15 @@ class ReadingNum extends ReadingNumBase
         }
 
         $sql = sprintf(
-            'INSERT INTO `%s` (`id`, `timestamp`, `data`) VALUES (%s)'.$this->buildOnDuplicateKey(),
-            $this->table, implode('),(', $values)
+            'INSERT INTO `%s` (`id`, `timestamp`, `data`) VALUES (%s) %s',
+            $this->table,
+            implode('),(', $values),
+            $this->buildOnDuplicateKey()
         );
 
         try {
             $this->runQuery($sql);
-            return (self::$db->affected_rows <= 0) ? 0 : self::$db->affected_rows;
+            return (static::$db->affected_rows <= 0) ? 0 : static::$db->affected_rows;
         } catch (\Exception $e) {
             return 0;
         }

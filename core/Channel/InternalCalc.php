@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 namespace Channel;
 
@@ -112,7 +113,10 @@ abstract class InternalCalc extends Channel
 
         $sql = $this->db->sql(
             'SELECT `pvlng_reading_tmp_start`({1}, {2}, {3}, {4})',
-            $this->orgId, $this->start, $this->end, $this->LifeTime
+            $this->orgId,
+            $this->start,
+            $this->end,
+            $this->LifeTime
         );
 
         while (($uid = $this->db->queryOne($sql)) == 0) {

@@ -1,10 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 namespace Core;
 
@@ -19,7 +21,7 @@ class Localizer
      */
     public static function setThousandSeparator($value)
     {
-        self::$ThousandSeparator = $value;
+        static::$ThousandSeparator = $value;
     }
 
     /**
@@ -27,7 +29,7 @@ class Localizer
      */
     public static function setDecimalPoint($value)
     {
-        self::$DecimalPoint = $value;
+        static::$DecimalPoint = $value;
     }
 
     /**
@@ -35,15 +37,17 @@ class Localizer
      */
     public static function toLocale($value)
     {
-        return is_numeric($value)
-             ? number_format(
-                   $value,
-                   // Find right-most position of comma in value to get count of decimals
-                   strlen(substr(strrchr($value, '.'), 1)),
-                   self::$DecimalPoint,
-                   self::$ThousandSeparator
-               )
-             : $value;
+        if (is_numeric($value)) {
+            return number_format(
+                $value,
+                // Find right-most position of comma in value to get count of decimals
+                strlen(substr(strrchr($value, '.'), 1)),
+                static::$DecimalPoint,
+                static::$ThousandSeparator
+            );
+        } else {
+            return $value;
+        }
     }
 
     /**
@@ -54,13 +58,13 @@ class Localizer
         if (is_array($value)) {
             // Call recursive for each array member
             foreach ($value as $k => $v) {
-                $value[$k] = self::fromLocale($v);
+                $value[$k] = static::fromLocale($v);
             }
         } elseif (preg_match('~^[ 0-9.,-]+$~', $value)) {
             // Remove thousand separators
-            $value = str_replace(self::$ThousandSeparator, '', $value);
+            $value = str_replace(static::$ThousandSeparator, '', $value);
             // Replace decimal point
-            $value = str_replace(self::$DecimalPoint, '.', $value);
+            $value = str_replace(static::$DecimalPoint, '.', $value);
         }
         return $value;
     }

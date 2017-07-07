@@ -1,11 +1,12 @@
 <?php
 /**
- * Buffering class loader
+ * PVLng - PhotoVoltaic Logger new generation
  *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2016 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 class Loader
 {
@@ -50,7 +51,9 @@ class Loader
         if ($cache) {
             static::$classMapFile = sprintf(
                 '%s%sclassmap.%s.php',
-                $cache, DIRECTORY_SEPARATOR, substr(md5(serialize(static::$loader)), -7)
+                $cache,
+                DIRECTORY_SEPARATOR,
+                substr(md5(serialize(static::$loader)), -7)
             );
             // Class map exists and is a valid array?
             if (file_exists(static::$classMapFile) &&

@@ -390,7 +390,10 @@ class Yryie
             if (isset($trace['object'])) {
                 $msg .= sprintf(
                     '%s[%s]%s%s',
-                    get_class($trace['object']), $trace['class'], $trace['type'], $trace['function']
+                    get_class($trace['object']),
+                    $trace['class'],
+                    $trace['type'],
+                    $trace['function']
                 );
             } elseif (isset($trace['class'])) {
                 $msg .= sprintf('%s%s%s', $trace['class'], $trace['type'], $trace['function']);
@@ -545,7 +548,9 @@ class Yryie
             self::add(
                 sprintf(
                     'avg. "%1$s": %4$s (%3$d in %2$s)',
-                    $avg, self::timef($data[0]), $data[1],
+                    $avg,
+                    self::timef($data[0]),
+                    $data[1],
                     self::timef($data[0]/$data[1])
                 ),
                 'timer'

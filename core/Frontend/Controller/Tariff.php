@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 namespace Frontend\Controller;
 
@@ -77,17 +78,22 @@ class Tariff extends Controller
                 continue;
             }
 
+            $days = implode(
+                ', ',
+                array_map(
+                    function ($a) {
+                        return I18N::translate('day2::'.($a==7?0:$a));
+                    },
+                    explode(',', $row->getDays())
+                )
+            );
+
             $tariff[] = array(
                 'id'      => $row->getId(),
                 'date'    => date($fmtDate, $row->getDateTS()),
                 'dateraw' => date('Y-m-d', $row->getDateTS()),
                 'time'    => $row->getTime(),
-                'days'    => implode(', ', array_map(
-                                    function ($a) {
-                                        return I18N::translate('day2::'.($a==7?0:$a));
-                                    },
-                                 explode(',', $row->getDays())
-                             )),
+                'days'    => $days,
                 'cost'    => $row->getCost(),
                 'tariff'  => $row->getTariff(),
                 'comment' => $row->getTimeComment(),

@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 namespace Channel;
 
@@ -112,7 +113,8 @@ class History extends InternalCalc
                  AND
                  IF (FROM_UNIXTIME(%2$s, "%%j") > FROM_UNIXTIME(%1$s, "%%j"),
                      FROM_UNIXTIME(%2$s, "%%j"), FROM_UNIXTIME(%2$s, "%%j") + 365)',
-                $start, $start + $this->valid_from * 86400
+                $start,
+                $start + $this->valid_from * 86400
             ));
 
             $q = (new \DBQuery)->select('('.substr($h, 0, -1).') t');

@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2013 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Core;
 
@@ -102,7 +103,7 @@ abstract class JSON
         $prev_char = '';
         $in_quotes = false;
         $ends_line_level = null;
-        $json_length = strlen( $json );
+        $json_length = strlen($json);
 
         for ($i = 0; $i < $json_length; $i++) {
             $char = $json[$i];
@@ -146,7 +147,7 @@ abstract class JSON
                 }
             }
             if ($new_line_level !== null) {
-                $result .= "\n".str_repeat( $indent, $new_line_level );
+                $result .= "\n".str_repeat($indent, $new_line_level);
             }
             $result .= $char.$post;
             $prev_char = $char;

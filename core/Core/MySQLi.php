@@ -1,10 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 namespace Core;
 
@@ -44,8 +46,8 @@ class MySQLi extends \MySQLi
         $this->Cli = !isset($_SERVER['REQUEST_METHOD']);
 
         // Call direct parent method for less overhead
-        parent::query('SET NAMES "'.self::$charset.'"');
-        parent::query('SET CHARACTER SET '.self::$charset);
+        parent::query('SET NAMES "'.static::$charset.'"');
+        parent::query('SET CHARACTER SET '.static::$charset);
 
         // Avoid SQL error (1690): BIGINT UNSIGNED value is out of range
         parent::query('SET sql_mode = \'NO_UNSIGNED_SUBTRACTION\'');
@@ -360,9 +362,9 @@ class MySQLi extends \MySQLi
      */
     public function set($key, $value)
     {
-        $replace = sprintf(
-            'REPLACE `%s` (`%s`, `%s`) VALUES (LOWER("{1}"), "{2}")',
-            $this->Settings[0], $this->Settings[1], $this->Settings[2]
+        $replace = vsprintf(
+            'REPLACE `%1$s` (`%2$s`, `%3$s`) VALUES (LOWER("{1}"), "{2}")',
+            $this->Settings
         );
 
         $this->query($replace, $key, $value);
@@ -381,9 +383,9 @@ class MySQLi extends \MySQLi
      */
     public function get($key)
     {
-        $query = sprintf(
-            'SELECT `%s` FROM `%s` WHERE `%s` = LOWER("{1}") LIMIT 1',
-            $this->Settings[2], $this->Settings[0], $this->Settings[1]
+        $query = vsprintf(
+            'SELECT `%3$s` FROM `%1$s` WHERE `%2$s` = LOWER("{1}") LIMIT 1',
+            $this->Settings
         );
 
         if (($res = $this->query($query, $key)) && ($obj = $res->fetch_object())) {

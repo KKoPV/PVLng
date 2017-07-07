@@ -1,18 +1,20 @@
 <?php
 /**
- * Fetch weather data from Wunderground API
+ * PVLng - PhotoVoltaic Logger new generation
  *
- * @author    Knut Kohl <github@knutkohl.de>
- * @copyright 2012-2014 Knut Kohl
- * @license   MIT License (MIT) http://opensource.org/licenses/MIT
- * @version   1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 
 /**
+ * Fetch weather data from Wunderground API
+ *
  * Settings from configuration can be accessed by
  * $section['<key>'] (keys lowercase)
  */
-
 $lat = $config->get('Core.Latitude');
 $lon = $config->get('Core.Longitude');
 
@@ -30,7 +32,10 @@ if (!$key) {
 
 $url = sprintf(
     'http://api.wunderground.com/api/%s/conditions/hourly/lang:%s/q/%f,%f.json',
-    $key, $section['language'], $lat, $lon
+    $key,
+    $section['language'],
+    $lat,
+    $lon
 );
 
 okv(1, 'URL', $url);

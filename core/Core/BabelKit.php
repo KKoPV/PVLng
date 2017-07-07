@@ -1,10 +1,16 @@
 <?php
 /**
- * BabelKit wrapper for plain MySQLi
+ * PVLng - PhotoVoltaic Logger new generation
  *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ */
+
+/**
+ * BabelKit wrapper for plain MySQLi
  */
 
 #
@@ -204,7 +210,8 @@ class BabelKit
      */
     public function select($code_set, $code_lang, $param = [])
     {
-        $param = array_merge([
+        $param = array_merge(
+            [
                 'var_name'      => null,
                 'id'            => null,
                 'value'         => null,
@@ -301,7 +308,8 @@ class BabelKit
      */
     public function radio($code_set, $code_lang, $param = [])
     {
-        $param = array_merge([
+        $param = array_merge(
+            [
                 'var_name'      => null,
                 'value'         => null,
                 'default'       => null,
@@ -389,7 +397,8 @@ class BabelKit
      */
     public function multiple($code_set, $code_lang, $param = [])
     {
-        $param = array_merge([
+        $param = array_merge(
+            [
                 'var_name'      => $code_set,
                 'id'            => $code_set,
                 'value'         => null,
@@ -461,7 +470,8 @@ class BabelKit
      */
     public function checkbox($code_set, $code_lang, $param = [])
     {
-        $param = array_merge([
+        $param = array_merge(
+            [
                 'var_name'      => $code_set,
                 'value'         => null,
                 'default'       => null,
@@ -583,7 +593,8 @@ class BabelKit
 
         if ($this->cache) {
             while ($this->cache->save(
-                $this->cacheKey($code_set, $code_lang, 'assoc'), $data
+                $this->cacheKey($code_set, $code_lang, 'assoc'),
+                $data
             )) {
                 foreach ($this->fullSet($code_set, $code_lang) as $row) {
                     $name = array_shift($row);
@@ -679,7 +690,12 @@ class BabelKit
                 if ($code_desc <> $old_desc || $code_order <> $old_order || $code_flag <> $old_flag) {
                     $this->doQuery(
                         $this->query['update'],
-                        $code_desc, $code_order, $code_flag, $code_set, $code_lang, $code_code
+                        $code_desc,
+                        $code_order,
+                        $code_flag,
+                        $code_set,
+                        $code_lang,
+                        $code_code
                     );
                 }
             } else {
@@ -688,14 +704,21 @@ class BabelKit
                 } else {
                     $this->doQuery(
                         $this->query['delete'],
-                        $code_set, $code_lang, $code_code
+                        $code_set,
+                        $code_lang,
+                        $code_code
                     );
                 }
             }
         } elseif ($code_desc <> '') {
             $this->doQuery(
                 $this->query['insert'],
-                $code_set, $code_lang, $code_code, $code_desc, $code_order, $code_flag
+                $code_set,
+                $code_lang,
+                $code_code,
+                $code_desc,
+                $code_order,
+                $code_flag
             );
         }
     }

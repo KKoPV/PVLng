@@ -1,10 +1,16 @@
 <?php
 /**
- * MQTT listener
+ * PVLng - PhotoVoltaic Logger new generation
  *
- * @author    Knut Kohl <github@knutkohl.de>
- * @copyright 2017 Knut Kohl
- * @license   MIT License (MIT) http://opensource.org/licenses/MIT
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ */
+
+/**
+ * MQTT listener
  */
 $opts = getopt('s:p:vh');
 
@@ -24,6 +30,7 @@ if (array_key_exists('h', $opts)) {
     echo PHP_EOL;
     echo 'Send your messages as {"data":"..."[,"timestamp":"..."]} to "pvlng/<API key>/data/<GUID>"', PHP_EOL;
     echo 'or a single reading value to "pvlng/<API key>/data/<GUID>/<timestamp>"', PHP_EOL;
+    echo 'or a single scalar value to "pvlng/<API key>/data/<GUID>/<timestamp>/<value>"', PHP_EOL;
     echo PHP_EOL;
     echo 'Usage: ', $argv[0], ' [options]', PHP_EOL;
     echo PHP_EOL;

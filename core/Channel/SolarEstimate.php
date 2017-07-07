@@ -1,10 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Channel;
 
@@ -84,7 +86,9 @@ class SolarEstimate extends InternalCalc
                      ) t1
                   GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
                  HAVING COUNT(*) = {2} ) t2',
-                $child->entity, $days, $lastTimestampToday
+                $child->entity,
+                $days,
+                $lastTimestampToday
             );
 
             list($Average1st, $Average) = array_values($this->db->queryRowArray($sql));
@@ -116,7 +120,12 @@ class SolarEstimate extends InternalCalc
                         ) >= {6}
                   GROUP BY DATE_FORMAT(FROM_UNIXTIME(`timestamp`), "%H%i")
                  HAVING COUNT(*) = {2}',
-                $child->entity, $days, $Average1st, $scale, $ProductionToday, $lastTimestampToday
+                $child->entity,
+                $days,
+                $Average1st,
+                $scale,
+                $ProductionToday,
+                $lastTimestampToday
             );
 
             if ($res = $this->db->query($sql)) {

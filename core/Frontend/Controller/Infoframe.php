@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Frontend\Controller;
 
@@ -96,9 +97,14 @@ class Infoframe extends Controller
                 $x = $item['x'];
                 $y = $item['y'];
                 if ($bgcolor) {
-                    imagefilledrectangle($im, $x-$item['border'], $y-$item['border'],
-                                         $x+imagefontwidth($font)*strlen($label)+$item['border'],
-                                         $y+imagefontheight($font)+$item['border'], $bgcolor);
+                    imagefilledrectangle(
+                        $im,
+                        $x-$item['border'],
+                        $y-$item['border'],
+                        $x+imagefontwidth($font)*strlen($label)+$item['border'],
+                        $y+imagefontheight($font)+$item['border'],
+                        $bgcolor
+                    );
                 }
                 imagestring($im, $font, $x, $y, $label, $color);
             }

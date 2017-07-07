@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 namespace Channel;
 
@@ -333,7 +334,9 @@ class Channel
                 (!is_null($this->valid_to)   && $this->value > $this->valid_to)) {
                 $msg = sprintf(
                     'Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
-                    $this->value, $this->valid_from, $this->valid_to
+                    $this->value,
+                    $this->valid_from,
+                    $this->valid_to
                 );
 
                 $cfg = new ORMConfig('LogInvalid');
@@ -398,8 +401,12 @@ class Channel
             // Check that new value is inside the valid range
             if ((!is_null($this->valid_from) && $this->value < $this->valid_from) ||
                 (!is_null($this->valid_to)   && $this->value > $this->valid_to)) {
-                $msg = sprintf('Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
-                               $this->value, $this->valid_from, $this->valid_to);
+                $msg = sprintf(
+                    'Value %1$s is outside of valid range (%2$s <= %1$f <= %3$s)',
+                    $this->value,
+                    $this->valid_from,
+                    $this->valid_to
+                );
 
                 $cfg = new ORMConfig('LogInvalid');
 
@@ -788,13 +795,15 @@ class Channel
      */
     protected function groupTimestampByPeriod()
     {
-        return $this->period[0] * static::$secondsPerPeriod[$this->period[1]] == 1
-             ? '`timestamp`'
-             : sprintf(
-                   '`timestamp` DIV (%1$d * %2$d) * %1$d * %2$d',
-                   $this->period[0],
-                   static::$secondsPerPeriod[$this->period[1]]
-               );
+        if ($this->period[0] * static::$secondsPerPeriod[$this->period[1]] == 1) {
+            return '`timestamp`';
+        } else {
+            return sprintf(
+                '`timestamp` DIV (%1$d * %2$d) * %1$d * %2$d',
+                $this->period[0],
+                static::$secondsPerPeriod[$this->period[1]]
+            );
+        }
     }
 
     /**
@@ -891,8 +900,12 @@ class Channel
                     // Auto-adjust channel offset
                     ORMLog::save(
                         $this->name,
-                        sprintf("Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
-                                $this->offset, $this->lastReading, $this->value)
+                        sprintf(
+                            "Adjust offset\nLast offset: %f\nLast reading: %f\nValue: %f",
+                            $this->offset,
+                            $this->lastReading,
+                            $this->value
+                        )
                     );
 
                     // Update channel in database
@@ -939,12 +952,12 @@ class Channel
 
         // Normalize aggregation period
         if (preg_match(
-                '~^([.\d]*)(|l|last|r|readlast|'.
+            '~^([.\d]*)(|l|last|r|readlast|'.
                 's|sec|seconds?|i|min|minutes?|h|hours?|'.
                 'd|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all)$~',
-                strtolower($request['period']),
-                $args
-            )) {
+            strtolower($request['period']),
+            $args
+        )) {
             $this->period[0] = $args[1] ?: 1;
 
             switch (substr($args[2], 0, 2)) {

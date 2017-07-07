@@ -1,11 +1,12 @@
 <?php
 /**
- * Session handling class
+ * PVLng - PhotoVoltaic Logger new generation
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2016 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Core;
 
@@ -57,7 +58,7 @@ abstract class Session
      */
     public static function setSavePath($path)
     {
-        self::debug('Set save path to "%s"', $path);
+        static::debug('Set save path to "%s"', $path);
         session_save_path($path);
     }
 
@@ -101,10 +102,10 @@ abstract class Session
             // from http://php.net/manual/function.session-regenerate-id.php
             // UCN from Gant at BleachEatingFreaks dot com, 24-Jan-2006 09:57
             if (version_compare(PHP_VERSION, '4.3.3', '<')) {
-                setCookie( session_name(), session_id(), ini_get('session.cookie_lifetime'));
+                setCookie(session_name(), session_id(), ini_get('session.cookie_lifetime'));
             }
 
-            session_name(self::$sessionName);
+            session_name(static::$sessionName);
 
             session_start();
 
@@ -114,13 +115,13 @@ abstract class Session
 
             // Check for valid Session;
             if (!isset($_SESSION['_token'])) {
-                $_SESSION['_token'] = self::token();
+                $_SESSION['_token'] = static::token();
             }
 
-            self::debug('Started "%s" = "%s"', session_name(), session_id());
+            static::debug('Started "%s" = "%s"', session_name(), session_id());
 
-            if (count(self::$bufferedData)) {
-                foreach (self::$bufferedData as $key => $value) {
+            if (count(static::$bufferedData)) {
+                foreach (static::$bufferedData as $key => $value) {
                     $key = strtolower($key);
                     if (isset($_SESSION[$key]) && is_array($_SESSION[$key])) {
                         $_SESSION[$key] = array_merge($_SESSION[$key], $value);
@@ -128,13 +129,13 @@ abstract class Session
                         $_SESSION[$key] = $value;
                     }
                 }
-                self::$bufferedData = array();
+                static::$bufferedData = array();
             }
 
             register_shutdown_function([__CLASS__, 'close']);
         }
 
-        $regenerate && self::regenerate();
+        $regenerate && static::regenerate();
     }
 
     /**
@@ -146,8 +147,15 @@ abstract class Session
     {
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
-            setcookie(self::$tokenName, self::token(), time()+$lifetime,
-                      $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+            setcookie(
+                static::$tokenName,
+                static::token(),
+                time()+$lifetime,
+                $p['path'],
+                $p['domain'],
+                $p['secure'],
+                $p['httponly']
+            );
         }
     }
 
@@ -158,7 +166,7 @@ abstract class Session
      */
     public static function remembered()
     {
-        return isset($_COOKIE[self::$tokenName]) && ($_COOKIE[self::$tokenName] == self::token());
+        return isset($_COOKIE[static::$tokenName]) && ($_COOKIE[static::$tokenName] == static::token());
     }
 
     /**
@@ -170,9 +178,16 @@ abstract class Session
     {
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
-            setcookie(self::$tokenName, '', time()-4200,
-                      $p['path'], $p['domain'], $p['secure'], $p['httponly']);
-            unset($_COOKIE[self::$tokenName]);
+            setcookie(
+                static::$tokenName,
+                '',
+                time()-4200,
+                $p['path'],
+                $p['domain'],
+                $p['secure'],
+                $p['httponly']
+            );
+            unset($_COOKIE[static::$tokenName]);
         }
     }
 
@@ -183,7 +198,7 @@ abstract class Session
      */
     public static function login($user)
     {
-        return self::set(self::LOGIN, $user);
+        return static::set(self::LOGIN, $user);
     }
 
     /**
@@ -193,16 +208,16 @@ abstract class Session
      */
     public static function loggedIn($user)
     {
-        if (self::get(self::LOGIN) === $user) {
+        if (static::get(self::LOGIN) === $user) {
             return true;
         }
 
-        if (self::remembered()) {
-            self::login($user);
+        if (static::remembered()) {
+            static::login($user);
             return true;
         }
 
-        self::forget();
+        static::forget();
         return false;
     }
 
@@ -213,8 +228,8 @@ abstract class Session
      */
     public static function logout()
     {
-        self::delete(self::LOGIN);
-        self::forget();
+        static::delete(self::LOGIN);
+        static::forget();
     }
 
     /**
@@ -247,16 +262,21 @@ abstract class Session
      */
     public static function destroy()
     {
-        self::debug('Destroy "%s" = "%s"', session_name(), session_id());
+        static::debug('Destroy "%s" = "%s"', session_name(), session_id());
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
-            setcookie(session_name(), '', time()-4200,
-                $params["path"], $params["domain"],
-                $params["secure"], $params["httponly"]
+            setcookie(
+                session_name(),
+                '',
+                time()-4200,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
             );
         }
         $_SESSION = array(); // destroy all of the session variables
-        self::close();
+        static::close();
         return @session_destroy();
     }
 
@@ -273,12 +293,12 @@ abstract class Session
     public static function checkRequest($param, $default = null)
     {
         if (array_key_exists($param, $_REQUEST)) {
-            self::set($param, $_REQUEST[$param]);
+            static::set($param, $_REQUEST[$param]);
         }
-        if (!self::has($param)) {
-            self::set($param, $default);
+        if (!static::has($param)) {
+            static::set($param, $default);
         }
-        return self::get($param);
+        return static::get($param);
     }
 
     /**
@@ -294,9 +314,9 @@ abstract class Session
      */
     public static function set($key, $val = null)
     {
-        $key = self::mapKey($key);
-        if (!self::active()) {
-            self::$bufferedData[$key] = $val;
+        $key = static::mapKey($key);
+        if (!static::active()) {
+            static::$bufferedData[$key] = $val;
         } else {
             $_SESSION[$key] = $val;
         }
@@ -314,7 +334,7 @@ abstract class Session
     public static function setA(array $array)
     {
         foreach ($array as $key => $value) {
-            self::set($key, $value);
+            static::set($key, $value);
         }
     }
 
@@ -327,9 +347,9 @@ abstract class Session
      */
     public static function add($key, $val)
     {
-        $key = self::mapKey($key);
-        if (!self::active()) {
-            self::$bufferedData[$key][] = $val;
+        $key = static::mapKey($key);
+        if (!static::active()) {
+            static::$bufferedData[$key][] = $val;
         } else {
             if (!isset($_SESSION[$key])) {
                 $_SESSION[$key] = array();
@@ -350,13 +370,13 @@ abstract class Session
      */
     public static function get($key, $default = null)
     {
-        $key = self::mapKey($key);
+        $key = static::mapKey($key);
         if (isset($_SESSION[$key])) {
             $val = $_SESSION[$key];
         } elseif (isset($default)) {
             $val = $default;
         } else {
-            $val = self::$NVL;
+            $val = static::$NVL;
         }
         return $val;
     }
@@ -369,8 +389,8 @@ abstract class Session
      */
     public static function takeout($key)
     {
-        $val = self::get($key);
-        self::delete($key);
+        $val = static::get($key);
+        static::delete($key);
         return $val;
     }
 
@@ -382,7 +402,7 @@ abstract class Session
      */
     public static function delete($key)
     {
-        self::set($key);
+        static::set($key);
     }
 
     /**
@@ -393,7 +413,7 @@ abstract class Session
      */
     public static function has($key)
     {
-        return array_key_exists(self::mapKey($key), $_SESSION);
+        return array_key_exists(static::mapKey($key), $_SESSION);
     }
 
     /**
@@ -403,7 +423,7 @@ abstract class Session
      */
     public static function valid()
     {
-        return ($_SESSION['_token'] == self::token());
+        return ($_SESSION['_token'] == static::token());
     }
 
     /**
@@ -442,12 +462,12 @@ abstract class Session
      */
     private static function debug()
     {
-        if (!self::$debug) {
+        if (!static::$debug) {
             return;
         }
 
         $params = func_get_args();
         $msg = array_shift($params);
-        self::$Messages[] = vsprintf($msg, $params);
+        static::$Messages[] = vsprintf($msg, $params);
     }
 }

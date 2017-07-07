@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 class DBQuery
 {
@@ -468,8 +469,11 @@ class DBQuery
             return $value;
         }
 
-        return '"' . str_replace(array('\\',   '"',   '\'',   "\r", "\n"),
-                                 array('\\\\', '\\"', '\\\'', '\r', '\n'), $value) . '"';
+        return '"' . str_replace(
+            array('\\',   '"',   '\'',   "\r", "\n"),
+            array('\\\\', '\\"', '\\\'', '\r', '\n'),
+            $value
+        ) . '"';
     }
 
     /**

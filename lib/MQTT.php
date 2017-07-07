@@ -1,10 +1,12 @@
 <?php
 /**
- * MQTT listener for channel data
+ * PVLng - PhotoVoltaic Logger new generation
  *
- * @author    Knut Kohl <github@knutkohl.de>
- * @copyright 2017 Knut Kohl
- * @license   MIT License (MIT) http://opensource.org/licenses/MIT
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 use Channel\Channel;
 use Core\JSON;
@@ -66,28 +68,46 @@ class MQTT
             }
 
             $this->dbg('Topic:', $topic);
-            $this->dbg('Message:', $msg);
 
-            // pvlng/<API key>/data/<GUID>[/<timestamp>]
+            if ($msg) {
+                $this->dbg('Message:', $msg);
+            }
+
+            // pvlng/<API key>/data/<GUID>[[/<timestamp>]/<value>]
             $topic = array_slice(explode('/', $topic), 3);
 
             $guid = array_shift($topic);
 
-            if (empty($topic)) {
-                // Assume JSON data send
-                $data = JSON::decode($msg, true);
-            } else {
-                // Assume raw data send
-                $data = array('data' => $msg, 'timestamp' => $topic[0]);
+            switch (count($topic)) {
+                default: // 0
+                    // Assume JSON data send
+                    $data = JSON::decode($msg, true);
+                    break;
+                case 1:
+                    // Assume raw data send for timestamp
+                    $data = array('timestamp' => $topic[0], 'data' => $msg);
+                    break;
+                case 2:
+                    // Assume scalar data send for timestamp
+                    $data = array('timestamp' => $topic[0], 'data' => $topic[1]);
+                    break;
+            } // switch
+
+            $result = $this->getChannel($guid)->write($data);
+
+            switch ($result) {
+                case 0:
+                    $result = 'No row added';
+                    break;
+                case 1:
+                    $result = '1 row added';
+                    break;
+                default:
+                    $result .= ' rows added';
+                    break;
             }
 
-            if (!array_key_exists($guid, $this->channels)) {
-                $this->channels[$guid] = Channel::byGUID($guid);
-            }
-
-            $rows = $this->channels[$guid]->write($data);
-
-            $this->dbg('Result:', $rows, 'row(s) added');
+            $this->dbg($result);
         } catch (Exception $e) {
             $this->dbg('ERROR: '.$e->getMessage());
         }
@@ -128,5 +148,17 @@ class MQTT
         if ($this->verbose) {
             printf('[%s] %s'.PHP_EOL, date('c'), implode(' ', func_get_args()));
         }
+    }
+
+    /**
+     * Lazy load channel instances
+     */
+    protected function getChannel($guid)
+    {
+        if (!array_key_exists($guid, $this->channels)) {
+            $this->channels[$guid] = Channel::byGUID($guid);
+        }
+
+        return $this->channels[$guid];
     }
 }

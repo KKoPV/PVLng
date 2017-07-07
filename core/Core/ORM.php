@@ -1,7 +1,9 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
@@ -825,7 +827,10 @@ abstract class ORM implements Iterator, Countable
 
         $sql = sprintf(
             '%s INTO `%s` (`%s`) VALUES (%s)',
-            $mode, $this->table, implode('`, `', $keys), implode(', ', $values)
+            $mode,
+            $this->table,
+            implode('`, `', $keys),
+            implode(', ', $values)
         );
 
         if ($mode == 'INSERT') {
@@ -887,7 +892,10 @@ abstract class ORM implements Iterator, Countable
      */
     protected function runQuery($sql)
     {
+        $sql = trim($sql);
+
         $this->sql[] = $sql;
+
         $res = static::$db->query($sql);
 
         // You have an error in your SQL syntax; check the manual ...
