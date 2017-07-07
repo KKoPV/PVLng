@@ -1,14 +1,15 @@
 <?php
 /**
- * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
+ * PVLng - PhotoVoltaic Logger new generation
  *
  * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2016 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- *
- * @codingStandardsIgnoreFile
  */
+
+// @codingStandardsIgnoreFile
 
 /**
  * Initialize
@@ -49,17 +50,6 @@ $api = new Api(array(
 ));
 
 Hook::run('api.init', $api);
-
-/**
- * Cross origin requests
- */
-if ($api->environment['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']) {
-    $api->response['Access-Control-Allow-Headers'] = $api->environment['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'];
-}
-if ($api->environment['HTTP_ACCESS_CONTROL_REQUEST_METHOD']) {
-    $api->response['Access-Control-Allow-Methods'] = $api->environment['HTTP_ACCESS_CONTROL_REQUEST_METHOD'];
-}
-$api->response['Access-Control-Allow-Origin'] = $api->environment['HTTP_ORIGIN'] ?: '*';
 
 /**
  * Environment
@@ -263,6 +253,8 @@ $api->notFound(function () use ($api) {
  * Run application
  */
 Hook::run('api.run', $api);
+
+$api->add(new CorsSlim\CorsSlim);
 
 $api->run();
 

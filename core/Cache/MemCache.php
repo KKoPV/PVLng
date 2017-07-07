@@ -70,7 +70,7 @@ class MemCache extends Cache
      */
     public function isAvailable()
     {
-        return @$this->memcache->connect($this->host, $this->port);
+        return $this->connect();
     }
 
     public function write($key, $data, $ttl)
@@ -88,9 +88,14 @@ class MemCache extends Cache
         return $this->memcache->delete($this->key($key));
     }
 
+    /**
+     * http://php.net/manual/memcache.flush.php
+     */
     public function flush()
     {
-        return $this->memcache->flush();
+        $result = $this->memcache->flush();
+        sleep(1);
+        return $result;
     }
 
     public function info()
@@ -158,6 +163,19 @@ class MemCache extends Cache
      * @var MemCache $memcache
      */
     protected $memcache;
+
+    /**
+     * Dedicated connect
+     */
+    protected function connect()
+    {
+        if (@$this->memcache->getStats()) {
+            // Connected
+            $this->memcache->close();
+        }
+
+        return @$this->memcache->connect($this->host, $this->port);
+    } // function connect()
 
     /**
      * Build internal Id from external Id and the cache token

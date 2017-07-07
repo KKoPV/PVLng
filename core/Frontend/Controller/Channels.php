@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Frontend\Controller;
 
@@ -14,13 +15,13 @@ namespace Frontend\Controller;
  */
 use Channel\Channel;
 use Core\Messages;
+use Core\PVLng;
 use Frontend\Controller;
 use ORM\Channel as ORMChannel;
 use ORM\ChannelTypeIcons as ORMChannelTypeIcons;
 use ORM\ChannelType as ORMChannelType;
 use ORM\ChannelView as ORMChannelView;
 use ORM\Tree as ORMTree;
-use PVLng\PVLng;
 use Yryie\Yryie;
 use DBQuery;
 use I18n;
@@ -225,13 +226,16 @@ class Channels extends Controller
 
         foreach ($channels as &$channel) {
             $type->reset()->filterById($channel['type'])->findOne();
-            $channel = array_merge(array(
+            $channel = array_merge(
+                array(
                 '_type'      => $type->getName(),
                 'icon'       => $type->getIcon(),
                 'numeric'    => 1,
                 'resolution' => 1,
                 'public'     => 1,
-            ), $channel);
+                ),
+                $channel
+            );
         }
 
         $this->view->Channels = $channels;
@@ -344,9 +348,11 @@ class Channels extends Controller
                 $alias
                     ->setType(0)
                     ->setChannel($entity->getGuid())
-                    ->setComment('Alias of "'.$entity->getName()
+                    ->setComment(
+                        'Alias of "'.$entity->getName()
                                . ($entity->getDescription() ? ' ('.$entity->getDescription().')' : '')
-                               . '"')
+                        . '"'
+                    )
                     ->insert();
 
                 if (!$alias->isError()) {
@@ -397,9 +403,10 @@ class Channels extends Controller
                     if (!$entity->getId()) {
                         $entity->insert();
                         Messages::success(I18N::translate('ChannelSaved'));
-                        if ($this->request->post('add2tree') &&
-                            $addTo = $this->request->post('tree') &&
-                            $tree = Channel::byId($addTo)->addChild($entity->getId())) {
+                        if ($this->request->post('add2tree')
+                            && $addTo = $this->request->post('tree')
+                            && $tree = Channel::byId($addTo)->addChild($entity->getId())
+                        ) {
                             Messages::success(I18N::translate('HierarchyCreated', 1));
                         }
                     } else {
@@ -440,7 +447,7 @@ class Channels extends Controller
                 // Search orignal channel by GUID from alias in hierarchy
                 $t = (new ORMTree)->filterByGUID($channel->getChannel())->findOne();
                 // Find now original channel by entity from hierarchy
-                # $channel->reset()->filterById($t->getEntity())->findOne();
+                // $channel->reset()->filterById($t->getEntity())->findOne();
                 $channel = new ORMChannel($t->getEntity());
                 unset($t);
                 // Set channel Id for edit form to new Id!
@@ -482,9 +489,12 @@ class Channels extends Controller
             }
         }
 
-        uasort($this->fields, function ($a, $b) {
-            return ($a['POSITION'] < $b['POSITION']) ? -1 : 1;
-        });
+        uasort(
+            $this->fields,
+            function ($a, $b) {
+                return ($a['POSITION'] < $b['POSITION']) ? -1 : 1;
+            }
+        );
 
         $this->view->Fields = $this->fields;
     }
@@ -620,14 +630,14 @@ class Channels extends Controller
                         foreach ($matches as $option) {
                             $val = trim($option[1]);
                             $data['OPTIONS'][] = array(
-                                'VALUE'   => $val,
-                                'TEXT'    => I18N::translate(trim($option[2])),
-                                'CHECKED' => ($val == $data['VALUE'])
+                            'VALUE'   => $val,
+                            'TEXT'    => I18N::translate(trim($option[2])),
+                            'CHECKED' => ($val == $data['VALUE'])
                             );
                         }
                     }
-                    // Set type for template compiler
-                    $data['TYPE'] = 'bool';
+                        // Set type for template compiler
+                        $data['TYPE'] = 'bool';
                     break;
 
                 // Select
@@ -636,9 +646,9 @@ class Channels extends Controller
                         foreach ($matches as $option) {
                             $val = trim($option[1]);
                             $data['OPTIONS'][] = array(
-                                'VALUE'    => $val,
-                                'TEXT'     => I18N::translate(trim($option[2])),
-                                'SELECTED' => ($val == $data['VALUE'])
+                            'VALUE'    => $val,
+                            'TEXT'     => I18N::translate(trim($option[2])),
+                            'SELECTED' => ($val == $data['VALUE'])
                             );
                         }
                     }
@@ -651,9 +661,9 @@ class Channels extends Controller
                     list(, $start, $end, $step) = explode(';', $data['TYPE'].';1', 4); // step of 1 as default
                     for ($i=$start; $i<=$end; $i+=$step) {
                         $data['OPTIONS'][] = array(
-                            'VALUE'    => $i,
-                            'TEXT'     => $i,
-                            'SELECTED' => ($i == $data['VALUE'])
+                        'VALUE'    => $i,
+                        'TEXT'     => $i,
+                        'SELECTED' => ($i == $data['VALUE'])
                         );
                     }
                     // Set type for template compiler
@@ -672,9 +682,9 @@ class Channels extends Controller
                         $option = array_values($option);
                         $val    = trim($option[0]);
                         $data['OPTIONS'][] = array(
-                            'VALUE'    => $val,
-                            'TEXT'     => I18N::translate(trim($option[1])),
-                            'SELECTED' => ($val == $data['VALUE'])
+                        'VALUE'    => $val,
+                        'TEXT'     => I18N::translate(trim($option[1])),
+                        'SELECTED' => ($val == $data['VALUE'])
                         );
                     }
                     // Set type for template compiler
@@ -699,9 +709,9 @@ class Channels extends Controller
                             $name = implode(', ', array_slice($name, 0, 4)) . ' ...';
                         }
                         $data['ICONS'][] = array(
-                            'ICON'   => $row->icon,
-                            'NAME'   => $name,
-                            'ACTUAL' => ($data['VALUE'] == $row->icon)
+                        'ICON'   => $row->icon,
+                        'NAME'   => $name,
+                        'ACTUAL' => ($data['VALUE'] == $row->icon)
                         );
                     }
                     // Set type for template compiler
@@ -742,25 +752,26 @@ class Channels extends Controller
         // check all fields
         foreach ($attr as $key => $data) {
             // apply settings for this field
-            $this->fields[$key] = isset($this->fields[$key])
-                                ? array_merge(
-                                      $this->fields[$key],
-                                      array_change_key_case($data, CASE_UPPER)
-                                  )
-                                : array_merge(
-                                      array(
-                                        'POSITION'    => 400,
-                                        'FIELD'       => $key,
-                                        'TYPE'        => 'text',
-                                        'VISIBLE'     => true,
-                                        'REQUIRED'    => false,
-                                        'READONLY'    => false,
-                                        'PLACEHOLDER' => null,
-                                        'DEFAULT'     => null,
-                                        'VALUE'       => ''
-                                      ),
-                                      array_change_key_case($data, CASE_UPPER)
-                                  );
+            $this->fields[$key] =
+                isset($this->fields[$key])
+              ? array_merge(
+                  $this->fields[$key],
+                  array_change_key_case($data, CASE_UPPER)
+              )
+              : array_merge(
+                  array(
+                      'POSITION'    => 400,
+                      'FIELD'       => $key,
+                      'TYPE'        => 'text',
+                      'VISIBLE'     => true,
+                      'REQUIRED'    => false,
+                      'READONLY'    => false,
+                      'PLACEHOLDER' => null,
+                      'DEFAULT'     => null,
+                      'VALUE'       => ''
+                    ),
+                  array_change_key_case($data, CASE_UPPER)
+              );
         }
     }
 
@@ -771,10 +782,10 @@ class Channels extends Controller
     {
         $q = new DBQuery('pvlng_tree_view');
         $q->get('id')
-          ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
-          ->get('name')
-          ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
-          ->filter('childs', array('ne' => 0));
+            ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
+            ->get('name')
+            ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
+            ->filter('childs', array('ne' => 0));
         $this->view->AddTree = $this->db->queryRowsArray($q);
     }
 }

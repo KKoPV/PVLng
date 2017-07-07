@@ -371,24 +371,6 @@ abstract class Cache
     // -------------------------------------------------------------------------
 
     /**
-     * Master timestamp
-     *
-     * @var int $ts
-     */
-    protected $ts;
-
-    /**
-     * Settings
-     *
-     * @var array $settings
-     */
-    protected $settings = array(
-        'Token'       => '',
-        'Directory'   => '',
-        'TTL'         => 3600
-    );
-
-    /**
      * Available caching methods
      *
      * @todo Test 'EAccelerator', 'XCache'
@@ -401,6 +383,32 @@ abstract class Cache
         // Always avail.
         'Mock'
     );
+
+    /**
+     * Settings
+     *
+     * @var array $settings
+     */
+    protected $settings = array(
+        'Token'       => '',
+        'Directory'   => '',
+        'Prefix'      => '',
+        'TTL'         => 3600
+    );
+
+    /**
+     * Stack of save() calls
+     *
+     * @var array $stack
+     */
+    protected $stack;
+
+    /**
+     * Master timestamp
+     *
+     * @var int $ts
+     */
+    protected $ts;
 
     /**
      * Check data validity according to the timestamps
@@ -455,17 +463,6 @@ abstract class Cache
         return json_decode($data, true);
         #return unserialize($data);
     } // function unserialize()
-
-    // -------------------------------------------------------------------------
-    // PROTECTED
-    // -------------------------------------------------------------------------
-
-    /**
-     * Stack of save() calls
-     *
-     * @var array $stack
-     */
-    protected $stack;
 
     /**
      * Increments / decrements value of the item by value.

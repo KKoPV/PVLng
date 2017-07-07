@@ -1,10 +1,11 @@
 <?php
 /**
- * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
+ * PVLng - PhotoVoltaic Logger new generation
  *
  * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2016 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 
@@ -204,11 +205,11 @@ $api->any(
                 $content[] = null;
                 $content[] = $sep;
                 $pattern = preg_replace_callback(
-                '~:(\w+)([+]?)~',
-                function ($p) {
-                    return '{'.($p[2]?'+':'').$p[1].'}';
-                },
-                $pattern
+                    '~:(\w+)([+]?)~',
+                    function ($p) {
+                        return '{'.($p[2]?'+':'').$p[1].'}';
+                    },
+                    $pattern
                 );
                 $content[] = '## '.$pattern;
                 foreach ($methods as $method => $route) {

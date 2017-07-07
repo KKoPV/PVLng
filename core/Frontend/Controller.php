@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Frontend;
 
@@ -124,7 +125,7 @@ class Controller extends SlimController
         if ($this->app->config('mode') == 'development') {
             $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
             $this->view->Development = true;
-            $this->config->set('View.Verbose', true);
+            $this->config->set('View.Verbose', PVLng::$DEVELOP);
         }
 
         $this->view->Debug     = PVLng::$DEBUG;
@@ -138,10 +139,10 @@ class Controller extends SlimController
             $messages[] = array(
                 'TYPE'    => $message['type'],
                 'MESSAGE' => str_replace(
-                                 array('\'',    '"',      "\n"),
-                                 array('&#39;', '&quot;', '\\n'),
-                                 $message['message']
-                             )
+                    array('\'',    '"',      "\n"),
+                    array('&#39;', '&quot;', '\\n'),
+                    $message['message']
+                )
             );
         }
         $this->view->MessagesRaw = $messages;

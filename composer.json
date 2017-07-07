@@ -13,7 +13,8 @@
     "require": {
         "slim/slim": "~2",
         "pv-log/json11": "^1.5",
-        "mustangostang/spyc": "^0.6.2"
+        "mustangostang/spyc": "^0.6.2",
+        "palanik/corsslim": "^1.1"
     },
     "require-dev": {
         "malukenho/docheader": "^0.1.5",

@@ -1,10 +1,11 @@
 <?php
 /**
- * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
+ * PVLng - PhotoVoltaic Logger new generation
  *
  * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2016 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 
@@ -31,8 +32,10 @@ $api->get(
 
         $sql = $api->db->sql(
             'CALL `pvlng_scatter`({1}, {2}, {3}, {4})',
-            $xChannel->entity, $yChannel->entity,
-            $request['start'], $request['end']
+            $xChannel->entity,
+            $yChannel->entity,
+            $request['start'],
+            $request['end']
         );
 
         if ($api->request->get('sql')) {

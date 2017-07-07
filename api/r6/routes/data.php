@@ -1,10 +1,11 @@
 <?php
 /**
- * PVLng - PhotoVoltaic Logger new generation (https://pvlng.com/)
+ * PVLng - PhotoVoltaic Logger new generation
  *
  * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2016 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 
@@ -19,12 +20,12 @@ $api->put(
 
         // Check request for 'timestamp' attribute, take as is if numeric,
         // otherwise convert datetime to timestamp
-//        $timestamp = isset($request['timestamp'])
-//                   ? ( is_numeric($request['timestamp'])
-//                     ? $request['timestamp']
-//                     : strtotime($request['timestamp'])
-//                     )
-//                   : NULL;
+    //        $timestamp = isset($request['timestamp'])
+    //                   ? ( is_numeric($request['timestamp'])
+    //                     ? $request['timestamp']
+    //                     : strtotime($request['timestamp'])
+    //                     )
+    //                   : NULL;
 
         try {
             $cnt = Channel\Channel::byGUID($guid)->write($request);

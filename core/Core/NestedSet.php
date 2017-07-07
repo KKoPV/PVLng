@@ -1,15 +1,12 @@
 <?php
 /**
- * Class to manage Mysql Nested Set Trees.
+ * PVLng - PhotoVoltaic Logger new generation
  *
- * Knut Kohl <github@knutkohl.de>
- *
- * - Extended to Namespace
- * - Change file names
- *
- * @author    Tobias Breunig <t.breunig@live.de>
- * @copyright 2009 Tobias Breunig
- * @license   http://www.opensource.org/licenses/bsd-license.html BSD License
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Core;
 
@@ -35,7 +32,7 @@ class NestedSet
      */
     public function __construct(MySQLi $db, $params)
     {
-        if (empty($params['table'])) {
+        if (!isset($params['table']) || !is_array($params['table'])) {
             // Load english messages to show error message
             $this->msg = include __DIR__ . DIRECTORY_SEPARATOR . 'NestedSet.en.php';
             $this->error(1);
@@ -44,9 +41,8 @@ class NestedSet
         $params = array_merge([
                 'table' => null,
                 'lang'  => 'en',
-                'debug' => false,
-            ], $params
-        );
+                'debug' => false
+            ], $params);
 
         $this->db    = $db;
         $this->table = $params['table'];
@@ -71,8 +67,10 @@ class NestedSet
         extract($this->table, EXTR_PREFIX_ALL, 't');
 
         $sql = sprintf(
-            'SELECT `%1$s` FROM `%2$s` WHERE `%3$s` = 1',
-            $t_n, $t_t, $t_l
+            'SELECT `%2$s` FROM `%1$s` WHERE `%3$s` = 1 LIMIT 1',
+            $t_t,
+            $t_n,
+            $t_l
         );
 
         if (!($result = $this->query($sql)) || !$result->num_rows) {
@@ -97,8 +95,12 @@ class NestedSet
         extract($this->table, EXTR_PREFIX_ALL, 't');
 
         $sql = sprintf(
-            'INSERT INTO `%1$s` (`%2$s`, `%3$s`, `%4$s`) VALUES("%5$s", 1, 2)',
-            $t_t, $t_p, $t_l, $t_r, $this->db->real_escape_string($nodeName)
+            'INSERT INTO `%1$s` (`%2$s`, `%3$s`, `%4$s`) VALUES (1, 2, "%5$s")',
+            $t_t,
+            $t_l,
+            $t_r,
+            $t_p,
+            $this->db->real_escape_string($nodeName)
         );
 
         if (!($result = $this->query($sql, true))) {
@@ -130,22 +132,20 @@ class NestedSet
         $sql = sprintf(
             'UPDATE `%1$s` SET `%2$s` = `%2$s` + 2 WHERE `%2$s` >= %5$d;
              UPDATE `%1$s` SET `%3$s` = `%3$s` + 2 WHERE `%3$s` >  %5$d;
-             INSERT INTO `%1$s`(`%4$s`, `%3$s`, `%2$s`) VALUES("%6$s", %5$d, %5$d+1)',
-            $t_t, $t_r, $t_l, $t_p, $parentData[$t_r], $this->db->real_escape_string($nodeName)
+             INSERT INTO `%1$s` (`%4$s`, `%3$s`, `%2$s`) VALUES ("%6$s", %5$d, %5$d+1)',
+            $t_t,
+            $t_r,
+            $t_l,
+            $t_p,
+            $parentData[$t_r],
+            $this->db->real_escape_string($nodeName)
         );
 
-        $this->lockDb();
-
-        if ($this->db->multi_query($sql)) {
-            while ($this->db->more_results() && $this->db->next_result()) {
-            }
-        } else {
+        if (!$this->multiQuery($sql)) {
             $this->error(100, $nodeName);
         }
 
-        $this->unlockDb();
-
-        if (!($result = $this->db->query('SELECT LAST_INSERT_ID()'))) {
+        if (!($result = $this->query('SELECT LAST_INSERT_ID()'))) {
             $this->error(100, $nodeName);
         }
 
@@ -173,19 +173,16 @@ class NestedSet
             'DELETE FROM `%1$s` WHERE `%2$s` BETWEEN %4$d AND %5$d;
              UPDATE `%1$s` SET `%2$s` = `%2$s` - %5$d + %4$d - 1 WHERE `%2$s` > %5$d;
              UPDATE `%1$s` SET `%3$s` = `%3$s` - %5$d + %4$d - 1 WHERE `%3$s` > %5$d',
-            $t_t, $t_l, $t_r, $branchData[$t_l], $branchData[$t_r]
+            $t_t,
+            $t_l,
+            $t_r,
+            $branchData[$t_l],
+            $branchData[$t_r]
         );
 
-        $this->lockDb();
-
-        if ($this->db->multi_query($sql)) {
-            while ($this->db->more_results() && $this->db->next_result()) {
-            }
-        } else {
+        if (!$this->multiQuery($sql)) {
             $this->error(303, $branchId, $sql);
         }
-
-        $this->unlockDb();
 
         return true;
     }
@@ -209,19 +206,16 @@ class NestedSet
              UPDATE `%1$s` SET `%2$s` = `%2$s` - 1, `%3$s` = `%3$s` - 1 WHERE `%2$s` BETWEEN %4$d AND %5$d;
              UPDATE `%1$s` SET `%2$s` = `%2$s` - 2 WHERE `%2$s` > %5$d;
              UPDATE `%1$s` SET `%3$s` = `%3$s` - 2 WHERE `%3$s` > %5$d',
-            $t_t, $t_l, $t_r, $nodeData[$t_l], $nodeData[$t_r]
+            $t_t,
+            $t_l,
+            $t_r,
+            $nodeData[$t_l],
+            $nodeData[$t_r]
         );
 
-        $this->lockDb();
-
-        if ($this->db->multi_query($sql)) {
-            while ($this->db->more_results() && $this->db->next_result()) {
-            }
-        } else {
+        if (!$this->multiQuery($sql)) {
             $this->error(303, $nodeId, $sql);
         }
-
-        $this->unlockDb();
 
         return true;
     }
@@ -239,10 +233,14 @@ class NestedSet
 
         $sql = sprintf(
             'UPDATE `%1$s` SET `%2$s` = "%3$s" WHERE `%4$s`= %5$d',
-            $t_t, $t_p, $this->db->real_escape_string($nodeName), $t_n, +$nodeId
+            $t_t,
+            $t_p,
+            $this->db->real_escape_string($nodeName),
+            $t_n,
+            +$nodeId
         );
 
-        if (!($result = $this->db->query($sql))) {
+        if (!($result = $this->query($sql))) {
             $this->error(100, $nodeName . ', ' . $nodeId, $sql);
         }
 
@@ -290,25 +288,27 @@ class NestedSet
         $d_l = $a_l - $b_l;
 
         $sql = sprintf(
-            'UPDATE `%1$s` SET `%2$s` = 0 WHERE `%2$s` <> 0;
+            'UPDATE `%1$s` SET `%2$s` = 0;
              UPDATE `%1$s` SET `%3$s` = `%3$s` + %5$d,`%4$s` = `%4$s` + %5$d, `%2$s` = 1
               WHERE `%4$s` BETWEEN %9$d AND %10$d;
              UPDATE `%1$s` SET `%3$s` = `%3$s` - %6$d,`%4$s` = `%4$s` - %6$d
               WHERE `%4$s` BETWEEN %7$d AND %8$d AND `%2$s` = 0;
-             UPDATE `%1$s` SET `%2$s` = 0 WHERE `%2$s` <> 0',
-            $t_t, $t_m, $t_r, $t_l, $d_r, $d_l, $a_l, $a_r, $b_l, $b_r
+             UPDATE `%1$s` SET `%2$s` = 0',
+            $t_t,
+            $t_m,
+            $t_r,
+            $t_l,
+            $d_r,
+            $d_l,
+            $a_l,
+            $a_r,
+            $b_l,
+            $b_r
         );
 
-        $this->lockDb();
-
-        if ($this->db->multi_query($sql)) {
-            while ($this->db->more_results() && $this->db->next_result()) {
-            }
-        } else {
+        if (!$this->multiQuery($sql)) {
             $this->error(100, $nodeId, $sql);
         }
-
-        $this->unlockDb();
 
         return true;
     }
@@ -350,25 +350,27 @@ class NestedSet
         $this->lockDb();
 
         $sql = sprintf(
-            'UPDATE `%1$s` SET `%2$s` = 0 WHERE `%2$s` <> 0;
+            'UPDATE `%1$s` SET `%2$s` = 0;
              UPDATE `%1$s` SET `%4$s` = `%4$s` - %5$d, `%3$s` = `%3$s` - %5$d, `%2$s` = 1
               WHERE `%3$s` BETWEEN %7$d AND %8$d;
              UPDATE `%1$s` SET `%4$s` = `%4$s` + %6$d, `%3$s` = `%3$s` + %6$d
               WHERE `%3$s` BETWEEN %9$d AND %10$d AND `%2$s` = 0;
-             UPDATE `%1$s` SET `%2$s` = 0 WHERE `%2$s` <> 0',
-            $t_t, $t_m, $t_l, $t_r, $d_l, $d_r, $b_l, $b_r, $a_l, $a_r
+             UPDATE `%1$s` SET `%2$s` = 0',
+            $t_t,
+            $t_m,
+            $t_l,
+            $t_r,
+            $d_l,
+            $d_r,
+            $b_l,
+            $b_r,
+            $a_l,
+            $a_r
         );
 
-        $this->lockDb();
-
-        if ($this->db->multi_query($sql)) {
-            while ($this->db->more_results() && $this->db->next_result()) {
-            }
-        } else {
+        if (!$this->multiQuery($sql)) {
             $this->error(100, $nodeId, $sql);
         }
-
-        $this->unlockDb();
 
         return true;
     }
@@ -420,19 +422,19 @@ class NestedSet
             'UPDATE `%1$s` SET `%2$s` = `%2$s` + 1,`%3$s` = `%3$s` + 1
               WHERE `%3$s` BETWEEN %5$d AND %6$d;
              UPDATE `%1$s` SET `%2$s` = `%2$s` - %7$d WHERE `%4$s` = %8$d',
-            $t_t, $t_r, $t_l, $t_n, $a_l, $a_r, $nodeWidth, $b_id
+            $t_t,
+            $t_r,
+            $t_l,
+            $t_n,
+            $a_l,
+            $a_r,
+            $nodeWidth,
+            $b_id
         );
 
-        $this->lockDb();
-
-        if ($this->db->multi_query($sql)) {
-            while ($this->db->more_results() && $this->db->next_result()) {
-            }
-        } else {
+        if (!$this->multiQuery($sql)) {
             $this->error(100, $nodeId, $sql);
         }
-
-        $this->unlockDb();
 
         return true;
     }
@@ -475,19 +477,19 @@ class NestedSet
             'UPDATE `%1$s` SET `%2$s` = `%2$s` - 1, `%3$s` = `%3$s` - 1
               WHERE `%3$s` BETWEEN %5$d AND %6$d;
              UPDATE `%1$s` SET `%2$s` = `%2$s` + %7$d WHERE `%4$s` = %8$d',
-            $t_t, $t_r, $t_l, $t_n, $a_l, $a_r, $nodeWidth, $b_id
+            $t_t,
+            $t_r,
+            $t_l,
+            $t_n,
+            $a_l,
+            $a_r,
+            $nodeWidth,
+            $b_id
         );
 
-        $this->lockDb();
-
-        if ($this->db->multi_query($sql)) {
-            while ($this->db->more_results() && $this->db->next_result()) {
-            }
-        } else {
+        if (!$this->multiQuery($sql)) {
             $this->error(100, $nodeId, $sql);
         }
-
-        $this->unlockDb();
 
         return true;
     }
@@ -512,7 +514,11 @@ class NestedSet
                 AND `n`.`%4$s` = %5$d
               GROUP BY `o`.`%1$s`
               ORDER BY `o`.`%1$s`',
-            $t_l, $t_r, $t_t, $t_n, $id
+            $t_l,
+            $t_r,
+            $t_t,
+            $t_n,
+            $id
         );
 
         if (!($result = $this->query($sql)) || !$result->num_rows) {
@@ -590,19 +596,23 @@ class NestedSet
 
         $sql = sprintf(
             'SELECT `n`.*,
-                    round((`n`.`%2$s` - `n`.`%1$s` - 1) / 2, 0) AS childs,
-                    count(*) - 1 +(`n`.`%1$s` > 1) + 1 AS level,
-                    ((min(`p`.`%2$s`) - `n`.`%2$s` -(`n`.`%1$s` > 1)) / 2) > 0 AS lower,
-                    (((`n`.`%1$s` - max(`p`.`%1$s`) > 1))) AS upper
+                    round((`n`.`%2$s` - `n`.`%1$s` - 1) / 2, 0) AS `childs`,
+                    count(*) - 1 +(`n`.`%1$s` > 1) + 1 AS `level`,
+                    ((min(`p`.`%2$s`) - `n`.`%2$s` -(`n`.`%1$s` > 1)) / 2) > 0 AS `lower`,
+                    (((`n`.`%1$s` - max(`p`.`%1$s`) > 1))) AS `upper`
                FROM `%3$s` `n`,
                     `%3$s` `p`
-              WHERE `n`.`%1$s` BETWEEN `p`.`%1$s` AND `p`.`%2$s` AND
-                   (`p`.`%4$s` != `n`.`%4$s` OR `n`.`%1$s` = 1)
-              GROUP BY `n`.`%4$s` ORDER BY `n`.`%1$s`',
-            $t_l, $t_r, $t_t, $t_n
+              WHERE `n`.`%1$s` BETWEEN `p`.`%1$s` AND `p`.`%2$s`
+                AND (`p`.`%4$s` != `n`.`%4$s` OR `n`.`%1$s` = 1)
+              GROUP BY `n`.`%4$s`
+              ORDER BY `n`.`%1$s`',
+            $t_l,
+            $t_r,
+            $t_t,
+            $t_n
         );
 
-        if (!($result = $this->db->query($sql)) || !$result->num_rows) {
+        if (!($result = $this->query($sql)) || !$result->num_rows) {
             $this->error(100, null, $sql);
         }
 
@@ -628,14 +638,19 @@ class NestedSet
 
         $sql = sprintf(
             'SELECT p.*
-               FROM `%1$s` AS n, `%1$s` AS p
+               FROM `%1$s` AS n,
+                    `%1$s` AS p
               WHERE n.`%2$s` BETWEEN p.`%2$s` AND p.`%3$s`
                 AND n.`%4$s` = %5$d
               ORDER BY p.`%2$s`',
-            $t_t, $t_l, $t_r, $t_n, +$nodeId
+            $t_t,
+            $t_l,
+            $t_r,
+            $t_n,
+            +$nodeId
         );
 
-        if (!($result = $this->db->query($sql))) {
+        if (!($result = $this->query($sql))) {
             $this->error(100, $nodeId, $sql);
         }
 
@@ -703,6 +718,30 @@ class NestedSet
     }
 
     /**
+     * Multi query wrapper
+     * Always lock table for write
+     *
+     * @param  string $sql Id of the Node
+     * @return mixed   Query result
+     */
+    protected function multiQuery($sql)
+    {
+        $this->lockDb();
+
+        if ($this->db->multi_query($sql)) {
+            while ($this->db->more_results() && $this->db->next_result()) {
+            }
+            $return = true;
+        } else {
+            $return = false;
+        }
+
+        $this->unlockDb();
+
+        return $return;
+    }
+
+    /**
      * Get the Id of a Node depending on its left or right Value
      *
      * @param  integer $directionValue Value of left or right Border
@@ -714,11 +753,14 @@ class NestedSet
         extract($this->table, EXTR_PREFIX_ALL, 't');
 
         $sql = sprintf(
-            'SELECT `%2$s` FROM `%1$s` WHERE `%3$s` = %4$d',
-            $t_t, $t_n, $this->table[$direction], +$directionValue
+            'SELECT `%2$s` FROM `%1$s` WHERE `%3$s` = %4$d LIMIT 1',
+            $t_t,
+            $t_n,
+            $this->table[$direction],
+            +$directionValue
         );
 
-        if (!($result = $this->db->query($sql))) {
+        if (!($result = $this->query($sql))) {
             return $this->error(100, $directionValue . ', ' . $direction, $sql);
         }
 
@@ -726,9 +768,7 @@ class NestedSet
             return $this->error(203, $directionValue . ', ' . $direction, $sql);
         }
 
-        $row = $result->fetch_assoc();
-
-        return $row[$t_n];
+        return $result->fetch_row()[0];
     }
 
     /**
@@ -742,11 +782,15 @@ class NestedSet
         extract($this->table, EXTR_PREFIX_ALL, 't');
 
         $sql = sprintf(
-            'SELECT `%1$s`,`%2$s`,`%3$s` FROM `%4$s` WHERE `%1$s` = %5$d',
-            $t_n, $t_l, $t_r, $t_t, +$nodeId
+            'SELECT `%1$s`,`%2$s`,`%3$s` FROM `%4$s` WHERE `%1$s` = %5$d LIMIT 1',
+            $t_n,
+            $t_l,
+            $t_r,
+            $t_t,
+            +$nodeId
         );
 
-        if (!($result = $this->db->query($sql))) {
+        if (!($result = $this->query($sql))) {
             return $this->error(100, $nodeId, $sql);
         }
 
@@ -768,15 +812,19 @@ class NestedSet
         extract($this->table, EXTR_PREFIX_ALL, 't');
 
         $sql = sprintf(
-            'SELECT COUNT(*) AS `level`
+            'SELECT COUNT(1)
                FROM `%1$s` AS p, `%1$s` AS n
               WHERE n.`%3$s` BETWEEN p.`%3$s` AND p.`%4$s`
               GROUP BY n.`%3$s`
               ORDER BY ABS(n.`%2$s` - %5$d)',
-            $t_t, $t_n, $t_l, $t_r, +$nodeId
+            $t_t,
+            $t_n,
+            $t_l,
+            $t_r,
+            +$nodeId
         );
 
-        if (!($result = $this->db->query($sql))) {
+        if (!($result = $this->query($sql))) {
             return $this->error(100, $nodeId, $sql);
         }
 
@@ -784,9 +832,7 @@ class NestedSet
             return $this->error(202, $nodeId, $sql);
         }
 
-        $row = $result->fetch_assoc();
-
-        return $row['level'];
+        return $result->fetch_row()[0];
     }
 
     /**
@@ -800,7 +846,7 @@ class NestedSet
 
         $sql = sprintf('SELECT COUNT(1) FROM `%1$s` AS `count`', $t_t);
 
-        if (!($result->$this->db->query($sql))) {
+        if (!($result->$this->query($sql))) {
             return $this->error(100, null, $sql);
         }
 
@@ -808,7 +854,7 @@ class NestedSet
             return $this->error(201, null, $sql);
         }
 
-        return $result->fetch_array(MYSQLI_NUM)[0];
+        return $result->fetch_row()[0];
     }
 
     /**
@@ -819,15 +865,16 @@ class NestedSet
      */
     protected function error($err, $param = null, $sql = null, $unlock = true)
     {
-        if ($unlock) {
-            $this->unlockDb();
-        }
+        $unlock && $this->unlockDb();
 
         $dbg = debug_backtrace(0, 2);
 
         $error = sprintf(
             '%s::%s(%s) %s',
-            $dbg[1]['class'], $dbg[1]['function'], $param, $this->msg[$err]
+            $dbg[1]['class'],
+            $dbg[1]['function'],
+            $param,
+            $this->msg[$err]
         );
 
         if ($this->debug && $this->db && $sql) {

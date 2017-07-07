@@ -57,7 +57,9 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
                         .add();
                 }
             },
+            zoomType: 'x',
             panning: true,
+            panKey: 'shift',
             resetZoomButton: {
                 relativeTo: 'chart',
                 position: { x: -2, y: 7 }
@@ -511,7 +513,7 @@ function updateChart(force) {
             channels_new.push(channel);
         }
 
-            /* Prepare axis */
+        /* Prepare axis */
         if (!yAxis[channel.axis]) {
             yAxis[channel.axis] = {
                 lineColor: channel.color,
@@ -572,26 +574,26 @@ function updateChart(force) {
                 /* timezone offset in minutes */
                 timezoneOffset: -tzOffset / 60
             }
-            });
+        });
 
-            /* Happens also on 1st call! */
-            chartOptions.yAxis = yAxis;
-            chartOptions.exporting = { filename: views.actual.slug };
+        /* Happens also on 1st call! */
+        chartOptions.yAxis = yAxis;
+        chartOptions.exporting = { filename: views.actual.slug };
 
-            chartOptions.plotOptions.bar.stacking = stacked ? 'normal' : null;
+        chartOptions.plotOptions.bar.stacking = stacked ? 'normal' : null;
 
-            /* (Re)Create chart */
-            $('#'+chartOptions.chart.renderTo).css('height', ChartHeight).show();
-            chart = new Highcharts.Chart(chartOptions);
-            $('#chart-wrapper').addClass('chart-loaded');
-            /* Help chart with fluid layout to find its correct size */
-            chart.reflow();
-            /* Show splitter */
-            $('.ui-resizable-handle', '#chart-wrapper').show();
-            /* Show zoom and pan help */
-            $('#zoom-hint').show();
+        /* (Re)Create chart */
+        $('#'+chartOptions.chart.renderTo).css('height', ChartHeight).show();
+        chart = new Highcharts.Chart(chartOptions);
+        $('#chart-wrapper').addClass('chart-loaded');
+        /* Help chart with fluid layout to find its correct size */
+        chart.reflow();
+        /* Show splitter */
+        $('.ui-resizable-handle', '#chart-wrapper').show();
+        /* Show zoom and pan help */
+        $('#zoom-hint').show();
 
-            channels_chart = channels_new;
+        channels_chart = channels_new;
     }
 
     setTimeout(function () {
@@ -612,8 +614,8 @@ function updateChart(force) {
     costs = 0,
     date = new Date(),
     today = ('0'+(date.getMonth()+1)).substr(-2) + '/' +
-        ('0'+date.getDate()).substr(-2) + '/' +
-        date.getFullYear(),
+            ('0'+date.getDate()).substr(-2) + '/' +
+            date.getFullYear(),
     deferred = [];
 
     /* Build deferred array to get data */
@@ -632,7 +634,7 @@ function updateChart(force) {
             end   = toDate + '+1day';
         }
 
-            deferred.push(
+        deferred.push(
             $.getJSON(url, {
                 attributes: true,
                 full:       true,
@@ -641,7 +643,7 @@ function updateChart(force) {
                 period:     (channel.type != 'scatter') ? period_count + period : '',
                 _canAbort:  true,
                 _ts:        date.getTime() /* Force fresh fetch */
-                })
+            })
         );
     });
 
@@ -665,7 +667,7 @@ function updateChart(force) {
             data       = arguments[arg][0];
             textStatus = arguments[arg][1];
             jqXHR      = arguments[arg][2];
-            channel = channels_chart[arg];
+            channel    = channels_chart[arg];
 
             if (textStatus == 'abort') {
                 /* Aborted during loading */
@@ -730,7 +732,22 @@ function updateChart(force) {
                 unit:           attr.unit,
                 raw:            (period == '')
             };
+/*
+            Not working yet, needs more research
 
+            var a;
+
+            if (attr.valid_from !== '' && attr.valid_to !== '') {
+                a = chart.yAxis[serie.yAxis];
+                a.softThreshold = true;
+                if (typeof a.min == 'undefined' || a.min > attr.valid_from) {
+                    a.min = attr.valid_from;
+                }
+                if (typeof a.max == 'undefined' || a.max < attr.valid_to) {
+                    a.max = attr.valid_to;
+                }
+            }
+*/
             if (channel.colorusediff !== 0) {
                 if (channel.colorusediff === 1) {
                     /* Color for values above threshold > switch colors! */
@@ -826,21 +843,20 @@ function updateChart(force) {
             pvlng.log('Serie', serie);
 
             if (!channel.all && (channel.min || channel.max || channel.last)) {
-                        serie = setMinMax(serie, channel);
+                serie = setMinMax(serie, channel);
             }
 
             if (!changed) {
-                        var s = chart.get(serie.id);
-                        /* Replace data direct in existing chart data */
-                        s.setData(serie.data, false);
-                        /* Do we have raw data? Only then deletion of reading value is possible */
-                        s.options.raw = (period == '');
+                var s = chart.get(serie.id);
+                /* Replace data direct in existing chart data */
+                s.setData(serie.data, false);
+                /* Do we have raw data? Only then deletion of reading value is possible */
+                s.options.raw = (period == '');
             } else {
-                        series[serie.id] = serie;
+                series[serie.id] = serie;
             }
 
             $('#cons'+channel._id).prop('title', 'loaded in ' + ((new Date).getTime() - channel._ts) + ' ms').tipTip();
-
             $('#costs').html(costs ? CurrencyFormat.replace('{}', Highcharts.numberFormat(costs, CurrencyDecimals)) : '');
         }
 

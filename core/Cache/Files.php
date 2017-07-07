@@ -36,7 +36,7 @@ class Files extends AbstractFile
     {
         // Buffer for next read
         $this->data[$key] = $data;
-        return $this->writeFile($this->fileName($key, '.single.cache'), $data);
+        return $this->writeFile($this->fileName($key, $this->suffix), $data);
     } // function write()
 
     /**
@@ -52,7 +52,7 @@ class Files extends AbstractFile
         } else {
             $this->misses++;
             // Buffer for more reads in this session
-            $this->data[$key] = $this->readFile($this->fileName($key, '.single.cache'));
+            $this->data[$key] = $this->readFile($this->fileName($key, $this->suffix));
         }
         return $this->data[$key];
     } // function fetch()
@@ -65,7 +65,7 @@ class Files extends AbstractFile
      */
     public function delete($key)
     {
-        return $this->removeFile($this->fileName($key, '.single.cache'));
+        return $this->removeFile($this->fileName($key, $this->suffix));
     } // function delete()
 
     /**
@@ -78,7 +78,7 @@ class Files extends AbstractFile
         parent::flush();
 
         $ok = true;
-        foreach (glob($this->fileName('*', '.single.cache')) as $file) {
+        foreach (glob($this->fileName('*', $this->suffix)) as $file) {
             $ok = ($ok && $this->removeFile($file));
         }
         return $ok;
@@ -109,6 +109,11 @@ class Files extends AbstractFile
     {
         return $this->misses;
     }
+
+    /**
+     *
+     */
+    protected $suffix = '.cache.single';
 
     /**
      *

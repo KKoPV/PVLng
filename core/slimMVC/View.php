@@ -1,9 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012 Knut Kohl
- * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace slimMVC;
 
@@ -294,6 +297,10 @@ class View extends SlimView
      */
     protected function displayAvailableVariables($called, $comment = '')
     {
+        if ($this->verbose < 2) {
+            return;
+        }
+
         $vlen = 0;
         foreach ($this->dataPointer as $key => &$value) {
             $vlen = max($vlen, strlen($key));
@@ -334,7 +341,7 @@ class View extends SlimView
         $html = file_get_contents($TplFile);
 
         if (strpos($html, '<!-- COMPILE OFF -->') === false) {
-            $html = '<?php $this->verbose && $this->displayAvailableVariables(\''.$TplFile.'\') ?'.'>' . $html;
+            $html = '<?php $this->displayAvailableVariables(\''.$TplFile.'\') ?'.'>' . $html;
 
             // <!-- INCLUDE template.tpl -->
             if (preg_match_all('~<!-- INCLUDE (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
@@ -349,7 +356,10 @@ class View extends SlimView
 
             // <!-- HOOK hook_name.ext -->
             if (preg_match_all(
-                '~<!-- HOOK ([a-z_]+\.(html|js|css)) -->~', $html, $args, PREG_SET_ORDER
+                '~<!-- HOOK ([a-z_]+\.(html|js|css)) -->~',
+                $html,
+                $args,
+                PREG_SET_ORDER
             )) {
                 foreach ($args as $arg) {
                     $html = str_replace(
@@ -362,7 +372,10 @@ class View extends SlimView
 
             // <!-- DEFINE name -->...<!-- END DEFINE -->
             if (preg_match_all(
-                '~<!-- DEFINE (.+?) -->\s*(.+?)\s*<!-- END DEFINE -->~s', $html, $args, PREG_SET_ORDER
+                '~<!-- DEFINE (.+?) -->\s*(.+?)\s*<!-- END DEFINE -->~s',
+                $html,
+                $args,
+                PREG_SET_ORDER
             )) {
                 foreach ($args as $macro) {
                     // Remove macro definition
@@ -377,7 +390,10 @@ class View extends SlimView
 
             // <!-- (ELSE)?IF ... -->...<!-- ELSE -->...<!-- ENDIF -->
             if (preg_match_all(
-                '~<!-- (ELSE)?IF (.*?) -->~', $html, $args, PREG_SET_ORDER
+                '~<!-- (ELSE)?IF (.*?) -->~',
+                $html,
+                $args,
+                PREG_SET_ORDER
             )) {
                 foreach ($args as $if) {
                     if (preg_match_all('~'.$this->RegexVar.'~', $if[2], $matches, PREG_SET_ORDER)) {
@@ -436,7 +452,10 @@ class View extends SlimView
 
             // Loops
             if (preg_match_all(
-                '~<!-- BEGIN ([A-Z][A-Z0-9_]*) -->~', $html, $args, PREG_SET_ORDER
+                '~<!-- BEGIN ([A-Z][A-Z0-9_]*) -->~',
+                $html,
+                $args,
+                PREG_SET_ORDER
             )) {
                 foreach ($args as $match) {
                     $html = str_replace(
@@ -619,7 +638,7 @@ class View extends SlimView
             $this->dataPointer[\'_LOOP_FIRST\'] = $_f%1$d; $_f%1$d = FALSE;
             $this->dataPointer[\'_LOOP_LAST\']  = ($_i%1$d == $_c%1$d);
             $this->dataPointer[\'_LOOP_ID\']    = $_i%1$d++;
-            $this->verbose && $this->displayAvailableVariables(\'%3$s\', \'Loop: %2$s\');
+            $this->displayAvailableVariables(\'%3$s\', \'Loop: %2$s\');
 ?'.'>';
 
     /**

@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Frontend\Controller;
 
@@ -14,8 +15,8 @@ namespace Frontend\Controller;
  */
 use Channel\Channel as Channel;
 use Core\Messages;
+use Core\PVLng;
 use Frontend\Controller;
-use PVLng\PVLng;
 use Yryie\Yryie;
 use DBQuery;
 use I18N;

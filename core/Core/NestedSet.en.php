@@ -1,9 +1,19 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
+ *
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ */
+
+/**
  * English language file
  */
 return [
-      1 => 'Missing table definition parameter.',
+      1 => 'Missing or invalid table definition parameter.',
 
     100 => 'Database Query failed.',
 

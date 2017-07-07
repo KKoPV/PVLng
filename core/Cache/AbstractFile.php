@@ -36,6 +36,7 @@ abstract class AbstractFile extends Cache
         parent::__construct($settings);
 
         $this->cachedir = $this->settings['Directory'];
+        $this->prefix   = $this->settings['Prefix'];
 
         // Auto detect cache directory
         // 1st use system temp. directory
@@ -99,6 +100,13 @@ abstract class AbstractFile extends Cache
     protected $data;
 
     /**
+     * Cache file prefix
+     *
+     * @var string $cachedir
+     */
+    protected $prefix;
+
+    /**
      * Caching directory
      *
      * @var string $cachedir
@@ -113,7 +121,7 @@ abstract class AbstractFile extends Cache
      */
     protected function fileName($key, $suffix = '.cache')
     {
-        return $this->cachedir . DIRECTORY_SEPARATOR . $this->key($key) . $suffix;
+        return $this->cachedir . DIRECTORY_SEPARATOR . $this->prefix . $this->key($key) . $suffix;
     } // function fileName()
 
     /**
