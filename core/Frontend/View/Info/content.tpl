@@ -58,7 +58,7 @@
                 </td>
             </tr>
             <tr>
-                <td style="vertical-align:top">Header</td>
+                <td style="vertical-align:top">Authorization Header</td>
                 <td>
                     <code class="b">Authorization: Bearer {APIKEY}</code>
                 </td>
@@ -164,8 +164,8 @@
             <tbody>
             <!-- BEGIN CACHEINFO -->
             <tr>
-                <td>{strtolower:_LOOP}</td>
-                <td>{raw:CACHEINFO}</td>
+                <td>{KEY}</td>
+                <td>{raw:VALUE}</td>
             </tr>
             <!-- END -->
             </tbody>

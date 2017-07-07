@@ -1,12 +1,12 @@
-<script>
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <knutkohl@users.sourceforge.net>
- * @copyright   2012-2016 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
-*/
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
+ */
 
 var resetTimer;
 
@@ -62,5 +62,3 @@ $(function() {
     });
 
 });
-
-</script>

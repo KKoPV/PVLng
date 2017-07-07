@@ -1,4 +1,3 @@
-<script>
 /**
  *
  *
@@ -42,11 +41,6 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
                         .add();
                 }
             },
-            panning: true,
-            resetZoomButton: {
-                relativeTo: 'chart',
-                position: { x: -2, y: 7 }
-            },
             style: { fontFamily: 'inherit' }
         },
         credits: false,
@@ -54,11 +48,6 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
         loading: {
             labelStyle: { top: '40%' },
             style: { opacity: 0.8 }
-        },
-        mapNavigation: {
-            /* For mouse wheel zoom */
-            enabled: true,
-            enableButtons: false
         },
         plotOptions: {
             bubble: { minSize: 4, maxSize: 12 },
@@ -94,20 +83,6 @@ var ChartHeight = +'{INDEX_CHARTHEIGHT}',
             },
             borderWidth: 0,
             shadow: true,
-        },
-        xAxis: {
-            events: {
-                afterSetExtremes: function(event) {
-                    var ex = this.getExtremes();
-                    if (ex.dataMax - ex.dataMin > event.max - event.min) {
-                        /* Zoomed in */
-                        if (!chart.resetZoomButton) chart.showResetZoom();
-                    } else {
-                        /* Full zoomed out, but make sure all is reset correct */
-                        chart.zoomOut();
-                    }
-                }
-            }
         }
     };
 
@@ -148,8 +123,6 @@ function updateChart(force) {
         chart = new Highcharts.Chart(chartOptions);
         /* Show splitter */
         $('.ui-resizable-handle', '#chart-wrapper').show();
-        /* Show zoom and pan help */
-        $('#zoom-hint').show();
     }
 
     /* Scroll to navigation as top most visible element */
@@ -242,7 +215,7 @@ function updateChart(force) {
 
         $.pnotify({
             type: 'success',
-            text: '2 {{ChannelsLoaded}} [' + _data.length + '] ' +
+            text: '2 {{ChannelsLoaded}}, ' + _data.length + ' {{DataRecords}} ' +
                   '(' + (((new Date).getTime() - ts)/1000).toFixed(1) + 's)'
         });
 
@@ -392,9 +365,7 @@ $(function() {
         ],
         lang: {
             thousandsSep: '{TSEP}',
-            decimalPoint: '{DSEP}',
-            resetZoom: '{{resetZoom}}',
-            resetZoomTitle: '{{resetZoomTitle}}'
+            decimalPoint: '{DSEP}'
         }
     });
 
@@ -548,5 +519,3 @@ $(function() {
     shortcut.add('F7',    function() { updateChart(true) });
 
 });
-
-</script>

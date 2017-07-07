@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Frontend\Controller;
 
@@ -73,7 +74,12 @@ class Info extends Controller
                AND `TABLE_SCHEMA` = "'.$dbName.'" AND `TABLE_NAME` LIKE "pvlng_%"
         ');
 
-        $this->view->CacheInfo   = $this->app->cache->info();
+        $cacheInfo = [];
+        foreach ($this->app->cache->info() as $key => $value) {
+            $cacheInfo[] = ['key' => $key, 'value' => $value];
+        }
+
+        $this->view->CacheInfo   = $cacheInfo;
         $this->view->CacheHits   = $this->app->cache->getHits();
         $this->view->CacheMisses = $this->app->cache->getMisses();
     }

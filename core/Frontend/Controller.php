@@ -212,9 +212,6 @@ class Controller extends SlimController
             )
         );
 
-        $this->view->append('Scripts', $this->view->fetch('script.js.html'));
-        $this->view->append('Scripts', $this->view->fetch('script.'.$action.'.js.html'));
-
         $this->view->display($this->Layout.'.tpl');
     }
 

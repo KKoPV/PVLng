@@ -1,4 +1,3 @@
-<!--
 /**
  *
  *
@@ -7,11 +6,6 @@
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
--->
-
-<script src="/js/jquery.treetable.js"></script>
-
-<script>
 
 (function($) {
 /**
@@ -168,5 +162,3 @@ $(function() {
     });
 
 });
-
-</script>

@@ -1,4 +1,3 @@
-<!--
 /**
  *
  *
@@ -7,10 +6,6 @@
  * @license     MIT License (MIT) http://opensource.org/licenses/MIT
  * @version     1.0.0
  */
--->
-
-<script>
-
 var geocoder;
 
 /**
@@ -64,6 +59,3 @@ $(function() {
 */
     shortcut.add('Enter', function() { $('#geoloc').click(); });
 });
-
-</script>
-<!-- <script src="//maps.google.com/maps/api/js"></script> -->

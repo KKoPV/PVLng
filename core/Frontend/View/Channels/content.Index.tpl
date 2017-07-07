@@ -109,3 +109,5 @@
         {{ConfirmDeleteEntity}}
     </p>
 </div>
+
+<script src="/js/jquery.treetable.js"></script>

@@ -525,7 +525,6 @@
             $('#pageload').remove();
             $('#container').fadeTo(0, 1);
 
-
             $('#login-dialog').dialog({
                 autoOpen: false,
                 resizable: false,
@@ -547,12 +546,8 @@
                 });
             }
         });
-    </script>
 
-    {SCRIPTS}
-
-    <script>
-
+        /* Inline scripts from Controllers */
         {INLINEJS}
 
         $(function($) {

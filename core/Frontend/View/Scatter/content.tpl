@@ -50,10 +50,6 @@
 
 <div class="clear"></div>
 
-<div id="zoom-hint">{{ClickDragShiftPan}}</div>
-
-<hr>
-
 <div class="spaced">
     <div class="alpha grid_2" style="padding:.4em">
         <label for="x-axis-channel">{{xAxisChannel}}</label>
