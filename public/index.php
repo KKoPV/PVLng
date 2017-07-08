@@ -291,13 +291,12 @@ Route::setDefaultConditions([
 $routesCache = PVLng::pathTemp('routes.frontend.php');
 
 if (PVLng::$DEBUG || !file_exists($routesCache)) {
-    $content = '';
+    $code = '';
     foreach (glob(PVLng::pathRoot('core', 'Frontend', 'Routes', '*.php')) as $file) {
-        $content .= file_get_contents($file) . PHP_EOL;
+        $code .= trim(str_replace('<?php', '', php_strip_whitespace($file))) . PHP_EOL;
     }
-    $content = str_replace('<?php', '', $content);
-    $content = preg_replace('~\s*/\*.*?\*/\s*~s', PHP_EOL, $content);
-    file_put_contents($routesCache, '<?php ' . $content);
+    file_put_contents($routesCache, '<?php' . PHP_EOL . $code);
+    unset($code);
 }
 
 include $routesCache;
