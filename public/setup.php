@@ -1,12 +1,89 @@
-<?php error_reporting(-1); ini_set('show_errors', 1);
+<?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
- * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
+ * @link      https://github.com/KKoPV/PVLng
+ * @link      https://pvlng.com/
+ * @author    Knut Kohl <github@knutkohl.de>
+ * @copyright 2012 Knut Kohl
+ * @license   MIT License (MIT) http://opensource.org/licenses/MIT
  */
+
+ini_set('display_errors', 1);
+error_reporting(-1);
+
+// ---------------------------------------------------------------------------
+
+$config = [
+
+    /**
+     * Minimal required PHP version
+     */
+    'PHPVersion' => '5.5',
+
+    /**
+     *
+     */
+    'Extensions' => [
+        'curl'     => [ 'cURL support' ],
+        'gd'       => [ 'Image processing' ],
+        'json'     => [ 'JSON support' ],
+        'mbstring' => [ 'Multibyte Support' ],
+        'mysqli'   => [ 'MySQLi support' ],
+        'pcre'     => [ 'PCRE support' ],
+        'session'  => [ 'Session support' ],
+        'apc'      => [ 'Alternative PHP Cache (APC)', false ], // not required, recommended
+        'memcache' => [ 'Memcache', false ], // not required, recommended
+    ],
+
+    /**
+     *
+     */
+    'Composer' => [ dirname(__DIR__) ],
+
+    /**
+     *
+     */
+    'Permissions' => [
+        '../tmp' => 'is_writable'
+    ],
+
+    /**
+     *
+     */
+    'Configuration' => [
+        'default' => '../config/config.default.yaml',
+        'config'  => '../config/config.yaml',
+    ],
+
+    /**
+     *
+     */
+    'MySQLi' => [
+        'config'   => '../config/config.yaml',
+        'host'     => 'database.host',
+        'socket'   => 'database.socket',
+        'port'     => 'database.port',
+        'username' => 'database.username',
+        'password' => 'database.password',
+        'database' => 'database.database'
+    ],
+
+];
+
+// ---------------------------------------------------------------------------
+
+// Load classes in defined order
+$path = 'setup' . DIRECTORY_SEPARATOR;
+require $path . 'Setup.php';
+require $path . 'SetupTask.php';
+require $path . 'Composer.php';
+require $path . 'Configuration.php';
+require $path . 'Extensions.php';
+require $path . 'MySQLi.php';
+require $path . 'PHPVersion.php';
+require $path . 'Permissions.php';
+
 ?>
 <!doctype html>
 <html class="no-js" lang="en">
@@ -30,80 +107,13 @@
 
 <h2>PVLng basic setup</h2>
 
-<?php
-
-// ---------------------------------------------------------------------------
-$config = array(
-
-    /**
-     * Minimal required PHP version
-     */
-    'PHPVersion' => '5.5',
-
-    /**
-     *
-     */
-    'PHPExtensions' => array(
-        'curl'     => array('cURL support'),
-        'gd'       => array('Image processing'),
-        'json'     => array('JSON support'),
-        'mbstring' => array('Multibyte Support'),
-        'mysqli'   => array('MySQLi support'),
-        'pcre'     => array('PCRE support'),
-        'session'  => array('Session support'),
-        'apc'      => array('Alternative PHP Cache (APC)', false), // not required, but recommended
-        'memcache' => array('Memcache', false), // not required, but recommended
-    ),
-
-    /**
-     *
-     */
-    'Composer' => array(
-        'root' => dirname(__DIR__)
-    ),
-
-    /**
-     *
-     */
-    'Permissions' => array(
-        '../tmp' => 'is_writable'
-    ),
-
-    /**
-     *
-     */
-    'Configuration' => array(
-        'default' => '../config/config.default.php',
-        'config'  => '../config/config.php',
-    ),
-
-    /**
-     *
-     */
-    'MySQLi' => array(
-        'config'   => '../config/config.php',
-        'host'     => 'Database.Host',
-        'socket'   => 'Database.Socket',
-        'port'     => 'Database.Port',
-        'user'     => 'Database.Username',
-        'pass'     => 'Database.Password',
-        'db'       => 'Database.Database'
-    ),
-
-);
-
-// ---------------------------------------------------------------------------
-include 'setup.classes.php';
-
-if (Setup\Setup::run($config) === FALSE):
-
-?>
+<?php if (!Setup\Setup::run($config)) : ?>
 
 <p>
     <form><input type="submit" value="Reload"></form>
 </p>
 
-<?php else: ?>
+<?php else : ?>
 
 <h2>Next</h2>
 
@@ -111,7 +121,7 @@ if (Setup\Setup::run($config) === FALSE):
     <form action="/adminpass"><input type="submit" value="Definition of your administration user" /></form>
 </p>
 
-<?php endif; ?>
+<?php endif ?>
 
 </body>
 </html>

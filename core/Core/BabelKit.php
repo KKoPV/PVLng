@@ -869,16 +869,15 @@ class BabelKit
 
         if ($result = $this->db->query($query)) {
             if (is_scalar($result)) {
-                $data = $result;
+                return $result;
             } else {
                 $data = [];
                 while ($row = $result->fetch_array(MYSQLI_NUM)) {
                     $data[] = $row;
                 }
                 $result->free();
+                return $data;
             }
         }
-
-        return $data;
     }
 }

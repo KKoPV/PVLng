@@ -6,6 +6,7 @@
 run/*
 tmp/*
 custom/
+core/Frontend/View/hook/*
 description.md
 
 !.githold

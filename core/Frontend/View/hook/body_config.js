@@ -1,1 +1,0 @@
-DatatablesStateSave = true;
