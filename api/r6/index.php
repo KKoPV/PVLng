@@ -38,8 +38,8 @@ Loader::register($loader, PVLng::$TempDir);
 
 PVLng::$DEBUG = (isset($_SERVER['HTTP_X_DEBUG']) && $_SERVER['HTTP_X_DEBUG']);
 
-$hooks = PVLng::pathRoot('config', 'hook.php');
-file_exists($hooks) && include $hooks;
+// May not exist
+@include PVLng::pathRoot('config', 'hook.php');
 
 Hook::run('api.load');
 

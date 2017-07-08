@@ -403,9 +403,9 @@ class Channels extends Controller
                     if (!$entity->getId()) {
                         $entity->insert();
                         Messages::success(I18N::translate('ChannelSaved'));
-                        if ($this->request->post('add2tree')
-                            && $addTo = $this->request->post('tree')
-                            && $tree = Channel::byId($addTo)->addChild($entity->getId())
+                        if ($this->request->post('add2tree') &&
+                            ($addTo = $this->request->post('tree')) &&
+                            ($tree = Channel::byId($addTo)->addChild($entity->getId()))
                         ) {
                             Messages::success(I18N::translate('HierarchyCreated', 1));
                         }

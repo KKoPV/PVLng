@@ -45,11 +45,11 @@ if (!file_exists(PVLng::pathRoot('config', 'config.yaml'))) {
     die(Header('Location: /public/setup.php'));
 }
 
-/**
- *
- */
-$hooks = PVLng::pathRoot('config', 'hook.php');
-file_exists($hooks) && include $hooks;
+PVLng::$DEBUG = true;
+PVLng::$DEVELOP = 1;
+
+// May not exist
+@include PVLng::pathRoot('config', 'hook.php');
 
 Hook::run('frontend.load');
 

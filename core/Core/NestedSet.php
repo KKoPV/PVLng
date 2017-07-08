@@ -259,7 +259,7 @@ class NestedSet
      *
      * @deprecated Swap space with the left Brother
      */
-    public function moveLft($nodeId)
+    public function moveLeft($nodeId, $required = false)
     {
         $nodeLevel = $this->getNodeLevel($nodeId);
 
@@ -274,7 +274,11 @@ class NestedSet
         $a_r = $a[$t_r];
 
         if (!($b_id = $this->getId($a_l - 1, 'r'))) {
-            $this->error(306, $nodeId);
+            if (!$required) {
+                return false;
+            } else {
+                 $this->error(306, $nodeId);
+            }
         }
 
         if (!($b = $this->getNode($b_id))) {
@@ -314,12 +318,12 @@ class NestedSet
     }
 
     /**
-   * Move a Node/Branch RIGHT
-   *
-   * @param  integer $nodeId Id of the Node
-   * @return boolean          TRUE or FALSE
-   */
-    public function moveRgt($nodeId)
+     * Move a Node/Branch RIGHT
+     *
+     * @param  integer $nodeId Id of the Node
+     * @return boolean          TRUE or FALSE
+     */
+    public function moveRight($nodeId, $required = false)
     {
         $nodeLevel = $this->getNodeLevel($nodeId);
 
@@ -334,7 +338,11 @@ class NestedSet
         $a_r = $a[$t_r];
 
         if (!($b_id = $this->getId($a_r + 1, 'l'))) {
-            $this->error(307, $nodeId);
+            if (!$required) {
+                return false;
+            } else {
+                $this->error(307, $nodeId);
+            }
         }
 
         if (!($b = $this->getNode($b_id))) {
@@ -381,7 +389,7 @@ class NestedSet
      * @param  integer $nodeId Id of the Node
      * @return boolean          TRUE or FALSE
      */
-    public function moveUp($nodeId)
+    public function moveUp($nodeId, $required = false)
     {
         $nodeLevel = $this->getNodeLevel($nodeId);
 
@@ -406,7 +414,11 @@ class NestedSet
         $a_r = $a[$t_r];
 
         if (!($b_id = $this->getId($a_r + 1, 'r'))) {
-            $this->error(308, $nodeId);
+            if (!$required) {
+                return false;
+            } else {
+                $this->error(308, $nodeId);
+            }
         }
 
         if (!($b = $this->getNode($b_id))) {
@@ -445,7 +457,7 @@ class NestedSet
      * @param  integer $nodeId Id of the Node
      * @return boolean          TRUE or FALSE
      */
-    public function moveDown($nodeId)
+    public function moveDown($nodeId, $required = false)
     {
         $nodeLevel = $this->getNodeLevel($nodeId);
 
@@ -460,7 +472,11 @@ class NestedSet
         $a_r = $a[$t_r];
 
         if (!$b_id = $this->getId($a_l - 1, 'r')) {
-            $this->error(306, $nodeId);
+            if (!$required) {
+                return false;
+            } else {
+                $this->error(306, $nodeId);
+            }
         }
         if (!$b = $this->getNode($b_id)) {
             $this->error(306, $nodeId);
@@ -760,15 +776,11 @@ class NestedSet
             +$directionValue
         );
 
-        if (!($result = $this->query($sql))) {
-            return $this->error(100, $directionValue . ', ' . $direction, $sql);
+        if (($result = $this->query($sql)) && ($result->num_rows > 0)) {
+            return $result->fetch_row()[0];
         }
 
-        if (!$result->num_rows) {
-            return $this->error(203, $directionValue . ', ' . $direction, $sql);
-        }
-
-        return $result->fetch_row()[0];
+        return false;
     }
 
     /**

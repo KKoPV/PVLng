@@ -64,28 +64,29 @@
 
             <i class="fa fa-fw fa-minus btn"></i>
 
-            <!-- IF {LEVEL} > 2 -->
-            <form action="/overview/moveup" method="post">
+            <!-- IF {LEVEL} > 1 -->
+            <form id="moveup_{raw:ID}" action="/overview/moveup" method="post">
                 <input type="hidden" name="id" value="{raw:ID}">
-                <i class="fa fa-fw fa-arrow-left btn" onclick="this.form.submit()"></i>
+                <input type="hidden" name="returnto" value="/overview#_{raw:ID}">
             </form>
+            <i class="fa fa-fw fa-arrow-left btn" onclick="$('#moveup_{raw:ID}').submit()"></i>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
-            <!-- IF {LEVEL} != 1 AND {UPPER} != 0 -->
+            <!-- IF {UPPER} != 0 -->
             <i class="fa fa-fw fa-arrow-up btn" onclick="return moveChild({raw:ID}, 'moveleft')"></i>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
-            <!-- IF {LEVEL} != 1 AND {LOWER} != 0 -->
+            <!-- IF {LOWER} != 0 -->
             <i class="fa fa-fw fa-arrow-down btn" onclick="return moveChild({raw:ID}, 'moveright')"></i>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 
-            <!-- IF {TYPE_ID} != "0" -->
+            <!-- IF {TYPE_ID} != 0 -->
             <a href="/channels/edit/{ENTITY}?returnto=/overview%23_{raw:ID}" class="fa fa-fw fa-pencil btn"></a>
             <!-- ELSE -->
             <a href="/channels/edit/{ENTITY_OF}?returnto=/overview%23_{raw:ID}" class="fa fa-fw fa-pencil btn"></a>
             <!-- ENDIF -->
 
-            <!-- IF {TYPE_ID} != "0" -->
+            <!-- IF {TYPE_ID} != 0 -->
             <a href="/channels/add/{ENTITY}?returnto=/overview%23_{raw:ID}" class="fa fa-fw fa-clone btn"></a>
             <!-- ELSE --><i class="fa fa-fw btn"></i><!-- ENDIF -->
 

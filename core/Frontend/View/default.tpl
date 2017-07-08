@@ -432,6 +432,7 @@
     <script src="/js/jquery.icheck.js"></script>
     <script src="/js/jquery.pnotify.js"></script>
     <script src="/js/jquery.smartmenus.min.js"></script>
+    <script src="/js/jquery.autosize.min.js"></script>
     <script src="/js/dataTables.js"></script>
     <script src="/js/select2.min.js"></script>
     <script src="/js/shortcut.js"></script>

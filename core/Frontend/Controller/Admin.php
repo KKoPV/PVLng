@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Frontend\Controller;
 
@@ -82,7 +83,7 @@ class Admin extends Controller
         $p2 = $this->request->post('p2');
 
         if ($p1 == '' || $p2 == '') {
-            Messages::Error(I18N::_('AdminAndPasswordRequired'), true);
+            Messages::Error(I18N::translate('AdminAndPasswordRequired'), true);
             $this->view->Ok = false;
             return;
         }

@@ -1,11 +1,12 @@
 <?php
 /**
+ * PVLng - PhotoVoltaic Logger new generation
  *
- *
- * @author      Knut Kohl <github@knutkohl.de>
- * @copyright   2012-2014 Knut Kohl
- * @license     MIT License (MIT) http://opensource.org/licenses/MIT
- * @version     1.0.0
+ * @link       https://github.com/KKoPV/PVLng
+ * @link       https://pvlng.com/
+ * @author     Knut Kohl <github@knutkohl.de>
+ * @copyright  2012 Knut Kohl
+ * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  */
 namespace Frontend\Controller;
 
@@ -45,10 +46,10 @@ class Overview extends Controller
      */
     public function indexAction()
     {
-        $this->view->SubTitle = I18N::_('Overview');
+        $this->view->SubTitle = I18N::translate('Overview');
 
         /// Yryie::StartTimer('Load tree with parents', NULL, 'db');
-        $this->view->Data = (new ORMTree)->getWithParents();
+        $this->view->Data = ORMTree::f()->getWithParents();
         /// Yryie::StopTimer();
 
         $channels = array();
@@ -74,8 +75,10 @@ class Overview extends Controller
      */
     public function addChildPostAction()
     {
-        if ($parent = $this->request->post('parent') &&
-            $childs = $this->request->post('child') && is_array($childs)) {
+        if (($parent = $this->request->post('parent')) &&
+            ($childs = $this->request->post('child')) &&
+            is_array($childs)
+        ) {
             $parent = Channel::byId($parent);
             foreach ($childs as $child) {
                 if ($child) {
@@ -151,7 +154,7 @@ class Overview extends Controller
 
         // Correct position below new target
         while ($offset-- > 0) {
-            if (!$this->tree->moveLft($id)) {
+            if (!$this->tree->moveLeft($id)) {
                 break;
             }
         }
@@ -166,7 +169,7 @@ class Overview extends Controller
             // Set an off-wall high value, loop breaks anyway if can't move anymore...
             $count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
             while ($count--) {
-                if (!$this->tree->moveLft($id)) {
+                if (!$this->tree->moveLeft($id)) {
                     break;
                 }
             }
@@ -182,7 +185,7 @@ class Overview extends Controller
             // Set an off-wall high value, loop breaks anyway if can't move anymore...
             $count = $this->request->post('countmax') ? PHP_INT_MAX : $this->request->post('count', 1);
             while ($count--) {
-                if (!$this->tree->moveRgt($id)) {
+                if (!$this->tree->moveRight($id)) {
                     break;
                 }
             }

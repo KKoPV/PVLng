@@ -49,10 +49,7 @@ class Controller extends SlimController
 
         $this->Layout = 'default';
 
-        if ($returnto = $this->app->request->get('returnto') ||
-            $returnto = $this->app->request->post('returnto')) {
-            Session::set('returnto', $returnto);
-        }
+        Session::set('returnto', $this->app->request->params('returnto'));
 
         // Need last part of class name
         $this->controller = preg_replace('~^.*\\\~', '', get_class($this));
