@@ -45,7 +45,11 @@ if (!file_exists(PVLng::pathRoot('config', 'config.yaml'))) {
     die(Header('Location: /public/setup.php'));
 }
 
-include PVLng::pathRoot('config', 'hook.php');
+/**
+ *
+ */
+$hooks = PVLng::pathRoot('config', 'hook.php');
+file_exists($hooks) && include $hooks;
 
 Hook::run('frontend.load');
 
@@ -145,8 +149,8 @@ try {
     I18N::setBabelKit($app->BabelKit);
 } catch (Exception $e) {
     die(
-        '<p><strong>Missing translations!</strong></p>'
-      . '<p>Did you loaded <tt>/sql/pvlng.sql</tt> into your database?!</p>'
+        '<p><strong>Missing translations!</strong></p>' .
+        '<p>Did you loaded <tt>/sql/pvlng.sql</tt> into your database?!</p>'
     );
 }
 
