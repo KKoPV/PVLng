@@ -2,11 +2,6 @@
 ### @author     Knut Kohl <github@knutkohl.de>
 ### @copyright  2012-2016 Knut Kohl
 ### @license    MIT License (MIT) http://opensource.org/licenses/MIT
-### @version    1.1.0
-###
-### v1.1.0
-### - Add MailOpts for UTF-8 encoding
-###
 ##############################################################################
 
 ##############################################################################
@@ -22,7 +17,13 @@
 #port=1883
 
 ##############################################################################
-### Log all actions for debugging only
-### default: /dev/null
+### Run in daemon mode by default
+### Emtpy variable for test mode
+### default: yes
+##############################################################################
+#daemon=yes
+
+##############################################################################
+### Log all actions for debugging only and only in daemon mode
 ##############################################################################
 #log=

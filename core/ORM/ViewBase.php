@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_view"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "View.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "View.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -35,6 +35,10 @@ abstract class ViewBase extends ORM
     // -----------------------------------------------------------------------
     // Setter methods
     // -----------------------------------------------------------------------
+
+    /**
+     * "id" is AutoInc, no setter
+     */
 
     /**
      * Basic setter for field "name"
@@ -137,6 +141,16 @@ abstract class ViewBase extends ORM
     // -----------------------------------------------------------------------
 
     /**
+     * Basic getter for field "id"
+     *
+     * @return mixed Id value
+     */
+    public function getId()
+    {
+        return $this->fields['id'];
+    }
+
+    /**
      * Basic getter for field "name"
      *
      * @return mixed Name value
@@ -181,16 +195,14 @@ abstract class ViewBase extends ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Filter for unique fields "name', 'public"
+     * Filter for field "id"
      *
-     * @param  mixed    $name, $public Filter values
+     * @param  mixed    $id Filter value
      * @return Instance For fluid interface
      */
-    public function filterByNamePublic($name, $public)
+    public function filterById($id)
     {
-        $this->filter('name', $name);
-        $this->filter('public', $public);
-        return $this;
+        return $this->filter('id', $id);
     }
 
     /**
@@ -202,6 +214,19 @@ abstract class ViewBase extends ORM
     public function filterBySlug($slug)
     {
         return $this->filter('slug', $slug);
+    }
+
+    /**
+     * Filter for unique fields "name', 'public"
+     *
+     * @param  mixed    $name, $public Filter values
+     * @return Instance For fluid interface
+     */
+    public function filterByNamePublic($name, $public)
+    {
+        $this->filter('name', $name);
+        $this->filter('public', $public);
+        return $this;
     }
 
     /**
@@ -242,15 +267,6 @@ abstract class ViewBase extends ORM
     // -----------------------------------------------------------------------
 
     /**
-     * Update fields on insert on duplicate key
-     */
-    protected function onDuplicateKey()
-    {
-        return '`data` = VALUES(`data`)
-              , `slug` = VALUES(`slug`)';
-    }
-
-    /**
      * Call create table sql on class creation and set to false
      */
     protected static $memory = false;
@@ -263,12 +279,14 @@ abstract class ViewBase extends ORM
     // @codingStandardsIgnoreStart
     protected static $createSQL = '
         CREATE TABLE IF NOT EXISTS `pvlng_view` (
+          `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
           `name` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'Chart name\',
           `public` tinyint(1) unsigned NOT NULL DEFAULT \'0\' COMMENT \'View type (private/public/mobile)\',
-          `data` text COMMENT \'Serialized channel data\',
+          `data` text NOT NULL COMMENT \'Serialized channel data\',
           `slug` varchar(50) NOT NULL DEFAULT \'\' COMMENT \'URL-save slug\',
-          PRIMARY KEY (`name`,`public`),
+          PRIMARY KEY (`id`),
           UNIQUE KEY `slug` (`slug`),
+          UNIQUE KEY `name` (`name`,`public`),
           KEY `public` (`public`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'View variants\'
     ';
@@ -284,33 +302,32 @@ abstract class ViewBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
+        'id'     => '',
         'name'   => '',
         'public' => '',
         'data'   => '',
         'slug'   => ''
-    );
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
+        'id'     => false,
         'name'   => false,
         'public' => false,
-        'data'   => true,
+        'data'   => false,
         'slug'   => false
-    );
+    ];
 
     /**
      *
      */
-    protected $primary = array(
-        'name',
-        'public'
-    );
+    protected $primary = ['id'];
 
     /**
      *
      */
-    protected $autoinc = '';
+    protected $autoinc = 'id';
 }

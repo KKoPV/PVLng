@@ -12,10 +12,8 @@ namespace Channel;
 /**
  *
  */
-#class MeterToSensor extends InternalCalc {
 class MeterToSensor extends Channel
 {
-
     /**
      * Accept only childs with meter attribute set
      */
@@ -44,7 +42,6 @@ class MeterToSensor extends Channel
      */
     public function read($request)
     {
-
         $this->beforeRead($request);
 
         // Fetch additional row BEFORE start timestamp

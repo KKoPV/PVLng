@@ -91,6 +91,9 @@ class Hook
      */
     protected static function normalizeHook($hook)
     {
+        if (is_array($hook)) {
+            $hook = implode('.', $hook);
+        }
         return strtolower($hook);
     }
 }

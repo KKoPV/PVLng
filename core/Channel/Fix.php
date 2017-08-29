@@ -14,7 +14,6 @@ namespace Channel;
  */
 class Fix extends InternalCalc
 {
-
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
@@ -24,7 +23,6 @@ class Fix extends InternalCalc
      */
     protected function beforeRead(&$request)
     {
-
         parent::beforeRead($request);
 
         if ($this->dataExists()) {

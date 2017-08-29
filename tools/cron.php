@@ -47,13 +47,15 @@ EOT;
  */
 function out($level)
 {
-    $args = func_get_args();
+    $args  = func_get_args();
     $level = array_shift($args);
 
-    if ($level > VERBOSE) return;
+    global $VERBOSE;
+
+    if ($level > $VERBOSE) return;
 
     $msg = count($args) ? array_shift($args) : str_repeat('-', 63);
-    vprintf('['.date('d-M H:i:s').'] '.$msg.PHP_EOL, $args);
+    vprintf(date('[d-M H:i:s] ') . $msg . PHP_EOL, $args);
 }
 
 /**
@@ -61,15 +63,21 @@ function out($level)
  */
 function okv($level, $key, $value)
 {
-    out($level, '%-20s = %s', $key, print_r($value, true));
+    if (is_scalar($value)) {
+        out($level, '%-20s = %s', $key, $value);
+    } else {
+        out($level, $key . PHP_EOL . print_r($value, true));
+    }
 }
 
 /**
  *
  */
-function curl($options, &$result, &$info=[])
+function curl($options, &$result, &$info)
 {
     $ch = curl_init();
+
+    $options[CURLOPT_RETURNTRANSFER] = 1;
 
     curl_setopt_array($ch, $options);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
@@ -82,18 +90,18 @@ function curl($options, &$result, &$info=[])
     curl_close($ch);
 
     // Debug curl
-    okv(1, 'Curl', $info['total_time'] . 's');
-    okv(1, 'Bytes up / down', $info['size_upload'] . ' / ' . $info['size_download']);
-    okv(2, 'Curl info', $info);
+    okv(1, 'cUrl total time', $info['total_time'] . 's');
+    okv(1, 'cUrl bytes up / down', $info['size_upload'] . ' / ' . $info['size_download']);
+    okv(2, 'cUrl info', $info);
 
     // Curl error?
     if ($errno) {
         okv(0, 'Curl error', '['.$errno.'] '.$error);
         okv(0, 'Parameters', $options);
-        return FALSE;
+        return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 ##############################################################################
@@ -102,19 +110,21 @@ function curl($options, &$result, &$info=[])
 // -f is undocumentd and ignore minutes interval, run always
 extract(getopt('c:fvth'), EXTR_PREFIX_ALL, 'param');
 
-if (isset($param_h)) usage();
+if (isset($param_h)) {
+    usage();
+}
 
 $TESTMODE = isset($param_t);
-$param_f = isset($param_f);
-$param_v = isset($param_v) ? (is_array($param_v)?count($param_v):1) : 0;
+$VERBOSE  = isset($param_v) ? (is_array($param_v) ? count($param_v) : 1) : 0;
+$FORCE    = isset($param_f);
+$CONFFILE = isset($param_c) ? $param_c : 'cron.yaml';
 
 // Increase verbosity by 1 in test mode
-$TESTMODE && $param_v++;
-define('VERBOSE', $param_v);
+$TESTMODE && $VERBOSE++;
 
-ini_set('display_startup_errors', !VERBOSE);
-ini_set('display_errors', !VERBOSE);
-error_reporting(!VERBOSE ? 0 : -1);
+ini_set('display_startup_errors', !$VERBOSE);
+ini_set('display_errors', !$VERBOSE);
+error_reporting($VERBOSE ? -1 : 0);
 
 $TESTMODE && okv( 1, 'Mode', 'TEST');
 
@@ -131,13 +141,12 @@ Loader::register($loader, PVLng::$TempDir);
 /**
  * Config file
  */
-$param_c = isset($param_c) ? $param_c : 'cron.yaml';
-$conffile = PVLng::pathRoot('config', $param_c);
-okv(1, 'Config file', $conffile);
+$CONFFILE = PVLng::pathRoot('config', $CONFFILE);
+okv(1, 'Config file', $CONFFILE);
 
 try {
     // Load into "Cron" namespace
-    $config = PVLng::getConfig()->loadNamespace('Cron', $conffile);
+    $config = PVLng::getConfig()->loadNamespace('Cron', $CONFFILE);
 } catch (Exception $e) {
     die($e->getMessage());
 }
@@ -156,17 +165,17 @@ for ($i=0; $i<$cnt; $i++) {
    switch ($pid = pcntl_fork()) {
 
       default:
-         // @parent
+         // parent
          pcntl_waitpid($pid, $status);
          break;
 
       case -1:
-         // @fail
+         // fail
          die('Fork failed');
          break;
 
       case 0:
-         // @child: Break out to loop and set section $id to process
+         // child: Break out to loop and set section $id to process
          $id = $i;
          break 2;
    }
@@ -182,29 +191,32 @@ PVLng::setDatabase(true);
 ob_start();
 
 $section = array_merge(
-    array(
+    [
         'handler' => '<handler unknown>',
         'enabled' => false,
         'name'    => '<unknown>',
         'each'    => 1
-    ),
+    ],
     $sections[$id]
 );
 
+$file = PVLng::pathRoot('tools', 'cron', $section['handler'].'.php');
+
+// Check for file exists only during test, in live don't check anymore
+if ($TESTMODE && !file_exists($file)) {
+    throw new Exception('Missing handler script: '.$file);
+}
+
 out(1);
-out(1, '[%d] %s (%s)', ($id+1), $section['name'], $section['handler']);
+out(1, '[%d] %s - %s', ($id+1), $section['handler'], $section['name']);
 out(1);
 
 try {
-    if ($section['enabled'] === true || $TESTMODE && $section['enabled'] === 0) {
+    if (($section['enabled'] === true) || $TESTMODE && ($section['enabled'] === 0)) {
         // Run in test mode at any minute or if forced flag was set...
-        if ($TESTMODE || isset($param_f) || $minute % $section['each'] == 0) {
-            $file = PVLng::pathRoot('tools', 'cron', $section['handler'].'.php');
-            // Check for file exists only during test, in live don't check anymore
-            if ($TESTMODE && !file_exists($file)) {
-                throw new Exception('Missing handler script: '.$file);
-            }
+        if ($TESTMODE || $FORCE || (($minute % $section['each']) === 0)) {
             unset($section['enabled'], $section['name'], $section['handler']);
+            // Run handler
             require $file;
         } else {
             out(1, 'Skip, not that minute');

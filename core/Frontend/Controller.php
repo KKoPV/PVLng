@@ -53,16 +53,16 @@ class Controller extends SlimController
 
         // Need last part of class name
         $this->controller = preg_replace('~^.*\\\~', '', get_class($this));
-        $this->ViewDir    = PVLng::path(PVLng::$RootDir, 'core', 'Frontend', 'View');
+        $this->ViewDir    = PVLng::pathRoot('core', 'Frontend', 'View');
 
-        $this->view->Module = strtolower($this->controller);
-        $this->view->User = $app->user;
+        $this->view->Module   = strtolower($this->controller);
+        $this->view->User     = $app->user;
         $this->view->Embedded = $this->app->request->get('embedded') ?: 0;
 
         $this->view->setTemplatesDirectory(array(
             PVLng::path($this->ViewDir, $this->controller, 'custom'),
             PVLng::path($this->ViewDir, $this->controller),
-            PVLng::path($this->ViewDir, 'hook'),
+            PVLng::pathRoot('hook', 'View'),
             $this->ViewDir
         ));
 
@@ -120,12 +120,13 @@ class Controller extends SlimController
         }
 
         if ($this->app->config('mode') == 'development') {
-            $this->view->Branch = shell_exec('git branch | grep \'*\' | cut -b3-');
-            $this->view->Development = true;
-            $this->config->set('View.Verbose', PVLng::$DEVELOP);
+            $this->view->Branch = trim(shell_exec('git branch | grep \'*\' | cut -b3-'));
         }
 
-        $this->view->Debug     = PVLng::$DEBUG;
+        $this->view->Debug       = PVLng::$DEBUG;
+        $this->view->Development = PVLng::$DEVELOP;
+        $this->view->verbose     = PVLng::$DEVELOP;
+
         $this->view->Language  = $this->app->Language;
         $this->view->Year      = date('Y');
 
@@ -144,13 +145,15 @@ class Controller extends SlimController
         }
         $this->view->MessagesRaw = $messages;
 
-        $this->view->PVLng         = PVLNG;
-        $this->view->Version       = PVLNG_VERSION;
-        $this->view->VersionDate   = PVLNG_VERSION_DATE;
-        $this->view->PHPVersion    = PHP_VERSION;
-        $this->view->MySQLVersion  = $this->db->queryOne('SELECT `pvlng_mysql_version`()');
         $this->view->ServerName    = $_SERVER['HTTP_HOST'];
         $this->view->ServerVersion = $_SERVER['SERVER_SOFTWARE'];
+
+        $this->view->PHPVersion    = PHP_VERSION;
+        $this->view->MySQLVersion  = $this->db->queryOne('SELECT `pvlng_mysql_version`()');
+
+        $this->view->PVLng         = PVLng::$APP_NAME;
+        $this->view->Version       = PVLng::$APP_VERSION;
+        $this->view->VersionDate   = PVLng::$APP_VERSION_DATE;
 
         if ($domain = ORMSettings::getCoreValue('API', 'Domain')) {
             $this->view->ApiUrl = '//'.$domain.'/latest/';
@@ -171,7 +174,10 @@ class Controller extends SlimController
             $this->db->VersionNew = isset($version[0]) ? $version[0] : false;
             Session::set('VersionCheck', time());
         }
-        $this->view->VersionNew = ($this->db->VersionNew > PVLNG_VERSION) ? $this->db->VersionNew : null;
+
+        $this->view->VersionNew = ($this->db->VersionNew > PVLng::$APP_VERSION)
+                                ? $this->db->VersionNew
+                                : null;
 
         // Missing files are ok
         // Head append

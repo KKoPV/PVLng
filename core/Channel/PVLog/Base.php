@@ -136,7 +136,7 @@ class Base extends Channel
    */
     protected function finish(&$yield, $request)
     {
-        $yield->setCreator('PVLng ' . PVLNG_VERSION);
+        $yield->setCreator('PVLng ' . PVLng::$APP_VERSION);
 
         $yield->setDeleteDayBeforeImport(
             isset($request['delete']) && $request['delete'] || $this->date != date('Y-m-d')

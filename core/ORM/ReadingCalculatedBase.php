@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_reading_tmp"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "ReadingCalculated.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "ReadingCalculated.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -345,7 +345,7 @@ abstract class ReadingCalculatedBase extends ORM
     /**
      * Call create table sql on class creation and set to false
      */
-    protected static $memory = false;
+    protected static $memory = true;
 
     /**
      * SQL for creation
@@ -364,7 +364,7 @@ abstract class ReadingCalculatedBase extends ORM
           PRIMARY KEY (`id`,`start`,`end`),
           UNIQUE KEY `uid` (`uid`),
           KEY `created` (`created`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT=\'Buffer and remember internal calculated data\'
+        ) ENGINE=MEMORY DEFAULT CHARSET=utf8 COMMENT=\'Buffer and remember internal calculated data\'
     ';
     // @codingStandardsIgnoreEnd
 
@@ -378,35 +378,31 @@ abstract class ReadingCalculatedBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
         'id'       => '',
         'start'    => '',
         'end'      => '',
         'lifetime' => '',
         'uid'      => '',
         'created'  => ''
-    );
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
         'id'       => false,
         'start'    => false,
         'end'      => false,
         'lifetime' => false,
         'uid'      => false,
         'created'  => false
-    );
+    ];
 
     /**
      *
      */
-    protected $primary = array(
-        'id',
-        'start',
-        'end'
-    );
+    protected $primary = ['id', 'start', 'end'];
 
     /**
      *

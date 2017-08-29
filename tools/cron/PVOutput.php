@@ -23,7 +23,8 @@ $data = array( 'd' => date('Ymd'), 't' => date('H:i') );
 
 // Loop channels
 foreach ($section['channels'] as $id => $channel) {
-    $channel = array_merge(array( 'guid' => '', 'factor' => 1 ), $channel);
+    // Better save than sorry
+    $channel = array_merge(['guid' => '', 'factor' => 1], $channel);
 
     // Ignore channels without GUID
     if ($channel['guid'] == '') {
@@ -38,10 +39,11 @@ foreach ($section['channels'] as $id => $channel) {
     }
 
     $d = $d->asArray();
-    $data[$id] = array_pop($d)['data'] * $channel['factor'];
+    // Data precision of 1 is enough
+    $data[$id] = round(array_pop($d)['data'] * $channel['factor'], 1);
 }
 
-okv(1, 'Data', print_r($data, true));
+okv(1, 'Data', $data);
 
 // Check, that at least ONE of v1 .. v4 is set
 if (empty($data[1]) && empty($data[2]) && empty($data[3]) && empty($data[4])) {
@@ -58,17 +60,23 @@ if ($TESTMODE) {
 }
 
 // Start curl sequence
-if (!curl(array(
-    CURLOPT_URL => $StatusURL,
-    // Authorization
-    CURLOPT_HTTPHEADER => array(
-        'X-Pvoutput-Apikey: ' . $section['apikey'],
-        'X-Pvoutput-SystemId: '. $section['systemid']
-    ),
-    // Send POST
-    CURLOPT_POSTFIELDS => $data,
-    CURLOPT_RETURNTRANSFER => 1,
-), $response, $info)) {
+$ok = curl(
+    [
+        CURLOPT_URL => $StatusURL,
+        // Authorization
+        CURLOPT_HTTPHEADER => array(
+            'X-Pvoutput-Apikey: ' . $section['apikey'],
+            'X-Pvoutput-SystemId: '. $section['systemid']
+        ),
+        // Send POST
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $data
+    ],
+    $response,
+    $info
+);
+
+if (!$ok) {
     return;
 }
 

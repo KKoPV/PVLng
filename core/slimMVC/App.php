@@ -70,6 +70,8 @@ class App extends Slim
     {
         $this->params->replace($params);
 
+        Hook::run(['Controller', $controller, 'before'], $this);
+
         // Don't check existance, app. error is ok here
         $class = '\Frontend\Controller\\' . $controller;
         $oController = new $class;
@@ -77,17 +79,18 @@ class App extends Slim
         $requestMethod = strtoupper($this->request->getMethod());
 
         $oController->before();
-        Hook::run('Controller.' . $controller . '.' . $action . '.before', $this);
 
         $method = 'before' . $requestMethod;
         $oController->$method();
-        Hook::run('Controller.' . $controller . '.' . $action . '.before.' . $requestMethod, $this);
 
         $this->action = $action;
 
         do {
             // Remember actual action to detect forwarding
             $action = $this->action;
+
+            Hook::run(['Controller', $controller, $action, 'before'], $this);
+            Hook::run(['Controller', $controller, $action, 'before', $requestMethod], $this);
 
             $method = $action . $requestMethod . 'Action';
             if (method_exists($oController, $method)) {
@@ -103,10 +106,13 @@ class App extends Slim
 
         $method = 'after' . $requestMethod;
         $oController->$method();
-        Hook::run('Controller.' . $controller . '.' . $action . '.after.' . $requestMethod, $this);
+
+        Hook::run(['Controller', $controller, $action, 'after', $requestMethod], $this);
 
         $oController->after();
-        Hook::run('Controller.' . $controller . '.' . $action . '.after', $this);
+
+        Hook::run(['Controller', $controller, $action, 'after'], $this);
+        Hook::run(['Controller', $controller, 'after'], $this);
 
         $oController->finalize($action);
     }

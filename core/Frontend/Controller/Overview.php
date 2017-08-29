@@ -128,13 +128,11 @@ class Overview extends Controller
             if (!$this->request->post('copy')) {
                 // MOVE
                 // Find target right
-                $q = new DBQuery('pvlng_tree');
-                $q->get('rgt')->whereEQ('id', $real_target);
+                $q = DBQuery::factory('pvlng_tree')->get('rgt')->whereEQ('id', $real_target);
                 $rgt = $this->db->queryOne($q);
 
                 // Find left and right of channel to move
-                $q = new DBQuery('pvlng_tree');
-                $q->whereEQ('id', $id);
+                $q = DBQuery::factory('pvlng_tree')->whereEQ('id', $id);
                 $data = $this->db->queryRow($q);
 
                 $sql = str_replace(

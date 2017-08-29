@@ -12,7 +12,7 @@ class Configuration extends SetupTask
     /**
      *
      */
-    public $title = 'Check configuration file';
+    public $title = 'Configuration file';
 
     /**
      *

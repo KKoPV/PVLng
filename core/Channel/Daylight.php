@@ -109,10 +109,10 @@ class Daylight extends InternalCalc
         if ($this->numeric and $this->extra) {
             // Fetch average of last x days of irradiation channel to buid curve
             // Base query, clone afterwards for time ranges filter
-            $qBase = new DBQuery('pvlng_reading_num');
-            $qBase->get($qBase->MAX('data'), 'data')
-                  ->filter('id', Channel::byGUID($this->extra)->entity)
-                  ->group('`timestamp` DIV 86400');
+            $qBase = DBQuery::factory('pvlng_reading_num')
+                    ->get($qBase->MAX('data'), 'data')
+                    ->filter('id', Channel::byGUID($this->extra)->entity)
+                    ->group('`timestamp` DIV 86400');
 
             $mean = (ORMSettings::getModelValue('Daylight', 'Average') == 0)
                   ? /* Select harmonic mean   */ 'COUNT(`data`)/SUM(1/`data`)'

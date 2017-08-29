@@ -82,7 +82,7 @@ class Channel
         }
 
         $channel = new ORMTree;
-        $channel->filter('guid', array('like' => $guid.'%'))->findOne();
+        $channel->filter('guid', ['like' => $guid.'%'])->findOne();
         $aliasOf = $channel->getAliasOf();
 
         if ($aliasOf && $alias) {
@@ -263,23 +263,23 @@ class Channel
         if ($attribute != '') {
             // Accept attribute name 'factor' for resolution
             // Here WITHOUT check, will be handled by __get()
-            return array(
+            return [
                 $attribute => $attribute == 'factor' ? $this->resolution : $this->$attribute
-            );
+            ];
         } else {
             return array_merge(
                 $this->getAttributesShort(),
-                array(
+                [
                     'start'       => $this->start,
                     'end'         => $this->end,
                     'consumption' => 0,
                     'costs'       => 0
-                ),
+                ],
                 $this->attributes,
-                array(
+                [
                     'datetime_start'=> $this->start ? date('Y-m-d H:i:s', $this->start) : '',
                     'datetime_end'  => $this->end   ? date('Y-m-d H:i:s', $this->end)   : ''
-                )
+                ]
             );
         }
     }
@@ -289,7 +289,7 @@ class Channel
      */
     public function getAttributesShort()
     {
-        return array(
+        return [
             'guid'        => $this->guid,
             'name'        => $this->name,
             'serial'      => $this->serial,
@@ -313,7 +313,7 @@ class Channel
             'icon'        => $this->icon,
             'extra'       => is_array($this->extra) ? implode("\n", $this->extra) : $this->extra,
             'comment'     => trim($this->comment)
-        );
+        ];
     }
 
     /**
@@ -465,15 +465,15 @@ class Channel
 
         $buffer = new Buffer;
 
-        if ($this->period[1] == self::READLAST ||
-            (!$this->meter && $this->period[1] == self::LAST)) {
+        if ($this->aggregationPeriod() == static::READLAST ||
+            (!$this->meter && $this->aggregationPeriod() == static::LAST)) {
             $q = $this->readLastRow();
 
             // Write without Id so calculaters afterwards will find all
             if ($row = $this->db->queryRowArray($q)) {
                 $buffer->write($row);
             }
-        } elseif ($this->meter && !$this->childs && $this->period[1] == self::LAST) {
+        } elseif ($this->meter && !$this->childs && $this->aggregationPeriod() == static::LAST) {
             $q = $this->readLastMeter();
 
             // Write without Id so calculaters afterwards will find all
@@ -481,9 +481,10 @@ class Channel
                 $buffer->write($row);
             }
         } else {
-            $q = DBQuery::forge($this->table[$this->numeric]);
+            $q = $this->getDbQuery();
 
-            if ($this->period[1] == self::LAST || $this->period[1] == self::ALL) {
+            if ($this->aggregationPeriod() == static::LAST ||
+                $this->aggregationPeriod() == static::ALL) {
                 // Select plain data
                 $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
                   ->get('timestamp')
@@ -601,7 +602,7 @@ class Channel
     {
         // Prepare analysis of request
         $request = array_merge(
-            array('start' => '', 'days' => null, 'end' => ''),
+            ['start' => '', 'days' => null, 'end' => ''],
             $request
         );
 
@@ -669,9 +670,8 @@ class Channel
     // -------------------------------------------------------------------------
 
     /**
-     * Grouping
+     * Grouping by time
      */
-    const NO        =  0;
     const SECOND    = 10;
     const MINUTE    = 20;
     const HOUR      = 30;
@@ -680,16 +680,20 @@ class Channel
     const MONTH     = 60;
     const QUARTER   = 61;
     const YEAR      = 70;
-    const LAST      = 80;
-    const READLAST  = 81;
+
+    /**
+     * Grouping other
+     */
+    const NO        = 80;
+    const LAST      = 90;
+    const READLAST  = 91;
     const ALL       = 99;
 
     /**
      * Period in seconds for each grouping period and SQL equivalent
      * Hold static only once in memory
      */
-    protected static $secondsPerPeriod = array(
-        self::NO        =>        1,
+    protected static $secondsPerPeriod = [
         self::SECOND    =>        1,
         self::MINUTE    =>       60,
         self::HOUR      =>     3600,
@@ -698,18 +702,19 @@ class Channel
         self::MONTH     =>  2592000, # 30 days
         self::QUARTER   =>  7776000,
         self::YEAR      => 31536000,
+        self::NO        =>        1,
         self::LAST      =>        1,
         self::READLAST  =>        1,
         self::ALL       =>        1
-    );
+    ];
 
     /**
      *
      */
-    protected $table = array(
+    protected $table = [
         'pvlng_reading_str', // numeric == 0
         'pvlng_reading_num', // numeric == 1
-    );
+    ];
 
     /**
      *
@@ -793,15 +798,23 @@ class Channel
     /**
      *
      */
+    protected function getDbQuery($fields = [])
+    {
+        return DBQuery::factory($this->table[$this->numeric], $fields);
+    }
+
+    /**
+     *
+     */
     protected function groupTimestampByPeriod()
     {
-        if ($this->period[0] * static::$secondsPerPeriod[$this->period[1]] == 1) {
+        if ($this->aggregationCount() * static::$secondsPerPeriod[$this->aggregationPeriod()] == 1) {
             return '`timestamp`';
         } else {
             return sprintf(
                 '`timestamp` DIV (%1$d * %2$d) * %1$d * %2$d',
-                $this->period[0],
-                static::$secondsPerPeriod[$this->period[1]]
+                $this->aggregationCount(),
+                static::$secondsPerPeriod[$this->aggregationPeriod()]
             );
         }
     }
@@ -812,7 +825,7 @@ class Channel
     protected function getChilds($refresh = false)
     {
         if ($refresh || is_null($this->bufferedChilds)) {
-            $this->bufferedChilds = array();
+            $this->bufferedChilds = [];
             foreach (PVLng::getNestedSet()->getChilds($this->id) as $child) {
                 $child = static::byID($child['id']);
                 $child->isChild = true;
@@ -934,12 +947,14 @@ class Channel
     {
         // Readable channel?
         if (!$this->read) {
-            throw new Exception('Can\'t read data from '.$this->name.', '
-                                .'instance of '.get_class($this), 400);
+            throw new Exception(
+                'Can\'t read data from '.$this->name.', instance of '.get_class($this),
+                400
+            );
         }
 
         // Required number of child channels?
-        if ($this->childs >= 0 && count($this->getChilds()) != $this->childs) {
+        if (($this->childs >= 0) && (count($this->getChilds()) != $this->childs)) {
             throw new Exception($this->name.' MUST have '.$this->childs.' child(s)', 400);
         }
 
@@ -948,65 +963,66 @@ class Channel
         $this->start = $request['start'];
         $this->end   = $request['end'];
 
-        $request = array_merge(array('period' => ''), $request);
+        $request = array_merge(['period' => ''], $request);
 
         // Normalize aggregation period
         if (preg_match(
-            '~^([.\d]*)(|l|last|r|readlast|'.
-                's|sec|seconds?|i|min|minutes?|h|hours?|'.
-                'd|days?|w|weeks?|m|months?|q|quarters?|y|years|a|all)$~',
+            '~^([.\d]*)'.
+            '(|s|sec|seconds?|i|min|minutes?|h|hours?|'.
+            'd|days?|w|weeks?|m|months?|q|quarters?|y|years|'.
+            'l|last|r|readlast|a|all)$~',
             strtolower($request['period']),
             $args
         )) {
             $this->period[0] = $args[1] ?: 1;
 
             switch (substr($args[2], 0, 2)) {
-                default:
-                    $this->period[1] = self::NO;
-                    break;
                 case 's':
                 case 'se':
-                    $this->period[1] = self::SECOND;
+                    $this->period[1] = static::SECOND;
                     break;
                 case 'i':
                 case 'mi':
-                    $this->period[1] = self::MINUTE;
+                    $this->period[1] = static::MINUTE;
                     break;
                 case 'h':
                 case 'ho':
-                    $this->period[1] = self::HOUR;
+                    $this->period[1] = static::HOUR;
                     break;
                 case 'd':
                 case 'da':
-                    $this->period[1] = self::DAY;
+                    $this->period[1] = static::DAY;
                     break;
                 case 'w':
                 case 'we':
-                    $this->period[1] = self::WEEK;
+                    $this->period[1] = static::WEEK;
                     break;
                 case 'm':
                 case 'mo':
-                    $this->period[1] = self::MONTH;
+                    $this->period[1] = static::MONTH;
                     break;
                 case 'q':
                 case 'qa':
-                    $this->period[1] = self::QUARTER;
+                    $this->period[1] = static::QUARTER;
                     break;
                 case 'y':
                 case 'ye':
-                    $this->period[1] = self::YEAR;
+                    $this->period[1] = static::YEAR;
                     break;
                 case 'l':
                 case 'la':
-                    $this->period[1] = self::LAST;
+                    $this->period[1] = static::LAST;
                     break;
                 case 'r':
                 case 're':
-                    $this->period[1] = self::READLAST;
+                    $this->period[1] = static::READLAST;
                     break;
                 case 'a':
                 case 'al':
-                    $this->period[1] = self::ALL;
+                    $this->period[1] = static::ALL;
+                    break;
+                default:
+                    $this->period[1] = static::NO;
                     break;
             }
         } else {
@@ -1015,7 +1031,7 @@ class Channel
 
         // Childs without proper "grouping" can't calculated by parent channels
         if ($this->isChild) {
-            static::$secondsPerPeriod[self::NO] = 10;
+            static::$secondsPerPeriod[static::NO] = 10;
         }
     }
 
@@ -1078,7 +1094,7 @@ class Channel
         }
         $buffer->close();
 
-        if ($this->period[1] == self::LAST && $lastrow) {
+        if ($this->aggregationPeriod() == static::LAST && $lastrow) {
             $datafile = new Buffer;
             $datafile->write($lastrow);
         }
@@ -1091,13 +1107,13 @@ class Channel
      */
     protected function filterReadTimestamp(&$q)
     {
-        if ($this->period[1] == self::ALL) {
+        if ($this->aggregationPeriod() == static::ALL) {
             return;
         }
 
         // Read one period before real start for meter calculations
         $start = $this->meter
-               ? $this->start - $this->period[0] * static::$secondsPerPeriod[$this->period[1]]
+               ? $this->start - $this->aggregationCount() * static::$secondsPerPeriod[$this->aggregationPeriod()]
                : $this->start;
 
         // End is midnight > minus 1 second
@@ -1128,6 +1144,22 @@ class Channel
         return array_key_exists($key, $array) ? $array[$key] : $default;
     }
 
+    /**
+     * Shortcut for aggregation count
+     */
+    protected function aggregationCount()
+    {
+        return $this->period[0];
+    }
+
+    /**
+     * Shortcut for aggregation period
+     */
+    protected function aggregationPeriod()
+    {
+        return $this->period[1];
+    }
+
     // -------------------------------------------------------------------------
     // PRIVATE
     // -------------------------------------------------------------------------
@@ -1144,10 +1176,9 @@ class Channel
     {
         if ($this->write && !$this->childs) {
              // Use special table for last readings for real channels
-             $q = DBQuery::forge('pvlng_reading_last');
+             $q = DBQuery::factory('pvlng_reading_last');
         } else {
-             $q = DBQuery::forge($this->table[$this->numeric])
-                  ->orderDescending('timestamp')->limit(1);
+             $q = $this->getDbQuery()->orderDescending('timestamp')->limit(1);
         }
 
         $q->get($q->FROM_UNIXTIME('timestamp'), 'datetime')
@@ -1169,7 +1200,7 @@ class Channel
      */
     private function readLastMeter()
     {
-        $q = DBQuery::forge($this->table[$this->numeric]);
+        $q = $this->getDbQuery();
 
         $value = $q->MAX('data') . '-' . $q->MIN('data');
 

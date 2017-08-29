@@ -21,7 +21,6 @@ use ORM\Tree as ORMTree;
  */
 class Calculator extends Channel
 {
-
     /**
      * Accept only childs of the same meter attribute and unit
      */

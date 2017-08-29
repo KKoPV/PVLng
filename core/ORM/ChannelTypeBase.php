@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_type"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "ChannelType.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "ChannelType.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -650,7 +650,7 @@ abstract class ChannelTypeBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
         'id'          => '',
         'name'        => '',
         'description' => '',
@@ -663,12 +663,12 @@ abstract class ChannelTypeBase extends ORM
         'graph'       => '',
         'icon'        => '',
         'obsolete'    => ''
-    );
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
         'id'          => false,
         'name'        => false,
         'description' => false,
@@ -681,14 +681,12 @@ abstract class ChannelTypeBase extends ORM
         'graph'       => false,
         'icon'        => false,
         'obsolete'    => false
-    );
+    ];
 
     /**
      *
      */
-    protected $primary = array(
-        'id'
-    );
+    protected $primary = ['id'];
 
     /**
      *

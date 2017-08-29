@@ -12,7 +12,7 @@ class Extensions extends SetupTask
     /**
      *
      */
-    public $title = 'Check required PHP Extensions';
+    public $title = 'PHP Extensions';
 
     /**
      *

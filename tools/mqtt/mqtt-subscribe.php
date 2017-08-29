@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * PVLng - PhotoVoltaic Logger new generation
@@ -29,8 +30,6 @@ if (array_key_exists('h', $opts)) {
     echo 'MQTT listener for PVLng channel data', PHP_EOL;
     echo PHP_EOL;
     echo 'Send your messages as {"data":"..."[,"timestamp":"..."]} to "pvlng/<API key>/data/<GUID>"', PHP_EOL;
-    echo 'or a single reading value to "pvlng/<API key>/data/<GUID>/<timestamp>"', PHP_EOL;
-    echo 'or a single scalar value to "pvlng/<API key>/data/<GUID>/<timestamp>/<value>"', PHP_EOL;
     echo PHP_EOL;
     echo 'Usage: ', $argv[0], ' [options]', PHP_EOL;
     echo PHP_EOL;
@@ -46,7 +45,7 @@ if (array_key_exists('h', $opts)) {
 /**
  *
  */
-require implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'core', 'Core', 'PVLng.php']);
+require implode(DIRECTORY_SEPARATOR, [__DIR__, '..', '..', 'core', 'Core', 'PVLng.php']);
 
 Core\PVLng::bootstrap();
 

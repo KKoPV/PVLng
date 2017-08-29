@@ -11,14 +11,15 @@
 namespace Core;
 
 /**
- *
+ * Interfaces
  */
 use Iterator;
 use Countable;
 
 /**
- *
+ * Classes
  */
+use MySQLi;
 use StdClass;
 
 /**
@@ -38,7 +39,7 @@ abstract class ORM implements Iterator, Countable
     /**
      *
      */
-    public static function setDatabase(\MySQLi $db)
+    public static function setDatabase(MySQLi $db)
     {
         static::$db = $db;
     }
@@ -65,7 +66,7 @@ abstract class ORM implements Iterator, Countable
     }
 
     /**
-     * Shortcut factory function for fluid interface
+     * Create MEMORY table
      */
     public static function checkMemoryTable()
     {
@@ -81,6 +82,7 @@ abstract class ORM implements Iterator, Countable
     }
 
     /**
+     * Class constructor
      *
      * @param mixed $id Key describing one row, on primary keys
      *                  with more than field, provide an array
@@ -101,7 +103,7 @@ abstract class ORM implements Iterator, Countable
 
     /**
      *
-     * @return void
+     * @return Instance
      */
     public function setThrowException($throw = true)
     {
@@ -120,9 +122,9 @@ abstract class ORM implements Iterator, Countable
 
     /**
      *
-     * @return instance
+     * @return Instance
      */
-    public function filterRaw($condition, $params = array())
+    public function filterRaw($condition, $params = [])
     {
         $this->filter[] = static::$db->sql($condition, $params);
         return $this;
@@ -130,12 +132,12 @@ abstract class ORM implements Iterator, Countable
 
     /**
      *
-     * @return instance
+     * @return Instance
      */
     public function filter($field, $value = null, $reset = false)
     {
         if ($reset) {
-            $this->filter = array();
+            $this->filter = [];
         }
 
         if (!is_array($field)) {
@@ -159,7 +161,7 @@ abstract class ORM implements Iterator, Countable
                 }
                 if (!empty($value)) {
                     // OR condition
-                    $q = array();
+                    $q = [];
                     foreach ($value as $v) {
                         $q[] = $field.' = '.$this->quote($v);
                     }
@@ -189,7 +191,7 @@ abstract class ORM implements Iterator, Countable
 
     /**
      *
-     * @return instance
+     * @return Instance
      */
     public function order($field)
     {
@@ -207,7 +209,7 @@ abstract class ORM implements Iterator, Countable
 
     /**
      *
-     * @return instance
+     * @return Instance
      */
     public function limit($limit, $offset = 0)
     {
@@ -217,13 +219,13 @@ abstract class ORM implements Iterator, Countable
 
     /**
      *
-     * @return array of result objects
+     * @return Instance
      */
     public function find()
     {
         $sql = $this->buildSelectSql() . $this->buildLimit();
 
-        $this->resultRows     = array();
+        $this->resultRows     = [];
         $this->resultPosition = 0;
 
         if ($res = $this->runQuery($sql)) {
@@ -247,7 +249,7 @@ abstract class ORM implements Iterator, Countable
     {
         $sql = $this->buildSelectSql() . ' LIMIT 1';
 
-        $this->resultRows     = array();
+        $this->resultRows     = [];
         $this->resultPosition = 0;
 
         if (($res = $this->runQuery($sql)) && ($row = $res->fetch_assoc())) {
@@ -268,13 +270,14 @@ abstract class ORM implements Iterator, Countable
      */
     public function rowCount()
     {
-        // Select direct from information_schema, SELECT COUNT(*) on large partitioned takes to long
+        // Select direct from information_schema, SELECT COUNT(*) on large
+        // partitioned tables takes to long
         $sql = 'SELECT `table_rows`
                   FROM `information_schema`.`tables`
                  WHERE `table_schema` = DATABASE()
                    AND `table_name`   = '.$this->quote($this->table).'
                  LIMIT 1';
-        return (($res = $this->runQuery($sql)) && (($row = $res->fetch_array(MYSQLI_NUM))) ? +$row[0] : 0);
+        return ($res = $this->runQuery($sql)) && (($row = $res->fetch_row())) ? +$row[0] : 0;
     }
 
     /**
@@ -283,14 +286,14 @@ abstract class ORM implements Iterator, Countable
     public function asAssoc()
     {
         if ($this->lastFind == 1) {
-            $data = array();
+            $data = [];
             foreach (array_keys($this->fields) as $field) {
                 // Force getter usage!
                 $data[$field] = $this->get($field);
             }
             return $data;
         } else {
-            $rows = array();
+            $rows = [];
             foreach ($this->resultRows as $row) {
                 $rows[] = $row->asAssoc();
             }
@@ -306,7 +309,7 @@ abstract class ORM implements Iterator, Countable
         if ($this->lastFind == 1) {
             return $this->buildObject();
         } else {
-            $rows = array();
+            $rows = [];
             foreach ($this->resultRows as $row) {
                 $rows[] = $row->buildObject();
             }
@@ -343,7 +346,7 @@ abstract class ORM implements Iterator, Countable
      */
     public function update()
     {
-        $set = array();
+        $set = [];
         foreach ($this->fields as $field => $value) {
             // Skip primary key(s) and not changed values
             if (!in_array($field, $this->primary) &&
@@ -365,8 +368,13 @@ abstract class ORM implements Iterator, Countable
             return 0;
         }
 
-        $sql = 'UPDATE ' . $this->table . ' SET ' . implode(',', $set) . $this->buildFilter() . ' LIMIT 1';
-        $this->runQuery($sql);
+        $this->runQuery(sprintf(
+            'UPDATE `%s` SET %s %s LIMIT 1',
+            $this->table,
+            implode(',', $set),
+            $this->buildFilter()
+        ));
+
         return static::$db->affected_rows;
     }
 
@@ -375,9 +383,11 @@ abstract class ORM implements Iterator, Countable
      */
     public function delete()
     {
-        $sql = 'DELETE FROM `' . $this->table . '`'
-             . $this->buildFilter($this->primary, $this->primaryValues());
-        return $this->runQuery($sql);
+        return $this->runQuery(sprintf(
+            'DELETE FROM `%s` %s LIMIT 1',
+            $this->table,
+            $this->buildFilter($this->primary, $this->primaryValues())
+        ));
     }
 
     /**
@@ -385,7 +395,7 @@ abstract class ORM implements Iterator, Countable
      */
     public function truncate()
     {
-        return $this->runQuery('TRUNCATE `' . $this->table . '`');
+        return $this->runQuery(sprintf('TRUNCATE `%s`', $this->table));
     }
 
     /**
@@ -420,8 +430,8 @@ abstract class ORM implements Iterator, Countable
         foreach ($this->fields as $key => $value) {
             $this->fields[$key] = $this->raw[$key] = null;
         }
-        $this->filter      = array();
-        $this->orderFields = array();
+        $this->filter      = [];
+        $this->orderFields = [];
         $this->limit       = null;
         return $this;
     }
@@ -590,9 +600,9 @@ abstract class ORM implements Iterator, Countable
         $sql,
         $resulttype = MYSQLI_NUM,
         $class = 'stdClass',
-        array $params = array()
+        array $params = []
     ) {
-        $result = array();
+        $result = [];
         $i = 0;
 
         // Calling a procedure is a bit affort via multi_query()
@@ -636,9 +646,9 @@ abstract class ORM implements Iterator, Countable
         $sql,
         $resulttype = MYSQLI_NUM,
         $class = 'stdClass',
-        array $params = array()
+        array $params = []
     ) {
-        $result = array();
+        $result = [];
         foreach ($this->multi_query($sql, $class, $params) as $res) {
             $result = array_merge($result, $res);
         }
@@ -650,7 +660,7 @@ abstract class ORM implements Iterator, Countable
      */
     public function __clone()
     {
-        $this->resultRows     = array();
+        $this->resultRows     = [];
         $this->resultPosition = 0;
         $this->lastFind       = 1;
         $this->oldfields      = $this->fields;
@@ -688,32 +698,32 @@ abstract class ORM implements Iterator, Countable
     /**
      *
      */
-    protected $sql = array();
+    protected $sql = [];
 
     /**
      *
      */
-    protected $fields = array();
+    protected $fields = [];
 
     /**
      *
      */
-    protected $raw = array();
+    protected $raw = [];
 
     /**
      *
      */
-    protected $oldfields = array();
+    protected $oldfields = [];
 
     /**
      *
      */
-    protected $nullable = array();
+    protected $nullable = [];
 
     /**
      *
      */
-    protected $primary = array();
+    protected $primary = [];
 
     /**
      *
@@ -728,27 +738,27 @@ abstract class ORM implements Iterator, Countable
     /**
      *
      */
-    protected $filter = array();
+    protected $filter = [];
 
     /**
      *
      */
-    protected $orderFields;
+    protected $orderFields = [];
 
     /**
      *
      */
-    protected $limit;
+    protected $limit = null;
 
     /**
      *
      */
-    protected $resultPosition;
+    protected $resultPosition = 0;
 
     /**
      *
      */
-    protected $resultRows = array();
+    protected $resultRows = [];
 
     /**
      * Overwrite for real classes according to real fields,
@@ -756,6 +766,7 @@ abstract class ORM implements Iterator, Countable
      */
     protected function onDuplicateKey()
     {
+        return '';
     }
 
     /**
@@ -763,7 +774,7 @@ abstract class ORM implements Iterator, Countable
      */
     protected function primaryValues()
     {
-        $values = array();
+        $values = [];
         foreach ($this->primary as $field) {
             $values[] = $this->fields[$field];
         }
@@ -783,7 +794,9 @@ abstract class ORM implements Iterator, Countable
      */
     protected function quote($value)
     {
-        return is_numeric($value) ? $value : '"' . static::$db->real_escape_string($value) . '"';
+        return is_numeric($value)
+             ? $value
+             : '"' . static::$db->real_escape_string($value) . '"';
     }
 
     /**
@@ -791,7 +804,12 @@ abstract class ORM implements Iterator, Countable
      */
     protected function buildSelectSql()
     {
-        return 'SELECT * FROM `'.$this->table.'`' . $this->buildFilter() . $this->buildOrder();
+        return sprintf(
+            'SELECT * FROM `%s` %s %s',
+            $this->table,
+            $this->buildFilter(),
+            $this->buildOrder()
+        );
     }
 
     /**
@@ -816,7 +834,7 @@ abstract class ORM implements Iterator, Countable
             $this->fields[$this->autoinc] = null;
         }
 
-        $keys = $values = array();
+        $keys = $values = [];
         foreach ($this->fields as $field => $value) {
             // Don't insert/replace empty fields
             if ($value != '' || $this->raw[$field] != '') {
@@ -882,9 +900,8 @@ abstract class ORM implements Iterator, Countable
      */
     protected function buildOnDuplicateKey()
     {
-        if ($dup = $this->onDuplicateKey()) {
-            return ' ON DUPLICATE KEY UPDATE ' . $dup;
-        }
+        $sql = $this->onDuplicateKey();
+        return ($sql) ? ' ON DUPLICATE KEY UPDATE ' . $sql : '';
     }
 
     /**
@@ -892,19 +909,27 @@ abstract class ORM implements Iterator, Countable
      */
     protected function runQuery($sql)
     {
-        $sql = trim($sql);
-
-        $this->sql[] = $sql;
+        $this->sql[] = trim($sql);
 
         $res = static::$db->query($sql);
 
-        // You have an error in your SQL syntax; check the manual ...
         if (static::$db->errno == 1149) {
+            /**
+             * Error: 1149 SQLSTATE: 42000 (ER_SYNTAX_ERROR)
+             *
+             *     You have an error in your SQL syntax; check the manual that
+             *     corresponds to your MySQL server version for the right syntax
+             *     to use
+             *
+             * https://dev.mysql.com/doc/refman/en/error-messages-server.html#error_er_syntax_error
+             *
+             * Always a hard exit!
+             */
             die(static::$db->error . ' : ' . $sql);
         }
 
-        if ($this->throwException && static::$db->errno) {
-            throw new Exception('Database error: '.static::$db->error, static::$db->errno);
+        if (static::$db->errno && $this->throwException) {
+            throw new Exception('DATABASE ERROR: '.static::$db->error, static::$db->errno);
         }
 
         return $res;

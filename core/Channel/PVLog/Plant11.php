@@ -5,13 +5,15 @@
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2013 Knut Kohl
  * @license     GNU General Public License http://www.gnu.org/licenses/gpl.txt
- * @version     1.0.0
  */
 namespace Channel\PVLog;
 
 /**
- * PV-Log generator classes
+ *
  */
+use Core\PVLng;
+
+// PV-Log generator classes
 use PVLog\Classes\Json\Instance;
 use PVLog\Classes\Json\Plant;
 
@@ -20,7 +22,6 @@ use PVLog\Classes\Json\Plant;
  */
 class Plant11 extends BaseAbstract11
 {
-
     /**
      * Used by API
      *
@@ -52,7 +53,12 @@ class Plant11 extends BaseAbstract11
         }
 
         return $instance
-            ->setCreator(sprintf('%s for %s (%.1fs)', PVLNG_VERSION_FULL, $this->name, microtime(true)-$time))
+            ->setCreator(sprintf(
+                '%s for %s (%.1fs)',
+                PVLng::$APP_VERSION_FULL,
+                $this->name,
+                microtime(true)-$time
+            ))
             ->setDeleteDayBeforeImport(1) // Send always all day data, so set delete flag...
             ->setPlant($plant)
             ->asJson(isset($request['pretty']) && $request['pretty']);

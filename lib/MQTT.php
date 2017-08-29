@@ -41,14 +41,11 @@ class MQTT
          */
         $topic = 'pvlng/'.PVLng::getApiKey().'/data/#';
 
-        $this->dbg('Listen for', $topic, '...');
+        $this->dbg('!', 'Listen for "' . $topic . '" ...');
 
-        $this->phpMQTT->subscribe(array(
-            $topic => array(
-                'function' => array($this, 'saveData'),
-                'qos'      => 0
-            )
-        ));
+        $this->phpMQTT->subscribe([
+            $topic => ['function' => [$this, 'saveData'], 'qos' => 0]
+        ]);
 
         // Endless loop
         while ($this->phpMQTT->proc()) {
@@ -62,54 +59,33 @@ class MQTT
     public function saveData($topic, $msg)
     {
         try {
+            $this->dbg('>', $topic);
+
+            // pvlng/<API key>/data/<GUID>[[/<timestamp>]/<value>]
+            $aTopic = array_slice(explode('/', $topic), 3);
+
+            $guid = array_shift($aTopic);
+
+            if ($guid == '') {
+                throw new Exception('Invalid topic: '.$topic);
+            }
+
             // Sometimes there is a \000 at the begin of the message...
             if (strpos($msg, '{') !== false) {
                 $msg = preg_replace('~^[^{]+~', '', $msg);
             }
 
-            $this->dbg('Topic:', $topic);
+            $this->dbg('>', $msg);
 
-            if ($msg) {
-                $this->dbg('Message:', $msg);
-            }
+            $data = JSON::decode($msg, true);
 
-            // pvlng/<API key>/data/<GUID>[[/<timestamp>]/<value>]
-            $topic = array_slice(explode('/', $topic), 3);
-
-            $guid = array_shift($topic);
-
-            switch (count($topic)) {
-                default: // 0
-                    // Assume JSON data send
-                    $data = JSON::decode($msg, true);
-                    break;
-                case 1:
-                    // Assume raw data send for timestamp
-                    $data = array('timestamp' => $topic[0], 'data' => $msg);
-                    break;
-                case 2:
-                    // Assume scalar data send for timestamp
-                    $data = array('timestamp' => $topic[0], 'data' => $topic[1]);
-                    break;
-            } // switch
+            $ts = -microtime(true);
 
             $result = $this->getChannel($guid)->write($data);
 
-            switch ($result) {
-                case 0:
-                    $result = 'No row added';
-                    break;
-                case 1:
-                    $result = '1 row added';
-                    break;
-                default:
-                    $result .= ' rows added';
-                    break;
-            }
-
-            $this->dbg($result);
+            $this->dbg('<', $result, 'row(s) added in', round(($ts+microtime(true))*1000), 'ms');
         } catch (Exception $e) {
-            $this->dbg('ERROR: '.$e->getMessage());
+            $this->dbg('-', $e->getMessage());
         }
     }
 
@@ -138,15 +114,19 @@ class MQTT
     /**
      *
      */
-    protected $channels = array();
+    protected $channels = [];
 
     /**
      *
      */
-    protected function dbg($level)
+    protected function dbg()
     {
         if ($this->verbose) {
-            printf('[%s] %s'.PHP_EOL, date('c'), implode(' ', func_get_args()));
+            printf(
+                '[%s] %s'.PHP_EOL,
+                date('Y-m-d H:i:s'),
+                implode(' ', func_get_args())
+            );
         }
     }
 
@@ -160,5 +140,27 @@ class MQTT
         }
 
         return $this->channels[$guid];
+    }
+
+    /**
+     * Support microseconds for date strings
+     *
+     * Idea from http://php.net/manual/de/datetime.format.php#113607
+     */
+    protected function date($format, $timestamp = null)
+    {
+        if (is_null($timestamp)) {
+            $timestamp = microtime(true);
+        }
+
+        $ts = floor($timestamp);
+        $ms = round(($timestamp - $ts) * 1e6);
+        // Make 6 char long
+        $ms = sprintf('%06d', $ms);
+
+        // Replace unescaped "u" with the calculated microseconds
+        $format = preg_replace('~(?<!\\\\)u~', $ms, $format);
+
+        return date($format, $ts);
     }
 }

@@ -13,17 +13,9 @@ class DBQuery
     /**
      *
      */
-    public static function forge($table = null, $fields = array())
+    public static function factory($table = null, $fields = array())
     {
-        return new DBQuery($table, $fields);
-    }
-
-    /**
-     *
-     */
-    public function __construct($table = null, $fields = array())
-    {
-        return $this->select($table, $fields);
+        return new self($table, $fields);
     }
 
     /**
@@ -35,7 +27,7 @@ class DBQuery
         $this->sql = 'SELECT';
         $this->table = $table;
         if (!is_array($fields)) {
-            $fields = array( $fields => '' );
+            $fields = [$fields => ''];
         }
         foreach ($fields as $field => $as) {
             $this->get($field, $as);
@@ -92,7 +84,7 @@ class DBQuery
     public function set($field, $value, $raw = false)
     {
         if ($field != '') {
-            $this->set[$field] = array($value, $raw);
+            $this->set[$field] = [$value, $raw];
         }
         return $this;
     }
@@ -694,16 +686,6 @@ class DBQuery
     /**
      *
      */
-    private function getWhereGroup($idx)
-    {
-        return (isset($this->whereExtra['('][$idx]) ? '( ' : '')
-             . $this->where[$idx]
-             . (isset($this->whereExtra[')'][$idx]) ? ' )' : '');
-    }
-
-    /**
-     *
-     */
     protected function getWhere()
     {
         if (empty($this->where)) {
@@ -757,5 +739,27 @@ class DBQuery
     protected function getLimit()
     {
         return $this->limit ? "\n" . ' LIMIT ' . $this->limit : '';
+    }
+
+    // -------------------------------------------------------------------------
+    // PRIVATE
+    // -------------------------------------------------------------------------
+
+    /**
+     *
+     */
+    private function __construct($table = null, $fields = array())
+    {
+        return $this->select($table, $fields);
+    }
+
+    /**
+     *
+     */
+    private function getWhereGroup($idx)
+    {
+        return (isset($this->whereExtra['('][$idx]) ? '( ' : '')
+             . $this->where[$idx]
+             . (isset($this->whereExtra[')'][$idx]) ? ' )' : '');
     }
 }

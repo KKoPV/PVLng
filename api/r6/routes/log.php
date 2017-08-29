@@ -42,7 +42,7 @@ $api->put(
 
         $log = new ORM\Log;
 
-        $log->setScope(!empty($request['scope']) ? $request['scope'] : 'API r'.$api->version);
+        $log->setScope(!empty($request['scope']) ? $request['scope'] : 'API '.$api->version);
         $log->setData(!empty($request['message']) ? trim($request['message']) : '');
 
         if ($log->insert()) {
@@ -115,7 +115,7 @@ $api->get(
         );
 
         // Read all entries
-        $q = DBQuery::forge('pvlng_log')->order('id')->limit($count, ($page-1)*$count);
+        $q = DBQuery::factory('pvlng_log')->order('id')->limit($count, ($page-1)*$count);
 
         if ($res = $api->db->query($q)) {
             while ($log = $res->fetch_object()) {
@@ -151,7 +151,7 @@ $api->post(
 
         $log = new ORM\Log($id);
 
-        $log->setScope(!empty($request['scope']) ? $request['scope'] : 'API r'.$api->version);
+        $log->setScope(!empty($request['scope']) ? $request['scope'] : 'API '.$api->version);
         $log->setData(!empty($request['message']) ? trim($request['message']) : '');
 
         if ($log->replace()) {

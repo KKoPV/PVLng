@@ -32,7 +32,7 @@ class Widget extends Controller
         $app->ContentType('text/javascript');
 
         // Compress in any case!
-        $this->config->set('View.Verbose', false);
+        $view->verbose = false;
         // Don't use layout, generate raw data
         $this->Layout = false;
 

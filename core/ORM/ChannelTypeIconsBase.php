@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_type_icons"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "ChannelTypeIcons.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "ChannelTypeIcons.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -106,7 +106,7 @@ abstract class ChannelTypeIconsBase extends ORM
      */
     // @codingStandardsIgnoreStart
     protected static $createSQL = '
-        CREATE ALGORITHM=UNDEFINED DEFINER=`pvlng`@`localhost` SQL SECURITY DEFINER VIEW `pvlng_type_icons` AS select `pvlng_type`.`icon` AS `icon`,group_concat(`pvlng_type`.`name` order by `pvlng_type`.`name` ASC separator \', \') AS `name` from `pvlng_type` where (`pvlng_type`.`id` <> 0) group by `pvlng_type`.`icon` order by group_concat(`pvlng_type`.`name` order by `pvlng_type`.`name` ASC separator \',\')
+        CREATE VIEW `pvlng_type_icons` AS select `pvlng_type`.`icon` AS `icon`,group_concat(`pvlng_type`.`name` order by `pvlng_type`.`name` ASC separator \', \') AS `name` from `pvlng_type` where (`pvlng_type`.`id` <> 0) group by `pvlng_type`.`icon` order by group_concat(`pvlng_type`.`name` order by `pvlng_type`.`name` ASC separator \',\')
     ';
     // @codingStandardsIgnoreEnd
 
@@ -120,22 +120,22 @@ abstract class ChannelTypeIconsBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
         'icon' => '',
         'name' => ''
-    );
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
 
-    );
+    ];
 
     /**
      *
      */
-    protected $primary = array();
+    protected $primary = [];
 
     /**
      *

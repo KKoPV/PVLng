@@ -29,6 +29,25 @@ use slimMVC\Config;
  */
 abstract class PVLng
 {
+    /**
+     *
+     */
+    public static $APP_NAME = 'PhotoVoltaic Logger new generation';
+
+    /**
+     *
+     */
+    public static $APP_VERSION;
+
+    /**
+     *
+     */
+    public static $APP_VERSION_DATE;
+
+    /**
+     *
+     */
+    public static $APP_VERSION_FULL;
 
     /**
      *
@@ -64,6 +83,14 @@ abstract class PVLng
         static::$RootDir = dirname(dirname(__DIR__));
         static::$TempDir = static::pathRoot('tmp');
 
+        // Contrib classes hardcoded
+        $contrib = static::pathRoot('lib', 'contrib');
+        include_once static::path($contrib, 'Array2XML.php');
+        include_once static::path($contrib, 'JavaScriptPacker.php');
+        include_once static::path($contrib, 'PasswordHash.php');
+        include_once static::path($contrib, 'nbbc.php');
+        include_once static::path($contrib, 'phpMQTT', 'phpMQTT.php');
+
         // Composer autoload
         $loader = include static::pathRoot('vendor', 'autoload.php');
 
@@ -72,15 +99,6 @@ abstract class PVLng
         if (!empty($dirs)) {
             $loader->addPsr4('', (array) $dirs);
         }
-
-        // Additional classes hardcoded
-        $contrib = static::pathRoot('lib', 'contrib');
-        include_once static::path($contrib, 'Array2XML.php');
-        include_once static::path($contrib, 'JavaScriptPacker.php');
-        include_once static::path($contrib, 'PasswordHash.php');
-        include_once static::path($contrib, 'markdown.php');
-        include_once static::path($contrib, 'nbbc.php');
-        include_once static::path($contrib, 'phpMQTT', 'phpMQTT.php');
 
         // Init all relevant objects with database
         static::setDatabase();
@@ -92,11 +110,10 @@ abstract class PVLng
         }
 
         // Version
-        $version = file(static::pathRoot('.version'), FILE_IGNORE_NEW_LINES);
-        define('PVLNG', 'PhotoVoltaic Logger new generation');
-        define('PVLNG_VERSION', $version[0]);
-        define('PVLNG_VERSION_DATE', $version[1]);
-        define('PVLNG_VERSION_FULL', PVLNG . ' ' . PVLNG_VERSION);
+        list(static::$APP_VERSION, static::$APP_VERSION_DATE) =
+            file(static::pathRoot('.version'), FILE_IGNORE_NEW_LINES);
+
+        static::$APP_VERSION_FULL = static::$APP_NAME . ' ' . static::$APP_VERSION;
 
         return $loader;
     }
@@ -109,7 +126,7 @@ abstract class PVLng
         // These objects needs a database
         ORM::setDatabase(static::getDatabase($reconnect));
         // Create memory tables if needed
-        include static::pathRoot('core', 'ORM', 'MemoryTables.check.php');
+        include static::pathRoot('core', 'ORM', '_checkMemoryTables.php');
     }
 
     /**
@@ -118,7 +135,7 @@ abstract class PVLng
     public static function getConfig()
     {
         if (!static::$config) {
-            static::$config = new Config;
+            static::$config = new Config();
             static::$config->load(static::pathRoot('config', 'config.default.yaml'))
                            ->load(static::pathRoot('config', 'config.yaml'));
         }
@@ -165,12 +182,12 @@ abstract class PVLng
                 static::getDatabase(),
                 [
                     'table' => [
-                        't'  => 'pvlng_tree',
-                        'n'  => 'id',
-                        'l'  => 'lft',
-                        'r'  => 'rgt',
-                        'm'  => 'moved',
-                        'p'  => 'entity'
+                        't'  => 'pvlng_tree', // Table name
+                        'n'  => 'id',         // Unique numbering field
+                        'l'  => 'lft',        // Left node number
+                        'r'  => 'rgt',        // Right node number
+                        'm'  => 'moved',      // Flag field for nodes moved
+                        'p'  => 'entity'      // Payload
                     ]
                 ]
             );
@@ -201,6 +218,7 @@ abstract class PVLng
     public static function getLoginToken()
     {
         $cfg = static::getConfig();
+
         return sha1(
             __FILE__ . "\x00" . sha1(
                 $_SERVER['REMOTE_ADDR'] . "\x00" .
@@ -262,6 +280,7 @@ abstract class PVLng
     public static function pathRoot()
     {
         $args = func_get_args();
+        // Prepend root dir to directory list
         array_unshift($args, static::$RootDir);
         return static::path($args);
     }
@@ -272,6 +291,7 @@ abstract class PVLng
     public static function pathTemp()
     {
         $args = func_get_args();
+        // Prepend temp. dir to directory list
         array_unshift($args, static::$TempDir);
         return static::path($args);
     }
@@ -292,20 +312,20 @@ abstract class PVLng
     /**
      *
      */
-    protected static $config;
+    protected static $config = null;
 
     /**
      *
      */
-    protected static $db;
+    protected static $db = null;
 
     /**
      *
      */
-    protected static $cache;
+    protected static $cache = null;
 
     /**
      *
      */
-    protected static $NestedSet;
+    protected static $NestedSet = null;
 }

@@ -45,8 +45,7 @@ foreach ($section['equipments'] as $equipment) {
     if (!curl(array(
         CURLOPT_URL => 'http://'.$ip.'/rpc',
         CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => 'RPC='.$r,
-        CURLOPT_RETURNTRANSFER => 1
+        CURLOPT_POSTFIELDS => 'RPC='.$r
     ), $data, $info)) {
         continue;
     }

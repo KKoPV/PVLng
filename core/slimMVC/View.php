@@ -25,7 +25,7 @@ class View extends SlimView
     /**
      *
      */
-    const TPL_MAP_FILE = 'template.map.php';
+    const TEMPLATE_MAP_FILE = 'template.map.php';
 
     /**
      *
@@ -45,6 +45,11 @@ class View extends SlimView
     /**
      *
      */
+    public $verbose;
+
+    /**
+     *
+     */
     public function __construct()
     {
         parent::__construct();
@@ -55,7 +60,7 @@ class View extends SlimView
 
         $this->cacheDirectory = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR);
 
-        $map = $this->cacheDirectory . DIRECTORY_SEPARATOR . self::TPL_MAP_FILE;
+        $map = $this->cacheDirectory . DIRECTORY_SEPARATOR . self::TEMPLATE_MAP_FILE;
         $this->templatesMap = file_exists($map) ? include $map : array();
     }
 
@@ -96,8 +101,6 @@ class View extends SlimView
      */
     public function render($template, $data = null)
     {
-        $this->verbose = $this->app->config->get('View.Verbose');
-
         if (file_exists($template)) {
             // Concrete file
             $TplFile = $template;
@@ -243,8 +246,8 @@ class View extends SlimView
     public function __destruct()
     {
         file_put_contents(
-            PVLng::path($this->cacheDirectory, self::TPL_MAP_FILE),
-            '<?php return '.var_export($this->templatesMap, true).';'
+            PVLng::path($this->cacheDirectory, self::TEMPLATE_MAP_FILE),
+            '<?php' . PHP_EOL . 'return '.var_export($this->templatesMap, true).';'
         );
     }
 
@@ -290,14 +293,9 @@ class View extends SlimView
     /**
      *
      */
-    protected $verbose;
-
-    /**
-     *
-     */
     protected function displayAvailableVariables($called, $comment = '')
     {
-        if ($this->verbose < 2) {
+        if ($this->Development < 2) {
             return;
         }
 
@@ -319,18 +317,23 @@ class View extends SlimView
         }
 
         // Output
-        echo "\n$c1 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n",
+        echo "\n$c1 " . str_repeat('- ', 48) . "\n",
              "### $called\n### $comment\n";
 
         $fmt = "%-{$vlen}s : %s\n";
         foreach ($this->dataPointer as $key => &$value) {
-            $v = (is_scalar($value) && (strpos($value, '<!--') === false) && (strpos($value, '/*') === false))
-               ? (strlen($value) < 75 ? $value : substr($value, 0, 75) . ' ...')
-               : (is_null($value) ? 'NULL' : '('. gettype($value) . ')');
+            if (is_scalar($value) &&
+                (strpos($value, '<!--') === false) &&
+                (strpos($value, '/*') === false)
+            ) {
+                $v = strlen($value) < 75 ? $value : substr($value, 0, 75) . ' ...';
+            } else {
+                $v = is_null($value) ? 'NULL' : '('. gettype($value) . ')';
+            }
+
             printf($fmt, $key, str_replace(['---', '--'], ['\\-\\-\\-', '\\-\\-'], $v));
         }
-
-        echo "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - $c2\n";
+        echo str_repeat('- ', 48) . "$c2\n";
     }
 
     /**
@@ -341,10 +344,16 @@ class View extends SlimView
         $html = file_get_contents($TplFile);
 
         if (strpos($html, '<!-- COMPILE OFF -->') === false) {
-            $html = '<?php $this->displayAvailableVariables(\''.$TplFile.'\') ?'.'>' . $html;
+            $html = '<?php $this->displayAvailableVariables(\''.$TplFile.'\') ?'.'>' .
+                    PHP_EOL . $html;
 
             // <!-- INCLUDE template.tpl -->
-            if (preg_match_all('~<!-- INCLUDE (.*?) -->~', $html, $args, PREG_SET_ORDER)) {
+            if (preg_match_all(
+                '~<!-- INCLUDE (.*?) -->~',
+                $html,
+                $args,
+                PREG_SET_ORDER
+            )) {
                 foreach ($args as $arg) {
                     $html = str_replace(
                         $arg[0],
@@ -396,9 +405,18 @@ class View extends SlimView
                 PREG_SET_ORDER
             )) {
                 foreach ($args as $if) {
-                    if (preg_match_all('~'.$this->RegexVar.'~', $if[2], $matches, PREG_SET_ORDER)) {
+                    if (preg_match_all(
+                        '~'.$this->RegexVar.'~',
+                        $if[2],
+                        $matches,
+                        PREG_SET_ORDER
+                    )) {
                         foreach ($matches as $match) {
-                            $if[2] = str_replace($match[0], '$this->renderValue(\''.$match[1].'\')', $if[2]);
+                            $if[2] = str_replace(
+                                $match[0],
+                                '$this->renderValue(\''.$match[1].'\')',
+                                $if[2]
+                            );
                         }
                     }
                     $html = str_replace($if[0], '<?php '.$if[1].'IF ('.$if[2].'): ?'.'>', $html);
@@ -407,7 +425,8 @@ class View extends SlimView
                 $html = str_replace('<!-- ENDIF -->', '<?php ENDIF ?'.'>', $html);
             }
 
-            // Translations {{...}} are shortcuts to helper function "translate", which have to be defined!
+            // Translations {{...}} are shortcuts to helper function "translate",
+            // which have to be defined!
             if (preg_match_all('~\{\{([^}]+?)\}\}~', $html, $args, PREG_SET_ORDER)) {
                 foreach ($args as $data) {
                     $html = str_replace($data[0], '{translate:"'.$data[1].'"}', $html);
@@ -419,14 +438,19 @@ class View extends SlimView
             $reg = '~( ( (\") ( [^\"] )* \\3 | ( [^,] )* ),\s* )~x';
 
             // function calls
-            if (preg_match_all('~\{(\w+):([^}]*)\}~', $html, $matches, PREG_SET_ORDER)) {
+            if (preg_match_all(
+                '~\{(\w+):([^}]*)\}~',
+                $html,
+                $matches,
+                PREG_SET_ORDER
+            )) {
                 foreach ($matches as $match) {
                     list(, $func, $data) = $match;
 
                     $args = '';
 
                     // function parameters
-                    if ($data != '' && preg_match_all($reg, $data.',', $params, PREG_SET_ORDER)) {
+                    if (($data != '') && preg_match_all($reg, $data.',', $params, PREG_SET_ORDER)) {
                         foreach ($params as $param) {
                             $args .= ',' . (
                               $param[4] != ''
@@ -483,7 +507,7 @@ class View extends SlimView
             $html = str_replace(array("\x01", "\x02"), array('{', '}'), $html);
         }
 
-        if (!$this->verbose) {
+        if ($this->verbose < 1) {
             if (substr(strtolower($TplFile), -4) == '.css') {
                 $html = $this->compressCSS($html);
             } elseif (substr(strtolower($TplFile), -3) == '.js') {

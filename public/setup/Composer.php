@@ -12,7 +12,7 @@ class Composer extends SetupTask
     /**
      *
      */
-    public $title = 'Check Composer dependencies';
+    public $title = 'Composer dependencies';
 
     /**
      *

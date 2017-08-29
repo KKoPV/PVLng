@@ -33,7 +33,7 @@ class Lists extends Controller
     {
         $this->view->SubTitle = I18N::translate('List');
 
-        $q = DBQuery::forge('pvlng_tree_view')
+        $q = DBQuery::factory('pvlng_tree_view')
              ->get('guid')->get('name')->get('description')
              ->get('type')->get('unit')->get('graph', 'available')->get('icon')
              ->get(

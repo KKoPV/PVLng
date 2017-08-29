@@ -15,13 +15,11 @@
 $api->any(
     '/help',
     function () use ($api) {
-        $version = preg_replace('~.*/(.*?)/routes~', '$1', __DIR__);
-
         foreach ($api->router()->getNamedRoutes() as $route) {
             $pattern = $route->getPattern();
 
             $help = array(
-            'pattern'     => str_replace('latest', $version, $api->request()->getRootUri()) . $pattern,
+            'pattern'     => str_replace('latest', $api->version, $api->request()->getRootUri()) . $pattern,
             'methods'     => implode(', ', $route->getHttpMethods()),
             'since'       => 'r1',
             'description' => $route->getName(),
@@ -44,7 +42,7 @@ $api->any(
         ksort($content);
 
         // Preprend version
-        array_unshift($content, array('version' => $version));
+        array_unshift($content, array('version' => $api->version));
 
         $api->response->headers->set('Content-Type', 'application/json');
         // Skip keys and render only the values
@@ -63,14 +61,13 @@ $api->any(
 $api->any(
     '/helphtml',
     function () use ($api) {
-        $version = preg_replace('~.*/(.*?)/routes~', '$1', __DIR__);
         $content = array();
 
         foreach ($api->router()->getNamedRoutes() as $route) {
             $pattern = $route->getPattern();
 
             $help = array(
-            'uri'         => str_replace('latest', $version, $api->request()->getRootUri()) . $pattern,
+            'uri'         => str_replace('latest', $api->version, $api->request()->getRootUri()) . $pattern,
             'pattern'     => substr($pattern, 1),
             'methods'     => '['.implode('|', $route->getHttpMethods()).']',
             'since'       => 'r1',
@@ -100,7 +97,7 @@ $api->any(
             $content[$route]['hash'] = $hash = substr(md5($route), -7);
             $body .= '<a href="#'.$hash.'">'.$help['pattern'].' <small>'.$help['methods'].'</small></a><br />';
         }
-        $body .= '</div><a name="top"></a><h2>Version '.$version.'</h2>';
+        $body .= '</div><a name="top"></a><h2>Version '.$api->version.'</h2>';
 
         foreach ($content as $help) {
             $body .= '<fieldset style="margin-bottom:1em;border:solid gray 1px">'
@@ -152,7 +149,6 @@ $api->any(
 $api->any(
     '/help/apiary',
     function () use ($api) {
-        $version = preg_replace('~.*/(.*?)/routes~', '$1', __DIR__);
         $sep = str_repeat('#', 80);
 
         $parameters = array(
@@ -163,14 +159,14 @@ $api->any(
         $content = array(
             'FORMAT: 1A',
             null,
-            '# PVLng API '.$version,
+            '# PVLng API '.$api->version,
         );
 
         $routes = array();
         foreach ($api->router()->getNamedRoutes() as $route) {
             $pattern = $route->getPattern();
             $group   = explode('/', $pattern);
-            $pattern = str_replace('latest', $version, $api->request()->getRootUri()) . $pattern;
+            $pattern = str_replace('latest', $api->version, $api->request()->getRootUri()) . $pattern;
             $help = array(
                 'since'       => 'r1',
                 'description' => $route->getName(),

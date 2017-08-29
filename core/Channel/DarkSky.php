@@ -11,7 +11,7 @@ namespace Channel;
 /**
  *
  */
-class DarkSky extends JSON
+class DarkSky extends MultiChannel
 {
     /**
      * Overwrite and call multiple times parent::write()

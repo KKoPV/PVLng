@@ -110,20 +110,20 @@ $api->get(
                 : ['guid' => $channel->guid, 'name' => $channel->name];
 
         if ($channel->numeric) {
-            $q = new DBQuery('pvlng_reading_num');
-            $q->get($q->MIN('timestamp'), 'timestamp_first')
-              ->get($q->MAX('timestamp'), 'timestamp_last')
-              ->get($q->COUNT('id'), 'readings')
-              ->get($q->MIN('data'), 'min')
-              ->get($q->MAX('data'), 'max')
-              ->get($q->AVG('data'), 'avg')
-              ->whereEQ('id', $channel->entity);
+            $q = DBQuery::factory('pvlng_reading_num')
+                ->get($q->MIN('timestamp'), 'timestamp_first')
+                ->get($q->MAX('timestamp'), 'timestamp_last')
+                ->get($q->COUNT('id'), 'readings')
+                ->get($q->MIN('data'), 'min')
+                ->get($q->MAX('data'), 'max')
+                ->get($q->AVG('data'), 'avg')
+                ->whereEQ('id', $channel->entity);
         } else {
-            $q = new DBQuery('pvlng_reading_str');
-            $q->get($q->MIN('timestamp'), 'timestamp_first')
-              ->get($q->MAX('timestamp'), 'timestamp_last')
-              ->get($q->COUNT('id'), 'readings')
-              ->whereEQ('id', $channel->entity);
+            $q = DBQuery::factory('pvlng_reading_str')
+                ->get($q->MIN('timestamp'), 'timestamp_first')
+                ->get($q->MAX('timestamp'), 'timestamp_last')
+                ->get($q->COUNT('id'), 'readings')
+                ->whereEQ('id', $channel->entity);
         }
 
         $result = $result + $api->db->queryRowArray($q);

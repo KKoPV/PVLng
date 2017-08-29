@@ -111,7 +111,7 @@ class YryieMiddleware extends Slim\Middleware
             }
         }
 
-        Yryie::debug('%d queries in %.3fms (~%.0fms each)', $qCnt, $qTime, $qTime/$qCnt);
+        Yryie::debug('SQL: %d queries in %.3f ms (~%.0f ms each)', $qCnt, $qTime, $qTime/$qCnt);
 
         if ($app->Response()->headers['Location']) {
             // Redirection

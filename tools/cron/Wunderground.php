@@ -41,7 +41,7 @@ $url = sprintf(
 okv(1, 'URL', $url);
 
 // Start curl sequence
-if (!curl([CURLOPT_URL => $url, CURLOPT_RETURNTRANSFER => 1], $data, $info)) {
+if (!curl([CURLOPT_URL => $url], $data, $info)) {
     return;
 }
 

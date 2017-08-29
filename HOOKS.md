@@ -1,8 +1,8 @@
-# Events
+# Template hooks
 
-All events have as naming convention: `module[_event]_name.(html|js|css)`
+All hooks have a naming convention: `module[_event]_name.(html|js|css)`
 
-Custom event files must be stored as `/core/frontend/View/event/module_event_name.(html|js|css)`
+Custom event files must be stored as `/hook/View/module_event_name.(html|js|css)`
 
 
 | File | Line | Event |
@@ -41,8 +41,9 @@ Custom event files must be stored as `/core/frontend/View/event/module_event_nam
 | /core/Frontend/View/default.tpl | 358 | body_container_after.html |
 | /core/Frontend/View/default.tpl | 418 | body_config.js |
 | /core/Frontend/View/default.tpl | 421 | javascript_files_before.html |
-| /core/Frontend/View/default.tpl | 464 | javascript_files_after.html |
-| /core/Frontend/View/default.tpl | 563 | body_page_after.html |
+| /core/Frontend/View/default.tpl | 465 | javascript_files_after.html |
+| /core/Frontend/View/default.tpl | 561 | body.js |
+| /core/Frontend/View/default.tpl | 565 | body_page_after.html |
 | /core/Frontend/View/Channels/content.Index.tpl | 12 | channel_content_before.html |
 | /core/Frontend/View/Channels/content.Index.tpl | 87 | channel_content_after.html |
 | /core/Frontend/View/Index/content.private.inc.tpl | 22 | index_channels_before._html |

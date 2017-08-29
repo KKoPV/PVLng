@@ -1,9 +1,7 @@
 <?php
 /**
- * PVLng - PhotoVoltaic Logger new generation
+ * Wrapper for JSON handling
  *
- * @link       https://github.com/KKoPV/PVLng
- * @link       https://pvlng.com/
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
@@ -27,7 +25,7 @@ abstract class JSON
     {
         $data = json_decode(trim($json), $asArray);
 
-        if ($err = self::check()) {
+        if ($err = static::check()) {
             throw new Exception($err);
         }
 
@@ -51,38 +49,29 @@ abstract class JSON
             $error = json_last_error();
         }
 
-        switch ($error) {
-            case JSON_ERROR_NONE:
-                return '';
-            case JSON_ERROR_DEPTH:
-                return 'JSON ERROR - Maximum stack depth exceeded';
-            case JSON_ERROR_STATE_MISMATCH:
-                return 'JSON ERROR - Underflow or the modes mismatch';
-            case JSON_ERROR_CTRL_CHAR:
-                return 'JSON ERROR - Unexpected control character found';
-            case JSON_ERROR_SYNTAX:
-                return 'JSON ERROR - Syntax error, malformed JSON';
-            case JSON_ERROR_UTF8:
-                return 'JSON ERROR - Malformed UTF-8 characters, possibly incorrectly encoded';
-            default:
-                return 'JSON ERROR ('.$error.') - Unknown error';
+        if ($error != JSON_ERROR_NONE) {
+            return isset(static::$errorMessages[$error])
+                 ? 'JSON ERROR - ' . static::$errorMessages[$error]
+                 : 'JSON ERROR ('.$error.') - Unknown error';
         }
+
+        return false;
     }
 
     /**
      *
      */
-    public static function xPath($json, $path)
+    public static function xPath($json, array $path)
     {
-        $data = self::decode($json, true);
+        $data = static::decode($json, true);
 
         // Root pointer
-        $p = &$data;
+        $pointer = &$data;
 
         foreach ($path as $key) {
-            if (is_array($p) and isset($p[$key])) {
+            if (is_array($pointer) and isset($pointer[$key])) {
                 // Move pointer foreward ...
-                $p = &$p[$key];
+                $pointer = &$pointer[$key];
             } else {
                 // Invalid key
                 throw new Exception('Invalid JSON xPath: '.implode('->', $path));
@@ -90,7 +79,7 @@ abstract class JSON
         }
 
         // Key found, return its value
-        return $p;
+        return $pointer;
     }
 
     /**
@@ -155,4 +144,19 @@ abstract class JSON
 
         return $result;
     }
+
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
+    /**
+     * English messages
+     */
+    protected static $errorMessages = [
+        JSON_ERROR_DEPTH          => 'Maximum stack depth exceeded',
+        JSON_ERROR_STATE_MISMATCH => 'Underflow or the modes mismatch',
+        JSON_ERROR_CTRL_CHAR      => 'Unexpected control character found',
+        JSON_ERROR_SYNTAX         => 'Syntax error, malformed JSON',
+        JSON_ERROR_UTF8           => 'Malformed UTF-8 characters, possibly incorrectly encoded'
+    ];
 }

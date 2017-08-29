@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_settings"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "Settings.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "Settings.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -423,7 +423,7 @@ abstract class SettingsBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
         'scope' => '',
         'name'  => '',
         'key'   => '',
@@ -431,12 +431,12 @@ abstract class SettingsBase extends ORM
         'order' => '',
         'type'  => '',
         'data'  => ''
-    );
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
         'scope' => false,
         'name'  => false,
         'key'   => false,
@@ -444,16 +444,12 @@ abstract class SettingsBase extends ORM
         'order' => false,
         'type'  => false,
         'data'  => false
-    );
+    ];
 
     /**
      *
      */
-    protected $primary = array(
-        'scope',
-        'name',
-        'key'
-    );
+    protected $primary = ['scope', 'name', 'key'];
 
     /**
      *

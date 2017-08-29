@@ -236,11 +236,8 @@ $api->get(
 
         $result = $api->readData($guid, $request);
 
-        if (is_string($result)) {
-            $array = json_decode($result, true);
-            if ($array && json_last_error() == JSON_ERROR_NONE) {
-                $result = $array;
-            }
+        if (is_string($result) && ($arr = Core\JSON::decode($result, true))) {
+            $result = $arr;
         }
 
         $api->response->headers->set('X-Data-Rows', count($result));

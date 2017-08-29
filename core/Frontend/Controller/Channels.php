@@ -484,6 +484,7 @@ class Channels extends Controller
                     $replace[$id] = $alternative->getName();
                 }
             }
+
             if (count($replace) > 1) {
                 $this->view->replace = $replace;
             }
@@ -780,12 +781,13 @@ class Channels extends Controller
      */
     protected function addToTree()
     {
-        $q = new DBQuery('pvlng_tree_view');
-        $q->get('id')
+        $q = DBQuery::factory('pvlng_tree_view')
+            ->get('id')
             ->get('CONCAT(REPEAT("&nbsp; &nbsp; ", `level`-2), IF(`haschilds`,"&bull; ","&rarr;"), "&nbsp;")', 'indent')
             ->get('name')
             ->get('`childs` = -1 OR `haschilds` < `childs`', 'available') // Unused child slots?
             ->filter('childs', array('ne' => 0));
+
         $this->view->AddTree = $this->db->queryRowsArray($q);
     }
 }

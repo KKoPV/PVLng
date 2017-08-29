@@ -14,66 +14,88 @@ error_reporting(-1);
 
 // ---------------------------------------------------------------------------
 
-$config = [
+$setup = [
 
     /**
-     * Minimal required PHP version
+     * Title and description
      */
-    'PHPVersion' => '5.5',
+    'title'       => 'PVLng basic setup',
+    'description' => 'Checking your server settings ...',
 
     /**
-     *
+     * Tasks to perform
      */
-    'Extensions' => [
-        'curl'     => [ 'cURL support' ],
-        'gd'       => [ 'Image processing' ],
-        'json'     => [ 'JSON support' ],
-        'mbstring' => [ 'Multibyte Support' ],
-        'mysqli'   => [ 'MySQLi support' ],
-        'pcre'     => [ 'PCRE support' ],
-        'session'  => [ 'Session support' ],
-        'apc'      => [ 'Alternative PHP Cache (APC)', false ], // not required, recommended
-        'memcache' => [ 'Memcache', false ], // not required, recommended
-    ],
+    'tasks' => [
 
-    /**
-     *
-     */
-    'Composer' => [ dirname(__DIR__) ],
+        /**
+         * Minimal required PHP version
+         */
+        'PHPVersion' => 5.5,
 
-    /**
-     *
-     */
-    'Permissions' => [
-        '../tmp' => 'is_writable'
-    ],
+        /**
+         *
+         */
+        'Extensions' => [
+            'mysqli'   => [ 'MySQL support' ],
+            'curl'     => [ 'cURL support' ],
+            'json'     => [ 'JSON support' ],
+            'mbstring' => [ 'Multibyte Support' ],
+            'pcre'     => [ 'PCRE support' ],
+            'session'  => [ 'Session support' ],
+            'gd'       => [ 'Image processing' ],
+            'apc'      => [ 'Alternative PHP Cache (APC)', false ], // recommended
+            'memcache' => [ 'Memcache', false ]                     // recommended
+        ],
 
-    /**
-     *
-     */
-    'Configuration' => [
-        'default' => '../config/config.default.yaml',
-        'config'  => '../config/config.yaml',
-    ],
+        /**
+         *
+         */
+        'Composer' => [
+            dirname(__DIR__)
+        ],
 
-    /**
-     *
-     */
-    'MySQLi' => [
-        'config'   => '../config/config.yaml',
-        'host'     => 'database.host',
-        'socket'   => 'database.socket',
-        'port'     => 'database.port',
-        'username' => 'database.username',
-        'password' => 'database.password',
-        'database' => 'database.database'
-    ],
+        /**
+         *
+         */
+        'Permissions' => [
+            '../tmp' => 'is_writable'
+        ],
 
+        /**
+         *
+         */
+        'Configuration' => [
+            'config'  => '../config/config.yaml',
+            'default' => '../config/config.default.yaml'
+        ],
+
+        /**
+         *
+         */
+        'MySQLi' => [
+            'config'   => '../config/config.yaml',
+
+            'credentials' => [
+                'host'     => 'database.host',
+                'socket'   => 'database.socket',
+                'port'     => 'database.port',
+                'username' => 'database.username',
+                'password' => 'database.password',
+                'database' => 'database.database'
+            ],
+
+            'variables' => [
+                'event_scheduler' => [
+                    ['ON', 1],
+                    'https://dev.mysql.com/doc/refman/en/server-options.html#option_mysqld_event-scheduler'
+                ]
+            ]
+        ]
+    ]
 ];
 
 // ---------------------------------------------------------------------------
-
-// Load classes in defined order
+// Load classes in defined order!
 $path = 'setup' . DIRECTORY_SEPARATOR;
 require $path . 'Setup.php';
 require $path . 'SetupTask.php';
@@ -96,18 +118,16 @@ require $path . 'Permissions.php';
     <link rel="stylesheet" href="/css/normalize.min.css" />
     <link rel="stylesheet" href="/css/default.min.css" />
 
-    <title>PVLng initial setup</title>
+    <title><?php echo $setup['title'] ?></title>
 
     <style>
-        body { width: 60%; margin: 1em auto }
+        body { width: 640px; margin: 1em auto }
         tt { font-size: 140% }
     </style>
 </head>
 <body>
 
-<h2>PVLng basic setup</h2>
-
-<?php if (!Setup\Setup::run($config)) : ?>
+<?php if (!Setup\Setup::run($setup)) : ?>
 
 <p>
     <form><input type="submit" value="Reload"></form>
@@ -115,10 +135,10 @@ require $path . 'Permissions.php';
 
 <?php else : ?>
 
-<h2>Next</h2>
+<h2><?php echo count($setup['tasks'])+1 ?>. Next</h2>
 
 <p>
-    <form action="/adminpass"><input type="submit" value="Definition of your administration user" /></form>
+    <form action="/adminpass"><input type="submit" value="Define your administration user" /></form>
 </p>
 
 <?php endif ?>

@@ -16,15 +16,19 @@ $api->put(
     '/store/:key',
     $APIkeyRequired,
     function ($key) use ($api) {
-        $request = json_decode($api->request->getBody(), true);
-        if ($err = JSON::check()) {
-            $api->stopAPI($err, 400);
+        $body = $api->request->getBody();
+
+        try {
+            $request = Core\JSON::decode($body, true);
+        } catch (Exception $e) {
+            $api->stopAPI($e->getMessage() . ': ' . $body, 400);
         }
+
         if (!count($request)) {
             $api->stopAPI('Invalid JSON data', 400);
         }
 
-        $api->db->set('API-'.strtolower($key), $request[0]);
+        $api->db->set('API-'.$key, $request[0]);
         // Set HTTP code 201 for "created"
         $api->response->setStatus(201);
     }
@@ -44,7 +48,7 @@ $api->get(
     '/store/:key',
     $APIkeyRequired,
     function ($key) use ($api) {
-        $api->render(array($key => $api->db->get('API-'.strtolower($key))));
+        $api->render(array($key => $api->db->get('API-'.$key)));
     }
 )
 ->name('GET /store/:key')

@@ -36,10 +36,8 @@ use Slim\Route;
 $loader = PVLng::bootstrap(__DIR__);
 Loader::register($loader, PVLng::$TempDir);
 
-PVLng::$DEBUG = (isset($_SERVER['HTTP_X_DEBUG']) && $_SERVER['HTTP_X_DEBUG']);
-
 // May not exist
-@include PVLng::pathRoot('config', 'hook.php');
+@include PVLng::pathRoot('hook', 'hook.php');
 
 Hook::run('api.load');
 
@@ -58,6 +56,7 @@ Hook::run('api.init', $api);
 $api->Language = 'en';
 $p = explode(DIRECTORY_SEPARATOR, __DIR__);
 $api->version = array_pop($p);
+unset($p);
 
 if (extension_loaded('newrelic')) {
     newrelic_set_appname('PVLng-API-'.$api->version);

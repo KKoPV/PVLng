@@ -15,7 +15,7 @@ abstract class SetupTask
     public $title = 'Setup task ...';
 
     /**
-     * Prepare result array
+     *
      */
     abstract public function process($params);
 
@@ -43,10 +43,14 @@ abstract class SetupTask
         return implode(DIRECTORY_SEPARATOR, func_get_args());
     }
 
+    // -----------------------------------------------------------------------
+    // PROTECTED
+    // -----------------------------------------------------------------------
+
     /**
      *
      */
-    protected $error;
+    protected $error = false;
 
     /**
      *
@@ -59,6 +63,14 @@ abstract class SetupTask
     protected function code($code)
     {
         return '<pre>' . $code . '</pre>';
+    }
+
+    /**
+     *
+     */
+    protected function subTitle()
+    {
+        $this->messages[] = '@' . implode(' ', func_get_args());
     }
 
     /**

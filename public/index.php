@@ -3,9 +3,8 @@
  * Main program file
  *
  * @author     Knut Kohl <github@knutkohl.de>
- * @copyright  2012-2014 Knut Kohl
+ * @copyright  2012 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
- * @version    1.0.0
  */
 
 /**
@@ -46,7 +45,7 @@ if (!file_exists(PVLng::pathRoot('config', 'config.yaml'))) {
 }
 
 // May not exist
-@include PVLng::pathRoot('config', 'hook.php');
+@include PVLng::pathRoot('hook', 'hook.php');
 
 Hook::run('frontend.load');
 
@@ -161,7 +160,8 @@ I18N::setBBCode(new BBCode);
 $app->hook(
     'slim.before.dispatch',
     function () use ($app) {
-        Yryie::Debug('slim.before.dispatch');
+        Yryie::debug('slim.before.dispatch');
+
         $route = $app->Router()->getCurrentRoute();
         $pattern = $route->getPattern();
 
@@ -308,9 +308,9 @@ $app->notFound(function () use ($app) {
 /**
  * Check for upgrade and delete user cache if required
  */
-if ($app->cache->AppVersion != PVLNG_VERSION) {
+if ($app->cache->AppVersion != PVLng::$APP_VERSION) {
     $app->cache->flush();
-    $app->cache->AppVersion = PVLNG_VERSION;
+    $app->cache->AppVersion = PVLng::$APP_VERSION;
 }
 
 // Transform data for view into local format

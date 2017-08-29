@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_tariff"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "Tariff.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "Tariff.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -195,27 +195,25 @@ abstract class TariffBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
         'id'      => '',
         'name'    => '',
         'comment' => ''
-    );
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
         'id'      => false,
         'name'    => false,
         'comment' => false
-    );
+    ];
 
     /**
      *
      */
-    protected $primary = array(
-        'id'
-    );
+    protected $primary = ['id'];
 
     /**
      *

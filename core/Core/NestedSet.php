@@ -20,7 +20,7 @@ class NestedSet
      *
      * Expect for parameter "table" an raay with
      * 't'  => table name
-     * 'n'  => id (primary)
+     * 'n'  => number (primary)
      * 'l'  => left
      * 'r'  => right,
      * 'm'  => moved
@@ -38,23 +38,29 @@ class NestedSet
             $this->error(1);
         }
 
+        $this->db = $db;
+
         $params = array_merge([
                 'table' => null,
                 'lang'  => 'en',
                 'debug' => false
             ], $params);
 
-        $this->db    = $db;
-        $this->table = $params['table'];
+        extract($params, EXTR_PREFIX_ALL, 'p');
+
+        $this->table = $p_table;
 
         // Prepare lock SQL with table name
-        $this->lockSql = 'LOCK TABLES `' . $this->table['t'] . '` WRITE';
-
-        $this->lang    = in_array($params['lang'], ['en', 'de']) ? $params['lang'] : 'en';
-        $this->debug   = $params['debug'];
+        $this->lockSql = 'LOCK TABLES `' . $p_table['t'] . '` WRITE';
 
         // Load lang. specific messages
-        $this->msg = include __DIR__ . DIRECTORY_SEPARATOR . 'NestedSet.' . $this->lang . '.php';
+        if (in_array($p_lang, ['en', 'de'])) {
+            $this->msg = include __DIR__ . DIRECTORY_SEPARATOR . 'NestedSet.' . $p_lang . '.php';
+        } else {
+            $this->msg = include __DIR__ . DIRECTORY_SEPARATOR . 'NestedSet.en.php';
+        }
+
+        $this->debug = $p_debug;
     }
 
     /**
@@ -225,7 +231,7 @@ class NestedSet
      *
      * @param  interger $nodeId   Id of the Node
      * @param  string   $nodeName New Name of the Node
-     * @return boolean          TRUE or FALSE
+     * @return boolean  TRUE or FALSE
      */
     public function renameNode($nodeName, $nodeId)
     {
@@ -255,7 +261,7 @@ class NestedSet
      * Move a Node/Branch LEFT
      *
      * @param  integer $nodeId Id of the Node
-     * @return boolean          TRUE or FALSE
+     * @return boolean TRUE or FALSE
      *
      * @deprecated Swap space with the left Brother
      */
@@ -321,7 +327,7 @@ class NestedSet
      * Move a Node/Branch RIGHT
      *
      * @param  integer $nodeId Id of the Node
-     * @return boolean          TRUE or FALSE
+     * @return boolean TRUE or FALSE
      */
     public function moveRight($nodeId, $required = false)
     {
@@ -387,7 +393,7 @@ class NestedSet
      * Move a Node/Branch UP
      *
      * @param  integer $nodeId Id of the Node
-     * @return boolean          TRUE or FALSE
+     * @return boolean TRUE or FALSE
      */
     public function moveUp($nodeId, $required = false)
     {
@@ -455,7 +461,7 @@ class NestedSet
      * Move a Node/Branch DOWN
      *
      * @param  integer $nodeId Id of the Node
-     * @return boolean          TRUE or FALSE
+     * @return boolean TRUE or FALSE
      */
     public function moveDown($nodeId, $required = false)
     {
@@ -694,11 +700,6 @@ class NestedSet
     protected $db;
 
     /**
-     *
-     */
-    protected $debug = false;
-
-    /**
      * Prebuild lock SQL statement
      *
      * @var string
@@ -711,6 +712,11 @@ class NestedSet
      * @var array
      */
     protected $msg;
+
+    /**
+     *
+     */
+    protected $debug;
 
     /**
      * Query wrapper with flag to lock table for write

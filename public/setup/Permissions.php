@@ -12,7 +12,7 @@ class Permissions extends SetupTask
     /**
      *
      */
-    public $title = 'Check file/directory permissions';
+    public $title = 'File / Directory permissions';
 
     /**
      *

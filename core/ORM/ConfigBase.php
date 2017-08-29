@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_config"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "Config.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "Config.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -108,6 +108,30 @@ abstract class ConfigBase extends ORM
         return $this;
     }
 
+    /**
+     * Basic setter for field "changed"
+     *
+     * @param  mixed    $changed Changed value
+     * @return Instance For fluid interface
+     */
+    public function setChanged($changed)
+    {
+        $this->fields['changed'] = $changed;
+        return $this;
+    }
+
+    /**
+     * Raw setter for field "changed", for INSERT, REPLACE and UPDATE
+     *
+     * @param  mixed    $changed Changed value
+     * @return Instance For fluid interface
+     */
+    public function setChangedRaw($changed)
+    {
+        $this->raw['changed'] = $changed;
+        return $this;
+    }
+
     // -----------------------------------------------------------------------
     // Getter methods
     // -----------------------------------------------------------------------
@@ -140,6 +164,16 @@ abstract class ConfigBase extends ORM
     public function getComment()
     {
         return $this->fields['comment'];
+    }
+
+    /**
+     * Basic getter for field "changed"
+     *
+     * @return mixed Changed value
+     */
+    public function getChanged()
+    {
+        return $this->fields['changed'];
     }
 
     // -----------------------------------------------------------------------
@@ -179,6 +213,17 @@ abstract class ConfigBase extends ORM
         return $this->filter('comment', $comment);
     }
 
+    /**
+     * Filter for field "changed"
+     *
+     * @param  mixed    $changed Filter value
+     * @return Instance For fluid interface
+     */
+    public function filterByChanged($changed)
+    {
+        return $this->filter('changed', $changed);
+    }
+
     // -----------------------------------------------------------------------
     // PROTECTED
     // -----------------------------------------------------------------------
@@ -189,7 +234,8 @@ abstract class ConfigBase extends ORM
     protected function onDuplicateKey()
     {
         return '`value` = VALUES(`value`)
-              , `comment` = VALUES(`comment`)';
+              , `comment` = VALUES(`comment`)
+              , `changed` = VALUES(`changed`)';
     }
 
     /**
@@ -205,9 +251,10 @@ abstract class ConfigBase extends ORM
     // @codingStandardsIgnoreStart
     protected static $createSQL = '
         CREATE TABLE IF NOT EXISTS `pvlng_config` (
-          `key` varchar(50) NOT NULL DEFAULT \'\',
-          `value` varchar(1000) NOT NULL DEFAULT \'\',
+          `key` varchar(64) NOT NULL DEFAULT \'\',
+          `value` varchar(1024) NOT NULL DEFAULT \'\',
           `comment` varchar(255) NOT NULL DEFAULT \'\',
+          `changed` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`key`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 PACK_KEYS=1 COMMENT=\'Application settings\'
     ';
@@ -223,27 +270,27 @@ abstract class ConfigBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
         'key'     => '',
         'value'   => '',
-        'comment' => ''
-    );
+        'comment' => '',
+        'changed' => ''
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
         'key'     => false,
         'value'   => false,
-        'comment' => false
-    );
+        'comment' => false,
+        'changed' => false
+    ];
 
     /**
      *
      */
-    protected $primary = array(
-        'key'
-    );
+    protected $primary = ['key'];
 
     /**
      *

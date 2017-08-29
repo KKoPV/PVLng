@@ -1,6 +1,6 @@
 <!--
 /**
- *
+ * Default main template
  *
  * @author      Knut Kohl <github@knutkohl.de>
  * @copyright   2012-2014 Knut Kohl
@@ -27,11 +27,7 @@
     <meta http-equiv="Content-Script-Type" content="text/javascript">
 
     <script>
-        var messages = [
-            <!-- BEGIN MESSAGESRAW -->
-            { type: '{TYPE}', text: '{MESSAGE}' },
-            <!-- END -->
-        ];
+        <!-- INCLUDE messages.js -->
     </script>
 
     <meta http-equiv="Content-Style-Type" content="text/css" />
@@ -556,7 +552,11 @@
              * Run postponed script actions as last
              */
             pvlng.onFinished.run();
+
         });
+
+        <!-- HOOK body.js -->
+
     </script>
 
     <!-- HOOK body_page_after.html -->

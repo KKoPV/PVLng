@@ -20,13 +20,12 @@ $api->get(
             'Content' => 'Translate this'
         ));
 
-        $q = new DBQuery('pvlng_babelkit');
-
-        $q->get($q->CONCAT('code_set', '"/"', 'code_code'), 'Code')
-          ->get('code_desc', 'Content')
-          ->whereEQ('code_lang', 'en')
-          // Exclude administrative code sets
-          ->whereNotLIKE('code_set', 'code%');
+        $q = DBQuery::factory('pvlng_babelkit')
+            ->get($q->CONCAT('code_set', '"/"', 'code_code'), 'Code')
+            ->get('code_desc', 'Content')
+            ->whereEQ('code_lang', 'en')
+            // Exclude administrative code sets
+            ->whereNotLIKE('code_set', 'code%');
 
         $api->db->setBuffered();
 
@@ -52,7 +51,7 @@ $api->get(
 $api->get(
     '/translate/:language(/:set)',
     function ($language, $set = null) use ($api) {
-        $q = new DBQuery('pvlng_babelkit');
+        $q = DBQuery::factory('pvlng_babelkit');
 
         if ($set) {
             $q->get('code_code', 'code')
@@ -91,9 +90,7 @@ $api->get(
 $api->get(
     '/languages',
     function () use ($api) {
-        $q = new DBQuery('pvlng_babelkit');
-
-        $q->get('DISTINCT code_lang');
+        $q = DBQuery::factory('pvlng_babelkit')->get('DISTINCT code_lang');
 
         $languages = array();
 

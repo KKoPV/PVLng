@@ -17,7 +17,6 @@
         "palanik/corsslim": "^1.1"
     },
     "require-dev": {
-        "malukenho/docheader": "^0.1.5",
         "phpunit/php-invoker": "~1.1",
         "phpunit/phpunit": "4.0.*",
         "squizlabs/php_codesniffer": "^3.0"

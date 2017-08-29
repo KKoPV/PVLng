@@ -2,18 +2,18 @@
 /**
  * Abstract base class for table "pvlng_log"
  *
- * *** NEVER EVER EDIT THIS FILE! ***
- *
- * To extend the functionallity, edit "Log.php"!
- *
- * If you make changes here, they will be lost on next upgrade PVLng!
+ *****************************************************************************
+ *                       NEVER EVER EDIT THIS FILE!
+ *****************************************************************************
+ * To extend functionallity edit "Log.php"
+ * If you make changes here, they will be lost on next upgrade!
  *
  * @author     Knut Kohl <github@knutkohl.de>
  * @copyright  2017 Knut Kohl
  * @license    MIT License (MIT) http://opensource.org/licenses/MIT
  *
- * @author     PVLng ORM class builder
- * @version    1.4.0 / 2016-07-18
+ * @author     ORM class builder
+ * @version    2.0.0 / 2017-08-17
  */
 namespace ORM;
 
@@ -241,29 +241,27 @@ abstract class LogBase extends ORM
     /**
      *
      */
-    protected $fields = array(
+    protected $fields = [
         'id'        => '',
         'timestamp' => '',
         'scope'     => '',
         'data'      => ''
-    );
+    ];
 
     /**
      *
      */
-    protected $nullable = array(
+    protected $nullable = [
         'id'        => false,
         'timestamp' => false,
         'scope'     => false,
         'data'      => true
-    );
+    ];
 
     /**
      *
      */
-    protected $primary = array(
-        'id'
-    );
+    protected $primary = ['id'];
 
     /**
      *
