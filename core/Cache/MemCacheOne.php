@@ -21,7 +21,6 @@ namespace Cache;
  */
 class MemCacheOne extends Cache
 {
-
     /**
      * Default server
      */

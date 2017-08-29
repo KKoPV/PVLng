@@ -21,27 +21,26 @@ namespace Cache;
  */
 class File extends AbstractFile
 {
-
     // -------------------------------------------------------------------------
     // PUBLIC
     // -------------------------------------------------------------------------
 
     /**
-     * Cache availability
+     * Class constructor
      *
-     * @return bool
+     * @param array $settings
+     * @return void
      */
-    public function isAvailable()
+    public function __construct($settings = array())
     {
-        if (parent::isAvailable()) {
-            $this->filename = $this->fileName(__FILE__);
-            // Load cached data
-            if ($data = $this->readFile($this->filename)) {
-                $this->data = $data;
-            }
-            return true;
+        parent::__construct($settings);
+
+        $this->filename = $this->fileName(__FILE__);
+
+        // Load cached data
+        if ($data = $this->readFile($this->filename)) {
+            $this->data = $data;
         }
-        return false;
     }
 
     /**
@@ -102,7 +101,11 @@ class File extends AbstractFile
     {
         // Save only if data was modified
         if ($this->modified) {
-            $this->writeFile($this->filename, $this->data);
+            if (!empty($this->data)) {
+                $this->writeFile($this->filename, $this->data);
+            } else {
+                $this->removeFile($this->filename);
+            }
         }
     } // function __destruct()
 

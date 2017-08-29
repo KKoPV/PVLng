@@ -6,15 +6,18 @@
 run/*
 tmp/*
 custom/
-core/Frontend/View/hook/*
 description.md
-
-!.githold
 
 info.php
 composer.lock
+composer.sh
+
+hook/View/*
+hook/hook.php
 
 /tests
 /vendor
 
 /phpc*
+
+!.githold

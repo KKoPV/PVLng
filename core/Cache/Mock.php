@@ -15,7 +15,6 @@ namespace Cache;
  */
 class Mock extends Cache
 {
-
     // -------------------------------------------------------------------------
     // PUBLIC
     // -------------------------------------------------------------------------
@@ -73,7 +72,7 @@ class Mock extends Cache
      */
     public function flush()
     {
-        $this->data = array();
+        $this->data = [];
         return true;
     }
 
@@ -84,5 +83,5 @@ class Mock extends Cache
     /**
      *
      */
-    protected $data = array();
+    protected $data = [];
 }
